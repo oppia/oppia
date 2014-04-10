@@ -495,15 +495,15 @@ class CheckedProof(BaseObject):
         """Validates and normalizes a raw Python object."""
         # TODO (jacob): This is not being run
         try:
-            assert isinstance(raw.get('assumptionsString'), basestring)
-            assert isinstance(raw.get('targetString'), basestring)
-            assert isinstance(raw.get('proofString'), basestring)
+            assert isinstance(raw.get('assumptions_string'), basestring)
+            assert isinstance(raw.get('target_string'), basestring)
+            assert isinstance(raw.get('proof_string'), basestring)
             assert raw.get('correct') in [True, False]
             if not raw.get('correct'):
-                assert isinstance(raw.get('errorCategory'), basestring)
-                assert isinstance(raw.get('errorCode'), basestring)
-                assert isinstance(raw.get('errorMessage'), basestring)
-                assert isinstance(raw.get('errorLine'), int)
+                assert isinstance(raw.get('error_category'), basestring)
+                assert isinstance(raw.get('error_code'), basestring)
+                assert isinstance(raw.get('error_message'), basestring)
+                assert isinstance(raw.get('error_line_number'), int)
             return copy.deepcopy(raw)
         except Exception:
             raise TypeError('Cannot convert to checked proof %s' % raw)
@@ -522,8 +522,8 @@ class LogicQuestion(BaseObject):
 
         def validateExpression(expression):
             assert isinstance(expression, dict)
-            assert isinstance(expression.get('kind'), basestring)
-            assert isinstance(expression.get('operator'), basestring)
+            assert isinstance(expression.get('top_kind_name'), basestring)
+            assert isinstance(expression.get('top_operator_name'), basestring)
             validateExpressionArray(expression.get('arguments'))
             validateExpressionArray(expression.get('dummies'))
 
@@ -532,42 +532,13 @@ class LogicQuestion(BaseObject):
             for item in array:
                 validateExpression(item)
 
-        def validateTypingElementArray(array):
-            assert isinstance(array, list)
-            for element in array:
-                assert isinstance(element, dict)
-                assert isinstance(element.get('type'), basestring)
-                assert element.get('arbitrarily_many') in [True, False]
-
         try:
-            if isinstance(raw, basestring):
-                assert raw == 'uninitialized'
-                return raw
-            else:
-                assert isinstance(raw, dict)
-                validateExpressionArray(raw.get('assumptions'))
-                validateExpressionArray(raw.get('results'))
-                assert len(raw.get('results')) == 1
+            assert isinstance(raw, dict)
+            validateExpressionArray(raw.get('assumptions'))
+            validateExpressionArray(raw.get('results'))
+            assert isinstance (raw.get('default_proof_string'), basestring)
 
-                assert isinstance(raw.get('language'), dict)
-                operators = raw.get('language').get('operators')
-                assert isinstance(operators, dict)
-                for item in operators:
-                    operator = operators.get(item)
-                    assert isinstance(operator.get('kind'), basestring)
-                    assert isinstance(operator.get('typing'), list)
-                    for typing_rule in operator.get('typing'):
-                        validateTypingElementArray(typing_rule.get('arguments'))
-                        validateTypingElementArray(typing_rule.get('dummies'))
-                        assert isinstance(typing_rule.get('output'), basestring)
-                    # TODO (jacob) uncomment once symbols are mandatory
-                    # assert isinstance(operator.get('symbols'), list)        
-                    # for symbol in operator.get('symbols'):
-                    #     assert isinstance(symbol, basestring)
-
-                assert isinstance (raw.get('defaultProofString'), basestring)
-
-                return copy.deepcopy(raw)
+            return copy.deepcopy(raw)
         except Exception:
             raise TypeError('Cannot convert to a logic question %s' % raw)
 
@@ -581,7 +552,6 @@ class LogicErrorCategory(BaseObject):
 
     @classmethod
     def normalize(cls, raw):
-        logging.warning(raw)
         try:
             assert raw in ['parsing', 'typing', 'line', 'layout', 'variables',
                         'logic', 'target', 'mistake']

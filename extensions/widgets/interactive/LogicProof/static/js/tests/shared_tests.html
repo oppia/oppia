@@ -1,0 +1,36 @@
+<html ng-app>
+  <head>
+    <script src="../lib/angular.min.js"></script>
+    <script src="../generatedParser.js"></script>
+    <script src="../shared.js"></script>
+    <script src="../data.js"></script>
+    <script src="sharedTests.js"></script>
+
+    <script>
+
+    </script>
+  </head>
+
+  <body ng-controller="TestCtrl">
+
+    <table border="0">
+      <tr>
+        <td> <b> Shared tests </b> </td>
+        <td> <a href="teacher_tests.html"> Teacher tests </a> </td>
+        <td> <a href="student_tests.html"> Student tests </a> </td>
+        <td> <a href="end_to_end_tests.html"> End to end tests </a> </td>
+        <td> <a href="../tools/demonstration.html"> Demonstration </a> </td>
+      </tr>
+    </table>
+    <h4>Tests for the shared components of the oppia logic widget.</h4>
+
+    <table>
+      <tr ng-repeat="testResult in testResults">
+        <td> <b>{{testResult.name}} </b></td>
+        <td> {{testResult.expected}} </td>
+        <td> {{testResult.actual}} </td>
+      </tr>
+    <table>
+
+  </body>
+</html>

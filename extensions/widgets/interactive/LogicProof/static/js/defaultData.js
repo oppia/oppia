@@ -1,7 +1,7 @@
-DEFAULT_QUESTION_DATA = {
+LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
   assumptions: [],
   results: [],
-  language: sharedData.BASE_STUDENT_LANGUAGE,
+  language: logicProofData.BASE_STUDENT_LANGUAGE,
   line_templates: [{
     "name": "and_eliminate_left",
     "reader_view": [
@@ -13,18 +13,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -43,8 +43,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -56,18 +56,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -81,8 +81,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -104,18 +104,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -134,8 +134,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -147,18 +147,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -172,8 +172,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -195,8 +195,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -212,8 +212,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -229,18 +229,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -255,8 +255,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -265,8 +265,8 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -277,18 +277,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -313,8 +313,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -330,8 +330,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -347,18 +347,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -373,8 +373,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -383,8 +383,8 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -395,18 +395,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -431,8 +431,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -448,18 +448,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -478,8 +478,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -491,8 +491,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -501,18 +501,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -526,8 +526,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -549,18 +549,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -579,8 +579,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -596,8 +596,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -609,8 +609,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -619,18 +619,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -644,8 +644,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -667,8 +667,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -684,18 +684,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -714,8 +714,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -727,8 +727,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -737,18 +737,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -762,8 +762,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -785,18 +785,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -815,8 +815,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -832,8 +832,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -845,8 +845,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -855,18 +855,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -880,8 +880,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -903,18 +903,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -933,18 +933,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -959,18 +959,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -984,18 +984,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1020,18 +1020,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -1050,18 +1050,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               }
@@ -1076,18 +1076,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1101,18 +1101,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             }
@@ -1137,18 +1137,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -1167,18 +1167,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               }
@@ -1197,18 +1197,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -1223,18 +1223,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1246,18 +1246,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             }
@@ -1271,18 +1271,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1307,18 +1307,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               }
@@ -1337,18 +1337,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -1367,18 +1367,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "iff",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "iff",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               }
@@ -1393,18 +1393,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1416,18 +1416,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             }
@@ -1441,18 +1441,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "iff",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "iff",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1477,8 +1477,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -1491,8 +1491,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -1514,8 +1514,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -1531,18 +1531,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -1561,8 +1561,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -1574,8 +1574,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -1584,18 +1584,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1609,8 +1609,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -1632,18 +1632,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -1662,8 +1662,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -1679,8 +1679,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -1692,8 +1692,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -1702,18 +1702,18 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1727,8 +1727,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -1750,18 +1750,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "implies",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "implies",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -1777,18 +1777,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "implies",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "implies",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -1813,8 +1813,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -1830,12 +1830,12 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "unary_connective",
-            "operator": "not",
+            "top_kind_name": "unary_connective",
+            "top_operator_name": "not",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               }
@@ -1858,8 +1858,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -1868,12 +1868,98 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "unary_connective",
-          "operator": "not",
+          "top_kind_name": "unary_connective",
+          "top_operator_name": "not",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
+              "arguments": [],
+              "dummies": []
+            }
+          ],
+          "dummies": []
+        },
+        "substitutions": [],
+        "type": "boolean"
+      }
+    ],
+    "results": [],
+    "variables": [],
+    "error": []
+  },
+  {
+    "name": "not_eliminate",
+    "reader_view": [
+      {
+        "format": "phrase",
+        "content": "from"
+      },
+      {
+        "format": "expression",
+        "content": {
+          "expression": {
+            "top_kind_name": "unary_connective",
+            "top_operator_name": "not",
+            "arguments": [
+              {
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
+                "arguments": [],
+                "dummies": []
+              }
+            ],
+            "dummies": []
+          },
+          "substitutions": [],
+          "type": "boolean"
+        }
+      },
+      {
+        "format": "phrase",
+        "content": "and"
+      },
+      {
+        "format": "expression",
+        "content": {
+          "expression": {
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
+            "arguments": [],
+            "dummies": []
+          },
+          "substitutions": [],
+          "type": "boolean"
+        }
+      },
+      {
+        "format": "phrase",
+        "content": "have"
+      },
+      {
+        "format": "phrase",
+        "content": "contradiction"
+      }
+    ],
+    "antecedents": [
+      {
+        "expression": {
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
+          "arguments": [],
+          "dummies": []
+        },
+        "substitutions": [],
+        "type": "boolean"
+      },
+      {
+        "expression": {
+          "top_kind_name": "unary_connective",
+          "top_operator_name": "not",
+          "arguments": [
+            {
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             }
@@ -1907,8 +1993,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -1921,8 +2007,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -1944,12 +2030,12 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "unary_connective",
-            "operator": "not",
+            "top_kind_name": "unary_connective",
+            "top_operator_name": "not",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               }
@@ -1965,12 +2051,12 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "unary_connective",
-          "operator": "not",
+          "top_kind_name": "unary_connective",
+          "top_operator_name": "not",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             }
@@ -1995,22 +2081,22 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "or",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "or",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "unary_connective",
-                "operator": "not",
+                "top_kind_name": "unary_connective",
+                "top_operator_name": "not",
                 "arguments": [
                   {
-                    "kind": "variable",
-                    "operator": "R",
+                    "top_kind_name": "variable",
+                    "top_operator_name": "R",
                     "arguments": [],
                     "dummies": []
                   }
@@ -2029,22 +2115,22 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "or",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "or",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "unary_connective",
-              "operator": "not",
+              "top_kind_name": "unary_connective",
+              "top_operator_name": "not",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 }
@@ -2072,18 +2158,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "or",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "or",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -2106,8 +2192,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "T",
+            "top_kind_name": "variable",
+            "top_operator_name": "T",
             "arguments": [],
             "dummies": []
           },
@@ -2119,18 +2205,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "or",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "or",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -2144,8 +2230,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "T",
+          "top_kind_name": "variable",
+          "top_operator_name": "T",
           "arguments": [],
           "dummies": []
         },
@@ -2167,8 +2253,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -2184,18 +2270,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "or",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "or",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -2210,8 +2296,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -2222,18 +2308,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "or",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "or",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -2258,8 +2344,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -2275,18 +2361,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "or",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "or",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -2301,8 +2387,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "S",
+          "top_kind_name": "variable",
+          "top_operator_name": "S",
           "arguments": [],
           "dummies": []
         },
@@ -2313,18 +2399,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "or",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "or",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -2339,6 +2425,40 @@ DEFAULT_QUESTION_DATA = {
     "error": []
   },
   {
+    "name": "take",
+    "reader_view": [
+      {
+        "format": "phrase",
+        "content": "take"
+      },
+      {
+        "format": "expression",
+        "content": {
+          "expression": {
+            "top_kind_name": "variable",
+            "top_operator_name": "a",
+            "arguments": [],
+            "dummies": []
+          },
+          "substitutions": [],
+          "type": "element",
+          "top_kind_name": "variable"
+        }
+      }
+    ],
+    "antecedents": [],
+    "results": [],
+    "variables": [
+      {
+        "top_kind_name": "variable",
+        "top_operator_name": "a",
+        "arguments": [],
+        "dummies": []
+      }
+    ],
+    "error": []
+  },
+  {
     "name": "exists_eliminate",
     "reader_view": [
       {
@@ -2349,20 +2469,20 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "quantifier",
-            "operator": "exists",
+            "top_kind_name": "quantifier",
+            "top_operator_name": "exists",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "p",
+                "top_kind_name": "variable",
+                "top_operator_name": "p",
                 "arguments": [],
                 "dummies": []
               }
             ],
             "dummies": [
               {
-                "kind": "variable",
-                "operator": "x",
+                "top_kind_name": "variable",
+                "top_operator_name": "x",
                 "arguments": [],
                 "dummies": []
               }
@@ -2384,14 +2504,14 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "a",
+            "top_kind_name": "variable",
+            "top_operator_name": "a",
             "arguments": [],
             "dummies": []
           },
           "substitutions": [],
           "type": "element",
-          "kind": "variable"
+          "top_kind_name": "variable"
         }
       },
       {
@@ -2402,16 +2522,16 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "p",
+            "top_kind_name": "variable",
+            "top_operator_name": "p",
             "arguments": [],
             "dummies": []
           },
           "substitutions": [
             {
               "x": {
-                "kind": "variable",
-                "operator": "a",
+                "top_kind_name": "variable",
+                "top_operator_name": "a",
                 "arguments": [],
                 "dummies": []
               }
@@ -2424,20 +2544,20 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "quantifier",
-          "operator": "exists",
+          "top_kind_name": "quantifier",
+          "top_operator_name": "exists",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "p",
+              "top_kind_name": "variable",
+              "top_operator_name": "p",
               "arguments": [],
               "dummies": []
             }
           ],
           "dummies": [
             {
-              "kind": "variable",
-              "operator": "x",
+              "top_kind_name": "variable",
+              "top_operator_name": "x",
               "arguments": [],
               "dummies": []
             }
@@ -2450,16 +2570,16 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "p",
+          "top_kind_name": "variable",
+          "top_operator_name": "p",
           "arguments": [],
           "dummies": []
         },
         "substitutions": [
           {
             "x": {
-              "kind": "variable",
-              "operator": "a",
+              "top_kind_name": "variable",
+              "top_operator_name": "a",
               "arguments": [],
               "dummies": []
             }
@@ -2470,8 +2590,8 @@ DEFAULT_QUESTION_DATA = {
     ],
     "variables": [
       {
-        "kind": "variable",
-        "operator": "a",
+        "top_kind_name": "variable",
+        "top_operator_name": "a",
         "arguments": [],
         "dummies": []
       }
@@ -2489,16 +2609,16 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "p",
+            "top_kind_name": "variable",
+            "top_operator_name": "p",
             "arguments": [],
             "dummies": []
           },
           "substitutions": [
             {
               "x": {
-                "kind": "variable",
-                "operator": "a",
+                "top_kind_name": "variable",
+                "top_operator_name": "a",
                 "arguments": [],
                 "dummies": []
               }
@@ -2515,8 +2635,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "a",
+            "top_kind_name": "variable",
+            "top_operator_name": "a",
             "arguments": [],
             "dummies": []
           },
@@ -2532,20 +2652,20 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "quantifier",
-            "operator": "exists",
+            "top_kind_name": "quantifier",
+            "top_operator_name": "exists",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "p",
+                "top_kind_name": "variable",
+                "top_operator_name": "p",
                 "arguments": [],
                 "dummies": []
               }
             ],
             "dummies": [
               {
-                "kind": "variable",
-                "operator": "x",
+                "top_kind_name": "variable",
+                "top_operator_name": "x",
                 "arguments": [],
                 "dummies": []
               }
@@ -2559,16 +2679,16 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "p",
+          "top_kind_name": "variable",
+          "top_operator_name": "p",
           "arguments": [],
           "dummies": []
         },
         "substitutions": [
           {
             "x": {
-              "kind": "variable",
-              "operator": "a",
+              "top_kind_name": "variable",
+              "top_operator_name": "a",
               "arguments": [],
               "dummies": []
             }
@@ -2580,20 +2700,20 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "quantifier",
-          "operator": "exists",
+          "top_kind_name": "quantifier",
+          "top_operator_name": "exists",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "p",
+              "top_kind_name": "variable",
+              "top_operator_name": "p",
               "arguments": [],
               "dummies": []
             }
           ],
           "dummies": [
             {
-              "kind": "variable",
-              "operator": "x",
+              "top_kind_name": "variable",
+              "top_operator_name": "x",
               "arguments": [],
               "dummies": []
             }
@@ -2605,8 +2725,8 @@ DEFAULT_QUESTION_DATA = {
     ],
     "variables": [
       {
-        "kind": "variable",
-        "operator": "a",
+        "top_kind_name": "variable",
+        "top_operator_name": "a",
         "arguments": [],
         "dummies": []
       }
@@ -2624,20 +2744,20 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "quantifier",
-            "operator": "for_all",
+            "top_kind_name": "quantifier",
+            "top_operator_name": "for_all",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "p",
+                "top_kind_name": "variable",
+                "top_operator_name": "p",
                 "arguments": [],
                 "dummies": []
               }
             ],
             "dummies": [
               {
-                "kind": "variable",
-                "operator": "x",
+                "top_kind_name": "variable",
+                "top_operator_name": "x",
                 "arguments": [],
                 "dummies": []
               }
@@ -2655,8 +2775,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "a",
+            "top_kind_name": "variable",
+            "top_operator_name": "a",
             "arguments": [],
             "dummies": []
           },
@@ -2672,16 +2792,16 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "p",
+            "top_kind_name": "variable",
+            "top_operator_name": "p",
             "arguments": [],
             "dummies": []
           },
           "substitutions": [
             {
               "x": {
-                "kind": "variable",
-                "operator": "a",
+                "top_kind_name": "variable",
+                "top_operator_name": "a",
                 "arguments": [],
                 "dummies": []
               }
@@ -2694,20 +2814,20 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "quantifier",
-          "operator": "for_all",
+          "top_kind_name": "quantifier",
+          "top_operator_name": "for_all",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "p",
+              "top_kind_name": "variable",
+              "top_operator_name": "p",
               "arguments": [],
               "dummies": []
             }
           ],
           "dummies": [
             {
-              "kind": "variable",
-              "operator": "x",
+              "top_kind_name": "variable",
+              "top_operator_name": "x",
               "arguments": [],
               "dummies": []
             }
@@ -2720,16 +2840,16 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "p",
+          "top_kind_name": "variable",
+          "top_operator_name": "p",
           "arguments": [],
           "dummies": []
         },
         "substitutions": [
           {
             "x": {
-              "kind": "variable",
-              "operator": "a",
+              "top_kind_name": "variable",
+              "top_operator_name": "a",
               "arguments": [],
               "dummies": []
             }
@@ -2740,8 +2860,8 @@ DEFAULT_QUESTION_DATA = {
     ],
     "variables": [
       {
-        "kind": "variable",
-        "operator": "a",
+        "top_kind_name": "variable",
+        "top_operator_name": "a",
         "arguments": [],
         "dummies": []
       }
@@ -2755,14 +2875,14 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "a",
+            "top_kind_name": "variable",
+            "top_operator_name": "a",
             "arguments": [],
             "dummies": []
           },
           "substitutions": [],
           "type": "element",
-          "kind": "variable"
+          "top_kind_name": "variable"
         }
       },
       {
@@ -2777,20 +2897,20 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "quantifier",
-            "operator": "for_all",
+            "top_kind_name": "quantifier",
+            "top_operator_name": "for_all",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "p",
+                "top_kind_name": "variable",
+                "top_operator_name": "p",
                 "arguments": [],
                 "dummies": []
               }
             ],
             "dummies": [
               {
-                "kind": "variable",
-                "operator": "x",
+                "top_kind_name": "variable",
+                "top_operator_name": "x",
                 "arguments": [],
                 "dummies": []
               }
@@ -2805,20 +2925,20 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "quantifier",
-          "operator": "for_all",
+          "top_kind_name": "quantifier",
+          "top_operator_name": "for_all",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "p",
+              "top_kind_name": "variable",
+              "top_operator_name": "p",
               "arguments": [],
               "dummies": []
             }
           ],
           "dummies": [
             {
-              "kind": "variable",
-              "operator": "x",
+              "top_kind_name": "variable",
+              "top_operator_name": "x",
               "arguments": [],
               "dummies": []
             }
@@ -2830,8 +2950,8 @@ DEFAULT_QUESTION_DATA = {
     ],
     "variables": [
       {
-        "kind": "variable",
-        "operator": "a",
+        "top_kind_name": "variable",
+        "top_operator_name": "a",
         "arguments": [],
         "dummies": []
       }
@@ -2849,8 +2969,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "a",
+            "top_kind_name": "variable",
+            "top_operator_name": "a",
             "arguments": [],
             "dummies": []
           },
@@ -2863,8 +2983,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [],
     "variables": [
       {
-        "kind": "variable",
-        "operator": "a",
+        "top_kind_name": "variable",
+        "top_operator_name": "a",
         "arguments": [],
         "dummies": []
       }
@@ -2882,8 +3002,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -2895,8 +3015,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -2907,8 +3027,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -2930,8 +3050,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "R",
+            "top_kind_name": "variable",
+            "top_operator_name": "R",
             "arguments": [],
             "dummies": []
           },
@@ -2947,18 +3067,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -2973,8 +3093,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -2985,18 +3105,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -3018,8 +3138,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
@@ -3035,8 +3155,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3052,18 +3172,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "S",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "S",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3088,18 +3208,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "S",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "S",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3118,8 +3238,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3145,8 +3265,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "S",
+            "top_kind_name": "variable",
+            "top_operator_name": "S",
             "arguments": [],
             "dummies": []
           },
@@ -3162,18 +3282,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -3188,8 +3308,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "R",
+          "top_kind_name": "variable",
+          "top_operator_name": "R",
           "arguments": [],
           "dummies": []
         },
@@ -3200,18 +3320,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -3233,8 +3353,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
@@ -3250,8 +3370,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3267,18 +3387,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "S",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "S",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3299,18 +3419,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "S",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "S",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3329,8 +3449,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
@@ -3346,8 +3466,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3363,8 +3483,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3386,8 +3506,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "T",
+            "top_kind_name": "variable",
+            "top_operator_name": "T",
             "arguments": [],
             "dummies": []
           },
@@ -3403,18 +3523,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -3429,8 +3549,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "T",
+          "top_kind_name": "variable",
+          "top_operator_name": "T",
           "arguments": [],
           "dummies": []
         },
@@ -3441,18 +3561,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -3474,18 +3594,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "S",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "S",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3504,8 +3624,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
@@ -3521,8 +3641,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3538,8 +3658,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
@@ -3555,8 +3675,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3572,18 +3692,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "S",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "S",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3612,8 +3732,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "T",
+            "top_kind_name": "variable",
+            "top_operator_name": "T",
             "arguments": [],
             "dummies": []
           },
@@ -3629,8 +3749,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "U",
+            "top_kind_name": "variable",
+            "top_operator_name": "U",
             "arguments": [],
             "dummies": []
           },
@@ -3646,18 +3766,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -3672,8 +3792,8 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "T",
+          "top_kind_name": "variable",
+          "top_operator_name": "T",
           "arguments": [],
           "dummies": []
         },
@@ -3682,8 +3802,8 @@ DEFAULT_QUESTION_DATA = {
       },
       {
         "expression": {
-          "kind": "variable",
-          "operator": "U",
+          "top_kind_name": "variable",
+          "top_operator_name": "U",
           "arguments": [],
           "dummies": []
         },
@@ -3694,18 +3814,18 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -3727,8 +3847,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "T",
+              "top_kind_name": "variable",
+              "top_operator_name": "T",
               "arguments": [],
               "dummies": []
             },
@@ -3744,8 +3864,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "U",
+              "top_kind_name": "variable",
+              "top_operator_name": "U",
               "arguments": [],
               "dummies": []
             },
@@ -3761,18 +3881,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "T",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "T",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "U",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "U",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3801,18 +3921,18 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "binary_connective",
-            "operator": "and",
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "and",
             "arguments": [
               {
-                "kind": "variable",
-                "operator": "R",
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
                 "arguments": [],
                 "dummies": []
               },
               {
-                "kind": "variable",
-                "operator": "S",
+                "top_kind_name": "variable",
+                "top_operator_name": "S",
                 "arguments": [],
                 "dummies": []
               }
@@ -3831,8 +3951,8 @@ DEFAULT_QUESTION_DATA = {
         "format": "expression",
         "content": {
           "expression": {
-            "kind": "variable",
-            "operator": "T",
+            "top_kind_name": "variable",
+            "top_operator_name": "T",
             "arguments": [],
             "dummies": []
           },
@@ -3844,18 +3964,18 @@ DEFAULT_QUESTION_DATA = {
     "antecedents": [
       {
         "expression": {
-          "kind": "binary_connective",
-          "operator": "and",
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "and",
           "arguments": [
             {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
             {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             }
@@ -3869,8 +3989,8 @@ DEFAULT_QUESTION_DATA = {
     "results": [
       {
         "expression": {
-          "kind": "variable",
-          "operator": "T",
+          "top_kind_name": "variable",
+          "top_operator_name": "T",
           "arguments": [],
           "dummies": []
         },
@@ -3889,18 +4009,18 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "binary_connective",
-              "operator": "and",
+              "top_kind_name": "binary_connective",
+              "top_operator_name": "and",
               "arguments": [
                 {
-                  "kind": "variable",
-                  "operator": "R",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
                   "arguments": [],
                   "dummies": []
                 },
                 {
-                  "kind": "variable",
-                  "operator": "S",
+                  "top_kind_name": "variable",
+                  "top_operator_name": "S",
                   "arguments": [],
                   "dummies": []
                 }
@@ -3919,8 +4039,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "R",
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
               "arguments": [],
               "dummies": []
             },
@@ -3936,8 +4056,8 @@ DEFAULT_QUESTION_DATA = {
           "format": "expression",
           "content": {
             "expression": {
-              "kind": "variable",
-              "operator": "S",
+              "top_kind_name": "variable",
+              "top_operator_name": "S",
               "arguments": [],
               "dummies": []
             },
@@ -3966,7 +4086,7 @@ DEFAULT_QUESTION_DATA = {
     contradiction: ['contradiction'],
     at: ['at']
   },
-  general_messages: sharedData.BASE_GENERAL_MESSAGES,
+  general_messages: logicProofData.BASE_GENERAL_MESSAGES,
   mistake_table: [
   {
     "name": "layout",
@@ -3974,23 +4094,23 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "first_line_indented",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
                 },
                 {
-                  "operator": 1,
-                  "kind": "constant",
+                  "top_operator_name": 1,
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -4000,16 +4120,16 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "greater_than",
-              "kind": "binary_relation",
+              "top_operator_name": "greater_than",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4019,8 +4139,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "integer"
                 },
                 {
-                  "operator": 0,
-                  "kind": "constant",
+                  "top_operator_name": 0,
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -4045,20 +4165,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "illegal_indent",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "greater_than",
-              "kind": "binary_relation",
+              "top_operator_name": "greater_than",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4068,23 +4188,23 @@ DEFAULT_QUESTION_DATA = {
                   "type": "integer"
                 },
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -4102,27 +4222,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_scope_creator",
-                  "kind": "prefix_function",
+                  "top_operator_name": "is_scope_creator",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -4155,20 +4275,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "double_indent",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "greater_than",
-              "kind": "binary_relation",
+              "top_operator_name": "greater_than",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4178,27 +4298,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "integer"
                 },
                 {
-                  "operator": "addition",
-                  "kind": "binary_function",
+                  "top_operator_name": "addition",
+                  "top_kind_name": "binary_function",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -4212,8 +4332,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 1,
-                      "kind": "constant",
+                      "top_operator_name": 1,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4227,23 +4347,23 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "is_scope_creator",
-              "kind": "prefix_function",
+              "top_operator_name": "is_scope_creator",
+              "top_kind_name": "prefix_function",
               "arguments": [
                 {
-                  "operator": "subtraction",
-                  "kind": "binary_function",
+                  "top_operator_name": "subtraction",
+                  "top_kind_name": "binary_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
                     },
                     {
-                      "operator": 1,
-                      "kind": "constant",
+                      "top_operator_name": 1,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4269,23 +4389,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4309,31 +4429,31 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_indent_given",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -4347,8 +4467,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'given'",
-                  "kind": "constant",
+                  "top_operator_name": "'given'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -4358,16 +4478,16 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "less_than_or_equals",
-              "kind": "binary_relation",
+              "top_operator_name": "less_than_or_equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4377,23 +4497,23 @@ DEFAULT_QUESTION_DATA = {
                   "type": "integer"
                 },
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -4423,23 +4543,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4460,23 +4580,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4492,28 +4612,28 @@ DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": " should be indented. Then stop indenting once you reach a statement of the form '@x.....' in which the "
+              "content": " should be indented. Then stop indenting once you reach a statement of the form '∀x.....' in which the "
             },
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4537,31 +4657,31 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_indent_assumption",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -4575,8 +4695,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'assumption'",
-                  "kind": "constant",
+                  "top_operator_name": "'assumption'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -4586,16 +4706,16 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "less_than_or_equals",
-              "kind": "binary_relation",
+              "top_operator_name": "less_than_or_equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4605,23 +4725,23 @@ DEFAULT_QUESTION_DATA = {
                   "type": "integer"
                 },
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -4651,23 +4771,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4688,23 +4808,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4725,23 +4845,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4762,23 +4882,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4799,23 +4919,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "subtraction",
-                    "kind": "binary_function",
+                    "top_operator_name": "subtraction",
+                    "top_kind_name": "binary_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": 1,
-                        "kind": "constant",
+                        "top_operator_name": 1,
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -4839,20 +4959,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_deindent_forall_0",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4862,8 +4982,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'for_all_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'for_all_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -4873,20 +4993,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -4896,23 +5016,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -4930,27 +5050,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -4964,8 +5084,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 0,
-                      "kind": "constant",
+                      "top_operator_name": 0,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -4991,12 +5111,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -5013,12 +5133,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -5035,23 +5155,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "entry",
-                "kind": "prefix_function",
+                "top_operator_name": "entry",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": 1,
-                    "kind": "constant",
+                    "top_operator_name": 1,
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
                   },
                   {
-                    "operator": "antecedents",
-                    "kind": "prefix_function",
+                    "top_operator_name": "antecedents",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -5075,20 +5195,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "incorrect_deindent_forall",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5098,8 +5218,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'for_all_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'for_all_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -5109,31 +5229,31 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not_equals",
-              "kind": "binary_relation",
+              "top_operator_name": "not_equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "scoper",
-                      "kind": "prefix_function",
+                      "top_operator_name": "scoper",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -5151,8 +5271,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'given'",
-                  "kind": "constant",
+                  "top_operator_name": "'given'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -5174,27 +5294,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -5219,27 +5339,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -5264,12 +5384,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -5289,20 +5409,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_deindent_for_all_1",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5312,8 +5432,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'for_all_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'for_all_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -5323,20 +5443,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -5346,23 +5466,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -5380,27 +5500,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -5414,8 +5534,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 1,
-                      "kind": "constant",
+                      "top_operator_name": 1,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5441,12 +5561,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -5466,20 +5586,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_deindent_for_all_2",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5489,8 +5609,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'for_all_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'for_all_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -5500,20 +5620,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -5523,23 +5643,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -5557,27 +5677,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "greater_than",
-                  "kind": "binary_relation",
+                  "top_operator_name": "greater_than",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -5591,8 +5711,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 1,
-                      "kind": "constant",
+                      "top_operator_name": 1,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5618,12 +5738,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -5643,20 +5763,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "double_deindent_forall",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5666,8 +5786,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'for_all_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'for_all_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -5677,16 +5797,16 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "less_than",
-              "kind": "binary_relation",
+              "top_operator_name": "less_than",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "indentation",
-                  "kind": "prefix_function",
+                  "top_operator_name": "indentation",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5696,27 +5816,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "integer"
                 },
                 {
-                  "operator": "subtraction",
-                  "kind": "binary_function",
+                  "top_operator_name": "subtraction",
+                  "top_kind_name": "binary_function",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -5730,8 +5850,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 1,
-                      "kind": "constant",
+                      "top_operator_name": 1,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5757,27 +5877,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -5805,20 +5925,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_deindent_implies_0",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5828,8 +5948,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'implies_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'implies_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -5839,20 +5959,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -5862,23 +5982,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -5896,16 +6016,16 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -5915,8 +6035,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 0,
-                      "kind": "constant",
+                      "top_operator_name": 0,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -5942,12 +6062,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -5964,19 +6084,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -5993,19 +6113,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -6025,20 +6145,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_deindent_not_0",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -6048,8 +6168,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'not_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'not_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -6059,20 +6179,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6082,23 +6202,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -6116,16 +6236,16 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6135,8 +6255,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 0,
-                      "kind": "constant",
+                      "top_operator_name": 0,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -6162,12 +6282,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -6184,19 +6304,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -6216,24 +6336,24 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "incorrect_deindent",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "or",
-              "kind": "binary_connective",
+              "top_operator_name": "or",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6243,8 +6363,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'implies_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'implies_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6254,16 +6374,16 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6273,8 +6393,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'not_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'not_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6288,31 +6408,31 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not_equals",
-              "kind": "binary_relation",
+              "top_operator_name": "not_equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "scoper",
-                      "kind": "prefix_function",
+                      "top_operator_name": "scoper",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -6330,8 +6450,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'assumption'",
-                  "kind": "constant",
+                  "top_operator_name": "'assumption'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -6353,27 +6473,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -6398,19 +6518,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -6430,24 +6550,24 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_deindent_1",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "or",
-              "kind": "binary_connective",
+              "top_operator_name": "or",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6457,8 +6577,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'implies_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'implies_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6468,16 +6588,16 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6487,8 +6607,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'not_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'not_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6502,20 +6622,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6525,23 +6645,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -6559,27 +6679,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -6593,8 +6713,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 1,
-                      "kind": "constant",
+                      "top_operator_name": 1,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -6620,19 +6740,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -6652,24 +6772,24 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_deindent_2",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "or",
-              "kind": "binary_connective",
+              "top_operator_name": "or",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6679,8 +6799,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'implies_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'implies_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6690,16 +6810,16 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6709,8 +6829,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'not_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'not_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6724,20 +6844,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6747,23 +6867,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -6781,27 +6901,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "greater_than",
-                  "kind": "binary_relation",
+                  "top_operator_name": "greater_than",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -6815,8 +6935,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 1,
-                      "kind": "constant",
+                      "top_operator_name": 1,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -6842,12 +6962,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -6864,19 +6984,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -6896,24 +7016,24 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "double_deindent_assumption",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "or",
-              "kind": "binary_connective",
+              "top_operator_name": "or",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6923,8 +7043,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'implies_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'implies_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6934,16 +7054,16 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6953,8 +7073,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'not_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'not_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -6968,20 +7088,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "less_than",
-                  "kind": "binary_relation",
+                  "top_operator_name": "less_than",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -6991,27 +7111,27 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "indentation",
-                          "kind": "prefix_function",
+                          "top_operator_name": "indentation",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "subtraction",
-                              "kind": "binary_function",
+                              "top_operator_name": "subtraction",
+                              "top_kind_name": "binary_function",
                               "arguments": [
                                 {
-                                  "operator": "n",
-                                  "kind": "variable",
+                                  "top_operator_name": "n",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": 1,
-                                  "kind": "constant",
+                                  "top_operator_name": 1,
+                                  "top_kind_name": "constant",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -7025,8 +7145,8 @@ DEFAULT_QUESTION_DATA = {
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7040,35 +7160,35 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "scoper",
-                          "kind": "prefix_function",
+                          "top_operator_name": "scoper",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "scoper",
-                              "kind": "prefix_function",
+                              "top_operator_name": "scoper",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "subtraction",
-                                  "kind": "binary_function",
+                                  "top_operator_name": "subtraction",
+                                  "top_kind_name": "binary_function",
                                   "arguments": [
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
                                     },
                                     {
-                                      "operator": 1,
-                                      "kind": "constant",
+                                      "top_operator_name": 1,
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -7090,8 +7210,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'assumption'",
-                      "kind": "constant",
+                      "top_operator_name": "'assumption'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -7112,32 +7232,32 @@ DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "You should only de-indent once here; we are dropping the assumption of "
+              "content": "You should only reduce the level of indentation once here; we are dropping the assumption of "
             },
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -7162,31 +7282,31 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "scoper",
-                        "kind": "prefix_function",
+                        "top_operator_name": "scoper",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "subtraction",
-                            "kind": "binary_function",
+                            "top_operator_name": "subtraction",
+                            "top_kind_name": "binary_function",
                             "arguments": [
                               {
-                                "operator": "n",
-                                "kind": "variable",
+                                "top_operator_name": "n",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
                               },
                               {
-                                "operator": 1,
-                                "kind": "constant",
+                                "top_operator_name": 1,
+                                "top_kind_name": "constant",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
@@ -7218,24 +7338,24 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "double_deindent_given",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "or",
-              "kind": "binary_connective",
+              "top_operator_name": "or",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7245,8 +7365,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'implies_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'implies_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -7256,16 +7376,16 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7275,8 +7395,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'not_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'not_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -7290,20 +7410,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "less_than",
-                  "kind": "binary_relation",
+                  "top_operator_name": "less_than",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7313,27 +7433,27 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "indentation",
-                          "kind": "prefix_function",
+                          "top_operator_name": "indentation",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "subtraction",
-                              "kind": "binary_function",
+                              "top_operator_name": "subtraction",
+                              "top_kind_name": "binary_function",
                               "arguments": [
                                 {
-                                  "operator": "n",
-                                  "kind": "variable",
+                                  "top_operator_name": "n",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": 1,
-                                  "kind": "constant",
+                                  "top_operator_name": 1,
+                                  "top_kind_name": "constant",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -7347,8 +7467,8 @@ DEFAULT_QUESTION_DATA = {
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7362,35 +7482,35 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "scoper",
-                          "kind": "prefix_function",
+                          "top_operator_name": "scoper",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "scoper",
-                              "kind": "prefix_function",
+                              "top_operator_name": "scoper",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "subtraction",
-                                  "kind": "binary_function",
+                                  "top_operator_name": "subtraction",
+                                  "top_kind_name": "binary_function",
                                   "arguments": [
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
                                     },
                                     {
-                                      "operator": 1,
-                                      "kind": "constant",
+                                      "top_operator_name": 1,
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -7412,8 +7532,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'given'",
-                      "kind": "constant",
+                      "top_operator_name": "'given'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -7439,27 +7559,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -7484,31 +7604,31 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "scoper",
-                        "kind": "prefix_function",
+                        "top_operator_name": "scoper",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "subtraction",
-                            "kind": "binary_function",
+                            "top_operator_name": "subtraction",
+                            "top_kind_name": "binary_function",
                             "arguments": [
                               {
-                                "operator": "n",
-                                "kind": "variable",
+                                "top_operator_name": "n",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
                               },
                               {
-                                "operator": 1,
-                                "kind": "constant",
+                                "top_operator_name": 1,
+                                "top_kind_name": "constant",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
@@ -7540,23 +7660,23 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "illegal_first_line",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
                 },
                 {
-                  "operator": 1,
-                  "kind": "constant",
+                  "top_operator_name": 1,
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -7566,20 +7686,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "or",
-              "kind": "binary_connective",
+              "top_operator_name": "or",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7589,8 +7709,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'for_all_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'for_all_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -7600,20 +7720,20 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "or",
-                  "kind": "binary_connective",
+                  "top_operator_name": "or",
+                  "top_kind_name": "binary_connective",
                   "arguments": [
                     {
-                      "operator": "equals",
-                      "kind": "binary_relation",
+                      "top_operator_name": "equals",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "template",
-                          "kind": "prefix_function",
+                          "top_operator_name": "template",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -7623,8 +7743,8 @@ DEFAULT_QUESTION_DATA = {
                           "type": "string"
                         },
                         {
-                          "operator": "'implies_introduce'",
-                          "kind": "constant",
+                          "top_operator_name": "'implies_introduce'",
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "string"
@@ -7634,16 +7754,16 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "equals",
-                      "kind": "binary_relation",
+                      "top_operator_name": "equals",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "template",
-                          "kind": "prefix_function",
+                          "top_operator_name": "template",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -7653,8 +7773,8 @@ DEFAULT_QUESTION_DATA = {
                           "type": "string"
                         },
                         {
-                          "operator": "'not_introduce'",
-                          "kind": "constant",
+                          "top_operator_name": "'not_introduce'",
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "string"
@@ -7692,20 +7812,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "unspecified_variable",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_initializer",
-                  "kind": "prefix_function",
+                  "top_operator_name": "is_initializer",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -7719,27 +7839,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "bounded_exists",
-              "kind": "bounded_quantifier",
+              "top_operator_name": "bounded_exists",
+              "top_kind_name": "bounded_quantifier",
               "arguments": [
                 {
-                  "operator": "is_in",
-                  "kind": "binary_relation",
+                  "top_operator_name": "is_in",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "x",
-                      "kind": "variable",
+                      "top_operator_name": "x",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "formula"
                     },
                     {
-                      "operator": "variables",
-                      "kind": "prefix_function",
+                      "top_operator_name": "variables",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7753,23 +7873,23 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "not",
-                  "kind": "unary_connective",
+                  "top_operator_name": "not",
+                  "top_kind_name": "unary_connective",
                   "arguments": [
                     {
-                      "operator": "is_initialized",
-                      "kind": "prefix_function",
+                      "top_operator_name": "is_initialized",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "x",
-                          "kind": "variable",
+                          "top_operator_name": "x",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "formula"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7785,8 +7905,8 @@ DEFAULT_QUESTION_DATA = {
               ],
               "dummies": [
                 {
-                  "operator": "x",
-                  "kind": "variable",
+                  "top_operator_name": "x",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "formula"
@@ -7807,12 +7927,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -7829,12 +7949,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -7851,12 +7971,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -7876,20 +7996,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "inaccessible_variable",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_initializer",
-                  "kind": "prefix_function",
+                  "top_operator_name": "is_initializer",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -7903,20 +8023,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "not_equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "not_equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -7926,8 +8046,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'for_all_introduce'",
-                      "kind": "constant",
+                      "top_operator_name": "'for_all_introduce'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -7937,27 +8057,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "bounded_exists",
-                  "kind": "bounded_quantifier",
+                  "top_operator_name": "bounded_exists",
+                  "top_kind_name": "bounded_quantifier",
                   "arguments": [
                     {
-                      "operator": "is_in",
-                      "kind": "binary_relation",
+                      "top_operator_name": "is_in",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "x",
-                          "kind": "variable",
+                          "top_operator_name": "x",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "formula"
                         },
                         {
-                          "operator": "variables",
-                          "kind": "prefix_function",
+                          "top_operator_name": "variables",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -7971,23 +8091,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "not",
-                      "kind": "unary_connective",
+                      "top_operator_name": "not",
+                      "top_kind_name": "unary_connective",
                       "arguments": [
                         {
-                          "operator": "is_accessible",
-                          "kind": "prefix_function",
+                          "top_operator_name": "is_accessible",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "x",
-                              "kind": "variable",
+                              "top_operator_name": "x",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "formula"
                             },
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -8003,8 +8123,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   "dummies": [
                     {
-                      "operator": "x",
-                      "kind": "variable",
+                      "top_operator_name": "x",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "formula"
@@ -8029,12 +8149,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8051,24 +8171,24 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper2",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper2",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "initializer",
-                        "kind": "prefix_function",
+                        "top_operator_name": "initializer",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "variable",
-                            "kind": "prefix_function",
+                            "top_operator_name": "variable",
+                            "top_kind_name": "prefix_function",
                             "arguments": [
                               {
-                                "operator": "n",
-                                "kind": "variable",
+                                "top_operator_name": "n",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
@@ -8078,8 +8198,8 @@ DEFAULT_QUESTION_DATA = {
                             "type": "formula"
                           },
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8104,20 +8224,20 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "scoper2",
-                "kind": "prefix_function",
+                "top_operator_name": "scoper2",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "initializer",
-                    "kind": "prefix_function",
+                    "top_operator_name": "initializer",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "variable",
-                        "kind": "prefix_function",
+                        "top_operator_name": "variable",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8127,8 +8247,8 @@ DEFAULT_QUESTION_DATA = {
                         "type": "formula"
                       },
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -8149,12 +8269,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8174,20 +8294,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "incorrect_variable_forall",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8197,8 +8317,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'for_all_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'for_all_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -8208,16 +8328,16 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not_equals",
-              "kind": "binary_relation",
+              "top_operator_name": "not_equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "variable",
-                  "kind": "prefix_function",
+                  "top_operator_name": "variable",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8227,27 +8347,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "formula"
                 },
                 {
-                  "operator": "variable",
-                  "kind": "prefix_function",
+                  "top_operator_name": "variable",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "scoper",
-                      "kind": "prefix_function",
+                      "top_operator_name": "scoper",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -8281,27 +8401,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8326,12 +8446,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8351,20 +8471,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "arbitrary_variable_clash",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8374,8 +8494,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'given'",
-                  "kind": "constant",
+                  "top_operator_name": "'given'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -8385,16 +8505,16 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "is_accessible",
-              "kind": "prefix_function",
+              "top_operator_name": "is_accessible",
+              "top_kind_name": "prefix_function",
               "arguments": [
                 {
-                  "operator": "variable",
-                  "kind": "prefix_function",
+                  "top_operator_name": "variable",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8404,8 +8524,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "formula"
                 },
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -8427,12 +8547,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8452,20 +8572,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "variable_clash",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8475,8 +8595,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'exists_eliminate'",
-                  "kind": "constant",
+                  "top_operator_name": "'exists_eliminate'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -8486,16 +8606,16 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "is_accessible",
-              "kind": "prefix_function",
+              "top_operator_name": "is_accessible",
+              "top_kind_name": "prefix_function",
               "arguments": [
                 {
-                  "operator": "variable",
-                  "kind": "prefix_function",
+                  "top_operator_name": "variable",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8505,8 +8625,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "formula"
                 },
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -8528,12 +8648,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8550,12 +8670,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8572,12 +8692,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8594,12 +8714,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "variable",
-                "kind": "prefix_function",
+                "top_operator_name": "variable",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -8624,27 +8744,27 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_antecedent",
         "occurs": {
-          "operator": "bounded_exists",
-          "kind": "bounded_quantifier",
+          "top_operator_name": "bounded_exists",
+          "top_kind_name": "bounded_quantifier",
           "arguments": [
             {
-              "operator": "is_in",
-              "kind": "binary_relation",
+              "top_operator_name": "is_in",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "A",
-                  "kind": "variable",
+                  "top_operator_name": "A",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "formula"
                 },
                 {
-                  "operator": "antecedents",
-                  "kind": "prefix_function",
+                  "top_operator_name": "antecedents",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8658,23 +8778,23 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_proven",
-                  "kind": "prefix_function",
+                  "top_operator_name": "is_proven",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "A",
-                      "kind": "variable",
+                      "top_operator_name": "A",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "formula"
                     },
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8690,8 +8810,8 @@ DEFAULT_QUESTION_DATA = {
           ],
           "dummies": [
             {
-              "operator": "A",
-              "kind": "variable",
+              "top_operator_name": "A",
+              "top_kind_name": "variable",
               "arguments": [],
               "dummies": [],
               "type": "formula"
@@ -8708,27 +8828,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "min",
-                "kind": "ranged_function",
+                "top_operator_name": "min",
+                "top_kind_name": "ranged_function",
                 "arguments": [
                   {
-                    "operator": "is_in",
-                    "kind": "binary_relation",
+                    "top_operator_name": "is_in",
+                    "top_kind_name": "binary_relation",
                     "arguments": [
                       {
-                        "operator": "A",
-                        "kind": "variable",
+                        "top_operator_name": "A",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "formula"
                       },
                       {
-                        "operator": "antecedents",
-                        "kind": "prefix_function",
+                        "top_operator_name": "antecedents",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8742,23 +8862,23 @@ DEFAULT_QUESTION_DATA = {
                     "type": "boolean"
                   },
                   {
-                    "operator": "not",
-                    "kind": "unary_connective",
+                    "top_operator_name": "not",
+                    "top_kind_name": "unary_connective",
                     "arguments": [
                       {
-                        "operator": "is_proven",
-                        "kind": "prefix_function",
+                        "top_operator_name": "is_proven",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "A",
-                            "kind": "variable",
+                            "top_operator_name": "A",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "formula"
                           },
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8774,8 +8894,8 @@ DEFAULT_QUESTION_DATA = {
                 ],
                 "dummies": [
                   {
-                    "operator": "A",
-                    "kind": "variable",
+                    "top_operator_name": "A",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "formula"
@@ -8791,27 +8911,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "min",
-                "kind": "ranged_function",
+                "top_operator_name": "min",
+                "top_kind_name": "ranged_function",
                 "arguments": [
                   {
-                    "operator": "is_in",
-                    "kind": "binary_relation",
+                    "top_operator_name": "is_in",
+                    "top_kind_name": "binary_relation",
                     "arguments": [
                       {
-                        "operator": "A",
-                        "kind": "variable",
+                        "top_operator_name": "A",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "formula"
                       },
                       {
-                        "operator": "antecedents",
-                        "kind": "prefix_function",
+                        "top_operator_name": "antecedents",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8825,23 +8945,23 @@ DEFAULT_QUESTION_DATA = {
                     "type": "boolean"
                   },
                   {
-                    "operator": "not",
-                    "kind": "unary_connective",
+                    "top_operator_name": "not",
+                    "top_kind_name": "unary_connective",
                     "arguments": [
                       {
-                        "operator": "is_proven",
-                        "kind": "prefix_function",
+                        "top_operator_name": "is_proven",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "A",
-                            "kind": "variable",
+                            "top_operator_name": "A",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "formula"
                           },
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8857,8 +8977,8 @@ DEFAULT_QUESTION_DATA = {
                 ],
                 "dummies": [
                   {
-                    "operator": "A",
-                    "kind": "variable",
+                    "top_operator_name": "A",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "formula"
@@ -8877,27 +8997,27 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "inaccessible_antecedent",
         "occurs": {
-          "operator": "bounded_exists",
-          "kind": "bounded_quantifier",
+          "top_operator_name": "bounded_exists",
+          "top_kind_name": "bounded_quantifier",
           "arguments": [
             {
-              "operator": "is_in",
-              "kind": "binary_relation",
+              "top_operator_name": "is_in",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "A",
-                  "kind": "variable",
+                  "top_operator_name": "A",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "formula"
                 },
                 {
-                  "operator": "antecedents",
-                  "kind": "prefix_function",
+                  "top_operator_name": "antecedents",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8911,23 +9031,23 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_available",
-                  "kind": "prefix_function",
+                  "top_operator_name": "is_available",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "A",
-                      "kind": "variable",
+                      "top_operator_name": "A",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "formula"
                     },
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -8943,8 +9063,8 @@ DEFAULT_QUESTION_DATA = {
           ],
           "dummies": [
             {
-              "operator": "A",
-              "kind": "variable",
+              "top_operator_name": "A",
+              "top_kind_name": "variable",
               "arguments": [],
               "dummies": [],
               "type": "formula"
@@ -8961,27 +9081,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "min",
-                "kind": "ranged_function",
+                "top_operator_name": "min",
+                "top_kind_name": "ranged_function",
                 "arguments": [
                   {
-                    "operator": "is_in",
-                    "kind": "binary_relation",
+                    "top_operator_name": "is_in",
+                    "top_kind_name": "binary_relation",
                     "arguments": [
                       {
-                        "operator": "A",
-                        "kind": "variable",
+                        "top_operator_name": "A",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "formula"
                       },
                       {
-                        "operator": "antecedents",
-                        "kind": "prefix_function",
+                        "top_operator_name": "antecedents",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -8995,23 +9115,23 @@ DEFAULT_QUESTION_DATA = {
                     "type": "boolean"
                   },
                   {
-                    "operator": "not",
-                    "kind": "unary_connective",
+                    "top_operator_name": "not",
+                    "top_kind_name": "unary_connective",
                     "arguments": [
                       {
-                        "operator": "is_available",
-                        "kind": "prefix_function",
+                        "top_operator_name": "is_available",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "A",
-                            "kind": "variable",
+                            "top_operator_name": "A",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "formula"
                           },
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -9027,8 +9147,8 @@ DEFAULT_QUESTION_DATA = {
                 ],
                 "dummies": [
                   {
-                    "operator": "A",
-                    "kind": "variable",
+                    "top_operator_name": "A",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "formula"
@@ -9044,39 +9164,39 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "prover",
-                        "kind": "prefix_function",
+                        "top_operator_name": "prover",
+                        "top_kind_name": "prefix_function",
                         "arguments": [
                           {
-                            "operator": "min",
-                            "kind": "ranged_function",
+                            "top_operator_name": "min",
+                            "top_kind_name": "ranged_function",
                             "arguments": [
                               {
-                                "operator": "is_in",
-                                "kind": "binary_relation",
+                                "top_operator_name": "is_in",
+                                "top_kind_name": "binary_relation",
                                 "arguments": [
                                   {
-                                    "operator": "A",
-                                    "kind": "variable",
+                                    "top_operator_name": "A",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "formula"
                                   },
                                   {
-                                    "operator": "antecedents",
-                                    "kind": "prefix_function",
+                                    "top_operator_name": "antecedents",
+                                    "top_kind_name": "prefix_function",
                                     "arguments": [
                                       {
-                                        "operator": "n",
-                                        "kind": "variable",
+                                        "top_operator_name": "n",
+                                        "top_kind_name": "variable",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "integer"
@@ -9090,23 +9210,23 @@ DEFAULT_QUESTION_DATA = {
                                 "type": "boolean"
                               },
                               {
-                                "operator": "not",
-                                "kind": "unary_connective",
+                                "top_operator_name": "not",
+                                "top_kind_name": "unary_connective",
                                 "arguments": [
                                   {
-                                    "operator": "is_available",
-                                    "kind": "prefix_function",
+                                    "top_operator_name": "is_available",
+                                    "top_kind_name": "prefix_function",
                                     "arguments": [
                                       {
-                                        "operator": "A",
-                                        "kind": "variable",
+                                        "top_operator_name": "A",
+                                        "top_kind_name": "variable",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "formula"
                                       },
                                       {
-                                        "operator": "n",
-                                        "kind": "variable",
+                                        "top_operator_name": "n",
+                                        "top_kind_name": "variable",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "integer"
@@ -9122,8 +9242,8 @@ DEFAULT_QUESTION_DATA = {
                             ],
                             "dummies": [
                               {
-                                "operator": "A",
-                                "kind": "variable",
+                                "top_operator_name": "A",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "formula"
@@ -9132,8 +9252,8 @@ DEFAULT_QUESTION_DATA = {
                             "type": "formula"
                           },
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -9161,16 +9281,16 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "missing_false",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "needs_false",
-              "kind": "prefix_function",
+              "top_operator_name": "needs_false",
+              "top_kind_name": "prefix_function",
               "arguments": [
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -9180,27 +9300,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "bounded_exists",
-                  "kind": "bounded_quantifier",
+                  "top_operator_name": "bounded_exists",
+                  "top_kind_name": "bounded_quantifier",
                   "arguments": [
                     {
-                      "operator": "less_than",
-                      "kind": "binary_relation",
+                      "top_operator_name": "less_than",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "k",
-                          "kind": "variable",
+                          "top_operator_name": "k",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -9210,12 +9330,12 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "yields_false",
-                      "kind": "prefix_function",
+                      "top_operator_name": "yields_false",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "k",
-                          "kind": "variable",
+                          "top_operator_name": "k",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -9227,8 +9347,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   "dummies": [
                     {
-                      "operator": "k",
-                      "kind": "variable",
+                      "top_operator_name": "k",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -9256,16 +9376,16 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "inaccessible_false",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "needs_false",
-              "kind": "prefix_function",
+              "top_operator_name": "needs_false",
+              "top_kind_name": "prefix_function",
               "arguments": [
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -9275,27 +9395,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "bounded_exists",
-                  "kind": "bounded_quantifier",
+                  "top_operator_name": "bounded_exists",
+                  "top_kind_name": "bounded_quantifier",
                   "arguments": [
                     {
-                      "operator": "less_than",
-                      "kind": "binary_relation",
+                      "top_operator_name": "less_than",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "k",
-                          "kind": "variable",
+                          "top_operator_name": "k",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -9305,16 +9425,16 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "and",
-                      "kind": "binary_connective",
+                      "top_operator_name": "and",
+                      "top_kind_name": "binary_connective",
                       "arguments": [
                         {
-                          "operator": "yields_false",
-                          "kind": "prefix_function",
+                          "top_operator_name": "yields_false",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "k",
-                              "kind": "variable",
+                              "top_operator_name": "k",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -9324,19 +9444,19 @@ DEFAULT_QUESTION_DATA = {
                           "type": "boolean"
                         },
                         {
-                          "operator": "is_in_scope",
-                          "kind": "prefix_function",
+                          "top_operator_name": "is_in_scope",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "k",
-                              "kind": "variable",
+                              "top_operator_name": "k",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -9352,8 +9472,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   "dummies": [
                     {
-                      "operator": "k",
-                      "kind": "variable",
+                      "top_operator_name": "k",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -9378,23 +9498,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "max",
-                "kind": "ranged_function",
+                "top_operator_name": "max",
+                "top_kind_name": "ranged_function",
                 "arguments": [
                   {
-                    "operator": "less_than",
-                    "kind": "binary_relation",
+                    "top_operator_name": "less_than",
+                    "top_kind_name": "binary_relation",
                     "arguments": [
                       {
-                        "operator": "k",
-                        "kind": "variable",
+                        "top_operator_name": "k",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
                       },
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -9404,12 +9524,12 @@ DEFAULT_QUESTION_DATA = {
                     "type": "boolean"
                   },
                   {
-                    "operator": "yields_false",
-                    "kind": "prefix_function",
+                    "top_operator_name": "yields_false",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "k",
-                        "kind": "variable",
+                        "top_operator_name": "k",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -9421,8 +9541,8 @@ DEFAULT_QUESTION_DATA = {
                 ],
                 "dummies": [
                   {
-                    "operator": "k",
-                    "kind": "variable",
+                    "top_operator_name": "k",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -9441,20 +9561,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "for_all_incorrect_conclusion",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -9464,8 +9584,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'for_all_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'for_all_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -9475,31 +9595,31 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_in",
-                  "kind": "binary_relation",
+                  "top_operator_name": "is_in",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "substitute",
-                      "kind": "prefix_function",
+                      "top_operator_name": "substitute",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "element",
-                          "kind": "prefix_function",
+                          "top_operator_name": "element",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "'p'",
-                              "kind": "constant",
+                              "top_operator_name": "'p'",
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "string"
                             },
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -9509,19 +9629,19 @@ DEFAULT_QUESTION_DATA = {
                           "type": "formula"
                         },
                         {
-                          "operator": "element",
-                          "kind": "prefix_function",
+                          "top_operator_name": "element",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "'x'",
-                              "kind": "constant",
+                              "top_operator_name": "'x'",
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "string"
                             },
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -9531,19 +9651,19 @@ DEFAULT_QUESTION_DATA = {
                           "type": "formula"
                         },
                         {
-                          "operator": "element",
-                          "kind": "prefix_function",
+                          "top_operator_name": "element",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "'a'",
-                              "kind": "constant",
+                              "top_operator_name": "'a'",
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "string"
                             },
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -9557,23 +9677,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "formula"
                     },
                     {
-                      "operator": "results",
-                      "kind": "prefix_function",
+                      "top_operator_name": "results",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -9607,23 +9727,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "substitute",
-                "kind": "prefix_function",
+                "top_operator_name": "substitute",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "element",
-                    "kind": "prefix_function",
+                    "top_operator_name": "element",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "'p'",
-                        "kind": "constant",
+                        "top_operator_name": "'p'",
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "string"
                       },
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -9633,19 +9753,19 @@ DEFAULT_QUESTION_DATA = {
                     "type": "formula"
                   },
                   {
-                    "operator": "element",
-                    "kind": "prefix_function",
+                    "top_operator_name": "element",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "'x'",
-                        "kind": "constant",
+                        "top_operator_name": "'x'",
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "string"
                       },
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -9655,19 +9775,19 @@ DEFAULT_QUESTION_DATA = {
                     "type": "formula"
                   },
                   {
-                    "operator": "element",
-                    "kind": "prefix_function",
+                    "top_operator_name": "element",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "'a'",
-                        "kind": "constant",
+                        "top_operator_name": "'a'",
+                        "top_kind_name": "constant",
                         "arguments": [],
                         "dummies": [],
                         "type": "string"
                       },
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -9691,20 +9811,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "implies_incorrect_conclusion",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -9714,8 +9834,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'implies_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'implies_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -9725,27 +9845,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_in",
-                  "kind": "binary_relation",
+                  "top_operator_name": "is_in",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "element",
-                      "kind": "prefix_function",
+                      "top_operator_name": "element",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "'S'",
-                          "kind": "constant",
+                          "top_operator_name": "'S'",
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "string"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -9755,23 +9875,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "formula"
                     },
                     {
-                      "operator": "results",
-                      "kind": "prefix_function",
+                      "top_operator_name": "results",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -9805,12 +9925,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -9827,19 +9947,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -9856,19 +9976,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -9888,20 +10008,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "implies_incorrect_assumption",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -9911,8 +10031,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'implies_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'implies_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -9922,23 +10042,23 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not_equals",
-              "kind": "binary_relation",
+              "top_operator_name": "not_equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "element",
-                  "kind": "prefix_function",
+                  "top_operator_name": "element",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "'R'",
-                      "kind": "constant",
+                      "top_operator_name": "'R'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
                     },
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -9948,27 +10068,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "formula"
                 },
                 {
-                  "operator": "result",
-                  "kind": "prefix_function",
+                  "top_operator_name": "result",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "scoper",
-                      "kind": "prefix_function",
+                      "top_operator_name": "scoper",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -10002,27 +10122,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -10047,19 +10167,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -10076,27 +10196,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -10121,19 +10241,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -10153,20 +10273,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "not_incorrect_conclusion",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -10176,8 +10296,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'not_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'not_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -10187,27 +10307,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "yields_false",
-                  "kind": "prefix_function",
+                  "top_operator_name": "yields_false",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "subtraction",
-                      "kind": "binary_function",
+                      "top_operator_name": "subtraction",
+                      "top_kind_name": "binary_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": 1,
-                          "kind": "constant",
+                          "top_operator_name": 1,
+                          "top_kind_name": "constant",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -10237,12 +10357,12 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -10259,19 +10379,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -10291,20 +10411,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "not_incorrect_assumption",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -10314,8 +10434,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'not_introduce'",
-                  "kind": "constant",
+                  "top_operator_name": "'not_introduce'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -10325,23 +10445,23 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not_equals",
-              "kind": "binary_relation",
+              "top_operator_name": "not_equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "element",
-                  "kind": "prefix_function",
+                  "top_operator_name": "element",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "'R'",
-                      "kind": "constant",
+                      "top_operator_name": "'R'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
                     },
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -10351,27 +10471,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "formula"
                 },
                 {
-                  "operator": "result",
-                  "kind": "prefix_function",
+                  "top_operator_name": "result",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "scoper",
-                      "kind": "prefix_function",
+                      "top_operator_name": "scoper",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "subtraction",
-                          "kind": "binary_function",
+                          "top_operator_name": "subtraction",
+                          "top_kind_name": "binary_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": 1,
-                              "kind": "constant",
+                              "top_operator_name": 1,
+                              "top_kind_name": "constant",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -10405,27 +10525,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -10450,27 +10570,27 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "subtraction",
-                        "kind": "binary_function",
+                        "top_operator_name": "subtraction",
+                        "top_kind_name": "binary_function",
                         "arguments": [
                           {
-                            "operator": "n",
-                            "kind": "variable",
+                            "top_operator_name": "n",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
                           },
                           {
-                            "operator": 1,
-                            "kind": "constant",
+                            "top_operator_name": 1,
+                            "top_kind_name": "constant",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -10498,20 +10618,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "or_missing_antecedent_both",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -10521,8 +10641,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'or_eliminate'",
-                  "kind": "constant",
+                  "top_operator_name": "'or_eliminate'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -10532,31 +10652,31 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "not",
-                  "kind": "unary_connective",
+                  "top_operator_name": "not",
+                  "top_kind_name": "unary_connective",
                   "arguments": [
                     {
-                      "operator": "bounded_exists",
-                      "kind": "bounded_quantifier",
+                      "top_operator_name": "bounded_exists",
+                      "top_kind_name": "bounded_quantifier",
                       "arguments": [
                         {
-                          "operator": "less_than",
-                          "kind": "binary_relation",
+                          "top_operator_name": "less_than",
+                          "top_kind_name": "binary_relation",
                           "arguments": [
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -10566,23 +10686,23 @@ DEFAULT_QUESTION_DATA = {
                           "type": "boolean"
                         },
                         {
-                          "operator": "bounded_exists",
-                          "kind": "bounded_quantifier",
+                          "top_operator_name": "bounded_exists",
+                          "top_kind_name": "bounded_quantifier",
                           "arguments": [
                             {
-                              "operator": "less_than",
-                              "kind": "binary_relation",
+                              "top_operator_name": "less_than",
+                              "top_kind_name": "binary_relation",
                               "arguments": [
                                 {
-                                  "operator": "i",
-                                  "kind": "variable",
+                                  "top_operator_name": "i",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": "j",
-                                  "kind": "variable",
+                                  "top_operator_name": "j",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -10592,23 +10712,23 @@ DEFAULT_QUESTION_DATA = {
                               "type": "boolean"
                             },
                             {
-                              "operator": "is_implication",
-                              "kind": "prefix_function",
+                              "top_operator_name": "is_implication",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'R'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'R'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -10618,19 +10738,19 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'T'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'T'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -10640,15 +10760,15 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "i",
-                                  "kind": "variable",
+                                  "top_operator_name": "i",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": "j",
-                                  "kind": "variable",
+                                  "top_operator_name": "j",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -10660,8 +10780,8 @@ DEFAULT_QUESTION_DATA = {
                           ],
                           "dummies": [
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -10672,8 +10792,8 @@ DEFAULT_QUESTION_DATA = {
                       ],
                       "dummies": [
                         {
-                          "operator": "j",
-                          "kind": "variable",
+                          "top_operator_name": "j",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -10686,27 +10806,27 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "not",
-                  "kind": "unary_connective",
+                  "top_operator_name": "not",
+                  "top_kind_name": "unary_connective",
                   "arguments": [
                     {
-                      "operator": "bounded_exists",
-                      "kind": "bounded_quantifier",
+                      "top_operator_name": "bounded_exists",
+                      "top_kind_name": "bounded_quantifier",
                       "arguments": [
                         {
-                          "operator": "less_than",
-                          "kind": "binary_relation",
+                          "top_operator_name": "less_than",
+                          "top_kind_name": "binary_relation",
                           "arguments": [
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -10716,23 +10836,23 @@ DEFAULT_QUESTION_DATA = {
                           "type": "boolean"
                         },
                         {
-                          "operator": "bounded_exists",
-                          "kind": "bounded_quantifier",
+                          "top_operator_name": "bounded_exists",
+                          "top_kind_name": "bounded_quantifier",
                           "arguments": [
                             {
-                              "operator": "less_than",
-                              "kind": "binary_relation",
+                              "top_operator_name": "less_than",
+                              "top_kind_name": "binary_relation",
                               "arguments": [
                                 {
-                                  "operator": "i",
-                                  "kind": "variable",
+                                  "top_operator_name": "i",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": "j",
-                                  "kind": "variable",
+                                  "top_operator_name": "j",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -10742,23 +10862,23 @@ DEFAULT_QUESTION_DATA = {
                               "type": "boolean"
                             },
                             {
-                              "operator": "is_implication",
-                              "kind": "prefix_function",
+                              "top_operator_name": "is_implication",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'S'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'S'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -10768,19 +10888,19 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'T'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'T'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -10790,15 +10910,15 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "i",
-                                  "kind": "variable",
+                                  "top_operator_name": "i",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": "j",
-                                  "kind": "variable",
+                                  "top_operator_name": "j",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -10810,8 +10930,8 @@ DEFAULT_QUESTION_DATA = {
                           ],
                           "dummies": [
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -10822,8 +10942,8 @@ DEFAULT_QUESTION_DATA = {
                       ],
                       "dummies": [
                         {
-                          "operator": "j",
-                          "kind": "variable",
+                          "top_operator_name": "j",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -10852,19 +10972,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'T'",
-                    "kind": "constant",
+                    "top_operator_name": "'T'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -10881,23 +11001,23 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "entry",
-                "kind": "prefix_function",
+                "top_operator_name": "entry",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": 1,
-                    "kind": "constant",
+                    "top_operator_name": 1,
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
                   },
                   {
-                    "operator": "antecedents",
-                    "kind": "prefix_function",
+                    "top_operator_name": "antecedents",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -10918,19 +11038,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -10947,19 +11067,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -10976,19 +11096,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11005,19 +11125,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'T'",
-                    "kind": "constant",
+                    "top_operator_name": "'T'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11034,19 +11154,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11063,19 +11183,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11092,19 +11212,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'T'",
-                    "kind": "constant",
+                    "top_operator_name": "'T'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11124,20 +11244,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "or_missing_antecedent_left",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -11147,8 +11267,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'or_eliminate'",
-                  "kind": "constant",
+                  "top_operator_name": "'or_eliminate'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -11158,27 +11278,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "bounded_exists",
-                  "kind": "bounded_quantifier",
+                  "top_operator_name": "bounded_exists",
+                  "top_kind_name": "bounded_quantifier",
                   "arguments": [
                     {
-                      "operator": "less_than",
-                      "kind": "binary_relation",
+                      "top_operator_name": "less_than",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "j",
-                          "kind": "variable",
+                          "top_operator_name": "j",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -11188,23 +11308,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "bounded_exists",
-                      "kind": "bounded_quantifier",
+                      "top_operator_name": "bounded_exists",
+                      "top_kind_name": "bounded_quantifier",
                       "arguments": [
                         {
-                          "operator": "less_than",
-                          "kind": "binary_relation",
+                          "top_operator_name": "less_than",
+                          "top_kind_name": "binary_relation",
                           "arguments": [
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -11214,23 +11334,23 @@ DEFAULT_QUESTION_DATA = {
                           "type": "boolean"
                         },
                         {
-                          "operator": "is_implication",
-                          "kind": "prefix_function",
+                          "top_operator_name": "is_implication",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "element",
-                              "kind": "prefix_function",
+                              "top_operator_name": "element",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "'R'",
-                                  "kind": "constant",
+                                  "top_operator_name": "'R'",
+                                  "top_kind_name": "constant",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "string"
                                 },
                                 {
-                                  "operator": "n",
-                                  "kind": "variable",
+                                  "top_operator_name": "n",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -11240,19 +11360,19 @@ DEFAULT_QUESTION_DATA = {
                               "type": "formula"
                             },
                             {
-                              "operator": "element",
-                              "kind": "prefix_function",
+                              "top_operator_name": "element",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "'T'",
-                                  "kind": "constant",
+                                  "top_operator_name": "'T'",
+                                  "top_kind_name": "constant",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "string"
                                 },
                                 {
-                                  "operator": "n",
-                                  "kind": "variable",
+                                  "top_operator_name": "n",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -11262,15 +11382,15 @@ DEFAULT_QUESTION_DATA = {
                               "type": "formula"
                             },
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -11282,8 +11402,8 @@ DEFAULT_QUESTION_DATA = {
                       ],
                       "dummies": [
                         {
-                          "operator": "i",
-                          "kind": "variable",
+                          "top_operator_name": "i",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -11294,8 +11414,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   "dummies": [
                     {
-                      "operator": "j",
-                      "kind": "variable",
+                      "top_operator_name": "j",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -11320,19 +11440,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'T'",
-                    "kind": "constant",
+                    "top_operator_name": "'T'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11349,19 +11469,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11378,19 +11498,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11410,20 +11530,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "or_missing_antecedent_right",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -11433,8 +11553,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'or_eliminate'",
-                  "kind": "constant",
+                  "top_operator_name": "'or_eliminate'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -11444,27 +11564,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "bounded_exists",
-                  "kind": "bounded_quantifier",
+                  "top_operator_name": "bounded_exists",
+                  "top_kind_name": "bounded_quantifier",
                   "arguments": [
                     {
-                      "operator": "less_than",
-                      "kind": "binary_relation",
+                      "top_operator_name": "less_than",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "j",
-                          "kind": "variable",
+                          "top_operator_name": "j",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -11474,23 +11594,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "bounded_exists",
-                      "kind": "bounded_quantifier",
+                      "top_operator_name": "bounded_exists",
+                      "top_kind_name": "bounded_quantifier",
                       "arguments": [
                         {
-                          "operator": "less_than",
-                          "kind": "binary_relation",
+                          "top_operator_name": "less_than",
+                          "top_kind_name": "binary_relation",
                           "arguments": [
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -11500,23 +11620,23 @@ DEFAULT_QUESTION_DATA = {
                           "type": "boolean"
                         },
                         {
-                          "operator": "is_implication",
-                          "kind": "prefix_function",
+                          "top_operator_name": "is_implication",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "element",
-                              "kind": "prefix_function",
+                              "top_operator_name": "element",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "'S'",
-                                  "kind": "constant",
+                                  "top_operator_name": "'S'",
+                                  "top_kind_name": "constant",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "string"
                                 },
                                 {
-                                  "operator": "n",
-                                  "kind": "variable",
+                                  "top_operator_name": "n",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -11526,19 +11646,19 @@ DEFAULT_QUESTION_DATA = {
                               "type": "formula"
                             },
                             {
-                              "operator": "element",
-                              "kind": "prefix_function",
+                              "top_operator_name": "element",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "'T'",
-                                  "kind": "constant",
+                                  "top_operator_name": "'T'",
+                                  "top_kind_name": "constant",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "string"
                                 },
                                 {
-                                  "operator": "n",
-                                  "kind": "variable",
+                                  "top_operator_name": "n",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -11548,15 +11668,15 @@ DEFAULT_QUESTION_DATA = {
                               "type": "formula"
                             },
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -11568,8 +11688,8 @@ DEFAULT_QUESTION_DATA = {
                       ],
                       "dummies": [
                         {
-                          "operator": "i",
-                          "kind": "variable",
+                          "top_operator_name": "i",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -11580,8 +11700,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   "dummies": [
                     {
-                      "operator": "j",
-                      "kind": "variable",
+                      "top_operator_name": "j",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -11606,19 +11726,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'T'",
-                    "kind": "constant",
+                    "top_operator_name": "'T'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11635,19 +11755,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11664,19 +11784,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -11696,20 +11816,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "or_inaccessible_antecedent_left",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -11719,8 +11839,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'or_eliminate'",
-                  "kind": "constant",
+                  "top_operator_name": "'or_eliminate'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -11730,27 +11850,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "bounded_exists",
-                  "kind": "bounded_quantifier",
+                  "top_operator_name": "bounded_exists",
+                  "top_kind_name": "bounded_quantifier",
                   "arguments": [
                     {
-                      "operator": "less_than",
-                      "kind": "binary_relation",
+                      "top_operator_name": "less_than",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "j",
-                          "kind": "variable",
+                          "top_operator_name": "j",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -11760,23 +11880,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "bounded_exists",
-                      "kind": "bounded_quantifier",
+                      "top_operator_name": "bounded_exists",
+                      "top_kind_name": "bounded_quantifier",
                       "arguments": [
                         {
-                          "operator": "less_than",
-                          "kind": "binary_relation",
+                          "top_operator_name": "less_than",
+                          "top_kind_name": "binary_relation",
                           "arguments": [
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -11786,27 +11906,27 @@ DEFAULT_QUESTION_DATA = {
                           "type": "boolean"
                         },
                         {
-                          "operator": "and",
-                          "kind": "binary_connective",
+                          "top_operator_name": "and",
+                          "top_kind_name": "binary_connective",
                           "arguments": [
                             {
-                              "operator": "is_implication",
-                              "kind": "prefix_function",
+                              "top_operator_name": "is_implication",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'R'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'R'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -11816,19 +11936,19 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'T'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'T'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -11838,15 +11958,15 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "i",
-                                  "kind": "variable",
+                                  "top_operator_name": "i",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": "j",
-                                  "kind": "variable",
+                                  "top_operator_name": "j",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -11856,31 +11976,31 @@ DEFAULT_QUESTION_DATA = {
                               "type": "boolean"
                             },
                             {
-                              "operator": "and",
-                              "kind": "binary_connective",
+                              "top_operator_name": "and",
+                              "top_kind_name": "binary_connective",
                               "arguments": [
                                 {
-                                  "operator": "not",
-                                  "kind": "unary_connective",
+                                  "top_operator_name": "not",
+                                  "top_kind_name": "unary_connective",
                                   "arguments": [
                                     {
-                                      "operator": "bounded_exists",
-                                      "kind": "bounded_quantifier",
+                                      "top_operator_name": "bounded_exists",
+                                      "top_kind_name": "bounded_quantifier",
                                       "arguments": [
                                         {
-                                          "operator": "less_than",
-                                          "kind": "binary_relation",
+                                          "top_operator_name": "less_than",
+                                          "top_kind_name": "binary_relation",
                                           "arguments": [
                                             {
-                                              "operator": "k",
-                                              "kind": "variable",
+                                              "top_operator_name": "k",
+                                              "top_kind_name": "variable",
                                               "arguments": [],
                                               "dummies": [],
                                               "type": "integer"
                                             },
                                             {
-                                              "operator": "n",
-                                              "kind": "variable",
+                                              "top_operator_name": "n",
+                                              "top_kind_name": "variable",
                                               "arguments": [],
                                               "dummies": [],
                                               "type": "integer"
@@ -11890,23 +12010,23 @@ DEFAULT_QUESTION_DATA = {
                                           "type": "boolean"
                                         },
                                         {
-                                          "operator": "and",
-                                          "kind": "binary_connective",
+                                          "top_operator_name": "and",
+                                          "top_kind_name": "binary_connective",
                                           "arguments": [
                                             {
-                                              "operator": "greater_than",
-                                              "kind": "binary_relation",
+                                              "top_operator_name": "greater_than",
+                                              "top_kind_name": "binary_relation",
                                               "arguments": [
                                                 {
-                                                  "operator": "k",
-                                                  "kind": "variable",
+                                                  "top_operator_name": "k",
+                                                  "top_kind_name": "variable",
                                                   "arguments": [],
                                                   "dummies": [],
                                                   "type": "integer"
                                                 },
                                                 {
-                                                  "operator": "i",
-                                                  "kind": "variable",
+                                                  "top_operator_name": "i",
+                                                  "top_kind_name": "variable",
                                                   "arguments": [],
                                                   "dummies": [],
                                                   "type": "integer"
@@ -11916,16 +12036,16 @@ DEFAULT_QUESTION_DATA = {
                                               "type": "boolean"
                                             },
                                             {
-                                              "operator": "less_than",
-                                              "kind": "binary_relation",
+                                              "top_operator_name": "less_than",
+                                              "top_kind_name": "binary_relation",
                                               "arguments": [
                                                 {
-                                                  "operator": "indentation",
-                                                  "kind": "prefix_function",
+                                                  "top_operator_name": "indentation",
+                                                  "top_kind_name": "prefix_function",
                                                   "arguments": [
                                                     {
-                                                      "operator": "k",
-                                                      "kind": "variable",
+                                                      "top_operator_name": "k",
+                                                      "top_kind_name": "variable",
                                                       "arguments": [],
                                                       "dummies": [],
                                                       "type": "integer"
@@ -11935,12 +12055,12 @@ DEFAULT_QUESTION_DATA = {
                                                   "type": "integer"
                                                 },
                                                 {
-                                                  "operator": "indentation",
-                                                  "kind": "prefix_function",
+                                                  "top_operator_name": "indentation",
+                                                  "top_kind_name": "prefix_function",
                                                   "arguments": [
                                                     {
-                                                      "operator": "i",
-                                                      "kind": "variable",
+                                                      "top_operator_name": "i",
+                                                      "top_kind_name": "variable",
                                                       "arguments": [],
                                                       "dummies": [],
                                                       "type": "integer"
@@ -11960,8 +12080,8 @@ DEFAULT_QUESTION_DATA = {
                                       ],
                                       "dummies": [
                                         {
-                                          "operator": "k",
-                                          "kind": "variable",
+                                          "top_operator_name": "k",
+                                          "top_kind_name": "variable",
                                           "arguments": [],
                                           "dummies": [],
                                           "type": "integer"
@@ -11974,16 +12094,16 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "boolean"
                                 },
                                 {
-                                  "operator": "less_than_or_equals",
-                                  "kind": "binary_relation",
+                                  "top_operator_name": "less_than_or_equals",
+                                  "top_kind_name": "binary_relation",
                                   "arguments": [
                                     {
-                                      "operator": "indentation",
-                                      "kind": "prefix_function",
+                                      "top_operator_name": "indentation",
+                                      "top_kind_name": "prefix_function",
                                       "arguments": [
                                         {
-                                          "operator": "i",
-                                          "kind": "variable",
+                                          "top_operator_name": "i",
+                                          "top_kind_name": "variable",
                                           "arguments": [],
                                           "dummies": [],
                                           "type": "integer"
@@ -11993,12 +12113,12 @@ DEFAULT_QUESTION_DATA = {
                                       "type": "integer"
                                     },
                                     {
-                                      "operator": "indentation",
-                                      "kind": "prefix_function",
+                                      "top_operator_name": "indentation",
+                                      "top_kind_name": "prefix_function",
                                       "arguments": [
                                         {
-                                          "operator": "n",
-                                          "kind": "variable",
+                                          "top_operator_name": "n",
+                                          "top_kind_name": "variable",
                                           "arguments": [],
                                           "dummies": [],
                                           "type": "integer"
@@ -12022,8 +12142,8 @@ DEFAULT_QUESTION_DATA = {
                       ],
                       "dummies": [
                         {
-                          "operator": "i",
-                          "kind": "variable",
+                          "top_operator_name": "i",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -12034,8 +12154,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   "dummies": [
                     {
-                      "operator": "j",
-                      "kind": "variable",
+                      "top_operator_name": "j",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -12060,19 +12180,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'R'",
-                    "kind": "constant",
+                    "top_operator_name": "'R'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -12089,19 +12209,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'T'",
-                    "kind": "constant",
+                    "top_operator_name": "'T'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -12118,31 +12238,31 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "max",
-                        "kind": "ranged_function",
+                        "top_operator_name": "max",
+                        "top_kind_name": "ranged_function",
                         "arguments": [
                           {
-                            "operator": "less_than",
-                            "kind": "binary_relation",
+                            "top_operator_name": "less_than",
+                            "top_kind_name": "binary_relation",
                             "arguments": [
                               {
-                                "operator": "i",
-                                "kind": "variable",
+                                "top_operator_name": "i",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
                               },
                               {
-                                "operator": "n",
-                                "kind": "variable",
+                                "top_operator_name": "n",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
@@ -12152,23 +12272,23 @@ DEFAULT_QUESTION_DATA = {
                             "type": "boolean"
                           },
                           {
-                            "operator": "bounded_exists",
-                            "kind": "bounded_quantifier",
+                            "top_operator_name": "bounded_exists",
+                            "top_kind_name": "bounded_quantifier",
                             "arguments": [
                               {
-                                "operator": "less_than",
-                                "kind": "binary_relation",
+                                "top_operator_name": "less_than",
+                                "top_kind_name": "binary_relation",
                                 "arguments": [
                                   {
-                                    "operator": "j",
-                                    "kind": "variable",
+                                    "top_operator_name": "j",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
                                   },
                                   {
-                                    "operator": "n",
-                                    "kind": "variable",
+                                    "top_operator_name": "n",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
@@ -12178,23 +12298,23 @@ DEFAULT_QUESTION_DATA = {
                                 "type": "boolean"
                               },
                               {
-                                "operator": "is_implication",
-                                "kind": "prefix_function",
+                                "top_operator_name": "is_implication",
+                                "top_kind_name": "prefix_function",
                                 "arguments": [
                                   {
-                                    "operator": "element",
-                                    "kind": "prefix_function",
+                                    "top_operator_name": "element",
+                                    "top_kind_name": "prefix_function",
                                     "arguments": [
                                       {
-                                        "operator": "'R'",
-                                        "kind": "constant",
+                                        "top_operator_name": "'R'",
+                                        "top_kind_name": "constant",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "string"
                                       },
                                       {
-                                        "operator": "n",
-                                        "kind": "variable",
+                                        "top_operator_name": "n",
+                                        "top_kind_name": "variable",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "integer"
@@ -12204,19 +12324,19 @@ DEFAULT_QUESTION_DATA = {
                                     "type": "formula"
                                   },
                                   {
-                                    "operator": "element",
-                                    "kind": "prefix_function",
+                                    "top_operator_name": "element",
+                                    "top_kind_name": "prefix_function",
                                     "arguments": [
                                       {
-                                        "operator": "'T'",
-                                        "kind": "constant",
+                                        "top_operator_name": "'T'",
+                                        "top_kind_name": "constant",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "string"
                                       },
                                       {
-                                        "operator": "n",
-                                        "kind": "variable",
+                                        "top_operator_name": "n",
+                                        "top_kind_name": "variable",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "integer"
@@ -12226,15 +12346,15 @@ DEFAULT_QUESTION_DATA = {
                                     "type": "formula"
                                   },
                                   {
-                                    "operator": "i",
-                                    "kind": "variable",
+                                    "top_operator_name": "i",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
                                   },
                                   {
-                                    "operator": "j",
-                                    "kind": "variable",
+                                    "top_operator_name": "j",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
@@ -12246,8 +12366,8 @@ DEFAULT_QUESTION_DATA = {
                             ],
                             "dummies": [
                               {
-                                "operator": "j",
-                                "kind": "variable",
+                                "top_operator_name": "j",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
@@ -12258,8 +12378,8 @@ DEFAULT_QUESTION_DATA = {
                         ],
                         "dummies": [
                           {
-                            "operator": "i",
-                            "kind": "variable",
+                            "top_operator_name": "i",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -12286,20 +12406,20 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "or_inaccessible_antecedent_right",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "template",
-                  "kind": "prefix_function",
+                  "top_operator_name": "template",
+                  "top_kind_name": "prefix_function",
                   "arguments": [
                     {
-                      "operator": "n",
-                      "kind": "variable",
+                      "top_operator_name": "n",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -12309,8 +12429,8 @@ DEFAULT_QUESTION_DATA = {
                   "type": "string"
                 },
                 {
-                  "operator": "'or_eliminate'",
-                  "kind": "constant",
+                  "top_operator_name": "'or_eliminate'",
+                  "top_kind_name": "constant",
                   "arguments": [],
                   "dummies": [],
                   "type": "string"
@@ -12320,27 +12440,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "bounded_exists",
-                  "kind": "bounded_quantifier",
+                  "top_operator_name": "bounded_exists",
+                  "top_kind_name": "bounded_quantifier",
                   "arguments": [
                     {
-                      "operator": "less_than",
-                      "kind": "binary_relation",
+                      "top_operator_name": "less_than",
+                      "top_kind_name": "binary_relation",
                       "arguments": [
                         {
-                          "operator": "j",
-                          "kind": "variable",
+                          "top_operator_name": "j",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
                         },
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -12350,23 +12470,23 @@ DEFAULT_QUESTION_DATA = {
                       "type": "boolean"
                     },
                     {
-                      "operator": "bounded_exists",
-                      "kind": "bounded_quantifier",
+                      "top_operator_name": "bounded_exists",
+                      "top_kind_name": "bounded_quantifier",
                       "arguments": [
                         {
-                          "operator": "less_than",
-                          "kind": "binary_relation",
+                          "top_operator_name": "less_than",
+                          "top_kind_name": "binary_relation",
                           "arguments": [
                             {
-                              "operator": "i",
-                              "kind": "variable",
+                              "top_operator_name": "i",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
                             },
                             {
-                              "operator": "j",
-                              "kind": "variable",
+                              "top_operator_name": "j",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -12376,27 +12496,27 @@ DEFAULT_QUESTION_DATA = {
                           "type": "boolean"
                         },
                         {
-                          "operator": "and",
-                          "kind": "binary_connective",
+                          "top_operator_name": "and",
+                          "top_kind_name": "binary_connective",
                           "arguments": [
                             {
-                              "operator": "is_implication",
-                              "kind": "prefix_function",
+                              "top_operator_name": "is_implication",
+                              "top_kind_name": "prefix_function",
                               "arguments": [
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'S'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'S'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -12406,19 +12526,19 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "element",
-                                  "kind": "prefix_function",
+                                  "top_operator_name": "element",
+                                  "top_kind_name": "prefix_function",
                                   "arguments": [
                                     {
-                                      "operator": "'T'",
-                                      "kind": "constant",
+                                      "top_operator_name": "'T'",
+                                      "top_kind_name": "constant",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "string"
                                     },
                                     {
-                                      "operator": "n",
-                                      "kind": "variable",
+                                      "top_operator_name": "n",
+                                      "top_kind_name": "variable",
                                       "arguments": [],
                                       "dummies": [],
                                       "type": "integer"
@@ -12428,15 +12548,15 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "formula"
                                 },
                                 {
-                                  "operator": "i",
-                                  "kind": "variable",
+                                  "top_operator_name": "i",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
                                 },
                                 {
-                                  "operator": "j",
-                                  "kind": "variable",
+                                  "top_operator_name": "j",
+                                  "top_kind_name": "variable",
                                   "arguments": [],
                                   "dummies": [],
                                   "type": "integer"
@@ -12446,31 +12566,31 @@ DEFAULT_QUESTION_DATA = {
                               "type": "boolean"
                             },
                             {
-                              "operator": "and",
-                              "kind": "binary_connective",
+                              "top_operator_name": "and",
+                              "top_kind_name": "binary_connective",
                               "arguments": [
                                 {
-                                  "operator": "not",
-                                  "kind": "unary_connective",
+                                  "top_operator_name": "not",
+                                  "top_kind_name": "unary_connective",
                                   "arguments": [
                                     {
-                                      "operator": "bounded_exists",
-                                      "kind": "bounded_quantifier",
+                                      "top_operator_name": "bounded_exists",
+                                      "top_kind_name": "bounded_quantifier",
                                       "arguments": [
                                         {
-                                          "operator": "less_than",
-                                          "kind": "binary_relation",
+                                          "top_operator_name": "less_than",
+                                          "top_kind_name": "binary_relation",
                                           "arguments": [
                                             {
-                                              "operator": "k",
-                                              "kind": "variable",
+                                              "top_operator_name": "k",
+                                              "top_kind_name": "variable",
                                               "arguments": [],
                                               "dummies": [],
                                               "type": "integer"
                                             },
                                             {
-                                              "operator": "n",
-                                              "kind": "variable",
+                                              "top_operator_name": "n",
+                                              "top_kind_name": "variable",
                                               "arguments": [],
                                               "dummies": [],
                                               "type": "integer"
@@ -12480,23 +12600,23 @@ DEFAULT_QUESTION_DATA = {
                                           "type": "boolean"
                                         },
                                         {
-                                          "operator": "and",
-                                          "kind": "binary_connective",
+                                          "top_operator_name": "and",
+                                          "top_kind_name": "binary_connective",
                                           "arguments": [
                                             {
-                                              "operator": "greater_than",
-                                              "kind": "binary_relation",
+                                              "top_operator_name": "greater_than",
+                                              "top_kind_name": "binary_relation",
                                               "arguments": [
                                                 {
-                                                  "operator": "k",
-                                                  "kind": "variable",
+                                                  "top_operator_name": "k",
+                                                  "top_kind_name": "variable",
                                                   "arguments": [],
                                                   "dummies": [],
                                                   "type": "integer"
                                                 },
                                                 {
-                                                  "operator": "i",
-                                                  "kind": "variable",
+                                                  "top_operator_name": "i",
+                                                  "top_kind_name": "variable",
                                                   "arguments": [],
                                                   "dummies": [],
                                                   "type": "integer"
@@ -12506,16 +12626,16 @@ DEFAULT_QUESTION_DATA = {
                                               "type": "boolean"
                                             },
                                             {
-                                              "operator": "less_than",
-                                              "kind": "binary_relation",
+                                              "top_operator_name": "less_than",
+                                              "top_kind_name": "binary_relation",
                                               "arguments": [
                                                 {
-                                                  "operator": "indentation",
-                                                  "kind": "prefix_function",
+                                                  "top_operator_name": "indentation",
+                                                  "top_kind_name": "prefix_function",
                                                   "arguments": [
                                                     {
-                                                      "operator": "k",
-                                                      "kind": "variable",
+                                                      "top_operator_name": "k",
+                                                      "top_kind_name": "variable",
                                                       "arguments": [],
                                                       "dummies": [],
                                                       "type": "integer"
@@ -12525,12 +12645,12 @@ DEFAULT_QUESTION_DATA = {
                                                   "type": "integer"
                                                 },
                                                 {
-                                                  "operator": "indentation",
-                                                  "kind": "prefix_function",
+                                                  "top_operator_name": "indentation",
+                                                  "top_kind_name": "prefix_function",
                                                   "arguments": [
                                                     {
-                                                      "operator": "i",
-                                                      "kind": "variable",
+                                                      "top_operator_name": "i",
+                                                      "top_kind_name": "variable",
                                                       "arguments": [],
                                                       "dummies": [],
                                                       "type": "integer"
@@ -12550,8 +12670,8 @@ DEFAULT_QUESTION_DATA = {
                                       ],
                                       "dummies": [
                                         {
-                                          "operator": "k",
-                                          "kind": "variable",
+                                          "top_operator_name": "k",
+                                          "top_kind_name": "variable",
                                           "arguments": [],
                                           "dummies": [],
                                           "type": "integer"
@@ -12564,16 +12684,16 @@ DEFAULT_QUESTION_DATA = {
                                   "type": "boolean"
                                 },
                                 {
-                                  "operator": "less_than_or_equals",
-                                  "kind": "binary_relation",
+                                  "top_operator_name": "less_than_or_equals",
+                                  "top_kind_name": "binary_relation",
                                   "arguments": [
                                     {
-                                      "operator": "indentation",
-                                      "kind": "prefix_function",
+                                      "top_operator_name": "indentation",
+                                      "top_kind_name": "prefix_function",
                                       "arguments": [
                                         {
-                                          "operator": "i",
-                                          "kind": "variable",
+                                          "top_operator_name": "i",
+                                          "top_kind_name": "variable",
                                           "arguments": [],
                                           "dummies": [],
                                           "type": "integer"
@@ -12583,12 +12703,12 @@ DEFAULT_QUESTION_DATA = {
                                       "type": "integer"
                                     },
                                     {
-                                      "operator": "indentation",
-                                      "kind": "prefix_function",
+                                      "top_operator_name": "indentation",
+                                      "top_kind_name": "prefix_function",
                                       "arguments": [
                                         {
-                                          "operator": "n",
-                                          "kind": "variable",
+                                          "top_operator_name": "n",
+                                          "top_kind_name": "variable",
                                           "arguments": [],
                                           "dummies": [],
                                           "type": "integer"
@@ -12612,8 +12732,8 @@ DEFAULT_QUESTION_DATA = {
                       ],
                       "dummies": [
                         {
-                          "operator": "i",
-                          "kind": "variable",
+                          "top_operator_name": "i",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -12624,8 +12744,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   "dummies": [
                     {
-                      "operator": "j",
-                      "kind": "variable",
+                      "top_operator_name": "j",
+                      "top_kind_name": "variable",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -12650,19 +12770,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'S'",
-                    "kind": "constant",
+                    "top_operator_name": "'S'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -12679,19 +12799,19 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "element",
-                "kind": "prefix_function",
+                "top_operator_name": "element",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "'T'",
-                    "kind": "constant",
+                    "top_operator_name": "'T'",
+                    "top_kind_name": "constant",
                     "arguments": [],
                     "dummies": [],
                     "type": "string"
                   },
                   {
-                    "operator": "n",
-                    "kind": "variable",
+                    "top_operator_name": "n",
+                    "top_kind_name": "variable",
                     "arguments": [],
                     "dummies": [],
                     "type": "integer"
@@ -12708,31 +12828,31 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "max",
-                        "kind": "ranged_function",
+                        "top_operator_name": "max",
+                        "top_kind_name": "ranged_function",
                         "arguments": [
                           {
-                            "operator": "less_than",
-                            "kind": "binary_relation",
+                            "top_operator_name": "less_than",
+                            "top_kind_name": "binary_relation",
                             "arguments": [
                               {
-                                "operator": "i",
-                                "kind": "variable",
+                                "top_operator_name": "i",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
                               },
                               {
-                                "operator": "n",
-                                "kind": "variable",
+                                "top_operator_name": "n",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
@@ -12742,23 +12862,23 @@ DEFAULT_QUESTION_DATA = {
                             "type": "boolean"
                           },
                           {
-                            "operator": "bounded_exists",
-                            "kind": "bounded_quantifier",
+                            "top_operator_name": "bounded_exists",
+                            "top_kind_name": "bounded_quantifier",
                             "arguments": [
                               {
-                                "operator": "less_than",
-                                "kind": "binary_relation",
+                                "top_operator_name": "less_than",
+                                "top_kind_name": "binary_relation",
                                 "arguments": [
                                   {
-                                    "operator": "j",
-                                    "kind": "variable",
+                                    "top_operator_name": "j",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
                                   },
                                   {
-                                    "operator": "n",
-                                    "kind": "variable",
+                                    "top_operator_name": "n",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
@@ -12768,23 +12888,23 @@ DEFAULT_QUESTION_DATA = {
                                 "type": "boolean"
                               },
                               {
-                                "operator": "is_implication",
-                                "kind": "prefix_function",
+                                "top_operator_name": "is_implication",
+                                "top_kind_name": "prefix_function",
                                 "arguments": [
                                   {
-                                    "operator": "element",
-                                    "kind": "prefix_function",
+                                    "top_operator_name": "element",
+                                    "top_kind_name": "prefix_function",
                                     "arguments": [
                                       {
-                                        "operator": "'S'",
-                                        "kind": "constant",
+                                        "top_operator_name": "'S'",
+                                        "top_kind_name": "constant",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "string"
                                       },
                                       {
-                                        "operator": "n",
-                                        "kind": "variable",
+                                        "top_operator_name": "n",
+                                        "top_kind_name": "variable",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "integer"
@@ -12794,19 +12914,19 @@ DEFAULT_QUESTION_DATA = {
                                     "type": "formula"
                                   },
                                   {
-                                    "operator": "element",
-                                    "kind": "prefix_function",
+                                    "top_operator_name": "element",
+                                    "top_kind_name": "prefix_function",
                                     "arguments": [
                                       {
-                                        "operator": "'T'",
-                                        "kind": "constant",
+                                        "top_operator_name": "'T'",
+                                        "top_kind_name": "constant",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "string"
                                       },
                                       {
-                                        "operator": "n",
-                                        "kind": "variable",
+                                        "top_operator_name": "n",
+                                        "top_kind_name": "variable",
                                         "arguments": [],
                                         "dummies": [],
                                         "type": "integer"
@@ -12816,15 +12936,15 @@ DEFAULT_QUESTION_DATA = {
                                     "type": "formula"
                                   },
                                   {
-                                    "operator": "i",
-                                    "kind": "variable",
+                                    "top_operator_name": "i",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
                                   },
                                   {
-                                    "operator": "j",
-                                    "kind": "variable",
+                                    "top_operator_name": "j",
+                                    "top_kind_name": "variable",
                                     "arguments": [],
                                     "dummies": [],
                                     "type": "integer"
@@ -12836,8 +12956,8 @@ DEFAULT_QUESTION_DATA = {
                             ],
                             "dummies": [
                               {
-                                "operator": "j",
-                                "kind": "variable",
+                                "top_operator_name": "j",
+                                "top_kind_name": "variable",
                                 "arguments": [],
                                 "dummies": [],
                                 "type": "integer"
@@ -12848,8 +12968,8 @@ DEFAULT_QUESTION_DATA = {
                         ],
                         "dummies": [
                           {
-                            "operator": "i",
-                            "kind": "variable",
+                            "top_operator_name": "i",
+                            "top_kind_name": "variable",
                             "arguments": [],
                             "dummies": [],
                             "type": "integer"
@@ -12881,23 +13001,23 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "last_line_indented_assumption",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
                 },
                 {
-                  "operator": "num_lines",
-                  "kind": "prefix_function",
+                  "top_operator_name": "num_lines",
+                  "top_kind_name": "prefix_function",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -12907,20 +13027,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "greater_than",
-                  "kind": "binary_relation",
+                  "top_operator_name": "greater_than",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -12930,8 +13050,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 0,
-                      "kind": "constant",
+                      "top_operator_name": 0,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -12941,20 +13061,20 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "not_equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "not_equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "scoper",
-                          "kind": "prefix_function",
+                          "top_operator_name": "scoper",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -12968,8 +13088,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'given'",
-                      "kind": "constant",
+                      "top_operator_name": "'given'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -12995,16 +13115,16 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "result",
-                "kind": "prefix_function",
+                "top_operator_name": "result",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -13028,23 +13148,23 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "last_line_indented_given",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
                 },
                 {
-                  "operator": "num_lines",
-                  "kind": "prefix_function",
+                  "top_operator_name": "num_lines",
+                  "top_kind_name": "prefix_function",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -13054,20 +13174,20 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "and",
-              "kind": "binary_connective",
+              "top_operator_name": "and",
+              "top_kind_name": "binary_connective",
               "arguments": [
                 {
-                  "operator": "greater_than",
-                  "kind": "binary_relation",
+                  "top_operator_name": "greater_than",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "indentation",
-                      "kind": "prefix_function",
+                      "top_operator_name": "indentation",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -13077,8 +13197,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "integer"
                     },
                     {
-                      "operator": 0,
-                      "kind": "constant",
+                      "top_operator_name": 0,
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "integer"
@@ -13088,20 +13208,20 @@ DEFAULT_QUESTION_DATA = {
                   "type": "boolean"
                 },
                 {
-                  "operator": "equals",
-                  "kind": "binary_relation",
+                  "top_operator_name": "equals",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "template",
-                      "kind": "prefix_function",
+                      "top_operator_name": "template",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "scoper",
-                          "kind": "prefix_function",
+                          "top_operator_name": "scoper",
+                          "top_kind_name": "prefix_function",
                           "arguments": [
                             {
-                              "operator": "n",
-                              "kind": "variable",
+                              "top_operator_name": "n",
+                              "top_kind_name": "variable",
                               "arguments": [],
                               "dummies": [],
                               "type": "integer"
@@ -13115,8 +13235,8 @@ DEFAULT_QUESTION_DATA = {
                       "type": "string"
                     },
                     {
-                      "operator": "'given'",
-                      "kind": "constant",
+                      "top_operator_name": "'given'",
+                      "top_kind_name": "constant",
                       "arguments": [],
                       "dummies": [],
                       "type": "string"
@@ -13142,16 +13262,16 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "text",
-                "kind": "prefix_function",
+                "top_operator_name": "text",
+                "top_kind_name": "prefix_function",
                 "arguments": [
                   {
-                    "operator": "scoper",
-                    "kind": "prefix_function",
+                    "top_operator_name": "scoper",
+                    "top_kind_name": "prefix_function",
                     "arguments": [
                       {
-                        "operator": "n",
-                        "kind": "variable",
+                        "top_operator_name": "n",
+                        "top_kind_name": "variable",
                         "arguments": [],
                         "dummies": [],
                         "type": "integer"
@@ -13175,23 +13295,23 @@ DEFAULT_QUESTION_DATA = {
       {
         "name": "last_line_not_target",
         "occurs": {
-          "operator": "and",
-          "kind": "binary_connective",
+          "top_operator_name": "and",
+          "top_kind_name": "binary_connective",
           "arguments": [
             {
-              "operator": "equals",
-              "kind": "binary_relation",
+              "top_operator_name": "equals",
+              "top_kind_name": "binary_relation",
               "arguments": [
                 {
-                  "operator": "n",
-                  "kind": "variable",
+                  "top_operator_name": "n",
+                  "top_kind_name": "variable",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
                 },
                 {
-                  "operator": "num_lines",
-                  "kind": "prefix_function",
+                  "top_operator_name": "num_lines",
+                  "top_kind_name": "prefix_function",
                   "arguments": [],
                   "dummies": [],
                   "type": "integer"
@@ -13201,27 +13321,27 @@ DEFAULT_QUESTION_DATA = {
               "type": "boolean"
             },
             {
-              "operator": "not",
-              "kind": "unary_connective",
+              "top_operator_name": "not",
+              "top_kind_name": "unary_connective",
               "arguments": [
                 {
-                  "operator": "is_in",
-                  "kind": "binary_relation",
+                  "top_operator_name": "is_in",
+                  "top_kind_name": "binary_relation",
                   "arguments": [
                     {
-                      "operator": "target",
-                      "kind": "prefix_function",
+                      "top_operator_name": "target",
+                      "top_kind_name": "prefix_function",
                       "arguments": [],
                       "dummies": [],
                       "type": "formula"
                     },
                     {
-                      "operator": "results",
-                      "kind": "prefix_function",
+                      "top_operator_name": "results",
+                      "top_kind_name": "prefix_function",
                       "arguments": [
                         {
-                          "operator": "n",
-                          "kind": "variable",
+                          "top_operator_name": "n",
+                          "top_kind_name": "variable",
                           "arguments": [],
                           "dummies": [],
                           "type": "integer"
@@ -13251,8 +13371,8 @@ DEFAULT_QUESTION_DATA = {
             {
               "format": "expression",
               "content": {
-                "operator": "target",
-                "kind": "prefix_function",
+                "top_operator_name": "target",
+                "top_kind_name": "prefix_function",
                 "arguments": [],
                 "dummies": [],
                 "type": "formula"
@@ -13271,8 +13391,8 @@ DEFAULT_QUESTION_DATA = {
     'name': 'variable',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -13290,23 +13410,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'entry',
-      'kind': 'prefix_function',
+      'top_operator_name': 'entry',
+      'top_kind_name': 'prefix_function',
       'arguments': [
         {
-          'operator': 1,
-          'kind': 'constant',
+          'top_operator_name': 1,
+          'top_kind_name': 'constant',
           'arguments': [],
           'dummies': [],
           'type': 'integer'
         },
         {
-          'operator': 'variables',
-          'kind': 'prefix_function',
+          'top_operator_name': 'variables',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -13325,8 +13445,8 @@ DEFAULT_QUESTION_DATA = {
     'name': 'result',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -13344,23 +13464,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'entry',
-      'kind': 'prefix_function',
+      'top_operator_name': 'entry',
+      'top_kind_name': 'prefix_function',
       'arguments': [
         {
-          'operator': 1,
-          'kind': 'constant',
+          'top_operator_name': 1,
+          'top_kind_name': 'constant',
           'arguments': [],
           'dummies': [],
           'type': 'integer'
         },
         {
-          'operator': 'results',
-          'kind': 'prefix_function',
+          'top_operator_name': 'results',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -13379,8 +13499,8 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_scope_creator',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -13398,20 +13518,20 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'or',
-      'kind': 'binary_connective',
+      'top_operator_name': 'or',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'equals',
-          'kind': 'binary_relation',
+          'top_operator_name': 'equals',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'template',
-              'kind': 'prefix_function',
+              'top_operator_name': 'template',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -13421,8 +13541,8 @@ DEFAULT_QUESTION_DATA = {
               'type': 'string'
             },
             {
-              'operator': '\'given\'',
-              'kind': 'constant',
+              'top_operator_name': '\'given\'',
+              'top_kind_name': 'constant',
               'arguments': [],
               'dummies': [],
               'type': 'string'
@@ -13432,16 +13552,16 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'equals',
-          'kind': 'binary_relation',
+          'top_operator_name': 'equals',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'template',
-              'kind': 'prefix_function',
+              'top_operator_name': 'template',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -13451,8 +13571,8 @@ DEFAULT_QUESTION_DATA = {
               'type': 'string'
             },
             {
-              'operator': '\'assumption\'',
-              'kind': 'constant',
+              'top_operator_name': '\'assumption\'',
+              'top_kind_name': 'constant',
               'arguments': [],
               'dummies': [],
               'type': 'string'
@@ -13471,8 +13591,8 @@ DEFAULT_QUESTION_DATA = {
     'name': 'scoper',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -13490,23 +13610,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'max',
-      'kind': 'ranged_function',
+      'top_operator_name': 'max',
+      'top_kind_name': 'ranged_function',
       'arguments': [
         {
-          'operator': 'less_than',
-          'kind': 'binary_relation',
+          'top_operator_name': 'less_than',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
             },
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -13516,16 +13636,16 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'less_than',
-          'kind': 'binary_relation',
+          'top_operator_name': 'less_than',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'indentation',
-              'kind': 'prefix_function',
+              'top_operator_name': 'indentation',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'k',
-                  'kind': 'variable',
+                  'top_operator_name': 'k',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -13535,12 +13655,12 @@ DEFAULT_QUESTION_DATA = {
               'type': 'integer'
             },
             {
-              'operator': 'indentation',
-              'kind': 'prefix_function',
+              'top_operator_name': 'indentation',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -13556,8 +13676,8 @@ DEFAULT_QUESTION_DATA = {
       ],
       'dummies': [
         {
-          'operator': 'k',
-          'kind': 'variable',
+          'top_operator_name': 'k',
+          'top_kind_name': 'variable',
           'arguments': [],
           'dummies': [],
           'type': 'integer'
@@ -13571,8 +13691,8 @@ DEFAULT_QUESTION_DATA = {
     'name': 'scoper2',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -13590,16 +13710,16 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'if',
-      'kind': 'prefix_function',
+      'top_operator_name': 'if',
+      'top_kind_name': 'prefix_function',
       'arguments': [
         {
-          'operator': 'is_scope_creator',
-          'kind': 'prefix_function',
+          'top_operator_name': 'is_scope_creator',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -13609,19 +13729,19 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'n',
-          'kind': 'variable',
+          'top_operator_name': 'n',
+          'top_kind_name': 'variable',
           'arguments': [],
           'dummies': [],
           'type': 'integer'
         },
         {
-          'operator': 'scoper',
-          'kind': 'prefix_function',
+          'top_operator_name': 'scoper',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -13640,14 +13760,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_in_scope',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'k',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'k',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -13669,24 +13789,24 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'or',
-      'kind': 'binary_connective',
+      'top_operator_name': 'or',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'and',
-          'kind': 'binary_connective',
+          'top_operator_name': 'and',
+          'top_kind_name': 'binary_connective',
           'arguments': [
             {
-              'operator': 'not',
-              'kind': 'unary_connective',
+              'top_operator_name': 'not',
+              'top_kind_name': 'unary_connective',
               'arguments': [
                 {
-                  'operator': 'is_scope_creator',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'is_scope_creator',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'k',
-                      'kind': 'variable',
+                      'top_operator_name': 'k',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -13700,20 +13820,20 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'and',
-              'kind': 'binary_connective',
+              'top_operator_name': 'and',
+              'top_kind_name': 'binary_connective',
               'arguments': [
                 {
-                  'operator': 'greater_than_or_equals',
-                  'kind': 'binary_relation',
+                  'top_operator_name': 'greater_than_or_equals',
+                  'top_kind_name': 'binary_relation',
                   'arguments': [
                     {
-                      'operator': 'indentation',
-                      'kind': 'prefix_function',
+                      'top_operator_name': 'indentation',
+                      'top_kind_name': 'prefix_function',
                       'arguments': [
                         {
-                          'operator': 'n',
-                          'kind': 'variable',
+                          'top_operator_name': 'n',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'integer'
@@ -13723,12 +13843,12 @@ DEFAULT_QUESTION_DATA = {
                       'type': 'integer'
                     },
                     {
-                      'operator': 'indentation',
-                      'kind': 'prefix_function',
+                      'top_operator_name': 'indentation',
+                      'top_kind_name': 'prefix_function',
                       'arguments': [
                         {
-                          'operator': 'k',
-                          'kind': 'variable',
+                          'top_operator_name': 'k',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'integer'
@@ -13742,27 +13862,27 @@ DEFAULT_QUESTION_DATA = {
                   'type': 'boolean'
                 },
                 {
-                  'operator': 'not',
-                  'kind': 'unary_connective',
+                  'top_operator_name': 'not',
+                  'top_kind_name': 'unary_connective',
                   'arguments': [
                     {
-                      'operator': 'bounded_exists',
-                      'kind': 'bounded_quantifier',
+                      'top_operator_name': 'bounded_exists',
+                      'top_kind_name': 'bounded_quantifier',
                       'arguments': [
                         {
-                          'operator': 'less_than',
-                          'kind': 'binary_relation',
+                          'top_operator_name': 'less_than',
+                          'top_kind_name': 'binary_relation',
                           'arguments': [
                             {
-                              'operator': 'i',
-                              'kind': 'variable',
+                              'top_operator_name': 'i',
+                              'top_kind_name': 'variable',
                               'arguments': [],
                               'dummies': [],
                               'type': 'integer'
                             },
                             {
-                              'operator': 'n',
-                              'kind': 'variable',
+                              'top_operator_name': 'n',
+                              'top_kind_name': 'variable',
                               'arguments': [],
                               'dummies': [],
                               'type': 'integer'
@@ -13772,23 +13892,23 @@ DEFAULT_QUESTION_DATA = {
                           'type': 'boolean'
                         },
                         {
-                          'operator': 'and',
-                          'kind': 'binary_connective',
+                          'top_operator_name': 'and',
+                          'top_kind_name': 'binary_connective',
                           'arguments': [
                             {
-                              'operator': 'greater_than',
-                              'kind': 'binary_relation',
+                              'top_operator_name': 'greater_than',
+                              'top_kind_name': 'binary_relation',
                               'arguments': [
                                 {
-                                  'operator': 'i',
-                                  'kind': 'variable',
+                                  'top_operator_name': 'i',
+                                  'top_kind_name': 'variable',
                                   'arguments': [],
                                   'dummies': [],
                                   'type': 'integer'
                                 },
                                 {
-                                  'operator': 'k',
-                                  'kind': 'variable',
+                                  'top_operator_name': 'k',
+                                  'top_kind_name': 'variable',
                                   'arguments': [],
                                   'dummies': [],
                                   'type': 'integer'
@@ -13798,16 +13918,16 @@ DEFAULT_QUESTION_DATA = {
                               'type': 'boolean'
                             },
                             {
-                              'operator': 'less_than',
-                              'kind': 'binary_relation',
+                              'top_operator_name': 'less_than',
+                              'top_kind_name': 'binary_relation',
                               'arguments': [
                                 {
-                                  'operator': 'indentation',
-                                  'kind': 'prefix_function',
+                                  'top_operator_name': 'indentation',
+                                  'top_kind_name': 'prefix_function',
                                   'arguments': [
                                     {
-                                      'operator': 'i',
-                                      'kind': 'variable',
+                                      'top_operator_name': 'i',
+                                      'top_kind_name': 'variable',
                                       'arguments': [],
                                       'dummies': [],
                                       'type': 'integer'
@@ -13817,12 +13937,12 @@ DEFAULT_QUESTION_DATA = {
                                   'type': 'integer'
                                 },
                                 {
-                                  'operator': 'indentation',
-                                  'kind': 'prefix_function',
+                                  'top_operator_name': 'indentation',
+                                  'top_kind_name': 'prefix_function',
                                   'arguments': [
                                     {
-                                      'operator': 'k',
-                                      'kind': 'variable',
+                                      'top_operator_name': 'k',
+                                      'top_kind_name': 'variable',
                                       'arguments': [],
                                       'dummies': [],
                                       'type': 'integer'
@@ -13842,8 +13962,8 @@ DEFAULT_QUESTION_DATA = {
                       ],
                       'dummies': [
                         {
-                          'operator': 'i',
-                          'kind': 'variable',
+                          'top_operator_name': 'i',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'integer'
@@ -13864,20 +13984,20 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'and',
-          'kind': 'binary_connective',
+          'top_operator_name': 'and',
+          'top_kind_name': 'binary_connective',
           'arguments': [
             {
-              'operator': 'greater_than',
-              'kind': 'binary_relation',
+              'top_operator_name': 'greater_than',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'indentation',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'indentation',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'n',
-                      'kind': 'variable',
+                      'top_operator_name': 'n',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -13887,12 +14007,12 @@ DEFAULT_QUESTION_DATA = {
                   'type': 'integer'
                 },
                 {
-                  'operator': 'indentation',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'indentation',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'k',
-                      'kind': 'variable',
+                      'top_operator_name': 'k',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -13906,27 +14026,27 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'not',
-              'kind': 'unary_connective',
+              'top_operator_name': 'not',
+              'top_kind_name': 'unary_connective',
               'arguments': [
                 {
-                  'operator': 'bounded_exists',
-                  'kind': 'bounded_quantifier',
+                  'top_operator_name': 'bounded_exists',
+                  'top_kind_name': 'bounded_quantifier',
                   'arguments': [
                     {
-                      'operator': 'less_than_or_equals',
-                      'kind': 'binary_relation',
+                      'top_operator_name': 'less_than_or_equals',
+                      'top_kind_name': 'binary_relation',
                       'arguments': [
                         {
-                          'operator': 'i',
-                          'kind': 'variable',
+                          'top_operator_name': 'i',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'integer'
                         },
                         {
-                          'operator': 'n',
-                          'kind': 'variable',
+                          'top_operator_name': 'n',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'integer'
@@ -13936,23 +14056,23 @@ DEFAULT_QUESTION_DATA = {
                       'type': 'boolean'
                     },
                     {
-                      'operator': 'and',
-                      'kind': 'binary_connective',
+                      'top_operator_name': 'and',
+                      'top_kind_name': 'binary_connective',
                       'arguments': [
                         {
-                          'operator': 'greater_than',
-                          'kind': 'binary_relation',
+                          'top_operator_name': 'greater_than',
+                          'top_kind_name': 'binary_relation',
                           'arguments': [
                             {
-                              'operator': 'i',
-                              'kind': 'variable',
+                              'top_operator_name': 'i',
+                              'top_kind_name': 'variable',
                               'arguments': [],
                               'dummies': [],
                               'type': 'integer'
                             },
                             {
-                              'operator': 'k',
-                              'kind': 'variable',
+                              'top_operator_name': 'k',
+                              'top_kind_name': 'variable',
                               'arguments': [],
                               'dummies': [],
                               'type': 'integer'
@@ -13962,16 +14082,16 @@ DEFAULT_QUESTION_DATA = {
                           'type': 'boolean'
                         },
                         {
-                          'operator': 'less_than_or_equals',
-                          'kind': 'binary_relation',
+                          'top_operator_name': 'less_than_or_equals',
+                          'top_kind_name': 'binary_relation',
                           'arguments': [
                             {
-                              'operator': 'indentation',
-                              'kind': 'prefix_function',
+                              'top_operator_name': 'indentation',
+                              'top_kind_name': 'prefix_function',
                               'arguments': [
                                 {
-                                  'operator': 'i',
-                                  'kind': 'variable',
+                                  'top_operator_name': 'i',
+                                  'top_kind_name': 'variable',
                                   'arguments': [],
                                   'dummies': [],
                                   'type': 'integer'
@@ -13981,12 +14101,12 @@ DEFAULT_QUESTION_DATA = {
                               'type': 'integer'
                             },
                             {
-                              'operator': 'indentation',
-                              'kind': 'prefix_function',
+                              'top_operator_name': 'indentation',
+                              'top_kind_name': 'prefix_function',
                               'arguments': [
                                 {
-                                  'operator': 'k',
-                                  'kind': 'variable',
+                                  'top_operator_name': 'k',
+                                  'top_kind_name': 'variable',
                                   'arguments': [],
                                   'dummies': [],
                                   'type': 'integer'
@@ -14006,8 +14126,8 @@ DEFAULT_QUESTION_DATA = {
                   ],
                   'dummies': [
                     {
-                      'operator': 'i',
-                      'kind': 'variable',
+                      'top_operator_name': 'i',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -14027,14 +14147,14 @@ DEFAULT_QUESTION_DATA = {
       'dummies': [],
       'type': 'boolean'
     },
-    'description': 'Whether the results & variables of line k<=n are accessible to line n'
+    'description': 'Whether the results and variables of line k<=n are accessible to line n'
   },
   {
     'name': 'is_initializer',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14052,20 +14172,20 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'or',
-      'kind': 'binary_connective',
+      'top_operator_name': 'or',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'equals',
-          'kind': 'binary_relation',
+          'top_operator_name': 'equals',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'template',
-              'kind': 'prefix_function',
+              'top_operator_name': 'template',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14075,8 +14195,8 @@ DEFAULT_QUESTION_DATA = {
               'type': 'string'
             },
             {
-              'operator': '\'given\'',
-              'kind': 'constant',
+              'top_operator_name': '\'given\'',
+              'top_kind_name': 'constant',
               'arguments': [],
               'dummies': [],
               'type': 'string'
@@ -14086,20 +14206,20 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'or',
-          'kind': 'binary_connective',
+          'top_operator_name': 'or',
+          'top_kind_name': 'binary_connective',
           'arguments': [
             {
-              'operator': 'equals',
-              'kind': 'binary_relation',
+              'top_operator_name': 'equals',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'template',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'template',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'n',
-                      'kind': 'variable',
+                      'top_operator_name': 'n',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -14109,8 +14229,8 @@ DEFAULT_QUESTION_DATA = {
                   'type': 'string'
                 },
                 {
-                  'operator': '\'for_all_eliminate\'',
-                  'kind': 'constant',
+                  'top_operator_name': '\'for_all_eliminate\'',
+                  'top_kind_name': 'constant',
                   'arguments': [],
                   'dummies': [],
                   'type': 'string'
@@ -14120,34 +14240,71 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'equals',
-              'kind': 'binary_relation',
+              'top_operator_name': 'or',
+              'top_kind_name': 'binary_connective',
               'arguments': [
                 {
-                  'operator': 'template',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'equals',
+                  'top_kind_name': 'binary_relation',
                   'arguments': [
                     {
-                      'operator': 'n',
-                      'kind': 'variable',
+                      'top_operator_name': 'template',
+                      'top_kind_name': 'prefix_function',
+                      'arguments': [
+                        {
+                          'top_operator_name': 'n',
+                          'top_kind_name': 'variable',
+                          'arguments': [],
+                          'dummies': [],
+                          'type': 'integer'
+                        }
+                      ],
+                      'dummies': [],
+                      'type': 'string'
+                    },
+                    {
+                      'top_operator_name': '\'exists_eliminate\'',
+                      'top_kind_name': 'constant',
                       'arguments': [],
                       'dummies': [],
-                      'type': 'integer'
+                      'type': 'string'
                     }
                   ],
                   'dummies': [],
-                  'type': 'string'
+                  'type': 'boolean'
                 },
                 {
-                  'operator': '\'exists_eliminate\'',
-                  'kind': 'constant',
-                  'arguments': [],
+                  'top_operator_name': 'equals',
+                  'top_kind_name': 'binary_relation',
+                  'arguments': [
+                    {
+                      'top_operator_name': 'template',
+                      'top_kind_name': 'prefix_function',
+                      'arguments': [
+                        {
+                          'top_operator_name': 'n',
+                          'top_kind_name': 'variable',
+                          'arguments': [],
+                          'dummies': [],
+                          'type': 'integer'
+                        }
+                      ],
+                      'dummies': [],
+                      'type': 'string'
+                    },
+                    {
+                      'top_operator_name': '\'take\'',
+                      'top_kind_name': 'constant',
+                      'arguments': [],
+                      'dummies': [],
+                      'type': 'string'
+                    }
+                  ],
                   'dummies': [],
-                  'type': 'string'
+                  'type': 'boolean'
                 }
               ],
-              'dummies': [],
-              'type': 'boolean'
+              'dummies': []
             }
           ],
           'dummies': [],
@@ -14163,14 +14320,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'initializes',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'x',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'x',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14192,16 +14349,16 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'and',
-      'kind': 'binary_connective',
+      'top_operator_name': 'and',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'is_initializer',
-          'kind': 'prefix_function',
+          'top_operator_name': 'is_initializer',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -14211,23 +14368,23 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'is_in',
-          'kind': 'binary_relation',
+          'top_operator_name': 'is_in',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'x',
-              'kind': 'variable',
+              'top_operator_name': 'x',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'formula'
             },
             {
-              'operator': 'variables',
-              'kind': 'prefix_function',
+              'top_operator_name': 'variables',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14250,14 +14407,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_initialized',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'x',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'x',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14279,23 +14436,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'or',
-      'kind': 'binary_connective',
+      'top_operator_name': 'or',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'is_in',
-          'kind': 'binary_relation',
+          'top_operator_name': 'is_in',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'x',
-              'kind': 'variable',
+              'top_operator_name': 'x',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'formula'
             },
             {
-              'operator': 'question_variables',
-              'kind': 'prefix_function',
+              'top_operator_name': 'question_variables',
+              'top_kind_name': 'prefix_function',
               'arguments': [],
               'dummies': [],
               'type': 'set_of_formulas'
@@ -14305,23 +14462,23 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'bounded_exists',
-          'kind': 'bounded_quantifier',
+          'top_operator_name': 'bounded_exists',
+          'top_kind_name': 'bounded_quantifier',
           'arguments': [
             {
-              'operator': 'less_than',
-              'kind': 'binary_relation',
+              'top_operator_name': 'less_than',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'k',
-                  'kind': 'variable',
+                  'top_operator_name': 'k',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
                 },
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14331,19 +14488,19 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'initializes',
-              'kind': 'prefix_function',
+              'top_operator_name': 'initializes',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'x',
-                  'kind': 'variable',
+                  'top_operator_name': 'x',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'formula'
                 },
                 {
-                  'operator': 'k',
-                  'kind': 'variable',
+                  'top_operator_name': 'k',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14355,8 +14512,8 @@ DEFAULT_QUESTION_DATA = {
           ],
           'dummies': [
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -14374,14 +14531,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'initializer',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'x',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'x',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14403,23 +14560,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'max',
-      'kind': 'ranged_function',
+      'top_operator_name': 'max',
+      'top_kind_name': 'ranged_function',
       'arguments': [
         {
-          'operator': 'less_than',
-          'kind': 'binary_relation',
+          'top_operator_name': 'less_than',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
             },
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -14429,19 +14586,19 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'initializes',
-          'kind': 'prefix_function',
+          'top_operator_name': 'initializes',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'x',
-              'kind': 'variable',
+              'top_operator_name': 'x',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'formula'
             },
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -14453,8 +14610,8 @@ DEFAULT_QUESTION_DATA = {
       ],
       'dummies': [
         {
-          'operator': 'k',
-          'kind': 'variable',
+          'top_operator_name': 'k',
+          'top_kind_name': 'variable',
           'arguments': [],
           'dummies': [],
           'type': 'integer'
@@ -14468,14 +14625,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_accessible',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'x',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'x',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14497,23 +14654,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'or',
-      'kind': 'binary_connective',
+      'top_operator_name': 'or',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'is_in',
-          'kind': 'binary_relation',
+          'top_operator_name': 'is_in',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'x',
-              'kind': 'variable',
+              'top_operator_name': 'x',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'formula'
             },
             {
-              'operator': 'question_variables',
-              'kind': 'prefix_function',
+              'top_operator_name': 'question_variables',
+              'top_kind_name': 'prefix_function',
               'arguments': [],
               'dummies': [],
               'type': 'set_of_formulas'
@@ -14523,23 +14680,23 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'bounded_exists',
-          'kind': 'bounded_quantifier',
+          'top_operator_name': 'bounded_exists',
+          'top_kind_name': 'bounded_quantifier',
           'arguments': [
             {
-              'operator': 'less_than',
-              'kind': 'binary_relation',
+              'top_operator_name': 'less_than',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'k',
-                  'kind': 'variable',
+                  'top_operator_name': 'k',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
                 },
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14549,23 +14706,23 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'and',
-              'kind': 'binary_connective',
+              'top_operator_name': 'and',
+              'top_kind_name': 'binary_connective',
               'arguments': [
                 {
-                  'operator': 'initializes',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'initializes',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'x',
-                      'kind': 'variable',
+                      'top_operator_name': 'x',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'formula'
                     },
                     {
-                      'operator': 'k',
-                      'kind': 'variable',
+                      'top_operator_name': 'k',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -14575,19 +14732,19 @@ DEFAULT_QUESTION_DATA = {
                   'type': 'boolean'
                 },
                 {
-                  'operator': 'is_in_scope',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'is_in_scope',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'k',
-                      'kind': 'variable',
+                      'top_operator_name': 'k',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
                     },
                     {
-                      'operator': 'n',
-                      'kind': 'variable',
+                      'top_operator_name': 'n',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -14603,8 +14760,8 @@ DEFAULT_QUESTION_DATA = {
           ],
           'dummies': [
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -14622,14 +14779,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_arbitrary',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'x',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'x',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14651,27 +14808,27 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'equals',
-      'kind': 'binary_relation',
+      'top_operator_name': 'equals',
+      'top_kind_name': 'binary_relation',
       'arguments': [
         {
-          'operator': 'template',
-          'kind': 'prefix_function',
+          'top_operator_name': 'template',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'initializer',
-              'kind': 'prefix_function',
+              'top_operator_name': 'initializer',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'x',
-                  'kind': 'variable',
+                  'top_operator_name': 'x',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'formula'
                 },
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14685,8 +14842,8 @@ DEFAULT_QUESTION_DATA = {
           'type': 'string'
         },
         {
-          'operator': '\'given\'',
-          'kind': 'constant',
+          'top_operator_name': '\'given\'',
+          'top_kind_name': 'constant',
           'arguments': [],
           'dummies': [],
           'type': 'string'
@@ -14701,14 +14858,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_proven',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'R',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'R',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14730,23 +14887,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'or',
-      'kind': 'binary_connective',
+      'top_operator_name': 'or',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'is_in',
-          'kind': 'binary_relation',
+          'top_operator_name': 'is_in',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'R',
-              'kind': 'variable',
+              'top_operator_name': 'R',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'formula'
             },
             {
-              'operator': 'assumptions',
-              'kind': 'prefix_function',
+              'top_operator_name': 'assumptions',
+              'top_kind_name': 'prefix_function',
               'arguments': [],
               'dummies': [],
               'type': 'set_of_formulas'
@@ -14756,23 +14913,23 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'bounded_exists',
-          'kind': 'bounded_quantifier',
+          'top_operator_name': 'bounded_exists',
+          'top_kind_name': 'bounded_quantifier',
           'arguments': [
             {
-              'operator': 'less_than',
-              'kind': 'binary_relation',
+              'top_operator_name': 'less_than',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'k',
-                  'kind': 'variable',
+                  'top_operator_name': 'k',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
                 },
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14782,23 +14939,23 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'is_in',
-              'kind': 'binary_relation',
+              'top_operator_name': 'is_in',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'R',
-                  'kind': 'variable',
+                  'top_operator_name': 'R',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'formula'
                 },
                 {
-                  'operator': 'results',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'results',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'k',
-                      'kind': 'variable',
+                      'top_operator_name': 'k',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -14814,8 +14971,8 @@ DEFAULT_QUESTION_DATA = {
           ],
           'dummies': [
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -14833,14 +14990,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'prover',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'R',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'R',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14862,23 +15019,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'max',
-      'kind': 'ranged_function',
+      'top_operator_name': 'max',
+      'top_kind_name': 'ranged_function',
       'arguments': [
         {
-          'operator': 'less_than',
-          'kind': 'binary_relation',
+          'top_operator_name': 'less_than',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
             },
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -14888,23 +15045,23 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'is_in',
-          'kind': 'binary_relation',
+          'top_operator_name': 'is_in',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'R',
-              'kind': 'variable',
+              'top_operator_name': 'R',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'formula'
             },
             {
-              'operator': 'results',
-              'kind': 'prefix_function',
+              'top_operator_name': 'results',
+              'top_kind_name': 'prefix_function',
               'arguments': [
                 {
-                  'operator': 'k',
-                  'kind': 'variable',
+                  'top_operator_name': 'k',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -14920,8 +15077,8 @@ DEFAULT_QUESTION_DATA = {
       ],
       'dummies': [
         {
-          'operator': 'k',
-          'kind': 'variable',
+          'top_operator_name': 'k',
+          'top_kind_name': 'variable',
           'arguments': [],
           'dummies': [],
           'type': 'integer'
@@ -14935,14 +15092,14 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_available',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'R',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'R',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -14964,23 +15121,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'or',
-      'kind': 'binary_connective',
+      'top_operator_name': 'or',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'is_in',
-          'kind': 'binary_relation',
+          'top_operator_name': 'is_in',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'R',
-              'kind': 'variable',
+              'top_operator_name': 'R',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'formula'
             },
             {
-              'operator': 'assumptions',
-              'kind': 'prefix_function',
+              'top_operator_name': 'assumptions',
+              'top_kind_name': 'prefix_function',
               'arguments': [],
               'dummies': [],
               'type': 'set_of_formulas'
@@ -14990,23 +15147,23 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'bounded_exists',
-          'kind': 'bounded_quantifier',
+          'top_operator_name': 'bounded_exists',
+          'top_kind_name': 'bounded_quantifier',
           'arguments': [
             {
-              'operator': 'less_than',
-              'kind': 'binary_relation',
+              'top_operator_name': 'less_than',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'k',
-                  'kind': 'variable',
+                  'top_operator_name': 'k',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
                 },
                 {
-                  'operator': 'n',
-                  'kind': 'variable',
+                  'top_operator_name': 'n',
+                  'top_kind_name': 'variable',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -15016,23 +15173,23 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'and',
-              'kind': 'binary_connective',
+              'top_operator_name': 'and',
+              'top_kind_name': 'binary_connective',
               'arguments': [
                 {
-                  'operator': 'is_in_scope',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'is_in_scope',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'k',
-                      'kind': 'variable',
+                      'top_operator_name': 'k',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
                     },
                     {
-                      'operator': 'n',
-                      'kind': 'variable',
+                      'top_operator_name': 'n',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -15042,23 +15199,23 @@ DEFAULT_QUESTION_DATA = {
                   'type': 'boolean'
                 },
                 {
-                  'operator': 'is_in',
-                  'kind': 'binary_relation',
+                  'top_operator_name': 'is_in',
+                  'top_kind_name': 'binary_relation',
                   'arguments': [
                     {
-                      'operator': 'R',
-                      'kind': 'variable',
+                      'top_operator_name': 'R',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'formula'
                     },
                     {
-                      'operator': 'results',
-                      'kind': 'prefix_function',
+                      'top_operator_name': 'results',
+                      'top_kind_name': 'prefix_function',
                       'arguments': [
                         {
-                          'operator': 'k',
-                          'kind': 'variable',
+                          'top_operator_name': 'k',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'integer'
@@ -15078,8 +15235,8 @@ DEFAULT_QUESTION_DATA = {
           ],
           'dummies': [
             {
-              'operator': 'k',
-              'kind': 'variable',
+              'top_operator_name': 'k',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -15097,8 +15254,8 @@ DEFAULT_QUESTION_DATA = {
     'name': 'yields_false',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -15116,16 +15273,16 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'equals',
-      'kind': 'binary_relation',
+      'top_operator_name': 'equals',
+      'top_kind_name': 'binary_relation',
       'arguments': [
         {
-          'operator': 'template',
-          'kind': 'prefix_function',
+          'top_operator_name': 'template',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -15135,8 +15292,8 @@ DEFAULT_QUESTION_DATA = {
           'type': 'string'
         },
         {
-          'operator': '\'not_eliminate\'',
-          'kind': 'constant',
+          'top_operator_name': '\'not_eliminate\'',
+          'top_kind_name': 'constant',
           'arguments': [],
           'dummies': [],
           'type': 'string'
@@ -15151,8 +15308,8 @@ DEFAULT_QUESTION_DATA = {
     'name': 'needs_false',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -15170,16 +15327,16 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'equals',
-      'kind': 'binary_relation',
+      'top_operator_name': 'equals',
+      'top_kind_name': 'binary_relation',
       'arguments': [
         {
-          'operator': 'template',
-          'kind': 'prefix_function',
+          'top_operator_name': 'template',
+          'top_kind_name': 'prefix_function',
           'arguments': [
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -15189,8 +15346,8 @@ DEFAULT_QUESTION_DATA = {
           'type': 'string'
         },
         {
-          'operator': '\'contradiction_eliminate\'',
-          'kind': 'constant',
+          'top_operator_name': '\'contradiction_eliminate\'',
+          'top_kind_name': 'constant',
           'arguments': [],
           'dummies': [],
           'type': 'string'
@@ -15205,26 +15362,26 @@ DEFAULT_QUESTION_DATA = {
     'name': 'is_implication',
     'variables': [
       {
-        'kind': 'variable',
-        'operator': 'R',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'R',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'S',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'S',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'm',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'm',
         'arguments': [],
         'dummies': []
       },
       {
-        'kind': 'variable',
-        'operator': 'n',
+        'top_kind_name': 'variable',
+        'top_operator_name': 'n',
         'arguments': [],
         'dummies': []
       }
@@ -15254,23 +15411,23 @@ DEFAULT_QUESTION_DATA = {
       }
     ],
     'definition': {
-      'operator': 'and',
-      'kind': 'binary_connective',
+      'top_operator_name': 'and',
+      'top_kind_name': 'binary_connective',
       'arguments': [
         {
-          'operator': 'less_than',
-          'kind': 'binary_relation',
+          'top_operator_name': 'less_than',
+          'top_kind_name': 'binary_relation',
           'arguments': [
             {
-              'operator': 'm',
-              'kind': 'variable',
+              'top_operator_name': 'm',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
             },
             {
-              'operator': 'n',
-              'kind': 'variable',
+              'top_operator_name': 'n',
+              'top_kind_name': 'variable',
               'arguments': [],
               'dummies': [],
               'type': 'integer'
@@ -15280,20 +15437,20 @@ DEFAULT_QUESTION_DATA = {
           'type': 'boolean'
         },
         {
-          'operator': 'and',
-          'kind': 'binary_connective',
+          'top_operator_name': 'and',
+          'top_kind_name': 'binary_connective',
           'arguments': [
             {
-              'operator': 'greater_than',
-              'kind': 'binary_relation',
+              'top_operator_name': 'greater_than',
+              'top_kind_name': 'binary_relation',
               'arguments': [
                 {
-                  'operator': 'indentation',
-                  'kind': 'prefix_function',
+                  'top_operator_name': 'indentation',
+                  'top_kind_name': 'prefix_function',
                   'arguments': [
                     {
-                      'operator': 'n',
-                      'kind': 'variable',
+                      'top_operator_name': 'n',
+                      'top_kind_name': 'variable',
                       'arguments': [],
                       'dummies': [],
                       'type': 'integer'
@@ -15303,8 +15460,8 @@ DEFAULT_QUESTION_DATA = {
                   'type': 'integer'
                 },
                 {
-                  'operator': 0,
-                  'kind': 'constant',
+                  'top_operator_name': 0,
+                  'top_kind_name': 'constant',
                   'arguments': [],
                   'dummies': [],
                   'type': 'integer'
@@ -15314,31 +15471,31 @@ DEFAULT_QUESTION_DATA = {
               'type': 'boolean'
             },
             {
-              'operator': 'and',
-              'kind': 'binary_connective',
+              'top_operator_name': 'and',
+              'top_kind_name': 'binary_connective',
               'arguments': [
                 {
-                  'operator': 'or',
-                  'kind': 'binary_connective',
+                  'top_operator_name': 'or',
+                  'top_kind_name': 'binary_connective',
                   'arguments': [
                     {
-                      'operator': 'is_in',
-                      'kind': 'binary_relation',
+                      'top_operator_name': 'is_in',
+                      'top_kind_name': 'binary_relation',
                       'arguments': [
                         {
-                          'operator': 'S',
-                          'kind': 'variable',
+                          'top_operator_name': 'S',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'formula'
                         },
                         {
-                          'operator': 'results',
-                          'kind': 'prefix_function',
+                          'top_operator_name': 'results',
+                          'top_kind_name': 'prefix_function',
                           'arguments': [
                             {
-                              'operator': 'n',
-                              'kind': 'variable',
+                              'top_operator_name': 'n',
+                              'top_kind_name': 'variable',
                               'arguments': [],
                               'dummies': [],
                               'type': 'integer'
@@ -15352,12 +15509,12 @@ DEFAULT_QUESTION_DATA = {
                       'type': 'boolean'
                     },
                     {
-                      'operator': 'yields_false',
-                      'kind': 'prefix_function',
+                      'top_operator_name': 'yields_false',
+                      'top_kind_name': 'prefix_function',
                       'arguments': [
                         {
-                          'operator': 'n',
-                          'kind': 'variable',
+                          'top_operator_name': 'n',
+                          'top_kind_name': 'variable',
                           'arguments': [],
                           'dummies': [],
                           'type': 'integer'
@@ -15371,20 +15528,20 @@ DEFAULT_QUESTION_DATA = {
                   'type': 'boolean'
                 },
                 {
-                  'operator': 'and',
-                  'kind': 'binary_connective',
+                  'top_operator_name': 'and',
+                  'top_kind_name': 'binary_connective',
                   'arguments': [
                     {
-                      'operator': 'equals',
-                      'kind': 'binary_relation',
+                      'top_operator_name': 'equals',
+                      'top_kind_name': 'binary_relation',
                       'arguments': [
                         {
-                          'operator': 'template',
-                          'kind': 'prefix_function',
+                          'top_operator_name': 'template',
+                          'top_kind_name': 'prefix_function',
                           'arguments': [
                             {
-                              'operator': 'm',
-                              'kind': 'variable',
+                              'top_operator_name': 'm',
+                              'top_kind_name': 'variable',
                               'arguments': [],
                               'dummies': [],
                               'type': 'integer'
@@ -15394,8 +15551,8 @@ DEFAULT_QUESTION_DATA = {
                           'type': 'string'
                         },
                         {
-                          'operator': '\'assumption\'',
-                          'kind': 'constant',
+                          'top_operator_name': '\'assumption\'',
+                          'top_kind_name': 'constant',
                           'arguments': [],
                           'dummies': [],
                           'type': 'string'
@@ -15405,27 +15562,27 @@ DEFAULT_QUESTION_DATA = {
                       'type': 'boolean'
                     },
                     {
-                      'operator': 'and',
-                      'kind': 'binary_connective',
+                      'top_operator_name': 'and',
+                      'top_kind_name': 'binary_connective',
                       'arguments': [
                         {
-                          'operator': 'is_in',
-                          'kind': 'binary_relation',
+                          'top_operator_name': 'is_in',
+                          'top_kind_name': 'binary_relation',
                           'arguments': [
                             {
-                              'operator': 'R',
-                              'kind': 'variable',
+                              'top_operator_name': 'R',
+                              'top_kind_name': 'variable',
                               'arguments': [],
                               'dummies': [],
                               'type': 'formula'
                             },
                             {
-                              'operator': 'results',
-                              'kind': 'prefix_function',
+                              'top_operator_name': 'results',
+                              'top_kind_name': 'prefix_function',
                               'arguments': [
                                 {
-                                  'operator': 'm',
-                                  'kind': 'variable',
+                                  'top_operator_name': 'm',
+                                  'top_kind_name': 'variable',
                                   'arguments': [],
                                   'dummies': [],
                                   'type': 'integer'
@@ -15439,20 +15596,20 @@ DEFAULT_QUESTION_DATA = {
                           'type': 'boolean'
                         },
                         {
-                          'operator': 'and',
-                          'kind': 'binary_connective',
+                          'top_operator_name': 'and',
+                          'top_kind_name': 'binary_connective',
                           'arguments': [
                             {
-                              'operator': 'equals',
-                              'kind': 'binary_relation',
+                              'top_operator_name': 'equals',
+                              'top_kind_name': 'binary_relation',
                               'arguments': [
                                 {
-                                  'operator': 'indentation',
-                                  'kind': 'prefix_function',
+                                  'top_operator_name': 'indentation',
+                                  'top_kind_name': 'prefix_function',
                                   'arguments': [
                                     {
-                                      'operator': 'n',
-                                      'kind': 'variable',
+                                      'top_operator_name': 'n',
+                                      'top_kind_name': 'variable',
                                       'arguments': [],
                                       'dummies': [],
                                       'type': 'integer'
@@ -15462,16 +15619,16 @@ DEFAULT_QUESTION_DATA = {
                                   'type': 'integer'
                                 },
                                 {
-                                  'operator': 'addition',
-                                  'kind': 'binary_function',
+                                  'top_operator_name': 'addition',
+                                  'top_kind_name': 'binary_function',
                                   'arguments': [
                                     {
-                                      'operator': 'indentation',
-                                      'kind': 'prefix_function',
+                                      'top_operator_name': 'indentation',
+                                      'top_kind_name': 'prefix_function',
                                       'arguments': [
                                         {
-                                          'operator': 'm',
-                                          'kind': 'variable',
+                                          'top_operator_name': 'm',
+                                          'top_kind_name': 'variable',
                                           'arguments': [],
                                           'dummies': [],
                                           'type': 'integer'
@@ -15481,8 +15638,8 @@ DEFAULT_QUESTION_DATA = {
                                       'type': 'integer'
                                     },
                                     {
-                                      'operator': 1,
-                                      'kind': 'constant',
+                                      'top_operator_name': 1,
+                                      'top_kind_name': 'constant',
                                       'arguments': [],
                                       'dummies': [],
                                       'type': 'integer'
@@ -15496,27 +15653,27 @@ DEFAULT_QUESTION_DATA = {
                               'type': 'boolean'
                             },
                             {
-                              'operator': 'not',
-                              'kind': 'unary_connective',
+                              'top_operator_name': 'not',
+                              'top_kind_name': 'unary_connective',
                               'arguments': [
                                 {
-                                  'operator': 'bounded_exists',
-                                  'kind': 'bounded_quantifier',
+                                  'top_operator_name': 'bounded_exists',
+                                  'top_kind_name': 'bounded_quantifier',
                                   'arguments': [
                                     {
-                                      'operator': 'less_than',
-                                      'kind': 'binary_relation',
+                                      'top_operator_name': 'less_than',
+                                      'top_kind_name': 'binary_relation',
                                       'arguments': [
                                         {
-                                          'operator': 'i',
-                                          'kind': 'variable',
+                                          'top_operator_name': 'i',
+                                          'top_kind_name': 'variable',
                                           'arguments': [],
                                           'dummies': [],
                                           'type': 'integer'
                                         },
                                         {
-                                          'operator': 'n',
-                                          'kind': 'variable',
+                                          'top_operator_name': 'n',
+                                          'top_kind_name': 'variable',
                                           'arguments': [],
                                           'dummies': [],
                                           'type': 'integer'
@@ -15526,23 +15683,23 @@ DEFAULT_QUESTION_DATA = {
                                       'type': 'boolean'
                                     },
                                     {
-                                      'operator': 'and',
-                                      'kind': 'binary_connective',
+                                      'top_operator_name': 'and',
+                                      'top_kind_name': 'binary_connective',
                                       'arguments': [
                                         {
-                                          'operator': 'greater_than',
-                                          'kind': 'binary_relation',
+                                          'top_operator_name': 'greater_than',
+                                          'top_kind_name': 'binary_relation',
                                           'arguments': [
                                             {
-                                              'operator': 'i',
-                                              'kind': 'variable',
+                                              'top_operator_name': 'i',
+                                              'top_kind_name': 'variable',
                                               'arguments': [],
                                               'dummies': [],
                                               'type': 'integer'
                                             },
                                             {
-                                              'operator': 'm',
-                                              'kind': 'variable',
+                                              'top_operator_name': 'm',
+                                              'top_kind_name': 'variable',
                                               'arguments': [],
                                               'dummies': [],
                                               'type': 'integer'
@@ -15552,16 +15709,16 @@ DEFAULT_QUESTION_DATA = {
                                           'type': 'boolean'
                                         },
                                         {
-                                          'operator': 'less_than_or_equals',
-                                          'kind': 'binary_relation',
+                                          'top_operator_name': 'less_than_or_equals',
+                                          'top_kind_name': 'binary_relation',
                                           'arguments': [
                                             {
-                                              'operator': 'indentation',
-                                              'kind': 'prefix_function',
+                                              'top_operator_name': 'indentation',
+                                              'top_kind_name': 'prefix_function',
                                               'arguments': [
                                                 {
-                                                  'operator': 'i',
-                                                  'kind': 'variable',
+                                                  'top_operator_name': 'i',
+                                                  'top_kind_name': 'variable',
                                                   'arguments': [],
                                                   'dummies': [],
                                                   'type': 'integer'
@@ -15571,12 +15728,12 @@ DEFAULT_QUESTION_DATA = {
                                               'type': 'integer'
                                             },
                                             {
-                                              'operator': 'indentation',
-                                              'kind': 'prefix_function',
+                                              'top_operator_name': 'indentation',
+                                              'top_kind_name': 'prefix_function',
                                               'arguments': [
                                                 {
-                                                  'operator': 'm',
-                                                  'kind': 'variable',
+                                                  'top_operator_name': 'm',
+                                                  'top_kind_name': 'variable',
                                                   'arguments': [],
                                                   'dummies': [],
                                                   'type': 'integer'
@@ -15596,8 +15753,8 @@ DEFAULT_QUESTION_DATA = {
                                   ],
                                   'dummies': [
                                     {
-                                      'operator': 'i',
-                                      'kind': 'variable',
+                                      'top_operator_name': 'i',
+                                      'top_kind_name': 'variable',
                                       'arguments': [],
                                       'dummies': [],
                                       'type': 'integer'

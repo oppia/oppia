@@ -212,3 +212,76 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = [u'http://¡Hola!.com']
 
         self.check_normalization(objects.SanitizedUrl, mappings, invalid_vals)
+
+    def test_checked_proof_validation(self):
+        """Tests objects of type CheckedProof"""
+        valid_example_1 = {
+            'assumptions_string': 'p',
+            'target_string': 'q',
+            'proof_string': 'from p we have q',
+            'correct': True
+        }
+        valid_example_2 = {
+            'assumptions_string': 'p',
+            'target_string': 'q',
+            'proof_string': 'from p we have q',
+            'correct': False,
+            'error_category': 'layout',
+            'error_code': 'bad_layout',
+            'error_message': 'layout is bad',
+            'error_line_number': 2
+        }
+        mappings = [
+            (valid_example_1, valid_example_1), 
+            (valid_example_2, valid_example_2)]
+
+        invalid_values = [
+            {}, None, {'assumptions_string': 'p'}, {
+                'assumptions_string': 'p',
+                'target_string': 'q',
+                'proof_string': 'from p we have q',
+                'correct': False
+            }]
+
+        self.check_normalization(
+            objects.CheckedProof, mappings, invalid_values)
+
+    def test_logic_question_validation(self):
+        """Tests objects of type LogicQuestion"""
+        p_expression = {
+            'top_kind_name': 'variable',
+            'top_operator_name': 'p',
+            'arguments': [],
+            'dummies': []
+        }
+
+        valid_example = {
+            'assumptions': [p_expression],
+            'results': [p_expression],
+            'default_proof_string': 'a proof'
+        }
+        mappings = [(valid_example, valid_example)]
+
+        invalid_values = [
+            {}, None, {'assumptions': p_expression}, {
+                'assumptions': p_expression,
+                'results': {
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p'
+                }
+            }]
+
+        self.check_normalization(
+            objects.LogicQuestion, mappings, invalid_values)
+
+    def test_logic_error_category_validation(self):
+        """Tests objects of type LogicErrorCategory"""
+
+        mappings = [
+            ('parsing', 'parsing'), ('typing', 'typing'), 
+            ('mistake', 'mistake')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.LogicErrorCategory, mappings, invalid_values)

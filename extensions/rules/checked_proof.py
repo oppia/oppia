@@ -19,8 +19,6 @@
 __author__ = 'Jacob Davis'
 
 from extensions.rules import base
-import logging
-
 
 class Correct(base.CheckedProofRule):
     description = 'is correct'
@@ -39,10 +37,9 @@ class NotCorrect(base.CheckedProofRule):
 
 
 class NotCorrectByCategory(base.CheckedProofRule):
-	description = 'is not correct due to {{c|LogicErrorCategory}}'
-	is_generic = False
+    description = 'is not correct due to {{c|LogicErrorCategory}}'
+    is_generic = False
 
-	def _evaluate(self, subject):
-		logging.warning(self.c)
-		return (not subject.get('correct')) and (
-			subject.get('errorCategory') == self.c)
+    def _evaluate(self, subject):
+        return (not subject.get('correct')) and (
+            subject.get('error_category') == self.c)

@@ -20,6 +20,7 @@ from core.domain import widget_domain
 from extensions.objects.models import objects
 from extensions.value_generators.models import generators
 
+
 class LogicProof(widget_domain.BaseWidget):
     """Definition of a widget.
 
@@ -44,13 +45,41 @@ class LogicProof(widget_domain.BaseWidget):
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
         'name': 'question',
-        'description': 'Question.',
+        'description': 'Question to ask.',
         'generator': generators.Copier,
         'init_args': {
-            'value': 'uninitialized'
+            'value': {
+                'assumptions': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'results': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'default_proof_string': ''
+            }
         },
         'customization_args': {
-            'value': 'uninitialized'
+            'value': {
+                'assumptions': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'results': [{
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p',
+                    'arguments': [],
+                    'dummies': []
+                }],
+                'default_proof_string': ''
+            }
         },
         'obj_type': 'LogicQuestion'
     }]
@@ -60,5 +89,5 @@ class LogicProof(widget_domain.BaseWidget):
     # must have at least one of these. This attribute name MUST be prefixed by
     # '_'.
     _handlers = [{
-        'name': 'submit', 'input_type': objects.CheckedProof
+        'name': 'submit', 'obj_type': 'CheckedProof'
     }]

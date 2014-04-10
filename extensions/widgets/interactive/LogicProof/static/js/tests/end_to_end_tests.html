@@ -1,0 +1,51 @@
+<html ng-app>
+  <head>
+    <script src="../lib/angular.min.js"></script>
+    <script src="../generatedParser.js"></script>
+    <script src="../shared.js"></script>
+    <script src="../teacher.js"></script>
+    <script src="../student.js"></script>
+    <script src="../data.js"></script>
+    <script src="../defaultData.js"></script>
+    <script src="../strings.js"></script>
+    <script src="endToEndTests.js"></script>
+
+    <script>
+
+    </script>
+  </head>
+
+  <body ng-controller="TestCtrl">
+    <table border="0">
+      <tr>
+        <td> <a href="shared_tests.html"> Shared tests </a> </td>
+        <td> <a href="teacher_tests.html"> Teacher tests </a> </td>
+        <td> <a href="student_tests.html"> Student tests </a> </td>
+        <td> <b> End to end tests </b> </td>
+        <td> <a href="../tools/demonstration.html"> Demonstration </a> </td>
+      </tr>
+    </table>
+    <h4>End-to-end and default-inputs tests of the oppia logic widget.</h4>
+
+    <b>Valid proofs:</b>
+    <table>
+      <tr ng-repeat="item in validResults">
+        <td> <b>{{item.index}} </b></td>
+        <td> {{item.result}} </td>
+        <td> {{item.error}} </td>
+      </tr>
+    <table>
+
+    <p></p>
+    <b>Invalid proofs:</b>
+    <table>
+      <tr ng-repeat="item in invalidResults">
+        <td> <b>{{item.index}} </b></td>
+        <td> {{item.result}} </td>
+        <td> {{item.expectedError}} </td>
+        <td> {{item.actualError}} </td>
+      </tr>
+    <table>
+
+  </body>
+</html>

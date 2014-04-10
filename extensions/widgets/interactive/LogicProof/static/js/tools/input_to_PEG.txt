@@ -21,7 +21,7 @@ booleanTemplate = expression:expression subs:substitution*
 substitution = '[' from:variable '->' to:expression ']'
     {
       var output = {};
-      output[from.operator] = to;
+      output[from.top_operator_name] = to;
       return output;
     }
 
@@ -76,19 +76,13 @@ booleanTemplate2 = '{{' expression:expression subs:substitution* '}}'
       };
     }
 
-stringMessage = character:[a-zA-Z0-9 ,.;:()!'"$^&*-_=+@#~?/<>\|]*
-    { 
-      return character.join('');
-    }
-
-
 //////////////// CONTROL FUNCTIONS ////////////////////////////
 
 formulaLHS = name:name '(' arguments:listOfVariables ')'
     {
       return {
-        kind: 'binary_function',
-        operator: name,
+        top_kind_name: 'binary_function',
+        top_operator_name: name,
         arguments: arguments,
         dummies:[]
       }
@@ -140,11 +134,11 @@ commaThenExpression =
 iffSymbol = '<=>'
 impliesSymbol = '=>'
 
-forAllSymbol = '@'
-existsSymbol = '$'
+forAllSymbol = '∀'
+existsSymbol = '∃'
 
-andSymbol = '&'
-orSymbol = '|'
+andSymbol = '∧'
+orSymbol = '∨'
 notSymbol = '~'
 
 equalsSymbol = '='
@@ -159,7 +153,7 @@ greaterThanSymbol = '>'
     {return 'greater_than'}
 notEqualsSymbol = '!='
     {return 'not_equals'}
-membershipSymbol = '?'
+membershipSymbol = '∈'
     {return 'is_in';}
 
 
@@ -174,8 +168,8 @@ iffFormula =
     left:impliesFormula iffSymbol right:iffFormula
     {
       return {
-        kind: 'binary_connective',
-        operator: 'iff',
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'iff',
         arguments: [left, right],
         dummies: []
       }
@@ -186,8 +180,8 @@ impliesFormula =
     left:quantifierFormula impliesSymbol right:impliesFormula
     {
       return {
-        kind: 'binary_connective',
-        operator: 'implies',
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'implies',
         arguments: [left, right],
         dummies: []
       }
@@ -204,8 +198,8 @@ forAllFormula =
     forAllSymbol left:variable '.'? right:quantifierFormula
     {
       return {
-        kind: 'quantifier',
-        operator: 'for_all',
+        top_kind_name: 'quantifier',
+        top_operator_name: 'for_all',
         arguments: [right],
         dummies: [left]
       };
@@ -216,8 +210,8 @@ existsFormula =
     existsSymbol left:variable '.'? right:quantifierFormula
     {
       return {
-        kind: 'quantifier',
-        operator: 'exists',
+        top_kind_name: 'quantifier',
+        top_operator_name: 'exists',
         arguments: [right],
         dummies: [left]
       };
@@ -228,11 +222,11 @@ boundedForAllFormula =
     forAllSymbol k:variable relation:boundableInfixRelationName n:element '.'? A:quantifierFormula
     {
       return {
-        kind: 'bounded_quantifier',
-        operator: 'bounded_for_all',
+        top_kind_name: 'bounded_quantifier',
+        top_operator_name: 'bounded_for_all',
         arguments: [{
-          kind: 'binary_relation',
-          operator: relation,
+          top_kind_name: 'binary_relation',
+          top_operator_name: relation,
           arguments: [k, n],
           dummies: []
         }, A],
@@ -245,11 +239,11 @@ boundedExistsFormula =
     existsSymbol k:variable relation:boundableInfixRelationName n:element '.'? A:quantifierFormula
     {
       return {
-        kind: 'bounded_quantifier',
-        operator: 'bounded_exists',
+        top_kind_name: 'bounded_quantifier',
+        top_operator_name: 'bounded_exists',
         arguments: [{
-          kind: 'binary_relation',
-          operator: relation,
+          top_kind_name: 'binary_relation',
+          top_operator_name: relation,
           arguments: [k, n],
           dummies: []
         }, A],
@@ -262,8 +256,8 @@ orFormula =
     left:andFormula orSymbol right:quantifierFormula
     {
       return {
-        kind: 'binary_connective',
-        operator: 'or',
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'or',
         arguments: [left, right],
         dummies: []
       };
@@ -274,8 +268,8 @@ andFormula =
     left:unaryFormula andSymbol right:andRHS
     {
       return {
-        kind: 'binary_connective',
-        operator: 'and',
+        top_kind_name: 'binary_connective',
+        top_operator_name: 'and',
         arguments: [left, right],
         dummies: []
       }
@@ -295,8 +289,8 @@ notFormula =
     notSymbol right:notRHS
     {
       return {
-        kind: 'unary_connective',
-        operator: 'not',
+        top_kind_name: 'unary_connective',
+        top_operator_name: 'not',
         arguments: [right],
         dummies: []
       }               
@@ -311,8 +305,8 @@ infixRelationFormula =
     left:additionArgument name:infixRelationName right:infixRelationRHS
     {
        return {
-        kind: 'binary_relation',
-        operator: name,
+        top_kind_name: 'binary_relation',
+        top_operator_name: name,
         arguments: [left, right],
         dummies: []
        }
@@ -344,8 +338,8 @@ additionArgument =
     left:subtractionArgument addition right:additionRHS
     {
       return {
-        kind: 'binary_function',
-        operator: 'addition',
+        top_kind_name: 'binary_function',
+        top_operator_name: 'addition',
         arguments: [left, right],
         dummies: []
       }
@@ -361,8 +355,8 @@ subtractionArgument =
     left:multiplicationArgument subtraction right:subtractionRHS
     {
       return {
-        kind: 'binary_function',
-        operator: 'subtraction',
+        top_kind_name: 'binary_function',
+        top_operator_name: 'subtraction',
         arguments: [left, right],
         dummies: []
       }
@@ -378,8 +372,8 @@ multiplicationArgument =
     left:divisionArgument multiplication right:multiplicationRHS
     {
       return {
-        kind: 'binary_function',
-        operator: 'multiplication',
+        top_kind_name: 'binary_function',
+        top_operator_name: 'multiplication',
         arguments: [left, right],
         dummies: []
       }
@@ -395,8 +389,8 @@ divisionArgument =
     left:exponentiationArgument division right:divisionRHS
     {
       return {
-        kind: 'binary_function',
-        operator: 'division',
+        top_kind_name: 'binary_function',
+        top_operator_name: 'division',
         arguments: [left, right],
         dummies: []
       }
@@ -412,8 +406,8 @@ exponentiationArgument =
     left:reducedArgument exponentiation right:exponentiationRHS
     {
       return {
-        kind: 'binary_function',
-        operator: 'exponentiation',
+        top_kind_name: 'binary_function',
+        top_operator_name: 'exponentiation',
         arguments: [left, right],
         dummies: []
       }
@@ -441,8 +435,8 @@ prefixFunction =
     name:name '(' arguments:listOfExpressions ')'
     {
       return {
-        kind: 'prefix_function',
-        operator: name,
+        top_kind_name: 'prefix_function',
+        top_operator_name: name,
         arguments: arguments,
         dummies: []
       }
@@ -455,11 +449,11 @@ prefixFunction =
     name:name '{' k:variable relation:boundableInfixRelationName n:element '|' A:expression '}'
     {
       return {
-        kind: 'ranged_function',
-        operator: name,
+        top_kind_name: 'ranged_function',
+        top_operator_name: name,
         arguments: [{
-          kind: 'binary_relation',
-          operator: relation,
+          top_kind_name: 'binary_relation',
+          top_operator_name: relation,
           arguments: [k, n],
           dummies: []
         }, A],
@@ -471,8 +465,8 @@ constant =
     digits:[0-9]+ 
     { 
       return {
-        kind: 'constant',
-        operator: parseInt(digits.join(""), 10),
+        top_kind_name: 'constant',
+        top_operator_name: parseInt(digits.join(""), 10),
         arguments: [],
         dummies: [],
         type: 'integer'
@@ -483,8 +477,8 @@ constant =
 string = '\'' characters:[a-zA-Z0-9_]* '\''
     {
       return {
-        kind: 'constant',
-        operator: '\'' + characters.join('') + '\'',
+        top_kind_name: 'constant',
+        top_operator_name: '\'' + characters.join('') + '\'',
         arguments: [],
         dummies: [],
         type: 'string'
@@ -495,8 +489,8 @@ variable =
     name:name
     {
       return {
-        kind: 'variable',
-        operator: name,
+        top_kind_name: 'variable',
+        top_operator_name: name,
         arguments: [],
         dummies: []
       };

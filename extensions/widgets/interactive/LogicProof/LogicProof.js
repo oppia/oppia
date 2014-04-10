@@ -28,79 +28,101 @@ oppia.directive('oppiaInteractiveLogicProof', [
       templateUrl: 'interactiveWidget/LogicProof',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
 
-        $scope.questionData = angular.copy(DEFAULT_QUESTION_DATA);
         $scope.localQuestionData = JSON.parse($attrs.questionWithValue);
-        if ($scope.localQuestionData === 'uninitialized') {
-          console.log('uninitialized');
-          $scope.questionData.assumptions = [{
-            kind: 'variable',
-            operator: 'P',
-            arguments: [],
-            dummies: []
-          }];
-          $scope.questionData.results = [{
-            kind: 'variable',
-            operator: 'P',
-            arguments: [],
-            dummies: []
-          }]
-        } else {
-          $scope.questionData.assumptions = $scope.localQuestionData.assumptions;
-          $scope.questionData.results = $scope.localQuestionData.results;
-          $scope.questionData.language.operators = $scope.localQuestionData.language.operators;
+
+        $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
+        $scope.questionData.assumptions = $scope.localQuestionData.assumptions;
+        $scope.questionData.results = $scope.localQuestionData.results;
+
+        // Deduce the new operators, as in BuildQuestion():
+        $scope.expressions = [];
+        $scope.topTypes = [];
+        for (var i = 0; i < $scope.questionData.assumptions.length; i++) {
+          $scope.expressions.push($scope.questionData.assumptions[i]);
+          $scope.topTypes.push('boolean');
         }
+        $scope.expressions.push($scope.questionData.results[0]);
+        $scope.topTypes.push('boolean');
+        $scope.typing = logicProofShared.assignTypesToExpressionArray(
+          $scope.expressions, $scope.topTypes, logicProofData.BASE_STUDENT_LANGUAGE, 
+          ['variable', 'constant', 'prefix_function']
+        );
+        $scope.questionData.language.operators = $scope.typing[0].operators;
         
-        $scope.assumptionsString = shared.displayExpressionArray($scope.questionData.assumptions, $scope.questionData.language.operators);
-        $scope.targetString = shared.displayExpression($scope.questionData.results[0], $scope.questionData.language.operators);
+        $scope.assumptionsString = logicProofShared.displayExpressionArray(
+          $scope.questionData.assumptions, 
+          $scope.questionData.language.operators);
+        $scope.targetString = logicProofShared.displayExpression(
+          $scope.questionData.results[0], 
+          $scope.questionData.language.operators);
+        $scope.questionString = ($scope.assumptionsString === '') ?
+            'Prove ' + $scope.targetString + '.':
+            'Assuming ' + $scope.assumptionsString + '; prove ' + $scope.targetString + '.';
 
-        $scope.questionInstance = student.buildInstance($scope.questionData);
-        $scope.proofString = $scope.localQuestionData.defaultProofString;
-        $scope.haveDefaultProof = ($scope.proofString !== '');
+        $scope.questionInstance = logicProofStudent.buildInstance($scope.questionData);
+        $scope.proofString = $scope.localQuestionData.default_proof_string;
+        $scope.haveErrorMessage = false;
 
-        $scope.displayMessage = function(message, line) {
-          $scope.proofError = '';
-          for (var i = 0; i < line; i++) {
-            $scope.proofError += ' \n';
+        $scope.displayMessage = function(message, lineNumber) {
+          var output = '';
+          for (var i = 0; i < lineNumber; i++) {
+            output += ' \n';
           }
-          $scope.proofError += message;
+          output += message;
+          return output;
         }
 
-        $scope.editProof = function() {
-          $scope.checkSuccess = false;
-          if ($scope.proofString.slice(-1) === '\n') {
+        $scope.$watch('proofString', function(newValue, oldValue) {
+          var comparison = logicProofConversion.compareStrings(newValue, oldValue);
+          if (comparison.first === newValue.length - 1) {
+            $scope.proofString = logicProofConversion.convertToLogicCharacters(newValue);
+          }
+
+          var haveNewLineBreak = 
+            (newValue.slice(comparison.first, comparison.last + 1).indexOf('\n') !== -1);
+          if (haveNewLineBreak) {
             try {
-              student.validateProof($scope.proofString, $scope.questionInstance);
+              logicProofStudent.validateProof($scope.proofString, $scope.questionInstance);
+              $scope.proofError = '';
             }
             catch (err) {
-              $scope.displayMessage(err.message, err.line);
+              $scope.proofError = $scope.displayMessage(err.message, err.line);
             }
           } else {
             $scope.proofError = '';
           }
-        }
+        })
 
+        // NOTE: proof_num_lines and displayed_question are only computed here
+        // because response.html needs them and does not have its own
+        // javascript.
         $scope.submitProof = function() {
           try {
-            proof = student.buildProof($scope.proofString, $scope.questionInstance);
-            student.checkProof(proof, $scope.questionInstance);
+            var proof = logicProofStudent.buildProof($scope.proofString, $scope.questionInstance);
+            logicProofStudent.checkProof(proof, $scope.questionInstance);
             $scope.$parent.$parent.submitAnswer({
-              assumptionsString: $scope.assumptionsString,
-              targetString: $scope.targetString,
-              proofString: $scope.proofString,
-              correct: true
+              assumptions_string: $scope.assumptionsString,
+              target_string: $scope.targetString,
+              proof_string: $scope.proofString,
+              proof_num_lines: proof.lines.length,
+              correct: true,
+              displayed_question: $scope.questionString,
+              displayed_message: ''
             }, 'submit');
           }
           catch (err) {
             $scope.$parent.$parent.submitAnswer({
-              assumptionsString: $scope.assumptionsString,
-              targetString: $scope.targetString,
-              proofString: $scope.proofString,
+              assumptions_string: $scope.assumptionsString,
+              target_string: $scope.targetString,
+              proof_string: $scope.proofString,
+              proof_num_lines: $scope.proofString.split('\n').length,
               correct: false,
-              errorCategory: err.category,
-              errorCode: err.code,
-              // TODO: should just return err.message, and fix response.html
-              errorMessage: 'line ' + (err.line + 1) + ': ' + err.message,
-              errorLine: err.line
+              error_category: err.category,
+              error_code: err.code,
+              error_message: err.message,
+              error_line_number: err.line,
+              displayed_question: $scope.questionString,
+              displayed_message: $scope.displayMessage(err.message, err.line)
             }, 'submit');
           }
         }

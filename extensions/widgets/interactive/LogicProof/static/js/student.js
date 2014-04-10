@@ -1,10 +1,20 @@
-var student = (function() {
+var logicProofStudent = (function() {
   /////////////////// BUILD INSTANCE ///////////////////////////////////
 
   // These evaluation rules must all return an object of their specified output
   // type (boolean, integer, string, formula or set_of_formulas) or throw an
-  // error with message 'evaluation failed'. They will be used by evaluate() when computing the value of an
-  // expression that contains these operators.
+  // error with message 'evaluation failed'. They will be used by evaluate() 
+  // when computing the value of an expression that contains these operators.
+
+  // Evaluation strictness: if an error occurs at any point in a computation
+  // then the entire computation will return an error; so for example 
+  // true||error evaluates as error rather than true. The exceptions to this 
+  // are bounded quantification and ranged functions; for these we will
+  // evaluate until we reach an answer and then return without computing any
+  // later values. So for example min{x<n|A(x)} where ~A(1)=false, A(2)=true 
+  // and A(3)=error will return true rather than error. The default control
+  // functions rely heavily on this functionality and will need to be rewritten
+  // if it is changed.
   BASE_CONTROL_MODEL = {
     evaluation_rules: {
       'and': {
@@ -51,9 +61,9 @@ var student = (function() {
         format: 'bottom_up',
         evaluateExpression: function(arguments, types, evaluationParameters) {
           return (types[0] === 'formula') ?
-            shared.checkExpressionsAreEqual(arguments[0], arguments[1]):
+            logicProofShared.checkExpressionsAreEqual(arguments[0], arguments[1]):
             (arguments[0].type === 'set_of_formulas') ?
-              shared.checkSetsOfExpressionsAreEqual(arguments[0], arguments[1]):
+              logicProofShared.checkSetsOfExpressionsAreEqual(arguments[0], arguments[1]):
               (arguments[0] === arguments[1]);
         }
       },
@@ -61,9 +71,9 @@ var student = (function() {
         format: 'bottom_up',
         evaluateExpression: function(arguments, types, evaluationParameters) {
           return (types[0] === 'formula') ?
-            !shared.checkExpressionsAreEqual(arguments[0], arguments[1]):
+            !logicProofShared.checkExpressionsAreEqual(arguments[0], arguments[1]):
             (arguments[0].type === 'set_of_formulas') ?
-              !shared.checkSetsOfExpressionsAreEqual(arguments[0], arguments[1]):
+              !logicProofShared.checkSetsOfExpressionsAreEqual(arguments[0], arguments[1]):
               (arguments[0] !== arguments[1]);
         }
       },
@@ -94,7 +104,7 @@ var student = (function() {
       'is_in': {
         format: 'bottom_up',
         evaluateExpression: function(arguments, types, evaluationParameters) {
-          return shared.checkExpressionIsInSet(arguments[0], arguments[1]);
+          return logicProofShared.checkExpressionIsInSet(arguments[0], arguments[1]);
         }
       },
       'addition': {
@@ -134,14 +144,19 @@ var student = (function() {
           for (var key in inputs) {
             newInputs[key] = inputs[key];
           }
-          var bounder = evaluate(expression.arguments[0].arguments[1], inputs, model, evaluationParameters, cache);
+          var bounder = evaluate(
+            expression.arguments[0].arguments[1], inputs, model, 
+            evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
-            var rangeEnd = (expression.arguments[0].operator === 'less_than') ?
+            var rangeEnd = (expression.arguments[0].top_operator_name === 'less_than') ?
                bounder :
                bounder + 1;
             for (var i = 1; i < rangeEnd; i++) {
-              newInputs[expression.dummies[0].operator] = i;
-              if (!evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = i;
+              if (
+                  !evaluate(
+                    expression.arguments[1], newInputs, model, 
+                    evaluationParameters, cache)) {
                 return false;
               }
             }
@@ -149,8 +164,11 @@ var student = (function() {
           } else {
             // here the bounder is a set_of_formulas (so an array)
             for (var i = 0; i < bounder.length; i++) {
-              newInputs[expression.dummies[0].operator] = bounder[i];
-              if (!evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = bounder[i];
+              if (
+                !evaluate(
+                  expression.arguments[1], newInputs, model, 
+                  evaluationParameters, cache)) {
                 return false;
               }
             }
@@ -165,14 +183,19 @@ var student = (function() {
           for (var key in inputs) {
             newInputs[key] = inputs[key];
           }
-          var bounder = evaluate(expression.arguments[0].arguments[1], inputs, model, evaluationParameters, cache);
+          var bounder = evaluate(
+            expression.arguments[0].arguments[1], inputs, model,
+            evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
-            var rangeEnd = (expression.arguments[0].operator === 'less_than') ?
+            var rangeEnd = (expression.arguments[0].top_operator_name === 'less_than') ?
                bounder :
                bounder + 1;
             for (var i = 1; i<rangeEnd; i++) {
-              newInputs[expression.dummies[0].operator] = i;
-              if (evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = i;
+              if (
+                evaluate(
+                  expression.arguments[1], newInputs, model, 
+                  evaluationParameters, cache)) {
                 return true;
               }
             }
@@ -180,8 +203,11 @@ var student = (function() {
           } else {
             // here the bounder is a set_of_formulas (so an array)
             for (var i = 0; i < bounder.length; i++) {
-              newInputs[expression.dummies[0].operator] = bounder[i];
-              if (evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = bounder[i];
+              if (
+                evaluate(
+                  expression.arguments[1], newInputs, model, 
+                  evaluationParameters, cache)) {
                 return true;
               }
             }
@@ -189,8 +215,10 @@ var student = (function() {
           }
         }
       },
-      // min{k<n|A(k)} will range over [1,..,n-1], throwing an error if no match is found
-      // min{p in antecedents(n)|A(p)} will range over antecedents(n), throwing an error if no match is found.
+      // min{k<n|A(k)} will range over [1,..,n-1], throwing an error if no 
+      // match is found.
+      // min{p∈antecedents(n)|A(p)} will range over antecedents(n), throwing
+      // an error if no match is found.
       'min': {
         format: 'top_down',
         evaluateExpression: function (expression, inputs, model, evaluationParameters, cache) {
@@ -198,22 +226,30 @@ var student = (function() {
           for (var key in inputs) {
             newInputs[key] = inputs[key];
           }
-          var bounder = evaluate(expression.arguments[0].arguments[1], inputs, model, evaluationParameters, cache);
+          var bounder = evaluate(
+            expression.arguments[0].arguments[1], inputs, model, 
+            evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
-            var rangeEnd = (expression.arguments[0].operator === 'less_than') ?
+            var rangeEnd = (expression.arguments[0].top_operator_name === 'less_than') ?
                bounder :
                bounder + 1;
             for (var i = 1; i < rangeEnd; i++) {
-              newInputs[expression.dummies[0].operator] = i;
-              if (evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = i;
+              if (
+                evaluate(
+                  expression.arguments[1], newInputs, model, 
+                  evaluationParameters, cache)) {
                 return i;
               }
             }
             throw new Error('evaluation failed');
           } else {
             for (var i = 0; i < bounder.length; i++) {
-              newInputs[expression.dummies[0].operator] = bounder[i];
-              if (evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = bounder[i];
+              if (
+                evaluate(
+                  expression.arguments[1], newInputs, model, 
+                  evaluationParameters, cache)) {
                 return bounder[i];
               }
             }
@@ -228,22 +264,30 @@ var student = (function() {
           for (var key in inputs) {
             newInputs[key] = inputs[key];
           }
-          var bounder = evaluate(expression.arguments[0].arguments[1], inputs, model, evaluationParameters, cache);
+          var bounder = evaluate(
+            expression.arguments[0].arguments[1], inputs, model, 
+            evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
-            var rangeEnd = (expression.arguments[0].operator === 'less_than') ?
+            var rangeEnd = (expression.arguments[0].top_operator_name === 'less_than') ?
                bounder :
                bounder + 1;
             for (var i = rangeEnd - 1; i > 0; i--) {
-              newInputs[expression.dummies[0].operator] = i;
-              if (evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = i;
+              if (
+                evaluate(
+                  expression.arguments[1], newInputs, model, 
+                  evaluationParameters, cache)) {
                 return i;
               }
             }
             throw new Error('evaluation failed');
           } else {
             for (var i = bounder.length-1; i >= 0; i--) {
-              newInputs[expression.dummies[0].operator] = bounder[i];
-              if (evaluate(expression.arguments[1], newInputs, model, evaluationParameters, cache)) {
+              newInputs[expression.dummies[0].top_operator_name] = bounder[i];
+              if (
+                evaluate(
+                  expression.arguments[1], newInputs, model, 
+                  evaluationParameters, cache)) {
                 return bounder[i];
               }
             }
@@ -251,7 +295,8 @@ var student = (function() {
           }
         }
       },
-      // We subtract one for these because for the user proof lines are indexed from 1
+      // We subtract one for these because for the user proof lines are indexed
+      // from 1.
       'indentation': {
         format: 'bottom_up',
         evaluateExpression: function(arguments, types, evaluationParameters) {
@@ -354,13 +399,16 @@ var student = (function() {
       'question_variables': {
         format: 'bottom_up',
         evaluateExpression: function(arguments, types, evaluationParameters) {
-          var names = shared.getOperatorsFromExpressionArray(evaluationParameters.assumptions.concat([evaluationParameters.target]), ['variable']);
-          // this gives us the variables as strings, we convert them to expressions
+          var names = logicProofShared.getOperatorsFromExpressionArray(
+            evaluationParameters.assumptions.concat(
+              [evaluationParameters.target]), ['variable']);
+          // This gives us the variables as strings, we convert them to
+          // expressions.
           var result = [];
           for (var i = 0; i < names.length; i++) {
             result.push({
-              kind: 'variable',
-              operator: names[i],
+              top_kind_name: 'variable',
+              top_operator_name: names[i],
               arguments: [],
               dummies: []
             })
@@ -388,7 +436,7 @@ var student = (function() {
         format: 'bottom_up',
         evaluateExpression: function(arguments, types, evaluationParameters) {
           var substitutions = {};
-          substitutions[arguments[1].operator] = arguments[2];
+          substitutions[arguments[1].top_operator_name] = arguments[2];
           return substituteIntoExpression(arguments[0], substitutions);
         }
       }
@@ -405,23 +453,30 @@ var student = (function() {
   *         proofs from the student.
   */
   var buildInstance = function(questionData) {
-    var evaluationRules = angular.copy(BASE_CONTROL_MODEL.evaluation_rules);
-    var controlOperators = angular.copy(sharedData.BASE_CONTROL_LANGUAGE.operators);
+    var evaluationRules = angular.copy(
+      BASE_CONTROL_MODEL.evaluation_rules);
+    var controlOperators = angular.copy(
+      logicProofData.BASE_CONTROL_LANGUAGE.operators);
     // NOTE: the javascript fails if we try to omit this function and define
     // evaluateExpression() directly inside the for loop.
     var makeEvaluateExpression = function(definition, variables) {
       return function(expression, inputs, model, evaluationParameters, cache) {
         var argumentValues = {};
         for (var i = 0; i < variables.length; i++) {
-          argumentValues[variables[i].operator] = evaluate(expression.arguments[i], inputs, model, evaluationParameters, cache);
+          argumentValues[variables[i].top_operator_name] = evaluate(
+            expression.arguments[i], inputs, model, evaluationParameters, 
+            cache);
         }
-        return evaluate(definition, argumentValues, model, evaluationParameters, cache);
+        return evaluate(
+          definition, argumentValues, model, evaluationParameters, cache);
       };
     };
     for (var i = 0; i < questionData.control_functions.length; i++) {
       evaluationRules[questionData.control_functions[i].name] = {
         format: 'definition',
-        evaluateExpression: makeEvaluateExpression(questionData.control_functions[i].definition, questionData.control_functions[i].variables)
+        evaluateExpression: makeEvaluateExpression(
+          questionData.control_functions[i].definition, 
+          questionData.control_functions[i].variables)
       };
       controlOperators[questionData.control_functions[i].name] = {
         kind: 'prefix_function',
@@ -433,8 +488,8 @@ var student = (function() {
       assumptions: questionData.assumptions,
       results: questionData.results,
       language: {
-        types: sharedData.BASE_STUDENT_LANGUAGE.types,
-        kinds: sharedData.BASE_STUDENT_LANGUAGE.kinds,
+        types: logicProofData.BASE_STUDENT_LANGUAGE.types,
+        kinds: logicProofData.BASE_STUDENT_LANGUAGE.kinds,
         operators: questionData.language.operators
       },
       line_templates: questionData.line_templates,
@@ -442,8 +497,8 @@ var student = (function() {
       general_messages: questionData.general_messages,
       mistake_table: questionData.mistake_table,
       control_language: {
-        types: sharedData.BASE_CONTROL_LANGUAGE.types,
-        kinds: sharedData.BASE_CONTROL_LANGUAGE.kinds,
+        types: logicProofData.BASE_CONTROL_LANGUAGE.types,
+        kinds: logicProofData.BASE_CONTROL_LANGUAGE.kinds,
         operators: controlOperators
       },
       control_model: {
@@ -452,16 +507,16 @@ var student = (function() {
     };
   }
 
-  ///////////////////   BUILD PROOF  ///////////////////////////////////
+  ///////////////////   BUILD PROOF  //////////////////////////////////////////
 
  /**
   * This function identifies a way in which the expression is an instance of
   * template, or throws an error if it is not.
-  * e.g. A(x)&t, p&q, {} will return {p: A(x), q:t}
-  * e.g. A(x)&t, p&q, {q: s} will throw an error
-  * e.g. $y.R(y), $x.p, {} will return {x:y, p: R(y)} as dummies also matched
+  * e.g. A(x)∧t, p∧q, {} will return {p: A(x), q:t}
+  * e.g. A(x)∧t, p∧q, {q: s} will throw an error
+  * e.g. ∃y.R(y), ∃x.p, {} will return {x:y, p: R(y)} as dummies also matched
   * Only variables in the template can be matched to arbitrary expressions in
-  * the expression; e.g. r|s is not an instance of p&q because & is not a
+  * the expression; e.g. r∨s is not an instance of p∧q because ∧ is not a
   * variable and so needs to be matched exactly.
   * @param expression: an Expression, which is to be matched
   * @param template: the Expression against which we will match
@@ -477,22 +532,24 @@ var student = (function() {
     for (var key in oldMatchings) {
       matchings[key] = oldMatchings[key];
     }
-    if (template.kind === 'variable') {
-      if (oldMatchings.hasOwnProperty(template.operator)) {
-        if (shared.checkExpressionsAreEqual(expression, oldMatchings[template.operator])) {
+    if (template.top_kind_name === 'variable') {
+      if (oldMatchings.hasOwnProperty(template.top_operator_name)) {
+        if (
+          logicProofShared.checkExpressionsAreEqual(
+            expression, oldMatchings[template.top_operator_name])) {
           return matchings;
         } else {
-          throw new shared.UserError('unmatched_line', {});
+          throw new logicProofShared.UserError('unmatched_line', {});
         }
       } else {
-        matchings[template.operator] = expression;
+        matchings[template.top_operator_name] = expression;
         return matchings;
       }
-    } else if (expression.operator !== template.operator ||
-          expression.kind !== template.kind ||
+    } else if (expression.top_operator_name !== template.top_operator_name ||
+          expression.top_kind_name !== template.top_kind_name ||
           expression.arguments.length !== template.arguments.length ||
           expression.dummies.length !== template.dummies.length) {
-        throw new shared.UserError('unmatched_line', {});
+        throw new logicProofShared.UserError('unmatched_line', {});
     } else {
       // For matching purposes arguments and dummies are equivalent
       var subExpressions = expression.arguments.concat(expression.dummies);
@@ -521,7 +578,7 @@ var student = (function() {
     for (var key in substitutions) {
       var isDummy = false;
       for (var i = 0; i < expression.dummies.length; i++) {
-        if (expression.dummies[i].operator === key) {
+        if (expression.dummies[i].top_operator_name === key) {
           isDummy = true;
         } 
       }
@@ -529,14 +586,16 @@ var student = (function() {
         newSubstitutions[key] = substitutions[key];
       }
     }
-    if (substitutions.hasOwnProperty(expression.operator)) {
-      return substitutions[expression.operator];
+    if (substitutions.hasOwnProperty(expression.top_operator_name)) {
+      return substitutions[expression.top_operator_name];
     } else {
       return {
-        operator: expression.operator,
-        kind: expression.kind,
-        arguments: substituteIntoExpressionArray(expression.arguments, newSubstitutions),
-        dummies: substituteIntoExpressionArray(expression.dummies, newSubstitutions)
+        top_operator_name: expression.top_operator_name,
+        top_kind_name: expression.top_kind_name,
+        arguments: substituteIntoExpressionArray(
+          expression.arguments, newSubstitutions),
+        dummies: substituteIntoExpressionArray(
+          expression.dummies, newSubstitutions)
       };
     }
   };
@@ -554,12 +613,12 @@ var student = (function() {
   // Replaces all operators from expression (including dummies) that appear in
   // the dictionary 'matchings' with their values in matchings.
   var instantiateExpression = function(expression, matchings) {
-    if (matchings.hasOwnProperty(expression.operator)) {
-      return matchings[expression.operator];
+    if (matchings.hasOwnProperty(expression.top_operator_name)) {
+      return matchings[expression.top_operator_name];
     } else {
       var output = {
-        operator: expression.operator,
-        kind: expression.kind,
+        top_operator_name: expression.top_operator_name,
+        top_kind_name: expression.top_kind_name,
         arguments: instantiateExpressionArray(expression.arguments, matchings),
         dummies: instantiateExpressionArray(expression.dummies, matchings)
       }
@@ -581,19 +640,22 @@ var student = (function() {
   * @return: an Expression
   */
   var computeExpressionFromTemplate = function(template, matchings) {
-    // e.g. template represents p[x -> a] and matchings represents {p: A(y), x: y, a: 2}
+    // e.g. template represents p[x -> a] and matchings represents
+    // {p: A(y), x: y, a: 2}
     var newExpression = instantiateExpression(template.expression, matchings);
     var newSubstitutions = [];
     for (var i = 0; i < template.substitutions.length; i++) {
       var substitution = {};
       for (var key in template.substitutions[i]) {
-        substitution[matchings[key].operator] = instantiateExpression(template.substitutions[i][key], matchings);
+        substitution[matchings[key].top_operator_name] = instantiateExpression(
+          template.substitutions[i][key], matchings);
       }
       newSubstitutions.push(substitution);
     }
     // e.g. now new_expression is A(y) and new_subsitutions represents [y -> 2]
     for (var i = 0; i < newSubstitutions.length; i++) {
-      newExpression = substituteIntoExpression(newExpression, newSubstitutions[i]);
+      newExpression = substituteIntoExpression(
+        newExpression, newSubstitutions[i]);
     }
     return newExpression;
     // e.g. result is A(2)    
@@ -615,7 +677,7 @@ var student = (function() {
   *        the line the student actually wrote to the LineTemplate provided by
   *        the techer of which it is an instance.
   * @param operators: from the student Language and used for display purposes.
-  * @raises This function throws a shared.UserError (with the 'pre-rendered' code) that 
+  * @raises This function throws a logicProofShared.UserError (with the 'pre-rendered' code) that 
   *         contains an array of strings describing the error, one of which will be 
   *         chosen later to show to the student. If the messages list is empty 
   *         (signifying that the line in question is a correct one) we do nothing.
@@ -629,11 +691,14 @@ var student = (function() {
           if (messages[i][j].format === 'string') {
             renderedMessages[i] += messages[i][j].content;
           } else {
-            renderedMessages[i] += shared.displayExpression(computeExpressionFromTemplate(messages[i][j].content, matchings), operators);
+            renderedMessages[i] += logicProofShared.displayExpression(
+              computeExpressionFromTemplate(
+                messages[i][j].content, matchings), operators);
           }
         }
       }
-      throw new shared.PreRenderedUserError(renderedMessages, templateName);
+      throw new logicProofShared.PreRenderedUserError(
+        renderedMessages, templateName);
     }
   }
 
@@ -650,17 +715,17 @@ var student = (function() {
   */
   var matchLineToTemplate = function(protoLine, template, vocabulary) {
     // These witness that the protoLine is an instance of the template. For
-    // example if the protoLine is 'we know A&B' and the template is 'we know
-    // p' then matchings would end up as {p: A&B}.
+    // example if the protoLine is 'we know A∧B' and the template is 'we know
+    // p' then matchings would end up as {p: A∧B}.
     var matchings = {};
 
     // check unsubstituted expressions agree
     if (protoLine.length !== template.length) {
-      throw new shared.UserError('unmatched_line', {});
+      throw new logicProofShared.UserError('unmatched_line', {});
     }
     for (var i = 0; i < protoLine.length; i++) {
       if (protoLine[i].format !== template[i].format) {
-        throw new shared.UserError('unmatched_line', {});
+        throw new logicProofShared.UserError('unmatched_line', {});
       }
       if (protoLine[i].format === 'expression') {
         // Only unsubstituted expression templates are useful in establishing 
@@ -669,16 +734,18 @@ var student = (function() {
         // a, because there are many possible subsitutions that could have
         // produced the expression we see.
         if (template[i].content.substitutions.length === 0) {
-          matchings = matchExpression(protoLine[i].content, template[i].content.expression, matchings);
+          matchings = matchExpression(
+            protoLine[i].content, template[i].content.expression, matchings);
         }
       }
     }
     // now check the substituted expression templates agree
     for (var i = 0; i < protoLine.length; i++) {
       if (protoLine[i].format === 'expression' && template[i].content.substitutions.length > 0) {
-        var expression = computeExpressionFromTemplate(template[i].content, matchings)
-        if (!shared.checkExpressionsAreEqual(protoLine[i].content, expression)) {
-          throw new shared.UserError('unmatched_line', {});
+        var expression = computeExpressionFromTemplate(
+          template[i].content, matchings)
+        if (!logicProofShared.checkExpressionsAreEqual(protoLine[i].content, expression)) {
+          throw new logicProofShared.UserError('unmatched_line', {});
         }
       }
     }
@@ -686,7 +753,7 @@ var student = (function() {
     // finally check phrases agree
     for (var i = 0; i < protoLine.length; i++) {
       if (protoLine[i].format === 'phrase' && protoLine[i].content !== template[i].content) {
-        throw new shared.UserError('unmatched_line', {});
+        throw new logicProofShared.UserError('unmatched_line', {});
       }
     }
 
@@ -710,15 +777,23 @@ var student = (function() {
     var typesRequired = [];
     for (var i = 0; i < templateReaderView.length; i++) {
       if (templateReaderView[i].format === 'expression') {
-        var expression = computeExpressionFromTemplate(templateReaderView[i].content, matchings);
-        if (templateReaderView[i].content.hasOwnProperty('kind') && templateReaderView[i].content.kind !== expression.kind) {
-          throw new shared.UserError('wrong_kind_in_line', {expression: expression, expected_kind: templateReaderView[i].content.kind});
+        var expression = computeExpressionFromTemplate(
+          templateReaderView[i].content, matchings);
+        if (
+          templateReaderView[i].content.hasOwnProperty('kind') && 
+          templateReaderView[i].content.kind !== expression.top_kind_name) {
+          throw new logicProofShared.UserError(
+            'wrong_kind_in_line', {
+              expression: expression, 
+              expected_kind: templateReaderView[i].content.kind
+            });
         }
         expressionsToCheck.push(expression);
         typesRequired.push(templateReaderView[i].content.type);
       }
     }
-    shared.assignTypesToExpressionArray(expressionsToCheck, typesRequired, language, ['variable', 'constant']);
+    logicProofShared.assignTypesToExpressionArray(
+      expressionsToCheck, typesRequired, language, ['variable', 'constant']);
   };
 
  /**
@@ -734,13 +809,15 @@ var student = (function() {
   *           message: a string describing the problem
   *         }
   */
-  var requireIdentifiableLine = function(lineString, lineTemplates, language, vocabulary, generalMessages) {
+  var requireIdentifiableLine = function(lineString, lineTemplates, language, 
+      vocabulary, generalMessages) {
     try {
-      var protoLines = shared.parseLineString(lineString.trim(), language.operators, vocabulary, false);
+      var protoLines = logicProofShared.parseLineString(
+        lineString.trim(), language.operators, vocabulary, false);
     }
     catch (err) {
       throw {
-        message: shared.renderError(err, generalMessages, language)
+        message: logicProofShared.renderError(err, generalMessages, language)
       };
     }
 
@@ -748,12 +825,14 @@ var student = (function() {
     for (var i = 0; i < protoLines.length; i++) {
       for (var j = 0; j < lineTemplates.length; j++) {
         try {
-          matchLineToTemplate(protoLines[i], lineTemplates[j].reader_view, vocabulary);
+          matchLineToTemplate(
+            protoLines[i], lineTemplates[j].reader_view, vocabulary);
           lineIdentified = true;
         }
         catch (err) {
           if (errorMessage === undefined) {
-            var errorMessage = shared.renderError(err, generalMessages, language);
+            var errorMessage = logicProofShared.renderError(
+              err, generalMessages, language);
           }
         }
       }
@@ -821,10 +900,12 @@ var student = (function() {
       n++;
     }
     if (n % 2 !== 0) {
-      throw new shared.UserError('odd_number_spaces', {});
+      throw new logicProofShared.UserError('odd_number_spaces', {});
     }
     var indentation = n / 2;
-    var protoLines = shared.parseLineString(lineString.slice(n, lineString.length), language.operators, vocabulary, false);
+    var protoLines = logicProofShared.parseLineString(
+      lineString.slice(n, lineString.length), language.operators, vocabulary, 
+      false);
 
     // At this stage we wish to return the 'best' matching with the following
     // priority list:
@@ -843,23 +924,30 @@ var student = (function() {
     for (var i = 0; i < protoLines.length; i++) {
       for (var j = 0; j < lineTemplates.length; j++) {
         try {
-          var matchings = matchLineToTemplate(protoLines[i], lineTemplates[j].reader_view, vocabulary);
-          requireValidMatching(matchings, lineTemplates[j].reader_view, language);
-          throwLineMessages(lineTemplates[j].error, lineTemplates[j].name, matchings, language.operators);
+          var matchings = matchLineToTemplate(
+            protoLines[i], lineTemplates[j].reader_view, vocabulary);
+          requireValidMatching(
+            matchings, lineTemplates[j].reader_view, language);
+          throwLineMessages(
+            lineTemplates[j].error, lineTemplates[j].name, matchings, 
+            language.operators);
 
           var antecedents = [];
           for (var k = 0; k < lineTemplates[j].antecedents.length; k++) {
             antecedents.push({
               format: 'expression',
-              content: computeExpressionFromTemplate(lineTemplates[j].antecedents[k], matchings)
+              content: computeExpressionFromTemplate(
+                lineTemplates[j].antecedents[k], matchings)
             });
           }
           return {
             template_name: lineTemplates[j].name,
             matchings: matchings,
             antecedents: antecedents,
-            results: computeExpressionsFromTemplateArray(lineTemplates[j].results, matchings),
-            variables: instantiateExpressionArray(lineTemplates[j].variables, matchings),
+            results: computeExpressionsFromTemplateArray(
+              lineTemplates[j].results, matchings),
+            variables: instantiateExpressionArray(
+              lineTemplates[j].variables, matchings),
             indentation: indentation,
             text: lineString
           };
@@ -895,14 +983,20 @@ var student = (function() {
     var builtLines = [];
     for (var i = 0; i < lineStrings.length; i++) {
       try {
-        builtLines.push(buildLine(lineStrings[i], questionInstance.line_templates, questionInstance.language, questionInstance.vocabulary));
+        builtLines.push(
+          buildLine(
+            lineStrings[i], questionInstance.line_templates, 
+            questionInstance.language, questionInstance.vocabulary));
       }
       catch (err) {
         throw {
-          message: shared.renderError(err, questionInstance.general_messages, questionInstance.language),
+          message: logicProofShared.renderError(
+            err, questionInstance.general_messages, questionInstance.language),
           line: i,
           code: err.code,
-          category: (err.name === 'PreRenderedUserError') ? 'line': questionInstance.general_messages[err.code].category
+          category: (err.name === 'PreRenderedUserError') ? 
+            'line': 
+            questionInstance.general_messages[err.code].category
         };
       }
     }
@@ -932,51 +1026,59 @@ var student = (function() {
   * @raises an error if any part of the evaluation failed, for example by
   *         trying to access an element of an array beyond the array's length.
   */
-  // NOTE: the console.log here are used for testing
   var evaluate = function(expression, inputs, model, evaluationRuleParameters, cache) {
-    ////console.log('EVALUATE ' + shared.displayExpression(expression, sharedData.BASE_CONTROL_LANGUAGE.operators) + ' ' + JSON.stringify(inputs))
 
     var cacheKey = JSON.stringify(expression) + '#' + JSON.stringify(inputs);
     if (cache.hasOwnProperty(cacheKey) && false) {
       return cache[cacheKey];
     }
 
-    if (expression.kind === 'variable') {
-      var answer = inputs[expression.operator];
-    } else if (expression.kind === 'constant') {
-      var answer = expression.operator;
+    if (expression.top_kind_name === 'variable') {
+      var answer = inputs[expression.top_operator_name];
+    } else if (expression.top_kind_name === 'constant') {
+      var answer = expression.top_operator_name;
     } else {
-      var evaluationRule = model.evaluation_rules[expression.operator];
+      var evaluationRule = model.evaluation_rules[expression.top_operator_name];
 
       if (evaluationRule.format === 'top_down') {
-        var answer =  evaluationRule.evaluateExpression(expression, inputs, model, evaluationRuleParameters, cache);
+        var answer =  evaluationRule.evaluateExpression(
+          expression, inputs, model, evaluationRuleParameters, cache);
 
       } else if (evaluationRule.format === 'definition') {
         // evaluate arguments (spec requires that the expression has no dummies)
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' + expression.operator + ' to be evaluated via a definition but it has dummies');
+          throw new Error('evaluate() received ' + 
+            expression.top_operator_name + 
+            ' to be evaluated via a definition but it has dummies');
         }
-        var answer =  evaluationRule.evaluateExpression(expression, inputs, model, evaluationRuleParameters, cache);
+        var answer =  evaluationRule.evaluateExpression(
+          expression, inputs, model, evaluationRuleParameters, cache);
 
       } else if (evaluationRule.format === 'bottom_up') {
         // evaluate arguments (spec requires that there are no dummies)
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' + expression.operator + ' to be evaluated bottom-up but it has dummies');
+          throw new Error('evaluate() received ' + 
+            expression.top_operator_name + 
+            ' to be evaluated bottom-up but it has dummies');
         }
         var arguments = [];
         for (var i = 0; i < expression.arguments.length; i++) {
-          arguments.push(evaluate(expression.arguments[i], inputs, model, evaluationRuleParameters, cache));
+          arguments.push(
+            evaluate(
+              expression.arguments[i], inputs, model, evaluationRuleParameters,
+              cache));
         }
         var types = [];
         for (var i = 0; i < expression.arguments.length; i++) {
           types.push(expression.arguments[i].type);
         }
-        var answer =  evaluationRule.evaluateExpression(arguments, types, evaluationRuleParameters);
+        var answer =  evaluationRule.evaluateExpression(
+          arguments, types, evaluationRuleParameters);
       } else {
-        throw Error('Unknown evaluation rule format (' + evaluationRule.format + ') sent to evaluate().')
+        throw Error('Unknown evaluation rule format (' + 
+          evaluationRule.format + ') sent to evaluate().')
       }
     }
-    ////console.log('EVALUATED ' + shared.displayExpression(expression, sharedData.BASE_CONTROL_LANGUAGE.operators) + ' ' + JSON.stringify(inputs) + ':  ' + JSON.stringify(answer));
     cache[cacheKey] = answer;
     return answer;
   };
@@ -997,7 +1099,7 @@ var student = (function() {
   *        expressions.
   * @raises This function will take the MistakeMessages given in the MistakeEntry and
   *         evaluate them to get strings describing the problem that could be shown to
-  *         the student. It then throws a shared.UserError containing these strings.
+  *         the student. It then throws a logicProofShared.UserError containing these strings.
   */
   var renderMistakeMessages = function(mistake, lineNumber, model, parameters, operators) {
     var renderedMessages = [];
@@ -1009,11 +1111,12 @@ var student = (function() {
           if (message[j].format === 'string') {
             renderedMessage += message[j].content;
           } else {
-            var rawResult = evaluate(message[j].content, {n:lineNumber+1}, model, parameters, {});
+            var rawResult = evaluate(
+              message[j].content, {n:lineNumber+1}, model, parameters, {});
             renderedMessage += (message[j].content.type === 'set_of_formulas') ?
-              shared.displayExpressionArray(rawResult, operators):
+              logicProofShared.displayExpressionArray(rawResult, operators):
               (message[j].content.type === 'formula') ?
-                shared.displayExpression(rawResult, operators):
+                logicProofShared.displayExpression(rawResult, operators):
                 rawResult;
           }
         }
@@ -1036,7 +1139,8 @@ var student = (function() {
   *        buildInstance().
   * @raises if a mistake from the mistake_table has been
   *          made in the proof, {
-  *            message: a human-readable description of the first mistake identified,
+  *            message: a human-readable description of the first mistake 
+  *              identified,
   *            line: the line (zero-indexed) the error occurred in,
   *            code: the name of the mistake that was made
   *            category: the MistakeSection that the mistake came from
@@ -1047,7 +1151,7 @@ var student = (function() {
     var parameters = {
       proof: proof,
       assumptions: questionInstance.assumptions,
-      // questionInstance.results is an array of expressions, to allow for 
+      // questionInstance.results is an array of expressions, to allow for
       // future questions in which the student has to prove more than one 
       // thing, but for now we only permit one target per question.
       target: questionInstance.results[0]
@@ -1065,7 +1169,9 @@ var student = (function() {
           // it implicit that n>1.
           var check = false;
           try {
-            check = evaluate(mistake.occurs, {n: lineNumber + 1}, questionInstance.control_model, parameters, evaluationCache);
+            check = evaluate(
+              mistake.occurs, {n: lineNumber + 1}, 
+              questionInstance.control_model, parameters, evaluationCache);
           }
           catch(err) {
             if (err.message !== 'evaluation failed') {
@@ -1080,10 +1186,15 @@ var student = (function() {
             // provided can be evaluated then we try to return to the student as 
             // helpful a message as possible.
             var error = (mistakeMessages.length > 0) ?
-              new shared.PreRenderedUserError(mistakeMessages, mistake.name):
-              new shared.UserError('unspecified_mistake', {section: questionInstance.mistake_table[i].name, entry: mistake.name});
+              new logicProofShared.PreRenderedUserError(
+                mistakeMessages, mistake.name):
+              new logicProofShared.UserError('unspecified_mistake', {
+                section: questionInstance.mistake_table[i].name, 
+                entry: mistake.name});
             throw {
-              message: shared.renderError(error, questionInstance.general_messages, questionInstance.language),
+              message: logicProofShared.renderError(
+                error, questionInstance.general_messages, 
+                questionInstance.language),
               line: lineNumber,
               code: mistake.name,
               category: questionInstance.mistake_table[i].name

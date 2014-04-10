@@ -1,21 +1,13 @@
 <div>
-    <div ng-if="assumptionsString === ''">
-      Prove {{targetString}}.
+    {{questionString}}
+    <div class="row-fluid">
+      <div class="span7">
+        <textarea ng-model="proofString" ng-trim="false" rows ="10" cols="50"></textarea>
+        <button ng-click="submitProof()">Submit</button>
+      </div>
+      <div class="span5" ng-show="proofError!==''" style="color:red" margin-top="60px">
+        <pre>{{proofError}}</pre>
+      </div>
     </div>
-    <div ng-if="assumptionsString !== ''">
-      Assuming {{assumptionsString}}; prove {{targetString}}.
-    </div>
-    <table>
-      <tr>
-        <td> <textarea ng-model="proofString" ng-trim="false" ng-change="editProof()" rows="10" cols="50"></textarea> </td>
-        <td valign="top"> 
-          <font color="red"><pre>{{proofError}}</pre></font>
-        </td>
-      </tr>
-    </table>
-    <p>
-      <button ng-if="haveDefaultProof" ng-click="submitProof()">Continue</button>
-      <button ng-if="!haveDefaultProof" ng-click="submitProof()">Submit</button>
-    </p>
 </div>
 

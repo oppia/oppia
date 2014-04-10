@@ -1,12 +1,12 @@
-var sharedData = (function() {
+var logicProofData = (function() {
 
   var BASE_VOCABULARY = {
     from: ['from'],
     and: ['and'],
     have: ['we have', 'we know', 'have'],
-    hence: ['hence', 'so', 'thus'],
-    whichever: ['and whichever is true'],
-    arbitrary: ['was arbitrary'],
+    hence: ['hence', 'so', 'thus', 'thence', 'whence'],
+    whichever: ['and whichever is true', 'and either way', 'and in either case'],
+    arbitrary: ['was arbitrary', 'is arbitrary'],
     take: ['take'],
     satisfying: ['satisfying', 'such that'],
     if: ['if'],
@@ -136,7 +136,7 @@ var sharedData = (function() {
           dummies: [],
           output: 'boolean'
         }],
-        symbols: ['&']
+        symbols: ['\u2227']
       },
       or: {
         kind: 'binary_connective',
@@ -145,7 +145,7 @@ var sharedData = (function() {
           dummies: [],
           output: 'boolean'
         }],
-        symbols: ['|']
+        symbols: ['\u2228']
       },
       implies: {
         kind: 'binary_connective',
@@ -181,7 +181,7 @@ var sharedData = (function() {
           dummies: [SINGLE_ELEMENT],
           output: 'boolean'
         }],
-        symbols: ['@', '.']
+        symbols: ['\u2200', '.']
       },
       exists: {
         kind: 'quantifier',
@@ -190,7 +190,7 @@ var sharedData = (function() {
           dummies: [SINGLE_ELEMENT],
           output: 'boolean'
         }],
-        symbols: ['$', '.']
+        symbols: ['\u2203', '.']
       },
       equals: {
         kind: 'binary_relation',
@@ -384,7 +384,7 @@ var sharedData = (function() {
           dummies: [],
           output: 'boolean'
         }],
-        symbols: ['&']
+        symbols: ['\u2227']
       },
       or: {
         kind: 'binary_connective',
@@ -396,7 +396,7 @@ var sharedData = (function() {
           dummies: [],
           output: 'boolean'
         }],
-        symbols: ['|']
+        symbols: ['\u2228']
       },
       implies: {
         kind: 'binary_connective',
@@ -510,7 +510,7 @@ var sharedData = (function() {
           dummies: [],
           output: 'boolean'
         }],
-        symbols: ['?']
+        symbols: ['\u2208']
       },
       addition: {
         kind: 'binary_function',
@@ -550,7 +550,7 @@ var sharedData = (function() {
           dummies: [SINGLE_INTEGER],
           output: 'boolean'          
         }],
-        symbols: ['@', '.']
+        symbols: ['\u2200', '.']
       },
       bounded_exists: {
         kind: 'bounded_quantifier',
@@ -563,10 +563,10 @@ var sharedData = (function() {
           dummies: [SINGLE_FORMULA],
           output: 'boolean'          
         }],
-        symbols: ['$', '.']
+        symbols: ['\u2203', '.']
       },
       // has form min{n<m|A(n)}, A(n) is the argument and n the dummy, or
-      // alteratively min{p?antecedents(n)|B(p)} which will return the first
+      // alteratively min{p∈antecedents(n)|B(p)} which will return the first
       // element of set_of_formulas antecedents(n) satisfying B.
       min: { 
         kind: 'ranged_function',

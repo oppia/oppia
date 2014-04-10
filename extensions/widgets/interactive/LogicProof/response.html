@@ -1,11 +1,13 @@
 <div>
-  <p>Assuming {{answer.assumptionsString}}, prove that {{answer.targetString}}.</p>
-  <table>
-    <tr>
-      <td> <textarea readonly rows="10" cols="50">{{answer.proofString}}</textarea> </td>
-      <td valign="top"> 
-        <font color="red"><pre>{{answer.errorMessage}}</pre></font>
-      </td>
-    </tr>
-  </table>
+    {{answer.displayed_question}}
+    <div class="row-fluid">
+      <div class="span7">
+        <textarea readonly rows="{{answer.proof_num_lines}}" cols="50">{{answer.proof_string}}</textarea>
+      </div>
+      {% if not answer.correct %}
+      <div class="span5" ng-show="proofError!==''" style="font:red">
+        <pre>{{answer.displayed_message}}</pre>
+      </div>
+      {% endif %}
+    </div>
 </div>

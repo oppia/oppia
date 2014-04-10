@@ -1,27 +1,37 @@
-shared = (function() {
+var logicProofShared = (function() {
 
-  MAX_NUM_PARSINGS_PERMITTED = 1000;
-  MAX_NUM_TYPINGS_PERMITTED = 1000;
+  // Used by parseLineString() to limit the number of possible parsings of a
+  // line (or line template) considered.
+  var MAX_NUM_PARSINGS_PERMITTED = 1000;
+  // Used by assignTypesToExpressionArray() to limit the number of possible 
+  // typings of an expression considered.
+  var MAX_NUM_TYPINGS_PERMITTED = 1000;
 
-  ////////////////// ERROR-HANDLING  //////////////////////////////////////////////////////
+  ////////////////// ERROR-HANDLING  //////////////////////////////////////////
 
   function UserError(code, parameters) {
     this.name = 'UserError';
     this.code = code;
     this.parameters = parameters || {};
   }
-  //UserError.prototype = new Error();
-  //UserError.prototype.constructor = UserError;
 
   function PreRenderedUserError(messages, code) {
     this.name = 'PreRenderedUserError';
     this.messages = messages;
     this.code = code;
   }
-  PreRenderedUserError.prototype = new Error();
-  PreRenderedUserError.prototype.constructor = PreRenderedUserError;
+  // TODO (Jacob) Make these errors prototype from Error()
 
-  // Converts a message template into a string to show to the user.
+ /** Converts a message template into a string to show to the user.
+  * @param messageTemplate: a GeneralMessageTemplate object that determines how
+  * to build the string describing an error.
+  * @param parameterFormats: a dictionary of GeneralMessageParameters, which 
+  *        specify the format of the parameter in question (e.g. 'string').
+  * @param parameters: a dictionary giving the values of the parameters for
+  *        this particular instance of the message.
+  * @param language: the relevant Language.
+  * @result a user-readable string. 
+  */
   var renderGeneralMessage = function(messageTemplate, parameterFormats, parameters, language) {
     var message = '';
     for (var i = 0; i < messageTemplate.length; i++) {
@@ -60,7 +70,9 @@ shared = (function() {
       }
       var messageTemplates = errorDictionary[error.code].templates;
       var messageTemplate = messageTemplates[Math.floor((Math.random()*messageTemplates.length))];
-      return renderGeneralMessage(messageTemplate, errorDictionary[error.code].parameters, error.parameters, language);
+      return renderGeneralMessage(
+        messageTemplate, errorDictionary[error.code].parameters, 
+        error.parameters, language);
     } else if (error.name === 'PreRenderedUserError') {
       return error.messages[Math.floor((Math.random()*error.messages.length))];
     } else {
@@ -68,7 +80,7 @@ shared = (function() {
     }
   };
 
-///////////////////  DISPLAY  ////////////////////////////////////////////////////////////
+///////////////////  DISPLAY  /////////////////////////////////////////////////
 
  /** 
   * @param expression: an Expression, which is to be displayed
@@ -82,86 +94,99 @@ shared = (function() {
 
  /**
   * As for displayExpression() with the addition of:
-  * @param used internally to determine whether to surround the formula with 
-  *        brackets; when calling this function it should not be provided.
+  * @param desirabilityOfBrackets used internally to determine whether to 
+  *        surround the formula with brackets.
   */
   var displayExpressionHelper = function(expression, operators, desirabilityOfBrackets) {
-    var desirabilityOfBracketsBelow = (expression.kind === 'binary_connective' || expression.kind === 'binary_relation' || expression.kind === 'binary_function') ?
+    var desirabilityOfBracketsBelow = (
+        expression.top_kind_name === 'binary_connective' || 
+        expression.top_kind_name === 'binary_relation' || 
+        expression.top_kind_name === 'binary_function') ?
       2:
-      (expression.kind === 'unary_connective' || expression.kind === 'quantifier') ?
+      (expression.top_kind_name === 'unary_connective' || 
+        expression.top_kind_name === 'quantifier') ?
         1:
         0;
     var processedArguments = [];
     var processedDummies = [];
     for (var i = 0; i < expression.arguments.length; i++) {
-      processedArguments.push(displayExpressionHelper(expression.arguments[i], operators, desirabilityOfBracketsBelow));
+      processedArguments.push(
+        displayExpressionHelper(
+          expression.arguments[i], operators, desirabilityOfBracketsBelow));
     }
     for (var i = 0; i < expression.dummies.length; i++) {
-      processedDummies.push(displayExpressionHelper(expression.dummies[i], operators, desirabilityOfBracketsBelow));
+      processedDummies.push(
+        displayExpressionHelper(
+          expression.dummies[i], operators, desirabilityOfBracketsBelow));
     }
 
-    var symbol = (!operators.hasOwnProperty(expression.operator)) ? expression.operator:
-      (!operators[expression.operator].hasOwnProperty('symbols')) ? expression.operator:
-      operators[expression.operator].symbols[0];
+    var symbol = (!operators.hasOwnProperty(expression.top_operator_name)) ?
+      expression.top_operator_name:
+      (!operators[expression.top_operator_name].hasOwnProperty('symbols')) ? 
+        expression.top_operator_name:
+        operators[expression.top_operator_name].symbols[0];
 
-    if (expression.kind === 'binary_connective' || expression.kind === 'binary_relation' || expression.kind === 'binary_function') {
+    if (expression.top_kind_name === 'binary_connective' || 
+        expression.top_kind_name === 'binary_relation' || 
+        expression.top_kind_name === 'binary_function') {
       return (desirabilityOfBrackets > 0) ? '(' + processedArguments.join(symbol) + ')':
         processedArguments.join(symbol);
-    } else if (expression.kind === 'unary_connective') {
+    } else if (expression.top_kind_name === 'unary_connective') {
       var output = symbol + processedArguments[0];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')': output;
-    } else if (expression.kind === 'quantifier') {
+    } else if (expression.top_kind_name === 'quantifier') {
       var output = symbol + processedDummies[0] + '.' + processedArguments[0]; 
       return (desirabilityOfBrackets === 2) ? '(' + output + ')': output;
-    } else if (expression.kind === 'bounded_quantifier') {
+    } else if (expression.top_kind_name === 'bounded_quantifier') {
       var output = symbol + processedArguments[0] + '.' + processedArguments[1];
       return (desirabilityOfBrackets === 2) ? '(' + output + ')': output;
-    } else if (expression.kind === 'prefix_relation' || expression.kind === 'prefix_function') {
+    } else if (expression.top_kind_name === 'prefix_relation' || 
+        expression.top_kind_name === 'prefix_function') {
       return symbol + '(' + processedArguments.join(',') + ')';
-    } else if (expression.kind === 'ranged_function') {
+    } else if (expression.top_kind_name === 'ranged_function') {
       return symbol + '{' + processedArguments[0] + ' | ' + processedArguments[1] + '}';
-    } else if (expression.kind === 'atom' || expression.kind === 'constant' || expression.kind === 'variable') {
+    } else if (expression.top_kind_name === 'atom' || 
+      expression.top_kind_name === 'constant' || 
+      expression.top_kind_name === 'variable') {
       return symbol;
     } else {
-      throw Error('Unknown kind ' + expression.kind + ' sent to displayExpression()');
+      throw Error('Unknown kind ' + expression.top_kind_name + ' sent to displayExpression()');
     }
   };
 
   var displayExpressionArray = function(expressionArray, operators) {
     var processedArray = [];
     for (var i = 0; i < expressionArray.length; i++) {
-      processedArray.push(displayExpressionHelper(expressionArray[i], operators));
+      processedArray.push(
+        displayExpressionHelper(expressionArray[i], operators));
     }
     return processedArray.join(', ');
   }
 
 
-///////////////////////////  PARSING  ///////////////////////////////////////////////////////////////////////////
+///////////////////////////  PARSING  /////////////////////////////////////////
 
  /** 
   * This function checks whether the string contains any symbol that occurs 
   * in a member of the symbols key for some operator (these will be
-  * symbols such as @, =, <).
+  * symbols such as ∀, =, <).
   * @param string: contains the characters we check
   * @param operators: a dictionary of Operator objects
-  * @param denotes that the string comes from line template from the teacher
-  *        rather than a line from the student.
+  * @param isTemplate: denotes that the string represents a line template (which
+  *        may have substitutions) and not just a line.
   * @result true or false
   */
   var containsLogicalCharacter = function(string, operators, isTemplate) {
     var GENERAL_LOGICAL_CHARACTERS = '(),';
     var TEMPLATE_LOGICAL_CHARACTERS = '[->]{|}';
 
-    for (var i = 0; i < GENERAL_LOGICAL_CHARACTERS.length; i++) {
-      if (string.indexOf(GENERAL_LOGICAL_CHARACTERS[i]) !== -1) {
-        return true;
-      }
+    if (containsCharacterFromArray(string, GENERAL_LOGICAL_CHARACTERS)) {
+      return true;
     }
-    for (var i = 0; i < TEMPLATE_LOGICAL_CHARACTERS.length; i++) {
-      if (isTemplate && string.indexOf(TEMPLATE_LOGICAL_CHARACTERS[i]) !== -1) {
-        return true;
-      }
+    if (isTemplate && containsCharacterFromArray(string, TEMPLATE_LOGICAL_CHARACTERS)) {
+      return true;
     }
+
     for (var key in operators) {
       if (operators[key].hasOwnProperty('symbols')) {
         for (var i = 0; i < operators[key].symbols.length; i++) {
@@ -181,26 +206,36 @@ shared = (function() {
   * This function strips whitespace from within expressions, whilst using the
   * whitespace between expressions to split a line into an array of word / 
   * expression strings.
-  * e.g. 'from p and q we have p & q' will be converted to ['from', 'p',
-  *   'and', 'q', 'we', 'have', 'p&q'].
+  * e.g. 'from p and q we have p ∧ q' will be converted to ['from', 'p',
+  *   'and', 'q', 'we', 'have', 'p∧q'].
   * @param inputString: the string from which whitespace is to be stripped.
-  * @param operators: an array of the Operator objects usable in the line
-  * @param if true then the string provided is a for a line template, such as
-  *        the teacher would write; otherwise it is a line from a proof written
-  *        by a student.
-  * @return A non-empty array of words and expressions (as strings).
+  * @param operators: a dictionary of the Operator objects usable in the line
+  * @param isTemplate: denotes that the string represents a line template (which
+  *        may have substitutions) and not just a line.
+  * @result A non-empty array of words and expressions (as strings).
   * @raises if the line is blank or contains an unknown character.
   */
   var preParseLineString = function(inputString, operators, isTemplate) {
 
-    var _absorbsSpacesToTheLeft = function(char) {
-      return containsLogicalCharacter(char, operators, isTemplate) && '({@$~'.indexOf(char) === -1;
+    // The logical characters that may occur at the start and end of a formula 
+    // respectively. The unicode characters are 'for all' and 'exists'.
+    var POSSIBLE_START_CHARS = '({\u2200\u2203~';
+    var POSSIBLE_END_CHARS = ')}]';
+    
+    var POSSIBLE_NAME_CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 _';
+
+    var _absorbsSpacesToTheLeft = function(character) {
+      return containsLogicalCharacter(character, operators, isTemplate) && 
+        !containsCharacter(POSSIBLE_START_CHARS, character);
     }
-    var _absorbsSpacesToTheRight = function(char) {
-      return containsLogicalCharacter(char, operators, isTemplate) && ')}] '.indexOf(char) === -1;
+    var _absorbsSpacesToTheRight = function(character) {
+      return (containsLogicalCharacter(character, operators, isTemplate) && 
+        !containsCharacter(POSSIBLE_END_CHARS, character)) || 
+        character === ' ';
     }
-    var _isLegalCharacter = function(char) {
-      return 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 '.indexOf(char) !== -1 || containsLogicalCharacter(char, operators, isTemplate);
+    var _isLegalCharacter = function(character) {
+      return containsCharacter(POSSIBLE_NAME_CHARS, character) || 
+        containsLogicalCharacter(character, operators, isTemplate);
     }
 
     var strippedString = '';
@@ -208,7 +243,10 @@ shared = (function() {
       if (!_isLegalCharacter(inputString[i])) {
         throw new UserError('illegal_symbol', {symbol: inputString[i]});
       }
-      if (inputString[i] !== ' ' || (i === 0 || !_absorbsSpacesToTheRight(strippedString[strippedString.length - 1])) &&
+      // We keep all non-spaces, and all spaces that are absorbed neither by
+      // characters to their left nor their right.
+      if (inputString[i] !== ' ' || 
+          (i === 0 || !_absorbsSpacesToTheRight(strippedString[strippedString.length - 1])) &&
           (i === inputString.length - 1 || !_absorbsSpacesToTheLeft(inputString[i + 1]))) {
         strippedString += inputString[i];
       }
@@ -291,18 +329,23 @@ shared = (function() {
       // (as a single atom) so otherwise we would end up with a large number of
       // spurious parsings. The exception is single-character words, because 
       // e.g. 'a' could reasonably be either a word or the name of an atom.
-      if (unparsedArray[i].length === 1 || vocabularyWords.indexOf(unparsedArray[i].toLowerCase()) === -1) {
+      if (unparsedArray[i].length === 1 || 
+          vocabularyWords.indexOf(unparsedArray[i].toLowerCase()) === -1) {
         // We attempt to parse this entry as an expression / expression template
         try {
-          var expression = parser.parse(unparsedArray[i], isTemplate ? 'expressionTemplate': 'expression')
+          var expression = logicProofParser.parse(
+            unparsedArray[i], isTemplate ? 'expressionTemplate': 'expression')
           for (var j = 0; j < partiallyParsedArrays[i].length; j++) {
             // We do not allow a line to have two expressions in a row. This is to
             // allow the identification of typos: For example if the user types 
-            // 'fron p&q ...' then otherwise we would think that both 'fron' and
-            // 'p&q' are expressions. We also do not attempt to parse a word as an
+            // 'fron p∧q ...' then otherwise we would think that both 'fron' and
+            // 'p∧q' are expressions. We also do not attempt to parse a word as an
             // expression if it is a vocabulary word, to avoid masses of silly 
             // attempts to parse the line.
-            if (i === 0 || partiallyParsedArrays[i][j][partiallyParsedArrays[i][j].length - 1].format === 'phrase') {
+            if (i === 0 || 
+                partiallyParsedArrays[i][j][
+                  partiallyParsedArrays[i][j].length - 1
+                ].format === 'phrase') {
               partiallyParsedArrays[i+1].push(partiallyParsedArrays[i][j].concat([{
                 format: 'expression',
                 content: expression
@@ -324,14 +367,15 @@ shared = (function() {
           break;
         }
       }
-      // We return a description of the problem, based on one of the best attempts
+      // We return a description of the problem, based on one of the best attempts.
       // NOTE: This is not guaranteed to correctly identify the mistake the
       // user made. It could do with improvement based on user feedback.
       // containsLogicalCharacter is used to guess if something is an
       // expression, but it is not always correct because expressions may
       // consist only of letters.
       var bestAttempt = partiallyParsedArrays[numEntriesMatched][0];
-      if (numEntriesMatched === 0 || bestAttempt[bestAttempt.length - 1].format === 'phrase') {
+      if (numEntriesMatched === 0 || 
+          bestAttempt[bestAttempt.length - 1].format === 'phrase') {
         var word = unparsedArray[numEntriesMatched];
         throw (vocabularyWords.indexOf(word) !== -1) ?
           new UserError('unidentified_phrase_starting_at', {word: word}):
@@ -358,7 +402,7 @@ shared = (function() {
     }
   };
 
-////////////////////  TYPING ASSIGNMENT /////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////  TYPING ASSIGNMENT ///////////////////////////////////////
 
  /**
   * This takes an array of TypingElements and converts it into an array of 
@@ -419,7 +463,7 @@ shared = (function() {
   *        of which the user is allowed to create new operators. Any operator
   *        with a kind not in this list and that does not already occur in the
   *        language will cause an error.
-  * @param permitDuplicateDummyNames: if true the user can write e.g. @x.p even
+  * @param permitDuplicateDummyNames: if true the user can write e.g. ∀x.p even
   *        if x is already in use; if false they cannot.
   * @result An array of dictionaries of the form: {
   *           typedExpression: A TypedExpression
@@ -434,47 +478,56 @@ shared = (function() {
   *         largest (in lexicographic ordering) as this is likely to be closest
   *         to what the user intended.
   */
-  var assignTypesToExpression = function(untypedExpression, possibleTopTypes, language, newKindsPermitted, permitDuplicateDummyNames) {
+  var assignTypesToExpression = function(untypedExpression, possibleTopTypes, 
+      language, newKindsPermitted, permitDuplicateDummyNames) {
     var operators = language.operators;
     newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
     permitDuplicateDummyNames = permitDuplicateDummyNames || false;
 
     var _attemptTyping = function(topType, typingRule) {
 
-      if (!operatorIsNew && untypedExpression.kind !== operators[untypedExpression.operator].kind) {
+      if (!operatorIsNew && 
+          untypedExpression.top_kind_name !== 
+            operators[untypedExpression.top_operator_name].kind) {
         throw new UserError('wrong_kind', {
-          operator: untypedExpression.operator, 
-          expected_kind: operators[untypedExpression.operator].kind,
-          actual_kind: untypedExpression.kind,
+          operator: untypedExpression.top_operator_name, 
+          expected_kind: operators[untypedExpression.top_operator_name].kind,
+          actual_kind: untypedExpression.top_kind_name,
           amount_typed: []
         });
       }
       if (topType !== typingRule.output) {
         throw new UserError('wrong_type', {
-          operator: untypedExpression.operator,
+          operator: untypedExpression.top_operator_name,
           expected_type: topType,
           actual_type: typingRule.output,
           amount_typed: []
         });
       }
 
-      var _isNumber = function(n){return !isNaN(parseFloat(n)) && isFinite(n);}
-      var _isString = function(s){return s[0] === '\'' && s[s.length-1] === '\''}
+      var _isNumber = function(n){
+        return !isNaN(parseFloat(n)) && isFinite(n);
+      }
+      var _isString = function(s){
+        return s[0] === '\'' && s[s.length-1] === '\''
+      }
       if (language.types.hasOwnProperty('integer') && 
-          _isNumber(untypedExpression.operator) && untypedExpression.kind === 'constant' &&
+          _isNumber(untypedExpression.top_operator_name) && 
+          untypedExpression.top_kind_name === 'constant' &&
           topType !== 'integer') {
         throw new UserError('wrong_type', {
-          operator: untypedExpression.operator,
+          operator: untypedExpression.top_operator_name,
           expected_type: topType,
           actual_type: 'integer',
           amount_typed: []
         })
       }
       if (language.types.hasOwnProperty('string') && 
-          _isString(untypedExpression.operator) && untypedExpression.kind === 'constant' &&
+          _isString(untypedExpression.top_operator_name) && 
+          untypedExpression.top_kind_name === 'constant' &&
           topType !== 'string') {
         throw new UserError('wrong_type', {
-          operator: untypedExpression.operator,
+          operator: untypedExpression.top_operator_name,
           expected_type: topType,
           actual_type: 'string',
           amount_typed: []
@@ -482,19 +535,21 @@ shared = (function() {
       }
 
       try {
-        var argumentTypes = instantiateTypingElementArray(typingRule.arguments, untypedExpression.arguments.length);
+        var argumentTypes = instantiateTypingElementArray(
+          typingRule.arguments, untypedExpression.arguments.length);
       }
       catch (err) {
-        err.parameters['operator'] = untypedExpression.operator;
+        err.parameters['operator'] = untypedExpression.top_operator_name;
         err.parameters['input_category'] = 'arguments';
         err.parameters['amount_typed'] = [];
         throw err;
       }
       try {
-        var dummyTypes = instantiateTypingElementArray(typingRule.dummies, untypedExpression.dummies.length);
+        var dummyTypes = instantiateTypingElementArray(
+          typingRule.dummies, untypedExpression.dummies.length);
       }
       catch (err) {
-        err.parameters['operator'] = untypedExpression.operator;
+        err.parameters['operator'] = untypedExpression.top_operator_name;
         err.parameters['input_category'] = 'dummies';
         err.parameters['amount_typed'] = [];
         throw err;
@@ -504,8 +559,8 @@ shared = (function() {
         updatedOperators[key] = operators[key];
       }
       if (operatorIsNew) {
-        updatedOperators[untypedExpression.operator] = {
-          kind: untypedExpression.kind,
+        updatedOperators[untypedExpression.top_operator_name] = {
+          kind: untypedExpression.top_kind_name,
           typing: [{
             arguments: argumentTypes,
             dummies: dummyTypes,
@@ -515,13 +570,15 @@ shared = (function() {
       }
 
       for (var n = 0; n < untypedExpression.dummies.length; n++) {
-        if (!permitDuplicateDummyNames && updatedOperators.hasOwnProperty(untypedExpression.dummies[n].operator)) {
+        if (!permitDuplicateDummyNames && 
+            updatedOperators.hasOwnProperty(
+              untypedExpression.dummies[n].top_operator_name)) {
           throw new UserError('duplicate_dummy_name', {
             dummy: untypedExpression.dummies[n],
             expression: untypedExpression,
             amount_typed: []
           });
-        } else if (untypedExpression.dummies[n].kind !== 'variable'){
+        } else if (untypedExpression.dummies[n].top_kind_name !== 'variable'){
           // The parser does not currently permit this to happen
           throw new UserError('dummy_not_variable', {
             dummy: untypedExpression.dummies[n],
@@ -542,16 +599,18 @@ shared = (function() {
     };
 
     var operatorIsNew = false;
-    if (!operators.hasOwnProperty(untypedExpression.operator)) {
-      if (newKindsPermitted.indexOf(untypedExpression.kind) === -1) {
-        throw new UserError('unknown_operator', {operator: untypedExpression.operator, amount_typed: []});
+    if (!operators.hasOwnProperty(untypedExpression.top_operator_name)) {
+      if (newKindsPermitted.indexOf(untypedExpression.top_kind_name) === -1) {
+        throw new UserError('unknown_operator', {
+          operator: untypedExpression.top_operator_name, amount_typed: []
+        });
       } else {
         operatorIsNew = true;
       }
     }
     var typingRules = (operatorIsNew) ?
-      language.kinds[untypedExpression.kind].typing: 
-      operators[untypedExpression.operator].typing;
+      language.kinds[untypedExpression.top_kind_name].typing: 
+      operators[untypedExpression.top_operator_name].typing;
 
     var results = [];
     for (var i = 0; i < possibleTopTypes.length; i++) {
@@ -565,19 +624,20 @@ shared = (function() {
               typedDummies.push(newAttempts[k].typedArray[l]);
               // These dummy variables should not be available outside this
               // part of the untypedExpression.
-              if (!operators.hasOwnProperty(untypedExpression.dummies[l].operator)) {
-                delete newAttempts[k].operators[untypedExpression.dummies[l].operator];
+              if (!operators.hasOwnProperty(untypedExpression.dummies[l].top_operator_name)) {
+                delete newAttempts[k].operators[untypedExpression.dummies[l].top_operator_name];
               }
             }
             var typedArguments = [];
-            for (var l = untypedExpression.dummies.length; l < untypedExpression.dummies.length + untypedExpression.arguments.length; l++) {
+            for (var l = untypedExpression.dummies.length; 
+                l < untypedExpression.dummies.length + untypedExpression.arguments.length; l++) {
               typedArguments.push(newAttempts[k].typedArray[l]);
             }
 
             results.push({
               typedExpression: {
-                operator: untypedExpression.operator,
-                kind: untypedExpression.kind,
+                top_operator_name: untypedExpression.top_operator_name,
+                top_kind_name: untypedExpression.top_kind_name,
                 arguments: typedArguments,
                 dummies: typedDummies,
                 type: possibleTopTypes[i]
@@ -587,10 +647,14 @@ shared = (function() {
           }
         }
         catch (err) {
-          if (bestAttemptSoFar !== undefined && !bestAttemptSoFar.hasOwnProperty('parameters')) {
+          if (bestAttemptSoFar !== undefined && 
+              !bestAttemptSoFar.hasOwnProperty('parameters')) {
             throw bestAttemptSoFar;
           }
-          if (bestAttemptSoFar === undefined || greaterThanInLex(err.parameters.amount_typed, bestAttemptSoFar.parameters.amount_typed)) {
+          if (bestAttemptSoFar === undefined || 
+              greaterThanInLex(
+                err.parameters.amount_typed, 
+                bestAttemptSoFar.parameters.amount_typed)) {
             var bestAttemptSoFar = err;
           }
         }
@@ -616,7 +680,8 @@ shared = (function() {
   *          }
   * @raises: as before
   */
-  var assignTypesToExpressionArray = function(untypedArray, topTypes, language, newKindsPermitted, isTemplate, numDummies) {
+  var assignTypesToExpressionArray = function(untypedArray, topTypes, language,
+      newKindsPermitted, isTemplate, numDummies) {
     newKindsPermitted = newKindsPermitted || ['constant', 'variable'];
     isTemplate = isTemplate || false;
     numDummies = numDummies || 0;
@@ -640,7 +705,9 @@ shared = (function() {
 
       for (var j = 0; j < partiallyTypedArrays[i].length ; j++) {
         // Dummies are always allowed to have previously unseen names
-        var newKindsPermittedHere = (i < numDummies) ? newKindsPermitted.concat(['variable']) : newKindsPermitted;
+        var newKindsPermittedHere = (i < numDummies) ? 
+          newKindsPermitted.concat(['variable']) : 
+          newKindsPermitted;
         try {
           var newResults = assignTypesToExpression(
             untypedArray[i], [topTypes[i]], {
@@ -649,7 +716,8 @@ shared = (function() {
               types: language.types
             }, newKindsPermittedHere, isTemplate);
           for (var k = 0; k < newResults.length; k++) {
-            partiallyTypedArrays[i + 1].push(partiallyTypedArrays[i][j].concat([newResults[k].typedExpression]));
+            partiallyTypedArrays[i + 1].push(
+              partiallyTypedArrays[i][j].concat([newResults[k].typedExpression]));
             partiallyUpdatedOperatorss[i + 1].push(newResults[k].operators);
           }
         }
@@ -658,7 +726,9 @@ shared = (function() {
             throw err;
           }
           var amountTyped = [i].concat(err.parameters.amount_typed);
-          if (bestAttemptSoFar === undefined || greaterThanInLex(amountTyped, bestAttemptSoFar.parameters.amount_typed)) {
+          if (bestAttemptSoFar === undefined || 
+              greaterThanInLex(
+                amountTyped, bestAttemptSoFar.parameters.amount_typed)) {
             err.parameters.amount_typed = amountTyped;
             var bestAttemptSoFar = err;
           }
@@ -683,12 +753,12 @@ shared = (function() {
 
 
 
-//////////////////////////  UTILITIES /////////////////////////////////////////////////////////////////////////////////////////////
+//////////////////////////  UTILITIES /////////////////////////////////////////
 
   // Expressions with different dummy variables are considered different
   var checkExpressionsAreEqual = function(expression1, expression2) {
-    if (expression1.kind !== expression2.kind ||
-        expression1.operator !== expression2.operator || 
+    if (expression1.top_kind_name !== expression2.top_kind_name ||
+        expression1.top_operator_name !== expression2.top_operator_name || 
         expression1.arguments.length !== expression2.arguments.length || 
         expression1.dummies.length !== expression2.dummies.length) {
       return false;
@@ -699,7 +769,7 @@ shared = (function() {
       }
     }
     for (var i = 0; i < expression1.arguments.length + expression1.dummies.length; i++) {
-      if (!checkExpressionsAreEqual((expression1.arguments.concat(expression1.dummies))[i], 
+      if (!checkExpressionsAreEqual((expression1.arguments.concat(expression1.dummies))[i],
           (expression2.arguments.concat(expression2.dummies))[i])) {
         return false;
       }
@@ -735,9 +805,12 @@ shared = (function() {
   // then all are returned
   var getOperatorsFromExpression = function(expression, kinds) {
     kinds = kinds || false;
-    var output = getOperatorsFromExpressionArray(expression.arguments.concat(expression.dummies), kinds);
-    return (output.indexOf(expression.operator) === -1 && (kinds === false || kinds.indexOf(expression.kind) !== -1)) ? 
-    output.concat([expression.operator]) : output;
+    var output = getOperatorsFromExpressionArray(
+      expression.arguments.concat(expression.dummies), kinds);
+    return (output.indexOf(expression.top_operator_name) === -1 && 
+        (kinds === false || kinds.indexOf(expression.top_kind_name) !== -1)) ?
+      output.concat([expression.top_operator_name]) : 
+      output;
   };  
 
   var getOperatorsFromExpressionArray = function(array, kinds) {
@@ -755,12 +828,13 @@ shared = (function() {
     return output;
   };
 
-  // The expression should be typed; returns the type of operator (or throws an error if
-  // not found). Does not check for inconsistent typing.
+  // The expression should be typed; returns the type of operator (or throws an
+  // error if not found). Does not check for inconsistent typing.
   // NOTE: treats dummy variables like free ones.
   var seekTypeInExpression = function(expression, operator) {
-    return operator === expression.operator ? expression.type:
-      seekTypeInExpressionArray(expression.arguments.concat(expression.dummies), operator);
+    return operator === expression.top_operator_name ? expression.type:
+      seekTypeInExpressionArray(
+        expression.arguments.concat(expression.dummies), operator);
   };
 
   var seekTypeInExpressionArray = function(array, operator) {
@@ -786,6 +860,21 @@ shared = (function() {
     }
     return false;
   };
+
+  // Checks if the string contains the character
+  var containsCharacter = function(string, character) {
+    return (string.indexOf(character) !== -1);
+  }
+
+  // Checks if the string contains some character from the array
+  var containsCharacterFromArray = function(string, array) {
+    for (var i = 0; i < array.length; i++) {
+      if (string.indexOf(array[i]) !== -1) {
+        return true;
+      }
+    }
+    return false;
+  }
 
   return {
     UserError: UserError,

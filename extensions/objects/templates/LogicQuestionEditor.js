@@ -28,44 +28,36 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope, $attrs) {
+    controller: function($scope, $element, $attrs) {
       $scope.alwaysEditable = true;
       $scope.localValue = {
-        assumptionsString: '',
-        targetString: '',
+        assumptionsString: logicProofShared.displayExpressionArray(
+          $scope.$parent.value.assumptions, logicProofData.BASE_STUDENT_LANGUAGE.operators),
+        targetString: logicProofShared.displayExpression(
+          $scope.$parent.value.results[0], logicProofData.BASE_STUDENT_LANGUAGE.operators),
         errorMessage: '',
-        proofString: ''
+        proofString: $scope.$parent.value.default_proof_string
       };
-      $scope.errorMessage = '';
+
+      console.log(logicProofData.BASE_STUDENT_LANGUAGE.operators)
+      console.log($scope.$parent.value.assumptions)
       
-      console.log('pater')
-      console.log($scope.$parent.value)
-      if ($scope.$parent.value !== 'uninitialized') {
-        $scope.localValue.assumptionsString = shared.displayExpressionArray(
-          $scope.$parent.value.assumptions, 
-          sharedData.BASE_STUDENT_LANGUAGE.operators)
-        $scope.localValue.targetString = shared.displayExpression(
-          $scope.$parent.value.results[0], 
-          sharedData.BASE_STUDENT_LANGUAGE.operators)
-        $scope.localValue.proofString = $scope.$parent.value.defaultProofString;
-      }
+      // We only start trying to build the question once a target formula has
+      // been provided.
       $scope.startBuilding = false;
       
       $scope.buildQuestion = function() {
         if ($scope.startBuilding) {
           try {
             builtQuestion = angular.copy(
-              teacher.buildQuestion(
+              logicProofTeacher.buildQuestion(
                 $scope.localValue.assumptionsString, 
                 $scope.localValue.targetString, 
-                DEFAULT_QUESTION_DATA.vocabulary));
+                LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
             $scope.$parent.value = {
               assumptions: builtQuestion.assumptions,
               results: builtQuestion.results,
-              language: {
-                operators: builtQuestion.operators
-              },
-              defaultProofString: $scope.localValue.proofString
+              default_proof_string: $scope.localValue.proofString
             }
             $scope.localValue.errorMessage = '';
           }
@@ -76,15 +68,30 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
       }
 
       $scope.$watch('localValue.assumptionsString', function(newValue, oldValue) {
+        var comparison = logicProofConversion.compareStrings(newValue, oldValue);
+        if (comparison.first === newValue.length - 1) {
+          $scope.localValue.assumptionsString = logicProofConversion.convertToLogicCharacters(newValue);
+        }
         $scope.buildQuestion();
       })
+
       $scope.$watch('localValue.targetString', function(newValue, oldValue) {
+        var comparison = logicProofConversion.compareStrings(newValue, oldValue);
+        if (comparison.first === newValue.length - 1) {
+          $scope.localValue.targetString = logicProofConversion.convertToLogicCharacters(newValue);
+        }
         if (newValue !== '') {
           $scope.startBuilding = true;
         }
         $scope.buildQuestion();
       })
+
       $scope.$watch('localValue.proofString', function(newValue, oldValue) {
+        var comparison = logicProofConversion.compareStrings(newValue, oldValue);
+        if (comparison.first === newValue.length - 1) {
+          $scope.localValue.proofString = logicProofConversion.convertToLogicCharacters(newValue);
+        }
+        $scope.startBuilding = true;
         $scope.buildQuestion();
       })
 
