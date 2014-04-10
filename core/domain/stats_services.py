@@ -64,11 +64,11 @@ class EventHandler(object):
 
     @classmethod
     def record_state_feedback_from_reader(
-            cls, exploration_id, state_name, feedback, history):
+            cls, exploration_id, state_name, feedback, history, submitter_id):
         """Records user feedback for a particular state."""
         stats_domain.FeedbackItem.create_feedback_for_state(
             exploration_id, state_name, feedback,
-            additional_data={'history': history})
+            additional_data={'history': history}, submitter_id=submitter_id)
 
     @classmethod
     def record_exploration_feedback_from_reader(
@@ -166,6 +166,13 @@ def get_state_rules_stats(exploration_id, state_name):
 
     return results
 
+def get_user_stats(user_id):
+    """Returns a dict with user statistics for a given user"""
+    user_stats = {}
+    user_stats['feedback'] = ( 
+        stats_domain.FeedbackItem.get_feedback_items_for_user(user_id) )
+
+    return user_stats
 
 def get_exploration_info(exploration_id):
     """Returns statistics about an exploration for display.
@@ -185,7 +192,6 @@ def get_exploration_info(exploration_id):
        'stateInfos': state_infos,
     }
     return exp_info
-
 
 def get_state_stats_for_exploration(exploration_id):
     """Returns a dict with state statistics for the given exploration id."""

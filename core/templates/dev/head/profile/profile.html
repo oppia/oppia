@@ -57,6 +57,20 @@
         <div ng-show="isEmpty(ownedExplorations) && isEmpty(editableExplorations) && isEmpty(viewableExplorations)">
           <em>No explorations here yet!</em>
         </div>
+
+        <div ng-show="!isEmpty(feedback)">
+          <h5>Feedback I've submitted</h5>
+          <dl class="dl-horizontal">
+            <div ng-repeat="f in feedback">
+              <dt><div class="oppia-feedback-status label">
+                <[f.status]>
+              </div></dt>
+              <dd><div class="oppia-feedback-content">
+                <[f.content]>
+              </div></dd>
+            </div>
+          </dl>
+        </div>
       </div>
     </div>
   </div>
