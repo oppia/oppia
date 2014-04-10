@@ -51,6 +51,9 @@ VALUE_GENERATORS_DIR = 'extensions/value_generators'
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
+# The default number of items to show on a page in a paged view.
+DEFAULT_PAGE_SIZE = 50
+
 # The default widget used for a new state.
 DEFAULT_WIDGET_ID = 'TextInput'
 
@@ -221,6 +224,7 @@ EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 SPLASH_PAGE_URL = '/'
 

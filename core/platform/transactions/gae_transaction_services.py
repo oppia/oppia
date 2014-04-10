@@ -29,3 +29,8 @@ def run_in_transaction(fn, *args, **kwargs):
         xg=True,
         propagation=ndb.TransactionOptions.ALLOWED,
     )
+
+
+# The NDB toplevel() function. For more details, see
+#   https://developers.google.com/appengine/docs/python/ndb/async#intro
+toplevel_wrapper = ndb.toplevel

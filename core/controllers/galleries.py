@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the gallery page."""
+"""Controllers for the gallery pages."""
 
 __author__ = 'sll@google.com (Sean Lip)'
 
@@ -23,7 +23,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -240,4 +239,21 @@ class CloneExploration(base.BaseHandler):
         self.render_json({
             EXPLORATION_ID_KEY: exp_services.clone_exploration(
                 self.user_id, exploration_id)
+        })
+
+
+class RecentCommitsHandler(base.BaseHandler):
+    """Returns a list of recent commits."""
+
+    def get(self):
+        """Handles GET requests."""
+        urlsafe_start_cursor = self.request.get('cursor')
+        all_commits, new_urlsafe_start_cursor, more = (
+            exp_services.get_next_page_of_all_non_private_commits(
+                urlsafe_start_cursor=urlsafe_start_cursor))
+        all_commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.render_json({
+            'results': all_commit_dicts,
+            'cursor': new_urlsafe_start_cursor,
+            'more': more,
         })
