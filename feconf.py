@@ -169,12 +169,9 @@ ALLOWED_WIDGETS = {
         'CodeRepl': {
             'dir': 'extensions/widgets/interactive/CodeRepl'
         },
-        # NOTE: Uncomment the following lines if you want to activate
-        # the music input widget. This widget is still being developed
-        # and is in pre-alpha stage.
-        # 'MusicNotesInput': {
-        #     'dir': 'extensions/widgets/interactive/MusicNotesInput'
-        # },
+        'MusicNotesInput': {
+            'dir': 'extensions/widgets/interactive/MusicNotesInput'
+        },
     }
 }
 
