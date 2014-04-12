@@ -31,7 +31,16 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         $scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.sequenceToGuessWithValue);
 
-        /** Array to hold the notes placed on staff. Notes are represented as
+        /**
+         * A note Object has a baseNoteMidiNumber and an offset property. For
+         * example, C#4 would be -> note = {baseNoteMidiNumber: 61, offset: 1};
+         *
+         * A readableNote Object has a readableNoteName property. For example,
+         * Gb5 would be -> readableNote = {readableNoteName: 'Gb5'};
+         */
+
+        /**
+         * Array to hold the notes placed on staff. Notes are represented as
          * objects with two keys: baseNoteMidiNumber and offset. The
          * baseNoteMidiNumber is an integer value denoting the MIDI number of
          * the staff-line the note is on, and the offset is either -1, 0 or 1,
@@ -73,8 +82,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         var verticalGridKeys = [
           81, 79, 77, 76, 74, 72, 71, 69, 67, 65, 64, 62, 60
         ];
-
-        var topStaffLine = 81;
 
         // Highest number of notes that can fit on the staff at any given time.
         var MAXIMUM_NOTES_POSSIBLE = 8;
@@ -131,7 +138,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // subtracting one vertical grid space from it.
         function computeStaffTop() {
           return (
-            getStaffLinePositions()[topStaffLine] - $scope.VERTICAL_GRID_SPACING
+            getStaffLinePositions()[verticalGridKeys[0]] - $scope.VERTICAL_GRID_SPACING
           );
         }
 
@@ -327,7 +334,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[lineValue],
                     offset: parseInt(noteType, 10),
                     noteId: noteId,
-                    noteDuration: 4,
                   };
 
                   // When a note is moved, its previous state must be removed
@@ -458,13 +464,14 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // leftPos is close to available horizontal grid position. If there is
         // not a close match, return undefined.
         function getNoteStartFromLeftPos(leftPos) {
-          for (var i = 0; i <= MAXIMUM_NOTES_POSSIBLE; i++) {
+          for (var i = 0; i < MAXIMUM_NOTES_POSSIBLE; i++) {
             // If the difference between leftPos and a horizontalGrid Position
             // is less than 2, then they are close enough to set a position. This
             // gives some wiggle room for rounding differences.
             if (Math.abs(leftPos - getHorizontalPosition(i)) < 2) {
               var note = {};
               note.noteStart = {'num': i, 'den': 1};
+              console.log({note: note});
               return {note: note};
             }
           }
@@ -521,7 +528,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           var ledgerLine = $('<div></div>');
           ledgerLine.appendTo('.oppia-music-input-staff')
           .addClass('oppia-music-input-ledger-line oppia-music-input-natural-note')
-          .addClass(noteId + ' ' + leftPos)
           .droppable({
             accept: '.oppia-music-input-note-choices div',
             // When a ledgerLine note is moved out of its droppable,
@@ -556,26 +562,25 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           }
         }
 
-        function _getCorrespondingNoteName(baseNoteMidiNumber) {
+        function _getCorrespondingNoteName(midiNumber) {
           var correspondingNoteName = null;
           for (var noteName in NOTE_NAMES_TO_MIDI_VALUES) {
-            if (NOTE_NAMES_TO_MIDI_VALUES[noteName] === baseNoteMidiNumber) {
+            if (NOTE_NAMES_TO_MIDI_VALUES[noteName] === midiNumber) {
               correspondingNoteName = noteName;
               break;
             }
           }
           if (correspondingNoteName === null) {
-            console.error('Invalid MIDI pitch: ' + baseNoteMidiNumber);
+            console.error('Invalid MIDI pitch: ' + midiNumber);
           }
           return correspondingNoteName;
         }
 
         /*
-         * Returns a note object with a readable note name, such as Eb5, A5 or F#4,
-         * given a note object with baseNoteMidiNumber and sharp/flat offset
+         * Returns a note object with a readable note name, such as Eb5, A5 or
+         * F#4, given a note object with baseNoteMidiNumber and sharp/flat offset
          * properties. For example, if note.baseNoteMidiNumber = 64 and
-         * note.offset = -1, this will return
-         * {'readableNoteName': 'Eb4', 'noteDuration': {'num': 1, 'den': 1}
+         * note.offset = -1, this will return {'readableNoteName': 'Eb4'}
          * (since 64 is the baseNoteMidiNumber for 'E', and -1 indicates a flat).
          */
         function _convertNoteToReadableNote(note) {
@@ -591,8 +596,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
           return {
             'readableNoteName':
-              correspondingNoteName[0] + accidental + correspondingNoteName[1],
-            'noteDuration': {'num': 1, 'den': 1}
+              correspondingNoteName[0] + accidental + correspondingNoteName[1]
           };
         }
 
@@ -603,8 +607,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
          * {'baseNoteMidiNumber': 64, 'offset': -1}
          * (since 64 is the baseNoteMidiNumber for 'E', and -1 indicates a flat).
          */
-        function _convertReadableNoteToNote(note) {
-          var readableNoteName = note.readableNoteName;
+        function _convertReadableNoteToNote(readableNote) {
+          var readableNoteName = readableNote.readableNoteName;
           if (readableNoteName.length === 2) {
             // This is a natural note.
             return {
@@ -620,8 +624,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             }
 
             return {
-              baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[readableNoteName[0] +
-                readableNoteName[2]],
+              baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[
+                readableNoteName[0] + readableNoteName[2]],
               offset: offset
             };
           } else {
@@ -630,11 +634,22 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           }
         }
 
+        // For each note in a sequence, add a noteDuration property.
+        // TODO (wagnerdmike) - add more options for note durations.
+        function _makeAllNotesHaveDurationOne(noteArray) {
+          for (var i = 0; i < noteArray.length; i++) {
+            noteArray[i].noteDuration = {'num': 1, 'den': 1};
+          }
+          return noteArray;
+        }
+
         $scope.submitAnswer = function(answer) {
           var readableSequence = [];
           for (var i = 0; i < noteSequence.length; i++) {
             readableSequence.push(_convertNoteToReadableNote(noteSequence[i].note));
           }
+          readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
+          console.log('readableSeq submit: ', readableSequence);
           $scope.$parent.$parent.submitAnswer(readableSequence, 'submit');
         };
 
