@@ -14,23 +14,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides a seam for transaction services."""
+"""Tests for methods in the widget registry."""
 
 __author__ = 'Sean Lip'
 
-
-from google.appengine.ext import ndb
-
-
-def run_in_transaction(fn, *args, **kwargs):
-    """Run a function in a transaction."""
-    return ndb.transaction(
-        lambda: fn(*args, **kwargs),
-        xg=True,
-        propagation=ndb.TransactionOptions.ALLOWED,
-    )
+from core.domain import widget_registry
+import test_utils
 
 
-# The NDB toplevel() function. For more details, see
-#   https://developers.google.com/appengine/docs/python/ndb/async#intro
-toplevel_wrapper = ndb.toplevel
+class WidgetRegistryTests(test_utils.GenericTestBase):
+    """Tests for the widget registry."""
+
+    def test_deduplication_of_dependency_ids(self):
+        self.assertItemsEqual(
+            widget_registry.Registry.get_deduplicated_dependency_ids(
+                ['CodeRepl']),
+            ['jsrepl'])
+
+        self.assertItemsEqual(
+            widget_registry.Registry.get_deduplicated_dependency_ids(
+                ['CodeRepl', 'CodeRepl', 'CodeRepl']),
+            ['jsrepl'])

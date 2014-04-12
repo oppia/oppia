@@ -14,23 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides a seam for transaction services."""
+"""Registry for JavaScript library dependencies."""
 
 __author__ = 'Sean Lip'
 
+import os
 
-from google.appengine.ext import ndb
-
-
-def run_in_transaction(fn, *args, **kwargs):
-    """Run a function in a transaction."""
-    return ndb.transaction(
-        lambda: fn(*args, **kwargs),
-        xg=True,
-        propagation=ndb.TransactionOptions.ALLOWED,
-    )
+import feconf
+import utils
 
 
-# The NDB toplevel() function. For more details, see
-#   https://developers.google.com/appengine/docs/python/ndb/async#intro
-toplevel_wrapper = ndb.toplevel
+class Registry(object):
+    """Registry of all JS/CSS library dependencies."""
+
+    @classmethod
+    def get_dependency_html(cls, dependency_id):
+        return utils.get_file_contents(os.path.join(
+            feconf.DEPENDENCIES_TEMPLATES_DIR, '%s.html' % dependency_id))

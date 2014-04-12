@@ -20,10 +20,10 @@ import os
 import re
 import string
 
+from core.domain import dependency_registry
 from core.domain import obj_services
 from core.domain import widget_domain
 from core.domain import widget_registry
-from extensions.objects.models import objects
 import feconf
 import test_utils
 import utils
@@ -297,3 +297,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             # parameters with the correct types.
             for param in widget.params:
                 widget._get_widget_param_instances({}, {})
+
+            # Check that all dependency ids are valid.
+            for dependency_id in widget.dependency_ids:
+                dependency_registry.Registry.get_dependency_html(dependency_id)
