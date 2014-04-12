@@ -14,6 +14,10 @@
 
 __author__ = 'Sean Lip'
 
+import os
+import StringIO
+import zipfile
+
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -321,35 +325,85 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
     """Test handler for exploration download."""
 
     def test_exploration_download_handler_for_default_exploration(self):
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
 
-        EXPLORATION_DOWNLOAD_URL = '/createhandler/download/0'
-        
-        # editor perspective
+        # Register and log in as an admin.
         self.register_editor('editor@example.com')
         self.login('editor@example.com')
-        #editor_exploration_dict = self.get_json(EXPLORATION_DOWNLOAD_URL)
-
-       
-        # todo(msl): change below
-        # Switch to the reader perspective
-        #self.logout()
-
-        #raise Exception(response.status_code)
-        #raise Exception(response.body)
-        #csrf_token = self.get_csrf_token_from_response(response)
-
-        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+        self.OWNER_ID = self.get_user_id_from_email('editor@example.com')
         
-        # self.post_json(
-        #     '%s' % EXPLORATION_DOWNLOAD_URL,
-        #     {
-        #         'exploration_id': 0
+        # Create a simple exploration
+        EXP_ID = 'eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'Welcome to Oppia!', 'A category')
+        #exploration.states[exploration.init_state_name].widget.handlers[
+        #    0].rule_specs[0].dest = feconf.END_DEST
+        exp_services.save_new_exploration(
+            self.get_current_logged_in_user_id(), exploration)
+        response = self.testapp.get('/create/%s' % EXP_ID)
+        csrf_token = self.get_csrf_token_from_response(response)
+        
+        # Download to zip file using download handler
+        EXPLORATION_DOWNLOAD_URL = '/createhandler/download/%s' % EXP_ID
+        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+
+        # Check downloaded zip file
+        self.assertEqual(response.headers['Content-Type'],'text/plain')
+        filename = 'oppia-WelcometoOppia!-v1.zip'
+        self.assertEqual(response.headers['Content-Disposition'], ('attachment; filename=%s' % str(filename)))
+        zfsaved = zipfile.ZipFile(StringIO.StringIO(response.body))
+        self.assertEqual(zfsaved.namelist(), ['Welcome to Oppia!.yaml'])
+        
+        # Load golden zip file
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'oppia-WelcometoOppia!-v1-gold.zip')) as f:
+            golden_zipfile = f.read()
+        zfgold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
+        self.assertEqual(zfgold.namelist(), ['Welcome to Oppia!.yaml'])
+
+        # Compare saved with golden file
+        self.assertEqual(
+            zfsaved.open('Welcome to Oppia!.yaml').read(), zfgold.open('Welcome to Oppia!.yaml').read())
+
+        
+        # todo(msl): add more checks with more complicated explorations
+        # some old code that might be useful for this:
+
+        # Save exploration
+        #exploration = exp_services.get_exploration_by_id(EXP_ID)
+        #exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        #exp_services._save_exploration(self.OWNER_ID, exploration, '',[])
+        
+        # Add a new state called 'mystate'
+        # response_dict = self.post_json(
+        #     '/createhandler/new_state_template/%s' % EXP_ID, {
+        #         'state_name': 'mystate'
         #     }, csrf_token)
 
-        self.logout()
+        # self.assertDictContainsSubset({
+        #     'content': [{'type': 'text', 'value': ''}],
+        #     'unresolved_answers': {}
+        # }, response_dict['new_state'])
+        # self.assertTrue('widget' in response_dict['new_state'])
 
+        #exp_services.update_exploration(
+        #    'editor@example.com', EXP_ID, response_dict, '')
+        
+        # Save exploration
+        #exploration = exp_services.get_exploration_by_id(EXP_ID)
+        #exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        #exploration = exp_services.get_exploration_by_id(EXP_ID)
+        #exp_services._save_exploration(self.OWNER_ID, exploration,'',[])
+
+        # # change exploration
+        # exp_services.update_exploration(
+        #     'editor@example.com', EXP_ID, [{
+        #         'cmd': 'edit_state_property',
+        #         'property_name': 'content',
+        #         'state_name': exploration.init_state_name,
+        #         'new_value': [{'type': 'text', 'value': 'abcd'}],
+        #     }], 'Change init state content')
+        
+        self.logout()
+        
 
 class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
 
