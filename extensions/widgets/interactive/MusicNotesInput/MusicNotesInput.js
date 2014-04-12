@@ -464,14 +464,13 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // leftPos is close to available horizontal grid position. If there is
         // not a close match, return undefined.
         function getNoteStartFromLeftPos(leftPos) {
-          for (var i = 0; i < MAXIMUM_NOTES_POSSIBLE; i++) {
+          for (var i = 0; i <= MAXIMUM_NOTES_POSSIBLE; i++) {
             // If the difference between leftPos and a horizontalGrid Position
             // is less than 2, then they are close enough to set a position. This
             // gives some wiggle room for rounding differences.
             if (Math.abs(leftPos - getHorizontalPosition(i)) < 2) {
               var note = {};
               note.noteStart = {'num': i, 'den': 1};
-              console.log({note: note});
               return {note: note};
             }
           }
@@ -649,7 +648,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
             readableSequence.push(_convertNoteToReadableNote(noteSequence[i].note));
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
-          console.log('readableSeq submit: ', readableSequence);
           $scope.$parent.$parent.submitAnswer(readableSequence, 'submit');
         };
 
