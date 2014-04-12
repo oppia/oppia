@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia learners' gallery page.
+ * @fileoverview Data and controllers for the Oppia playtesters' gallery page.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
-  $scope.learnGalleryDataUrl = '/learnhandler/data';
+function PlaytestGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+  $scope.playtestGalleryDataUrl = '/playtesthandler/data';
   $scope.categoryList = [];
   $scope.categories = {};
 
@@ -29,7 +29,7 @@ function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreat
   $rootScope.loadingMessage = 'Loading';
 
   // Retrieves gallery data from the server.
-  $http.get($scope.learnGalleryDataUrl).success(function(data) {
+  $http.get($scope.playtestGalleryDataUrl).success(function(data) {
     $scope.categories = data.categories;
 
     // Put the category names in a list.
@@ -49,4 +49,4 @@ function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreat
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-LearnGallery.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+PlaytestGallery.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];

@@ -114,6 +114,13 @@ urls = [
         'learn_gallery_handler'),
 
     get_redirect_route(
+        r'%s' % feconf.PLAYTEST_GALLERY_URL, galleries.PlaytestPage,
+        'playtest_gallery_page'),
+    get_redirect_route(
+        r'%s' % feconf.PLAYTEST_GALLERY_DATA_URL, galleries.PlaytestHandler,
+        'playtest_gallery_handler'),
+
+    get_redirect_route(
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,
         'contribute_gallery_page'),
     get_redirect_route(

@@ -1,22 +1,20 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Learners' Gallery
+  Playtesters' Gallery
 {% endblock subtitle %}
 
 {% block content %}
-  <div class="container" ng-controller="LearnGallery">
+  <div class="container" ng-controller="PlaytestGallery">
     <div class="row">
       <div class="span8">
         <div class="oppia-gallery-frame">
 
           <h3 class="oppia-page-title">
-            Learners' Gallery
+            Playtesters' Gallery
           </h3>
 
-          <p>
-            This gallery shows all explorations that have been moved out of beta.
-          </p>
+          <p>All explorations in this gallery are still in beta. Play them and give feedback to make them better!</p>
 
           <div class="oppia-gallery" ng-if="displayedCategories">
             <div class="tabbable tabs-left">
@@ -51,6 +49,9 @@
                               </span>
                             </div>
                           </a>
+                          <span ng-if="exploration.to_playtest" class="label label-info pull-right">
+                            Invited to playtest
+                          </span>
                         </div>
                       </div>
 
@@ -61,18 +62,6 @@
 
             </div>
           </div>
-
-          <br>
-
-          {% if user_email %}
-            <h4>
-              To create new explorations or edit existing ones, visit the <a href="/contribute">Contributors' Gallery</a>.
-            </h4>
-          {% else %}
-            <h4>
-              To create new explorations or edit existing ones, you must <a href="{{contribute_gallery_login_url}}">log in</a>.
-            </h4>
-          {% endif %}
         </div>
       </div>
     </div>
@@ -82,6 +71,6 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('galleries/LearnGallery.js') }}
+    {{ include_js_file('galleries/PlaytestGallery.js') }}
   </script>
 {% endblock footer_js %}

@@ -120,10 +120,16 @@ def _get_explorations_summary_dict(exploration_rights):
     return result
 
 
-def get_non_private_explorations_summary_dict():
-    """Returns a summary of non-private explorations."""
+def get_public_explorations_summary_dict():
+    """Returns a summary of public (beta) explorations."""
     return _get_explorations_summary_dict(
-        rights_manager.get_non_private_exploration_rights())
+        rights_manager.get_public_exploration_rights())
+
+
+def get_publicized_explorations_summary_dict():
+    """Returns a summary of publicized explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_publicized_exploration_rights())
 
 
 def get_community_owned_explorations_summary_dict():

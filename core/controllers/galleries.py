@@ -64,23 +64,53 @@ class LearnHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
+
         explorations_dict = (
-            exp_services.get_non_private_explorations_summary_dict())
+            exp_services.get_publicized_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
             categories[exploration_data['category']].append({
                 'id': eid,
-                'is_public': (
-                    exploration_data['rights']['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLIC),
-                'is_publicized': (
-                    exploration_data['rights']['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLICIZED),
+                'title': exploration_data['title'],
+            })
+
+        self.values.update({
+            'categories': categories,
+        })
+        self.render_json(self.values)
+
+
+class PlaytestPage(base.BaseHandler):
+    """The exploration gallery page for playtesters."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_PLAYTEST,
+        })
+        self.render_template('galleries/playtest.html')
+
+
+class PlaytestHandler(base.BaseHandler):
+    """Provides data for the exploration gallery page for playtesters."""
+
+    def get(self):
+        """Handles GET requests."""
+        # TODO(sll): Implement paging.
+        explorations_dict = (
+            exp_services.get_public_explorations_summary_dict())
+
+        categories = collections.defaultdict(list)
+        for (eid, exploration_data) in explorations_dict.iteritems():
+            categories[exploration_data['category']].append({
+                'id': eid,
                 'title': exploration_data['title'],
                 'to_playtest': False,
             })
 
+        # Add private explorations that the user has been specifically invited
+        # to playtest.
         if self.user_id:
             playtest_dict = (
                 exp_services.get_explicit_viewer_explorations_summary_dict(
@@ -88,12 +118,6 @@ class LearnHandler(base.BaseHandler):
             for (eid, exploration_data) in playtest_dict.iteritems():
                 categories[exploration_data['category']].append({
                     'id': eid,
-                    'is_public': (
-                        exploration_data['rights']['status'] ==
-                        rights_manager.EXPLORATION_STATUS_PUBLIC),
-                    'is_publicized': (
-                        exploration_data['rights']['status'] ==
-                        rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                     'title': exploration_data['title'],
                     'to_playtest': True,
                 })
@@ -139,7 +163,9 @@ class ContributeHandler(base.BaseHandler):
         if (rights_manager.Actor(self.user_id).is_moderator() or
                 self.is_super_admin):
             explorations_dict.update(
-                exp_services.get_non_private_explorations_summary_dict())
+                exp_services.get_public_explorations_summary_dict())
+            explorations_dict.update(
+                exp_services.get_publicized_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
