@@ -38,32 +38,23 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
         errorMessage: '',
         proofString: $scope.$parent.value.default_proof_string
       };
-
-      console.log(logicProofData.BASE_STUDENT_LANGUAGE.operators)
-      console.log($scope.$parent.value.assumptions)
-      
-      // We only start trying to build the question once a target formula has
-      // been provided.
-      $scope.startBuilding = false;
       
       $scope.buildQuestion = function() {
-        if ($scope.startBuilding) {
-          try {
-            builtQuestion = angular.copy(
-              logicProofTeacher.buildQuestion(
-                $scope.localValue.assumptionsString, 
-                $scope.localValue.targetString, 
-                LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
-            $scope.$parent.value = {
-              assumptions: builtQuestion.assumptions,
-              results: builtQuestion.results,
-              default_proof_string: $scope.localValue.proofString
-            }
-            $scope.localValue.errorMessage = '';
+        try {
+          builtQuestion = angular.copy(
+            logicProofTeacher.buildQuestion(
+              $scope.localValue.assumptionsString, 
+              $scope.localValue.targetString, 
+              LOGIC_PROOF_DEFAULT_QUESTION_DATA.vocabulary));
+          $scope.$parent.value = {
+            assumptions: builtQuestion.assumptions,
+            results: builtQuestion.results,
+            default_proof_string: $scope.localValue.proofString
           }
-          catch (err) {
-            $scope.localValue.errorMessage = err.message;
-          }
+          $scope.localValue.errorMessage = '';
+        }
+        catch (err) {
+          $scope.localValue.errorMessage = err.message;
         }
       }
 
@@ -81,7 +72,6 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
           $scope.localValue.targetString = logicProofConversion.convertToLogicCharacters(newValue);
         }
         if (newValue !== '') {
-          $scope.startBuilding = true;
         }
         $scope.buildQuestion();
       })
@@ -91,7 +81,6 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
         if (comparison.first === newValue.length - 1) {
           $scope.localValue.proofString = logicProofConversion.convertToLogicCharacters(newValue);
         }
-        $scope.startBuilding = true;
         $scope.buildQuestion();
       })
 

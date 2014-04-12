@@ -27,7 +27,13 @@ function TestCtrl($scope) {
         logicProofTeacher.buildQuestion(
           'we\u2227you', 'p=q', logicProofData.BASE_VOCABULARY)
       }
-    },    
+    },
+    'question_5': {
+      expected: 1,
+      actual: logicProofTeacher.buildQuestion(
+        'R(albert)\u2227R(betty)', 'p', logicProofData.BASE_VOCABULARY
+      ).results.length
+    },
     'line_template_1': {
       expected: JSON.stringify({
         name: "and_introduce",

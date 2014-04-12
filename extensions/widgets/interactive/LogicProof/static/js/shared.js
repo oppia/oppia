@@ -544,6 +544,7 @@ var logicProofShared = (function() {
         err.parameters['amount_typed'] = [];
         throw err;
       }
+
       try {
         var dummyTypes = instantiateTypingElementArray(
           typingRule.dummies, untypedExpression.dummies.length);
@@ -559,11 +560,23 @@ var logicProofShared = (function() {
         updatedOperators[key] = operators[key];
       }
       if (operatorIsNew) {
+
+        var _decorateTypes = function(types) {
+          decoratedTypes = [];
+          for (var k = 0; k < types.length; k++) {
+            decoratedTypes.push({
+              type: types[k],
+              arbitrarily_many: false
+            });
+          }
+          return decoratedTypes;
+        }
+
         updatedOperators[untypedExpression.top_operator_name] = {
           kind: untypedExpression.top_kind_name,
           typing: [{
-            arguments: argumentTypes,
-            dummies: dummyTypes,
+            arguments: _decorateTypes(argumentTypes),
+            dummies: _decorateTypes(dummyTypes),
             output: topType
           }]
         };

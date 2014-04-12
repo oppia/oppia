@@ -160,7 +160,7 @@ function TestCtrl($scope) {
           logicProofData.BASE_VOCABULARY, false);
       }
     },
-    'instantiate_typing_': {
+    'instantiate_typing_1': {
       expected: JSON.stringify(['boolean', 'element', 'element']),
       actual: JSON.stringify(logicProofShared.instantiateTypingElementArray([{
         type: 'boolean',
@@ -169,6 +169,10 @@ function TestCtrl($scope) {
         type: 'element',
         arbitrarily_many: true,
       }], 3))
+    },
+    'instantiate_typing_2': {
+      expected: JSON.stringify([]),
+      actual: JSON.stringify(logicProofShared.instantiateTypingElementArray([], 0))
     },
     'assign_types_1': {
       expected: JSON.stringify({
