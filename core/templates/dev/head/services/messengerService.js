@@ -101,7 +101,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           return;
         }
 
-        if (hashDict.version == '0.0.0') {
+        if (hashDict.version == '0.0.0' || hashDict.version == '0.0.1') {
           $log.info('Posting message to parent: ' + messageTitle);
 
           var payload = getPayload[messageTitle](messageData);
@@ -118,8 +118,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
             JSON.stringify({
               title: messageTitle,
               payload: payload,
-              sourceTagId: hashDict.tagid,
-              secret: hashDict.secret
+              sourceTagId: hashDict.tagid
             }), '*');
         } else {
           $log.error('Unknown version for embedding: ' + hashDict.version);
