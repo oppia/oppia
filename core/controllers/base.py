@@ -169,7 +169,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def unescape_state_name(self, escaped_state_name):
         """Unescape a state name that is encoded with encodeURIComponent."""
-        return urllib.unquote(str(escaped_state_name)).decode('utf-8')
+        return urllib.unquote(unicode(escaped_state_name)).decode('utf-8')
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass."""
@@ -337,21 +337,21 @@ class BaseHandler(webapp2.RequestHandler):
 
         if isinstance(exception, self.UnauthorizedUserException):
             self.error(401)
-            self._render_exception(401, {'error': str(exception)})
+            self._render_exception(401, {'error': unicode(exception)})
             return
 
         if isinstance(exception, self.InvalidInputException):
             self.error(400)
-            self._render_exception(400, {'error': str(exception)})
+            self._render_exception(400, {'error': unicode(exception)})
             return
 
         if isinstance(exception, self.InternalErrorException):
             self.error(500)
-            self._render_exception(500, {'error': str(exception)})
+            self._render_exception(500, {'error': unicode(exception)})
             return
 
         self.error(500)
-        self._render_exception(500, {'error': str(exception)})
+        self._render_exception(500, {'error': unicode(exception)})
 
     class UnauthorizedUserException(Exception):
         """Error class for unauthorized access."""

@@ -67,7 +67,6 @@ import feconf
 
 EXPECTED_TEST_COUNT = 239
 
-
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--test_target',
