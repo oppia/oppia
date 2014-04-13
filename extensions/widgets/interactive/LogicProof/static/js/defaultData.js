@@ -2442,7 +2442,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           },
           "substitutions": [],
           "type": "element",
-          "top_kind_name": "variable"
+          "kind": "variable"
         }
       }
     ],
@@ -2511,7 +2511,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           },
           "substitutions": [],
           "type": "element",
-          "top_kind_name": "variable"
+          "kind": "variable"
         }
       },
       {
@@ -2882,7 +2882,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           },
           "substitutions": [],
           "type": "element",
-          "top_kind_name": "variable"
+          "kind": "variable"
         }
       },
       {
@@ -2975,7 +2975,8 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             "dummies": []
           },
           "substitutions": [],
-          "type": "element"
+          "type": "element",
+          "kind": "variable"
         }
       }
     ],

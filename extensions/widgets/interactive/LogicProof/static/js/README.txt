@@ -16,6 +16,8 @@ The code is contained in the following files:
  written by the student and converts it into a Proof object (or reports an error
  the student has made) and the third checks the proof to see whether the student
  has made any mistakes.
+  - conversion.js. Used to convert symbols into unicode logic symbols as users
+ type.
 
  More information about the program flow, together with specifications for all the 
  objects used, can be found at [LINK].
@@ -29,5 +31,7 @@ The code is contained in the following files:
 
   *** IMPORTANT ***
   After making any changes to the code in /static/js, run the tests in
-  /static/js/tests and make sure they all pass.
+  /static/js/tests and make sure they all pass. (To run them open each file 
+  with 'Tests' in its name in a browser and check that 'passed' appears for
+  each test.)
   *** IMPORTANT ***

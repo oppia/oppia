@@ -493,7 +493,6 @@ class CheckedProof(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        # TODO (jacob): This is not being run
         try:
             assert isinstance(raw.get('assumptions_string'), basestring)
             assert isinstance(raw.get('target_string'), basestring)
