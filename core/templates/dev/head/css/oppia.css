@@ -586,10 +586,6 @@ textarea {
   cursor: pointer;
   padding: 1px 3px;
 }
-.oppia-editable::after {
-  /* The Unicode characters below represent spaces. */
-  content: '\00a0\00a0\00a0\00a0\00a0 ✎';
-}
 .oppia-editable:hover {
   border: 1px solid #111;
   opacity: 0.95;
