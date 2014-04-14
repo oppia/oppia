@@ -52,7 +52,8 @@ class ExplorationChange(object):
         'widget_customization_args', 'widget_sticky', 'widget_handlers')
 
     EXPLORATION_PROPERTIES = (
-        'title', 'category', 'param_specs', 'param_changes')
+        'title', 'category', 'objective', 'language_code', 'skill_tags',
+        'blurb', 'author_notes', 'param_specs', 'param_changes')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -641,12 +642,18 @@ class State(object):
 class Exploration(object):
     """Domain object for an Oppia exploration."""
 
-    def __init__(self, exploration_id, title, category, default_skin,
+    def __init__(self, exploration_id, title, category, objective,
+                 language_code, skill_tags, blurb, author_notes, default_skin,
                  init_state_name, states_dict, param_specs_dict,
                  param_changes_list, version):
         self.id = exploration_id
         self.title = title
         self.category = category
+        self.objective = objective
+        self.language_code = language_code
+        self.skill_tags = skill_tags
+        self.blurb = blurb
+        self.author_notes = author_notes
         self.default_skin = default_skin
         self.init_state_name = init_state_name
 
@@ -665,7 +672,9 @@ class Exploration(object):
         self.version = version
 
     @classmethod
-    def create_default_exploration(cls, exploration_id, title, category):
+    def create_default_exploration(
+            cls, exploration_id, title, category,
+            language_code=feconf.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_STATE_NAME).to_dict()
         states_dict = {
@@ -673,8 +682,9 @@ class Exploration(object):
         }
 
         return cls(
-            exploration_id, title, category, 'conversation_v1',
-            feconf.DEFAULT_STATE_NAME, states_dict, {}, [], 0)
+            exploration_id, title, category, '', language_code, [], '', '',
+            'conversation_v1', feconf.DEFAULT_STATE_NAME, states_dict, {}, [],
+            0)
 
     @classmethod
     def _require_valid_name(cls, name, name_type):
@@ -729,14 +739,44 @@ class Exploration(object):
                 % self.category)
         self._require_valid_name(self.category, 'the exploration category')
 
+        if not isinstance(self.objective, basestring):
+            raise utils.ValidationError(
+                'Expected objective to be a string, received %s' %
+                self.objective)
+
+        if not isinstance(self.language_code, basestring):
+            raise utils.ValidationError(
+                'Expected language_code to be a string, received %s' %
+                self.language_code)
+        # TODO(sll): Check that the language code is valid.
+
+        if not isinstance(self.skill_tags, list):
+            raise utils.ValidationError(
+                'Expected skill_tags to be a list, received %s' %
+                self.skill_tags)
+        for tag in self.skill_tags:
+            if not isinstance(tag, basestring):
+                raise utils.ValidationError(
+                    'Expected each tag in skill_tags to be a string, received '
+                    '%s' % tag)
+
+        if not isinstance(self.blurb, basestring):
+            raise utils.ValidationError(
+                'Expected blurb to be a string, received %s' % self.blurb)
+
+        if not isinstance(self.author_notes, basestring):
+            raise utils.ValidationError(
+                'Expected author_notes to be a string, received %s' %
+                self.author_notes)
+
+        if not self.default_skin:
+            raise utils.ValidationError(
+                'Expected a default_skin to be specified.')
         if not isinstance(self.default_skin, basestring):
             raise utils.ValidationError(
                 'Expected default_skin to be a string, received %s (%s).'
                 % self.default_skin, type(self.default_skin))
         # TODO(sll): Check that the skin name corresponds to a valid skin.
-        if not self.default_skin:
-            raise utils.ValidationError(
-                'Expected a default_skin to be specified.')
 
         if not isinstance(self.states, dict):
             raise utils.ValidationError(
@@ -834,6 +874,15 @@ class Exploration(object):
                 self._verify_no_dead_ends()
             except utils.ValidationError as e:
                 warnings_list.append(unicode(e))
+
+            if not self.objective:
+                warnings_list.append(
+                    'An objective must be specified (in the \'Settings\' tab).'
+                )
+
+            if not self.language_code:
+                warnings_list.append(
+                    'A language must be specified (in the \'Settings\' tab).')
 
             if len(warnings_list) > 0:
                 warning_str = ''
@@ -959,6 +1008,21 @@ class Exploration(object):
 
     def update_category(self, category):
         self.category = category
+
+    def update_objective(self, objective):
+        self.objective = objective
+
+    def update_language_code(self, language_code):
+        self.language_code = language_code
+
+    def update_skill_tags(self, skill_tags):
+        self.skill_tags = skill_tags
+
+    def update_blurb(self, blurb):
+        self.blurb = blurb
+
+    def update_author_notes(self, author_notes):
+        self.author_notes = author_notes
 
     def update_param_specs(self, param_specs_dict):
         self.param_specs = {
@@ -1125,7 +1189,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 2
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 3
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -1143,6 +1207,19 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v2_dict_to_v3_dict(cls, exploration_dict):
+        """Converts a v2 exploration dict into a v3 exploration dict."""
+        exploration_dict['schema_version'] = 3
+
+        exploration_dict['objective'] = 'FIXME dummy objective from v2 upgrade'
+        exploration_dict['language_code'] = 'en'
+        exploration_dict['skill_tags'] = []
+        exploration_dict['blurb'] = ''
+        exploration_dict['author_notes'] = ''
+
+        return exploration_dict
+
+    @classmethod
     def from_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string."""
         exploration_dict = utils.dict_from_yaml(yaml_content)
@@ -1153,13 +1230,25 @@ class Exploration(object):
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v1 and v2 YAML files at present.')
+                'Sorry, we can only process v1, v2 and v3 YAML files at '
+                'present.')
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)
+            exploration_dict = cls._convert_v2_dict_to_v3_dict(
+                exploration_dict)
+        elif exploration_schema_version == 2:
+            exploration_dict = cls._convert_v2_dict_to_v3_dict(
+                exploration_dict)
 
         exploration = cls.create_default_exploration(
-            exploration_id, title, category)
+            exploration_id, title, category,
+            language_code=exploration_dict['language_code'])
+        exploration.objective = exploration_dict['objective']
+        exploration.skill_tags = exploration_dict['skill_tags']
+        exploration.blurb = exploration_dict['blurb']
+        exploration.author_notes = exploration_dict['author_notes']
+
         exploration.param_specs = {
             ps_name: param_domain.ParamSpec.from_dict(ps_val) for
             (ps_name, ps_val) in exploration_dict['param_specs'].iteritems()
@@ -1190,16 +1279,18 @@ class Exploration(object):
                                     % pc.name)
 
             wdict = sdict['widget']
-            widget_handlers = [AnswerHandlerInstance.from_dict_and_obj_type({
-                'name': handler['name'],
-                'rule_specs': [{
-                    'definition': rule_spec['definition'],
-                    'dest': rule_spec['dest'],
-                    'feedback': [html_cleaner.clean(feedback)
-                                 for feedback in rule_spec['feedback']],
-                    'param_changes': rule_spec.get('param_changes', []),
-                } for rule_spec in handler['rule_specs']],
-            }, WidgetInstance._get_obj_type(wdict['widget_id'])) for handler in wdict['handlers']]
+            widget_handlers = [
+                AnswerHandlerInstance.from_dict_and_obj_type({
+                    'name': handler['name'],
+                    'rule_specs': [{
+                        'definition': rule_spec['definition'],
+                        'dest': rule_spec['dest'],
+                        'feedback': [html_cleaner.clean(feedback)
+                                     for feedback in rule_spec['feedback']],
+                        'param_changes': rule_spec.get('param_changes', []),
+                    } for rule_spec in handler['rule_specs']],
+                }, WidgetInstance._get_obj_type(wdict['widget_id']))
+                for handler in wdict['handlers']]
 
             state.widget = WidgetInstance(
                 wdict['widget_id'], wdict['customization_args'],
@@ -1216,10 +1307,15 @@ class Exploration(object):
 
     def to_yaml(self):
         return utils.yaml_from_dict({
+            'author_notes': self.author_notes,
+            'blurb': self.blurb,
             'default_skin': self.default_skin,
             'init_state_name': self.init_state_name,
+            'language_code': self.language_code,
+            'objective': self.objective,
             'param_changes': self.param_change_dicts,
             'param_specs': self.param_specs_dict,
+            'skill_tags': self.skill_tags,
             'states': {state_name: state.to_dict()
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION

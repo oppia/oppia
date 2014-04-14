@@ -56,6 +56,19 @@ class ExplorationModel(base_models.VersionedModel):
     title = ndb.StringProperty(required=True)
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True, indexed=True)
+    # The objective of this exploration.
+    objective = ndb.TextProperty(required=True, indexed=False)
+    # The ISO 639-1 code for the language this exploration is written in.
+    language_code = ndb.StringProperty(required=True, indexed=True)
+    # Skill tags associated with this exploration.
+    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
+    # A blurb for this exploration.
+    blurb = ndb.TextProperty(default='', indexed=False)
+    # 'Author notes' for this exploration.
+    author_notes = ndb.TextProperty(default='', indexed=False)
+    # The default HTML template to use for displaying the exploration to the
+    # reader. This is a filename in data/skins (without the .html suffix).
+    default_skin = ndb.StringProperty(default='conversation_v1')
 
     # The name of the initial state of this exploration.
     init_state_name = ndb.StringProperty(required=True, indexed=False)
@@ -69,9 +82,6 @@ class ExplorationModel(base_models.VersionedModel):
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
-    # The default HTML template to use for displaying the exploration to the
-    # reader. This is a filename in data/skins (without the .html suffix).
-    default_skin = ndb.StringProperty(default='conversation_v1')
 
     @classmethod
     def get_multi(cls, exp_ids):
