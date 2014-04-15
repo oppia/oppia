@@ -354,8 +354,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     $(ui.helper).css({top: topPos, left: leftPos});
 
                     if (Math.floor(leftPos) > Math.floor(
-                        getHorizontalPosition(MAXIMUM_NOTES_POSSIBLE))) {
-                      removeNotesFromNoteSequenceWithId(note.noteId);
+                        getHorizontalPosition(MAXIMUM_NOTES_POSSIBLE - 1))) {
                       $(ui.helper).remove();
                       repaintLedgerLines();
                       return;
@@ -373,7 +372,6 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     note.noteStart =
                       getNoteStartFromLeftPos(leftPos).note.noteStart;
                   } else {
-                    removeNotesFromNoteSequenceWithId(noteId);
                     repaintLedgerLines();
                     return;
                   }
@@ -464,7 +462,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // leftPos is close to available horizontal grid position. If there is
         // not a close match, return undefined.
         function getNoteStartFromLeftPos(leftPos) {
-          for (var i = 0; i <= MAXIMUM_NOTES_POSSIBLE; i++) {
+          for (var i = 0; i < MAXIMUM_NOTES_POSSIBLE; i++) {
             // If the difference between leftPos and a horizontalGrid Position
             // is less than 2, then they are close enough to set a position. This
             // gives some wiggle room for rounding differences.
@@ -508,15 +506,14 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           var lastHorizontalPositionOffset =
             $('.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
-            lastHorizontalPositionOffset - (MAXIMUM_NOTES_POSSIBLE *
+            lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
                             $scope.HORIZONTAL_GRID_SPACING);
           return leftOffset + (noteStartAsFloat * $scope.HORIZONTAL_GRID_SPACING);
         }
 
         function isCloneOffStaff(helperClone) {
           return (!(helperClone.position().top > staffTop &&
-                  helperClone.position().top < staffBottom) ||
-                  helperClone.position().left > RIGHT_EDGE_OF_STAFF_POSITION);
+                  helperClone.position().top < staffBottom));
         }
 
         function isLedgerLineNote(lineValue) {
