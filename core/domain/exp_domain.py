@@ -1212,7 +1212,7 @@ class Exploration(object):
         exploration_dict['schema_version'] = 3
 
         exploration_dict['objective'] = 'FIXME dummy objective from v2 upgrade'
-        exploration_dict['language_code'] = 'en'
+        exploration_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
         exploration_dict['skill_tags'] = []
         exploration_dict['blurb'] = ''
         exploration_dict['author_notes'] = ''
@@ -1235,11 +1235,12 @@ class Exploration(object):
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
                 exploration_dict)
+            exploration_schema_version = 2
+
+        if exploration_schema_version == 2:
             exploration_dict = cls._convert_v2_dict_to_v3_dict(
                 exploration_dict)
-        elif exploration_schema_version == 2:
-            exploration_dict = cls._convert_v2_dict_to_v3_dict(
-                exploration_dict)
+            exploration_schema_version = 3
 
         exploration = cls.create_default_exploration(
             exploration_id, title, category,
