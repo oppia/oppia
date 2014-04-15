@@ -756,6 +756,11 @@ textarea {
   color: #444
 }
 
+.oppia-feeback-reader-link {
+  margin-left: 40px;
+  font-size: smaller;
+}
+
 .label-info {
   background-color: #18447E;
 }
