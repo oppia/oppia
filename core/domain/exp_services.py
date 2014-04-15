@@ -119,6 +119,25 @@ def _get_explorations_summary_dict(exploration_rights):
             }
     return result
 
+def get_exploration_titles(exp_ids):
+    """Returns exploration titles for the give ids.
+
+    The result is a dict with exploration ids as keys and their corresponding
+    titles as the values.
+    """
+    explorations = [
+        (get_exploration_from_model(e) if e else None)
+        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+
+    result = {}
+    for ind, exploration in enumerate(explorations):
+        if exploration is None:
+            logging.error(
+                'Could not find exploration corresponding to id %s' %
+                exploration.id)
+        else:
+            result[exploration.id] = exploration.title
+    return result
 
 def get_non_private_explorations_summary_dict():
     """Returns a summary of non-private explorations."""

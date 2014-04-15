@@ -168,11 +168,24 @@ def get_state_rules_stats(exploration_id, state_name):
 
 def get_user_stats(user_id):
     """Returns a dict with user statistics for a given user"""
-    user_stats = {}
-    user_stats['feedback'] = ( 
-        stats_domain.FeedbackItem.get_feedback_items_for_user(user_id) )
+    feedback = stats_domain.FeedbackItem.get_feedback_items_for_user(user_id)
+    exp_ids = {}
+    for k in feedback:
+        exp_id = stats_domain.FeedbackItem.get_exploration_id_from_target_id(
+            feedback[k]['target_id'])
+        exp_ids[exp_id] = True
+    exp_titles = exp_services.get_exploration_titles(exp_ids.keys())
+    for k in feedback:
+        target_id = feedback[k]['target_id']
+        exp_id = stats_domain.FeedbackItem.get_exploration_id_from_target_id(
+            target_id)
+        state_name = stats_domain.FeedbackItem.get_state_name_from_target_id(
+            target_id)
+        feedback[k]['exp_id'] = exp_id
+        feedback[k]['exp_title'] = exp_titles[exp_id]
+        feedback[k]['state_name'] = state_name
 
-    return user_stats
+    return {'feedback': feedback}
 
 def get_exploration_info(exploration_id):
     """Returns statistics about an exploration for display.

@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import copy
 import operator
+import re
 
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -151,6 +152,17 @@ class FeedbackItem(object):
     @classmethod
     def _get_target_id_for_exploration(cls, exploration_id):
         return 'exploration:%s' % (exploration_id)
+
+    @classmethod
+    def get_exploration_id_from_target_id(cls, target_id):
+        m = re.search('\d+', target_id)
+        return m.group(0) if m else None
+
+    @classmethod
+    def get_state_name_from_target_id(cls, target_id):
+        m = re.search('\.(.*)', target_id)
+        print target_id
+        return m.group(1) if m else None
 
     @classmethod
     def get_feedback_items_for_state(cls, exploration_id, state_name):
