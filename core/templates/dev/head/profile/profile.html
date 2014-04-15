@@ -65,9 +65,27 @@
               <dt><div class="oppia-feedback-status label">
                 <[f.status]>
               </div></dt>
-              <dd><div class="oppia-feedback-content">
-                <[f.content]>
-              </div></dd>
+              <dd>
+                <div class="oppia-feedback-content">
+                  <[f.content]>
+                </div>
+                <div class="oppia-feeback-reader-link">
+                  <a href="/explore/<[f.exp_id]>"><[f.exp_title]></a>
+                  <div ng-switch on="f.state_name" style="display:inline-block;">
+                    <div ng-switch-when="END">
+                      (state: <a href="/create/<[f.exp_id]>#/">END</a>)
+                    </div>
+                    <div ng-switch-when=""></div>
+                    <div ng-switch-default>
+                      (state:
+                        <a href="/create/<[f.exp_id]>#/gui/<[f.state_name]>">
+                          <[f.state_name]>
+                        </a>
+                      )
+                    </div>
+                  </div>
+                </div>
+              </dd>
             </div>
           </dl>
         </div>
