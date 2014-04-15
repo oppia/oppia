@@ -169,7 +169,7 @@ class FeedbackHandler(base.BaseHandler):
             ).get_interactive_widget_tag(
                 new_state.widget.customization_args, new_params)
         )
- 
+
         return (new_params, question_html, interactive_html)
 
 
