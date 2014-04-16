@@ -155,13 +155,12 @@ class FeedbackItem(object):
 
     @classmethod
     def get_exploration_id_from_target_id(cls, target_id):
-        m = re.search('\d+', target_id)
-        return m.group(0) if m else None
+        m = re.search('\:([^\.]*)', target_id)
+        return m.group(1) if m else None
 
     @classmethod
     def get_state_name_from_target_id(cls, target_id):
         m = re.search('\.(.*)', target_id)
-        print target_id
         return m.group(1) if m else None
 
     @classmethod

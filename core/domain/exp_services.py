@@ -120,7 +120,7 @@ def _get_explorations_summary_dict(exploration_rights):
     return result
 
 def get_exploration_titles(exp_ids):
-    """Returns exploration titles for the give ids.
+    """Returns exploration titles for the given ids.
 
     The result is a dict with exploration ids as keys and their corresponding
     titles as the values.

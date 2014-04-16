@@ -167,23 +167,29 @@ def get_state_rules_stats(exploration_id, state_name):
     return results
 
 def get_user_stats(user_id):
-    """Returns a dict with user statistics for a given user"""
+    """Returns a dict with user statistics for a given user.
+    The dict includes only one item "feedback" which itself is a dict with the
+    feedback item ID as the keys and the values being yet another dict of:
+    target_id, content, and status -- coming from FeedbackItemModel.
+    exp_id -- exploration ID for which the feedback was made.
+    exp_title -- title of the exploration.
+    state_name -- name of the state for which the feedback was made.
+    """
     feedback = stats_domain.FeedbackItem.get_feedback_items_for_user(user_id)
-    exp_ids = {}
-    for k in feedback:
-        exp_id = stats_domain.FeedbackItem.get_exploration_id_from_target_id(
-            feedback[k]['target_id'])
-        exp_ids[exp_id] = True
-    exp_titles = exp_services.get_exploration_titles(exp_ids.keys())
-    for k in feedback:
-        target_id = feedback[k]['target_id']
+    exp_ids_with_feedback = set([
+        stats_domain.FeedbackItem.get_exploration_id_from_target_id(
+            feedback[k]['target_id']) for k in feedback
+        ])
+    exp_titles = exp_services.get_exploration_titles(exp_ids_with_feedback)
+    for feedback_id, feedback_dict in feedback.iteritems():
+        target_id = feedback_dict['target_id']
         exp_id = stats_domain.FeedbackItem.get_exploration_id_from_target_id(
             target_id)
         state_name = stats_domain.FeedbackItem.get_state_name_from_target_id(
             target_id)
-        feedback[k]['exp_id'] = exp_id
-        feedback[k]['exp_title'] = exp_titles[exp_id]
-        feedback[k]['state_name'] = state_name
+        feedback_dict['exp_id'] = exp_id
+        feedback_dict['exp_title'] = exp_titles[exp_id]
+        feedback_dict['state_name'] = state_name
 
     return {'feedback': feedback}
 
