@@ -13,15 +13,17 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for an editor's main exploration page.
+ * @fileoverview Controllers and services for the exploration editor page.
  *
  * @author sll@google.com (Sean Lip)
  */
 
+// TODO(sll): Move all hardcoded strings to the top of the file.
 var END_DEST = 'END';
 
-// TODO(sll): Move all hardcoded strings to the top of the file.
 
+// A service that maintains a record of which state in the exploration is
+// currently active.
 oppia.factory('editorContextService', ['$log', function($log) {
   var activeStateName = null;
 
@@ -45,9 +47,168 @@ oppia.factory('editorContextService', ['$log', function($log) {
   };
 }]);
 
+
+// A service that maintains a provisional list of changes to be committed to
+// the server.
+oppia.factory('changeListService', [
+    '$rootScope', 'warningsData', function($rootScope, warningsData) {
+  // TODO(sll): Implement undo, redo functionality. Show a message on each step
+  // saying what the step is doing.
+  // TODO(sll): Allow the user to view the list of changes made so far, as well
+  // as the list of changes in the undo stack.
+
+  // Temporary buffer for changes made to the exploration.
+  var explorationChangeList = [];
+  // Stack for storing undone changes. The last element is the most recently
+  // undone change.
+  var undoneChangeStack = [];
+
+  var CMD_ADD_STATE = 'add_state';
+  var CMD_RENAME_STATE = 'rename_state';
+  var CMD_DELETE_STATE = 'delete_state';
+  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
+  var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
+
+  var EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES = {
+    'title': 'explorationTitle',
+    'category': 'explorationCategory',
+    'param_specs': 'paramSpecs',
+    'param_changes': 'explorationParamChanges'
+  };
+
+  var STATE_BACKEND_NAMES_TO_FRONTEND_NAMES = {
+    'widget_customization_args': 'widgetCustomizationArgs',
+    'widget_id': 'widgetId',
+    'widget_handlers': 'widgetHandlers',
+    'widget_sticky': 'widgetSticky',
+    'state_name': 'stateName',
+    'content': 'content',
+    'param_changes': 'stateParamChanges'
+  };
+
+  var _addChange = function(changeDict) {
+    if ($rootScope.loadingMessage) {
+      return;
+    }
+    explorationChangeList.push(changeDict);
+    undoneChangeStack = [];
+  };
+
+  return {
+    /**
+     * Saves a change dict that represents adding a new state.
+     *
+     * It is the responsbility of the caller to check that the new state name
+     * is valid.
+     *
+     * @param {string} stateName The name of the newly-added state
+     */
+    addState: function(stateName) {
+      _addChange({
+        cmd: CMD_ADD_STATE,
+        state_name: stateName
+      });
+    },
+    /**
+     * Saves a change dict that represents the renaming of a state.
+     *
+     * It is the responsibility of the caller to check that the two names
+     * are not equal.
+     *
+     * @param {string} newStateName The new name of the state
+     * @param {string} oldStateName The previous name of the state
+     */
+    renameState: function(newStateName, oldStateName) {
+      _addChange({
+        cmd: CMD_RENAME_STATE,
+        old_state_name: oldStateName,
+        new_state_name: newStateName
+      });
+    },
+    /**
+     * Saves a change dict that represents deleting a new state.
+     *
+     * It is the responsbility of the caller to check that the deleted state
+     * name corresponds to an existing state.
+     *
+     * @param {string} stateName The name of the deleted state.
+     */
+    deleteState: function(stateName) {
+      _addChange({
+        cmd: CMD_DELETE_STATE,
+        state_name: stateName
+      });
+    },
+    /**
+     * Saves a change dict that represents a change to an exploration property
+     * (e.g. title, category, etc.)
+     *
+     * It is the responsibility of the caller to check that the old and new
+     * values are not equal.
+     *
+     * @param {string} backendName The backend name of the property
+     *   (e.g. title, category)
+     * @param {string} newValue The new value of the property
+     * @param {string} oldValue The previous value of the property
+     */
+    editExplorationProperty: function(backendName, newValue, oldValue) {
+      if (!EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+        warningsData.addWarning('Invalid exploration property: ' + backendName);
+        return;
+      }
+      _addChange({
+        cmd: CMD_EDIT_EXPLORATION_PROPERTY,
+        property_name: backendName,
+        new_value: newValue,
+        old_value: oldValue
+      });
+    },
+    /**
+     * Saves a change dict that represents a change to a state property.
+     *
+     * It is the responsibility of the caller to check that the old and new
+     * values are not equal.
+     *
+     * @param {string} stateName The name of the state that is being edited
+     * @param {string} backendName The backend name of the edited property
+     * @param {string} newValue The new value of the property
+     * @param {string} oldValue The previous value of the property
+     */
+    editStateProperty: function(stateName, backendName, newValue, oldValue) {
+      if (!STATE_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+        warningsData.addWarning('Invalid state property: ' + backendName);
+        return;
+      }
+      _addChange({
+        cmd: CMD_EDIT_STATE_PROPERTY,
+        state_name: stateName,
+        property_name: backendName,
+        new_value: newValue,
+        old_value: oldValue
+      });
+    },
+    discardAllChanges: function() {
+      explorationChangeList = [];
+      undoneChangeStack = [];
+    },
+    getChangeList: function() {
+      return angular.copy(explorationChangeList);
+    },
+    undoLastChange: function() {
+      if (explorationChangeList.length === 0) {
+        warningsData.addWarning('There are no changes to undo.');
+        return;
+      }
+      var lastChange = explorationChangeList.pop();
+      undoneChangeStack.push(lastChange);
+    }
+  };
+}]);
+
+
 function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $window,
     $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
-    editorContextService) {
+    editorContextService, changeListService) {
 
   $scope.getActiveStateName = function() {
     if (editorContextService.isInStateContext()) {
@@ -91,102 +252,10 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
   * Methods affecting the saving of explorations.
   **************************************************/
 
-  // Temporary buffer for changes made to the exploration.
-  $scope.explorationChangeList = [];
-  // Stack for storing undone changes. The last element is the most recently
-  // undone change.
-  $scope.undoneChangeStack = [];
   // Whether or not a save action is currently in progress.
   $scope.isSaveInProgress = false;
   // Whether or not a discard action is currently in progress.
   $scope.isDiscardInProgress = false;
-
-  // TODO(sll): Implement undo, redo functionality. Show a message on each step
-  // saying what the step is doing.
-  // TODO(sll): Allow the user to view the list of changes made so far, as well
-  // as the list of changes in the undo stack.
-
-  var CMD_ADD_STATE = 'add_state';
-  var CMD_RENAME_STATE = 'rename_state';
-  var CMD_DELETE_STATE = 'delete_state';
-  var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
-  var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
-
-  $scope.STATE_BACKEND_NAMES_TO_FRONTEND_NAMES = {
-    'widget_customization_args': 'widgetCustomizationArgs',
-    'widget_id': 'widgetId',
-    'widget_handlers': 'widgetHandlers',
-    'widget_sticky': 'widgetSticky',
-    'state_name': 'stateName',
-    'content': 'content',
-    'param_changes': 'stateParamChanges'
-  };
-
-  $scope.EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES = {
-    'title': 'explorationTitle',
-    'category': 'explorationCategory',
-    'param_specs': 'paramSpecs',
-    'param_changes': 'explorationParamChanges'
-  };
-
-  $scope.addRenameStateChange = function(newStateName, oldStateName) {
-    $scope.explorationChangeList.push({
-      cmd: CMD_RENAME_STATE,
-      old_state_name: oldStateName,
-      new_state_name: newStateName
-    });
-  };
-
-  $scope.addStateChange = function(backendName, newValue, oldValue) {
-    if ($rootScope.loadingMessage || angular.equals(newValue, oldValue)) {
-      return;
-    }
-
-    if (!editorContextService.isInStateContext()) {
-      warningsData.addWarning('Unexpected error: a state property was saved ' +
-          'outside the context of a state. We would appreciate it if you ' +
-          'reported this bug here: https://code.google.com/p/oppia/issues/list.');
-      return;
-    }
-    if (!$scope.STATE_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
-      warningsData.addWarning('Invalid state property: ' + backendName);
-      return;
-    }
-
-    $scope.explorationChangeList.push({
-      cmd: CMD_EDIT_STATE_PROPERTY,
-      state_name: editorContextService.getActiveStateName(),
-      property_name: backendName,
-      new_value: newValue,
-      old_value: oldValue
-    });
-    $scope.undoneChangeStack = [];
-  };
-
-  /**
-   * Saves a property of an exploration (e.g. title, category, etc.)
-   * @param {string} backendName The backend name of the property (e.g. title, category)
-   * @param {string} newValue The new value of the property
-   * @param {string} oldValue The previous value of the property
-   */
-  $scope.addExplorationChange = function(backendName, newValue, oldValue) {
-    if ($rootScope.loadingMessage || angular.equals(newValue, oldValue)) {
-      return;
-    }
-
-    if (!$scope.EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
-      warningsData.addWarning('Invalid exploration property: ' + backendName);
-      return;
-    }
-
-    $scope.explorationChangeList.push({
-      cmd: CMD_EDIT_EXPLORATION_PROPERTY,
-      property_name: backendName,
-      new_value: newValue,
-      old_value: oldValue
-    });
-    $scope.undoneChangeStack = [];
-  };
 
   $scope.discardChanges = function() {
     var confirmDiscard = confirm('Do you want to discard your changes?');
@@ -194,10 +263,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
       warningsData.clear();
       $scope.isDiscardInProgress = true;
 
-      // Clear both change lists.
-      $scope.explorationChangeList = [];
-      $scope.undoneChangeStack = [];
-
+      changeListService.discardAllChanges();
       $scope.initExplorationPage(function() {
         $scope.selectMainTab();
 
@@ -214,7 +280,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
   };
 
   $scope.isExplorationLockedForEditing = function() {
-    return $scope.explorationChangeList.length > 0;
+    return changeListService.getChangeList().length > 0;
   };
 
   $scope.displaySaveReminderWarning = function() {
@@ -238,7 +304,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
     $http.post(
       $scope.changeListSummaryUrl,
       oppiaRequestCreator.createRequest({
-        change_list: $scope.explorationChangeList,
+        change_list: changeListService.getChangeList(),
         version: explorationData.data.version
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
@@ -389,16 +455,15 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
       modalInstance.result.then(function(commitMessage) {
         $scope.isSaveInProgress = true;
 
-        explorationData.save(
-          $scope.explorationChangeList, commitMessage, function() {
-            $scope.explorationChangeList = [];
-            $scope.undoneChangeStack = [];
-            $scope.initExplorationPage();
-            $scope.refreshVersionHistory();
-            $scope.isSaveInProgress = false;
-          }, function() {
-            $scope.isSaveInProgress = false;
-          });
+        var changeList = changeListService.getChangeList();
+        explorationData.save(changeList, commitMessage, function() {
+          changeListService.discardAllChanges();
+          $scope.initExplorationPage();
+          $scope.refreshVersionHistory();
+          $scope.isSaveInProgress = false;
+        }, function() {
+          $scope.isSaveInProgress = false;
+        });
       });
     }).error(function(data) {
       $log.error(data);
@@ -800,11 +865,15 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
       return;
     }
 
+    if (newValue == $scope.explorationTitleMemento) {
+      return;
+    }
+
     warningsData.clear();
-    $scope.explorationTitle = newValue;
-    $scope.addExplorationChange(
+    changeListService.editExplorationProperty(
       'title', newValue, $scope.explorationTitleMemento);
-    $scope.explorationTitleMemento = $scope.explorationTitle;
+    $scope.explorationTitle = newValue;
+    $scope.explorationTitleMemento = newValue;
   }
 
   $scope.saveExplorationCategory = function(newValue) {
@@ -814,20 +883,28 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
       return;
     }
 
+    if (newValue == $scope.explorationCategoryMemento) {
+      return;
+    }
+
     warningsData.clear();
-    $scope.explorationCategory = newValue;
-    $scope.addExplorationChange(
+    changeListService.editExplorationProperty(
       'category', newValue, $scope.explorationCategoryMemento);
-    $scope.explorationCategoryMemento = $scope.explorationCategory;
+    $scope.explorationCategory = newValue;
+    $scope.explorationCategoryMemento = newValue;
   }
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
-    $scope.addExplorationChange('param_changes', newValue, oldValue);
+    if (!angular.equals(newValue, oldValue)) {
+      changeListService.editExplorationProperty(
+        'param_changes', newValue, oldValue);
+    }
   };
 
   $scope.$watch('paramSpecs', function(newValue, oldValue) {
-    if (oldValue !== undefined && !$scope.isDiscardInProgress) {
-      $scope.addExplorationChange('param_specs', newValue, oldValue);
+    if (oldValue !== undefined && !$scope.isDiscardInProgress
+        && !angular.equals(newValue, oldValue)) {
+      changeListService.editExplorationProperty('param_specs', newValue, oldValue);
     }
   });
 
@@ -840,9 +917,8 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
     }
 
     var oldParamSpecs = angular.copy($scope.paramSpecs);
-
     $scope.paramSpecs[name] = {obj_type: type};
-    $scope.addExplorationChange(
+    changeListService.editExplorationProperty(
       'param_specs', angular.copy($scope.paramSpecs), oldParamSpecs);
   };
 
@@ -1018,10 +1094,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
     .success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
-      $scope.explorationChangeList.push({
-        cmd: CMD_ADD_STATE,
-        state_name: newStateName
-      });
+      changeListService.addState(newStateName);
 
       $scope.drawGraph();
       $scope.newStateDesc = '';
@@ -1030,7 +1103,6 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
         successCallback(newStateName);
       }
     }).error(function(data) {
-      $log.error(data);
       warningsData.addWarning(
         data.error || 'Error communicating with server.');
     });
@@ -1092,11 +1164,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
         $scope.selectMainTab();
       }
 
-      $scope.explorationChangeList.push({
-        cmd: CMD_DELETE_STATE,
-        state_name: deleteStateName
-      });
-
+      changeListService.deleteState(deleteStateName);
       $scope.drawGraph();
     });
   };
@@ -1108,5 +1176,6 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
 ExplorationEditor.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
-  'activeInputData', 'oppiaRequestCreator', 'editorContextService'
+  'activeInputData', 'oppiaRequestCreator', 'editorContextService',
+  'changeListService'
 ];
