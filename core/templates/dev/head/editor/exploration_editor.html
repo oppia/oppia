@@ -221,7 +221,7 @@
 
           <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
             {% if can_publicize %}
-              <span ng-show="isPublic">
+              <span ng-show="isPublic" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
                   Move out of beta
                   <span ng-if="currentUserIsAdmin">
@@ -231,12 +231,11 @@
                     (as moderator)
                   </span>
                 </button>
-                &nbsp;&nbsp;&nbsp;
               </span>
             {% endif %}
 
             {% if can_unpublicize %}
-              <span ng-show="isPublicized">
+              <span ng-show="isPublicized" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
                   Move back into beta
                   <span ng-if="currentUserIsAdmin">
@@ -246,24 +245,22 @@
                     (as moderator)
                   </span>
                 </button>
-                &nbsp;&nbsp;&nbsp;
               </span>
             {% endif %}
 
             {% if can_publish %}
-              <span ng-show="isPrivate">
+              <span ng-show="isPrivate" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
                   Publish
                 </button>
                 <img class="oppia-help" src="/images/help.png"
                      tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
                      tooltip-placement="bottom">
-                &nbsp;&nbsp;&nbsp;
               </span>
             {% endif %}
 
             {% if can_unpublish %}
-              <span ng-show="isPublic">
+              <span ng-show="isPublic" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
                   Unpublish
                   <span ng-if="currentUserIsAdmin">
@@ -273,46 +270,41 @@
                     (as moderator)
                   </span>
                 </button>
-                &nbsp;&nbsp;&nbsp;
               </span>
             {% endif %}
 
             {% if can_release_ownership %}
-              <span ng-hide="isCommunityOwned">
+              <span ng-hide="isCommunityOwned" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="showReleaseExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
                   Release Ownership
                 </button>
                 <img class="oppia-help" src="/images/help.png"
                      tooltip="Click this button to release ownership of this exploration to the community."
                      tooltip-placement="bottom">
-                &nbsp;&nbsp;&nbsp;
               </span>
             {% endif %}
 
-            <a class="btn" target="_blank" href="/explore/<[explorationId]>"
+            <a class="btn oppia-exploration-ctrl" target="_blank" href="/explore/<[explorationId]>"
                title="Play this exploration in a new window.">
               <i class="icon-play"></i>
             </a>
 
-            &nbsp;&nbsp;&nbsp;
-
-            <a class="btn" ng-click="downloadExploration()"
+            <a class="btn oppia-exploration-ctrl" ng-click="downloadExploration()"
                title="Download exploration as a zip file.">
               <i class="icon-download-alt"></i>
             </a>
 
-            <span ng-if="isPrivate">
-              &nbsp;&nbsp;&nbsp;
-              <button type="button" class="btn btn-danger"
-                      ng-click="deleteExploration('')"
-                      title="Delete this exploration">
-                <i class="icon-trash" title="Delete Exploration"></i>
-              </button>
-            </span>
+            <button type="button"
+                    ng-if="isPrivate"
+                    class="btn btn-danger oppia-exploration-ctrl"
+                    ng-click="deleteExploration('')"
+                    title="Delete this exploration">
+              <i class="icon-trash" title="Delete Exploration"></i>
+            </button>
 
-            <span ng-if="isPublic && (currentUserIsAdmin || currentUserIsModerator)">
-              &nbsp;&nbsp;&nbsp;
-              <button type="button" class="btn btn-danger"
+            <span ng-if="isPublic && (currentUserIsAdmin || currentUserIsModerator)" class="oppia-exploration-ctrl">
+              <button type="button"
+                      class="btn btn-danger"
                       ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
                 <i class="icon-trash"></i>
                 <span ng-if="currentUserIsAdmin">

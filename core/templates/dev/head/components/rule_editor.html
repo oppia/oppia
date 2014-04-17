@@ -10,6 +10,9 @@
             <i class="icon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></i>
           </span>
           <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
+          <span ng-if="!isDefaultRule()">
+            <i class="icon-pencil" title="Edit Rule"></i>
+          </span>
         </div>
       </div>
 
@@ -87,8 +90,8 @@
             <[rule.dest]>
           </a>
         </span>
-        <button ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
-          ✎
+        <button class="btn btn-mini" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
+          <i class="icon-pencil" title="Edit Rule Destination"></i>
         </button>
       </div>
 

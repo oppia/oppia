@@ -10,7 +10,9 @@
 
 {% block center %}
   <div ng-if="!contentMemento">
-    <button ng-click="editContent()" class="pull-right">✎</button>
+    <button ng-click="editContent()" class="btn btn-mini pull-right">
+      <i class="icon-pencil" title="Edit Content"></i>
+    </button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
       In this section, type what you want the reader to see before interacting with this state.
     </span>

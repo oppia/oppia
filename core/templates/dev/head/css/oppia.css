@@ -193,6 +193,10 @@ textarea {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
 
+.oppia-exploration-ctrl {
+  margin: 0 5px;
+}
+
 .oppia-loading-fullpage {
   border: 1px;
   border-radius: 5px;
@@ -585,10 +589,6 @@ textarea {
   border: 1px dotted gray;
   cursor: pointer;
   padding: 1px 3px;
-}
-.oppia-editable::after {
-  /* The Unicode characters below represent spaces. */
-  content: '\00a0\00a0\00a0\00a0\00a0 ✎';
 }
 .oppia-editable:hover {
   border: 1px solid #111;
