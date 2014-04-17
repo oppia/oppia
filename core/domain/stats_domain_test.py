@@ -210,3 +210,29 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer2': 1})
         self.assertEquals(answer_log.total_answer_count, 1)
+
+
+class FeedbackItemUnitTests(test_utils.GenericTestBase):
+    """Test feedback item access."""
+
+    def test_get_target_id_for_state(self):
+        exp_id = 'EXP00'
+        state_name = 'STATE_XYZ'
+        target_id = stats_domain.FeedbackItem._get_target_id_for_state(
+            exp_id, state_name)
+        self.assertEquals(
+            stats_domain.FeedbackItem.get_exploration_id_from_target_id(
+                target_id),
+            exp_id)
+        self.assertEquals(
+            stats_domain.FeedbackItem.get_state_name_from_target_id(target_id),
+            state_name)
+
+    def test_get_target_id_for_exploration(self):
+        exp_id = 'EXP00'
+        target_id = stats_domain.FeedbackItem._get_target_id_for_exploration(
+            exp_id)
+        self.assertEquals(
+            stats_domain.FeedbackItem.get_exploration_id_from_target_id(
+                target_id),
+            exp_id)
