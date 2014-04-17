@@ -14,13 +14,16 @@ files = [
   'third_party/static/ui-utils-0.1.1/ui-utils.js',
   'third_party/static/ui-map-0.5.0/ui-map.js',
   'core/templates/dev/head/**/*.js',
-  'core/templates/dev/head/**/*.html'
+  'core/templates/dev/head/**/*.html',
+  'extensions/widgets/interactive/**/*.js',
+  'extensions/widgets/interactive/**/*.html'
 ];
 
 exclude = ['core/templates/dev/head/**/*-e2e.js'];
 
 preprocessors = {
-  'core/templates/dev/head/**/*.html': 'html2js'
+  'core/templates/dev/head/**/*.html': 'html2js',
+  'extensions/widgets/interactive/**/*.html': 'html2js'
 };
 
 autoWatch = true;

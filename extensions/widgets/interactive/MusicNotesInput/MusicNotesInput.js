@@ -26,7 +26,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interactiveWidget/MusicNotesInput',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         $scope.SOUNDFONT_URL = '/third_party/static/midi-js-09335a/soundfont/';
         $scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.sequenceToGuessWithValue);
@@ -46,9 +46,28 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
          * the staff-line the note is on, and the offset is either -1, 0 or 1,
          * denoting a flat, natural or sharp respectively.
          */
-        var noteSequence = [];
+        $scope.noteSequence = [];
+        $scope._addNoteToNoteSequence = function(note) {
+          $scope.noteSequence.push({note: note});
+        };
+        // Remove a specific note with given noteId from noteSequence. If given
+        // noteId is not in noteSequence, nothing will be removed.
+        $scope._removeNotesFromNoteSequenceWithId = function(noteId) {
+          for (var i = 0; i < $scope.noteSequence.length; i++) {
+            if ($scope.noteSequence[i].note.noteId === noteId) {
+              $scope.noteSequence.splice(i, 1);
+            }
+          }
+        };
+        // Sorts noteSequence elements according to the return value of the
+        // compareNoteStarts function.
+        $scope._sortNoteSequence = function() {
+          $scope.noteSequence.sort(compareNoteStarts);
+        };
 
-        // Counter to create unique id for each note dropped on staff.
+        /**
+         * Counter to create unique id for each note dropped on staff.
+         */
         $scope._currentNoteId = 0;
         $scope.generateNoteId = function() {
           $scope._currentNoteId += 1;
@@ -86,15 +105,13 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // Highest number of notes that can fit on the staff at any given time.
         var MAXIMUM_NOTES_POSSIBLE = 8;
 
-        var noteChoicesElt = $('.oppia-music-input-note-choices');
-        var staffContainerElt = $('.oppia-music-input-staff');
+        var noteChoicesElt = $element.find('.oppia-music-input-note-choices');
+        var staffContainerElt = $element.find('.oppia-music-input-staff');
 
         // Sets grid positions and initializes widget after staff has loaded.
-        $(document).ready(function() {
-          setTimeout(function() {
-            $scope.init();
-          }, 300);
-        });
+        setTimeout(function() {
+          $scope.init();
+        }, 300);
 
         // When page is resized, all notes are removed from sequence and staff
         // and then repainted in their new corresponding positions.
@@ -103,7 +120,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         });
 
         // Creates draggable notes and droppable staff.
-        $scope.init = function init() {
+        $scope.init = function() {
           $scope.CONTAINER_WIDTH = staffContainerElt.width();
           $scope.CONTAINER_HEIGHT = 0.2 * $scope.CONTAINER_WIDTH;
 
@@ -121,7 +138,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           // The farthest edge of the staff. If a note is placed beyond this
           // position, it will be discarded.
           RIGHT_EDGE_OF_STAFF_POSITION =
-            $('.oppia-music-input-valid-note-area').width();
+            $element.find('.oppia-music-input-valid-note-area').width();
 
           clearNotesFromStaff();
           initPalette();
@@ -151,12 +168,12 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         // Removes all notes from staff.
         function clearNotesFromStaff() {
-          $('.oppia-music-input-note-choices div').remove();
+          $element.find('.oppia-music-input-note-choices div').remove();
         }
 
         // Removes all droppable staff lines.
         function clearDroppableStaff() {
-          $('.oppia-music-input-staff div').remove();
+          $element.find('.oppia-music-input-staff div').remove();
         }
 
         // Returns an Object containing the baseNoteMidiValues (81, 79, 77...)
@@ -164,7 +181,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         function getStaffLinePositions() {
           var staffLinePositionsArray = [];
           var staffLinePositions = {};
-          $('.oppia-music-input-staff div.oppia-music-staff-position').each(function() {
+          $element.find('.oppia-music-input-staff div.oppia-music-staff-position').each(function() {
             staffLinePositionsArray.push($(this).position().top);
           });
           for (var i = 0; i < staffLinePositionsArray.length; i++) {
@@ -175,66 +192,67 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         // Creates the notes and helper-clone notes for the noteChoices div.
         function initPalette() {
+          var noteChoicesDiv = $element.find('.oppia-music-input-note-choices');
           for (var i = 0; i < NOTE_TYPES.length; i++) {
-            $('<div></div>')
-            .data('noteType', NOTE_TYPES[i])
-            .addClass(function () {
-              if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
-                $(this).addClass('oppia-music-input-natural-note');
-              }
-            })
-            .appendTo('.oppia-music-input-note-choices')
-            .draggable({
-              // Keeps note from being placed on top of the clef.
-              containment: '.oppia-music-input-valid-note-area',
-              cursor: 'pointer',
-              helper: 'clone',
-              stack: '.oppia-music-input-note-choices div',
-              grid: [$scope.HORIZONTAL_GRID_SPACING, 1],
-              stop: function(evt, ui) {
-                if (!isCloneOffStaff($(ui.helper))) {
-                  // This makes the helper clone a new draggable note.
-                  var helperClone = $(ui.helper)
-                  // Retains original note type (e.g. natural, flat, sharp).
-                  .data('noteType', $(this).data('noteType'))
-                  .draggable({
-                    // The leftPosBeforeDrag helps with the sorting of user sequence.
-                    start: function(evt, ui) {
-                      $(this).data('leftPosBeforeDrag', $(this).position().left);
-                    },
-                    containment: '.oppia-music-input-valid-note-area',
-                    cursor: 'pointer',
-                    grid: [$scope.HORIZONTAL_GRID_SPACING, 1],
-                    // Stops helper clone from being cloned again.
-                    helper: 'original',
-                    stack: '.oppia-music-input-note-choices div',
-                    tolerance: 'intersect',
-                    revert: function() {
-                      var draggableOptions = $(this);
-                      // If note is out of droppable or off staff, remove it.
-                      if (isCloneOffStaff(draggableOptions)) {
-                        removeNotesFromNoteSequenceWithId(draggableOptions.data(
-                                                          'noteId'));
-                        sortNoteSequence();
-                        draggableOptions.remove();
-                      }
-                    }
-                  });
+            var innerDiv = $('<div></div>')
+              .data('noteType', NOTE_TYPES[i])
+              .addClass(function() {
+                if ($(this).data('noteType') === NOTE_TYPE_NATURAL) {
+                  $(this).addClass('oppia-music-input-natural-note');
                 }
-              }
-            });
+              })
+              .draggable({
+                // Keeps note from being placed on top of the clef.
+                containment: '.oppia-music-input-valid-note-area',
+                cursor: 'pointer',
+                helper: 'clone',
+                stack: '.oppia-music-input-note-choices div',
+                grid: [$scope.HORIZONTAL_GRID_SPACING, 1],
+                stop: function(evt, ui) {
+                  if (!isCloneOffStaff($(ui.helper))) {
+                    // This makes the helper clone a new draggable note.
+                    var helperClone = $(ui.helper)
+                    // Retains original note type (e.g. natural, flat, sharp).
+                    .data('noteType', $(this).data('noteType'))
+                    .draggable({
+                      // The leftPosBeforeDrag helps with the sorting of user sequence.
+                      start: function(evt, ui) {
+                        $(this).data('leftPosBeforeDrag', $(this).position().left);
+                      },
+                      containment: '.oppia-music-input-valid-note-area',
+                      cursor: 'pointer',
+                      grid: [$scope.HORIZONTAL_GRID_SPACING, 1],
+                      // Stops helper clone from being cloned again.
+                      helper: 'original',
+                      stack: '.oppia-music-input-note-choices div',
+                      tolerance: 'intersect',
+                      revert: function() {
+                        var draggableOptions = $(this);
+                        // If note is out of droppable or off staff, remove it.
+                        if (isCloneOffStaff(draggableOptions)) {
+                          $scope._removeNotesFromNoteSequenceWithId(
+                            draggableOptions.data('noteId'));
+                          $scope._sortNoteSequence();
+                          draggableOptions.remove();
+                        }
+                      }
+                    });
+                  }
+                }
+              });
+            noteChoicesDiv.append(innerDiv);
           }
         }
 
         function repaintNotes() {
-          var noteSequence = getNoteSequence();
-          for (var i = 0; i < noteSequence.length; i++) {
-            $('<div></div>')
+          var noteChoicesDiv = $element.find('.oppia-music-input-note-choices');
+
+          for (var i = 0; i < $scope.noteSequence.length; i++) {
+            var innerDiv = $('<div></div>')
               .data('noteType', NOTE_TYPE_NATURAL)
-              .data('noteId', noteSequence[i].note.noteId)
+              .data('noteId', $scope.noteSequence[i].note.noteId)
               .addClass('oppia-music-input-natural-note')
               .addClass('oppia-music-input-on-staff')
-              .appendTo('.oppia-music-input-note-choices')
               .draggable({
                 // Keeps note from being placed on top of the clef.
                 containment: '.oppia-music-input-valid-note-area',
@@ -248,8 +266,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   var draggableOptions = $(this);
                   // If note is out of droppable or off staff, remove it.
                   if (isCloneOffStaff(draggableOptions)) {
-                    removeNotesFromNoteSequenceWithId(draggableOptions.data('noteId'));
-                    sortNoteSequence();
+                    $scope._removeNotesFromNoteSequenceWithId(
+                      draggableOptions.data('noteId'));
+                    $scope._sortNoteSequence();
                     draggableOptions.remove();
                   }
                 }
@@ -258,24 +277,26 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
               // vertically by the midi value they hold.
               .css({
                 top:
-                  getVerticalPosition(noteSequence[i].note.baseNoteMidiNumber) -
+                  getVerticalPosition($scope.noteSequence[i].note.baseNoteMidiNumber) -
                     $scope.VERTICAL_GRID_SPACING / 2.0,
                 left:
-                  getHorizontalPosition(getNoteStartAsFloat(noteSequence[i].note))
-              });
-            repaintLedgerLines();
+                  getHorizontalPosition(getNoteStartAsFloat($scope.noteSequence[i].note)),
+                position: 'absolute'
+              })
+            noteChoicesDiv.append(innerDiv);
           }
+          repaintLedgerLines();
         }
 
         // Creates a staff of droppable lines.
         function buildDroppableStaff() {
           var lineValues = Object.keys(NOTE_NAMES_TO_MIDI_VALUES);
           for (var i = 0; i < lineValues.length; i++) {
+
             var staffLineDiv = $('<div></div>')
               .addClass('oppia-music-staff-position')
               .css('height', $scope.VERTICAL_GRID_SPACING)
               .data('lineValue', lineValues[i])
-              .appendTo('.oppia-music-input-staff')
               .droppable({
                 accept: '.oppia-music-input-note-choices div',
                 // Over and out are used to remove helper clone if
@@ -333,7 +354,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   var note = {
                     baseNoteMidiNumber: NOTE_NAMES_TO_MIDI_VALUES[lineValue],
                     offset: parseInt(noteType, 10),
-                    noteId: noteId,
+                    noteId: noteId
                   };
 
                   // When a note is moved, its previous state must be removed
@@ -341,7 +362,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   // erroneously hold notes that have been moved to other
                   // positions. Also this allows an on-staff note's position
                   // to be freed up if it is moved.
-                  removeNotesFromNoteSequenceWithId(note.noteId);
+                  $scope._removeNotesFromNoteSequenceWithId(note.noteId);
 
                   // Makes sure that a note can move vertically on it's position.
                   if (startPos !== leftPos) {
@@ -376,8 +397,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                     return;
                   }
 
-                  addNoteToNoteSequence(note);
-                  sortNoteSequence();
+                  $scope._addNoteToNoteSequence(note);
+                  $scope._sortNoteSequence();
 
                   // Sounds the note when it is dropped onto staff.
                   playChord([_convertNoteToMidiPitch(note)]);
@@ -386,6 +407,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                   repaintLedgerLines();
                 }
               });
+
+            $element.find('.oppia-music-input-staff').append(staffLineDiv);
 
             if (i === 0) {
               $scope.topPositionForCenterOfTopStaffLine =
@@ -396,38 +419,15 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
             // Check if noteName is a valid staff line and if so, paint staff line.
             if (NOTES_ON_LINES.indexOf(noteName) !== -1) {
-              $('<div></div>')
-              // Positions and centers the staff line directly on top of its
-              // associated droppable.
-              .css('margin-top', $scope.VERTICAL_GRID_SPACING / 2.5)
-              .addClass('oppia-music-staff-line')
-              .appendTo(staffLineDiv);
+              staffLineDiv.append(
+                $('<div></div>')
+                // Positions and centers the staff line directly on top of its
+                // associated droppable.
+                .css('margin-top', $scope.VERTICAL_GRID_SPACING / 2.5)
+                .addClass('oppia-music-staff-line')
+              );
             }
           }
-        }
-
-        function addNoteToNoteSequence(note) {
-          noteSequence.push({note: note});
-        }
-
-        function getNoteSequence() {
-          return noteSequence;
-        }
-
-        // Remove a specific note with given noteId from noteSequence. If given
-        // noteId is not in noteSequence, nothing will be removed.
-        function removeNotesFromNoteSequenceWithId(noteId) {
-          for (var i = 0; i < noteSequence.length; i++) {
-            if (noteSequence[i].note.noteId === noteId) {
-              noteSequence.splice(i, 1);
-            }
-          }
-        }
-
-        // Sorts noteSequence elements according to the return value of the
-        // compareNoteStarts function.
-        function sortNoteSequence() {
-          noteSequence.sort(compareNoteStarts);
         }
 
         // When compareNoteStarts(a, b) returns less than 0, a is less than b.
@@ -447,8 +447,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           if (getNoteStartFromLeftPos(leftPos)) {
             var newNoteToCheck = getNoteStartFromLeftPos(leftPos);
             if (newNoteToCheck.note.noteStart !== undefined) {
-              for (var i = 0; i < noteSequence.length; i++) {
-                if (compareNoteStarts(noteSequence[i], newNoteToCheck) === 0) {
+              for (var i = 0; i < $scope.noteSequence.length; i++) {
+                if (compareNoteStarts($scope.noteSequence[i], newNoteToCheck) === 0) {
                   return true;
                 }
               }
@@ -482,9 +482,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         // Clear noteSequence values and remove all notes
         // and Ledger Lines from the staff.
         $scope.clearSequence = function() {
-          noteSequence = [];
-          $('.oppia-music-input-on-staff').remove();
-          $('.oppia-music-input-ledger-line').remove();
+          $scope.noteSequence = [];
+          $element.find('.oppia-music-input-on-staff').remove();
+          $element.find('.oppia-music-input-ledger-line').remove();
         };
 
         // Converts the midiValue of a droppable line that a note is on
@@ -504,7 +504,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
          */
         function getHorizontalPosition(noteStartAsFloat) {
           var lastHorizontalPositionOffset =
-            $('.oppia-music-input-note-choices div:first-child').position().left;
+            $element.find('.oppia-music-input-note-choices div:first-child').position().left;
           var leftOffset =
             lastHorizontalPositionOffset - ((MAXIMUM_NOTES_POSSIBLE - 1) *
                             $scope.HORIZONTAL_GRID_SPACING);
@@ -521,38 +521,39 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         }
 
         function drawLedgerLine(topPos, leftPos, lineValue, noteId) {
-          var ledgerLine = $('<div></div>');
-          ledgerLine.appendTo('.oppia-music-input-staff')
-          .addClass('oppia-music-input-ledger-line oppia-music-input-natural-note')
-          .droppable({
-            accept: '.oppia-music-input-note-choices div',
-            // When a ledgerLine note is moved out of its droppable,
-            // remove ledger line.
-            out: function(evt, ui) {
-              $(this).hide();
-            },
-            hoverClass: 'oppia-music-input-hovered',
-            containment: '.oppia-music-input-valid-note-area',
-          })
-          // Adjust ledger line to be centered with the note.
-          .css({
-            left: leftPos - 1,
-            // 0.4 is a little less than half to allow for the height of the
-            // ledger line when considering its placement.
-            top: topPos + $scope.VERTICAL_GRID_SPACING * 0.4,
-          });
+          var ledgerLineDiv = $('<div></div>')
+            .addClass('oppia-music-input-ledger-line oppia-music-input-natural-note')
+            .droppable({
+              accept: '.oppia-music-input-note-choices div',
+              // When a ledgerLine note is moved out of its droppable,
+              // remove ledger line.
+              out: function(evt, ui) {
+                $(this).hide();
+              },
+              hoverClass: 'oppia-music-input-hovered',
+              containment: '.oppia-music-input-valid-note-area',
+            })
+            // Adjust ledger line to be centered with the note.
+            .css({
+              left: leftPos - 1,
+              // 0.4 is a little less than half to allow for the height of the
+              // ledger line when considering its placement.
+              top: topPos + $scope.VERTICAL_GRID_SPACING * 0.4,
+            });
+
+          $element.find('.oppia-music-input-staff').append(ledgerLineDiv);
         }
 
         function repaintLedgerLines() {
-          for (var i = 0; i < noteSequence.length; i++) {
-            var lineValue =
-              _getCorrespondingNoteName(noteSequence[i].note.baseNoteMidiNumber);
+          for (var i = 0; i < $scope.noteSequence.length; i++) {
+            var note = $scope.noteSequence[i].note;
+            var lineValue =_getCorrespondingNoteName(note.baseNoteMidiNumber);
             if (isLedgerLineNote(lineValue)) {
               drawLedgerLine(
-                getVerticalPosition(noteSequence[i].note.baseNoteMidiNumber),
-                getHorizontalPosition(getNoteStartAsFloat(noteSequence[i].note)),
+                getVerticalPosition(note.baseNoteMidiNumber),
+                getHorizontalPosition(getNoteStartAsFloat(note)),
                 lineValue,
-                noteSequence[i].note.noteId
+                note.noteId
               );
             }
           }
@@ -641,8 +642,9 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
         $scope.submitAnswer = function(answer) {
           var readableSequence = [];
-          for (var i = 0; i < noteSequence.length; i++) {
-            readableSequence.push(_convertNoteToReadableNote(noteSequence[i].note));
+          for (var i = 0; i < $scope.noteSequence.length; i++) {
+            readableSequence.push(
+              _convertNoteToReadableNote($scope.noteSequence[i].note));
           }
           readableSequence = _makeAllNotesHaveDurationOne(readableSequence);
           $scope.$parent.$parent.submitAnswer(readableSequence, 'submit');
