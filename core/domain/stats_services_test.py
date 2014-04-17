@@ -211,6 +211,41 @@ class StatsServicesUnitTests(test_utils.GenericTestBase):
         self.assertEquals(state_info['score'], 10)
         self.assertEquals(state_info['data'], '3')
                 
+    def test_get_user_stats(self):
+        exp0 = exp_domain.Exploration.create_default_exploration(
+            'eid0', 'title0', 'category')
+        exp_services.save_new_exploration('uid0', exp0)
+        exp1 = exp_domain.Exploration.create_default_exploration(
+            'eid1', 'title1', 'category')
+        exp_services.save_new_exploration('uid0', exp1)
+
+        f0 = stats_domain.FeedbackItem.create_feedback_for_state(
+            'eid0', 'welcome', 'my feedback', None, 'uid0')
+        f1 = stats_domain.FeedbackItem.create_feedback_for_exploration(
+            'eid1', 'another feedback', None, 'uid0')
+
+        # This should return the both feedback.
+        self.assertEquals(stats_services.get_user_stats('uid0'), {'feedback': {
+            f0.id: {
+                'content': 'my feedback',
+                'exp_id': 'eid0',
+                'exp_title': 'title0',
+                'state_name': 'welcome',
+                'status': 'new',
+                'target_id': 'state:eid0.welcome',
+            },
+            f1.id: {
+                'content': 'another feedback',
+                'exp_id': 'eid1',
+                'exp_title': 'title1',
+                'state_name': None,
+                'status': 'new',
+                'target_id': 'exploration:eid1',
+            },
+        }})
+        # uid1 does not have any feedbacks.
+        self.assertEquals(stats_services.get_user_stats('uid1'),
+            {'feedback':{}})
 
 
 class TopImprovableStatesUnitTests(test_utils.GenericTestBase):

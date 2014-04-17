@@ -133,8 +133,7 @@ def get_exploration_titles(exp_ids):
     for ind, exploration in enumerate(explorations):
         if exploration is None:
             logging.error(
-                'Could not find exploration corresponding to id %s' %
-                exploration.id)
+                'Could not find exploration corresponding to id')
         else:
             result[exploration.id] = exploration.title
     return result
