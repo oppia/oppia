@@ -158,8 +158,7 @@ function InteractiveWidgetEditor(
       $scope.widgetCustomizationArgs = angular.copy(newWidget.customization_args);
       changeListService.editStateProperty(
         activeStateName, 'widget_customization_args',
-        $scope.widgetCustomizationArgs, $scope.widgetCustomizationArgsMemento
-      );
+        $scope.widgetCustomizationArgs, $scope.widgetCustomizationArgsMemento);
     }
 
     $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
