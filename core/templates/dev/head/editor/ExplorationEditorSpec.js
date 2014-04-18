@@ -206,3 +206,61 @@ describe('Change list service', function() {
     })
   });
 });
+
+
+describe('Exploration title service', function() {
+  beforeEach(module('oppia'));
+
+  describe('exploration title service', function() {
+    var ets = null;
+
+    beforeEach(inject(function($injector) {
+      ets = $injector.get('explorationTitleService');
+    }));
+
+    it('correctly initializes the service', function() {
+      expect(ets.displayed).toBeNull();
+      expect(ets.savedMemento).toBeNull();
+      ets.init('A title');
+      expect(ets.displayed).toEqual('A title');
+      expect(ets.savedMemento).toEqual('A title');
+    });
+
+    it('updates only the title and not the memento', function() {
+      ets.init('A title');
+      ets.displayed = 'New title';
+      expect(ets.displayed).toEqual('New title');
+      expect(ets.savedMemento).toEqual('A title');
+    });
+
+    it('restores correctly from the memento', function() {
+      ets.init('A title');
+      ets.displayed = 'New title';
+      ets.restoreFromMemento();
+      expect(ets.displayed).toEqual('A title');
+      expect(ets.savedMemento).toEqual('A title');
+    });
+
+    it('updates the memento with the displayed title', function() {
+      ets.init('A title');
+      ets.displayed = 'New title';
+      expect(ets.savedMemento).toEqual('A title');      
+      ets.updateMemento();
+      expect(ets.savedMemento).toEqual('New title');
+    });
+
+    it('correctly reports whether the title has changed since it was saved', function() {
+      ets.init('A title');
+      expect(ets.hasChanged()).toBe(false);
+      ets.displayed = 'A title';
+      expect(ets.hasChanged()).toBe(false);
+      ets.displayed = 'New title';
+      expect(ets.hasChanged()).toBe(true);
+      ets.displayed = 'A title';
+      expect(ets.hasChanged()).toBe(false);
+
+      ets.updateMemento();
+      expect(ets.hasChanged()).toBe(false);
+    });
+  });
+});

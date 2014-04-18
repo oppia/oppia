@@ -206,9 +206,40 @@ oppia.factory('changeListService', [
 }]);
 
 
+// A data service that stores the current exploration title so that it can be displayed
+// and edited in multiple places in the UI.
+oppia.factory('explorationTitleService', [function() {
+  return {
+    // The current value of the title (which may not have been saved yet). In general,
+    // this will be bound directly to the UI.
+    displayed: null,
+    // The previous (saved) value of the title.
+    savedMemento: null,
+    // Initializes the service.
+    init: function(title) {
+      this.displayed = title;
+      this.savedMemento = title;
+    },
+    // Returns whether the title has changed from the memento.
+    hasChanged: function() {
+      return (this.savedMemento !== this.displayed);
+    },
+    // Updates the memento to the displayed title. It is the responsibility of
+    // the caller to ensure that an actual save action is performed.
+    updateMemento: function() {
+      this.savedMemento = this.displayed;
+    },
+    // Reverts the displayed title to the saved memento.
+    restoreFromMemento: function() {
+      this.displayed = this.savedMemento;
+    }
+  };
+}]);
+
+
 function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $window,
     $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
-    editorContextService, changeListService) {
+    editorContextService, changeListService, explorationTitleService) {
 
   $scope.getActiveStateName = function() {
     if (editorContextService.isInStateContext()) {
@@ -793,20 +824,24 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
+    if (!$scope.explorationTitleService) {
+      $scope.explorationTitleService = explorationTitleService;
+    }
     explorationData.getData().then(function(data) {
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
       $scope.states = angular.copy(data.states);
-      $scope.explorationTitle = data.title;
+
+      $scope.explorationTitleService.init(data.title);
+
       $scope.explorationCategory = data.category;
+      $scope.explorationCategoryMemento = data.category;
+
       $scope.initStateName = data.init_state_name;
       $scope.currentUser = data.user;
       $scope.paramSpecs = angular.copy(data.param_specs || {});
       $scope.explorationParamChanges = angular.copy(data.param_changes || []);
       $scope.currentVersion = data.version;
-
-      $scope.explorationTitleMemento = data.title;
-      $scope.explorationCategoryMemento = data.category;
 
       $scope.initExplorationRights(data.rights);
 
@@ -858,23 +893,24 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
       finalStateName: END_DEST};
   };
 
-  $scope.saveExplorationTitle = function(newValue) {
-    newValue = $scope.normalizeWhitespace(newValue);
-    if (!$scope.isValidEntityName(newValue, true)) {
-      $scope.explorationTitle = $scope.explorationTitleMemento;
+  $scope.saveExplorationTitle = function() {
+    explorationTitleService.displayed = $scope.normalizeWhitespace(
+      explorationTitleService.displayed);
+    if (!$scope.isValidEntityName(explorationTitleService.displayed, true)) {
+      explorationTitleService.restoreFromMemento();
       return;
     }
 
-    if (newValue == $scope.explorationTitleMemento) {
+    if (!explorationTitleService.hasChanged()) {
       return;
     }
 
     warningsData.clear();
     changeListService.editExplorationProperty(
-      'title', newValue, $scope.explorationTitleMemento);
-    $scope.explorationTitle = newValue;
-    $scope.explorationTitleMemento = newValue;
-  }
+      'title', explorationTitleService.displayed,
+      explorationTitleService.savedMemento);
+    explorationTitleService.updateMemento();
+  };
 
   $scope.saveExplorationCategory = function(newValue) {
     newValue = $scope.normalizeWhitespace(newValue);
@@ -892,7 +928,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
       'category', newValue, $scope.explorationCategoryMemento);
     $scope.explorationCategory = newValue;
     $scope.explorationCategoryMemento = newValue;
-  }
+  };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
     if (!angular.equals(newValue, oldValue)) {
@@ -1177,5 +1213,5 @@ ExplorationEditor.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
   'activeInputData', 'oppiaRequestCreator', 'editorContextService',
-  'changeListService'
+  'changeListService', 'explorationTitleService'
 ];
