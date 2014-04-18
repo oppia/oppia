@@ -224,7 +224,7 @@ class StatsServicesUnitTests(test_utils.GenericTestBase):
         f1 = stats_domain.FeedbackItem.create_feedback_for_exploration(
             'eid1', 'another feedback', None, 'uid0')
 
-        # This should return the both feedback.
+        # This should return the both the feedback.
         self.assertEquals(stats_services.get_user_stats('uid0'), {'feedback': {
             f0.id: {
                 'content': 'my feedback',
