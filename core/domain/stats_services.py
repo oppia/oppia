@@ -194,25 +194,6 @@ def get_user_stats(user_id):
 
     return {'feedback': feedback}
 
-def get_exploration_info(exploration_id):
-    """Returns statistics about an exploration for display.
-    Includes state-specific flags and is planned to have other
-    fields for statistics display on an exploration level."""
-    exploration_annotations = stats_domain.ExplorationAnnotations.get(
-        exploration_id)
-
-    state_infos = {}
-    for state_name in exploration_annotations.summarized_state_data:
-        state_infos[state_name] = (
-            exploration_annotations.summarized_state_data[state_name])
-
-    # TODO(sfederwisch): add other fields, like completion rate
-    # exploration_feedback, state hit counts and time stats
-    exp_info = {
-       'stateInfos': state_infos,
-    }
-    return exp_info
-
 def get_state_stats_for_exploration(exploration_id):
     """Returns a dict with state statistics for the given exploration id."""
     exploration = exp_services.get_exploration_by_id(exploration_id)
