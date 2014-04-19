@@ -82,6 +82,17 @@ class AboutPage(base.BaseHandler):
         self.render_template('pages/about.html')
 
 
+class SiteGuidelinesPage(base.BaseHandler):
+    """Page with site guidelines."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_ABOUT,
+        })
+        self.render_template('pages/site_guidelines.html')
+
+
 class ContactPage(base.BaseHandler):
     """Page with feedback."""
 
@@ -89,7 +100,7 @@ class ContactPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
-            'nav_mode': feconf.NAV_MODE_CONTACT,
+            'nav_mode': feconf.NAV_MODE_ABOUT,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
         })
         self.render_template('pages/contact.html')
