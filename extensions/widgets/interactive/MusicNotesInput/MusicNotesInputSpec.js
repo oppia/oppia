@@ -119,7 +119,8 @@ describe('MusicNotesInput interactive widget', function() {
       ctrlScope.clearSequence();
       expect(ctrlScope.noteSequence).toEqual([]);
     });
-    it('adds three notes to a sequence then removes two notes', function() {
+
+    it('removes notes with particular ids', function() {
       expect(ctrlScope.noteSequence).toEqual([]);
 
       ctrlScope._addNoteToNoteSequence({
@@ -132,60 +133,46 @@ describe('MusicNotesInput interactive widget', function() {
         offset: 0,
         noteId: 'note_id_1'
       });
-      ctrlScope._addNoteToNoteSequence({
-        baseNoteMidiNumber: 60,
-        offset: 0,
-        noteId: 'note_id_2'
-      });
+      ctrlScope._removeNotesFromNoteSequenceWithId('note_id_0');
       expect(ctrlScope.noteSequence).toEqual([{
-        note: {
-          baseNoteMidiNumber: 76,
-          offset: 0,
-          noteId: 'note_id_0'
-        }
-      }, {
         note: {
           baseNoteMidiNumber: 81,
           offset: 0,
           noteId: 'note_id_1'
         }
-      }, {
-        note: {
-          baseNoteMidiNumber: 60,
-          offset: 0,
-          noteId: 'note_id_2'
-        }
       }]);
+    });
 
+    it('does not do anything when asked to remove a note that does not exist',
+       function() {
+      expect(ctrlScope.noteSequence).toEqual([]);
+
+      ctrlScope._addNoteToNoteSequence({
+        baseNoteMidiNumber: 64,
+        offset: 0,
+        noteId: 'note_id_0'
+      });
       ctrlScope._removeNotesFromNoteSequenceWithId('note_id_1');
-
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
-          baseNoteMidiNumber: 76,
+          baseNoteMidiNumber: 64,
           offset: 0,
           noteId: 'note_id_0'
         }
-      }, {
-        note: {
-          baseNoteMidiNumber: 60,
-          offset: 0,
-          noteId: 'note_id_2'
-        }
       }]);
+    });
 
-      expect(ctrlScope.noteSequence.length).toEqual(2);
+    it('correctly handles duplicate removals', function() {
+      expect(ctrlScope.noteSequence).toEqual([]);
 
+      ctrlScope._addNoteToNoteSequence({
+        baseNoteMidiNumber: 72,
+        offset: 0,
+        noteId: 'note_id_0'
+      });
       ctrlScope._removeNotesFromNoteSequenceWithId('note_id_0');
-
-      expect(ctrlScope.noteSequence).toEqual([{
-        note: {
-          baseNoteMidiNumber: 60,
-          offset: 0,
-          noteId: 'note_id_2'
-        }
-      }]);
-
-      expect(ctrlScope.noteSequence.length).toEqual(1);
+      ctrlScope._removeNotesFromNoteSequenceWithId('note_id_0');
+      expect(ctrlScope.noteSequence).toEqual([]);
     });
   });
 
