@@ -117,7 +117,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Interval-2
+          dest: Pitch Trainer-1
           feedback:
           - Sounds good to me!
           param_changes: []
@@ -161,7 +161,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Pitch Trainer-2
+          dest: Pitch Trainer-1
           feedback:
           - Good choice. It's always smart to review what you've learned.
           param_changes: []

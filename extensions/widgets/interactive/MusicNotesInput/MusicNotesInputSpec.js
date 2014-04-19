@@ -119,6 +119,74 @@ describe('MusicNotesInput interactive widget', function() {
       ctrlScope.clearSequence();
       expect(ctrlScope.noteSequence).toEqual([]);
     });
+    it('adds three notes to a sequence then removes two notes', function() {
+      expect(ctrlScope.noteSequence).toEqual([]);
+
+      ctrlScope._addNoteToNoteSequence({
+        baseNoteMidiNumber: 76,
+        offset: 0,
+        noteId: 'note_id_0'
+      });
+      ctrlScope._addNoteToNoteSequence({
+        baseNoteMidiNumber: 81,
+        offset: 0,
+        noteId: 'note_id_1'
+      });
+      ctrlScope._addNoteToNoteSequence({
+        baseNoteMidiNumber: 60,
+        offset: 0,
+        noteId: 'note_id_2'
+      });
+      expect(ctrlScope.noteSequence).toEqual([{
+        note: {
+          baseNoteMidiNumber: 76,
+          offset: 0,
+          noteId: 'note_id_0'
+        }
+      }, {
+        note: {
+          baseNoteMidiNumber: 81,
+          offset: 0,
+          noteId: 'note_id_1'
+        }
+      }, {
+        note: {
+          baseNoteMidiNumber: 60,
+          offset: 0,
+          noteId: 'note_id_2'
+        }
+      }]);
+
+      ctrlScope._removeNotesFromNoteSequenceWithId('note_id_1');
+
+      expect(ctrlScope.noteSequence).toEqual([{
+        note: {
+          baseNoteMidiNumber: 76,
+          offset: 0,
+          noteId: 'note_id_0'
+        }
+      }, {
+        note: {
+          baseNoteMidiNumber: 60,
+          offset: 0,
+          noteId: 'note_id_2'
+        }
+      }]);
+
+      expect(ctrlScope.noteSequence.length).toEqual(2);
+
+      ctrlScope._removeNotesFromNoteSequenceWithId('note_id_0');
+
+      expect(ctrlScope.noteSequence).toEqual([{
+        note: {
+          baseNoteMidiNumber: 60,
+          offset: 0,
+          noteId: 'note_id_2'
+        }
+      }]);
+
+      expect(ctrlScope.noteSequence.length).toEqual(1);
+    });
   });
 
 });
