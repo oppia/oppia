@@ -168,6 +168,7 @@ def get_state_rules_stats(exploration_id, state_name):
 
 def get_user_stats(user_id):
     """Returns a dict with user statistics for a given user.
+
     The dict includes only one item "feedback" which itself is a dict with the
     feedback item ID as the keys and the values being yet another dict of:
     target_id, content, and status -- coming from FeedbackItemModel.
