@@ -23,6 +23,27 @@
 # The root folder MUST be named 'oppia'.
 # It runs integration tests.
 
+function cleanup {
+  # Send a kill signal to the dev server.
+  #
+  # The [Pp] is to avoid the grep finding the 'grep protractor/selenium' process
+  # as well. The awk command gets just the process ID from the grepped line.
+  kill `ps aux | grep [Pp]rotractor/selenium | awk '{print $2}'`
+
+  # Send a kill signal to the dev server.
+  kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=4445" | awk '{print $2}'`
+
+  # Wait for the servers to go down.
+  while nc -vz localhost 4444; do sleep 1; done
+  while nc -vz localhost 4445; do sleep 1; done
+
+  echo Done!
+}
+
+# Forces the cleanup function to run on exit.
+trap cleanup EXIT
+
+
 if [ -z "$BASH_VERSION" ]
 then
   echo ""
@@ -37,9 +58,7 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
-
 # Install third party dependencies
-# TODO(sll): Make this work with fewer third-party dependencies.
 bash scripts/install_third_party.sh
 
 echo Checking whether Karma is installed in $TOOLS_DIR
@@ -48,6 +67,22 @@ if [ ! -h "$NODE_MODULE_DIR/.bin/karma" ]; then
   $NPM_INSTALL karma@0.8.7
 fi
 
-$NODE_MODULE_DIR/.bin/karma start core/tests/karma-e2e.conf.js
+echo Checking whether Protractor is installed in $TOOLS_DIR
+if [ ! -h "$NODE_MODULE_DIR/.bin/protractor" ]; then
+  echo Installing Protractor
+  $NPM_INSTALL protractor@0.21.0
+fi
 
-echo Done!
+$NODE_MODULE_DIR/.bin/webdriver-manager update
+
+# Start a selenium process.
+($NODE_MODULE_DIR/.bin/webdriver-manager start )&
+# Start a demo server.
+(python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=4445 --clear_datastore=yes .)&
+
+# Wait for the servers to come up.
+while ! nc -vz localhost 4444; do sleep 1; done
+while ! nc -vz localhost 4445; do sleep 1; done
+
+# Run the integration tests.
+$NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
