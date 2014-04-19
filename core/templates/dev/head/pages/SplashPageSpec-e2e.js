@@ -19,8 +19,6 @@
  */
 
 describe('splash page', function() {
-  var ptor = protractor.getInstance();
-
   it('should have welcome text', function() {
     // Load the Oppia splash page.
     browser.get('/');
@@ -42,7 +40,7 @@ describe('splash page', function() {
       expect(items[2].getText()).toBe('Create an Oppia account');
 
       items[1].click();
-      expect(ptor.getCurrentUrl()).toContain('/about');
+      expect(browser.getCurrentUrl()).toContain('/about');
     });
   });
 });
