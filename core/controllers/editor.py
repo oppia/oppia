@@ -516,7 +516,6 @@ class ExplorationStatisticsHandler(EditorHandler):
         self.render_json({
             'num_visits': stats_services.get_exploration_visit_count(
                 exploration_id),
-            'exp_info': stats_services.get_exploration_info(exploration_id),
             'num_completions': stats_services.get_exploration_completed_count(
                 exploration_id),
             'state_stats': stats_services.get_state_stats_for_exploration(

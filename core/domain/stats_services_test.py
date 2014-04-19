@@ -183,34 +183,6 @@ class StatsServicesUnitTests(test_utils.GenericTestBase):
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
-    def test_get_exploration_info(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
-        rule = exp_domain.RuleSpec.from_dict_and_obj_type({
-            'definition':  {
-                 'rule_type': 'atomic',
-                 'name': 'IsLessThan',
-                 'subject': 'answer',
-                 'inputs': {'x': 5}
-             },
-             'dest': 'dest',
-             'feedback': None,
-             'param_changes': []
-        }, 'Real')
-        exp_services.save_new_exploration('fake@user.com', exp)
-        state_name = exp.init_state_name
-
-        for _ in range(10):
-            stats_services.EventHandler.record_answer_submitted(
-                'eid', 1, state_name, self.SUBMIT_HANDLER,
-                rule, '3')
-        exp_info = stats_services.get_exploration_info('eid')
-        self.assertEquals(len(exp_info['stateInfos']), 1)
-        state_info = exp_info['stateInfos'][state_name]
-        self.assertEquals(state_info['flag_type'], 'missing')
-        self.assertEquals(state_info['score'], 10)
-        self.assertEquals(state_info['data'], '3')
-                
     def test_get_user_stats(self):
         exp0 = exp_domain.Exploration.create_default_exploration(
             'eid0', 'title0', 'category')
