@@ -670,7 +670,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         };
 
         $scope.playCurrentSequence = function() {
-          playSequence(convertNoteSequenceToMidiSequence(noteSequence));
+          playSequence(convertNoteSequenceToMidiSequence($scope.noteSequence));
         };
 
         // Takes an input > 0, converts to a noteStart object and returns a

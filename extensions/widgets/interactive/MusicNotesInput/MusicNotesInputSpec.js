@@ -61,7 +61,7 @@ describe('MusicNotesInput interactive widget', function() {
     });
 
     it('loads the palette when initialized', function() {
-      expect(elt.html()).toContain('oppia-music-input-natural-note')
+      expect(elt.html()).toContain('oppia-music-input-natural-note');
     });
 
     it('adds notes to note sequence in the correct order', function() {
@@ -70,32 +70,32 @@ describe('MusicNotesInput interactive widget', function() {
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 71,
         offset: 0,
-        noteId: '1'
+        noteId: 'note_id_0'
       });
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 71,
           offset: 0,
-          noteId: '1'
+          noteId: 'note_id_0'
         }
       }]);
 
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 72,
         offset: 0,
-        noteId: '2'
+        noteId: 'note_id_1'
       });
       expect(ctrlScope.noteSequence).toEqual([{
         note: {
           baseNoteMidiNumber: 71,
           offset: 0,
-          noteId: '1'
+          noteId: 'note_id_0'
         }
       }, {
         note: {
           baseNoteMidiNumber: 72,
           offset: 0,
-          noteId: '2'
+          noteId: 'note_id_1'
         }
       }]);
     });
@@ -106,12 +106,12 @@ describe('MusicNotesInput interactive widget', function() {
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 71,
         offset: 0,
-        noteId: '1'
+        noteId: 'note_id_0'
       });
       ctrlScope._addNoteToNoteSequence({
         baseNoteMidiNumber: 72,
         offset: 0,
-        noteId: '2'
+        noteId: 'note_id_1'
       });
 
       expect(ctrlScope.noteSequence.length).toEqual(2);
