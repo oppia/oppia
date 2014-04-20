@@ -12,7 +12,6 @@
           <ul class="nav nav-tabs about-tabs">
             <li class="active"><a href="#what-is-oppia" data-toggle="tab">About Oppia</a></li>
             <li><a href="#what-is-this-website" data-toggle="tab">About this website</a></li>
-            <li><a href="#how-to-use" data-toggle="tab">How to Use Oppia</a></li>
             <li><a href="#credits" data-toggle="tab">Credits</a></li>
             <li><a href="#license" data-toggle="tab">License</a></li>
           </ul>
@@ -52,51 +51,6 @@
                 </p>
               </div>
             </div>
-            <div class="tab-pane" id="how-to-use">
-              <div class="oppia-about">
-                <h1>Using Oppia</h1>
-                <p>
-                  The main units of learning in Oppia are called explorations. These are multi-stage interactive activities that attempt to engage readers in a learning conversation and provide formative feedback along the way.
-                </p>
-                <p>
-                  Any user of Oppia, logged-in or otherwise, can play through, browse, and search for any <a href="/learn">public explorations</a>. To create or edit explorations, a user will need to be logged-in and to author his/her work under a stable username.
-                </p>
-                <p>
-                  Responses submitted to explorations are stored anonymously. The anonymized responses are shown to exploration creators and editors, so that the explorations can be improved over time.
-                </p>
-
-                <h2 id="community">Community Guidelines</h2>
-                <ol>
-                  <li style="line-height: 25px;">
-                    Ownership of explorations is temporary and eventually reverts to the Oppia community (see <a href="#lifecycle" target="_self">Lifecycle of an Exploration</a> for more details). The idea is to make it easy for the explorations on this site to improve continuously.
-                  </li>
-                  <li style="line-height: 25px;">
-                    Cloning explorations in order to publish an alternative version is discouraged -- it is better to suggest improvements or give feedback on the original exploration. However, you are welcome to privately clone an exploration to see how it's made.
-                  </li>
-                  <li style="line-height: 25px;">
-                    Please exercise judgement before publishing an exploration. Every exploration on this site should have significant educational value, and should not contain advertising, spam, vandalism or abuse.
-                  </li>
-                  <li style="line-height: 25px;">
-                    Creating multiple usernames, using explorations to trick users, or circumventing site features that are meant to encourage the improvement of explorations are examples of antisocial behavior that may result in account suspension.
-                  </li>
-                  <li style="line-height: 25px;">
-                    For contentious topics and clarifications on guidelines, please use the Oppia discussion forum.
-                  </li>
-                  <li style="line-height: 25px;">
-                    The governance model for Oppia comprises site admins and moderators. Site admins manage and have overall responsibility for the site; they are the final arbitrators on any dispute. Moderators suggest and review major edits for explorations, and enforce the behavioral norms described within these community guidelines.
-                  </li>
-                </ol>
-                <br>
-
-                <h2 id="lifecycle">Lifecycle of an Exploration</h2>
-                <p>
-                  All explorations start off as private, which means that they can only be viewed by the exploration editors, invited playtesters, and site admins. When an exploration is in a good enough state for general use, any owner of the exploration may decide to publish it. Currently, publishing is a one-way process. After an exploration is published, it will enter "beta" status, and be visible in the public gallery to users who click "Show all explorations". Anyone will be able to play it, give feedback, and suggest edits. Owners are encouraged to submit high-quality explorations to the <a href="https://groups.google.com/forum/#!forum/oppia-moderator-requests">moderators' request forum</a>, and those that are approved will move out of beta status and become directly visible in the gallery.
-                </p>
-                <p>
-                  The editors of an exploration can retain exclusive editing rights as long as they continue to maintain the exploration and respond to feedback and change suggestions in a timely manner. Otherwise, the exploration will be considered 'orphaned' and ownership of it will revert to the community, who will then be able to collectively improve the exploration over time. The owner(s) of an exploration may also choose to release ownership to the community at any time.
-                </p>
-              </div>
-            </div>
             <div class="tab-pane" id="credits">
               <div class="oppia-about">
                 <h1>Credits</h1>
@@ -112,6 +66,7 @@
                     <li>Michael Wagner</li>
                     <li>Phil Wagner</li>
                     <li>Reinaldo Aguiar</li>
+                    <li>Samara Trilling</li>
                     <li>Sean Lip</li>
                     <li>Stephanie Federwisch</li>
                     <li>Tarashish Mishra</li>
@@ -120,7 +75,7 @@
                   </ul>
                 </p>
                 <p>
-                  The maintainers of {{SITE_NAME}} are also very grateful for feedback, ideas and suggestions from the following people: Albert Gural, Alex Kauffmann, Amit Deutsch, Catherine Colman, John Cox, John Orr, Neil Fraser, Pavel Simakov, Peter Norvig, Philip Guo, Piotr Mitros and Vikrant Nanda.
+                  The maintainers of {{SITE_NAME}} are also very grateful for feedback, ideas and suggestions from the following people: Albert Gural, Alex Kauffmann, Amit Deutsch, Catherine Colman, John Cox, John Orr, Michael Anuzis, Mike Gainer, Neil Fraser, Pavel Simakov, Peter Norvig, Philip Guo, Piotr Mitros and Vikrant Nanda.
                 </p>
               </div>
             </div>
@@ -131,15 +86,14 @@
                   Oppia is an open source project, and its <a href="https://code.google.com/p/oppia/">code</a> is released under an <a href="https://www.apache.org/licenses/">Apache 2.0</a> license. See the <a href="https://code.google.com/p/oppia/">Google code site</a> for more details.
                 </p>
                 <p>
-                  The textual content of explorations on this site, as well as image files included with them, are licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/legalcode">CC-BY-SA 4.0</a> with a waiver of the attribution requirement. More specifically: if you reuse content from this site, we encourage you to include a link to the exploration page from which the content originated, but do not require it.
+                  The textual content of explorations on this site, as well as image files included with them, are licensed under <a href="http://creativecommons.org/licenses/by-sa/4.0/legalcode">CC-BY-SA 4.0</a> with a waiver of the attribution requirement (specifically, Sections 3(a)(1) and 3(a)(2)). That is, if you reuse content from this site, we encourage you to include a link to the exploration page from which the content originated, but do not require it.
                 </p>
               </div>
             </div>
-
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
 {% endblock %}
