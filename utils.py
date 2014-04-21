@@ -23,6 +23,7 @@ import os
 import random
 import re
 import StringIO
+import time
 import unicodedata
 import urllib
 import urlparse
@@ -313,3 +314,12 @@ def convert_to_hash(string, max_length):
         hashlib.sha1(string).digest())
 
     return encoded_string[:max_length]
+
+
+def get_time_in_millisecs(datetime_obj):
+    """Returns time in milliseconds since the Epoch.
+
+    Args:
+      datetime_obj: An object of type datetime.datetime.
+    """
+    return time.mktime(datetime_obj.timetuple()) * 1000

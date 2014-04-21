@@ -5,6 +5,40 @@
 {% endblock subtitle %}
 
 {% block content %}
+  <script type="text/ng-template" id="playtestGallery/gallerySection">
+    <div class="oppia-gallery">
+      <table>
+        <tr>
+          <th style="padding-left: 10px; width: 30%; text-align: left;">Exploration</th>
+          <th style="width: 20%"></th>
+          <th style="width: 25%; text-align: left;">Category</th>
+          <th style="width: 25%; text-align: left;">Last updated</th>
+        </tr>
+        <tr ng-repeat="exploration in explorations track by $index">
+          <td>
+            <div class="oppia-gallery-tile-top">
+              <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
+                <div class="oppia-gallery-tile-description">
+                  <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                  <span class="oppia-gallery-tile-play">
+                    <i class="icon-play-circle"></i>
+                  </span>
+                </div>
+              </a>
+            </div>
+          </td>
+          <td></td>
+          <td>
+            <[exploration.category]>
+          </td>
+          <td>
+            <[getLocaleStringForDate(exploration.last_updated)]>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </script>
+
   <div class="container" ng-controller="PlaytestGallery">
     <div class="row">
       <div class="span8">
@@ -15,52 +49,14 @@
           </h3>
 
           <p>All explorations in this gallery are still in beta. Play them and give feedback to make them better!</p>
+          <playtest-gallery-section explorations="publicExplorations">
+          </playtest-gallery-section>
 
-          <div class="oppia-gallery" ng-if="displayedCategories">
-            <div class="tabbable tabs-left">
-
-              <div class="oppia-gallery-menu">
-                <div class="oppia-gallery-menu-title">
-                  <strong>Categories</strong>
-                </div>
-                <ul class="nav nav-pills nav-stacked" id="navTabs">
-                  <li ng-repeat="(category, explorations) in displayedCategories"
-                      ng-class="{active: $index == 0}">
-                    <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
-                      <[category]>
-                    </a>
-                  </li>
-                </ul>
-              </div>
-
-              <div class="tab-content oppia-gallery-tiles-container">
-                <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
-                  <div class="container-fluid">
-                    <div class="row-fluid">
-
-                      <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
-
-                        <div class="oppia-gallery-tile-top">
-                          <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
-                            <div class="oppia-gallery-tile-description">
-                              <span class="oppia-gallery-tile-title"><[exploration.title]></span>
-                              <span class="oppia-gallery-tile-play">
-                                <i class="icon-play-circle"></i>
-                              </span>
-                            </div>
-                          </a>
-                          <span ng-if="exploration.to_playtest" class="label label-info pull-right">
-                            Invited to playtest
-                          </span>
-                        </div>
-                      </div>
-
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-            </div>
+          <div ng-if="privateExplorations">
+            <br><br>
+            <h4>Private explorations you've been invited to playtest</h4>
+            <playtest-gallery-section explorations="privateExplorations">
+            </playtest-gallery-section>
           </div>
         </div>
       </div>

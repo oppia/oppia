@@ -18,28 +18,30 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function PlaytestGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
-  $scope.playtestGalleryDataUrl = '/playtesthandler/data';
-  $scope.categoryList = [];
-  $scope.categories = {};
+oppia.directive('playtestGallerySection', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      explorations: '='
+    },
+    templateUrl: 'playtestGallery/gallerySection',
+    controller: ['$scope', 'oppiaDateFormatter', function($scope, oppiaDateFormatter) {
+      $scope.getLocaleStringForDate = function(millisSinceEpoch) {
+        return oppiaDateFormatter.getLocaleString(millisSinceEpoch);
+      };
+    }]
+  };
+}]);
 
-  $scope.displayedCategoryList = [];
-  $scope.displayedCategories = {};
+function PlaytestGallery($scope, $http, $rootScope, warningsData) {
+  $scope.playtestGalleryDataUrl = '/playtesthandler/data';
 
   $rootScope.loadingMessage = 'Loading';
 
   // Retrieves gallery data from the server.
   $http.get($scope.playtestGalleryDataUrl).success(function(data) {
-    $scope.categories = data.categories;
-
-    // Put the category names in a list.
-    for (var category in $scope.categories) {
-      $scope.categoryList.push(category);
-    }
-
-    $scope.displayedCategoryList = angular.copy($scope.categoryList);
-    $scope.displayedCategories = angular.copy($scope.categories);
-
+    $scope.publicExplorations = data.public_explorations_list;
+    $scope.privateExplorations = data.private_explorations_list;
     $rootScope.loadingMessage = '';
   }).error(function(data) {
     warningsData.addWarning(data.error || 'Error communicating with server.');
@@ -49,4 +51,5 @@ function PlaytestGallery($scope, $http, $rootScope, warningsData, oppiaRequestCr
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-PlaytestGallery.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+PlaytestGallery.$inject = [
+  '$scope', '$http', '$rootScope', 'warningsData'];

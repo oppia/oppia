@@ -98,32 +98,41 @@ class PlaytestHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
-        explorations_dict = (
-            exp_services.get_public_explorations_summary_dict())
 
-        categories = collections.defaultdict(list)
-        for (eid, exploration_data) in explorations_dict.iteritems():
-            categories[exploration_data['category']].append({
-                'id': eid,
-                'title': exploration_data['title'],
-                'to_playtest': False,
-            })
+        explorations_dict = (
+            exp_services.get_recently_edited_public_explorations_summary_dict()
+        )
+
+        public_explorations_list = [{
+            'id': exp_id,
+            'title': exp_data['title'],
+            'category': exp_data['category'],
+            'last_updated': exp_data['last_updated'],
+            'to_playtest': False,
+        } for (exp_id, exp_data) in explorations_dict.iteritems()]
 
         # Add private explorations that the user has been specifically invited
         # to playtest.
+        private_explorations_list = []
         if self.user_id:
             playtest_dict = (
                 exp_services.get_explicit_viewer_explorations_summary_dict(
-                    self.user_id))
-            for (eid, exploration_data) in playtest_dict.iteritems():
-                categories[exploration_data['category']].append({
-                    'id': eid,
-                    'title': exploration_data['title'],
-                    'to_playtest': True,
-                })
+                    self.user_id, include_timestamps=True))
+            private_explorations_list = [{
+                'id': exp_id,
+                'title': exp_data['title'],
+                'category': exp_data['category'],
+                'last_updated': exp_data['last_updated'],
+                'to_playtest': True,
+            } for (exp_id, exp_data) in playtest_dict.iteritems()]
 
         self.values.update({
-            'categories': categories,
+            'public_explorations_list': sorted(
+                public_explorations_list, key=lambda exp: exp['last_updated'],
+                reverse=True),
+            'private_explorations_list': sorted(
+                private_explorations_list, key=lambda exp: exp['last_updated'],
+                reverse=True)
         })
         self.render_json(self.values)
 
