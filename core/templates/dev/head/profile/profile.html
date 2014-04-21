@@ -70,20 +70,7 @@
                   <[f.content]>
                 </div>
                 <div class="oppia-feedback-reader-link">
-                  <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a>
-                  <div ng-switch on="f.state_name" style="display:inline-block;">
-                    <div ng-switch-when="END">
-                      (state: <a href="/create/<[f.exp_id]>#/">END</a>)
-                    </div>
-                    <div ng-switch-when=""></div>
-                    <div ng-switch-default>
-                      (state:
-                        <a ng-href="/create/<[f.exp_id]>#/gui/<[f.state_name]>">
-                          <[f.state_name]>
-                        </a>
-                      )
-                    </div>
-                  </div>
+                  <em>for exploration: <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a></em>
                 </div>
               </dd>
             </div>
