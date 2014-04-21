@@ -171,11 +171,19 @@ class ExplorationRightsModel(base_models.VersionedModel):
             committer_id, commit_message, commit_cmds)
 
     @classmethod
-    def get_non_private(cls):
-        """Returns an iterable with non-private exp rights models."""
+    def get_public(cls):
+        """Returns an iterable with public (beta) exp rights models."""
         return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status.IN([
-                EXPLORATION_STATUS_PUBLIC, EXPLORATION_STATUS_PUBLICIZED])
+            ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLIC
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_publicized(cls):
+        """Returns an iterable with publicized exp rights models."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLICIZED
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)
