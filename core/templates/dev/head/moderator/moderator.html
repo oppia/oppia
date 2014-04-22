@@ -31,14 +31,22 @@
         <table class="oppia-padded-table">
           <tr>
             <th>Timestamp</th>
-            <th>Exploration ID</th>
+            <th>Exploration</th>
+            <th>Category</th>
             <th>Username</th>
             <th>Commit message</th>
             <th>Community-owned?</th>
           </tr>
           <tr ng-repeat="commit in allCommits track by $index">
             <td><[getHumanReadableDate(commit.last_updated)]></td>
-            <td><a ng-href="<[getExplorationCreateUrl(commit.exploration_id)]>"><[commit.exploration_id]></a></td>
+            <td>
+              <a ng-href="<[getExplorationCreateUrl(commit.exploration_id)]>">
+                <[explorationData[commit.exploration_id].title]>
+              </a>
+            </td>
+            <td>
+              <[explorationData[commit.exploration_id].category]>
+            </td>
             <td><[commit.username]></td>
             <td><[commit.commit_message]></td>
             <td><[commit.post_commit_community_owned]></td>

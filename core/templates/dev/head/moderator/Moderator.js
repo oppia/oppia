@@ -50,6 +50,10 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
   $scope.recentCommitsCursor = null;
   $scope.reachedEndOfCommits = false;
   $scope.allCommits = [];
+  // Map of exploration ids to objects containing a single key: title. Only the
+  // first fetch of the data is used to populate this map, so that explorations
+  // on multiple pages with the same id correspond to the same data.
+  $scope.explorationData = {};
   $scope.loadMoreCommits = function() {
     if ($scope.reachedEndOfCommits) {
       return;
@@ -62,6 +66,15 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
     }
 
     $http.get(recentCommitsUrl).success(function(data) {
+      // Update the explorationData object with information about newly-
+      // discovered explorations.
+      var explorationIdsToExplorationData = data.exp_ids_to_exp_data;
+      for (var expId in explorationIdsToExplorationData) {
+        if (!$scope.explorationData.hasOwnProperty(expId)) {
+          $scope.explorationData[expId] = explorationIdsToExplorationData[expId];
+        }
+      }
+
       for (var i = 0; i < data.results.length; i++) {
         $scope.allCommits.push(data.results[i]);
       }
