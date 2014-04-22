@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
+function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData,
   warningsData, activeInputData, oppiaRequestCreator, editorContextService) {
 
   $scope.$on('guiTabSelected', function(evt) {
@@ -48,7 +48,8 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
   $scope.closeStateEditor = function() {
     $scope.$broadcast('externalSave');
-    $scope.$parent.selectMainTab();
+    editorContextService.clearActiveStateName();
+    $scope.$parent.showMainTabWithoutStateEditor();
   };
 
   $scope.getIncomingStates = function(stateName) {
@@ -191,6 +192,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
 }
 
-StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
+StateEditor.$inject = ['$scope', '$http', '$filter', '$log', '$sce', '$modal',
     'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator',
     'editorContextService'];

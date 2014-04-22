@@ -60,21 +60,27 @@
 
         <div ng-show="!isEmpty(feedback)">
           <h5>Feedback I've submitted</h5>
-          <dl class="dl-horizontal">
-            <div ng-repeat="f in feedback">
-              <dt><div class="oppia-feedback-status label">
-                <[f.status]>
-              </div></dt>
-              <dd>
+          <table>
+            <tr ng-repeat="f in feedback">
+              <td>
+                <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a>
+              </td>
+              <td style="width: 20px;">
+              </td>
+              <td>
+                <div class="oppia-feedback-status label">
+                  <[f.status]>
+                </div>
+              </td>
+              <td style="width: 20px;">
+              </td>
+              <td>
                 <div class="oppia-feedback-content">
                   <[f.content]>
                 </div>
-                <div class="oppia-feedback-reader-link">
-                  <em>for exploration: <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a></em>
-                </div>
-              </dd>
-            </div>
-          </dl>
+              </td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>

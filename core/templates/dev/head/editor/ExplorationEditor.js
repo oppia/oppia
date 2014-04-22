@@ -421,16 +421,11 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
   var STATS_VIEWER_URL = '/stats';
   var SETTINGS_URL = '/settings';
   var HISTORY_URL = '/history';
-  var firstLoad = true;
 
   $scope.selectMainTab = function() {
-    // This is needed so that if a state id is entered in the URL,
-    // the first tab does not get selected automatically, changing
-    // the location to '/'.
-    if (!firstLoad || $location.path().indexOf('gui') === -1) {
+    if ($location.path().indexOf('gui') === -1) {
       $location.path('/');
     }
-    firstLoad = false;
   };
 
   $scope.selectStatsTab = function() {
@@ -449,6 +444,11 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
     warningsData.clear();
     $scope.saveAndChangeActiveState(stateName);
     $location.path('/gui/' + stateName);
+  };
+
+  $scope.showMainTabWithoutStateEditor = function(stateName) {
+    warningsData.clear();
+    $location.path('/');
   };
 
   $scope.$watch(function() {
@@ -482,9 +482,6 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
           setTimeout(function () {
             if ($location.hash()) {
               $anchorScroll();
-            }
-            if (firstLoad) {
-              firstLoad = false;
             }
           }, 1000);
         }

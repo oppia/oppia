@@ -126,10 +126,10 @@ MAX_FILE_SIZE_BYTES = 1048576
 # Each item is a dict with two keys: the human-readable name of the link and
 # the URL of the page.
 ABOUT_PAGES = [{
-    'name': 'About the site',
+    'name': 'About this site',
     'url': '/about'
 }, {
-    'name': 'Site guidelines',
+    'name': 'How to use this site',
     'url': '/site_guidelines',
 }, {
     'name': 'Blog',

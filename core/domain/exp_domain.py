@@ -844,7 +844,7 @@ class Exploration(object):
                     'exploration: %s' % warning_str)
 
     def _verify_no_self_loops(self):
-        """Verify that there are no self-loops."""
+        """Verify that there are no feedback-less self-loops."""
         for (state_name, state) in self.states.iteritems():
             for handler in state.widget.handlers:
                 for rule in handler.rule_specs:
@@ -856,11 +856,18 @@ class Exploration(object):
                     # self-loop is always saved to the backend.
                     if (rule.dest == state_name and not rule.feedback
                             and not state.widget.sticky):
-                        raise utils.ValidationError(
-                            'Please add feedback for any rules in state "%s" '
-                            'which loop back to that state, otherwise '
-                            'the reader is likely to get frustrated.' %
-                            state_name)
+                        if rule.is_default:
+                            error_msg = (
+                                'Please add feedback for the default rule in '
+                                'state "%s", otherwise the reader is likely '
+                                'to get frustrated.' % state_name)
+                        else:
+                            error_msg = (
+                                'Please add feedback for any rules in state '
+                                '"%s" which loop back to that state, '
+                                'otherwise the reader is likely to get '
+                                'frustrated.' % state_name)
+                        raise utils.ValidationError(error_msg)
 
     def _verify_all_states_reachable(self):
         """Verifies that all states are reachable from the initial state."""
