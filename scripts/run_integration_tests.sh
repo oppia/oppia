@@ -33,9 +33,10 @@ function cleanup {
   # Send a kill signal to the dev server.
   kill `ps aux | grep "[Dd]ev_appserver.py --host=0.0.0.0 --port=4445" | awk '{print $2}'`
 
-  # Wait for the servers to go down.
-  while nc -vz localhost 4444; do sleep 1; done
-  while nc -vz localhost 4445; do sleep 1; done
+  # Wait for the servers to go down; suppress "connection refused" error output
+  # from nc since that is exactly what we are expecting to happen.
+  while ( nc -vz localhost 4444 >/dev/null 2>&1 ); do sleep 1; done
+  while ( nc -vz localhost 4445 >/dev/null 2>&1 ); do sleep 1; done
 
   echo Done!
 }
@@ -86,3 +87,6 @@ while ! nc -vz localhost 4445; do sleep 1; done
 
 # Run the integration tests.
 $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
+
+# Developers: note that at the end of this script, the cleanup() function at
+# the top of the file is run.
