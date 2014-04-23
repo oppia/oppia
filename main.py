@@ -26,9 +26,12 @@ from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
 from core.controllers import reader
+from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import services
 from core.controllers import widgets
+from core.platform import models
+transaction_services = models.Registry.import_transaction_services()
 
 import webapp2
 from webapp2_extras.routes import RedirectRoute
@@ -88,6 +91,8 @@ urls = [
     webapp2.Route(
         r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(
+        r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
@@ -111,6 +116,13 @@ urls = [
         'learn_gallery_handler'),
 
     get_redirect_route(
+        r'%s' % feconf.PLAYTEST_GALLERY_URL, galleries.PlaytestPage,
+        'playtest_gallery_page'),
+    get_redirect_route(
+        r'%s' % feconf.PLAYTEST_GALLERY_DATA_URL, galleries.PlaytestHandler,
+        'playtest_gallery_handler'),
+
+    get_redirect_route(
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,
         'contribute_gallery_page'),
     get_redirect_route(
@@ -125,6 +137,10 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.CLONE_EXPLORATION_URL,
         galleries.CloneExploration, 'clone_exploration'),
+
+    get_redirect_route(
+        r'%s' % feconf.RECENT_COMMITS_DATA_URL,
+        recent_commits.RecentCommitsHandler, 'recent_commits_handler'),
 
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
@@ -216,4 +232,5 @@ error404_handler = [webapp2.Route(r'/.*', Error404Handler)]
 urls = urls + error404_handler
 
 
-app = webapp2.WSGIApplication(urls, debug=feconf.DEBUG)
+app = transaction_services.toplevel_wrapper(
+    webapp2.WSGIApplication(urls, debug=feconf.DEBUG))

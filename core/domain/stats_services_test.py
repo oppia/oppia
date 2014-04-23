@@ -183,34 +183,41 @@ class StatsServicesUnitTests(test_utils.GenericTestBase):
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
-    def test_get_exploration_info(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
-        rule = exp_domain.RuleSpec.from_dict_and_obj_type({
-            'definition':  {
-                 'rule_type': 'atomic',
-                 'name': 'IsLessThan',
-                 'subject': 'answer',
-                 'inputs': {'x': 5}
-             },
-             'dest': 'dest',
-             'feedback': None,
-             'param_changes': []
-        }, 'Real')
-        exp_services.save_new_exploration('fake@user.com', exp)
-        state_name = exp.init_state_name
+    def test_get_user_stats(self):
+        exp0 = exp_domain.Exploration.create_default_exploration(
+            'eid0', 'title0', 'category')
+        exp_services.save_new_exploration('uid0', exp0)
+        exp1 = exp_domain.Exploration.create_default_exploration(
+            'eid1', 'title1', 'category')
+        exp_services.save_new_exploration('uid0', exp1)
 
-        for _ in range(10):
-            stats_services.EventHandler.record_answer_submitted(
-                'eid', 1, state_name, self.SUBMIT_HANDLER,
-                rule, '3')
-        exp_info = stats_services.get_exploration_info('eid')
-        self.assertEquals(len(exp_info['stateInfos']), 1)
-        state_info = exp_info['stateInfos'][state_name]
-        self.assertEquals(state_info['flag_type'], 'missing')
-        self.assertEquals(state_info['score'], 10)
-        self.assertEquals(state_info['data'], '3')
-                
+        f0 = stats_domain.FeedbackItem.create_feedback_for_state(
+            'eid0', 'welcome', 'my feedback', None, 'uid0')
+        f1 = stats_domain.FeedbackItem.create_feedback_for_exploration(
+            'eid1', 'another feedback', None, 'uid0')
+
+        # This should return the both the feedback.
+        self.assertEquals(stats_services.get_user_stats('uid0'), {'feedback': {
+            f0.id: {
+                'content': 'my feedback',
+                'exp_id': 'eid0',
+                'exp_title': 'title0',
+                'state_name': 'welcome',
+                'status': 'new',
+                'target_id': 'state:eid0.welcome',
+            },
+            f1.id: {
+                'content': 'another feedback',
+                'exp_id': 'eid1',
+                'exp_title': 'title1',
+                'state_name': None,
+                'status': 'new',
+                'target_id': 'exploration:eid1',
+            },
+        }})
+        # uid1 does not have any feedbacks.
+        self.assertEquals(stats_services.get_user_stats('uid1'),
+            {'feedback':{}})
 
 
 class TopImprovableStatesUnitTests(test_utils.GenericTestBase):

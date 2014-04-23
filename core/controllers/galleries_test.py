@@ -15,7 +15,6 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import galleries
-from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
 import feconf
@@ -45,7 +44,8 @@ class LearnGalleryTest(test_utils.GenericTestBase):
 
     def test_learn_gallery_handler(self):
         """Test access to the learners' gallery data handler."""
-        # Load a demo exploration.
+        # Load a demo exploration. This is only in beta so it does not show
+        # up in the learners' gallery.
         exp_services.load_demo('0')
 
         response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
@@ -53,15 +53,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
-            'categories': {
-                'Welcome': [{
-                    'is_public': True,
-                    'is_publicized': False,
-                    'to_playtest': False,
-                    'id': '0',
-                    'title': 'Welcome to Oppia!'
-                }]
-            }
+            'categories': {}
         }, response_dict)
 
     def test_login_message(self):
@@ -99,6 +91,49 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             feconf.NEW_EXPLORATION_URL, EXP_A_DICT, csrf_token
         )[galleries.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
+
+
+class PlaytestGalleryTest(test_utils.GenericTestBase):
+
+    def test_playtest_gallery_page(self):
+        """Test access to the playtesters' gallery page."""
+        response = self.testapp.get(feconf.PLAYTEST_GALLERY_URL)
+        self.assertEqual(response.status_int, 200)
+        response.mustcontain(
+            'Playtesters\' Gallery',
+            # Test that no edit/copy links are shown (at least in the HTML
+            # template; a full test should check what happens after the JS is
+            # loaded and data is fetched from the backend).
+            no=[CAN_EDIT_STR, CAN_CLONE_STR, 'Create New Exploration',
+                'Categories']
+        )
+
+        # Test that the correct navbar tab is active.
+        self.assertRegexpMatches(
+            response.body, r'class="active">\s+<a href="/playtest">Playtest')
+
+    def test_playtest_gallery_handler(self):
+        """Test access to the playtesters' gallery data handler."""
+        # Load a demo exploration, which ends up being in beta.
+        exp_services.load_demo('0')
+
+        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
+        self.assertDictContainsSubset({
+            'is_admin': False,
+            'is_moderator': False,
+            'is_super_admin': False,
+            'private_explorations_list': [],
+        }, response_dict)
+        self.assertIn('public_explorations_list', response_dict)
+        self.assertEqual(len(response_dict['public_explorations_list']), 1)
+        self.assertDictContainsSubset({
+            'category': 'Welcome',
+            'id': '0',
+            'title': 'Welcome to Oppia!',
+            'to_playtest': False
+        }, response_dict['public_explorations_list'][0])
+        self.assertIn(
+            'last_updated', response_dict['public_explorations_list'][0])
 
     def test_can_see_explorations_to_playtest(self):
         """Test viewability of playtestable explorations."""
@@ -146,45 +181,39 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         # E logs out.
         self.logout()
 
-        # An anonymous user sees nothing to playtest on the Learn page.
-        response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
+        # An anonymous user sees nothing to playtest on the Playtest page.
+        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
-            'categories': {}
+            'public_explorations_list': [],
+            'private_explorations_list': [],
         }, response_dict)
 
         # If PA logs in, he sees exploration A but not exploration B on the
         # Learn page.
         self.login(PLAYTESTER_A_EMAIL)
-        response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
-        self.assertEqual({
-            'is_admin': False,
-            'is_moderator': False,
-            'is_super_admin': False,
-            'categories': {
-                'Test Explorations': [{
-                    'is_public': False,
-                    'is_publicized': False,
-                    'to_playtest': True,
-                    'id': exp_a_id,
-                    'title': 'A'
-                }]
-            },
-            'user_email': PLAYTESTER_A_EMAIL,
-            'username': None,
-        }, response_dict)
+        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
+        self.assertEqual(len(response_dict['public_explorations_list']), 0)
+        self.assertEqual(len(response_dict['private_explorations_list']), 1)
+        self.assertDictContainsSubset({
+            'category': 'Test Explorations',
+            'id': exp_a_id,
+            'title': 'A',
+            'to_playtest': True
+        }, response_dict['private_explorations_list'][0])
         self.logout()
 
-        # E does not see either exploration on the Learn page.
+        # E does not see either exploration on the Playtest page.
         self.login(EDITOR_EMAIL)
-        response_dict = self.get_json(feconf.LEARN_GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
-            'categories': {},
+            'public_explorations_list': [],
+            'private_explorations_list': [],
         }, response_dict)
         self.logout()
 

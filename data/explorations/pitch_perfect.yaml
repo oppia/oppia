@@ -117,7 +117,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Interval-2
+          dest: Pitch Trainer-1
           feedback:
           - Sounds good to me!
           param_changes: []
@@ -161,7 +161,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Pitch Trainer-2
+          dest: Pitch Trainer-1
           feedback:
           - Good choice. It's always smart to review what you've learned.
           param_changes: []
@@ -265,8 +265,8 @@ states:
       value: Great job! That's as far as we're going to go with this exploration,
         but there's still a lot more you can learn. Next time you hear a song on the
         radio, try to pick out intervals that sound familiar. Just remember, ear training
-        is a life long journey and you'll get significantly better at with just a
-        little effort. Thanks for playing!
+        is a life long journey and you'll get significantly better at it with just
+        a little effort. Thanks for playing!
     param_changes: []
     widget:
       customization_args:
@@ -460,7 +460,10 @@ states:
     content:
     - type: text
       value: Now that you have an idea of how this is going to work, where do you
-        want to go?
+        want to go with it? I think its best to start with individual pitches, then
+        move to intervals, and work with melodies last after your ears have warmed
+        up. You, however, are a free thinking individual, and should go wherever your
+        heart desires. Where would you like to boldly go?
     param_changes: []
     widget:
       customization_args:
@@ -524,10 +527,10 @@ states:
   Interval Trainer-1:
     content:
     - type: text
-      value: Great job! If you can match one note, it shouldn't be hard to match two,
-        right? Two notes make up what is called an interval. There are a few different
-        kinds but you don't have to worry about remembering them all just yet. Let's
-        just start with a few common ones.&nbsp;
+      value: "Great job! If you can match one note, it shouldn't be hard to match\
+        \ two, right? Two notes make up what is called an interval. There are a few\
+        \ different kinds but you don't have to worry about remembering them all just\
+        \ yet. Let's just start with a few common ones.\_"
     param_changes: []
     widget:
       customization_args:
@@ -755,9 +758,9 @@ states:
             rule_type: default
           dest: Interval Trainer-1
           feedback:
-          - Listen to the desired sequence again and make your selection. You can
-            compare it to your sequence as many times as you like, befor submitting,
-            by using the play buttons.
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_"
           - "Try again. Listen to the desired sequence and make your selection.\_"
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
@@ -999,9 +1002,9 @@ states:
           dest: Interval Trainer-2
           feedback:
           - It's okay, practice makes perfect. Try as many times as you like.
-          - Listen to the desired sequence again and make your selection. You can
-            compare it with your sequence as many times as you like, before submitting,
-            by using the play buttons.
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_"
           param_changes: []
       sticky: true
       widget_id: MusicNotesInput
@@ -1180,9 +1183,9 @@ states:
             rule_type: default
           dest: Interval Trainer-3
           feedback:
-          - Listen to the desired sequence again and make your selection. You can
-            compare it with your sequence as many times as you like, before submitting,
-            by using the play buttons.
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_"
           - Try again. Listen to the desired sequence and make your selection.
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
@@ -1191,10 +1194,9 @@ states:
   Melody Trainer-1:
     content:
     - type: text
-      value: Well you've traveled far, haven't you? Let's try our ears at a few familiar
-        melodies. Don't worry about the rhythm for now, we're just going to focus
-        on matching the pitches. Listen to the desired sequence and match them on
-        the staff.
+      value: Well you've traveled far, haven't you? Let's try our ears at a few melodies.
+        Don't worry about the rhythm for now, we're just going to focus on matching
+        the pitches. Listen to the desired sequence and match them on the staff.
     param_changes: []
     widget:
       customization_args:
@@ -1344,18 +1346,18 @@ states:
           dest: Melody Trainer-1
           feedback:
           - Try again. Listen to the desired sequence and make your selection.
-          - Listen to the desired sequence and make your selection. You can compare
-            it with your sequence as many times as you like, before submitting, by
-            using the play buttons.
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_"
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
-      sticky: false
+      sticky: true
       widget_id: MusicNotesInput
   Melody Trainer-2:
     content:
     - type: text
-      value: Now you've got the hang of it! Let's try another melody you may be familiar
-        with. Listen to the desired sequence and try to match it on the staff. &nbsp;
+      value: "You've got the hang of it! Let's try another melody. Listen to the desired\
+        \ sequence and try to match it on the staff. \_"
     param_changes: []
     widget:
       customization_args:
@@ -1591,23 +1593,23 @@ states:
           feedback:
           - It's okay, keep trying and you'll get it soon.
           - Try again. Listen to the desired sequence and make your selection.
-          - Listen to the desired sequence and make your selection. You can compare
-            it with your sequence as many times as you like, before submitting, by
-            using the play buttons.
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_"
           param_changes: []
       sticky: true
       widget_id: MusicNotesInput
   Pitch Trainer-1:
     content:
     - type: text
-      value: In this exploration, we're going to learn the basics of music theory.
-        Now don't be afraid, it's not all that hard, and the good thing is, you've
-        been training your ear for it your whole life.&nbsp;<div><br></div><div>Music
-        is made up of notes and rests. Listen to the desired sequence of notes by
-        pressing the button, artfully named, "Play Desired Sequence", and then try
-        to match it by dragging notes onto the staff.&nbsp;</div><div><br></div><div>For
-        now let's start small with just one note. Don't worry about getting it right
-        the first time. Your ears will grow with time.</div>
+      value: "In this exploration, we're going to learn the basics of music theory.\
+        \ Now don't be afraid, it's not all that hard, and the good thing is, you've\
+        \ been training your ear for it your whole life.\_<div><br></div><div>Music\
+        \ is made up of notes and rests. Listen to the desired sequence of notes by\
+        \ pressing the button, artfully named, \"Play Desired Sequence\", and then\
+        \ try to match it by dragging notes onto the staff.\_</div><div><br></div><div>For\
+        \ now let's start small with just one note. Don't worry about getting it right\
+        \ the first time. Your ears will grow with time.</div>"
     param_changes: []
     widget:
       customization_args:
@@ -1670,12 +1672,177 @@ states:
             moving the note down an octave.
           param_changes: []
         - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: 2
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - You're very close, just a little too high. Give it another shot!<br>
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: 3
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - You're very close, just a little too high. Give it another shot!<br>
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: 5
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - Your choice is a bit too high. Give it another go!<br>
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: 7
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - Your choice is a bit too high. Give it another go!<br>
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: -2
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - You're very close, just a little too low. Give it another try!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: -3
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - You're very close, just a little too low. Give it another try!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: -5
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - Your choice is a bit too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: -7
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - Your choice is a bit too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: -9
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - Your choice is a bit too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: -10
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - Your choice is much too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: D5
+              y: -14
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-1
+          feedback:
+          - Your choice is much too low. Give it another shot!
+          param_changes: []
+        - definition:
             rule_type: default
           dest: Pitch Trainer-1
           feedback:
-          - Listen to the desired sequence again and make your selection. You can
-            compare it with your note as many times as you like before submitting
-            by using the play buttons.<br>
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_<br>"
           - Try again. Listen to the desired note and make your selection.<br>
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
@@ -1684,8 +1851,8 @@ states:
   Pitch Trainer-2:
     content:
     - type: text
-      value: Listen to the desired note and make your selection. You can compare your
-        note with the desired one as many times as you like before submitting.&nbsp;
+      value: "Listen to the desired note and make your selection. You can compare\
+        \ your note with the desired one as many times as you like before submitting.\_"
     param_changes: []
     widget:
       customization_args:
@@ -1748,11 +1915,177 @@ states:
             moving the note up an octave.
           param_changes: []
         - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: -1
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Very close, you're just a bit too low. Give it another try!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: -3
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Very close, you're just a bit too low. Give it another try!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: -5
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Your choice is just a bit too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 2
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Very close, your choice is just a bit too high. Give it another go!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 4
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Very close, your choice is just a bit too high. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 6
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Your choice is just a bit too high. Give it another go!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 7
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Your choice is just a bit too high. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 9
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Your choice is just a bit too high. Give it another go!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 11
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Your choice is much too high. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 14
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Your choice is much too high. Give it another go!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: F4
+              y: 16
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-2
+          feedback:
+          - Your choice is much too high. Give it another go!
+          param_changes: []
+        - definition:
             rule_type: default
           dest: Pitch Trainer-2
           feedback:
-          - "Listen to the desired sequence and make your selection. You can compare\
-            \ it with your note as many times as you like using the play buttons.\_"
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_"
           - "Try again. Listen to the desired note and make your selection.\_"
           - It's okay, practice makes perfect. Try as many times as you like.
           param_changes: []
@@ -1826,13 +2159,178 @@ states:
             moving the note up an octave.
           param_changes: []
         - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -2
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Very close, your choice is just a bit too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -4
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Very close, your choice is just a bit too low. Give it another go!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -5
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is just a bit too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -7
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is just a bit too low. Give it another go!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -9
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is a bit too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -10
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is much too low. Give it another try!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -14
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is much too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -16
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is much too low. Give it another try!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -17
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is much too low. Give it another shot!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -19
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is much too low. Give it another try!
+          param_changes: []
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: A5
+              y: -21
+            name: IsTranspositionOf
+            rule_type: atomic
+            subject: answer
+          dest: Pitch Trainer-3
+          feedback:
+          - Your choice is much too low. Give it another shot!
+          param_changes: []
+        - definition:
             rule_type: default
           dest: Pitch Trainer-3
           feedback:
           - It's okay, practice makes perfect. Try as many times as you like.
-          - "LIsten to the desired note and make your selection. You can compare it\
-            \ with your note as many times as you like, before submitting, by using\
-            \ the play buttons.\_"
+          - "Not quite there yet. Listen to the desired sequence again and make your\
+            \ selection. You can compare it with your note as many times as you like\
+            \ using the play buttons.\_"
           - Try again. Listen to the desired note and make your selection.
           param_changes: []
       sticky: true

@@ -64,6 +64,9 @@ class ExplorationPage(base.BaseHandler):
 
         # TODO(sll): Cache these computations.
         interactive_widget_ids = exploration.get_interactive_widget_ids()
+        widget_dependencies = (
+            widget_registry.Registry.get_dependencies_html(
+                interactive_widget_ids))
         widget_js_directives = (
             widget_registry.Registry.get_noninteractive_widget_js() +
             widget_registry.Registry.get_interactive_widget_js(
@@ -73,9 +76,12 @@ class ExplorationPage(base.BaseHandler):
             'content': skins_services.get_skin_html(exploration.default_skin),
             'exploration_version': version,
             'iframed': is_iframed,
-            'is_private': rights_manager.is_exploration_private(exploration_id),
+            'is_private': rights_manager.is_exploration_private(
+                exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
+            'widget_dependencies': jinja2.utils.Markup(
+                widget_dependencies),
         })
 
         if is_iframed:
@@ -168,7 +174,7 @@ class FeedbackHandler(base.BaseHandler):
             ).get_interactive_widget_tag(
                 new_state.widget.customization_args, new_params)
         )
- 
+
         return (new_params, question_html, interactive_html)
 
 
@@ -275,4 +281,4 @@ class ReaderFeedbackHandler(base.BaseHandler):
         # TODO(sll): Add the reader's history log here.
         stats_services.EventHandler.record_state_feedback_from_reader(
             exploration_id, state_name, feedback,
-            {'state_history': state_history})
+            {'state_history': state_history}, self.user_id)

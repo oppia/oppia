@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the gallery page."""
+"""Controllers for the gallery pages."""
 
 __author__ = 'sll@google.com (Sean Lip)'
 
@@ -23,7 +23,6 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
-from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -65,42 +64,75 @@ class LearnHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
+
         explorations_dict = (
-            exp_services.get_non_private_explorations_summary_dict())
+            exp_services.get_publicized_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
             categories[exploration_data['category']].append({
                 'id': eid,
-                'is_public': (
-                    exploration_data['rights']['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLIC),
-                'is_publicized': (
-                    exploration_data['rights']['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                 'title': exploration_data['title'],
-                'to_playtest': False,
             })
-
-        if self.user_id:
-            playtest_dict = (
-                exp_services.get_explicit_viewer_explorations_summary_dict(
-                    self.user_id))
-            for (eid, exploration_data) in playtest_dict.iteritems():
-                categories[exploration_data['category']].append({
-                    'id': eid,
-                    'is_public': (
-                        exploration_data['rights']['status'] ==
-                        rights_manager.EXPLORATION_STATUS_PUBLIC),
-                    'is_publicized': (
-                        exploration_data['rights']['status'] ==
-                        rights_manager.EXPLORATION_STATUS_PUBLICIZED),
-                    'title': exploration_data['title'],
-                    'to_playtest': True,
-                })
 
         self.values.update({
             'categories': categories,
+        })
+        self.render_json(self.values)
+
+
+class PlaytestPage(base.BaseHandler):
+    """The exploration gallery page for playtesters."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_PLAYTEST,
+        })
+        self.render_template('galleries/playtest.html')
+
+
+class PlaytestHandler(base.BaseHandler):
+    """Provides data for the exploration gallery page for playtesters."""
+
+    def get(self):
+        """Handles GET requests."""
+        # TODO(sll): Implement paging.
+
+        explorations_dict = (
+            exp_services.get_recently_edited_public_explorations_summary_dict()
+        )
+
+        public_explorations_list = [{
+            'id': exp_id,
+            'title': exp_data['title'],
+            'category': exp_data['category'],
+            'last_updated': exp_data['last_updated'],
+            'to_playtest': False,
+        } for (exp_id, exp_data) in explorations_dict.iteritems()]
+
+        # Add private explorations that the user has been specifically invited
+        # to playtest.
+        private_explorations_list = []
+        if self.user_id:
+            playtest_dict = (
+                exp_services.get_explicit_viewer_explorations_summary_dict(
+                    self.user_id, include_timestamps=True))
+            private_explorations_list = [{
+                'id': exp_id,
+                'title': exp_data['title'],
+                'category': exp_data['category'],
+                'last_updated': exp_data['last_updated'],
+                'to_playtest': True,
+            } for (exp_id, exp_data) in playtest_dict.iteritems()]
+
+        self.values.update({
+            'public_explorations_list': sorted(
+                public_explorations_list, key=lambda exp: exp['last_updated'],
+                reverse=True),
+            'private_explorations_list': sorted(
+                private_explorations_list, key=lambda exp: exp['last_updated'],
+                reverse=True)
         })
         self.render_json(self.values)
 
@@ -140,7 +172,9 @@ class ContributeHandler(base.BaseHandler):
         if (rights_manager.Actor(self.user_id).is_moderator() or
                 self.is_super_admin):
             explorations_dict.update(
-                exp_services.get_non_private_explorations_summary_dict())
+                exp_services.get_public_explorations_summary_dict())
+            explorations_dict.update(
+                exp_services.get_publicized_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
@@ -240,4 +274,21 @@ class CloneExploration(base.BaseHandler):
         self.render_json({
             EXPLORATION_ID_KEY: exp_services.clone_exploration(
                 self.user_id, exploration_id)
+        })
+
+
+class RecentCommitsHandler(base.BaseHandler):
+    """Returns a list of recent commits."""
+
+    def get(self):
+        """Handles GET requests."""
+        urlsafe_start_cursor = self.request.get('cursor')
+        all_commits, new_urlsafe_start_cursor, more = (
+            exp_services.get_next_page_of_all_non_private_commits(
+                urlsafe_start_cursor=urlsafe_start_cursor))
+        all_commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.render_json({
+            'results': all_commit_dicts,
+            'cursor': new_urlsafe_start_cursor,
+            'more': more,
         })

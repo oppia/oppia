@@ -33,6 +33,7 @@ from core.platform import models
 (base_models, exp_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration
 ])
+transaction_services = models.Registry.import_transaction_services()
 import feconf
 import test_utils
 import utils
@@ -71,14 +72,15 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
             feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
         self.user_id_admin = self.get_user_id_from_email('admin@example.com')
 
-    def save_new_default_exploration(self, exploration_id):
-        """Saves a new default exploration written by self.OWNER_ID.
+    def save_new_default_exploration(self,
+            exploration_id, owner_id, title='A title'):
+        """Saves a new default exploration written by owner_id.
 
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, 'A title', 'A category')
-        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+            exploration_id, title, 'A category')
+        exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
     def save_new_valid_exploration(self, exploration_id, owner_id):
@@ -97,14 +99,14 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
-    def test_get_non_private_explorations_summary_dict(self):
-        self.save_new_default_exploration(self.EXP_ID)
+    def test_get_public_explorations_summary_dict(self):
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         self.assertEqual(
-            exp_services.get_non_private_explorations_summary_dict(), {})
+            exp_services.get_public_explorations_summary_dict(), {})
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
         self.assertEqual(
-            exp_services.get_non_private_explorations_summary_dict(), {
+            exp_services.get_public_explorations_summary_dict(), {
                 self.EXP_ID: {
                     'title': 'A title',
                     'category': 'A category',
@@ -122,7 +124,20 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
         self.assertEqual(
-            exp_services.get_non_private_explorations_summary_dict(), {
+            exp_services.get_public_explorations_summary_dict(), {})
+
+    def test_get_publicized_explorations_summary_dict(self):
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+        self.assertEqual(
+            exp_services.get_publicized_explorations_summary_dict(), {})
+
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_publicized_explorations_summary_dict(), {})
+
+        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_publicized_explorations_summary_dict(), {
                 self.EXP_ID: {
                     'title': 'A title',
                     'category': 'A category',
@@ -139,7 +154,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         )
 
     def test_get_explicit_viewer_explorations_summary_dict(self):
-        self.save_new_default_exploration(self.EXP_ID)
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
             rights_manager.ROLE_VIEWER)
@@ -184,7 +199,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                 self.OWNER_ID), {})
 
     def test_get_editable_explorations_summary_dict(self):
-        self.save_new_default_exploration(self.EXP_ID)
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)
@@ -218,11 +233,27 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         self.assertEqual(exp_services.count_explorations(), 0)
 
-        self.save_new_default_exploration(self.EXP_ID)
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         self.assertEqual(exp_services.count_explorations(), 1)
 
-        self.save_new_default_exploration('A new exploration id')
+        self.save_new_default_exploration(
+            'A new exploration id', self.OWNER_ID)
         self.assertEqual(exp_services.count_explorations(), 2)
+
+    def test_get_exploration_titles(self):
+        self.assertEqual(exp_services.get_exploration_titles([]), {})
+
+        self.save_new_default_exploration('A', self.OWNER_ID, 'TitleA')
+        self.assertEqual(exp_services.get_exploration_titles(['A']),
+            {'A': 'TitleA'})
+
+        self.save_new_default_exploration('B', self.OWNER_ID, 'TitleB')
+        self.assertEqual(exp_services.get_exploration_titles(['A']),
+            {'A': 'TitleA'})
+        self.assertEqual(exp_services.get_exploration_titles(['A', 'B']),
+            {'A': 'TitleA', 'B': 'TitleB'})
+        self.assertEqual(exp_services.get_exploration_titles(['A', 'C']),
+            {'A': 'TitleA'})
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
@@ -233,7 +264,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaisesRegexp(Exception, 'Entity .* not found'):
             exp_services.get_exploration_by_id('fake_eid')
 
-        exploration = self.save_new_default_exploration(self.EXP_ID)
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
         retrieved_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(exploration.id, retrieved_exploration.id)
         self.assertEqual(exploration.title, retrieved_exploration.title)
@@ -245,7 +277,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         """Test that soft deletion of explorations works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
 
-        self.save_new_default_exploration(self.EXP_ID)
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
 
         exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
         with self.assertRaises(Exception):
@@ -265,7 +297,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_hard_deletion_of_explorations(self):
         """Test that hard deletion of explorations works correctly."""
-        self.save_new_default_exploration(self.EXP_ID)
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
 
         exp_services.delete_exploration(
             self.OWNER_ID, self.EXP_ID, force_deletion=True)
@@ -286,7 +318,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
     def test_clone_exploration(self):
         """Test cloning an exploration with assets."""
-        exploration = self.save_new_default_exploration(self.EXP_ID)
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
         exploration.add_states(['New state'])
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
@@ -317,10 +350,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.save_new_exploration(self.OWNER_ID, exploration)
 
     def test_save_and_retrieve_exploration(self):
-        exploration = self.save_new_default_exploration(self.EXP_ID)
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
         exploration.param_specs = {
             'theParameter': param_domain.ParamSpec('Int')}
-        exp_services._save_exploration('A user id', exploration, '', [])
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         retrieved_exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(retrieved_exploration.title, 'A title')
@@ -457,7 +491,8 @@ states:
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
-        exploration = self.save_new_default_exploration(self.EXP_ID)
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
         exploration.add_states(['New state'])
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
@@ -470,7 +505,8 @@ states:
 
     def test_export_to_zip_file_with_assets(self):
         """Test exporting an exploration with assets to a zip file."""
-        exploration = self.save_new_default_exploration(self.EXP_ID)
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
         exploration.add_states(['New state'])
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
@@ -490,7 +526,8 @@ states:
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""
-        exploration = self.save_new_default_exploration(self.EXP_ID)
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
         self.assertEqual(exploration.version, 1)
 
         exploration.add_states(['New state'])
@@ -534,7 +571,8 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def setUp(self):
         super(UpdateStateTests, self).setUp()
-        exploration = self.save_new_default_exploration(self.EXP_ID)
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
 
         self.init_state_name = exploration.init_state_name
 
@@ -568,6 +606,32 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                 'feedback': ['Incorrect', '<b>Wrong answer</b>'],
                 '$$hashKey': '059'
             }]}
+
+    def test_update_state_name(self):
+        """Test updating of state name."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [{
+            'cmd': 'rename_state',
+            'old_state_name': '(untitled state)',
+            'new_state_name': 'new name',
+        }], 'Change state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertIn('new name', exploration.states)
+        self.assertNotIn('(untitled state)', exploration.states)
+
+    def test_update_state_name_with_unicode(self):
+        """Test updating of state name to one that uses unicode characters."""
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [{
+            'cmd': 'rename_state',
+            'old_state_name': '(untitled state)',
+            'new_state_name': u'¡Hola! αβγ',
+        }], 'Change state name')
+
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
+        self.assertIn(u'¡Hola! αβγ', exploration.states)
+        self.assertNotIn('(untitled state)', exploration.states)
 
     def test_update_param_changes(self):
         """Test updating of param_changes."""
@@ -1104,3 +1168,313 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertGreaterEqual(
             snapshots_metadata[0]['created_on'],
             snapshots_metadata[1]['created_on'])
+
+
+class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
+    """Test methods relating to the exploration commit log."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    BOB_NAME = 'bob'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+    COMMIT_ALBERT_CREATE_EXP_1 = {
+        'username': ALBERT_NAME,
+        'version': 1,
+        'exploration_id': EXP_ID_1,
+        'commit_type': 'create',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': True,
+        'commit_message': 'New exploration created with title \'A title\'.',
+        'post_commit_status': 'private'
+    }
+
+    COMMIT_BOB_EDIT_EXP_1 = {
+        'username': BOB_NAME,
+        'version': 2,
+        'exploration_id': EXP_ID_1,
+        'commit_type': 'edit',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': True,
+        'commit_message': 'Changed title.',
+        'post_commit_status': 'private'
+    }
+
+    COMMIT_ALBERT_CREATE_EXP_2 = {
+        'username': ALBERT_NAME,
+        'version': 1,
+        'exploration_id': 'eid2',
+        'commit_type': 'create',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': True,
+        'commit_message': 'New exploration created with title \'A title\'.',
+        'post_commit_status': 'private'
+    }
+
+    COMMIT_ALBERT_EDIT_EXP_1 = {
+        'username': 'albert',
+        'version': 3,
+        'exploration_id': 'eid1',
+        'commit_type': 'edit',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': True,
+        'commit_message': 'Changed title to Albert1 title.',
+        'post_commit_status': 'private'
+    }
+
+    COMMIT_ALBERT_EDIT_EXP_2 = {
+        'username': 'albert',
+        'version': 2,
+        'exploration_id': 'eid2',
+        'commit_type': 'edit',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': True,
+        'commit_message': 'Changed title to Albert2.',
+        'post_commit_status': 'private'
+    }
+
+    COMMIT_BOB_REVERT_EXP_1 = {
+        'username': 'bob',
+        'version': 4,
+        'exploration_id': 'eid1',
+        'commit_type': 'revert',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': True,
+        'commit_message': 'Reverted exploration to version 2',
+        'post_commit_status': 'private'
+    }
+
+    COMMIT_ALBERT_DELETE_EXP_1 = {
+        'username': 'albert',
+        'version': 5,
+        'exploration_id': 'eid1',
+        'commit_type': 'delete',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': True,
+        'commit_message': '',
+        'post_commit_status': 'private'
+    }
+
+    COMMIT_ALBERT_PUBLISH_EXP_2 = {
+        'username': 'albert',
+        'version': None,
+        'exploration_id': 'eid2',
+        'commit_type': 'edit',
+        'post_commit_community_owned': False,
+        'post_commit_is_private': False,
+        'commit_message': 'Exploration published.',
+        'post_commit_status': 'public'
+    }
+
+    def setUp(self):
+        """Populate the database of explorations to be queried against.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Bob edits the title of EXP_ID_1.
+        - (3) Albert creates EXP_ID_2.
+        - (4) Albert edits the title of EXP_ID_1.
+        - (5) Albert edits the title of EXP_ID_2.
+        - (6) Bob reverts Albert's last edit to EXP_ID_1.
+        - (7) Albert deletes EXP_ID_1.
+        - Bob tries to publish EXP_ID_2, and is denied access.
+        - (8) Albert publishes EXP_ID_2.
+        """
+        super(ExplorationCommitLogUnitTests, self).setUp()
+
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.register_editor(self.ALBERT_EMAIL, username=self.ALBERT_NAME)
+        self.register_editor(self.BOB_EMAIL, username=self.BOB_NAME)
+
+        # This needs to be done in a toplevel wrapper because the datastore
+        # puts to the event log are asynchronous.
+        @transaction_services.toplevel_wrapper
+        def populate_datastore():
+            exploration_1 = self.save_new_valid_exploration(
+                self.EXP_ID_1, self.ALBERT_ID)
+
+            exploration_1.title = 'Exploration 1 title'
+            exp_services._save_exploration(
+                self.BOB_ID, exploration_1, 'Changed title.', [])
+
+            exploration_2 = self.save_new_valid_exploration(
+                self.EXP_ID_2, self.ALBERT_ID)
+
+            exploration_1.title = 'Exploration 1 Albert title'
+            exp_services._save_exploration(
+                self.ALBERT_ID, exploration_1,
+                'Changed title to Albert1 title.', [])
+
+            exploration_2.title = 'Exploration 2 Albert title'
+            exp_services._save_exploration(
+                self.ALBERT_ID, exploration_2, 'Changed title to Albert2.', [])
+
+            exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
+
+            exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_1)
+
+            # This commit should not be recorded.
+            with self.assertRaisesRegexp(
+                    Exception, 'This exploration cannot be published'):
+                rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
+
+            rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
+
+        populate_datastore()
+
+    def test_get_next_page_of_all_commits(self):
+        all_commits = exp_services.get_next_page_of_all_commits()[0]
+        self.assertEqual(len(all_commits), 8)
+        for ind, commit in enumerate(all_commits):
+            if ind != 0:
+                self.assertGreater(
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
+
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+
+        # Note that commits are ordered from most recent to least recent.
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-2])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-3])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-4])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-5])
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-6])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-7])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-8])
+
+    def test_get_next_page_of_all_non_private_commits(self):
+        all_commits = (
+            exp_services.get_next_page_of_all_non_private_commits()[0])
+        self.assertEqual(len(all_commits), 1)
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
+
+    def test_get_commit_log_for_exploration_id(self):
+        all_commits = exp_services.get_next_page_of_all_commits_by_exp_id(
+            self.EXP_ID_1)[0]
+        self.assertEqual(len(all_commits), 5)
+        for ind, commit in enumerate(all_commits):
+            if ind != 0:
+                self.assertGreater(
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
+
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-2])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-3])
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-4])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-5])
+
+        all_commits = exp_services.get_next_page_of_all_commits_by_exp_id(
+            self.EXP_ID_2)[0]
+        self.assertEqual(len(all_commits), 3)
+        for ind, commit in enumerate(all_commits):
+            if ind != 0:
+                self.assertGreater(
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
+
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-1])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-2])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-3])
+
+    def test_get_commit_log_for_explorations_by_user(self):
+        all_commits = exp_services.get_next_page_of_all_commits_by_user_id(
+            self.ALBERT_ID)[0]
+        self.assertEqual(len(all_commits), 6)
+        for ind, commit in enumerate(all_commits):
+            if ind != 0:
+                self.assertGreater(
+                    all_commits[ind - 1].last_updated,
+                    all_commits[ind].last_updated)
+
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-2])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-3])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-4])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-5])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-6])
+
+        all_commits = exp_services.get_next_page_of_all_commits_by_user_id(
+            self.BOB_ID)[0]
+        self.assertEqual(len(all_commits), 2)
+        for ind, commit in enumerate(all_commits):
+            if ind != 0:
+                self.assertGreater(
+                    all_commits[ind - 1].created_on,
+                    all_commits[ind].created_on)
+
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-1])
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-2])
+
+    def test_paging(self):
+        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
+            page_size=5)
+        self.assertEqual(len(all_commits), 5)
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-1])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-2])
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-3])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-4])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-5])
+        self.assertTrue(more)
+
+        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
+            page_size=5, urlsafe_start_cursor=cursor)
+        self.assertEqual(len(all_commits), 3)
+        commit_dicts = [commit.to_dict() for commit in all_commits]
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
+        self.assertDictContainsSubset(
+            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-2])
+        self.assertDictContainsSubset(
+            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-3])
+        self.assertFalse(more)
+
+
+class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
+    """Test special cases relating to the exploration commit logs."""
+
+    def test_paging_with_no_commits(self):
+        all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
+            page_size=5)
+        self.assertEqual(len(all_commits), 0)
