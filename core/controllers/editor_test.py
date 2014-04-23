@@ -330,38 +330,48 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
         self.register_editor('editor@example.com')
         self.login('editor@example.com')
         self.OWNER_ID = self.get_user_id_from_email('editor@example.com')
-        
+
         # Create a simple exploration
         EXP_ID = 'eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'The title for ZIP download handler test!', 'This is just a test category')
-        exploration.add_states(['State A','State 2','State 3'])
+            EXP_ID, 'The title for ZIP download handler test!',
+            'This is just a test category')
+        exploration.add_states(['State A', 'State 2', 'State 3'])
         exp_services.save_new_exploration(self.OWNER_ID, exploration)
-        exploration.rename_state('State 2','State B')
+        exploration.rename_state('State 2', 'State B')
         exploration.delete_state('State 3')
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
         response = self.testapp.get('/create/%s' % EXP_ID)
-        
+
         # Download to zip file using download handler
         EXPLORATION_DOWNLOAD_URL = '/createhandler/download/%s' % EXP_ID
         response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
 
         # Check downloaded zip file
-        self.assertEqual(response.headers['Content-Type'],'text/plain')
+        self.assertEqual(response.headers['Content-Type'], 'text/plain')
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-        self.assertEqual(response.headers['Content-Disposition'], 'attachment; filename=%s' % str(filename))
+        self.assertEqual(response.headers['Content-Disposition'], 
+                         'attachment; filename=%s' % str(filename))
         zf_saved = zipfile.ZipFile(StringIO.StringIO(response.body))
-        self.assertEqual(zf_saved.namelist(), ['The title for ZIP download handler test!.yaml'])
-        
+        self.assertEqual(
+            zf_saved.namelist(),
+            ['The title for ZIP download handler test!.yaml'])
+
         # Load golden zip file
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')) as f:
+        with open(os.path.join(
+                feconf.TESTS_DATA_DIR, 
+                'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
-        self.assertEqual(zf_gold.namelist(), ['The title for ZIP download handler test!.yaml'])
 
         # Compare saved with golden file
         self.assertEqual(
-            zf_saved.open('The title for ZIP download handler test!.yaml').read(), zf_gold.open('The title for ZIP download handler test!.yaml').read())
+            zf_saved.open(
+                'The title for ZIP download handler test!.yaml'
+                ).read(),
+            zf_gold.open(
+                'The title for ZIP download handler test!.yaml'
+                ).read())
 
         self.logout()
         
