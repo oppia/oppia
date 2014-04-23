@@ -59,8 +59,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       forbidNodeDeletion: '@',
       stateStats: '=',
       allowPanning: '@',
-      currentStateName: '=',
-      expStats: '='
+      currentStateName: '='
     },
     link: function(scope, element, attrs) {
       // The maximum number of nodes to show in a row.
@@ -81,7 +80,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             newVal.nodes, newVal.links, newVal.initStateName, newVal.finalStateName,
             scope.nodeFill, scope.opacityMap, scope.forbidNodeDeletion,
             scope.highlightStates, scope.stateStats, scope.allowPanning,
-            scope.currentStateName, scope.expStats
+            scope.currentStateName
           );
         }
       });
@@ -92,7 +91,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             scope.val.nodes, scope.val.links, scope.val.initStateName,
             scope.val.finalStateName, scope.nodeFill, scope.opacityMap,
             scope.forbidNodeDeletion, scope.highlightStates, scope.stateStats,
-            scope.allowPanning, scope.currentStateName, scope.expStats
+            scope.allowPanning, scope.currentStateName
           );
         }
       })
@@ -293,13 +292,12 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         return nodeData;
       }
 
-      function isStateFlagged(name, highlightStates, expStats, stateStats) {
+      function isStateFlagged(name, highlightStates, stateStats) {
           var isHighlightState = (highlightStates && name in highlightStates);
-          var flagged = (expStats && name in expStats.stateInfos);
           var hasFeedback = (
             stateStats && stateStats[name] &&
             Object.keys(stateStats[name].readerFeedback).length > 0);
-          return (isHighlightState || hasFeedback || flagged);
+          return (isHighlightState || hasFeedback);
       }
 
       function drawGraph(nodes, links, initStateName, finalStateName, nodeFill,

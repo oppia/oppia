@@ -18,7 +18,9 @@
 * @author yanamal@google.com (Yana Malysheva)
 */
 
-function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+function Moderator(
+    $scope, $http, $rootScope, warningsData, oppiaRequestCreator,
+    oppiaDateFormatter) {
 
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
@@ -37,8 +39,7 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
   };
 
   $scope.getHumanReadableDate = function(millisSinceEpoch) {
-    var date = new Date(millisSinceEpoch);
-    return date.toUTCString();
+    return oppiaDateFormatter.getHumanReadableDate(millisSinceEpoch);
   };
 
   $scope.getExplorationCreateUrl = function(explorationId) {
@@ -80,4 +81,6 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
 /**
 * Injects dependencies in a way that is preserved by minification.
 */
-Moderator.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+Moderator.$inject = [
+  '$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator',
+  'oppiaDateFormatter'];

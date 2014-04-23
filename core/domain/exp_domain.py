@@ -127,8 +127,7 @@ class ExplorationCommitLogEntry(object):
     def to_dict(self):
         """This omits created_on, user_id and (for now) commit_cmds."""
         return {
-            # Represented as milliseconds since the Epoch.
-            'last_updated': time.mktime(self.last_updated.timetuple()) * 1000,
+            'last_updated': utils.get_time_in_millisecs(self.last_updated),
             'username': self.username,
             'exploration_id': self.exploration_id,
             'commit_type': self.commit_type,

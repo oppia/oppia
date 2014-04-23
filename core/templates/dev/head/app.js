@@ -103,3 +103,19 @@ oppia.factory('oppiaRequestCreator', [function() {
     }
   };
 }]);
+
+// Service for converting dates in milliseconds since the Epoch to
+// human-readable dates.
+oppia.factory('oppiaDateFormatter', [function() {
+  return {
+    getHumanReadableDate: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
+      return date.toUTCString();
+    },
+    getLocaleString: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
+      return date.toLocaleString();
+    }
+  };
+}]);
+

@@ -91,6 +91,8 @@ urls = [
     webapp2.Route(
         r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(
+        r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
@@ -112,6 +114,13 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.LEARN_GALLERY_DATA_URL, galleries.LearnHandler,
         'learn_gallery_handler'),
+
+    get_redirect_route(
+        r'%s' % feconf.PLAYTEST_GALLERY_URL, galleries.PlaytestPage,
+        'playtest_gallery_page'),
+    get_redirect_route(
+        r'%s' % feconf.PLAYTEST_GALLERY_DATA_URL, galleries.PlaytestHandler,
+        'playtest_gallery_handler'),
 
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,

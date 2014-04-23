@@ -65,9 +65,14 @@
               <dt><div class="oppia-feedback-status label">
                 <[f.status]>
               </div></dt>
-              <dd><div class="oppia-feedback-content">
-                <[f.content]>
-              </div></dd>
+              <dd>
+                <div class="oppia-feedback-content">
+                  <[f.content]>
+                </div>
+                <div class="oppia-feedback-reader-link">
+                  <em>for exploration: <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a></em>
+                </div>
+              </dd>
             </div>
           </dl>
         </div>

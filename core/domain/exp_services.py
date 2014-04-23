@@ -95,7 +95,8 @@ def get_new_exploration_id():
 
 
 # Query methods.
-def _get_explorations_summary_dict(exploration_rights):
+def _get_explorations_summary_dict(
+        exploration_rights, include_timestamps=False):
     """Returns exploration summaries corresponding to the given rights objects.
 
     The summary is a dict that is keyed by exploration id. Each value is a dict
@@ -103,9 +104,10 @@ def _get_explorations_summary_dict(exploration_rights):
     is the rights object, represented as a dict.
     """
     exp_ids = [rights.id for rights in exploration_rights]
+    exploration_models = exp_models.ExplorationModel.get_multi(exp_ids)
     explorations = [
         (get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+        for e in exploration_models]
 
     result = {}
     for ind, exploration in enumerate(explorations):
@@ -117,15 +119,52 @@ def _get_explorations_summary_dict(exploration_rights):
             result[exploration.id] = {
                 'title': exploration.title,
                 'category': exploration.category,
-                'rights': exploration_rights[ind].to_dict()
+                'rights': exploration_rights[ind].to_dict(),
             }
+            if include_timestamps:
+                result[exploration.id]['last_updated'] = (
+                    utils.get_time_in_millisecs(
+                        exploration_models[ind].last_updated))
     return result
 
+def get_exploration_titles(exp_ids):
+    """Returns exploration titles for the given ids.
 
-def get_non_private_explorations_summary_dict():
-    """Returns a summary of non-private explorations."""
+    The result is a dict with exploration ids as keys and their corresponding
+    titles as the values.
+    """
+    explorations = [
+        (get_exploration_from_model(e) if e else None)
+        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+
+    result = {}
+    for ind, exploration in enumerate(explorations):
+        if exploration is None:
+            logging.error(
+                'Could not find exploration corresponding to id')
+        else:
+            result[exploration.id] = exploration.title
+    return result
+
+def get_recently_edited_public_explorations_summary_dict():
+    """Returns a summary of recently edited public (beta) explorations."""
+    # TODO(sll): This is inefficient and not page-able; replace this once we
+    # have an easily-queryable list of explorations.
     return _get_explorations_summary_dict(
-        rights_manager.get_non_private_exploration_rights())
+        rights_manager.get_public_exploration_rights(),
+        include_timestamps=True)
+
+
+def get_public_explorations_summary_dict():
+    """Returns a summary of public (beta) explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_public_exploration_rights())
+
+
+def get_publicized_explorations_summary_dict():
+    """Returns a summary of publicized explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_publicized_exploration_rights())
 
 
 def get_community_owned_explorations_summary_dict():
@@ -134,7 +173,8 @@ def get_community_owned_explorations_summary_dict():
         rights_manager.get_community_owned_exploration_rights())
 
 
-def get_explicit_viewer_explorations_summary_dict(user_id):
+def get_explicit_viewer_explorations_summary_dict(
+        user_id, include_timestamps=False):
     """Returns a summary of some viewable explorations for this user.
 
     These explorations have the user explicitly listed in the viewer_ids field.
@@ -146,7 +186,8 @@ def get_explicit_viewer_explorations_summary_dict(user_id):
     query.
     """
     return _get_explorations_summary_dict(
-        rights_manager.get_viewable_exploration_rights(user_id))
+        rights_manager.get_viewable_exploration_rights(user_id),
+        include_timestamps=include_timestamps)
 
 
 def get_explicit_editor_explorations_summary_dict(user_id):

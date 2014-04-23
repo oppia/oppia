@@ -72,13 +72,14 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
             feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
         self.user_id_admin = self.get_user_id_from_email('admin@example.com')
 
-    def save_new_default_exploration(self, exploration_id, owner_id):
+    def save_new_default_exploration(self,
+            exploration_id, owner_id, title='A title'):
         """Saves a new default exploration written by owner_id.
 
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, 'A title', 'A category')
+            exploration_id, title, 'A category')
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -99,14 +100,14 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
-    def test_get_non_private_explorations_summary_dict(self):
+    def test_get_public_explorations_summary_dict(self):
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         self.assertEqual(
-            exp_services.get_non_private_explorations_summary_dict(), {})
+            exp_services.get_public_explorations_summary_dict(), {})
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
         self.assertEqual(
-            exp_services.get_non_private_explorations_summary_dict(), {
+            exp_services.get_public_explorations_summary_dict(), {
                 self.EXP_ID: {
                     'title': 'A title',
                     'category': 'A category',
@@ -124,7 +125,20 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
 
         rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
         self.assertEqual(
-            exp_services.get_non_private_explorations_summary_dict(), {
+            exp_services.get_public_explorations_summary_dict(), {})
+
+    def test_get_publicized_explorations_summary_dict(self):
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+        self.assertEqual(
+            exp_services.get_publicized_explorations_summary_dict(), {})
+
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_publicized_explorations_summary_dict(), {})
+
+        rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertEqual(
+            exp_services.get_publicized_explorations_summary_dict(), {
                 self.EXP_ID: {
                     'title': 'A title',
                     'category': 'A category',
@@ -226,6 +240,21 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.save_new_default_exploration(
             'A new exploration id', self.OWNER_ID)
         self.assertEqual(exp_services.count_explorations(), 2)
+
+    def test_get_exploration_titles(self):
+        self.assertEqual(exp_services.get_exploration_titles([]), {})
+
+        self.save_new_default_exploration('A', self.OWNER_ID, 'TitleA')
+        self.assertEqual(exp_services.get_exploration_titles(['A']),
+            {'A': 'TitleA'})
+
+        self.save_new_default_exploration('B', self.OWNER_ID, 'TitleB')
+        self.assertEqual(exp_services.get_exploration_titles(['A']),
+            {'A': 'TitleA'})
+        self.assertEqual(exp_services.get_exploration_titles(['A', 'B']),
+            {'A': 'TitleA', 'B': 'TitleB'})
+        self.assertEqual(exp_services.get_exploration_titles(['A', 'C']),
+            {'A': 'TitleA'})
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):

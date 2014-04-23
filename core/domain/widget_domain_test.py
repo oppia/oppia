@@ -182,10 +182,10 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
             # In this directory there should only be a config .py file, an
             # html file, a JS file, a response.html file, (optionally) a
-            # directory named 'static' and (optionally) a stats_response.html
-            # file.
+            # directory named 'static', (optionally) a widget JS test file, and
+            # (optionally) a stats_response.html file.
             dir_contents = os.listdir(widget_dir)
-            self.assertLessEqual(len(dir_contents), 7)
+            self.assertLessEqual(len(dir_contents), 8)
 
             optional_dirs_and_files_count = 0
 
@@ -207,6 +207,13 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     widget_dir, '%s.pyc' % widget_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    widget_dir, '%sSpec.js' % widget_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass

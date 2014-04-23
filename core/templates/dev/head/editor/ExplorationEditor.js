@@ -743,8 +743,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
         'numVisits': data.num_visits,
         'numCompletions': data.num_completions,
         'stateStats': data.state_stats,
-        'imp': data.imp,
-        'expInfo': data.exp_info
+        'imp': data.imp
       };
 
       $scope.chartData = [

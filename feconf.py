@@ -125,6 +125,22 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
 
+# An ordered list of links to stand-alone pages to display in the 'About' tab.
+# Each item is a dict with two keys: the human-readable name of the link and
+# the URL of the page.
+ABOUT_PAGES = [{
+    'name': 'About the site',
+    'url': '/about'
+}, {
+    'name': 'Site guidelines',
+    'url': '/site_guidelines',
+}, {
+    'name': 'Blog',
+    'url': 'https://oppiablog.blogspot.com',
+}, {
+    'name': 'Contact',
+    'url': '/contact',
+}]
 
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {
@@ -176,12 +192,9 @@ ALLOWED_WIDGETS = {
         'CodeRepl': {
             'dir': 'extensions/widgets/interactive/CodeRepl'
         },
-        # NOTE: Uncomment the following lines if you want to activate
-        # the music input widget. This widget is still being developed
-        # and is in pre-alpha stage.
-        # 'MusicNotesInput': {
-        #     'dir': 'extensions/widgets/interactive/MusicNotesInput'
-        # },
+        'MusicNotesInput': {
+            'dir': 'extensions/widgets/interactive/MusicNotesInput'
+        },
     }
 }
 
@@ -206,10 +219,7 @@ DEMO_EXPLORATIONS = [
     # please note that Oppia lacks many of the features of a full interactive
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
-    # WARNING: This exploration relies on the music input widget, which is
-    # still in pre-alpha. Uncomment the following line if you want to be able
-    # to load it on the Oppia server.
-    # ('pitch_perfect.yaml', 'Pitch Perfect', 'Music')
+    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music')
 ]
 
 # TODO(sll): Add all other URLs here.
@@ -227,6 +237,8 @@ EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
+PLAYTEST_GALLERY_URL = '/playtest'
+PLAYTEST_GALLERY_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 SPLASH_PAGE_URL = '/'
@@ -237,4 +249,5 @@ NAV_MODE_CONTRIBUTE = 'contribute'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LEARN = 'learn'
+NAV_MODE_PLAYTEST = 'playtest'
 NAV_MODE_PROFILE = 'profile'
