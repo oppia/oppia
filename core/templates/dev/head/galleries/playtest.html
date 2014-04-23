@@ -6,23 +6,23 @@
 
 {% block content %}
   <script type="text/ng-template" id="playtestGallery/gallerySection">
-    <div class="oppia-gallery">
-      <table>
+    <div class="oppia-gallery col-lg-9">
+      <table class="table">
         <tr>
-          <th style="padding-left: 10px; width: 30%; text-align: left;">Exploration</th>
-          <th style="width: 20%"></th>
-          <th style="width: 25%; text-align: left;">Category</th>
-          <th style="width: 25%; text-align: left;">Last updated</th>
+          <th>Exploration</th>
+          <th></th>
+          <th>Category</th>
+          <th>Last updated</th>
         </tr>
         <tr ng-repeat="exploration in explorations track by $index">
           <td>
             <div class="oppia-gallery-tile-top">
               <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
                 <div class="oppia-gallery-tile-description">
-                  <span class="oppia-gallery-tile-title"><[exploration.title]></span>
                   <span class="oppia-gallery-tile-play">
                     <i class="icon-play-circle"></i>
                   </span>
+                  <span class="oppia-gallery-tile-title"><[exploration.title]></span>
                 </div>
               </a>
             </div>
