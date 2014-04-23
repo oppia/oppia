@@ -96,7 +96,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
             hashParts[i].substring(separatorLocation + 1));
         }
 
-        if (!hashDict.tagid || !hashDict.version || !hashDict.secret) {
+        if (!hashDict.version || !hashDict.secret) {
           $log.error('Invalid hash for embedding: ' + hash);
           return;
         }
@@ -112,14 +112,19 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
 
           $log.info(payload);
 
+          var objToSendToParent = {
+            title: messageTitle,
+            payload: payload
+          };
+          if (hashDict.version == '0.0.0') {
+            // Ensure backwards-compatibility.
+            objToSendToParent.sourceTagId = hashDict.tagid;
+            objToSendToParent.secret = hashDict.secret;
+          }
+
           // The targetOrigin needs to be * because any page can iframe an
           // exploration.
-          $window.parent.postMessage(
-            JSON.stringify({
-              title: messageTitle,
-              payload: payload,
-              sourceTagId: hashDict.tagid
-            }), '*');
+          $window.parent.postMessage(JSON.stringify(objToSendToParent), '*');
         } else {
           $log.error('Unknown version for embedding: ' + hashDict.version);
           return;

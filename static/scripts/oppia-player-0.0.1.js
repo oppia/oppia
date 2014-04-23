@@ -14,291 +14,316 @@
 
 /**
  * Insert this script at the bottom of your web page. It will take all the
- * <oppia> tags and render them as iframes to Oppia explorations.
+ * <oppia> tags and render them as iframes of Oppia explorations.
  *
  * @author sll@google.com (Sean Lip)
  */
 
 
 (function() {
-  var OPPIA_EMBED_GLOBALS = {
+  // Prevent duplicate loads of this embedding script.
+  if (window.hasOwnProperty('OPPIA_EMBED_GLOBALS')) {
+    return;
+  }
+
+  window.OPPIA_EMBED_GLOBALS = {
     version: '0.0.1'
   };
 
   /**
    * Logs a message in the console only if the embedding page is on localhost.
    * @param {string} The message to log.
+   * @param {boolean} Whether to log the message only in dev mode.
    */
-  function _log(message) {
-    if (window.location.host.indexOf('localhost') !== -1) {
+  function _debug(message) {
+    if (console && window.location.host.indexOf('localhost') === 0) {
       console.log(message);
     }
   }
 
-  var tagIdToIframeMapping = {};
+  /**
+   * Logs a message in the console.
+   * @param {string} The message to log.
+   */
+  function _log(message) {
+    if (console) {
+      console.log(message);
+    }
+  }
 
   /**
    * Create a random string used for the iframed window to verify that messages
    * sent to it are from the parent that created the iframe.
    */
-  function makeSecret() {
-    var alphanumericChars = (
-      'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789');
-    var SECRET_LENGTH = 64;
-
-    var secret = '';
-    for (var i = 0; i < SECRET_LENGTH; i++) {
-      secret += alphanumericChars.charAt(
-        Math.floor(Math.random() * alphanumericChars.length));
-    }
-    return secret;
+  var SECRET_LENGTH = 64;
+  var secret = '';
+  for (var i = 0; i < SECRET_LENGTH; i++) {
+    secret += String.fromCharCode(65 + Math.floor(Math.random() * 26));
   }
 
-  var secret = makeSecret();
-
-  /**
-   * Receives JSON-encoded messages from embedded Oppia iframes. Each message
-   * has a title and a payload. The structure of the payload depends on what
-   * the title is:
-   *   - 'heightChange': The payload is an Object with the following fields:
-   *         height: a positive integer, and
-   *         scroll: boolean -- scroll down to bottom if true.
-   *   - 'explorationLoaded': The payload is an empty Object.
-   *   - 'stateTransition': The payload is an Object with three keys:
-   *         'oldStateName', 'jsonAnswer' and 'newStateName'. All three of
-   *         these have values of type String.
-   *   - 'explorationReset': The payload is an Object with a single key-value
-   *         pair. The key is 'stateName', and the value is of type String.
-   *   - 'explorationCompleted': The payload is an empty Object.
-   */
-  window.addEventListener('message', function(evt) {
-    try {
-      var data = JSON.parse(evt.data);
-    } catch(error) {
-      return;
-    }
-
-    // Verify that the message comes from the created iframe.
-    if (tagIdToIframeMapping[data.sourceTagId] !== evt.source) {
-      return;
-    }
-
-    _log(data);
-    var iframeNode = document.getElementById(data.sourceTagId);
-
-    switch(data.title) {
-      case 'heightChange':
-        // TODO(sll): Validate that data.payload is a dict with one field
-        // whose key is 'height' and whose value is a positive integer.
-        // TODO(sll): These should pass the iframe source, too (in case there
-        // are multiple oppia iframes on a page).
-        window.OPPIA_PLAYER.onHeightChange(
-          iframeNode, data.payload.height, data.payload.scroll);
-        break;
-      case 'explorationLoaded':
-        window.OPPIA_PLAYER.onExplorationLoaded(iframeNode);
-        break;
-      case 'stateTransition':
-        window.OPPIA_PLAYER.onStateTransition(
-          iframeNode, data.payload.oldStateName, data.payload.jsonAnswer,
-          data.payload.newStateName);
-        break;
-      case 'explorationReset':
-        // This needs to be set in order to allow the scrollHeight of the
-        // iframe content to be calculated accurately within the iframe's JS.
-        iframeNode.style.height = 'auto';
-        window.OPPIA_PLAYER.onExplorationReset(
-          iframeNode, data.payload.stateName);
-        break;
-      case 'explorationCompleted':
-        window.OPPIA_PLAYER.onExplorationCompleted(iframeNode);
-        break;
-      default:
-        if (console) {
-          console.log('Error: event ' + data.title + ' not recognized.');
-        }
-    }
-  }, false);
-
-  function generateNewRandomId() {
-    while (true) {
-      var ID_LENGTH = 12;
-      var generatedId = '';
-      for (var i = 0; i < ID_LENGTH; i++) {
-        generatedId += String.fromCharCode(65 + Math.floor(Math.random() * 26));
-      }
-      if (!document.getElementById(generatedId)) {
-        return generatedId;
-      }
-    }
-  }
-
-  // Maps Oppia iframe ids to loading div ids.
-  var oppiaNodeIdsToLoadingDivIds = {};
-
-  /**
-   * Transforms an <oppia/> tag into an iframe that embeds an Oppia exploration.
-   * The following attributes on the tag are recognized:
-   *   - oppia-id (mandatory): The id of the Oppia exploration to embed.
-   *   - src: The server hosting the Oppia exploration. Defaults to the current
-   *       server.
-   *   - locale: The preferred locale. Defaults to 'en' (which is the only one
-   *       that is currently implemented).
-   *   - height: The non-changing height of the iframe (can be specified as
-   *       standard CSS). If not set, defaults to an initial height of 700px
-   *       and is allowed to change when the iframe content changes.
-   *   - width: The non-changing width of the iframe (can be specified as
-   *       standard CSS). If not set, defaults to an initial width of 700px and
-   *       is allowed to change when the iframe content changes.
-   *   - exploration-version: The version number of the exploration.
-   *   - autoload: If true, loads the exploration automatically, otherwise
-   *       prompts the user before loading the exploration.
-   *
-   * @param {DOMNode} oppiaNode The DOM node that corresponds to the <oppia/>
-   *       tag.
-   */
-  function reloadOppiaTag(oppiaNode) {
-    if (!oppiaNode.getAttribute('oppia-id')) {
-      if (console) {
-        console.log('Error: oppia node has no id.');
+  var OppiaEmbed = (function() {
+    function OppiaEmbed(oppiaNode) {
+      // Validate the incoming node.
+      if (oppiaNode.tagName !== 'oppia') {
+        _log('Error: expected OppiaEmbed to be defined using a node of type ' +
+             '<oppia>, not ' + oppiaNode.tagName);
       }
 
-      var div = document.createElement('div');
+      // This attribute is set to true when the iframe has loaded.
+      this.contentHasLoaded = false;
+      // The domain of the embedded site.
+      this.targetDomain = null;
 
-      var strongTag = document.createElement('strong');
-      strongTag.textContent = 'Warning: ';
-      div.appendChild(strongTag);
+      // The initial <oppia> node.
+      this.oppiaNode = oppiaNode;
+      // The loading message div that replaces the <oppia> node while the
+      // exploration is being loaded.
+      this.loadingDiv = null;
+      // The iframe node containing the exploration; this node ultimately
+      // replaces the <oppia> node.
+      this.iframe = null;
+    }
 
-      var spanTag = document.createElement('span');
-      spanTag.textContent = (
+    var LOADING_TIMEOUT_SECS = 10000;
+    var warningBoxStyle = (
+      'background-color: #ddd; border-radius: 5px; margin: 1px auto; ' +
+      'max-width: 700px; padding: 30px; text-align: center');
+
+    OppiaEmbed.prototype.init = function() {
+      if (this.contentHasLoaded) {
+        _log('Error: tried to re-initialize Oppia node after its content ' +
+             'was loaded.');
+        return;
+      }
+
+      if (this.iframe !== null) {
+        _log('Error: tried to initialize Oppia node, but the exploration ' +
+             'iframe is already loaded.');
+        return;
+      }
+
+      var that = this;
+
+      if (!this.oppiaNode.getAttribute('oppia-id')) {
+        var strongTag = document.createElement('strong');
+        strongTag.textContent = 'Warning: ';
+
+        var spanTag = document.createElement('span');
+        spanTag.textContent = (
           'This Oppia exploration could not be loaded because no ' +
           'oppia-id attribute was specified in the HTML tag.');
-      div.appendChild(spanTag);
 
-      var divStyles = [
-        'background-color: #eee',
-        'border-radius: 5px',
-        'font-size: 1.2em',
-        'margin: 10px',
-        'padding: 10px',
-        'width: 70%'
-      ];
-      div.setAttribute('style', divStyles.join('; ') + ';');
-      oppiaNode.parentNode.replaceChild(div, oppiaNode);
-      return;
+        var div = document.createElement('div');
+        div.appendChild(strongTag);
+        div.appendChild(spanTag);
+        div.setAttribute('style', warningBoxStyle);
+
+        this.oppiaNode.parentNode.replaceChild(div, this.oppiaNode);
+        return;
+      }
+
+      var autoload = this.oppiaNode.getAttribute('autoload') || true;
+      if (autoload && autoload === 'false') {
+        // Do not load the exploration automatically.
+        var button = document.createElement('button');
+        button.textContent = 'Load Exploration';
+        button.onclick = function() {
+          that.init();
+        };
+        var buttonStyles = [
+          'background-color: rgb(95, 201, 95)',
+          'border-radius: 5px',
+          'color: white',
+          'font-size: 1.2em',
+          'height: 50px',
+          'padding: 10px',
+          'width: 700px'
+        ];
+        button.setAttribute('style', buttonStyles.join('; ') + ';');
+
+        var buttonContainer = document.createElement('div');
+        buttonContainer.setAttribute(
+          'style', 'margin: 10px auto; text-align: center');
+        buttonContainer.appendChild(button);
+        this.oppiaNode.appendChild(buttonContainer);
+
+        // Set autoload to true so that the frame actually does load the next
+        // time init() is called on this node.
+        this.oppiaNode.setAttribute('autoload', 'true');
+        return;
+      }
+
+      this.iframe = document.createElement('iframe');
+      var currLoc = window.location.protocol + '//' + window.location.host;
+      this.targetDomain = this.oppiaNode.getAttribute('src') || currLoc;
+      var locale = this.oppiaNode.getAttribute('locale') || 'en';
+      var height = this.oppiaNode.getAttribute('height');
+      var width = this.oppiaNode.getAttribute('width');
+      var fixedHeight = 'false';
+      var fixedWidth = 'false';
+      var explorationVersion = this.oppiaNode.getAttribute('exploration-version') || '';
+
+      if (!height || height == 'auto') {
+        // The default height is 700px.
+        height = '700px';
+      } else {
+        fixedHeight = 'true';
+      }
+
+      if (!width || width == 'auto') {
+        // The default width is 98%. This leaves room for the vertical scrollbar
+        // (otherwise we get a horizontal scrollbar when there's a vertical
+        // scrollbar).
+        width = '98%';
+      } else {
+        fixedWidth = 'true';
+      }
+
+      var VERSION_KEY = 'version=';
+      var SECRET_KEY = 'secret=';
+      var versionString = explorationVersion ? '&v=' + explorationVersion : '';
+      this.iframe.src = encodeURI(
+        this.targetDomain + '/explore/' + this.oppiaNode.getAttribute('oppia-id') +
+        '?iframed=true&locale=en' + versionString +
+        '#' + VERSION_KEY + OPPIA_EMBED_GLOBALS.version +
+        '&' + SECRET_KEY + secret);
+
+      var iframeAttrs = {
+        seamless: 'seamless',
+        height: height,
+        width: width,
+        fixedheight: fixedHeight,
+        fixedwidth: fixedWidth,
+        frameborder: 0,
+        // Hide the iframe first so that autofocus will not scroll the page.
+        style: 'margin: 10px; position: fixed; top: -9999px; visibility: hidden;'
+      };
+      for (var key in iframeAttrs) {
+        this.iframe.setAttribute(key, iframeAttrs[key]);
+      }
+
+      this.oppiaNode.parentNode.replaceChild(this.iframe, this.oppiaNode);
+
+      // Create a div with a loading message.
+      var loadingMessageSpan = document.createElement('span');
+      loadingMessageSpan.style.fontSize = 'larger';
+      loadingMessageSpan.textContent = 'Loading...';
+
+      var loadingMessageContainer = document.createElement('div');
+      loadingMessageContainer.setAttribute('style', warningBoxStyle);
+      loadingMessageContainer.appendChild(loadingMessageSpan);
+      loadingMessageContainer.style.textAlign = 'center';
+
+      this.loadingDiv = document.createElement('div');
+      this.loadingDiv.appendChild(loadingMessageContainer);
+      this.loadingDiv.appendChild(document.createElement('br'));
+      this.loadingDiv.appendChild(document.createElement('br'));
+
+      this.iframe.parentNode.insertBefore(this.loadingDiv, this.iframe);
+
+      setTimeout(function() {
+        // Show a warning message after the timeout.
+        if (!that.contentHasLoaded) {
+          var loadingMessageContainer = that.loadingDiv.firstChild;
+          var loadingMessage = loadingMessageContainer.firstChild;
+
+          loadingMessage.textContent = 'This exploration could not be loaded.';
+
+          var loadingMessageSubtitle = document.createElement('div');
+          loadingMessageSubtitle.textContent = 'Sorry about that.';
+
+          loadingMessageContainer.setAttribute('style', warningBoxStyle);
+          loadingMessageContainer.appendChild(document.createElement('br'));
+          loadingMessageContainer.appendChild(document.createElement('br'));
+          loadingMessageContainer.appendChild(loadingMessageSubtitle);
+        }
+      }, LOADING_TIMEOUT_SECS);
+
+      /**
+       * Receives JSON-encoded messages from embedded Oppia iframes. Each
+       * message has a title and a payload. The structure of the payload
+       * depends on what the title is:
+       *   - 'heightChange': The payload is an Object with the following fields:
+       *         height: a positive integer, and
+       *         scroll: boolean -- scroll down to bottom if true.
+       *   - 'explorationLoaded': The payload is an empty Object.
+       *   - 'stateTransition': The payload is an Object with three keys:
+       *       'oldStateName', 'jsonAnswer' and 'newStateName'. All three of
+       *       these have values of type String.
+       *   - 'explorationReset': The payload is an Object with a single
+       *          key-value pair. The key is 'stateName', and the value is of
+       *          type String.
+       *   - 'explorationCompleted': The payload is an empty Object.
+       */
+      window.addEventListener('message', function(evt) {
+        // Verify the origin of the message.
+        if (evt.origin !== that.targetDomain) {
+          return false;
+        }
+
+        // Verify that the message comes from the child we know about.
+        if (evt.source !== that.iframe.contentWindow) {
+          return false;
+        }
+
+        try {
+          var data = JSON.parse(evt.data);
+          _debug(data);
+        } catch(error) {
+          return false;
+        }
+
+        var iframeNode = that.iframe;
+        switch(data.title) {
+          case 'explorationLoaded':
+            that.loadingDiv.parentNode.removeChild(that.loadingDiv);
+            that.explorationHasLoaded = true;
+            window.OPPIA_PLAYER.onExplorationLoaded(iframeNode);
+            break;
+          case 'heightChange':
+            window.OPPIA_PLAYER.onHeightChange(
+              iframeNode, data.payload.height, data.payload.scroll);
+            break;
+          case 'stateTransition':
+            window.OPPIA_PLAYER.onStateTransition(
+              iframeNode, data.payload.oldStateName, data.payload.jsonAnswer,
+              data.payload.newStateName);
+            break;
+          case 'explorationReset':
+            // This needs to be set in order to allow the scrollHeight of the
+            // iframe content to be calculated accurately within the iframe's
+            // JS.
+            iframeNode.style.height = 'auto';
+            window.OPPIA_PLAYER.onExplorationReset(
+              iframeNode, data.payload.stateName);
+            break;
+          case 'explorationCompleted':
+            window.OPPIA_PLAYER.onExplorationCompleted(iframeNode);
+            break;
+          default:
+            _log('Error: event ' + data.title + ' not recognized.');
+        }
+      }, false);
     }
 
-    var autoload = oppiaNode.getAttribute('autoload') || true;
-    if (autoload && autoload === 'false') {
-      // Do not load the exploration automatically.
-      var button = document.createElement('button');
-      button.textContent = 'Load Oppia Exploration';
-      button.setAttribute('onclick', 'reloadParentOppiaTag(this)');
-      var buttonStyles = [
-        'background-color: green',
-        'border-radius: 5px',
-        'color: white',
-        'font-size: 1.2em',
-        'height: 50px',
-        'margin: 10px',
-        'padding: 10px',
-        'width: 50%'
-      ];
-      button.setAttribute('style', buttonStyles.join('; ') + ';');
-      oppiaNode.appendChild(button);
-
-      // Set autoload to true so that the frame actually does load the next time
-      // reloadOppiaTag() is called on this node.
-      oppiaNode.setAttribute('autoload', 'true');
-      return;
-    }
-
-    var iframe = document.createElement('iframe');
-
-    var currLoc = window.location.protocol + '//' + window.location.host;
-    var locale = oppiaNode.getAttribute('locale') || 'en';
-    var height = oppiaNode.getAttribute('height');
-    var width = oppiaNode.getAttribute('width');
-    var fixedHeight = 'false';
-    var fixedWidth = 'false';
-    var explorationVersion = oppiaNode.getAttribute('exploration-version') || '';
-
-    var tagId = oppiaNode.getAttribute('id') || generateNewRandomId();
-
-    if (!height || height == 'auto') {
-      // The default height is 700px.
-      height = '700px';
-    } else {
-      fixedHeight = 'true';
-    }
-
-    if (!width || width == 'auto') {
-      // The default width is 98%. This leaves room for the vert scrollbar
-      // (otherwise we get a horiz scrollbar when there's a vert scrollbar).
-      width = '98%';
-    } else {
-      fixedWidth = 'true';
-    }
-
-    var TAG_ID_KEY = 'tagid=';
-    var VERSION_KEY = 'version=';
-    var SECRET_KEY = 'secret=';
-
-    // TODO(sll): Properly handle the case where ids are manually set, but are
-    // not unique.
-    iframe.setAttribute('id', tagId);
-    var versionString = explorationVersion ? '&v=' + explorationVersion : '';
-    iframe.setAttribute('src', encodeURI(
-      (oppiaNode.getAttribute('src') || currLoc) +
-      '/explore/' + oppiaNode.getAttribute('oppia-id') +
-      '?iframed=true&locale=en' + versionString +
-      '#' + TAG_ID_KEY + tagId +
-      '&' + VERSION_KEY + OPPIA_EMBED_GLOBALS.version +
-      '&' + SECRET_KEY + secret));
-    iframe.setAttribute('seamless', 'seamless');
-    iframe.setAttribute('height', height);
-    iframe.setAttribute('width', width);
-    iframe.setAttribute('fixedheight', fixedHeight);
-    iframe.setAttribute('fixedwidth', fixedWidth);
-    iframe.setAttribute('frameborder', 0);
-    iframe.setAttribute('style', 'margin: 10px;');
-
-    // Hide the iframe first so that autofocus will not scroll the page.
-    iframe.style.position = 'fixed';
-    iframe.style.top = '-9999px';
-    iframe.style.visibility = 'hidden';
-
-    oppiaNode.parentNode.replaceChild(iframe, oppiaNode);
-
-    // Create a div with a loading message.
-    var loadingDivId = tagId + '-loading';
-
-    var loadingDiv = document.createElement('div');
-    loadingDiv.setAttribute('id', loadingDivId);
-    var loadingMessageContainer = document.createElement('center');
-    var loadingMessageSpan = document.createElement('span');
-    loadingMessageSpan.style.fontSize = 'larger';
-    loadingMessageSpan.textContent = 'Loading...';
-
-    iframe.parentNode.appendChild(loadingDiv);
-    loadingDiv.appendChild(loadingMessageContainer);
-    loadingDiv.appendChild(document.createElement('br'));
-    loadingDiv.appendChild(document.createElement('br'));
-    loadingMessageContainer.appendChild(loadingMessageSpan);
-
-    oppiaNodeIdsToLoadingDivIds[tagId] = loadingDivId;
-    tagIdToIframeMapping[tagId] = iframe.contentWindow;
-  }
-
-  function reloadParentOppiaTag(buttonNode) {
-    reloadOppiaTag(buttonNode.parentNode);
-  }
+    return OppiaEmbed;
+  })();
 
   window.onload = function() {
     // Note that document.getElementsByTagName() is a live view of the DOM and
-    // will change in response to DOM multations.
-    while (document.getElementsByTagName('oppia').length > 0) {
-      reloadOppiaTag(document.getElementsByTagName('oppia')[0]);
+    // will change in response to DOM mutations.
+    var oppiaElementsFromDOM = document.getElementsByTagName('oppia');
+
+    // The oppiaElementsFromDOM list needs to be copied, otherwise it gets
+    // changed during the for loop.
+    var oppiaElements = [];
+    for (var i = 0; i < oppiaElementsFromDOM.length; i++) {
+      oppiaElements.push(oppiaElementsFromDOM[i]);
+    }
+
+    for (var i = 0; i < oppiaElements.length; i++) {
+      var oppiaElement = new OppiaEmbed(oppiaElements[i]);
+      oppiaElement.init();
     }
   };
 
@@ -312,7 +337,9 @@
      *     changing the height.
      */
     onHeightChange: function(iframeNode, newHeight, doScroll) {
-      _log('onHeightChange event triggered on ' + iframeNode + ' for ' + newHeight);
+      _debug(
+        'onHeightChange event triggered on ' + iframeNode + ' for ' +
+        newHeight);
 
       // This is set to 'auto' when the exploration is reset. If this is not
       // removed, the iframe height will not change even if iframeNode.height
@@ -329,14 +356,6 @@
       window.OPPIA_PLAYER.onHeightChangePostHook(iframeNode, newHeight);
     },
     onExplorationLoaded: function(iframeNode) {
-      // Remove the loading-message div.
-      var nodeId = iframeNode.getAttribute('id');
-      var nodeToRemove = document.getElementById(
-        oppiaNodeIdsToLoadingDivIds[nodeId]);
-      if (nodeToRemove) {
-        nodeToRemove.parentNode.removeChild(nodeToRemove);
-      }
-
       setTimeout(function() {
         // Show the oppia contents after making sure the rendering happened.
         iframeNode.style.position = 'inherit';
@@ -359,6 +378,7 @@
 }(window, document));
 
 
+// FIXME: The contents of all functions below this line can be overwritten.
 
 /**
  * Called after the height of the embedded iframe is changed and the iframe has
@@ -368,12 +388,7 @@
  * @param {int} newHeight The new height of the embedded iframe.
  */
 window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
-  // FIXME: This function can be overwritten.
-  if (console && window.location.host.indexOf('localhost') !== -1) {
-    console.log(
-      'onHeightChangePostHook event triggered on ' + iframeNode + '.');
-    console.log(newHeight);
-  }
+
 };
 
 /**
@@ -382,10 +397,7 @@ window.OPPIA_PLAYER.onHeightChangePostHook = function(iframeNode, newHeight) {
  *     postMessage call.
  */
 window.OPPIA_PLAYER.onExplorationLoadedPostHook = function(iframeNode) {
-  // FIXME: This function can be overwritten.
-  if (console && window.location.host.indexOf('localhost') !== -1) {
-    console.log('onExplorationLoaded event triggered on ' + iframeNode + '.');
-  }
+
 };
 
 /**
@@ -398,13 +410,7 @@ window.OPPIA_PLAYER.onExplorationLoadedPostHook = function(iframeNode) {
  */
 window.OPPIA_PLAYER.onStateTransitionPostHook = function(
     iframeNode, oldStateName, jsonAnswer, newStateName) {
-  // FIXME: This function can be overwritten.
-  if (console && window.location.host.indexOf('localhost') !== -1) {
-    console.log('onStateTransition event triggered on ' + iframeNode + '.');
-    console.log(oldStateName);
-    console.log(jsonAnswer);
-    console.log(newStateName);
-  }
+
 };
 
 /**
@@ -414,11 +420,7 @@ window.OPPIA_PLAYER.onStateTransitionPostHook = function(
  * @param {string} stateName The reader's current state, before the reset.
  */
 window.OPPIA_PLAYER.onExplorationResetPostHook = function(iframeNode, stateName) {
-  // FIXME: This function can be overwritten.
-  if (console && window.location.host.indexOf('localhost') !== -1) {
-    console.log('onExplorationReset event triggered on ' + iframeNode + '.');
-    console.log(stateName);
-  }
+
 };
 
 /**
@@ -427,9 +429,5 @@ window.OPPIA_PLAYER.onExplorationResetPostHook = function(iframeNode, stateName)
  *     postMessage call.
  */
 window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
-  // FIXME: This function can be overwritten.
-  if (console && window.location.host.indexOf('localhost') !== -1) {
-    console.log(
-      'onExplorationCompleted event triggered on ' + iframeNode + '.');
-  }
+
 };
