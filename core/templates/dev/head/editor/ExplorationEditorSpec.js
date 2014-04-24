@@ -244,8 +244,8 @@ describe('Exploration title service', function() {
     it('updates the memento with the displayed title', function() {
       ets.init('A title');
       ets.displayed = 'New title';
-      expect(ets.savedMemento).toEqual('A title');      
-      ets.updateMemento();
+      expect(ets.savedMemento).toEqual('A title');
+      ets.saveDisplayedValue();
       expect(ets.savedMemento).toEqual('New title');
     });
 
@@ -259,8 +259,78 @@ describe('Exploration title service', function() {
       ets.displayed = 'A title';
       expect(ets.hasChanged()).toBe(false);
 
-      ets.updateMemento();
+      ets.saveDisplayedValue();
       expect(ets.hasChanged()).toBe(false);
+    });
+  });
+});
+
+
+describe('Exploration rights service', function() {
+  beforeEach(module('oppia'));
+
+  describe('exploration rights service', function() {
+    var ers = null;
+
+    beforeEach(inject(function($injector) {
+      ers = $injector.get('explorationRightsService');
+
+      GLOBALS.EXPLORATION_STATUS_PRIVATE = 'private';
+      GLOBALS.EXPLORATION_STATUS_PUBLIC = 'public';
+      GLOBALS.EXPLORATION_STATUS_PUBLICIZED = 'publicized';
+    }));
+
+    it('correctly initializes the service', function() {
+      expect(ers.ownerNames).toBeNull();
+      expect(ers.editorNames).toBeNull();
+      expect(ers.viewerNames).toBeNull();
+      expect(ers._status).toBeNull();
+      expect(ers._clonedFrom).toBeNull();
+      expect(ers._isCommunityOwned).toBeNull();
+
+      ers.init(['abc'], [], [], 'private', 'e1234', true);
+
+      expect(ers.ownerNames).toEqual(['abc']);
+      expect(ers.editorNames).toEqual([]);
+      expect(ers.viewerNames).toEqual([]);
+      expect(ers._status).toEqual('private');
+      expect(ers._clonedFrom).toEqual('e1234');
+      expect(ers._isCommunityOwned).toBe(true);
+    });
+
+    it('reports the correct derived statuses', function() {
+      ers.init(['abc'], [], [], 'private', 'e1234', true);
+      expect(ers.isPrivate()).toBe(true);
+      expect(ers.isPublic()).toBe(false);
+      expect(ers.isPublicized()).toBe(false);
+
+      ers.init(['abc'], [], [], 'public', 'e1234', true);
+      expect(ers.isPrivate()).toBe(false);
+      expect(ers.isPublic()).toBe(true);
+      expect(ers.isPublicized()).toBe(false);
+
+      ers.init(['abc'], [], [], 'publicized', 'e1234', true);
+      expect(ers.isPrivate()).toBe(false);
+      expect(ers.isPublic()).toBe(false);
+      expect(ers.isPublicized()).toBe(true);
+    });
+
+    it('reports the correct cloning status', function() {
+      ers.init(['abc'], [], [], 'publicized', '1234', true);
+      expect(ers.isCloned()).toBe(true);
+      expect(ers.clonedFrom()).toEqual('1234');
+
+      ers.init(['abc'], [], [], 'publicized', null, true);
+      expect(ers.isCloned()).toBe(false);
+      expect(ers.clonedFrom()).toBeNull();
+    });
+
+    it('reports the correct community-owned status', function() {
+      ers.init(['abc'], [], [], 'publicized', '1234', false);
+      expect(ers.isCommunityOwned()).toBe(false);
+
+      ers.init(['abc'], [], [], 'publicized', '1234', true);
+      expect(ers.isCommunityOwned()).toBe(true);
     });
   });
 });

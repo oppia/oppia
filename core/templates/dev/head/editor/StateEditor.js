@@ -20,7 +20,7 @@
 
 function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   warningsData, activeInputData, oppiaRequestCreator, editorContextService,
-  changeListService) {
+  changeListService, validatorsService) {
 
   $scope.$on('guiTabSelected', function(evt) {
     $scope.initStateEditor();
@@ -31,6 +31,10 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       $log.error('Attempted to open state editor outside a state context.');
       return;
     }
+
+    explorationData.getData().then(function(data) {
+      $scope.paramSpecs = data.param_specs || {};
+    });
 
     $scope.stateNameEditorIsShown = false;
 
@@ -96,7 +100,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   };
 
   $scope._getNormalizedStateName = function(newStateName) {
-    return $scope.normalizeWhitespace(newStateName);
+    return $filter('normalizeWhitespace')(newStateName);
   };
 
   $scope.saveStateNameAndRefresh = function(newStateName) {
@@ -107,7 +111,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope._getNormalizedStateName(newStateName);
-    if (!$scope.isValidEntityName(newStateName, true)) {
+    if (!validatorsService.isValidEntityName(newStateName, true)) {
       return;
     }
     if (newStateName.length > 50) {
@@ -192,4 +196,4 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
 StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
     'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator',
-    'editorContextService', 'changeListService'];
+    'editorContextService', 'changeListService', 'validatorsService'];

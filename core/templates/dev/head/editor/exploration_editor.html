@@ -204,11 +204,11 @@
     </script>
 
     <div class="container">
-      <div class="row" ng-if="isCloned">
+      <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="span12">
           <div class="oppia-align-center oppia-warning">
             <strong>Note:</strong> This is a private, unpublishable copy of a
-            <a ng-href="<[getExplorationUrl(clonedFrom)]>" target="_blank">public exploration</a>.
+            <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
             You are very welcome to submit feedback to improve the original exploration: to do this,
             click the previous link, then click the green Feedback button on the left of the page.
             Thank you!
@@ -221,7 +221,7 @@
 
           <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
             {% if can_publicize %}
-              <span ng-show="isPublic" class="oppia-exploration-ctrl">
+              <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
                   Move out of beta
                   <span ng-if="currentUserIsAdmin">
@@ -235,7 +235,7 @@
             {% endif %}
 
             {% if can_unpublicize %}
-              <span ng-show="isPublicized" class="oppia-exploration-ctrl">
+              <span ng-show="explorationRightsService.isPublicized()" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
                   Move back into beta
                   <span ng-if="currentUserIsAdmin">
@@ -249,7 +249,7 @@
             {% endif %}
 
             {% if can_publish %}
-              <span ng-show="isPrivate" class="oppia-exploration-ctrl">
+              <span ng-show="explorationRightsService.isPrivate()" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
                   Publish
                 </button>
@@ -260,7 +260,7 @@
             {% endif %}
 
             {% if can_unpublish %}
-              <span ng-show="isPublic" class="oppia-exploration-ctrl">
+              <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
                   Unpublish
                   <span ng-if="currentUserIsAdmin">
@@ -274,7 +274,7 @@
             {% endif %}
 
             {% if can_release_ownership %}
-              <span ng-hide="isCommunityOwned" class="oppia-exploration-ctrl">
+              <span ng-hide="explorationRightsService.isCommunityOwned()" class="oppia-exploration-ctrl">
                 <button type="button" ng-click="showReleaseExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
                   Release Ownership
                 </button>
@@ -294,15 +294,14 @@
               <i class="icon-download-alt"></i>
             </a>
 
-            <button type="button"
-                    ng-if="isPrivate"
+            <button type="button" ng-if="explorationRightsService.isPrivate()"
                     class="btn btn-danger oppia-exploration-ctrl"
                     ng-click="deleteExploration('')"
                     title="Delete this exploration">
               <i class="icon-trash" title="Delete Exploration"></i>
             </button>
 
-            <span ng-if="isPublic && (currentUserIsAdmin || currentUserIsModerator)" class="oppia-exploration-ctrl">
+            <span ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)" class="oppia-exploration-ctrl">
               <button type="button"
                       class="btn btn-danger"
                       ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
@@ -320,16 +319,16 @@
 
           <h3>
             <[explorationTitleService.displayed]>
-            <span ng-if="!isPrivate" class="label label-info">
+            <span ng-if="!explorationRightsService.isPrivate()" class="label label-info">
               Published
             </span>
-            <span ng-if="isPublic" class="label label-info">
+            <span ng-if="explorationRightsService.isPublic()" class="label label-info">
               Beta
             </span>
-            <span ng-if="isCloned" class="label label-info">
+            <span ng-if="explorationRightsService.isCloned()" class="label label-info">
               Cloned
             </span>
-            <span ng-if="isCommunityOwned" class="label label-info">
+            <span ng-if="explorationRightsService.isCommunityOwned()" class="label label-info">
               Community-owned
             </span>
           </h3>
@@ -358,7 +357,7 @@
                 {% include 'editor/exploration_settings.html' %}
               </tab>
 
-              <tab heading="History" active="historyTabActive" select="selectHistoryTab()" ng-disabled="isCloned">
+              <tab heading="History" active="historyTabActive" select="selectHistoryTab()" ng-disabled="explorationRightsService.isCloned()">
                 {% include 'editor/exploration_history.html' %}
               </tab>
             </tabset>
@@ -389,6 +388,7 @@
     {{ include_js_file('components/objectEditor.js') }}
     {{ object_editors_js }}
     {{ include_js_file('editor/StatsViewer.js') }}
+    {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateReaderFeedback.js') }}
     {{ include_js_file('editor/UnresolvedAnswers.js') }}

@@ -72,6 +72,7 @@ oppia.factory('changeListService', [
   var EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES = {
     'title': 'explorationTitle',
     'category': 'explorationCategory',
+    'objective': 'explorationObjective',
     'param_specs': 'paramSpecs',
     'param_changes': 'explorationParamChanges'
   };
@@ -159,8 +160,8 @@ oppia.factory('changeListService', [
       _addChange({
         cmd: CMD_EDIT_EXPLORATION_PROPERTY,
         property_name: backendName,
-        new_value: newValue,
-        old_value: oldValue
+        new_value: angular.copy(newValue),
+        old_value: angular.copy(oldValue)
       });
     },
     /**
@@ -183,8 +184,8 @@ oppia.factory('changeListService', [
         cmd: CMD_EDIT_STATE_PROPERTY,
         state_name: stateName,
         property_name: backendName,
-        new_value: newValue,
-        old_value: oldValue
+        new_value: angular.copy(newValue),
+        old_value: angular.copy(oldValue)
       });
     },
     discardAllChanges: function() {
@@ -206,47 +207,188 @@ oppia.factory('changeListService', [
 }]);
 
 
-// A data service that stores the current exploration title so that it can be displayed
-// and edited in multiple places in the UI.
-oppia.factory('explorationTitleService', [function() {
+oppia.factory('explorationPropertyService', [
+    'changeListService', 'warningsData', function(changeListService, warningsData) {
+  // Public base API for data services corresponding to exploration properties
+  // (title, category, etc.)
   return {
-    // The current value of the title (which may not have been saved yet). In general,
-    // this will be bound directly to the UI.
+    // The current value of the property (which may not have been saved to the
+    // frontend yet). In general, this will be bound directly to the UI.
     displayed: null,
-    // The previous (saved) value of the title.
+    // The previous (saved-in-the-frontend) value of the property. Here, 'saved'
+    // means that this is the latest value of the property as determined by the
+    // frontend change list.
     savedMemento: null,
-    // Initializes the service.
-    init: function(title) {
-      this.displayed = title;
-      this.savedMemento = title;
+    init: function(value) {
+      this.displayed = value;
+      this.savedMemento = value;
     },
-    // Returns whether the title has changed from the memento.
+    // Returns whether the current value has changed from the memento.
     hasChanged: function() {
       return (this.savedMemento !== this.displayed);
     },
-    // Updates the memento to the displayed title. It is the responsibility of
-    // the caller to ensure that an actual save action is performed.
-    updateMemento: function() {
+    // The backend name for this property. THIS MUST BE SPECIFIED BY SUBCLASSES.
+    propertyName: null,
+    // Transforms the given value into a normalized form. THIS CAN BE
+    // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
+    _normalize: function(value) {
+      return value;
+    },
+    // Validates the given value and returns a boolean stating whether it
+    // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
+    // behavior is to always return true.
+    _isValid: function(value) {
+      return true;
+    },
+    // Creates a new entry in the change list, and updates the memento to the
+    // displayed value.
+    saveDisplayedValue: function() {
+      if (this.propertyName === null) {
+        console.error('Property name cannot be null.');
+        return;
+      }
+
+      this.displayed = this._normalize(this.displayed);
+      if (!this._isValid(this.displayed) || !this.hasChanged()) {
+        this.restoreFromMemento();
+        return;
+      }
+
+      warningsData.clear();
+      changeListService.editExplorationProperty(
+        this.propertyName, this.displayed, this.savedMemento);
       this.savedMemento = this.displayed;
     },
-    // Reverts the displayed title to the saved memento.
+    // Reverts the displayed value to the saved memento.
     restoreFromMemento: function() {
       this.displayed = this.savedMemento;
     }
   };
 }]);
 
+// A data service that stores the current exploration title so that it can be
+// displayed and edited in multiple places in the UI.
+oppia.factory('explorationTitleService', [
+    'explorationPropertyService', '$filter', 'validatorsService',
+    function(explorationPropertyService, $filter, validatorsService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'title';
+  child._normalize = function(value) {
+    return $filter('normalizeWhitespace')(value);
+  };
+  child._isValid = function(value) {
+    return validatorsService.isValidEntityName(value, true);
+  };
+  return child;
+}]);
 
-function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $window,
-    $filter, $rootScope, $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
-    editorContextService, changeListService, explorationTitleService) {
+// A data service that stores the current exploration category so that it can be
+// displayed and edited in multiple places in the UI.
+oppia.factory('explorationCategoryService', [
+    'explorationPropertyService', '$filter', 'validatorsService',
+    function(explorationPropertyService, $filter, validatorsService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'category';
+  child._normalize = function(value) {
+    return $filter('normalizeWhitespace')(value);
+  };
+  child._isValid = function(value) {
+    return validatorsService.isValidEntityName(value, true);
+  };
+  return child;
+}]);
+
+// A data service that stores the current exploration objective so that it can be
+// displayed and edited in multiple places in the UI.
+oppia.factory('explorationObjectiveService', [
+    'explorationPropertyService', '$filter', 'validatorsService',
+    function(explorationPropertyService, $filter, validatorsService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'objective';
+  child._normalize = function(value) {
+    return $filter('normalizeWhitespace')(value);
+  };
+  child._isValid = function(value) {
+    return validatorsService.isNonempty(value, true);
+  };
+  return child;
+}]);
+
+// A data service that stores data about the rights for this exploration.
+oppia.factory('explorationRightsService', [
+    '$http', 'explorationData', 'oppiaRequestCreator', 'warningsData',
+    function($http, explorationData, oppiaRequestCreator, warningsData) {
+  return {
+    ownerNames: null,
+    editorNames: null,
+    viewerNames: null,
+    _status: null,
+    _clonedFrom: null,
+    _isCommunityOwned: null,
+    init: function(
+        ownerNames, editorNames, viewerNames, status, clonedFrom,
+        isCommunityOwned) {
+      this.ownerNames = ownerNames;
+      this.editorNames = editorNames;
+      this.viewerNames = viewerNames;
+      this._status = status;
+      // This is null if the exploration was not cloned from anything.
+      this._clonedFrom = clonedFrom;
+      this._isCommunityOwned = isCommunityOwned;
+    },
+    clonedFrom: function() {
+      return this._clonedFrom;
+    },
+    isPrivate: function() {
+      return Boolean(this._status === GLOBALS.EXPLORATION_STATUS_PRIVATE);
+    },
+    isPublic: function() {
+      return Boolean(this._status === GLOBALS.EXPLORATION_STATUS_PUBLIC);
+    },
+    isPublicized: function() {
+      return Boolean(this._status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED);
+    },
+    isCloned: function() {
+      return Boolean(this._clonedFrom);
+    },
+    isCommunityOwned: function() {
+      return this._isCommunityOwned;
+    },
+    saveChangeToBackend: function(requestParameters) {
+      var that = this;
+
+      requestParameters['version'] = explorationData.data.version;
+      var explorationRightsUrl = '/createhandler/rights/' + explorationData.explorationId;
+      $http.put(
+        explorationRightsUrl,
+        oppiaRequestCreator.createRequest(requestParameters),
+        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+          success(function(data) {
+            warningsData.clear();
+            that.init(
+              data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
+              data.rights.status, data.rights.cloned_from, data.rights.community_owned);
+          }).
+          error(function(data) {
+            warningsData.addWarning(
+              data.error || 'Error communicating with server.');
+          });
+    }
+  };
+}]);
+
+
+function ExplorationEditor(
+    $scope, $http, $location, $anchorScroll, $modal, $window, $filter, $rootScope,
+    $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
+    editorContextService, changeListService, explorationTitleService,
+    explorationCategoryService, explorationObjectiveService,
+    explorationRightsService, validatorsService) {
 
   $scope.getActiveStateName = function() {
-    if (editorContextService.isInStateContext()) {
-      return editorContextService.getActiveStateName();
-    } else {
-      return '';
-    }
+    return (
+      editorContextService.isInStateContext() ?
+      editorContextService.getActiveStateName() : '');
   };
 
   $scope.saveActiveState = function() {
@@ -365,8 +507,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
         return;
       }
 
-      if (!$scope.isPrivate && warningMessage) {
-        $log.error(warningMessage);
+      if (!explorationRightsService.isPrivate() && warningMessage) {
         // If the exploration is not private, warnings should be fixed before
         // it can be saved.
         warningsData.addWarning(warningMessage);
@@ -395,7 +536,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
             return deletedStates;
           },
           commitMessageIsOptional: function() {
-            return $scope.isPrivate;
+            return explorationRightsService.isPrivate();
           }
         },
         controller: [
@@ -415,6 +556,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
             $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES = {
               'title': 'Title',
               'category': 'Category',
+              'objective': 'Objective',
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes'
             };
@@ -449,7 +591,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
             };
 
             $scope.formatExplorationPropertyChange = function(propertyName, changeInfo) {
-              if (propertyName == 'title' || propertyName == 'category') {
+              if (['title', 'category', 'objective'].indexOf(propertyName) !== -1) {
                 return $scope._getLongFormPropertyChange(
                   $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                   changeInfo);
@@ -669,7 +811,6 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
-  $scope.explorationRightsUrl = '/createhandler/rights/' + $scope.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
   $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
@@ -789,60 +930,34 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
     // TODO(sll): Initialize the newly displayed field.
   };
 
-  $scope.ROLES = [
-    {name: 'Manager (can edit permissions)', value: 'owner'},
-    {name: 'Collaborator (can make changes)', value: 'editor'},
-    {name: 'Playtester (can give feedback)', value: 'viewer'}
-  ];
-
-  // Initializes the exploration rights information using the rights dict from
-  // the backend.
-  $scope.initExplorationRights = function(rightsData) {
-    $scope.ownerNames = rightsData.owner_names;
-    $scope.editorNames = rightsData.editor_names;
-    $scope.viewerNames = rightsData.viewer_names;
-    $scope.isPrivate = Boolean(
-      rightsData.status === GLOBALS.EXPLORATION_STATUS_PRIVATE);
-    $scope.isPublic = Boolean(
-      rightsData.status === GLOBALS.EXPLORATION_STATUS_PUBLIC);
-    $scope.isPublicized = Boolean(
-      rightsData.status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED);
-    $scope.isCloned = Boolean(rightsData.cloned_from);
-    $scope.clonedFrom = rightsData.cloned_from;
-    $scope.isCommunityOwned = rightsData.community_owned;
-  };
-
   $scope.getExplorationUrl = function(explorationId) {
-    if (explorationId) {
-      return '/explore/' + explorationId;
-    } else {
-      return '';
-    }
+    return explorationId ? ('/explore/' + explorationId) : '';
   };
 
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
-    if (!$scope.explorationTitleService) {
-      $scope.explorationTitleService = explorationTitleService;
-    }
     explorationData.getData().then(function(data) {
+      explorationTitleService.init(data.title);
+      explorationCategoryService.init(data.category);
+      explorationObjectiveService.init(data.objective);
+
+      $scope.explorationTitleService = explorationTitleService;
+      $scope.explorationRightsService = explorationRightsService;
+
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
       $scope.states = angular.copy(data.states);
 
-      $scope.explorationTitleService.init(data.title);
-
-      $scope.explorationCategory = data.category;
-      $scope.explorationCategoryMemento = data.category;
+      $scope.paramSpecs = data.param_specs || {};
 
       $scope.initStateName = data.init_state_name;
       $scope.currentUser = data.user;
-      $scope.paramSpecs = angular.copy(data.param_specs || {});
-      $scope.explorationParamChanges = angular.copy(data.param_changes || []);
       $scope.currentVersion = data.version;
 
-      $scope.initExplorationRights(data.rights);
+      explorationRightsService.init(
+        data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
+        data.rights.status, data.rights.cloned_from, data.rights.community_owned);
 
       $scope.drawGraph();
 
@@ -892,57 +1007,6 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
       finalStateName: END_DEST};
   };
 
-  $scope.saveExplorationTitle = function() {
-    explorationTitleService.displayed = $scope.normalizeWhitespace(
-      explorationTitleService.displayed);
-    if (!$scope.isValidEntityName(explorationTitleService.displayed, true)) {
-      explorationTitleService.restoreFromMemento();
-      return;
-    }
-
-    if (!explorationTitleService.hasChanged()) {
-      return;
-    }
-
-    warningsData.clear();
-    changeListService.editExplorationProperty(
-      'title', explorationTitleService.displayed,
-      explorationTitleService.savedMemento);
-    explorationTitleService.updateMemento();
-  };
-
-  $scope.saveExplorationCategory = function(newValue) {
-    newValue = $scope.normalizeWhitespace(newValue);
-    if (!$scope.isValidEntityName(newValue, true)) {
-      $scope.explorationCategory = $scope.explorationCategoryMemento;
-      return;
-    }
-
-    if (newValue == $scope.explorationCategoryMemento) {
-      return;
-    }
-
-    warningsData.clear();
-    changeListService.editExplorationProperty(
-      'category', newValue, $scope.explorationCategoryMemento);
-    $scope.explorationCategory = newValue;
-    $scope.explorationCategoryMemento = newValue;
-  };
-
-  $scope.saveExplorationParamChanges = function(newValue, oldValue) {
-    if (!angular.equals(newValue, oldValue)) {
-      changeListService.editExplorationProperty(
-        'param_changes', newValue, oldValue);
-    }
-  };
-
-  $scope.$watch('paramSpecs', function(newValue, oldValue) {
-    if (oldValue !== undefined && !$scope.isDiscardInProgress
-        && !angular.equals(newValue, oldValue)) {
-      changeListService.editExplorationProperty('param_specs', newValue, oldValue);
-    }
-  });
-
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
     $log.info('Adding a param spec to the exploration.');
     if (name in $scope.paramSpecs) {
@@ -968,55 +1032,16 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
     document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
   };
 
-  /********************************************
-  * Methods for rights management.
-  ********************************************/
-  $scope.openEditRolesForm = function() {
-    activeInputData.name = 'explorationMetadata.editRoles';
-    $scope.newMemberEmail = '';
-    $scope.newMemberRole = $scope.ROLES[0];
-  };
-
-  $scope.closeEditRolesForm = function() {
-    $scope.newMemberEmail = '';
-    $scope.newMemberRole = $scope.ROLES[0];
-    activeInputData.clear();
-  };
-
-  $scope.editRole = function(newMemberEmail, newMemberRole) {
-    activeInputData.clear();
-    $scope._saveExplorationRightsChange({
-      new_member_email: newMemberEmail,
-      new_member_role: newMemberRole
-    });
-  };
-
-  $scope._saveExplorationRightsChange = function(requestParameters) {
-    requestParameters['version'] = explorationData.data.version;
-    $http.put(
-        $scope.explorationRightsUrl,
-        oppiaRequestCreator.createRequest(requestParameters),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-            success(function(data) {
-              warningsData.clear();
-              $scope.initExplorationRights(data.rights);
-            }).
-            error(function(data) {
-              warningsData.addWarning(
-                data.error || 'Error communicating with server.');
-            });
-  };
-
   $scope.publicizeExploration = function() {
-    $scope._saveExplorationRightsChange({is_publicized: true});
+    explorationRightsService.saveChangeToBackend({is_publicized: true});
   };
 
   $scope.unpublicizeExploration = function() {
-    $scope._saveExplorationRightsChange({is_publicized: false});
+    explorationRightsService.saveChangeToBackend({is_publicized: false});
   };
 
   $scope.unpublishExploration = function() {
-    $scope._saveExplorationRightsChange({is_public: false});
+    explorationRightsService.saveChangeToBackend({is_public: false});
   };
 
   $scope.showPublishExplorationModal = function() {
@@ -1036,7 +1061,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
         }
       ]
     }).result.then(function() {
-      $scope._saveExplorationRightsChange({is_public: true});
+      explorationRightsService.saveChangeToBackend({is_public: true});
     });
   };
 
@@ -1057,7 +1082,7 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
         }
       ]
     }).result.then(function() {
-      $scope._saveExplorationRightsChange({is_community_owned: true});
+      explorationRightsService.saveChangeToBackend({is_community_owned: true});
     });
   };
 
@@ -1095,15 +1120,15 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
   ********************************************/
   $scope.isNewStateNameValid = function(newStateName) {
     return (
-      $scope.isValidEntityName(newStateName) &&
+      validatorsService.isValidEntityName(newStateName) &&
       newStateName.toUpperCase() !== END_DEST &&
       !$scope.states[newStateName]);
   };
 
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, successCallback) {
-    newStateName = $scope.normalizeWhitespace(newStateName);
-    if (!$scope.isValidEntityName(newStateName, true)) {
+    newStateName = $filter('normalizeWhitespace')(newStateName);
+    if (!validatorsService.isValidEntityName(newStateName, true)) {
       return;
     }
     if (newStateName.toUpperCase() == END_DEST) {
@@ -1212,5 +1237,6 @@ ExplorationEditor.$inject = [
   '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
   'activeInputData', 'oppiaRequestCreator', 'editorContextService',
-  'changeListService', 'explorationTitleService'
+  'changeListService', 'explorationTitleService', 'explorationCategoryService',
+  'explorationObjectiveService', 'explorationRightsService', 'validatorsService'
 ];

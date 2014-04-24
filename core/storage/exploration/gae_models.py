@@ -57,9 +57,9 @@ class ExplorationModel(base_models.VersionedModel):
     # The category this exploration belongs to.
     category = ndb.StringProperty(required=True, indexed=True)
     # The objective of this exploration.
-    objective = ndb.TextProperty(required=True, indexed=False)
+    objective = ndb.TextProperty(default='', indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
-    language_code = ndb.StringProperty(required=True, indexed=True)
+    language_code = ndb.StringProperty(indexed=True)
     # Skill tags associated with this exploration.
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
