@@ -313,14 +313,14 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           maxDepth = Math.max(maxDepth, nodeData[nodeName].depth);
         }
 
-        var VIEWPORT_HEIGHT = 100.0 * (maxDepth + 1);
-        var VIEWPORT_WIDTH = 800.0;
+        var VIEWPORT_HEIGHT = 80.0 * (maxDepth + 1);
+        var VIEWPORT_WIDTH = 250.0;
 
         var vis = d3.select(element[0]).append('svg:svg')
           .attr({
-            'class': 'oppia-graph-viz',
-            'height': VIEWPORT_HEIGHT,
-            'width': VIEWPORT_WIDTH
+            'class': 'oppia-graph-viz'
+            // 'height': VIEWPORT_HEIGHT,
+            // 'width': VIEWPORT_WIDTH
           });
 
         if (allowPanning) {

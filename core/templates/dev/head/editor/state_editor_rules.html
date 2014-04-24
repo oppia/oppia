@@ -2,14 +2,12 @@
 
 {% block id %}rules{% endblock %}
 
+{% block label %}rules{% endblock %}
+
 {% block row %}
   <div ng-repeat="(handlerName, handler) in widgetHandlers">
     {{ super() }}
   </div>
-{% endblock %}
-
-{% block label %}
-  when readers <[handlerName]>:
 {% endblock %}
 
 {% block link %}

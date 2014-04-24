@@ -750,6 +750,8 @@ function ExplorationEditor($scope, $http, $location, $anchorScroll, $modal, $win
 
       $scope.refreshExplorationStatistics();
 
+      $scope.showStateEditor($scope.initStateName);
+
       if (successCallback) {
         successCallback();
       }

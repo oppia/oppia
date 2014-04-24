@@ -582,45 +582,33 @@ textarea {
 
 .oppia-state-name-container {
   padding: 2px;
-  width: 60%;
 }
 
 .oppia-editable {
-  border: 1px dotted gray;
   cursor: pointer;
   padding: 1px 3px;
 }
 .oppia-editable:hover {
-  border: 1px solid #111;
-  opacity: 0.95;
+  opacity: 0.9;
 }
 
 .oppia-state-editor-container {
   min-height: 800px;
+  min-width: 1170px;
   position: relative;
 }
 
 .oppia-state-editor {
-  background-color: white;
-  border: 3px solid black;
-  border-radius: 5px;
-  height: 88%;
-  position: fixed;
-  right: 0;
-  top: 10%;
-  width: 70%;
-  z-index: 100;
+  display: inline-block;
+  width: 750px;
+  position: absolute;
 }
 
 .oppia-state-editor-header {
-  background: #ddd;
-  max-height: 7%;
-  padding: 1px 10px;
+  text-align: center;
 }
 
 .oppia-state-editor-body {
-  max-height: 90%;
-  overflow-y: scroll;
   padding: 5px 10px;
   position: relative;
 }
@@ -646,6 +634,22 @@ textarea {
 }
 
 /* Styles for the state graph vizualization. */
+
+.oppia-exploration-graph-container { 
+  display: inline-block;
+  position: absolute;
+  right: 0px;
+}
+
+.oppia-graph-viz-container {
+  width: 400px;
+  height: 200px;
+  border: 1px solid black;
+}
+
+.oppia-add-state-container {
+  margin-top: 10px;
+}
 
 .oppia-graph-viz path.link {
   fill: none;
