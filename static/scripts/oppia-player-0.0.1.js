@@ -20,7 +20,7 @@
  */
 
 
-(function() {
+(function(window, document) {
   // Prevent duplicate loads of this embedding script.
   if (window.hasOwnProperty('OPPIA_EMBED_GLOBALS')) {
     return;
@@ -52,8 +52,12 @@
   }
 
   /**
-   * Create a random string used for the iframed window to verify that messages
-   * sent to it are from the parent that created the iframe.
+   * Create a random secret that is added to the fragment (the part after the
+   * '#' symbol) of each child iframe's location URL. Any postMessages sent to
+   * that child should include this secret, and the child iframe should check
+   * that the secret in the received postMessage matches the secret in the
+   * location hash. This defends against fraudulent messages being sent to the
+   * child iframe by other code within the parent page.
    */
   var SECRET_LENGTH = 64;
   var secret = '';
@@ -64,9 +68,9 @@
   var OppiaEmbed = (function() {
     function OppiaEmbed(oppiaNode) {
       // Validate the incoming node.
-      if (oppiaNode.tagName !== 'oppia') {
-        _log('Error: expected OppiaEmbed to be defined using a node of type ' +
-             '<oppia>, not ' + oppiaNode.tagName);
+      if (oppiaNode.tagName !== 'OPPIA') {
+        throw ('Error: expected OppiaEmbed to be defined using a node of type ' +
+               '<oppia>, not ' + oppiaNode.tagName);
       }
 
       // This attribute is set to true when the iframe has loaded.
