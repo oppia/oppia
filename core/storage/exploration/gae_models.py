@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
+import feconf
 
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
@@ -59,7 +60,8 @@ class ExplorationModel(base_models.VersionedModel):
     # The objective of this exploration.
     objective = ndb.TextProperty(default='', indexed=False)
     # The ISO 639-1 code for the language this exploration is written in.
-    language_code = ndb.StringProperty(indexed=True)
+    language_code = ndb.StringProperty(
+        default=feconf.DEFAULT_LANGUAGE_CODE, indexed=True)
     # Skill tags associated with this exploration.
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
     # A blurb for this exploration.
