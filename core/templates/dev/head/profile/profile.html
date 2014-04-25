@@ -28,7 +28,7 @@
               <span ng-if="expData.rights.status == 'private'">
                 (Private)
               </span>
-              <a href="/create/<[expId]>"><[expData.title]></a>
+              <a ng-href="/create/<[expId]>"><[expData.title]></a>
             </li>
           </ul>
         </div>
@@ -40,7 +40,7 @@
               <span ng-if="expData.rights.status == 'private'">
                 (Private)
               </span>
-              <a href="/create/<[expId]>"><[expData.title]></a>
+              <a ng-href="/create/<[expId]>"><[expData.title]></a>
             </li>
           </ul>
         </div>
@@ -49,7 +49,7 @@
           <h5>Explorations I can playtest</h5>
           <ul>
             <li ng-repeat="(expId, expData) in viewableExplorations">
-              <a href="/create/<[expId]>"><[expData.title]></a>
+              <a ng-href="/explore/<[expId]>"><[expData.title]></a>
             </li>
           </ul>
         </div>
