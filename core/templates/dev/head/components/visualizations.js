@@ -319,8 +319,6 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         var vis = d3.select(element[0]).append('svg:svg')
           .attr({
             'class': 'oppia-graph-viz'
-            // 'height': VIEWPORT_HEIGHT,
-            // 'width': VIEWPORT_WIDTH
           });
 
         if (allowPanning) {
