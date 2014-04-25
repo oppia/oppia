@@ -814,8 +814,7 @@ var logicProofStudent = (function() {
     try {
       var protoLines = logicProofShared.parseLineString(
         lineString.trim(), language.operators, vocabulary, false);
-    }
-    catch (err) {
+    } catch (err) {
       throw {
         message: logicProofShared.renderError(err, generalMessages, language)
       };
@@ -828,8 +827,7 @@ var logicProofStudent = (function() {
           matchLineToTemplate(
             protoLines[i], lineTemplates[j].reader_view, vocabulary);
           lineIdentified = true;
-        }
-        catch (err) {
+        } catch (err) {
           if (errorMessage === undefined) {
             var errorMessage = logicProofShared.renderError(
               err, generalMessages, language);
@@ -865,8 +863,7 @@ var logicProofStudent = (function() {
         requireIdentifiableLine(lineStrings[i], 
           questionInstance.line_templates, questionInstance.language, 
           questionInstance.vocabulary, questionInstance.general_messages);
-      }
-      catch (err) {
+      } catch (err) {
         throw {
           message: err.message,
           line: i
@@ -951,8 +948,7 @@ var logicProofStudent = (function() {
             indentation: indentation,
             text: lineString
           };
-        }
-        catch (err) {
+        } catch (err) {
           if (_isBetterAttempt(err, bestAttemptSoFar)) {
             var bestAttemptSoFar = err;
           }
@@ -987,8 +983,7 @@ var logicProofStudent = (function() {
           buildLine(
             lineStrings[i], questionInstance.line_templates, 
             questionInstance.language, questionInstance.vocabulary));
-      }
-      catch (err) {
+      } catch (err) {
         throw {
           message: logicProofShared.renderError(
             err, questionInstance.general_messages, questionInstance.language),
@@ -1121,8 +1116,7 @@ var logicProofStudent = (function() {
           }
         }
         renderedMessages.push(renderedMessage);
-      }
-      catch (err) {
+      } catch (err) {
         if (err.message !== 'evaluation failed') {
           throw err;
         }
@@ -1172,8 +1166,7 @@ var logicProofStudent = (function() {
             check = evaluate(
               mistake.occurs, {n: lineNumber + 1}, 
               questionInstance.control_model, parameters, evaluationCache);
-          }
-          catch(err) {
+          } catch(err) {
             if (err.message !== 'evaluation failed') {
               throw err;
             }

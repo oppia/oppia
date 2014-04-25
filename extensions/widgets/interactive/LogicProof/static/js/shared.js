@@ -537,8 +537,7 @@ var logicProofShared = (function() {
       try {
         var argumentTypes = instantiateTypingElementArray(
           typingRule.arguments, untypedExpression.arguments.length);
-      }
-      catch (err) {
+      } catch (err) {
         err.parameters['operator'] = untypedExpression.top_operator_name;
         err.parameters['input_category'] = 'arguments';
         err.parameters['amount_typed'] = [];
@@ -548,8 +547,7 @@ var logicProofShared = (function() {
       try {
         var dummyTypes = instantiateTypingElementArray(
           typingRule.dummies, untypedExpression.dummies.length);
-      }
-      catch (err) {
+      } catch (err) {
         err.parameters['operator'] = untypedExpression.top_operator_name;
         err.parameters['input_category'] = 'dummies';
         err.parameters['amount_typed'] = [];
@@ -658,8 +656,7 @@ var logicProofShared = (function() {
               operators: newAttempts[k].operators
             });
           }
-        }
-        catch (err) {
+        } catch (err) {
           if (bestAttemptSoFar !== undefined && 
               !bestAttemptSoFar.hasOwnProperty('parameters')) {
             throw bestAttemptSoFar;
@@ -733,8 +730,7 @@ var logicProofShared = (function() {
               partiallyTypedArrays[i][j].concat([newResults[k].typedExpression]));
             partiallyUpdatedOperatorss[i + 1].push(newResults[k].operators);
           }
-        }
-        catch (err) {
+        } catch (err) {
           if (!err.hasOwnProperty('parameters')) {
             throw err;
           }
@@ -854,8 +850,7 @@ var logicProofShared = (function() {
     for (var i = 0; i < array.length; i++) {
       try {
         return seekTypeInExpression(array[i], operator);
-      }
-      catch (err) {}
+      } catch (err) {}
     }
     throw UserError('unknown_typing_error', {expression: expression});
   };

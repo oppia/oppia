@@ -30,8 +30,7 @@ var logicProofTeacher = (function() {
       try {
         var assumptions = logicProofParser.parse(
           assumptionsString.replace(/ /g, ''), 'listOfExpressions');
-      }
-      catch(err) {
+      } catch(err) {
         var error = new logicProofShared.UserError(
           'unparseable', {field: 'assumptions'});
         throw {
@@ -43,8 +42,7 @@ var logicProofTeacher = (function() {
     try {
       var target = logicProofParser.parse(
         targetString.replace(/ /g, ''), 'expression');
-    }
-    catch(err) {
+    } catch(err) {
       var error = new logicProofShared.UserError(
         'unparseable', {field: 'target'});
       throw {
@@ -73,8 +71,7 @@ var logicProofTeacher = (function() {
       }
       requireNoVocabularyWordsUsed(
         expressions, logicProofData.BASE_STUDENT_LANGUAGE.operators, vocabulary);
-    }
-    catch (err) {
+    } catch (err) {
       throw {
         message: logicProofShared.renderError(
           err, TEACHER_ERROR_MESSAGES, logicProofData.BASE_STUDENT_LANGUAGE)

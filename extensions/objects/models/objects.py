@@ -494,15 +494,16 @@ class CheckedProof(BaseObject):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
-            assert isinstance(raw.get('assumptions_string'), basestring)
-            assert isinstance(raw.get('target_string'), basestring)
-            assert isinstance(raw.get('proof_string'), basestring)
-            assert raw.get('correct') in [True, False]
-            if not raw.get('correct'):
-                assert isinstance(raw.get('error_category'), basestring)
-                assert isinstance(raw.get('error_code'), basestring)
-                assert isinstance(raw.get('error_message'), basestring)
-                assert isinstance(raw.get('error_line_number'), int)
+            assert isinstance(raw, dict)
+            assert isinstance(raw['assumptions_string'], basestring)
+            assert isinstance(raw['target_string'], basestring)
+            assert isinstance(raw['proof_string'], basestring)
+            assert raw['correct'] in [True, False]
+            if not raw['correct']:
+                assert isinstance(raw['error_category'], basestring)
+                assert isinstance(raw['error_code'], basestring)
+                assert isinstance(raw['error_message'], basestring)
+                assert isinstance(raw['error_line_number'], int)
             return copy.deepcopy(raw)
         except Exception:
             raise TypeError('Cannot convert to checked proof %s' % raw)
@@ -519,23 +520,23 @@ class LogicQuestion(BaseObject):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
 
-        def validateExpression(expression):
+        def _validateExpression(expression):
             assert isinstance(expression, dict)
-            assert isinstance(expression.get('top_kind_name'), basestring)
-            assert isinstance(expression.get('top_operator_name'), basestring)
-            validateExpressionArray(expression.get('arguments'))
-            validateExpressionArray(expression.get('dummies'))
+            assert isinstance(expression['top_kind_name'], basestring)
+            assert isinstance(expression['top_operator_name'], basestring)
+            _validateExpressionArray(expression['arguments'])
+            _validateExpressionArray(expression['dummies'])
 
-        def validateExpressionArray(array):
+        def _validateExpressionArray(array):
             assert isinstance(array, list)
             for item in array:
-                validateExpression(item)
+                _validateExpression(item)
 
         try:
             assert isinstance(raw, dict)
-            validateExpressionArray(raw.get('assumptions'))
-            validateExpressionArray(raw.get('results'))
-            assert isinstance (raw.get('default_proof_string'), basestring)
+            _validateExpressionArray(raw['assumptions'])
+            _validateExpressionArray(raw['results'])
+            assert isinstance (raw['default_proof_string'], basestring)
 
             return copy.deepcopy(raw)
         except Exception:

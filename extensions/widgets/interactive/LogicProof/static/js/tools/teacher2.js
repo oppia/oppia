@@ -145,23 +145,20 @@ var logicProofTeacher2 = (function() {
     try {
       var antecedents = logicProofParser.parse(
         antecedentsString.replace(/ /g, ''), 'listOfBooleanTemplates');
-    }
-    catch(err) {
+    } catch(err) {
       throw new logicProofShared.UserError(
         'unparseable', {field: 'antecedents'})
     }
     try {
       var results = logicProofParser.parse(
         resultsString.replace(/ /g, ''), 'listOfBooleanTemplates');
-    }
-    catch(err) {
+    } catch(err) {
       throw new logicProofShared.UserError('unparseable', {field: 'results'})
     }
     try {
       var variables = logicProofParser.parse(
         variablesString.replace(/ /g, ''), 'listOfVariables');
-    }
-    catch(err) {
+    } catch(err) {
       throw new logicProofShared.UserError('unparseable', {field: 'variables'})
     }
     var errors = []
@@ -294,8 +291,7 @@ var logicProofTeacher2 = (function() {
             stringTable[i].variables, stringTable[i].error,
             logicProofData.BASE_STUDENT_LANGUAGE, vocabulary))
         failures.push('');
-      }
-      catch (err) {
+      } catch (err) {
         failed = true;
         failures.push(
           logicProofShared.renderError(
@@ -393,8 +389,7 @@ var logicProofTeacher2 = (function() {
     try {
       var occurs = logicProofParser.parse(
         occursString.replace(/ /g, ''), 'expression');
-    }
-    catch (err) {
+    } catch (err) {
       throw new logicProofShared.UserError(
         'unparseable', {field: 'description of when this mistake occurs'});
     }
@@ -469,8 +464,7 @@ var logicProofTeacher2 = (function() {
             entryStrings[i].name, entryStrings[i].occurs, 
             entryStrings[i].message, controlLanguage));
         failures.push('');
-      }
-      catch (err) {
+      } catch (err) {
         failed = true;
         failures.push(
           logicProofShared.renderError(
@@ -642,16 +636,14 @@ var logicProofTeacher2 = (function() {
     try {
       var formulaLHS = logicProofParser.parse(
         LHSstring.replace(/ /g, ''), 'formulaLHS');
-    }
-    catch(err) {
+    } catch(err) {
       throw new logicProofShared.UserError(
         'unparseable', {field: 'left-hand side'});
     }
     try {
       var formulaRHS = logicProofParser.parse(
         RHSstring.replace(/ /g, ''), 'expression');
-    }
-    catch(err) {
+    } catch(err) {
       throw new logicProofShared.UserError(
         'unparseable', {field: 'right-hand side'});
     }
@@ -722,8 +714,7 @@ var logicProofTeacher2 = (function() {
         var built = buildControlFunction(
           controlFunctionStrings[i].LHS, controlFunctionStrings[i].RHS,
           controlFunctionStrings[i].description, controlLanguage);
-      }
-      catch (err) {
+      } catch (err) {
         throw {
           message: logicProofShared.renderError(err, logicProofTeacher.TEACHER_ERROR_MESSAGES, 
             logicProofData.BASE_CONTROL_LANGUAGE),
@@ -781,8 +772,7 @@ var logicProofTeacher2 = (function() {
               fragmentString.slice(2, fragmentString.length - 2).replace(/ /g, ''), 
               'expression')
         }
-      }
-      catch (err) {
+      } catch (err) {
         throw new logicProofShared.UserError(
           'unparseable_fragment', {fragment: fragmentString});
       }

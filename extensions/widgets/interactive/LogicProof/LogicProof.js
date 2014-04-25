@@ -30,11 +30,16 @@ oppia.directive('oppiaInteractiveLogicProof', [
 
         $scope.localQuestionData = JSON.parse($attrs.questionWithValue);
 
+        // This is the information about how to mark a question (e.g. the 
+        // permited line templates) that is stored in defaultData.js within
+        // the dependencies.
         $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
+
         $scope.questionData.assumptions = $scope.localQuestionData.assumptions;
         $scope.questionData.results = $scope.localQuestionData.results;
 
-        // Deduce the new operators, as in BuildQuestion():
+        // Deduce the new operators, as in logicProofTeacher.buildQuestion(),
+        // since these are not currently stored separately for each question.
         $scope.expressions = [];
         $scope.topTypes = [];
         for (var i = 0; i < $scope.questionData.assumptions.length; i++) {
@@ -84,8 +89,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             try {
               logicProofStudent.validateProof($scope.proofString, $scope.questionInstance);
               $scope.proofError = '';
-            }
-            catch (err) {
+            } catch (err) {
               $scope.proofError = $scope.displayMessage(err.message, err.line);
             }
           } else {
@@ -109,8 +113,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
               displayed_question: $scope.questionString,
               displayed_message: ''
             }, 'submit');
-          }
-          catch (err) {
+          } catch (err) {
             $scope.$parent.$parent.submitAnswer({
               assumptions_string: $scope.assumptionsString,
               target_string: $scope.targetString,

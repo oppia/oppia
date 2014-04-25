@@ -25,7 +25,7 @@ var logicProofConversion = (function() {
   }
 
   // Returns first and last characters in the new string that have been
-  // changed.
+  // changed, or false if one string is not defined.
   var compareStrings = function(newString, oldString) {
     if (newString === undefined || oldString === undefined) {
       return false;

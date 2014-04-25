@@ -52,8 +52,7 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
             default_proof_string: $scope.localValue.proofString
           }
           $scope.localValue.errorMessage = '';
-        }
-        catch (err) {
+        } catch (err) {
           $scope.localValue.errorMessage = err.message;
         }
       }
