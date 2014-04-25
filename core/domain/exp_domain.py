@@ -1152,7 +1152,13 @@ class Exploration(object):
     @classmethod
     def from_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string."""
-        exploration_dict = utils.dict_from_yaml(yaml_content)
+        try:
+            exploration_dict = utils.dict_from_yaml(yaml_content)
+        except Exception as e:
+            raise Exception(
+                'Please ensure that you are uploading a YAML text file, not '
+                'a zip file. The YAML parser returned the following error: %s'
+                % e)
 
         exploration_schema_version = exploration_dict.get('schema_version')
         if exploration_schema_version is None:

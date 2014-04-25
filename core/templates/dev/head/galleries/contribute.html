@@ -15,6 +15,11 @@
             <a class="btn btn-success btn-large" ng-click="showCreateExplorationModal(categoryList)">
               Create New Exploration
             </a>
+            {% if allow_yaml_file_upload %}
+              <a class="btn btn-large" ng-click="showUploadExplorationModal(categoryList)">
+                Upload Existing Exploration
+              </a>
+            {% endif %}
           </span>
 
           <h3 class="oppia-page-title">
@@ -106,18 +111,6 @@
               </div>
 
             </div>
-          </div>
-
-          <br>
-          <br>
-
-          <div>
-
-            {% if allow_yaml_file_upload %}
-              <a class="btn btn-large" ng-click="showUploadExplorationModal(categoryList)">
-                Upload Existing Exploration
-              </a>
-            {% endif %}
           </div>
 
           <script type="text/ng-template" id="modals/galleryCreateNew">
