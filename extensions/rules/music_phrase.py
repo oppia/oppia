@@ -47,11 +47,10 @@ class Equals(base.MusicPhraseRule):
 
 
 class IsLongerSequence(base.MusicPhraseRule):
-    description = 'is a longer sequence than {{x|MusicPhrase}}'
+    description = 'has more than {{k|NonnegativeInt}} notes'
 
     def _evaluate(self, subject):
-        return (len(_convert_sequence_to_midi(subject)) >
-                len(_convert_sequence_to_midi(self.x)))
+        return (len(_convert_sequence_to_midi(subject)) > self.k)
 
 
 class IsEqualToExceptFor(base.MusicPhraseRule):
@@ -63,11 +62,12 @@ class IsEqualToExceptFor(base.MusicPhraseRule):
         midi_user_sequence = _convert_sequence_to_midi(subject)
         counter = 0
         num_correct_notes_needed = len(midi_target_sequence) - self.k
-        for i in range(min(
-                len(midi_target_sequence), len(midi_user_sequence))):
-            if midi_user_sequence[i] == midi_target_sequence[i]:
-                counter += 1
-        return counter >= num_correct_notes_needed
+        if len(midi_user_sequence) == len(midi_target_sequence):
+            for i in range(len(midi_user_sequence)):
+                if midi_user_sequence[i] == midi_target_sequence[i]:
+                    counter += 1
+            return counter == num_correct_notes_needed
+        return False
 
 
 class IsTranspositionOf(base.MusicPhraseRule):
@@ -76,14 +76,13 @@ class IsTranspositionOf(base.MusicPhraseRule):
 
     def _evaluate(self, subject):
         target_sequence_length = len(self.x)
-        if (len(subject) == target_sequence_length):
+        if len(subject) == target_sequence_length:
             midi_target_sequence = _convert_sequence_to_midi(self.x)
             midi_user_sequence = _convert_sequence_to_midi(subject)
-            is_transposition = True
             for i in range(target_sequence_length):
                 if midi_user_sequence[i] - self.y != midi_target_sequence[i]:
                     return False
-            return is_transposition
+            return True
         else:
             return False
 
@@ -98,15 +97,11 @@ class IsTranspositionOfExceptFor(base.MusicPhraseRule):
         midi_target_sequence = _convert_sequence_to_midi(self.x)
         midi_user_sequence = _convert_sequence_to_midi(subject)
         target_sequence_length = len(midi_target_sequence)
-        if (len(midi_user_sequence) == target_sequence_length or
-                len(midi_user_sequence) >= target_sequence_length - self.k):
+        if len(midi_user_sequence) == target_sequence_length:
             num_correct_notes_needed = target_sequence_length - self.k
-            if len(midi_user_sequence) > 1:
-                for i in range(min(
-                        len(midi_target_sequence), len(midi_user_sequence))):
-                    if (midi_user_sequence[i] - self.y ==
-                            midi_target_sequence[i]):
-                        counter += 1
-            return counter >= num_correct_notes_needed
-        else:
-            return False
+            for i in range(target_sequence_length):
+                if (midi_user_sequence[i] - self.y ==
+                        midi_target_sequence[i]):
+                    counter += 1
+            return counter == num_correct_notes_needed
+        return False
