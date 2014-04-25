@@ -169,7 +169,7 @@ class BaseHandler(webapp2.RequestHandler):
 
     def unescape_state_name(self, escaped_state_name):
         """Unescape a state name that is encoded with encodeURIComponent."""
-        return urllib.unquote(unicode(escaped_state_name)).decode('utf-8')
+        return urllib.unquote(escaped_state_name).decode('utf-8')
 
     def dispatch(self):
         """Overrides dispatch method in webapp2 superclass."""
