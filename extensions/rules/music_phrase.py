@@ -50,7 +50,14 @@ class IsLongerSequence(base.MusicPhraseRule):
     description = 'has more than {{k|NonnegativeInt}} notes'
 
     def _evaluate(self, subject):
-        return (len(_convert_sequence_to_midi(subject)) > self.k)
+        return len(_convert_sequence_to_midi(subject)) > self.k
+
+
+class IsShorterSequence(base.MusicPhraseRule):
+    description = 'has less than {{k|NonnegativeInt}} notes'
+
+    def _evaluate(self, subject):
+        return len(_convert_sequence_to_midi(subject)) < self.k
 
 
 class IsEqualToExceptFor(base.MusicPhraseRule):
