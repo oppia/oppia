@@ -22,10 +22,16 @@ import logging
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import utils
 
 from google.appengine.ext import ndb
 
 QUERY_LIMIT = 100
+MAX_ANSWER_HASH_LEN = 100
+
+
+def hash_answer(answer):
+    return utils.convert_to_hash(answer, MAX_ANSWER_HASH_LEN)
 
 
 class StateCounterModel(base_models.BaseModel):
@@ -166,6 +172,11 @@ class FeedbackItemModel(base_models.BaseModel):
         return feedback_entity
 
     @classmethod
+    def get_feedback_items_for_user(cls, user_id):
+        """Gets all feedback submitted by a given user."""
+        return cls.get_all().filter(
+            cls.submitter_id == user_id).fetch(QUERY_LIMIT)
+    @classmethod
     def get_new_feedback_items_for_target(cls, target_id):
         """Gets all 'new' feedback items corresponding to a given target_id."""
         return cls.get_all().filter(
@@ -174,20 +185,21 @@ class FeedbackItemModel(base_models.BaseModel):
 
 
 def process_submitted_answer(
-        exploration_id, state_name, handler_name, rule_str, answer):
+        exploration_id, exploration_version, state_name, handler_name,
+        rule, answer):
     """Adds an answer to the answer log for the rule it hits.
 
     Args:
         exploration_id: the exploration id
         state_name: the state name
         handler_name: a string representing the handler name (e.g., 'submit')
-        rule_str: a string representation of the rule
+        rule: the rule
         answer: an HTML string representation of the answer
     """
     # TODO(sll): Run these two updates in a transaction.
 
     answer_log = StateRuleAnswerLogModel.get_or_create(
-        exploration_id, state_name, handler_name, rule_str)
+        exploration_id, state_name, handler_name, str(rule))
     if answer in answer_log.answers:
         answer_log.answers[answer] += 1
     else:
@@ -205,7 +217,8 @@ def process_submitted_answer(
     counter.put()
 
 
-def resolve_answers(exploration_id, state_name, handler_name, rule_str, answers):
+def resolve_answers(
+        exploration_id, state_name, handler_name, rule_str, answers):
     """Resolves selected answers for the given rule.
 
     Args:
@@ -227,7 +240,8 @@ def resolve_answers(exploration_id, state_name, handler_name, rule_str, answers)
             logging.error(
                 'Answer %s not found in answer log for rule %s of exploration '
                 '%s, state %s, handler %s' % (
-                    answer, rule_str, exploration_id, state_name, handler_name))
+                    answer, rule_str, exploration_id, state_name,
+                    handler_name))
         else:
             resolved_count += answer_log.answers[answer]
             del answer_log.answers[answer]

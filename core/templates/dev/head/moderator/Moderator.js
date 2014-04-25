@@ -18,8 +18,10 @@
 * @author yanamal@google.com (Yana Malysheva)
 */
 
-function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
-  
+function Moderator(
+    $scope, $http, $rootScope, warningsData, oppiaRequestCreator,
+    oppiaDateFormatter) {
+
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
     $scope.lastSubmittedUsername = username;
@@ -30,14 +32,55 @@ function Moderator($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
     ).success(function(data) {
-      $scope.userEmail = data.user_email; 
+      $scope.userEmail = data.user_email;
     }).error(function(data) {
       warningsData.addWarning(data.error);
     });
-  }
+  };
+
+  $scope.getHumanReadableDate = function(millisSinceEpoch) {
+    return oppiaDateFormatter.getHumanReadableDate(millisSinceEpoch);
+  };
+
+  $scope.getExplorationCreateUrl = function(explorationId) {
+    return '/create/' + explorationId;
+  };
+
+  // TODO(sll): Abstract this out into a general utility function so that it
+  // can be used in multiple places.
+  $scope.recentCommitsCursor = null;
+  $scope.reachedEndOfCommits = false;
+  $scope.allCommits = [];
+  $scope.loadMoreCommits = function() {
+    if ($scope.reachedEndOfCommits) {
+      return;
+    }
+
+    var recentCommitsUrl = '/recentcommitshandler/recent_commits';
+    recentCommitsUrl += '?query_type=all_non_private_commits';
+    if ($scope.recentCommitsCursor) {
+      recentCommitsUrl += ('?cursor=' + $scope.recentCommitsCursor);
+    }
+
+    $http.get(recentCommitsUrl).success(function(data) {
+      for (var i = 0; i < data.results.length; i++) {
+        $scope.allCommits.push(data.results[i]);
+      }
+      $scope.recentCommitsCursor = data.cursor;
+      if (!data.more) {
+        $scope.reachedEndOfCommits = true;
+      }
+    }).error(function(data) {
+      warningsData.addWarning(data.error);
+    });
+  };
+
+  $scope.loadMoreCommits();
 }
 
 /**
 * Injects dependencies in a way that is preserved by minification.
 */
-Moderator.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+Moderator.$inject = [
+  '$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator',
+  'oppiaDateFormatter'];

@@ -292,9 +292,17 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         return nodeData;
       }
 
+      function isStateFlagged(name, highlightStates, stateStats) {
+          var isHighlightState = (highlightStates && name in highlightStates);
+          var hasFeedback = (
+            stateStats && stateStats[name] &&
+            Object.keys(stateStats[name].readerFeedback).length > 0);
+          return (isHighlightState || hasFeedback);
+      }
+
       function drawGraph(nodes, links, initStateName, finalStateName, nodeFill,
                          opacityMap, forbidNodeDeletion, highlightStates, stateStats,
-                         allowPanning, currentStateName) {
+                         allowPanning, currentStateName, expStats) {
         // Clear all SVG elements on the canvas.
         d3.select(element[0]).selectAll('svg').remove();
 
@@ -614,28 +622,19 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
               'stroke-width': '1',
               'stroke': '#DDDDDD',
               'fill-opacity': function(d) {
-                var isHighlightState = (highlightStates && d.name in highlightStates);
-                var hasFeedback = (
-                  stateStats && stateStats[d.name] &&
-                  Object.keys(stateStats[d.name].readerFeedback).length > 0);
-                return (isHighlightState || hasFeedback) ? '1' : '0' ;
+                return isStateFlagged(
+                  d.name, highlightStates, expStats, stateStats) ? '1' : '0';
               },
               'stroke-opacity': function(d) {
-                var isHighlightState = (highlightStates && d.name in highlightStates);
-                var hasFeedback = (
-                  stateStats && stateStats[d.name] &&
-                  Object.keys(stateStats[d.name].readerFeedback).length > 0);
-                return (isHighlightState || hasFeedback) ? '1' : '0' ;
+                return isStateFlagged(
+                  d.name, highlightStates, expStats, stateStats) ? '1' : '0' ;
               }
             });
 
           nodeEnter.append('svg:text')
             .text(function(d) {
-              var isHighlightState = (d.name in highlightStates);
-              var hasFeedback = (
-                stateStats && stateStats[d.name] &&
-                Object.keys(stateStats[d.name].readerFeedback).length > 0);
-              return (isHighlightState || hasFeedback) ? '⚠' : '' ;
+              return isStateFlagged(
+                  d.name, highlightStates, expStats, stateStats) ? '⚠' : '';
             })
             .attr({
               'fill': 'firebrick',

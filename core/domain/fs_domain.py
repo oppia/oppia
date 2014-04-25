@@ -25,7 +25,6 @@ from core.platform import models
 (file_models,) = models.Registry.import_models([
     models.NAMES.file
 ])
-transaction_services = models.Registry.import_transaction_services()
 import feconf
 import utils
 

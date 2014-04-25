@@ -7,9 +7,12 @@
         </button>
         <div ng-class="getEditableCssClassForRule()" style="margin-right: 30px;" ng-click="openRuleDescriptionEditorIfNotDefault()">
           <span ng-if="isRuleConfusing()">
-            <i class="icon-warning-sign" title="This rule loops back to the same state and has no feedback, so it will probably confuse readers."></i>
+            <i class="icon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></i>
           </span>
           <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
+          <span ng-if="!isDefaultRule()">
+            <i class="icon-pencil" title="Edit Rule"></i>
+          </span>
         </div>
       </div>
 
@@ -83,10 +86,12 @@
           <[rule.dest]>
         </span>
         <span ng-if="rule.dest != 'END' && rule.dest != getActiveStateName()">
-          <a href="/create/<[explorationId]>#/gui/<[rule.dest]>"><[rule.dest]></a>
+          <a href="/create/<[explorationId]>#/gui/<[getEscapedDest()]>">
+            <[rule.dest]>
+          </a>
         </span>
-        <button ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
-          ✎
+        <button class="btn btn-mini" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
+          <i class="icon-pencil" title="Edit Rule Destination"></i>
         </button>
       </div>
 

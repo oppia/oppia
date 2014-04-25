@@ -16,11 +16,14 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import base64
+import hashlib
 import json
 import os
 import random
 import re
 import StringIO
+import time
 import unicodedata
 import urllib
 import urlparse
@@ -298,3 +301,25 @@ class JSONEncoderForHTML(json.JSONEncoder):
         for chunk in chunks:
             yield chunk.replace('&', '\\u0026').replace(
                 '<', '\\u003c').replace('>', '\\u003e')
+
+
+def convert_to_hash(string, max_length):
+    """Convert a string to a SHA1 hash."""
+    if not isinstance(string, basestring):
+        raise Exception(
+            'Expected string, received %s of type %s' %
+            (string, type(string)))
+
+    encoded_string = base64.urlsafe_b64encode(
+        hashlib.sha1(string).digest())
+
+    return encoded_string[:max_length]
+
+
+def get_time_in_millisecs(datetime_obj):
+    """Returns time in milliseconds since the Epoch.
+
+    Args:
+      datetime_obj: An object of type datetime.datetime.
+    """
+    return time.mktime(datetime_obj.timetuple()) * 1000

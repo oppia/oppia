@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  About
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="container">
+    <div class="row">
+      <div class="span8">
+        <div class="tabbable">
+          <ul class="nav nav-tabs about-tabs">
+            <li class="active"><a href="#how-to-use" data-toggle="tab">How to Use Oppia</a></li>
+          </ul>
+
+          <div class="tab-content">
+            <div class="tab-pane active" id="how-to-use">
+              <div class="oppia-about">
+                <h1>Using Oppia</h1>
+                <p>
+                  The main units of learning in Oppia are called explorations. These are multi-stage interactive activities that attempt to engage readers in a learning conversation and provide formative feedback along the way.
+                </p>
+                <p>
+                  Any user of Oppia, logged-in or otherwise, can play through, browse, and search for any <a href="/learn">public explorations</a>. To create or edit explorations, a user will need to be logged-in and to author his/her work under a stable username.
+                </p>
+                <p>
+                  Responses submitted to explorations are stored anonymously. The anonymized responses are shown to exploration creators and editors, so that the explorations can be improved over time.
+                </p>
+
+                <h2 id="community">Community Guidelines</h2>
+                <ol>
+                  <li style="line-height: 25px;">
+                    Ownership of explorations is temporary and eventually reverts to the Oppia community (see <a href="#lifecycle" target="_self">Lifecycle of an Exploration</a> for more details). The idea is to make it easy for the explorations on this site to improve continuously.
+                  </li>
+                  <li style="line-height: 25px;">
+                    Cloning explorations in order to publish an alternative version is discouraged -- it is better to suggest improvements or give feedback on the original exploration. However, you are welcome to privately clone an exploration to see how it's made.
+                  </li>
+                  <li style="line-height: 25px;">
+                    Please exercise judgement before publishing an exploration. Every exploration on this site should have significant educational value, and should not contain advertising, spam, vandalism or abuse.
+                  </li>
+                  <li style="line-height: 25px;">
+                    Creating multiple usernames, using explorations to trick users, or circumventing site features that are meant to encourage the improvement of explorations are examples of antisocial behavior that may result in account suspension.
+                  </li>
+                  <li style="line-height: 25px;">
+                    For contentious topics and clarifications on guidelines, please use the Oppia discussion forum.
+                  </li>
+                  <li style="line-height: 25px;">
+                    The governance model for Oppia comprises site admins and moderators. Site admins manage and have overall responsibility for the site; they are the final arbitrators on any dispute. Moderators suggest and review major edits for explorations, and enforce the behavioral norms described within these community guidelines.
+                  </li>
+                </ol>
+                <br>
+
+                <h2 id="lifecycle">Lifecycle of an Exploration</h2>
+                <p>
+                  All explorations start off as private, which means that they can only be viewed by the exploration editors, invited playtesters, and site admins. When an exploration is in a good enough state for general use, any owner of the exploration may decide to publish it. Currently, publishing is a one-way process. After an exploration is published, it will enter "beta" status, and be visible in the public gallery to users who click "Show all explorations". Anyone will be able to play it, give feedback, and suggest edits. Owners are encouraged to submit high-quality explorations to the <a href="https://groups.google.com/forum/#!forum/oppia-moderator-requests">moderators' request forum</a>, and those that are approved will move out of beta status and become directly visible in the gallery.
+                </p>
+                <p>
+                  The editors of an exploration can retain exclusive editing rights as long as they continue to maintain the exploration and respond to feedback and change suggestions in a timely manner. Otherwise, the exploration will be considered 'orphaned' and ownership of it will revert to the community, who will then be able to collectively improve the exploration over time. The owner(s) of an exploration may also choose to release ownership to the community at any time.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

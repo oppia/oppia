@@ -64,6 +64,9 @@ class ExplorationPage(base.BaseHandler):
 
         # TODO(sll): Cache these computations.
         interactive_widget_ids = exploration.get_interactive_widget_ids()
+        widget_dependencies = (
+            widget_registry.Registry.get_dependencies_html(
+                interactive_widget_ids))
         widget_js_directives = (
             widget_registry.Registry.get_noninteractive_widget_js() +
             widget_registry.Registry.get_interactive_widget_js(
@@ -73,9 +76,12 @@ class ExplorationPage(base.BaseHandler):
             'content': skins_services.get_skin_html(exploration.default_skin),
             'exploration_version': version,
             'iframed': is_iframed,
-            'is_private': rights_manager.is_exploration_private(exploration_id),
+            'is_private': rights_manager.is_exploration_private(
+                exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
+            'widget_dependencies': jinja2.utils.Markup(
+                widget_dependencies),
         })
 
         if is_iframed:
@@ -133,17 +139,16 @@ class FeedbackHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     def _append_answer_to_stats_log(
-            self, old_state, answer, exploration_id, old_state_name,
-            old_params, handler, rule):
+            self, old_state, answer, exploration_id, exploration_version,
+            old_state_name, old_params, handler, rule):
         """Append the reader's answer to the statistics log."""
         widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
 
         recorded_answer = widget.get_stats_log_html(
             old_state.widget.customization_args, old_params, answer)
-
         stats_services.EventHandler.record_answer_submitted(
-            exploration_id, old_state_name, handler, str(rule),
+            exploration_id, 1, old_state_name, handler, rule,
             recorded_answer)
 
     def _append_content(self, exploration, sticky, finished, old_params,
@@ -226,8 +231,8 @@ class FeedbackHandler(base.BaseHandler):
         )
 
         self._append_answer_to_stats_log(
-            old_state, answer, exploration_id, old_state_name, old_params,
-            handler, rule)
+            old_state, answer, exploration_id, exploration.version,
+            old_state_name, old_params, handler, rule)
 
         # Append the reader's answer to the response HTML.
         reader_response_html = old_widget.get_reader_response_html(
@@ -276,4 +281,4 @@ class ReaderFeedbackHandler(base.BaseHandler):
         # TODO(sll): Add the reader's history log here.
         stats_services.EventHandler.record_state_feedback_from_reader(
             exploration_id, state_name, feedback,
-            {'state_history': state_history})
+            {'state_history': state_history}, self.user_id)

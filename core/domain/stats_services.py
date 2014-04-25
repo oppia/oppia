@@ -45,11 +45,13 @@ class EventHandler(object):
 
     @classmethod
     def record_answer_submitted(
-            cls, exploration_id, state_name, handler_name, rule_str, answer):
+            cls, exploration_id, exploration_version, state_name,
+            handler_name, rule, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
-            exploration_id, state_name, handler_name, rule_str, answer)
+            exploration_id, exploration_version, state_name,
+            handler_name, rule, answer)
 
     @classmethod
     def resolve_answers_for_default_rule(
@@ -62,11 +64,11 @@ class EventHandler(object):
 
     @classmethod
     def record_state_feedback_from_reader(
-            cls, exploration_id, state_name, feedback, history):
+            cls, exploration_id, state_name, feedback, history, submitter_id):
         """Records user feedback for a particular state."""
         stats_domain.FeedbackItem.create_feedback_for_state(
             exploration_id, state_name, feedback,
-            additional_data={'history': history})
+            additional_data={'history': history}, submitter_id=submitter_id)
 
     @classmethod
     def record_exploration_feedback_from_reader(
@@ -164,6 +166,33 @@ def get_state_rules_stats(exploration_id, state_name):
 
     return results
 
+def get_user_stats(user_id):
+    """Returns a dict with user statistics for a given user.
+
+    The dict includes only one item "feedback" which itself is a dict with the
+    feedback item ID as the keys and the values being yet another dict of:
+    target_id, content, and status -- coming from FeedbackItemModel.
+    exp_id -- exploration ID for which the feedback was made.
+    exp_title -- title of the exploration.
+    state_name -- name of the state for which the feedback was made.
+    """
+    feedback = stats_domain.FeedbackItem.get_feedback_items_for_user(user_id)
+    exp_ids_with_feedback = set([
+        stats_domain.FeedbackItem.get_exploration_id_from_target_id(
+            feedback[k]['target_id']) for k in feedback
+        ])
+    exp_titles = exp_services.get_exploration_titles(exp_ids_with_feedback)
+    for feedback_id, feedback_dict in feedback.iteritems():
+        target_id = feedback_dict['target_id']
+        exp_id = stats_domain.FeedbackItem.get_exploration_id_from_target_id(
+            target_id)
+        state_name = stats_domain.FeedbackItem.get_state_name_from_target_id(
+            target_id)
+        feedback_dict['exp_id'] = exp_id
+        feedback_dict['exp_title'] = exp_titles[exp_id]
+        feedback_dict['state_name'] = state_name
+
+    return {'feedback': feedback}
 
 def get_state_stats_for_exploration(exploration_id):
     """Returns a dict with state statistics for the given exploration id."""

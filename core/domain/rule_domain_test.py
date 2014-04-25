@@ -71,6 +71,10 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
             [('x', objects.Number), ('y', objects.UnicodeString)]
         )
 
+    def test_rule_is_generic(self):
+        self.assertTrue(rule_domain.is_generic('Real', 'IsGreaterThan'))
+        self.assertFalse(rule_domain.is_generic('UnicodeString', 'Equals'))
+
 
 class RuleDataUnitTests(test_utils.GenericTestBase):
     """Tests for the actual rules in extensions/."""

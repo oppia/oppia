@@ -22,9 +22,6 @@ function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreat
   $scope.learnGalleryDataUrl = '/learnhandler/data';
   $scope.categoryList = [];
   $scope.categories = {};
-  // The default is to show only explorations that have moved out of beta or
-  // that this user has been invited to playtest.
-  $scope.areAllBetaExplorationsShown = false;
 
   $scope.displayedCategoryList = [];
   $scope.displayedCategories = {};
@@ -40,50 +37,13 @@ function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreat
       $scope.categoryList.push(category);
     }
 
-    $scope.initializeDisplay();
+    $scope.displayedCategoryList = angular.copy($scope.categoryList);
+    $scope.displayedCategories = angular.copy($scope.categories);
 
     $rootScope.loadingMessage = '';
   }).error(function(data) {
     warningsData.addWarning(data.error || 'Error communicating with server.');
   });
-
-  // TODO(sll): If there is no difference between the two types of displays,
-  // hide the 'Show All' button.
-  $scope.initializeDisplay = function() {
-    if ($scope.areAllBetaExplorationsShown) {
-      $scope.displayedCategoryList = angular.copy($scope.categoryList);
-      $scope.displayedCategories = angular.copy($scope.categories);
-    } else {
-      $scope.displayedCategoryList = [];
-      $scope.displayedCategories = {};
-
-      for (var category in $scope.categories) {
-        var validExplorationCount = 0;
-        var filteredExplorations = {};
-        for (var exploration in $scope.categories[category]) {
-          if ($scope.categories[category][exploration].to_playtest ||
-              $scope.categories[category][exploration].is_publicized) {
-            filteredExplorations[exploration] = $scope.categories[category][exploration];
-            validExplorationCount++;
-          }
-        }
-        if (validExplorationCount > 0) {
-          $scope.displayedCategories[category] = filteredExplorations;
-          $scope.displayedCategoryList.push(category);
-        }
-      }
-    }
-  };
-
-  $scope.showBetaExplorations = function() {
-    $scope.areAllBetaExplorationsShown = true;
-    $scope.initializeDisplay();
-  };
-
-  $scope.hideBetaExplorations = function() {
-    $scope.areAllBetaExplorationsShown = false;
-    $scope.initializeDisplay();
-  };
 }
 
 /**

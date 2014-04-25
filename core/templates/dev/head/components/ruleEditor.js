@@ -167,7 +167,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.getCssClassForRule = function() {
           return ($scope.isRuleConfusing() ? 'oppia-rule-bubble-warning'
-                                               : 'oppia-rule-bubble');
+                                           : 'oppia-rule-bubble');
         };
 
         $scope.getEditableCssClassForRule = function() {
@@ -258,6 +258,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           }
           $scope.ruleDescriptionFragments = result;
+        };
+
+        $scope.getEscapedDest = function() {
+          return encodeURIComponent($scope.rule.dest);
         };
 
         $scope.getExtendedChoiceArray = function(choices) {

@@ -93,7 +93,8 @@ def get_new_exploration_id():
 
 
 # Query methods.
-def _get_explorations_summary_dict(exploration_rights):
+def _get_explorations_summary_dict(
+        exploration_rights, include_timestamps=False):
     """Returns exploration summaries corresponding to the given rights objects.
 
     The summary is a dict that is keyed by exploration id. Each value is a dict
@@ -101,9 +102,10 @@ def _get_explorations_summary_dict(exploration_rights):
     is the rights object, represented as a dict.
     """
     exp_ids = [rights.id for rights in exploration_rights]
+    exploration_models = exp_models.ExplorationModel.get_multi(exp_ids)
     explorations = [
         (get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+        for e in exploration_models]
 
     result = {}
     for ind, exploration in enumerate(explorations):
@@ -115,15 +117,52 @@ def _get_explorations_summary_dict(exploration_rights):
             result[exploration.id] = {
                 'title': exploration.title,
                 'category': exploration.category,
-                'rights': exploration_rights[ind].to_dict()
+                'rights': exploration_rights[ind].to_dict(),
             }
+            if include_timestamps:
+                result[exploration.id]['last_updated'] = (
+                    utils.get_time_in_millisecs(
+                        exploration_models[ind].last_updated))
     return result
 
+def get_exploration_titles(exp_ids):
+    """Returns exploration titles for the given ids.
 
-def get_non_private_explorations_summary_dict():
-    """Returns a summary of non-private explorations."""
+    The result is a dict with exploration ids as keys and their corresponding
+    titles as the values.
+    """
+    explorations = [
+        (get_exploration_from_model(e) if e else None)
+        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
+
+    result = {}
+    for ind, exploration in enumerate(explorations):
+        if exploration is None:
+            logging.error(
+                'Could not find exploration corresponding to id')
+        else:
+            result[exploration.id] = exploration.title
+    return result
+
+def get_recently_edited_public_explorations_summary_dict():
+    """Returns a summary of recently edited public (beta) explorations."""
+    # TODO(sll): This is inefficient and not page-able; replace this once we
+    # have an easily-queryable list of explorations.
     return _get_explorations_summary_dict(
-        rights_manager.get_non_private_exploration_rights())
+        rights_manager.get_public_exploration_rights(),
+        include_timestamps=True)
+
+
+def get_public_explorations_summary_dict():
+    """Returns a summary of public (beta) explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_public_exploration_rights())
+
+
+def get_publicized_explorations_summary_dict():
+    """Returns a summary of publicized explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_publicized_exploration_rights())
 
 
 def get_community_owned_explorations_summary_dict():
@@ -132,7 +171,8 @@ def get_community_owned_explorations_summary_dict():
         rights_manager.get_community_owned_exploration_rights())
 
 
-def get_explicit_viewer_explorations_summary_dict(user_id):
+def get_explicit_viewer_explorations_summary_dict(
+        user_id, include_timestamps=False):
     """Returns a summary of some viewable explorations for this user.
 
     These explorations have the user explicitly listed in the viewer_ids field.
@@ -144,7 +184,8 @@ def get_explicit_viewer_explorations_summary_dict(user_id):
     query.
     """
     return _get_explorations_summary_dict(
-        rights_manager.get_viewable_exploration_rights(user_id))
+        rights_manager.get_viewable_exploration_rights(user_id),
+        include_timestamps=include_timestamps)
 
 
 def get_explicit_editor_explorations_summary_dict(user_id):
@@ -712,6 +753,9 @@ def save_new_exploration_from_yaml_and_assets(
 
 def delete_demo(exploration_id):
     """Deletes a single demo exploration."""
+    if not (0 <= int(exploration_id) < len(feconf.DEMO_EXPLORATIONS)):
+        raise Exception('Invalid demo exploration id %s' % exploration_id)
+
     exploration = get_exploration_by_id(exploration_id, strict=False)
     if not exploration:
         logging.info('Exploration with id %s was not deleted, because it '
@@ -752,3 +796,89 @@ def load_demo(exploration_id):
         feconf.ADMIN_COMMITTER_ID, exploration_id)
 
     logging.info('Exploration with id %s was loaded.' % exploration_id)
+
+
+def get_next_page_of_all_commits(
+        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+    """Returns a page of commits to all explorations in reverse time order.
+
+    The return value is a triple (results, cursor, more) as described in
+    fetch_page() at:
+
+        https://developers.google.com/appengine/docs/python/ndb/queryclass
+    """
+    results, new_urlsafe_start_cursor, more = (
+        exp_models.ExplorationCommitLogEntryModel.get_all_commits(
+            page_size, urlsafe_start_cursor))
+
+    return ([exp_domain.ExplorationCommitLogEntry(
+        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.exploration_id, entry.commit_type, entry.commit_message,
+        entry.commit_cmds, entry.version, entry.post_commit_status,
+        entry.post_commit_community_owned, entry.post_commit_is_private
+    ) for entry in results], new_urlsafe_start_cursor, more)
+
+
+def get_next_page_of_all_non_private_commits(
+        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+    """Returns a page of non-private commits in reverse time order.
+
+    The return value is a triple (results, cursor, more) as described in
+    fetch_page() at:
+
+        https://developers.google.com/appengine/docs/python/ndb/queryclass
+    """
+    results, new_urlsafe_start_cursor, more = (
+        exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
+            page_size, urlsafe_start_cursor))
+
+    return ([exp_domain.ExplorationCommitLogEntry(
+        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.exploration_id, entry.commit_type, entry.commit_message,
+        entry.commit_cmds, entry.version, entry.post_commit_status,
+        entry.post_commit_community_owned, entry.post_commit_is_private
+    ) for entry in results], new_urlsafe_start_cursor, more)
+
+
+def get_next_page_of_all_commits_by_exp_id(
+        exploration_id, page_size=feconf.DEFAULT_PAGE_SIZE,
+        urlsafe_start_cursor=None):
+    """Returns a page of commits to this exploration in reverse time order.
+
+    The return value is a triple (results, cursor, more) as described in
+    fetch_page() at:
+
+        https://developers.google.com/appengine/docs/python/ndb/queryclass
+    """
+    results, new_urlsafe_start_cursor, more = (
+        exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_exp_id(
+            exploration_id, page_size, urlsafe_start_cursor))
+
+    return ([exp_domain.ExplorationCommitLogEntry(
+        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.exploration_id, entry.commit_type, entry.commit_message,
+        entry.commit_cmds, entry.version, entry.post_commit_status,
+        entry.post_commit_community_owned, entry.post_commit_is_private
+    ) for entry in results], new_urlsafe_start_cursor, more)
+
+
+def get_next_page_of_all_commits_by_user_id(
+        user_id, page_size=feconf.DEFAULT_PAGE_SIZE,
+        urlsafe_start_cursor=None):
+    """Returns a page of commits by the given user_id in reverse time order.
+
+    The return value is a triple (results, cursor, more) as described in
+    fetch_page() at:
+
+        https://developers.google.com/appengine/docs/python/ndb/queryclass
+    """
+    results, new_urlsafe_start_cursor, more = (
+        exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_user_id(
+            user_id, page_size, urlsafe_start_cursor))
+
+    return ([exp_domain.ExplorationCommitLogEntry(
+        entry.created_on, entry.last_updated, entry.user_id, entry.username,
+        entry.exploration_id, entry.commit_type, entry.commit_message,
+        entry.commit_cmds, entry.version, entry.post_commit_status,
+        entry.post_commit_community_owned, entry.post_commit_is_private
+    ) for entry in results], new_urlsafe_start_cursor, more)

@@ -16,10 +16,7 @@
 
 __author__ = 'Sean Lip'
 
-import base64
 import feconf
-import hashlib
-
 import utils
 
 from core.platform import models
@@ -134,11 +131,10 @@ class BaseModel(ndb.Model):
         MAX_RETRIES = 10
         RAND_RANGE = 127 * 127
         ID_LENGTH = 12
-        # TODO(sll): Pull this logic out into utils.
         for i in range(MAX_RETRIES):
-            new_id = base64.urlsafe_b64encode(hashlib.sha1(
-                '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE))
-            ).digest())[:ID_LENGTH]
+            new_id = utils.convert_to_hash(
+                '%s%s' % (entity_name, utils.get_random_int(RAND_RANGE)),
+                ID_LENGTH)
             if not cls.get_by_id(new_id):
                 return new_id
 

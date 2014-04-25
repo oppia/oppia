@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import copy
 import logging
 import os
 
@@ -97,6 +98,9 @@ class BaseWidget(object):
     # Answer handlers. Overridden in subclasses.
     _handlers = []
 
+    # JS library dependency ids. Overridden in subclasses.
+    _dependency_ids = []
+
     @property
     def params(self):
         return [WidgetParamSpec(**param) for param in self._params]
@@ -108,6 +112,10 @@ class BaseWidget(object):
                 'This method should only be called for interactive widgets.')
 
         return [AnswerHandler(**ah) for ah in self._handlers]
+
+    @property
+    def dependency_ids(self):
+        return copy.deepcopy(self._dependency_ids)
 
     @property
     def is_interactive(self):

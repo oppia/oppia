@@ -7,6 +7,7 @@
 {% block content %}
   <div ng-controller="Moderator">
     <div class="oppia-content">
+      <h3>Email a user</h3>
       <div class="oppia-gallery-frame">
         <form ng-submit="submitUserEmailRequest(username)">
           <div>
@@ -21,6 +22,28 @@
       </div>
       <div>
         <[userEmail]>
+      </div>
+    </div>
+
+    <div class="oppia-content">
+      <h3>Recent Commits (all non-private explorations)</h3>
+      <div when-scrolled-to-bottom="loadMoreCommits()" ng-show="allCommits.length">
+        <table class="oppia-padded-table">
+          <tr>
+            <th>Timestamp</th>
+            <th>Exploration ID</th>
+            <th>Username</th>
+            <th>Commit message</th>
+            <th>Community-owned?</th>
+          </tr>
+          <tr ng-repeat="commit in allCommits track by $index">
+            <td><[getHumanReadableDate(commit.last_updated)]></td>
+            <td><a ng-href="<[getExplorationCreateUrl(commit.exploration_id)]>"><[commit.exploration_id]></a></td>
+            <td><[commit.username]></td>
+            <td><[commit.commit_message]></td>
+            <td><[commit.post_commit_community_owned]></td>
+          </tr>
+        </table>
       </div>
     </div>
   </div>
