@@ -40,9 +40,14 @@ class RecentCommitsHandler(base.BaseHandler):
         else:
             raise self.PageNotFoundException
 
+        exp_ids = set([commit.exploration_id for commit in all_commits])
+        exp_ids_to_exp_data = (
+            exp_services.get_exploration_titles_and_categories(exp_ids))
+
         all_commit_dicts = [commit.to_dict() for commit in all_commits]
         self.render_json({
             'results': all_commit_dicts,
             'cursor': new_urlsafe_start_cursor,
             'more': more,
+            'exp_ids_to_exp_data': exp_ids_to_exp_data,
         })

@@ -64,7 +64,10 @@
               <[rule]>
               <ul>
                 <li ng-repeat="answerData in ruleData.answers track by $index">
-                  <[answerData[0]]> (<[getNumTimesString(answerData[1])]>)
+                  <span class="label pull-right">
+                    <[getNumTimesString(answerData[1])]>
+                  </span>
+                  <pre><[answerData[0]]></pre>
                   <a href="#" onclick="return false;" ng-click="gotoStateEditor('rules')">
                     Add a rule for this answer
                   </a>

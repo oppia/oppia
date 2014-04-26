@@ -67,7 +67,7 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
       }, true);
 
       $scope.addItem = function() {
-        $scope.localValue.push({label: ''});
+        $scope.localValue.push({label: $scope.choices[0]});
       };
 
       $scope.deleteItem = function(index) {
