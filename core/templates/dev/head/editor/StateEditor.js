@@ -127,10 +127,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   });
 
   $scope.saveTextContent = function() {
-    $scope.$apply();
     if ($scope.contentMemento !== null && $scope.contentMemento !== $scope.content) {
-      // The $apply() call seems to be needed in order to ensure that the latest
-      // values from the RTE are captured.
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'content',
         angular.copy($scope.content), angular.copy($scope.contentMemento));

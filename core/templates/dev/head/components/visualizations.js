@@ -525,12 +525,11 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           })
           .on('click', function(d) {
             if (d.name !== END_DEST) {
-              scope.$parent.$broadcast('externalSave');
               scope.$parent.stateName = d.name;
               if (!stateStats) {
                 scope.$parent.showStateEditor(d.name);
                 // The call to $apply() is needed in order to trigger the
-                // tab change event on the parent controller.
+                // state change event on the parent controller.
                 scope.$apply();
               } else {
                 scope.$parent.showStateStatsModal(d.name, highlightStates[d.name]);
