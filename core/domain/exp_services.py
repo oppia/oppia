@@ -60,10 +60,12 @@ def _get_exploration_memcache_key(exploration_id, version=None):
 def get_exploration_from_model(exploration_model):
     return exp_domain.Exploration(
         exploration_model.id, exploration_model.title,
-        exploration_model.category, exploration_model.default_skin,
-        exploration_model.init_state_name, exploration_model.states,
-        exploration_model.param_specs, exploration_model.param_changes,
-        exploration_model.version)
+        exploration_model.category, exploration_model.objective,
+        exploration_model.language_code, exploration_model.skill_tags,
+        exploration_model.blurb, exploration_model.author_notes,
+        exploration_model.default_skin, exploration_model.init_state_name,
+        exploration_model.states, exploration_model.param_specs,
+        exploration_model.param_changes, exploration_model.version)
 
 
 def get_exploration_by_id(exploration_id, strict=True, version=None):
@@ -289,6 +291,16 @@ def apply_change_list(exploration_id, change_list):
                     exploration.update_title(change.new_value)
                 elif change.property_name == 'category':
                     exploration.update_category(change.new_value)
+                elif change.property_name == 'objective':
+                    exploration.update_objective(change.new_value)
+                elif change.property_name == 'language_code':
+                    exploration.update_language_code(change.new_value)
+                elif change.property_name == 'skill_tags':
+                    exploration.update_skill_tags(change.new_value)
+                elif change.property_name == 'blurb':
+                    exploration.update_blurb(change.new_value)
+                elif change.property_name == 'author_notes':
+                    exploration.update_author_notes(change.new_value)
                 elif change.property_name == 'param_specs':
                     exploration.update_param_specs(change.new_value)
                 elif change.property_name == 'param_changes':
@@ -471,13 +483,19 @@ def _save_exploration(
 
     exploration_model.category = exploration.category
     exploration_model.title = exploration.title
+    exploration_model.objective = exploration.objective
+    exploration_model.language_code = exploration.language_code
+    exploration_model.skill_tags = exploration.skill_tags
+    exploration_model.blurb = exploration.blurb
+    exploration_model.author_notes = exploration.author_notes
+    exploration_model.default_skin = exploration.default_skin
+
     exploration_model.init_state_name = exploration.init_state_name
     exploration_model.states = {
         state_name: state.to_dict()
         for (state_name, state) in exploration.states.iteritems()}
     exploration_model.param_specs = exploration.param_specs_dict
     exploration_model.param_changes = exploration.param_change_dicts
-    exploration_model.default_skin = exploration.default_skin
 
     exploration_model.commit(
         committer_id, commit_message, change_list)
@@ -502,13 +520,18 @@ def _create_exploration(
         id=exploration.id,
         category=exploration.category,
         title=exploration.title,
+        objective=exploration.objective,
+        language_code=exploration.language_code,
+        skill_tags=exploration.skill_tags,
+        blurb=exploration.blurb,
+        author_notes=exploration.author_notes,
+        default_skin=exploration.default_skin,
         init_state_name=exploration.init_state_name,
         states={
             state_name: state.to_dict()
             for (state_name, state) in exploration.states.iteritems()},
         param_specs=exploration.param_specs_dict,
         param_changes=exploration.param_change_dicts,
-        default_skin=exploration.default_skin
     )
     model.commit(committer_id, commit_message, commit_cmds)
     exploration.version += 1

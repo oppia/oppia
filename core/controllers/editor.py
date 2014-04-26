@@ -216,6 +216,7 @@ class ExplorationHandler(EditorHandler):
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'category': exploration.category,
+            'objective': exploration.objective,
             'title': exploration.title,
             'states': states,
             'param_changes': exploration.param_change_dicts,

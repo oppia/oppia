@@ -122,6 +122,9 @@ ADMIN_EMAIL_ADDRESS = 'admin@oppia'
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
+# The default language code for an exploration.
+DEFAULT_LANGUAGE_CODE = 'en'
+
 # An ordered list of links to stand-alone pages to display in the 'About' tab.
 # Each item is a dict with two keys: the human-readable name of the link and
 # the URL of the page.
