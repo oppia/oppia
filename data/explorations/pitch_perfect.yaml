@@ -1230,8 +1230,9 @@ states:
           param_changes: []
         - definition:
             inputs:
-              k: 3
-            name: IsShorterThan
+              a: 1
+              b: 2
+            name: HasLengthInclusivelyBetween
             rule_type: atomic
             subject: answer
           dest: Melody Trainer-1
@@ -1407,8 +1408,9 @@ states:
           param_changes: []
         - definition:
             inputs:
-              k: 5
-            name: IsShorterThan
+              a: 1
+              b: 4
+            name: HasLengthInclusivelyBetween
             rule_type: atomic
             subject: answer
           dest: Melody Trainer-2

@@ -53,13 +53,12 @@ class IsLongerThan(base.MusicPhraseRule):
         return len(_convert_sequence_to_midi(subject)) > self.k
 
 
-class IsShorterThan(base.MusicPhraseRule):
-    description = 'has between 1 and {{k|NonnegativeInt}} notes, inclusive'
+class HasLengthInclusivelyBetween(base.MusicPhraseRule):
+    description = ('has between {{a|NonnegativeInt}} and '
+                   '{{b|NonnegativeInt}} notes, inclusive')
 
     def _evaluate(self, subject):
-        midi_user_sequence_length = len(_convert_sequence_to_midi(subject))
-        return (midi_user_sequence_length != 0 and
-                midi_user_sequence_length < self.k)
+        return (self.a <= len(_convert_sequence_to_midi(subject)) <= self.b)
 
 
 class IsEqualToExceptFor(base.MusicPhraseRule):
