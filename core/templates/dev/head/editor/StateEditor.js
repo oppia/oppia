@@ -46,43 +46,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     }
   };
 
-  $scope.getIncomingStates = function(stateName) {
-    var incomingStates = {},
-        statesToRuleNames = {},
-        otherStateName;
-
-    for (otherStateName in $scope.states) {
-      var handlers = $scope.states[otherStateName].widget.handlers;
-      var widgetParams = $scope.states[otherStateName].widget.customization_args;
-      for (var i = 0; i < handlers.length; i++) {
-        for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-          if (handlers[i].rule_specs[j].dest == stateName) {
-            incomingStates[otherStateName] = $scope.states[otherStateName];
-
-            var previousChoices = null;
-            if (widgetParams.hasOwnProperty('choices')) {
-              previousChoices = widgetParams.choices;
-            }
-
-            var ruleName = $filter('parameterizeRuleDescription')(
-                handlers[i].rule_specs[j], previousChoices);
-
-            if (otherStateName in statesToRuleNames) {
-              statesToRuleNames[otherStateName].push(ruleName);
-            } else {
-              statesToRuleNames[otherStateName] = [ruleName];
-            }
-          }
-        }
-      }
-    }
-
-    for (otherStateName in incomingStates) {
-      incomingStates[otherStateName].rules = statesToRuleNames[otherStateName];
-    }
-    return incomingStates;
-  };
-
   $scope.openStateNameEditor = function() {
     $scope.stateNameEditorIsShown = true;
     $scope.tmpStateName = $scope.stateName;
