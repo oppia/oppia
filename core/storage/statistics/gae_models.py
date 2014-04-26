@@ -184,6 +184,84 @@ class FeedbackItemModel(base_models.BaseModel):
         ).filter(cls.status == 'new').fetch(QUERY_LIMIT)
 
 
+class BaseEventLogEntryModel(base_models.BaseModel): 
+    """An individual event entry to be used for statistics."""
+    # Time the event occurred
+    timestamp = ndb.DateTimeProperty()
+    # Which specific event this is
+    event_type = ndb.StringProperty()
+
+    @classmethod
+    def get_or_create(cls):
+        raise NotImplementedError 
+
+
+class ReaderEventLogEntryModel(BaseEventLogEntryModel):
+    """A generic model for event log entries for action from reader view."""
+    # Id of exploration currently being played.
+    exploration_id = ndb.IntegerProperty()
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty()
+    # Name of current state.
+    state_name = ndb.StringProperty()
+    # ID of current student's session
+    session_id = ndb.StringProperty()
+    # Time since start of this state before this event occurred (in sec).
+    time_spent = ndb.FloatProperty()
+    # Current parameter values, map of parameter name to value
+    param_values = ndb.JsonProperty()
+    # Which type of play-through this is (preview, from gallery)
+    play_type = ndb.StringProperty()
+
+    @classmethod
+    def get_or_create(cls):
+        raise NotImplementedError 
+
+
+class LeaveExplorationEventLogEntryModel(ReaderEventLogEntryModel):
+    """An event triggered by a student leaving the exploration.
+
+    Can represent completing the exploration or leaving early."""
+
+    @classmethod
+    def create(cls, timestamp, exp_id, exp_version, state_name, session_id,
+               time_spent, param_values, play_type):
+        """Creates a new leave exploration event."""
+        entity_id = cls.get_new_id('%s:%s' % (
+                                   utils.get_time_in_millisecs(timestamp),
+                                   session_id))
+        leave_event_entity = cls(timestamp=timestamp, event_type='LEAVE',
+                                 exploration_id=exp_id,
+                                 exploration_version=exp_version,
+                                 state_name=state_name, session_id=session_id,
+                                 time_spent=time_spent,
+                                 param_values=param_values,
+                                 play_type=play_type)
+        leave_event_entity.put()
+
+
+class StartExplorationEventLogEntryModel(ReaderEventLogEntryModel):
+    """An event triggered by a student leaving the exploration.
+
+    Can represent completing the exploration or leaving early."""
+
+    @classmethod
+    def create(cls, timestamp, exp_id, exp_version, state_name, session_id,
+               param_values, play_type):
+        """Creates a new leave exploration event."""
+        entity_id = cls.get_new_id('%s:%s' % (
+                                   utils.get_time_in_millisecs(timestamp),
+                                   session_id))
+        start_event_entity = cls(timestamp=timestamp, event_type='START',
+                                 exploration_id=exp_id,
+                                 exploration_version=exp_version,
+                                 state_name=state_name, session_id=session_id,
+                                 time_spent=0.0,
+                                 param_values=param_values,
+                                 play_type=play_type)
+        start_event_entity.put()
+
+
 def process_submitted_answer(
         exploration_id, exploration_version, state_name, handler_name,
         rule, answer):

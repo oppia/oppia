@@ -437,3 +437,14 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         self.assertEquals(
             stats_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
+
+
+class EventLogEntryTests(test_utils.GenericTestBase):
+    """Test for the event log creation."""
+
+    def test_create_events(self):
+        """Basic test that makes sure there are no exceptions thrown."""
+        stats_services.EventHandler.start_exploration(1, 2, 'state', 'session',
+            {}, 'play_type')
+        stats_services.EventHandler.leave_exploration(1, 2, 'state', 'session',
+            27.2, {}, 'play_type')

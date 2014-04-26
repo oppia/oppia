@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
 import feconf
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -85,6 +86,20 @@ class EventHandler(object):
         feedback_item = get_feedback_item_by_id(feedback_item_id)
         feedback_item.change_status(new_status)
         _save_feedback_item(feedback_item)
+
+    @classmethod
+    def start_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          param_values, play_type):
+        stats_models.StartExplorationEventLogEntryModel.create(
+            datetime.datetime.utcnow(), exp_id, exp_version, state_name,
+            session_id, param_values, play_type)
+
+    @classmethod
+    def leave_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          time_spent, param_values, play_type):
+        stats_models.LeaveExplorationEventLogEntryModel.create(
+            datetime.datetime.utcnow(), exp_id, exp_version, state_name,
+            session_id, time_spent, param_values, play_type)
 
 
 def get_unresolved_answers_for_default_rule(exploration_id, state_name):
