@@ -53,11 +53,6 @@ function InteractiveWidgetEditor(
   $scope.initInteractiveWidget = function(data) {
     $scope.resetInteractiveWidgetEditor();
 
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open interactive widget editor outside a state context.');
-      return;
-    }
-
     $scope.stateName = editorContextService.getActiveStateName();
 
     // Stores rules in the form of key-value pairs. For each pair, the key is

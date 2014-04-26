@@ -37,12 +37,6 @@ oppia.factory('editorContextService', ['$log', function($log) {
         return;
       }
       activeStateName = newActiveStateName;
-    },
-    clearActiveStateName: function() {
-      activeStateName = null;
-    },
-    isInStateContext: function() {
-      return (activeStateName !== null);
     }
   };
 }]);
@@ -373,37 +367,24 @@ function ExplorationEditor(
     explorationRightsService, validatorsService) {
 
   $scope.getActiveStateName = function() {
-    return (
-      editorContextService.isInStateContext() ?
-      editorContextService.getActiveStateName() : '');
+    return editorContextService.getActiveStateName();
   };
 
   $scope.saveActiveState = function() {
-    if (editorContextService.isInStateContext()) {
-      try {
+    try {
+      $rootScope.$broadcast('externalSave');
+    } catch (e) {
+      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+      // null" error. To get around this we must use $apply().
+      $rootScope.$apply(function() {
         $rootScope.$broadcast('externalSave');
-      } catch (e) {
-        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-        // null" error. To get around this we must use $apply().
-        $rootScope.$apply(function() {
-          $rootScope.$broadcast('externalSave');
-        });
-      }
+      });
     }
-  };
-
-  $scope.saveAndClearActiveState = function() {
-    $scope.saveActiveState();
-    editorContextService.clearActiveStateName();
   };
 
   $scope.saveAndChangeActiveState = function(newStateName) {
     $scope.saveActiveState();
     editorContextService.setActiveStateName(newStateName);
-  };
-
-  $scope.currentlyInStateContext = function() {
-    return editorContextService.isInStateContext();
   };
 
   var CONTRIBUTE_GALLERY_PAGE = '/contribute';
@@ -425,8 +406,6 @@ function ExplorationEditor(
 
       changeListService.discardAllChanges();
       $scope.initExplorationPage(function() {
-        $scope.selectMainTab();
-
         // The $apply() is needed to call all the exploration field $watch()
         // methods before flipping isDiscardInProgress.
         $scope.$apply();
@@ -457,7 +436,7 @@ function ExplorationEditor(
   });
 
   $scope.saveChanges = function() {
-    $scope.saveAndClearActiveState();
+    $scope.saveActiveState();
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
@@ -646,16 +625,9 @@ function ExplorationEditor(
   var STATS_VIEWER_URL = '/stats';
   var SETTINGS_URL = '/settings';
   var HISTORY_URL = '/history';
-  var firstLoad = true;
 
   $scope.selectMainTab = function() {
-    // This is needed so that if a state id is entered in the URL,
-    // the first tab does not get selected automatically, changing
-    // the location to '/'.
-    if (!firstLoad || $location.path().indexOf('gui') === -1) {
-      $location.path('/');
-    }
-    firstLoad = false;
+    $scope.showStateEditor(editorContextService.getActiveStateName());
   };
 
   $scope.selectStatsTab = function() {
@@ -691,9 +663,9 @@ function ExplorationEditor(
         var stateName = editorContextService.getActiveStateName();
         var stateData = $scope.states[stateName];
         if (stateData === null || stateData === undefined || $.isEmptyObject(stateData)) {
-          // This state does not exist. Redirect to the exploration page.
+          // This state does not exist. Redirect to the initial state.
+          $scope.showStateEditor($scope.initStateName);
           warningsData.addWarning('State ' + stateName + ' does not exist.');
-          $location.path('/');
           return;
         } else {
           $scope.settingsTabActive = false;
@@ -708,9 +680,6 @@ function ExplorationEditor(
             if ($location.hash()) {
               $anchorScroll();
             }
-            if (firstLoad) {
-              firstLoad = false;
-            }
           }, 1000);
         }
       };
@@ -722,21 +691,21 @@ function ExplorationEditor(
       }
     } else if (path == STATS_VIEWER_URL) {
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = false;
       $scope.historyTabActive = false;
     } else if (path == SETTINGS_URL) {
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.statsTabActive = false;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = true;
       $scope.historyTabActive = false;
     } else if (path == HISTORY_URL) {
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.statsTabActive = false;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = false;
@@ -749,7 +718,7 @@ function ExplorationEditor(
     } else {
       $location.path('/');
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.mainTabActive = true;
       $scope.statsTabActive = false;
       $scope.settingsTabActive = false;
@@ -948,11 +917,12 @@ function ExplorationEditor(
 
       $scope.drawGraph();
 
+      editorContextService.setActiveStateName($scope.initStateName);
+      $scope.showStateEditor($scope.initStateName);
+
       $rootScope.loadingMessage = '';
 
       $scope.refreshExplorationStatistics();
-
-      $scope.showStateEditor($scope.initStateName);
 
       if (successCallback) {
         successCallback();
@@ -1209,8 +1179,7 @@ function ExplorationEditor(
       }
 
       if (editorContextService.getActiveStateName() === deleteStateName) {
-        editorContextService.clearActiveStateName();
-        $scope.selectMainTab();
+        $scope.showStateEditor($scope.initStateName);
       }
 
       changeListService.deleteState(deleteStateName);

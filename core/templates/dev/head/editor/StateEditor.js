@@ -27,11 +27,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   });
 
   $scope.initStateEditor = function() {
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open state editor outside a state context.');
-      return;
-    }
-
     explorationData.getData().then(function(data) {
       $scope.paramSpecs = data.param_specs || {};
     });
@@ -49,11 +44,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     if ($scope.stateName && stateData) {
       $scope.$broadcast('stateEditorInitialized', stateData);
     }
-  };
-
-  $scope.closeStateEditor = function() {
-    $scope.$broadcast('externalSave');
-    $scope.$parent.selectMainTab();
   };
 
   $scope.getIncomingStates = function(stateName) {
