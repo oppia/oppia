@@ -1,41 +1,39 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Playtesters' Gallery
+  Playtest Queue
 {% endblock subtitle %}
 
 {% block content %}
   <script type="text/ng-template" id="playtestGallery/gallerySection">
-    <div class="oppia-gallery col-lg-9">
-      <table class="table">
-        <tr>
-          <th>Exploration</th>
-          <th></th>
-          <th>Category</th>
-          <th>Last updated</th>
-        </tr>
+    <div class="row">
+    <div class="oppia-gallery span8">
+        <table class="table">
+        <thead>
+          <th class="span4"><h4>Exploration</h4></th>
+          <th class="span2"><h4>Category</h4></th>
+          <th class="span2"><h4>Last edited</h4></th>
+        </thead>
         <tr ng-repeat="exploration in explorations track by $index">
-          <td>
-            <div class="oppia-gallery-tile-top">
-              <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
-                <div class="oppia-gallery-tile-description">
-                  <span class="oppia-gallery-tile-play">
+          <td class="span4">
+            <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile">
+                <div class="">
+                  <span class="">
                     <i class="icon-play-circle"></i>
                   </span>
                   <span class="oppia-gallery-tile-title"><[exploration.title]></span>
                 </div>
-              </a>
-            </div>
+            </a>
           </td>
-          <td></td>
-          <td>
+          <td class="span2">
             <[exploration.category]>
           </td>
-          <td>
+          <td class="span2">
             <[getLocaleStringForDate(exploration.last_updated)]>
           </td>
         </tr>
-      </table>
+        </table>
+    </div>
     </div>
   </script>
 
