@@ -212,15 +212,13 @@ oppia.factory('explorationPropertyService', [
   // Public base API for data services corresponding to exploration properties
   // (title, category, etc.)
   return {
-    // The current value of the property (which may not have been saved to the
-    // frontend yet). In general, this will be bound directly to the UI.
-    displayed: null,
-    // The previous (saved-in-the-frontend) value of the property. Here, 'saved'
-    // means that this is the latest value of the property as determined by the
-    // frontend change list.
-    savedMemento: null,
     init: function(value) {
+      // The current value of the property (which may not have been saved to the
+      // frontend yet). In general, this will be bound directly to the UI.
       this.displayed = value;
+      // The previous (saved-in-the-frontend) value of the property. Here, 'saved'
+      // means that this is the latest value of the property as determined by the
+      // frontend change list.
       this.savedMemento = value;
     },
     // Returns whether the current value has changed from the memento.
@@ -273,9 +271,7 @@ oppia.factory('explorationTitleService', [
     function(explorationPropertyService, $filter, validatorsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'title';
-  child._normalize = function(value) {
-    return $filter('normalizeWhitespace')(value);
-  };
+  child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
     return validatorsService.isValidEntityName(value, true);
   };
@@ -289,9 +285,7 @@ oppia.factory('explorationCategoryService', [
     function(explorationPropertyService, $filter, validatorsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'category';
-  child._normalize = function(value) {
-    return $filter('normalizeWhitespace')(value);
-  };
+  child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
     return validatorsService.isValidEntityName(value, true);
   };
@@ -305,9 +299,7 @@ oppia.factory('explorationObjectiveService', [
     function(explorationPropertyService, $filter, validatorsService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'objective';
-  child._normalize = function(value) {
-    return $filter('normalizeWhitespace')(value);
-  };
+  child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
     return validatorsService.isNonempty(value, true);
   };
@@ -319,12 +311,6 @@ oppia.factory('explorationRightsService', [
     '$http', 'explorationData', 'oppiaRequestCreator', 'warningsData',
     function($http, explorationData, oppiaRequestCreator, warningsData) {
   return {
-    ownerNames: null,
-    editorNames: null,
-    viewerNames: null,
-    _status: null,
-    _clonedFrom: null,
-    _isCommunityOwned: null,
     init: function(
         ownerNames, editorNames, viewerNames, status, clonedFrom,
         isCommunityOwned) {
@@ -332,7 +318,8 @@ oppia.factory('explorationRightsService', [
       this.editorNames = editorNames;
       this.viewerNames = viewerNames;
       this._status = status;
-      // This is null if the exploration was not cloned from anything.
+      // This is null if the exploration was not cloned from anything,
+      // otherwise it is the exploration ID of the source exploration.
       this._clonedFrom = clonedFrom;
       this._isCommunityOwned = isCommunityOwned;
     },
@@ -340,13 +327,13 @@ oppia.factory('explorationRightsService', [
       return this._clonedFrom;
     },
     isPrivate: function() {
-      return Boolean(this._status === GLOBALS.EXPLORATION_STATUS_PRIVATE);
+      return this._status === GLOBALS.EXPLORATION_STATUS_PRIVATE;
     },
     isPublic: function() {
-      return Boolean(this._status === GLOBALS.EXPLORATION_STATUS_PUBLIC);
+      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLIC;
     },
     isPublicized: function() {
-      return Boolean(this._status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED);
+      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED;
     },
     isCloned: function() {
       return Boolean(this._clonedFrom);
@@ -357,7 +344,7 @@ oppia.factory('explorationRightsService', [
     saveChangeToBackend: function(requestParameters) {
       var that = this;
 
-      requestParameters['version'] = explorationData.data.version;
+      requestParameters.version = explorationData.data.version;
       var explorationRightsUrl = '/createhandler/rights/' + explorationData.explorationId;
       $http.put(
         explorationRightsUrl,

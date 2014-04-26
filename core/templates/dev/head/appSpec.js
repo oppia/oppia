@@ -42,5 +42,14 @@ describe('Validators service', function() {
       expect(vs.isValidEntityName('y')).toBe(false);
       expect(vs.isValidEntityName('bx')).toBe(false);
     });
+
+    it('should correctly validate non-emptiness', function() {
+      expect(vs.isNonempty('b')).toBe(true);
+      expect(vs.isNonempty('abc def')).toBe(true);
+
+      expect(vs.isNonempty('')).toBe(false);
+      expect(vs.isNonempty(null)).toBe(false);
+      expect(vs.isNonempty(undefined)).toBe(false);
+    });
   });
 });

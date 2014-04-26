@@ -219,8 +219,8 @@ describe('Exploration title service', function() {
     }));
 
     it('correctly initializes the service', function() {
-      expect(ets.displayed).toBeNull();
-      expect(ets.savedMemento).toBeNull();
+      expect(ets.displayed).toBeUndefined();
+      expect(ets.savedMemento).toBeUndefined();
       ets.init('A title');
       expect(ets.displayed).toEqual('A title');
       expect(ets.savedMemento).toEqual('A title');
@@ -281,12 +281,12 @@ describe('Exploration rights service', function() {
     }));
 
     it('correctly initializes the service', function() {
-      expect(ers.ownerNames).toBeNull();
-      expect(ers.editorNames).toBeNull();
-      expect(ers.viewerNames).toBeNull();
-      expect(ers._status).toBeNull();
-      expect(ers._clonedFrom).toBeNull();
-      expect(ers._isCommunityOwned).toBeNull();
+      expect(ers.ownerNames).toBeUndefined();
+      expect(ers.editorNames).toBeUndefined();
+      expect(ers.viewerNames).toBeUndefined();
+      expect(ers._status).toBeUndefined();
+      expect(ers._clonedFrom).toBeUndefined();
+      expect(ers._isCommunityOwned).toBeUndefined();
 
       ers.init(['abc'], [], [], 'private', 'e1234', true);
 
