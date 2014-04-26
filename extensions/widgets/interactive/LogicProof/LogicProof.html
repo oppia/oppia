@@ -3,6 +3,7 @@
   <div class="row-fluid">
     <div class="span7">
       <textarea ng-model="proofString" ng-trim="false" rows="10" cols="50"></textarea>
+      <button ng-click="showHelp()">Help</button>
       <button ng-click="submitProof()">Submit</button>
     </div>
     <div class="span5" ng-show="proofError">
@@ -10,4 +11,3 @@
     </div>
   </div>
 </div>
-

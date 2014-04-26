@@ -5,3 +5,71 @@
 <script src="/extensions/widgets/interactive/LogicProof/static/js/defaultData.js"></script>
 <script src="/extensions/widgets/interactive/LogicProof/static/js/generatedParser.js"></script>
 <script src="/extensions/widgets/interactive/LogicProof/static/js/conversion.js"></script>
+
+<div ng-cloak>
+<script type="text/ng-template" id="modals/logicProofHelp">
+
+  <div class="modal-body">
+    <p>
+      <div class="row-fluid">
+        <div class="span6">
+          <u>Acceptable line types</u><br>
+          From R∧S we have R<br>
+          From R∧S we have S<br>
+          From R and S we have R∧S<br><br>
+
+          From R and R=>S we have S<br>
+          If R <i>(indent after)</i><br>
+          Hence R=>S <i>(deindent this line)</i><br>
+          We have R<br><br>
+
+          From R we have R∨S<br>
+          From S we have R∨S<br>
+          We have R∨S and whichever is true we have T<br><br>
+
+          From R and ~R we have contradiction<br>
+          From contradiction we have S<br>
+          Hence ~R <i>(deindent this line)</i><br>
+          We have R∨~R
+        </div>
+        <div class="span6">
+          From R and R<=>S we have S<br>
+          From S and R<=>S we have R<br>
+          From R<=>S we have R=>S<br>
+          From R<=>S we have S=>R<br>
+          From R=>S and S=>R we have R<=>S<br><br>
+
+          From ∀x.p at c we have p[x->c]<br>
+          Given c <i>(indent after)</i><br>
+          c was arbitrary hence ∀x.p<br>
+          From p[x->c] at c we have ∃x.p<br>
+          We have ∃x.p so take c satisfying p[x->c]<br>
+          Take x<br><br>
+
+          <i>An indent is two spaces at the start of the line</i><br><br>
+ 
+          <table border="1">
+          	<tr>
+              <td><i>Type</i></td>
+              <td>&nbsp; &amp;&nbsp; </td>
+              <td>&nbsp; |&nbsp; </td>
+              <td>&nbsp; @&nbsp; </td>
+              <td>&nbsp; $&nbsp; </td>
+            </tr>
+            <tr>
+              <td><i>to get</i></td>
+              <td>&nbsp; ∧ &nbsp; </td>
+              <td>&nbsp; ∨ &nbsp; </td>
+              <td>&nbsp; ∀ &nbsp; </td>
+              <td>&nbsp; ∃ &nbsp; </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" ng-click="close()">Close</button>
+  </div>
+</script>
+</div>

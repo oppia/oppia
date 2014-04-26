@@ -26,7 +26,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interactiveWidget/LogicProof',
-      controller: ['$scope', '$attrs', function($scope, $attrs) {
+      controller: ['$scope', '$attrs', '$modal', function($scope, $attrs, $modal) {
 
         $scope.localQuestionData = JSON.parse($attrs.questionWithValue);
 
@@ -129,7 +129,18 @@ oppia.directive('oppiaInteractiveLogicProof', [
             }, 'submit');
           }
         }
-
+        $scope.showHelp = function() {
+          $modal.open({
+            templateUrl: 'modals/logicProofHelp',
+            backdrop: 'static',
+            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+                $scope.close = function() {
+                  $modalInstance.close();
+                };
+              }
+            ]
+          }).result.then(function() {});
+        };
       }]
     };
   }
