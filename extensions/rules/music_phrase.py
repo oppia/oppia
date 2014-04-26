@@ -54,7 +54,7 @@ class IsLongerThan(base.MusicPhraseRule):
 
 
 class IsShorterThan(base.MusicPhraseRule):
-    description = 'has fewer than {{k|NonnegativeInt}} notes'
+    description = 'has between 1 and {{k|NonnegativeInt}} notes, inclusive'
 
     def _evaluate(self, subject):
         midi_user_sequence_length = len(_convert_sequence_to_midi(subject))
@@ -76,8 +76,7 @@ class IsEqualToExceptFor(base.MusicPhraseRule):
             sum(1 for x in zip(
                 midi_target_sequence, midi_user_sequence) if x[0] == x[1])
         )
-        if len(midi_target_sequence) - num_correct_notes == self.k:
-            return True
+        return len(midi_target_sequence) - num_correct_notes <= self.k
 
 
 class IsTranspositionOf(base.MusicPhraseRule):
@@ -111,5 +110,4 @@ class IsTranspositionOfExceptFor(base.MusicPhraseRule):
             sum(1 for x in zip(
                 midi_target_sequence, midi_user_sequence) if x[0] == x[1] - self.y)
         )
-        if len(midi_target_sequence) - num_correct_notes == self.k:
-            return True
+        return len(midi_target_sequence) - num_correct_notes <= self.k
