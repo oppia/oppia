@@ -569,15 +569,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: E4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: B4
+              k:
+              - 2
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
@@ -809,15 +802,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: A4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: D5
+              k:
+              - 2
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
@@ -1052,15 +1038,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: A4
+              k:
+              - 2
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
@@ -1244,19 +1223,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: F4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: B4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
+              k:
+              - 3
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
@@ -1420,27 +1388,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: E5
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: G4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
+              k:
+              - 5
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
@@ -1639,11 +1588,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: D5
+              k:
+              - 1
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
@@ -1882,11 +1828,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: F4
+              k:
+              - 1
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
@@ -2126,11 +2069,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: A5
+              k:
+              - 1
             name: IsLongerSequence
             rule_type: atomic
             subject: answer
