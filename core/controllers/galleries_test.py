@@ -385,6 +385,10 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                     'state_name': exp_dict['init_state_name'],
                     'property_name': 'widget_handlers',
                     'new_value': {'submit': widget_handlers[0]['rule_specs']},
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'An objective',
                 }]
             },
             csrf_token
@@ -425,6 +429,10 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                     'state_name': exp_dict['init_state_name'],
                     'property_name': 'widget_handlers',
                     'new_value': {'submit': widget_handlers[0]['rule_specs']},
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'An objective',
                 }]
             },
             csrf_token

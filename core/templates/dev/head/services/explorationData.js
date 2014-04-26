@@ -47,6 +47,7 @@ oppia.factory('explorationData', [
 
     // Put exploration variables here.
     var explorationData = {
+      explorationId: explorationId,
       // Returns a promise that supplies the data for the current exploration.
       getData: function() {
         if (explorationData.data) {
