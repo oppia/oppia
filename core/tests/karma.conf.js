@@ -28,7 +28,7 @@ preprocessors = {
 
 autoWatch = true;
 
-browsers = ['Firefox'];
+browsers = ['PhantomJS'];
 
 // Kill the browser if it does not capture in the given timeout [ms].
 captureTimeout = 60000;

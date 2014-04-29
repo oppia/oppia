@@ -48,6 +48,12 @@ if [ ! -h "$NODE_MODULE_DIR/.bin/karma" ]; then
   $NPM_INSTALL karma@0.8.7
 fi
 
+echo Checking whether PhantomJS is installed in $TOOLS_DIR
+if [ ! -h "$NODE_MODULE_DIR/.bin/phantomjs" ]; then
+  echo Installing PhantomJS
+  $NPM_INSTALL phantomjs@1.9
+fi
+
 $NODE_MODULE_DIR/.bin/karma start core/tests/karma.conf.js
 
 echo Done!

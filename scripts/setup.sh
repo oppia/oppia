@@ -73,3 +73,4 @@ export MACHINE_TYPE=`uname -m`
 export OS=`uname`
 
 export NPM_INSTALL="$TOOLS_DIR/node-0.10.1/bin/npm install"
+export PHANTOMJS_BIN="$NODE_MODULE_DIR/phantomjs/bin/phantomjs"
