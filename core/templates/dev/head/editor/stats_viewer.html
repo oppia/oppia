@@ -7,7 +7,14 @@
     <br>
 
     <h4>Common student paths </h4>
-    <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates" state-stats="stats.stateStats"></state-graph-viz>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span12">
+          <div state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates" state-stats="stats.stateStats">
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div ng-if="stats.numVisits == 0">

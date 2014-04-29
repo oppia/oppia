@@ -594,14 +594,8 @@ textarea {
 
 .oppia-state-editor-container {
   min-height: 800px;
-  min-width: 1170px;
+  min-width: 700px;
   position: relative;
-}
-
-.oppia-state-editor {
-  display: inline-block;
-  width: 750px;
-  position: absolute;
 }
 
 .oppia-state-editor-header {
@@ -635,15 +629,8 @@ textarea {
 
 /* Styles for the state graph vizualization. */
 
-.oppia-exploration-graph-container { 
-  display: inline-block;
-  position: absolute;
-  right: 0px;
-}
-
 .oppia-graph-viz-container {
-  width: 400px;
-  height: 200px;
+  height: 400px;
   border: 1px solid black;
 }
 

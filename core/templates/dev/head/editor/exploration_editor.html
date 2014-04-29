@@ -342,11 +342,15 @@
             <tabset>
               <tab heading="Main" active="mainTabActive" select="selectMainTab()">
                 <div class="oppia-state-editor-container">
-                  <div class="oppia-exploration-graph-container">
-                    {% include 'editor/exploration_graph.html' %}
-                  </div>
-                  <div class="oppia-state-editor" ng-controller="StateEditor">
-                    {% include 'editor/state_editor.html' %}
+                  <div class="container-fluid">
+                    <div class="row-fluid">
+                      <div class="span9" ng-controller="StateEditor">
+                        {% include 'editor/state_editor.html' %}
+                      </div>
+                      <div class="span3">
+                        {% include 'editor/exploration_graph.html' %}
+                      </div>
+                    </div>
                   </div>
                 </div>
               </tab>
