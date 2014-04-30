@@ -158,7 +158,7 @@ function InteractiveWidgetEditor(
 
     $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
     $scope.updateStatesData();
-    $scope.drawGraph();
+    $scope.refreshGraph();
 
     var activeStateName = editorContextService.getActiveStateName();
     $scope.states[activeStateName].widget.widget_id = $scope.widgetId;
@@ -256,7 +256,7 @@ function InteractiveWidgetEditor(
         editorContextService.getActiveStateName(), 'widget_handlers',
         angular.copy(newHandlers), angular.copy(oldHandlers));
       $scope.updateStatesData();
-      $scope.drawGraph();
+      $scope.refreshGraph();
       $scope.widgetHandlersMemento = angular.copy(newHandlers);
     }
   };

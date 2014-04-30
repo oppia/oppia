@@ -729,7 +729,7 @@ function ExplorationEditor(
   /********************************************
   * Methods affecting the graph visualization.
   ********************************************/
-  $scope.drawGraph = function() {
+  $scope.refreshGraph = function() {
     $scope.graphData = $scope.getNodesAndLinks(
       $scope.states, $scope.initStateName);
   };
@@ -915,7 +915,7 @@ function ExplorationEditor(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from, data.rights.community_owned);
 
-      $scope.drawGraph();
+      $scope.refreshGraph();
 
       editorContextService.setActiveStateName($scope.initStateName);
       $scope.showStateEditor($scope.initStateName);
@@ -1115,7 +1115,7 @@ function ExplorationEditor(
 
       changeListService.addState(newStateName);
 
-      $scope.drawGraph();
+      $scope.refreshGraph();
       $scope.newStateDesc = '';
 
       if (successCallback) {
@@ -1129,6 +1129,10 @@ function ExplorationEditor(
 
   $scope.deleteState = function(deleteStateName) {
     warningsData.clear();
+
+    if (deleteStateName === $scope.initStateName || deleteStateName === END_DEST) {
+      return;
+    }
 
     $modal.open({
       templateUrl: 'modals/deleteState',
@@ -1183,8 +1187,78 @@ function ExplorationEditor(
       }
 
       changeListService.deleteState(deleteStateName);
-      $scope.drawGraph();
+      $scope.refreshGraph();
     });
+  };
+
+  $scope.openStateGraphModal = function(deleteStateName) {
+    warningsData.clear();
+
+    $modal.open({
+      templateUrl: 'modals/stateGraph',
+      backdrop: 'static',
+      resolve: {
+        currentStateName: function() {
+          return $scope.getActiveStateName();
+        },
+        graphData: function() {
+          return $scope.graphData;
+        }
+      },
+      controller: [
+        '$scope', '$modalInstance', 'currentStateName', 'graphData',
+        function($scope, $modalInstance, currentStateName, graphData) {
+          $scope.currentStateName = currentStateName;
+          $scope.graphData = graphData;
+
+          $scope.deleteState = function(stateName) {
+            $modalInstance.close({
+              action: 'delete',
+              stateName: stateName
+            });
+          };
+
+          $scope.selectState = function(stateName) {
+            if (stateName !== END_DEST) {
+              $modalInstance.close({
+                action: 'navigate',
+                stateName: stateName
+              });
+            }
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function(closeDict) {
+      if (closeDict.action === 'delete') {
+        $scope.deleteState(closeDict.stateName);
+      } else if (closeDict.action === 'navigate') {
+        $scope.onClickStateInMinimap(closeDict.stateName);
+      } else {
+        console.error('Invalid closeDict action: ' + closeDict.action);
+      }
+    });
+  };
+
+  $scope.onClickStateInMinimap = function(stateName) {
+    if (stateName !== END_DEST) {
+      $scope.showStateEditor(stateName);
+      // The call to $apply() is needed in order to trigger the state change
+      // event. This is probably because the call sometimes originates from the
+      // d3 code, which Angular does not know about. The call to $apply() is
+      // wrapped here within a setTimeout function as described here:
+      //
+      //   http://stackoverflow.com/questions/18626039/apply-already-in-progress-error
+      //
+      // to prevent it causing an error when it fires unnecessarily.
+      setTimeout(function() {
+        $scope.$apply();
+      });
+    }
   };
 }
 

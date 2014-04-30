@@ -56,10 +56,13 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       highlightStates: '=',
       nodeFill: '@',
       opacityMap: '=',
-      forbidNodeDeletion: '@',
       stateStats: '=',
       allowPanning: '@',
-      currentStateName: '='
+      currentStateName: '=',
+      centerAtCurrentState: '@',
+      onClickFunction: '=',
+      onDeleteFunction: '=',
+      onMaximizeFunction: '='
     },
     template: '<div></div>',
     replace: true,
@@ -75,9 +78,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         if ($scope.val) {
           $scope.drawGraph(
             $scope.val.nodes, $scope.val.links, $scope.val.initStateName,
-            $scope.val.finalStateName, $scope.nodeFill, $scope.opacityMap,
-            $scope.forbidNodeDeletion, $scope.highlightStates, $scope.stateStats,
-            $scope.allowPanning, $scope.currentStateName
+            $scope.val.finalStateName
           );
         }
       }, true);
@@ -87,9 +88,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         if ($scope.val) {
           $scope.drawGraph(
             $scope.val.nodes, $scope.val.links, $scope.val.initStateName,
-            $scope.val.finalStateName, $scope.nodeFill, $scope.opacityMap,
-            $scope.forbidNodeDeletion, $scope.highlightStates, $scope.stateStats,
-            $scope.allowPanning, $scope.currentStateName
+            $scope.val.finalStateName
           );
         }
       });
@@ -109,10 +108,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       $scope.$watch('val', function(newVal, oldVal) {
         if (newVal) {
           $scope.drawGraph(
-            newVal.nodes, newVal.links, newVal.initStateName, newVal.finalStateName,
-            $scope.nodeFill, $scope.opacityMap, $scope.forbidNodeDeletion,
-            $scope.highlightStates, $scope.stateStats, $scope.allowPanning,
-            $scope.currentStateName
+            newVal.nodes, newVal.links, newVal.initStateName,
+            newVal.finalStateName
           );
         }
       });
@@ -121,9 +118,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         if ($scope.val) {
           $scope.drawGraph(
             $scope.val.nodes, $scope.val.links, $scope.val.initStateName,
-            $scope.val.finalStateName, $scope.nodeFill, $scope.opacityMap,
-            $scope.forbidNodeDeletion, $scope.highlightStates, $scope.stateStats,
-            $scope.allowPanning, $scope.currentStateName
+            $scope.val.finalStateName
           );
         }
       })
@@ -332,10 +327,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           return (isHighlightState || hasFeedback);
       }
 
-      $scope.drawGraph = function(
-          nodes, links, initStateName, finalStateName, nodeFill, opacityMap,
-          forbidNodeDeletion, highlightStates, stateStats, allowPanning,
-          currentStateName, expStats) {
+      $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {
         // Clear all SVG elements on the canvas.
         d3.select($element[0]).selectAll('svg').remove();
 
@@ -354,24 +346,16 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             'class': 'oppia-graph-viz'
           });
 
-        if (allowPanning) {
-          vis = vis.append('g')
-            .call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
-              vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
-            }))
-          .append('g');
+        var dimensions = $scope.getElementDimensions();
 
-          vis.append('rect')
-            .attr({
-              'width': VIEWPORT_WIDTH,
-              'height': VIEWPORT_HEIGHT
-            })
-            .style({
-              'fill-opacity': 0,
-              'fill': 'none',
-              'pointer-events': 'all',
-              'cursor': 'move'
-            });
+        if ($scope.onMaximizeFunction) {
+          vis.append('foreignObject')
+            .attr('x', dimensions.w - 30)
+            .attr('y', 0)
+            .attr('width', 30)
+            .attr('height', 30)
+            .html('<button style="font-size: large; float: right; z-index: 300;">+</button>')
+            .on('click', $scope.onMaximizeFunction);
         }
 
         // Change the position values in nodeData to use pixels.
@@ -384,6 +368,35 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             nodeData[nodeName][VERTICAL_PROPERTIES[i]] = (
               VIEWPORT_HEIGHT * nodeData[nodeName][VERTICAL_PROPERTIES[i]] / 100.0);
           }
+        }
+
+        if ($scope.centerAtCurrentState) {
+          // Center the graph at the current state (or, rather, pan it so that the
+          // current state is about a third of the way across in each direction).
+          var deltaX = -(nodeData[$scope.currentStateName].x0 - dimensions.w / 3);
+          var deltaY = -(nodeData[$scope.currentStateName].y0 - dimensions.h / 3);
+          vis = vis.append('g').attr(
+            'transform', 'translate(' + deltaX + ',' + deltaY + ')');
+        }
+
+        if ($scope.allowPanning) {
+          vis = vis.append('g')
+            .call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
+              vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+            }))
+            .append('g');
+
+          vis.append('rect')
+            .attr({
+              'width': VIEWPORT_WIDTH,
+              'height': VIEWPORT_HEIGHT
+            })
+            .style({
+              'fill-opacity': 0,
+              'fill': 'none',
+              'pointer-events': 'all',
+              'cursor': 'move'
+            });
         }
 
         var augmentedLinks = [];
@@ -420,15 +433,15 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           });
         gradient.append('stop')
           .attr({'offset': '0%'})
-          .style({'stop-color': nodeFill, 'stop-opacity': 1});
+          .style({'stop-color': $scope.nodeFill, 'stop-opacity': 1});
         gradient.append('stop')
           .attr({'offset': '100%'})
-          .style({'stop-color': nodeFill, 'stop-opacity': 0.1});
+          .style({'stop-color': $scope.nodeFill, 'stop-opacity': 0.1});
 
-        if (opacityMap) {
+        if ($scope.opacityMap) {
           var legendWidth = 210;
           var legendHeight = 70;
-          var x = 400;
+          var x = VIEWPORT_WIDTH - legendWidth;
           var legend = vis.append('svg:rect')
             .attr({'width': legendWidth, 'x': x})
             .style({'fill': 'transparent', 'stroke': 'black'});
@@ -447,7 +460,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             });
 
           vis.append('svg:text')
-            .text(opacityMap['legend'])
+            .text($scope.opacityMap['legend'])
             .attr({'x': x + 10, 'y': 50});
 
           legend.attr('height', legendHeight);
@@ -535,7 +548,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             'x': function(d) { return d.x0; },
             'y': function(d) { return d.y0; },
             'class': function(d) {
-              return (d.name !== END_DEST && d.name !== currentStateName) ? 'clickable' : null;
+              return (d.name !== END_DEST && d.name !== $scope.currentStateName) ? 'clickable' : null;
             }
           })
           .style({
@@ -544,12 +557,12 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             },
             'stroke-width': function(d) {
               return (
-                d.name == currentStateName ? '4' :
+                d.name == $scope.currentStateName ? '4' :
                 (d.name == initStateName || d.name == END_DEST) ? '2' : '1');
             },
             'fill': function(d) {
               return (
-                nodeFill ? nodeFill :
+                $scope.nodeFill ? $scope.nodeFill :
                 d.name == initStateName ? 'olive' :
                 d.name == END_DEST ? 'green' :
                 d.reachable === false ? 'pink' :
@@ -558,24 +571,14 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
               );
             },
             'fill-opacity': function(d) {
-              return opacityMap ? opacityMap[d.name] : 0.5;
+              return $scope.opacityMap ? $scope.opacityMap[d.name] : 0.5;
             }
           })
           .on('click', function(d) {
-            if (d.name !== END_DEST) {
-              $scope.$parent.stateName = d.name;
-              if (!stateStats) {
-                $scope.$parent.showStateEditor(d.name);
-                // The call to $apply() is needed in order to trigger the
-                // state change event on the parent controller.
-                $scope.$apply();
-              } else {
-                $scope.$parent.showStateStatsModal(d.name, highlightStates[d.name]);
-              }
-            }
+            $scope.onClickFunction(d.name);
           })
           .on('mouseover', function(d) {
-            if (d.name !== END_DEST && d.name !== currentStateName) {
+            if (d.name !== END_DEST && d.name !== $scope.currentStateName) {
               d3.select(this).transition().duration(150)
                 .attr('height', d.height + 6)
                 .attr('width', d.width + 6)
@@ -586,7 +589,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           })
           .on('mouseout', function(d) {
             var fill = (
-              nodeFill ? nodeFill :
+              $scope.nodeFill ? $scope.nodeFill :
               d.name == initStateName ? 'olive' :
               d.name == END_DEST ? 'green' :
               d.reachable === false ? 'pink' :
@@ -626,20 +629,10 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             'y': function(d) { return d.yLabel; }
           });
 
-        if (highlightStates) {
+        if ($scope.highlightStates) {
           nodeEnter.append('svg:rect')
             .on('click', function(d) {
-              if (d.name != END_DEST) {
-                $scope.$parent.stateName = d.name;
-                if (!stateStats) {
-                  $scope.$parent.showStateEditor(d.name);
-                   // The call to $apply() is needed in order to trigger the
-                  // tab change event on the parent controller.
-                  $scope.$apply();
-                } else {
-                  $scope.$parent.showStateStatsModal(d.name, highlightStates[d.name]);
-                }
-              }
+              $scope.onClickFunction(d.name);
             })
             .attr({
               'width': '22',
@@ -658,18 +651,18 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
               'stroke': '#DDDDDD',
               'fill-opacity': function(d) {
                 return isStateFlagged(
-                  d.name, highlightStates, expStats, stateStats) ? '1' : '0';
+                  d.name, $scope.highlightStates, $scope.expStats, $scope.stateStats) ? '1' : '0';
               },
               'stroke-opacity': function(d) {
                 return isStateFlagged(
-                  d.name, highlightStates, expStats, stateStats) ? '1' : '0' ;
+                  d.name, $scope.highlightStates, $scope.expStats, $scope.stateStats) ? '1' : '0' ;
               }
             });
 
           nodeEnter.append('svg:text')
             .text(function(d) {
               return isStateFlagged(
-                  d.name, highlightStates, expStats, stateStats) ? '⚠' : '';
+                  d.name, $scope.highlightStates, $scope.expStats, $scope.stateStats) ? '⚠' : '';
             })
             .attr({
               'fill': 'firebrick',
@@ -684,7 +677,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             });
         }
 
-        if (!forbidNodeDeletion) {
+        if ($scope.onDeleteFunction) {
           // Add a 'delete node' handler.
           nodeEnter.append('svg:rect')
             .attr({
@@ -706,7 +699,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             .style('fill', 'pink')
             .on('click', function(d) {
               if (d.name !== initStateName && d.name !== END_DEST) {
-                $scope.$parent.deleteState(d.name);
+                $scope.onDeleteFunction(d.name);
               }
             })
 
@@ -720,7 +713,6 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
               return (d.name !== initStateName && d.name !== END_DEST) ? 'x' : '';
             });
         }
-
       }
     }]
   };

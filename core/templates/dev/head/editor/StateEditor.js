@@ -109,7 +109,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       changeListService.renameState(newStateName, $scope.stateNameMemento);
 
       $scope.stateNameEditorIsShown = false;
-      $scope.drawGraph();
+      $scope.refreshGraph();
       $scope.initStateEditor();
     }
   };
