@@ -354,7 +354,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             .attr('y', 0)
             .attr('width', 30)
             .attr('height', 30)
-            .html('<button style="font-size: large; float: right; z-index: 300;">+</button>')
+            .html('<button class="oppia-map-expansion-button">+</button>')
             .on('click', $scope.onMaximizeFunction);
         }
 
@@ -373,8 +373,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         if ($scope.centerAtCurrentState) {
           // Center the graph at the current state (or, rather, pan it so that the
           // current state is about a third of the way across in each direction).
-          var deltaX = -(nodeData[$scope.currentStateName].x0 - dimensions.w / 3);
-          var deltaY = -(nodeData[$scope.currentStateName].y0 - dimensions.h / 3);
+          var deltaX = -(nodeData[$scope.currentStateName].x0 - dimensions.w / 2);
+          var deltaY = -(nodeData[$scope.currentStateName].y0 - dimensions.h / 2);
           vis = vis.append('g').attr(
             'transform', 'translate(' + deltaX + ',' + deltaY + ')');
         }
