@@ -22,8 +22,29 @@ function Profile($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
   $scope.profileDataUrl = '/profilehandler/data/';
   $rootScope.loadingMessage = 'Loading';
 
+  var findExpStats = function(data) {
+    var result = {};
+    var count = function(exps, totalProperty, privateProperty) {
+      var totalCount = 0;
+      var privateCount = 0;
+      for (id in exps) {
+        totalCount++;
+        if (exps[id].rights.status == 'private') {
+          privateCount++;
+        }
+      }
+      result[totalProperty] = totalCount;
+      result[privateProperty] = privateCount;
+    };
+    count(data.owned, 'owned', 'owned_private');
+    count(data.editable, 'editable', 'editable_private');
+    count(data.viewable, 'viewable', 'viewable_private');
+    return result;
+  };
+
   // Retrieves profile data from the server.
   $http.get($scope.profileDataUrl).success(function(data) {
+    $scope.explorationStats = findExpStats(data);
     $scope.ownedExplorations = data.owned;
     $scope.editableExplorations = data.editable;
     $scope.viewableExplorations = data.viewable;

@@ -21,8 +21,21 @@
 
         <hr>
 
+        <h4>Explorations (private)</h4>
+          <div ng-if="explorationStats.owned > 0"><a href="#owned">
+            I manage <[explorationStats.owned]>
+            (<[explorationStats.owned_private]>) explorations.
+          </a></div>
+        <div ng-if="explorationStats.editable > 0"><a href="#editable">
+            I collaborate on <[explorationStats.editable]>
+            (<[explorationStats.editable_private]>) explorations.
+        </a></div>
+        <div ng-if="explorationStats.viewable > 0"><a href="#viewable">
+            I playtest <[explorationStats.viewable]>
+            (<[explorationStats.viewable_private]>) explorations.
+        </a></div>
+
         <div ng-show="!isEmpty(ownedExplorations)">
-          <h5>Explorations I manage</h5>
           <ul>
             <li ng-repeat="(expId, expData) in ownedExplorations">
               <span ng-if="expData.rights.status == 'private'">
