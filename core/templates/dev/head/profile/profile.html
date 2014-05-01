@@ -22,20 +22,21 @@
         <hr>
 
         <h4>Explorations (private)</h4>
-          <div ng-if="explorationStats.owned > 0"><a href="#owned">
-            I manage <[explorationStats.owned]>
-            (<[explorationStats.owned_private]>) explorations.
-          </a></div>
-        <div ng-if="explorationStats.editable > 0"><a href="#editable">
+        <div ng-if="explorationStats.owned > 0"><a href="#owned_section">
+          I manage <[explorationStats.owned]>
+          (<[explorationStats.owned_private]>) explorations.
+        </a></div>
+        <div ng-if="explorationStats.editable > 0"><a href="#editable_section">
             I collaborate on <[explorationStats.editable]>
             (<[explorationStats.editable_private]>) explorations.
         </a></div>
-        <div ng-if="explorationStats.viewable > 0"><a href="#viewable">
+        <div ng-if="explorationStats.viewable > 0"><a href="#viewable_section">
             I playtest <[explorationStats.viewable]>
             (<[explorationStats.viewable_private]>) explorations.
         </a></div>
 
         <div ng-show="!isEmpty(ownedExplorations)">
+          <h5 id="owned_section">Explorations I manage</h5>
           <ul>
             <li ng-repeat="(expId, expData) in ownedExplorations">
               <span ng-if="expData.rights.status == 'private'">
@@ -47,7 +48,7 @@
         </div>
 
         <div ng-show="!isEmpty(editableExplorations)">
-          <h5>Explorations I collaborate on</h5>
+          <h5 id="editable_section">Explorations I collaborate on</h5>
           <ul>
             <li ng-repeat="(expId, expData) in editableExplorations">
               <span ng-if="expData.rights.status == 'private'">
@@ -59,7 +60,7 @@
         </div>
 
         <div ng-show="!isEmpty(viewableExplorations)">
-          <h5>Explorations I can playtest</h5>
+          <h5 id="viewable_section">Explorations I can playtest</h5>
           <ul>
             <li ng-repeat="(expId, expData) in viewableExplorations">
               <a ng-href="/explore/<[expId]>"><[expData.title]></a>
