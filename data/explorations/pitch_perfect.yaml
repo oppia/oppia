@@ -1,8 +1,13 @@
+author_notes: ''
+blurb: ''
 default_skin: conversation_v1
 init_state_name: Pitch Trainer-1
+language_code: en
+objective: practice listening to and transcribing musical pitches
 param_changes: []
 param_specs: {}
-schema_version: 2
+schema_version: 3
+skill_tags: []
 states:
   Choice from Interval-1:
     content:

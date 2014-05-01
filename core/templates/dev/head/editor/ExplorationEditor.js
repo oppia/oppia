@@ -644,8 +644,10 @@ function ExplorationEditor(
 
   $scope.showStateEditor = function(stateName) {
     warningsData.clear();
-    $scope.saveAndChangeActiveState(stateName);
-    $location.path('/gui/' + stateName);
+    if (stateName) {
+      $scope.saveAndChangeActiveState(stateName);
+      $location.path('/gui/' + stateName);
+    }
   };
 
   $scope.showMainTabWithoutStateEditor = function(stateName) {
@@ -659,10 +661,44 @@ function ExplorationEditor(
     var path = newPath;
     $log.info('Path is now ' + path);
 
+    if (newPath === '') {
+      $location.path(oldPath);
+      return;
+    }
+
     $rootScope.$broadcast('externalSave');
 
-    if (path.indexOf('/gui/') != -1) {
-      $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
+    if (path == STATS_VIEWER_URL) {
+      $scope.saveActiveState();
+      $scope.statsTabActive = true;
+      $scope.mainTabActive = false;
+      $scope.settingsTabActive = false;
+      $scope.historyTabActive = false;
+    } else if (path == SETTINGS_URL) {
+      $scope.saveActiveState();
+      $scope.statsTabActive = false;
+      $scope.mainTabActive = false;
+      $scope.settingsTabActive = true;
+      $scope.historyTabActive = false;
+    } else if (path == HISTORY_URL) {
+      $scope.saveActiveState();
+      $scope.statsTabActive = false;
+      $scope.mainTabActive = false;
+      $scope.settingsTabActive = false;
+      $scope.historyTabActive = true;
+
+      if ($scope.explorationSnapshots === null) {
+        // TODO(sll): Do this on-hover rather than on-click.
+        $scope.refreshVersionHistory();
+      }
+    } else {
+      if (path.indexOf('/gui/') != -1) {
+        $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
+      } else if ($scope.initStateName) {
+        $location.path('/gui/' + $scope.initStateName);
+      } else {
+        return;
+      }
 
       var callback = function() {
         var stateName = editorContextService.getActiveStateName();
@@ -694,40 +730,6 @@ function ExplorationEditor(
       } else {
         $scope.initExplorationPage(callback);
       }
-    } else if (path == STATS_VIEWER_URL) {
-      $location.hash('');
-      $scope.saveActiveState();
-      $scope.statsTabActive = true;
-      $scope.mainTabActive = false;
-      $scope.settingsTabActive = false;
-      $scope.historyTabActive = false;
-    } else if (path == SETTINGS_URL) {
-      $location.hash('');
-      $scope.saveActiveState();
-      $scope.statsTabActive = false;
-      $scope.mainTabActive = false;
-      $scope.settingsTabActive = true;
-      $scope.historyTabActive = false;
-    } else if (path == HISTORY_URL) {
-      $location.hash('');
-      $scope.saveActiveState();
-      $scope.statsTabActive = false;
-      $scope.mainTabActive = false;
-      $scope.settingsTabActive = false;
-      $scope.historyTabActive = true;
-
-      if ($scope.explorationSnapshots === null) {
-        // TODO(sll): Do this on-hover rather than on-click.
-        $scope.refreshVersionHistory();
-      }
-    } else {
-      $location.path('/');
-      $location.hash('');
-      $scope.saveActiveState();
-      $scope.mainTabActive = true;
-      $scope.statsTabActive = false;
-      $scope.settingsTabActive = false;
-      $scope.historyTabActive = false;
     }
   });
 
@@ -904,6 +906,7 @@ function ExplorationEditor(
       explorationObjectiveService.init(data.objective);
 
       $scope.explorationTitleService = explorationTitleService;
+      $scope.explorationObjectiveService = explorationObjectiveService;
       $scope.explorationRightsService = explorationRightsService;
 
       $scope.currentUserIsAdmin = data.is_admin;
@@ -923,7 +926,9 @@ function ExplorationEditor(
       $scope.refreshGraph();
 
       editorContextService.setActiveStateName($scope.initStateName);
-      $scope.showStateEditor($scope.initStateName);
+      if ($scope.mainTabActive) {
+        $scope.showStateEditor($scope.initStateName);
+      }
 
       $rootScope.loadingMessage = '';
 

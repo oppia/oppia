@@ -156,7 +156,7 @@ oppia.factory('validatorsService', [
     isNonempty: function(input, showWarnings) {
       if (!input) {
         if (showWarnings) {
-          warningsData.addWarning('Please enter a non-empty name.');
+          warningsData.addWarning('Please enter a non-empty value.');
         }
         return false;
       }
