@@ -601,6 +601,10 @@ textarea {
   position: relative;
 }
 
+.oppia-state-editor-footer {
+  margin-bottom: 30px;
+}
+
 .oppia-state-content {
   border-left: 1px solid #ddd;
   border-right: 1px solid #ddd;
@@ -633,8 +637,8 @@ textarea {
 .oppia-graph-maximize-button {
   font-size: large;
   z-index: 300;
-  margin-right: 2px;
-  margin-top: 2px;
+  height: 26px;
+  margin-left:2px;
 }
 
 .oppia-add-state-container {
@@ -758,45 +762,84 @@ textarea {
   background-color: #18447E;
 }
 
+.oppia-rule-block {
+  margin-top: 10px;
+}
+
+.oppia-add-rule-button {
+  width: 100%;
+  margin-top: 10px;
+  margin-bottom: 10px;
+  padding: 5px;
+  font-weight: bold;
+}
+
+.oppia-edit-rule-description-button {
+  margin-left: 5px;
+}
+
+.oppia-rule-swap-arrows {
+  margin-top: 10px;
+  width: 20px !important;
+}
+
 .oppia-rule-bubble {
   background: #18447E;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  padding: 3px;
+  padding: 5px;
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.oppia-rule-header-bubble {
+  font-weight: bold; 
+  text-align: center;
+}
+
+.oppia-rule-description-picker-bubble {
+  text-align: center;
+}
+
+.oppia-rule-description-back-arrow {
+  float: left;
 }
 
 .oppia-rule-bubble-warning {
   background: #F9EDBE;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  padding: 3px;
+  padding: 5px;
+  color: #000;
+}
+
+.oppia-rule-bubble-description-picker {
+  background: #F9EDBE;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 5px;
   color: #000;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.oppia-rule-bubble-description-picker {
-  background: #89B5F0;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  padding: 3px;
-  color: #000;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+.oppia-rule-description-close-button {
+  margin-bottom: 10px;
+}
+
+.oppia-rule-description-editor {
+  display: inline-block;
 }
 
 .oppia-feedback-bubble {
   background: #E0E0E0;
-  border-bottom-left-radius: 8px;
   padding: 5px;
-  width: 80%;
+  border-bottom-right-radius: 8px;
+  border-bottom-left-radius: 8px;
 }
 
 .oppia-dest-bubble {
   background: #EEEEEE;
-  border-bottom-right-radius: 8px;
   padding: 5px;
-  width: 20%;
 }
 
 .oppia-logo {
