@@ -224,11 +224,12 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         // Calculate the width and height of each grid rectangle.
         var totalRows = maxDepth + 1;
-        var totalColumns = 0;
-        for (var level in maxOffsetInEachLevel) {
-          totalColumns = Math.max(totalColumns, maxOffsetInEachLevel[level]);
-        }
-        totalColumns += 1;
+        // Set totalColumns to be MAX_NODES_PER_ROW, so that the width of the graph
+        // visualization can be calculated based on a fixed constant, MAX_NODES_PER_ROW.
+        // Otherwise, the width of the individual nodes is dependent on the number
+        // of nodes in the longest row, and this makes the nodes too wide if, e.g., the
+        // overall graph is just a single column wide.
+        var totalColumns = MAX_NODES_PER_ROW;
 
         // Horizontal padding between the graph and the edge of the graph visualization,
         // measured as a percentage of the entire height.
@@ -339,10 +340,12 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         }
 
         var GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
-        // Note: the '9' is arbitrary. This is a heuristic based on what looks
-        // good in the browser.
-        var GRAPH_WIDTH = Math.max(
-          $element.width(), MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * 9);
+        // A rough upper bound for the width of a single letter, in pixels, to use
+        // as a scaling factor to determine the width of graph nodes. This is not
+        // an entirely accurate description because it also takes into account the
+        // horizontal whitespace between graph nodes.
+        var LETTER_WIDTH_IN_PIXELS = 10.5;
+        var GRAPH_WIDTH = MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS;
 
         var outerVis = d3.select($element[0]).append('svg:svg')
           .attr({
