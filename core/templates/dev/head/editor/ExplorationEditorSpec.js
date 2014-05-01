@@ -29,20 +29,6 @@ describe('Editor context service', function() {
       ecs = $injector.get('editorContextService');
     }));
 
-    it('should correctly determine whether we are in a state context', function() {
-      expect(ecs.isInStateContext()).toBe(false);
-      ecs.setActiveStateName('A State');
-      expect(ecs.isInStateContext()).toBe(true);
-    });
-
-    it('should correctly clear the active state name', function() {
-      ecs.setActiveStateName('A State');
-      expect(ecs.isInStateContext()).toBe(true);
-      ecs.clearActiveStateName();
-      expect(ecs.isInStateContext()).toBe(false);
-      expect(ecs.getActiveStateName()).toBeNull();
-    });
-
     it('should correctly set and get state names', function() {
       ecs.setActiveStateName('A State');
       expect(ecs.getActiveStateName()).toBe('A State');
@@ -50,11 +36,9 @@ describe('Editor context service', function() {
 
     it('should not allow invalid state names to be set', function() {
       ecs.setActiveStateName('');
-      expect(ecs.isInStateContext()).toBe(false);
       expect(ecs.getActiveStateName()).toBeNull();
 
       ecs.setActiveStateName(null);
-      expect(ecs.isInStateContext()).toBe(false);
       expect(ecs.getActiveStateName()).toBeNull();
     });
   });

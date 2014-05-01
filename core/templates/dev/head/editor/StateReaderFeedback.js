@@ -22,11 +22,6 @@
 function StateReaderFeedback($scope, $log, warningsData, explorationData, editorContextService) {
 
   $scope.initReaderFeedback = function() {
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open state reader feedback log outside a state context.');
-      return;
-    }
-
     $scope.stateName = editorContextService.getActiveStateName();
     if ($scope.stateName && $scope.$parent.stats &&
         $scope.$parent.stats.stateStats[$scope.stateName]) {
@@ -39,9 +34,7 @@ function StateReaderFeedback($scope, $log, warningsData, explorationData, editor
     $scope.initReaderFeedback();
   });
   $scope.$watch('$parent.stats', function(newValue) {
-    if (editorContextService.isInStateContext()) {
-      $scope.initReaderFeedback();
-    }
+    $scope.initReaderFeedback();
   });
 
   $scope.resolveReaderFeedback = function(feedbackId, newStatus) {

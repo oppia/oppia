@@ -53,11 +53,6 @@ function InteractiveWidgetEditor(
   $scope.initInteractiveWidget = function(data) {
     $scope.resetInteractiveWidgetEditor();
 
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open interactive widget editor outside a state context.');
-      return;
-    }
-
     $scope.stateName = editorContextService.getActiveStateName();
 
     // Stores rules in the form of key-value pairs. For each pair, the key is
@@ -163,7 +158,7 @@ function InteractiveWidgetEditor(
 
     $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
     $scope.updateStatesData();
-    $scope.drawGraph();
+    $scope.refreshGraph();
 
     var activeStateName = editorContextService.getActiveStateName();
     $scope.states[activeStateName].widget.widget_id = $scope.widgetId;
@@ -261,7 +256,7 @@ function InteractiveWidgetEditor(
         editorContextService.getActiveStateName(), 'widget_handlers',
         angular.copy(newHandlers), angular.copy(oldHandlers));
       $scope.updateStatesData();
-      $scope.drawGraph();
+      $scope.refreshGraph();
       $scope.widgetHandlersMemento = angular.copy(newHandlers);
     }
   };

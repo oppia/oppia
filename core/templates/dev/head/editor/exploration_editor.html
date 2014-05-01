@@ -57,7 +57,7 @@
         <p>
           This means that this exploration will be added to the public gallery,
           visible to all users of the site. It will also be possible to view
-          statistics on readers' attempts at the exploration, so that the
+          statistics on reader attempts at the exploration, so that the
           exploration can be improved over time.
         </p>
 
@@ -341,10 +341,14 @@
 
             <tabset>
               <tab heading="Main" active="mainTabActive" select="selectMainTab()">
-                <div class="oppia-state-editor-container">
-                  {% include 'editor/exploration_graph.html' %}
-                  <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor" draggable="{containment: 'window', delay: 200, distance: 5, handle: '.oppia-state-editor-header'}">
-                    {% include 'editor/state_editor.html' %}
+                <div class="container-fluid">
+                  <div class="row-fluid">
+                    <div class="span9" ng-controller="StateEditor">
+                      {% include 'editor/state_editor.html' %}
+                    </div>
+                    <div class="span3">
+                      {% include 'editor/exploration_graph.html' %}
+                    </div>
                   </div>
                 </div>
               </tab>

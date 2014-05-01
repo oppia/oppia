@@ -37,12 +37,6 @@ oppia.factory('editorContextService', ['$log', function($log) {
         return;
       }
       activeStateName = newActiveStateName;
-    },
-    clearActiveStateName: function() {
-      activeStateName = null;
-    },
-    isInStateContext: function() {
-      return (activeStateName !== null);
     }
   };
 }]);
@@ -373,37 +367,24 @@ function ExplorationEditor(
     explorationRightsService, validatorsService) {
 
   $scope.getActiveStateName = function() {
-    return (
-      editorContextService.isInStateContext() ?
-      editorContextService.getActiveStateName() : '');
+    return editorContextService.getActiveStateName();
   };
 
   $scope.saveActiveState = function() {
-    if (editorContextService.isInStateContext()) {
-      try {
+    try {
+      $rootScope.$broadcast('externalSave');
+    } catch (e) {
+      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+      // null" error. To get around this we must use $apply().
+      $rootScope.$apply(function() {
         $rootScope.$broadcast('externalSave');
-      } catch (e) {
-        // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-        // null" error. To get around this we must use $apply().
-        $rootScope.$apply(function() {
-          $rootScope.$broadcast('externalSave');
-        });
-      }
+      });
     }
-  };
-
-  $scope.saveAndClearActiveState = function() {
-    $scope.saveActiveState();
-    editorContextService.clearActiveStateName();
   };
 
   $scope.saveAndChangeActiveState = function(newStateName) {
     $scope.saveActiveState();
     editorContextService.setActiveStateName(newStateName);
-  };
-
-  $scope.currentlyInStateContext = function() {
-    return editorContextService.isInStateContext();
   };
 
   var CONTRIBUTE_GALLERY_PAGE = '/contribute';
@@ -425,8 +406,6 @@ function ExplorationEditor(
 
       changeListService.discardAllChanges();
       $scope.initExplorationPage(function() {
-        $scope.selectMainTab();
-
         // The $apply() is needed to call all the exploration field $watch()
         // methods before flipping isDiscardInProgress.
         $scope.$apply();
@@ -457,7 +436,7 @@ function ExplorationEditor(
   });
 
   $scope.saveChanges = function() {
-    $scope.saveAndClearActiveState();
+    $scope.saveActiveState();
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
@@ -648,9 +627,7 @@ function ExplorationEditor(
   var HISTORY_URL = '/history';
 
   $scope.selectMainTab = function() {
-    if ($location.path().indexOf('gui') === -1) {
-      $location.path('/');
-    }
+    $scope.showStateEditor(editorContextService.getActiveStateName());
   };
 
   $scope.selectStatsTab = function() {
@@ -691,9 +668,9 @@ function ExplorationEditor(
         var stateName = editorContextService.getActiveStateName();
         var stateData = $scope.states[stateName];
         if (stateData === null || stateData === undefined || $.isEmptyObject(stateData)) {
-          // This state does not exist. Redirect to the exploration page.
+          // This state does not exist. Redirect to the initial state.
+          $scope.showStateEditor($scope.initStateName);
           warningsData.addWarning('State ' + stateName + ' does not exist.');
-          $location.path('/');
           return;
         } else {
           $scope.settingsTabActive = false;
@@ -719,21 +696,21 @@ function ExplorationEditor(
       }
     } else if (path == STATS_VIEWER_URL) {
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = false;
       $scope.historyTabActive = false;
     } else if (path == SETTINGS_URL) {
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.statsTabActive = false;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = true;
       $scope.historyTabActive = false;
     } else if (path == HISTORY_URL) {
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.statsTabActive = false;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = false;
@@ -746,7 +723,7 @@ function ExplorationEditor(
     } else {
       $location.path('/');
       $location.hash('');
-      $scope.saveAndClearActiveState();
+      $scope.saveActiveState();
       $scope.mainTabActive = true;
       $scope.statsTabActive = false;
       $scope.settingsTabActive = false;
@@ -757,7 +734,7 @@ function ExplorationEditor(
   /********************************************
   * Methods affecting the graph visualization.
   ********************************************/
-  $scope.drawGraph = function() {
+  $scope.refreshGraph = function() {
     $scope.graphData = $scope.getNodesAndLinks(
       $scope.states, $scope.initStateName);
   };
@@ -943,7 +920,10 @@ function ExplorationEditor(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from, data.rights.community_owned);
 
-      $scope.drawGraph();
+      $scope.refreshGraph();
+
+      editorContextService.setActiveStateName($scope.initStateName);
+      $scope.showStateEditor($scope.initStateName);
 
       $rootScope.loadingMessage = '';
 
@@ -1140,7 +1120,7 @@ function ExplorationEditor(
 
       changeListService.addState(newStateName);
 
-      $scope.drawGraph();
+      $scope.refreshGraph();
       $scope.newStateDesc = '';
 
       if (successCallback) {
@@ -1154,6 +1134,10 @@ function ExplorationEditor(
 
   $scope.deleteState = function(deleteStateName) {
     warningsData.clear();
+
+    if (deleteStateName === $scope.initStateName || deleteStateName === END_DEST) {
+      return;
+    }
 
     $modal.open({
       templateUrl: 'modals/deleteState',
@@ -1204,13 +1188,82 @@ function ExplorationEditor(
       }
 
       if (editorContextService.getActiveStateName() === deleteStateName) {
-        editorContextService.clearActiveStateName();
-        $scope.selectMainTab();
+        $scope.showStateEditor($scope.initStateName);
       }
 
       changeListService.deleteState(deleteStateName);
-      $scope.drawGraph();
+      $scope.refreshGraph();
     });
+  };
+
+  $scope.openStateGraphModal = function(deleteStateName) {
+    warningsData.clear();
+
+    $modal.open({
+      templateUrl: 'modals/stateGraph',
+      backdrop: 'static',
+      resolve: {
+        currentStateName: function() {
+          return $scope.getActiveStateName();
+        },
+        graphData: function() {
+          return $scope.graphData;
+        }
+      },
+      controller: [
+        '$scope', '$modalInstance', 'currentStateName', 'graphData',
+        function($scope, $modalInstance, currentStateName, graphData) {
+          $scope.currentStateName = currentStateName;
+          $scope.graphData = graphData;
+
+          $scope.deleteState = function(stateName) {
+            $modalInstance.close({
+              action: 'delete',
+              stateName: stateName
+            });
+          };
+
+          $scope.selectState = function(stateName) {
+            if (stateName !== END_DEST) {
+              $modalInstance.close({
+                action: 'navigate',
+                stateName: stateName
+              });
+            }
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function(closeDict) {
+      if (closeDict.action === 'delete') {
+        $scope.deleteState(closeDict.stateName);
+      } else if (closeDict.action === 'navigate') {
+        $scope.onClickStateInMinimap(closeDict.stateName);
+      } else {
+        console.error('Invalid closeDict action: ' + closeDict.action);
+      }
+    });
+  };
+
+  $scope.onClickStateInMinimap = function(stateName) {
+    if (stateName !== END_DEST) {
+      $scope.showStateEditor(stateName);
+      // The call to $apply() is needed in order to trigger the state change
+      // event. This is probably because the call sometimes originates from the
+      // d3 code, which Angular does not know about. The call to $apply() is
+      // wrapped here within a setTimeout function as described here:
+      //
+      //   http://stackoverflow.com/questions/18626039/apply-already-in-progress-error
+      //
+      // to prevent it causing an error when it fires unnecessarily.
+      setTimeout(function() {
+        $scope.$apply();
+      });
+    }
   };
 }
 

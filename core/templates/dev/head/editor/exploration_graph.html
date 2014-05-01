@@ -1,24 +1,36 @@
 <div>
-  <p>
-    <em>
-      Each rectangle in this diagram represents one of the
-      <a href="#" popover="A state is a step in the reader's progress through the exploration. It is typically a single question." popover-placement="bottom" popover-trigger="mouseenter">states</a> making up this exploration. You can edit each state by clicking on its rectangle.
-    </em>
-    <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">More info...</a>
-  </p>
-
   <center ng-show="!isEndStateReachable()" class="oppia-warning">
     <i class="icon-warning-sign"></i>
     <strong>Warning: </strong>This exploration cannot be completed. The END state is unreachable.
   </center>
 
-  <state-graph-viz val="graphData" allow-panning="true" current-state-name="getActiveStateName()"></state-graph-viz>
+  <div class="oppia-graph-viz-container">
+    <div state-graph-viz val="graphData" current-state-name="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" center-at-current-state="true">
+    </div>
+  </div>
 
-  <form ng-submit="addState(newStateDesc)">
-    Add a new state:
-    <input style="width: 30" type="text" ng-model="newStateDesc" placeholder="New State Name" required>
-    <button class="btn" type="submit" ng-disabled="!isNewStateNameValid(newStateDesc)">
-      Submit
-    </button>
-  </form>
+  <div class="oppia-add-state-container">
+    <form ng-submit="addState(newStateDesc)">
+      Add a new state:
+      <input style="width: 30" type="text" ng-model="newStateDesc" placeholder="New State Name" required>
+      <button class="btn" type="submit" ng-disabled="!isNewStateNameValid(newStateDesc)">
+        Submit
+      </button>
+    </form>
+  </div>
+
+  <script type="text/ng-template" id="modals/stateGraph">
+    <div class="modal-header">
+      <h3>State Graph Visualization</h3>
+    </div>
+
+    <div class="modal-body">
+      <div state-graph-viz val="graphData" allow-panning="true" current-state-name="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true">
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" ng-click="cancel()">Close</button>
+    </div>
+  </script>
 </div>
