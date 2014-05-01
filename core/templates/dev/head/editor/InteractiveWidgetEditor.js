@@ -229,10 +229,10 @@ function InteractiveWidgetEditor(
   $scope.swapRules = function(handlerName, index1, index2) {
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
 
-    $scope.tmpRule = $scope.widgetHandlers[handlerName][index1];
+    var tmpSwapRule = $scope.widgetHandlers[handlerName][index1];
     $scope.widgetHandlers[handlerName][index1] =
         $scope.widgetHandlers[handlerName][index2];
-    $scope.widgetHandlers[handlerName][index2] = $scope.tmpRule;
+    $scope.widgetHandlers[handlerName][index2] = tmpSwapRule;
 
     $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
   };
