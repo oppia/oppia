@@ -99,7 +99,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       // The following variable must be at least 3. It represents the maximum length,
       // in characters, for the name of each node label in the graph. It should not be
       // used for layout purposes.
-      var MAX_NODE_LABEL_LENGTH = 20;
+      var MAX_NODE_LABEL_LENGTH = 15;
 
       $scope.truncate = function(text) {
         return $filter('truncate')(text, MAX_NODE_LABEL_LENGTH);
@@ -230,10 +230,10 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         }
         totalColumns += 1;
 
-        // Horizontal padding between the graph and the edge of the graph viewport,
+        // Horizontal padding between the graph and the edge of the graph visualization,
         // measured as a percentage of the entire height.
         var HORIZONTAL_EDGE_PADDING_PERCENT = 5.0;
-        // Vertical edge padding between the graph and the edge of the graph viewport,
+        // Vertical edge padding between the graph and the edge of the graph visualization,
         // measured as a percentage of the entire height.
         var VERTICAL_EDGE_PADDING_PERCENT = 5.0;
 
@@ -338,25 +338,18 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           maxDepth = Math.max(maxDepth, nodeData[nodeName].depth);
         }
 
-        var VIEWPORT_HEIGHT = 80.0 * (maxDepth + 1);
-        var VIEWPORT_WIDTH = $element.width();
+        var GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
+        // Note: the '9' is arbitrary. This is a heuristic based on what looks
+        // good in the browser.
+        var GRAPH_WIDTH = Math.max(
+          $element.width(), MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * 9);
 
-        var vis = d3.select($element[0]).append('svg:svg')
+        var outerVis = d3.select($element[0]).append('svg:svg')
           .attr({
             'class': 'oppia-graph-viz'
           });
 
         var dimensions = $scope.getElementDimensions();
-
-        if ($scope.onMaximizeFunction) {
-          vis.append('foreignObject')
-            .attr('x', dimensions.w - 30)
-            .attr('y', 0)
-            .attr('width', 30)
-            .attr('height', 30)
-            .html('<button class="oppia-map-expansion-button">+</button>')
-            .on('click', $scope.onMaximizeFunction);
-        }
 
         // Change the position values in nodeData to use pixels.
         for (var nodeName in nodeData) {
@@ -364,17 +357,24 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           var VERTICAL_PROPERTIES = ['y0', 'height', 'yLabel', 'labelHeight'];
           for (var i = 0; i < HORIZONTAL_PROPERTIES.length; i++) {
             nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] = (
-              VIEWPORT_WIDTH * nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] / 100.0);
+              GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] / 100.0);
             nodeData[nodeName][VERTICAL_PROPERTIES[i]] = (
-              VIEWPORT_HEIGHT * nodeData[nodeName][VERTICAL_PROPERTIES[i]] / 100.0);
+              GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_PROPERTIES[i]] / 100.0);
           }
         }
 
+        var vis = outerVis.append('g');
+
         if ($scope.centerAtCurrentState) {
-          // Center the graph at the current state (or, rather, pan it so that the
-          // current state is about a third of the way across in each direction).
-          var deltaX = -(nodeData[$scope.currentStateName].x0 - dimensions.w / 2);
-          var deltaY = -(nodeData[$scope.currentStateName].y0 - dimensions.h / 2);
+          // Center the graph at the node representing the current state.
+          var deltaX = -(
+            nodeData[$scope.currentStateName].x0 +
+            nodeData[$scope.currentStateName].width / 2 -
+            dimensions.w / 2);
+          var deltaY = -(
+            nodeData[$scope.currentStateName].y0 +
+            nodeData[$scope.currentStateName].height / 2 -
+            dimensions.h / 2);
           vis = vis.append('g').attr(
             'transform', 'translate(' + deltaX + ',' + deltaY + ')');
         }
@@ -388,8 +388,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
           vis.append('rect')
             .attr({
-              'width': VIEWPORT_WIDTH,
-              'height': VIEWPORT_HEIGHT
+              'width': GRAPH_WIDTH,
+              'height': GRAPH_HEIGHT
             })
             .style({
               'fill-opacity': 0,
@@ -441,7 +441,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         if ($scope.opacityMap) {
           var legendWidth = 210;
           var legendHeight = 70;
-          var x = VIEWPORT_WIDTH - legendWidth;
+          var x = GRAPH_WIDTH - legendWidth;
           var legend = vis.append('svg:rect')
             .attr({'width': legendWidth, 'x': x})
             .style({'fill': 'transparent', 'stroke': 'black'});
@@ -712,6 +712,16 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             .text(function(d) {
               return (d.name !== initStateName && d.name !== END_DEST) ? 'x' : '';
             });
+        }
+
+        if ($scope.onMaximizeFunction) {
+          outerVis.append('foreignObject')
+            .attr('x', dimensions.w - 30)
+            .attr('y', 0)
+            .attr('width', 30)
+            .attr('height', 30)
+            .html('<button class="oppia-graph-maximize-button">+</button>')
+            .on('click', $scope.onMaximizeFunction);
         }
       }
     }]

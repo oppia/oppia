@@ -630,8 +630,8 @@ textarea {
   border: 1px solid black;
 }
 
-.oppia-map-expansion-button {
-  font-size: large; 
+.oppia-graph-maximize-button {
+  font-size: large;
   z-index: 300;
   margin-right: 2px;
   margin-top: 2px;
