@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Playtesters' Gallery
+  Playtesters' Queue
 {% endblock subtitle %}
 
 {% block content %}
-  <script type="text/ng-template" id="playtestGallery/gallerySection">
+  <script type="text/ng-template" id="playtestQueue/main">
     <div class="oppia-gallery">
       <table>
         <tr>
@@ -39,24 +39,24 @@
     </div>
   </script>
 
-  <div class="container" ng-controller="PlaytestGallery">
+  <div class="container" ng-controller="PlaytestQueue">
     <div class="row">
       <div class="span8">
         <div class="oppia-gallery-frame">
 
           <h3 class="oppia-page-title">
-            Playtesters' Gallery
+            Playtesters' Queue
           </h3>
 
-          <p>All explorations in this gallery are still in beta. Play them and give feedback to make them better!</p>
-          <playtest-gallery-section explorations="publicExplorations">
-          </playtest-gallery-section>
+          <p>All explorations on this page are still in beta. Play them and give feedback to make them better!</p>
+          <playtest-queue-section explorations="publicExplorations">
+          </playtest-queue-section>
 
           <div ng-if="privateExplorations">
             <br><br>
             <h4>Private explorations you've been invited to playtest</h4>
-            <playtest-gallery-section explorations="privateExplorations">
-            </playtest-gallery-section>
+            <playtest-queue-section explorations="privateExplorations">
+            </playtest-queue-section>
           </div>
         </div>
       </div>
@@ -67,6 +67,6 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('galleries/PlaytestGallery.js') }}
+    {{ include_js_file('galleries/PlaytestQueue.js') }}
   </script>
 {% endblock footer_js %}

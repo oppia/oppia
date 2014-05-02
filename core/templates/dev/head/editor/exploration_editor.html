@@ -49,33 +49,27 @@
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to
-          <a href="../site_guidelines#/how-to-use#lifecycle" target="_blank">publish</a> an
-          exploration!
+          Congratulations, you are about to publish an exploration! This will move the exploration
+          into "beta" mode, and make it visible to all users. (You can find more information in the
+          <a href="../site_guidelines#/how-to-use#lifecycle" target="_blank">exploration lifecycle</a> 
+          documentation).
         </p>
 
         <p>
-          This means that this exploration will be added to the public gallery,
-          visible to all users of the site. It will also be possible to view
-          statistics on reader attempts at the exploration, so that the
-          exploration can be improved over time.
-        </p>
-
-        <p>
-          Please only publish this exploration if it contains significant
-          educational content. Publishing an exploration is currently a
-          <strong>one-way</strong> action, since once you publish the
-          exploration, the Oppia community will be able to contribute feedback
-          and suggest improvements to it.
-        </p>
-
-        <p>
-          Would you like to publish this exploration?
+          <strong>Important:</strong> Before publishing the exploration, please ensure that it
+          meets the following basic criteria (<a href="../site_guidelines#/beta-criteria">why?</a>):
+          <ul>
+            <li>It should teach its intended audience something new (as opposed to just being a test of existing knowledge).</li>
+            <li>It should convey more than a single isolated factoid.</li>
+            <li>It should provide useful feedback and guidance to the learner, in a way that is more substantial than just 'Correct'/'Incorrect'.</li>
+            <li>It should not substantially duplicate existing explorations.</li>
+          </ul>
+          Otherwise, please improve the exploration prior to publication.
         </p>
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="publish()">Publish</button>
+        <button class="btn btn-success" ng-click="publish()">Publish</button>
         <button class="btn" ng-click="cancel()">Cancel</button>
       </div>
     </script>
