@@ -655,6 +655,8 @@ function ExplorationEditor(
     $location.path('/');
   };
 
+  // When the URL path changes, reroute to the appropriate tab in the
+  // exploration editor page.
   $scope.$watch(function() {
     return $location.path();
   }, function(newPath, oldPath) {
@@ -668,19 +670,19 @@ function ExplorationEditor(
 
     $rootScope.$broadcast('externalSave');
 
-    if (path == STATS_VIEWER_URL) {
+    if (path === STATS_VIEWER_URL) {
       $scope.saveActiveState();
       $scope.statsTabActive = true;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = false;
       $scope.historyTabActive = false;
-    } else if (path == SETTINGS_URL) {
+    } else if (path === SETTINGS_URL) {
       $scope.saveActiveState();
       $scope.statsTabActive = false;
       $scope.mainTabActive = false;
       $scope.settingsTabActive = true;
       $scope.historyTabActive = false;
-    } else if (path == HISTORY_URL) {
+    } else if (path === HISTORY_URL) {
       $scope.saveActiveState();
       $scope.statsTabActive = false;
       $scope.mainTabActive = false;
