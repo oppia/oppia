@@ -635,10 +635,9 @@ textarea {
 }
 
 .oppia-graph-maximize-button {
-  font-size: large;
-  z-index: 300;
   height: 26px;
-  margin-left:2px;
+  margin-left: 2px;
+  z-index: 300;
 }
 
 .oppia-add-state-container {
@@ -767,11 +766,11 @@ textarea {
 }
 
 .oppia-add-rule-button {
-  width: 100%;
-  margin-top: 10px;
-  margin-bottom: 10px;
-  padding: 5px;
   font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  padding: 5px;
+  width: 100%;
 }
 
 .oppia-edit-rule-description-button {
@@ -780,7 +779,6 @@ textarea {
 
 .oppia-rule-swap-arrows {
   margin-top: 10px;
-  width: 20px !important;
 }
 
 .oppia-rule-bubble {
@@ -830,16 +828,24 @@ textarea {
   display: inline-block;
 }
 
+.oppia-feedback-and-dest {
+  display: table;
+  width: 100%;
+}
+
 .oppia-feedback-bubble {
   background: #E0E0E0;
-  padding: 5px;
-  border-bottom-right-radius: 8px;
   border-bottom-left-radius: 8px;
+  display: table-cell;
+  padding: 5px;
 }
 
 .oppia-dest-bubble {
   background: #EEEEEE;
+  border-bottom-right-radius: 8px;
+  display: table-cell;
   padding: 5px;
+  vertical-align: middle;
 }
 
 .oppia-logo {

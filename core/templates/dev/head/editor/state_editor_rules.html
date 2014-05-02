@@ -24,18 +24,18 @@
 
       <div class="span1 oppia-rule-swap-arrows">
         <span class="pull-right">
-          <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="oppia-rule-ctrl btn btn-mini">
-            <i class="icon-arrow-up" title="move rule up"></i>
+          <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="btn btn-mini oppia-rule-ctrl">
+            <i class="icon-arrow-up" title="Move Rule Up"></i>
           </button>
           <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">
-            <i class="icon-arrow-up" title="move rule up"></i>
+            <i class="icon-arrow-up" title="Move Rule Up"></i>
           </span>
 
-          <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)" class="oppia-rule-ctrl btn btn-mini">
-            <i class="icon-arrow-down" title="move rule down"></i>
+          <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)" class="btn btn-mini oppia-rule-ctrl">
+            <i class="icon-arrow-down" title="Move Rule Down"></i>
           </button>
           <span ng-hide="$index < handler.length - 2" class="oppia-grayed oppia-rule-ctrl">
-            <i class="icon-arrow-down" title="move rule down"></i>
+            <i class="icon-arrow-down" title="Move Rule Down"></i>
           </span>
         </span>
       </div>
