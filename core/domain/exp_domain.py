@@ -1217,7 +1217,7 @@ class Exploration(object):
         """Converts a v2 exploration dict into a v3 exploration dict."""
         exploration_dict['schema_version'] = 3
 
-        exploration_dict['objective'] = 'FIXME dummy objective from v2 upgrade'
+        exploration_dict['objective'] = ''
         exploration_dict['language_code'] = feconf.DEFAULT_LANGUAGE_CODE
         exploration_dict['skill_tags'] = []
         exploration_dict['blurb'] = ''

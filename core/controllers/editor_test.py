@@ -350,7 +350,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
         # Check downloaded zip file
         self.assertEqual(response.headers['Content-Type'], 'text/plain')
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-        self.assertEqual(response.headers['Content-Disposition'], 
+        self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % str(filename))
         zf_saved = zipfile.ZipFile(StringIO.StringIO(response.body))
         self.assertEqual(
@@ -359,7 +359,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
 
         # Load golden zip file
         with open(os.path.join(
-                feconf.TESTS_DATA_DIR, 
+                feconf.TESTS_DATA_DIR,
                 'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
@@ -374,7 +374,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
                 ).read())
 
         self.logout()
-        
+
 
 class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
 
@@ -475,15 +475,19 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
         exp_services.delete_demo(EXP_ID)
         exp_services.load_demo(EXP_ID)
 
-        # In version 2, change the initial state content.
+        # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_services.update_exploration(
             'editor@example.com', EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective',
+            }, {
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
                 'new_value': [{'type': 'text', 'value': 'ABC'}],
-            }], 'Change init state content')
+            }], 'Change objective and init state content')
 
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(

@@ -355,7 +355,7 @@ blurb: ''
 default_skin: conversation_v1
 init_state_name: (untitled state)
 language_code: en
-objective: FIXME dummy objective from v2 upgrade
+objective: ''
 param_changes: []
 param_specs: {}
 schema_version: 3

@@ -1,8 +1,13 @@
+author_notes: ''
+blurb: ''
 default_skin: conversation_v1
 init_state_name: Start
+language_code: en
+objective: discover the Root Linear Coefficient Theorem
 param_changes: []
 param_specs: {}
-schema_version: 2
+schema_version: 3
+skill_tags: []
 states:
   Coefficient Signs:
     content:
@@ -273,13 +278,14 @@ states:
   Quotient of terms:
     content:
     - type: text
-      value: Here's the general expression again:<div><oppia-noninteractive-math raw_latex-with-value="&amp;quot;(x
-        - a_1)(x - a_2)(x - a_3) ... (x - a_n)&amp;quot;"></oppia-noninteractive-math><br><br>When&nbsp;<oppia-noninteractive-math
-        raw_latex-with-value="&amp;quot;n&amp;quot;"></oppia-noninteractive-math>&nbsp;is
-        even, the constant and linear terms have opposite signs...</div><div><br>when&nbsp;<oppia-noninteractive-math
-        raw_latex-with-value="&amp;quot;n&amp;quot;"></oppia-noninteractive-math>&nbsp;is
-        odd, the constant and linear terms also have opposite signs...<br><br>What,
-        then, is the sign of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>
+      value: "Here's the general expression again:<div><oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;(x - a_1)(x - a_2)(x - a_3) ... (x - a_n)&amp;quot;\"\
+        ></oppia-noninteractive-math><br><br>When\_<oppia-noninteractive-math raw_latex-with-value=\"\
+        &amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_is even, the constant\
+        \ and linear terms have opposite signs...</div><div><br>when\_<oppia-noninteractive-math\
+        \ raw_latex-with-value=\"&amp;quot;n&amp;quot;\"></oppia-noninteractive-math>\_\
+        is odd, the constant and linear terms also have opposite signs...<br><br>What,\
+        \ then, is the sign of the quotient:<br>[linear coefficient] / [constant term]<br>?</div>"
     param_changes: []
     widget:
       customization_args:
