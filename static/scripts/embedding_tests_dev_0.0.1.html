@@ -1,4 +1,10 @@
 <h2>v0.0.1 (unminified)</h2>
+<p>For instructions: see the README file in /static/scripts.</p>
+<p>
+  NB: When you click the 'reset exploration' button, an alert message saying "Reset
+  exploration" should be displayed. This checks that events are being sent from the
+  Oppia iframe to the containing page.
+</p>
 
 <h3>Standard embedding of the latest version</h3>
 <oppia oppia-id="0"></oppia>
@@ -19,3 +25,9 @@
 <h3>ERROR: 404 error with deferred loading</h3>
 <oppia oppia-id="fake_id" autoload="false"></oppia>
 <script src="http://localhost:8181/scripts/oppia-player-0.0.1.js"></script>
+
+<script>
+  window.OPPIA_PLAYER.onExplorationResetPostHook = function(a, b) {
+    alert('Reset exploration');
+  };
+</script>
