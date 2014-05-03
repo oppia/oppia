@@ -60,15 +60,14 @@
 
           <br>
 
-          {% if user_email %}
-            <h4>
+          <h4>
+            You can try out more beta explorations on the <a href="/playtest">Playtest</a> page!
+            {% if user_email %}
               To create new explorations or edit existing ones, visit the <a href="/contribute">Contributors' Gallery</a>.
-            </h4>
-          {% else %}
-            <h4>
+            {% else %}
               To create new explorations or edit existing ones, you must <a href="{{contribute_gallery_login_url}}">log in</a>.
-            </h4>
-          {% endif %}
+            {% endif %}
+          </h4>
         </div>
       </div>
     </div>

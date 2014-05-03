@@ -5,14 +5,14 @@
   </center>
 
   <div class="oppia-graph-viz-container">
-    <div state-graph-viz val="graphData" current-state-name="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" center-at-current-state="true">
+    <div state-graph-viz val="graphData" current-state-name="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" allow-panning="true" center-at-current-state="true">
     </div>
   </div>
 
   <div class="oppia-add-state-container">
     <form ng-submit="addState(newStateDesc)">
       Add a new state:
-      <input style="width: 30" type="text" ng-model="newStateDesc" placeholder="New State Name" required>
+      <input style="width: 30" type="text" ng-model="newStateDesc" placeholder="New State Name">
       <button class="btn" type="submit" ng-disabled="!isNewStateNameValid(newStateDesc)">
         Submit
       </button>

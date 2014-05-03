@@ -21,18 +21,18 @@
 
         <hr>
 
-        <h4>Explorations (private)</h4>
+        <h4>Exploration counts</h4>
         <div ng-if="explorationStats.owned > 0"><a href="#owned_section">
           I manage <[explorationStats.owned]>
-          (<[explorationStats.owned_private]>) explorations.
+          (<[explorationStats.owned_private]> private) explorations.
         </a></div>
         <div ng-if="explorationStats.editable > 0"><a href="#editable_section">
             I collaborate on <[explorationStats.editable]>
-            (<[explorationStats.editable_private]>) explorations.
+            (<[explorationStats.editable_private]> private) explorations.
         </a></div>
         <div ng-if="explorationStats.viewable > 0"><a href="#viewable_section">
             I playtest <[explorationStats.viewable]>
-            (<[explorationStats.viewable_private]>) explorations.
+            (<[explorationStats.viewable_private]> private) explorations.
         </a></div>
 
         <div ng-show="!isEmpty(ownedExplorations)">

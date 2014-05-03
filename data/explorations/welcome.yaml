@@ -172,15 +172,16 @@ states:
   Things you can do:
     content:
     - type: text
-      value: "That's a very quick sample of Oppia. For more sample explorations, check\
-        \ out the gallery .<div><br></div><div>If you want to add custom question\
-        \ types, or run your own instance of Oppia, have a look at our code site:</div><div><br></div><div>\_\
-        \ \_ \_<a href=\"https://code.google.com/p/oppia/\" target=\"_blank\">https://code.google.com/p/oppia/</a><br></div><div><br></div><div>You\
-        \ can also create new explorations, like this one, by clicking on the \"Create\
-        \ a new exploration\" button in the gallery.</div><br><div>We hope you enjoy\
-        \ using Oppia. If you have feedback, let us know! You can find our discussion\
-        \ forum at\_<a href=\"https://groups.google.com/forum/?fromgroups#!forum/oppia\"\
-        \ target=\"_blank\">https://groups.google.com/forum/?fromgroups#!forum/oppia</a>.</div><div><br></div>"
+      value: That's a very quick sample of Oppia. For more sample explorations, check
+        out the gallery .<div><br></div><div>If you want to add custom question types,
+        or run your own instance of Oppia, have a look at our code site:</div><div>&nbsp;
+        &nbsp;&nbsp;<br></div>&nbsp; &nbsp;&nbsp;<oppia-noninteractive-link open_link_in_same_window-with-value=""
+        url-with-value="&amp;quot;https://code.google.com/p/oppia/&amp;quot;"></oppia-noninteractive-link><div><br></div><div>You
+        can also create new explorations, like this one, by clicking on the "Create
+        a new exploration" button in the gallery.</div><br><div>We hope you enjoy
+        using Oppia. If you have feedback, let us know! You can find our discussion
+        forum at&nbsp;<oppia-noninteractive-link open_link_in_same_window-with-value=""
+        url-with-value="&amp;quot;https://groups.google.com/forum/?fromgroups#!forum/oppia&amp;quot;"></oppia-noninteractive-link>.</div>
     param_changes: []
     widget:
       customization_args: {}
@@ -199,7 +200,8 @@ states:
     - type: text
       value: <div>Hi, welcome to Oppia!</div><div><br></div><div><span>Oppia is a
         tool that helps you create interactive learning activities that can be continually
-        improved over time. You can find more information at <a href="https://code.google.com/p/oppia/">https://code.google.com/p/oppia/</a>.</span></div><div><br></div><div>But
+        improved over time. You can find more information at&nbsp;</span><oppia-noninteractive-link
+        open_link_in_same_window-with-value="true" url-with-value="&amp;quot;https://code.google.com/p/oppia/&amp;quot;"></oppia-noninteractive-link>.</div><div><br></div><div>But
         first, do you know where the name 'Oppia' comes from?</div>
     param_changes: []
     widget:
