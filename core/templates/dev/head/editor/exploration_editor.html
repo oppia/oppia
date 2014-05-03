@@ -49,33 +49,29 @@
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to
-          <a href="../site_guidelines#/how-to-use#lifecycle" target="_blank">publish</a> an
-          exploration!
+          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="../site_guidelines#/publish-and-release-criteria" target="_blank">why?</a>):
+          <ul>
+            <li>It should help its intended audience learn something new.</li>
+            <li>It should convey more than a single isolated factoid.</li>
+            <li>It should provide useful feedback and guidance to help the learner (and not just 'Correct'/'Incorrect').</li>
+            <li>It should not substantially duplicate existing explorations.</li>
+          </ul>
+        </p>
+        <p>
+          You can read more about these criteria on the <a href="http://localhost:8181/site_guidelines#/publish-and-release-criteria" target="_blank">exploration publishing criteria</a> page.
         </p>
 
         <p>
-          This means that this exploration will be added to the public gallery,
-          visible to all users of the site. It will also be possible to view
-          statistics on reader attempts at the exploration, so that the
-          exploration can be improved over time.
-        </p>
-
-        <p>
-          Please only publish this exploration if it contains significant
-          educational content. Publishing an exploration is currently a
-          <strong>one-way</strong> action, since once you publish the
-          exploration, the Oppia community will be able to contribute feedback
-          and suggest improvements to it.
-        </p>
-
-        <p>
-          Would you like to publish this exploration?
+          If your exploration meets all these criteria, please feel free to publish
+          it so that others can playtest and improve it! Good explorations can subsequently be
+          moved to the Learn gallery. (You can find more information
+          <a href="../site_guidelines#/how-to-use#lifecycle" target="_blank">here</a>
+          about how this works.)
         </p>
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="publish()">Publish</button>
+        <button class="btn btn-success" ng-click="publish()">Publish</button>
         <button class="btn" ng-click="cancel()">Cancel</button>
       </div>
     </script>

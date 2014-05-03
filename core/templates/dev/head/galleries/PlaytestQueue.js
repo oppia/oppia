@@ -13,18 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia playtesters' gallery page.
+ * @fileoverview Data and controllers for the Oppia playtesters' queue page.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('playtestGallerySection', [function() {
+oppia.directive('playtestQueueSection', [function() {
   return {
     restrict: 'E',
     scope: {
       explorations: '='
     },
-    templateUrl: 'playtestGallery/gallerySection',
+    templateUrl: 'playtestQueue/main',
     controller: ['$scope', 'oppiaDateFormatter', function($scope, oppiaDateFormatter) {
       $scope.getLocaleStringForDate = function(millisSinceEpoch) {
         return oppiaDateFormatter.getLocaleString(millisSinceEpoch);
@@ -33,13 +33,13 @@ oppia.directive('playtestGallerySection', [function() {
   };
 }]);
 
-function PlaytestGallery($scope, $http, $rootScope, warningsData) {
-  $scope.playtestGalleryDataUrl = '/playtesthandler/data';
+function PlaytestQueue($scope, $http, $rootScope, warningsData) {
+  $scope.playtestQueueDataUrl = '/playtesthandler/data';
 
   $rootScope.loadingMessage = 'Loading';
 
-  // Retrieves gallery data from the server.
-  $http.get($scope.playtestGalleryDataUrl).success(function(data) {
+  // Retrieves data from the server.
+  $http.get($scope.playtestQueueDataUrl).success(function(data) {
     $scope.publicExplorations = data.public_explorations_list;
     $scope.privateExplorations = data.private_explorations_list;
     $rootScope.loadingMessage = '';
@@ -51,5 +51,5 @@ function PlaytestGallery($scope, $http, $rootScope, warningsData) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-PlaytestGallery.$inject = [
+PlaytestQueue.$inject = [
   '$scope', '$http', '$rootScope', 'warningsData'];
