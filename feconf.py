@@ -132,7 +132,7 @@ ABOUT_PAGES = [{
     'name': 'About this site',
     'url': '/about'
 }, {
-    'name': 'How to use this site',
+    'name': 'How to use Oppia',
     'url': '/site_guidelines',
 }, {
     'name': 'Blog',
