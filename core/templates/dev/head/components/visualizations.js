@@ -349,7 +349,9 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         var outerVis = d3.select($element[0]).append('svg:svg')
           .attr({
-            'class': 'oppia-graph-viz'
+            'class': 'oppia-graph-viz',
+            'width': '100%',
+            'height': '100%'
           });
 
         var dimensions = $scope.getElementDimensions();
