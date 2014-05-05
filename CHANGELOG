@@ -3,6 +3,33 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.4 (5 May 2014)
+-------------------
+New pages:
+* Add a new 'playtest queue' page.
+* Add a new tab in the 'How to use Oppia' page that outlines the 'beta' and 'release' criteria for explorations, and further clarify the description of the exploration lifecycle.
+
+Editor interface improvements:
+* Redesign the exploration editor page to focus more on the state editor rather than the exploration graph, and make it generally tidier.
+* Make exploration graph nodes have a fixed width.
+* Rewrite and simplify the 'publish exploration' modal.
+
+Editor functionality improvements:
+* Allow each exploration to specify an objective, and make this mandatory for published explorations.
+
+Profile page improvements:
+* Show counts of a user's private/public explorations.
+
+Improvements to the workflow for embedding Oppia explorations in other pages:
+* Create a new version of the embedding script that allows explorations to be loaded only after the user clicks a button.
+* Add manual integration tests for the embedding workflow.
+
+Infrastructure:
+* Use PhantomJS instead of Firefox for running unit tests.
+* Add an integration test framework.
+* Add an integration test for the exploration download handler.
+
+
 v1.2.3 (26 Apr 2014)
 --------------------
 Interactive widgets:
