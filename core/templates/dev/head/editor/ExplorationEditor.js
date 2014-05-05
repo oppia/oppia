@@ -927,9 +927,12 @@ function ExplorationEditor(
 
       $scope.refreshGraph();
 
-      editorContextService.setActiveStateName($scope.initStateName);
+      if (!editorContextService.getActiveStateName()) {
+        editorContextService.setActiveStateName($scope.initStateName);
+      }
+
       if ($scope.mainTabActive) {
-        $scope.showStateEditor($scope.initStateName);
+        $scope.showStateEditor(editorContextService.getActiveStateName());
       }
 
       $rootScope.loadingMessage = '';
