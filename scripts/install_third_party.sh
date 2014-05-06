@@ -96,7 +96,7 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     git checkout 13f89c2cab0ee9163e0077102478958a14afb781
 
     git submodule update --init --recursive
-    
+
     # Add a temporary backup file so that this script works on both Linux and Mac.
     TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
 
@@ -120,157 +120,8 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
 
   # Move the build directory to the static resources folder.
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
-  mv $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
+  cp -r $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 fi
 
-if [ ! -d "$TOOLS_DIR/yuicompressor-2.4.8" ]; then
-  echo Installing YUI Compressor
-  mkdir -p $TOOLS_DIR/yuicompressor-2.4.8
-  wget https://github.com/yui/yuicompressor/releases/download/v2.4.8/yuicompressor-2.4.8.jar -O $TOOLS_DIR/yuicompressor-2.4.8/yuicompressor-2.4.8.jar
-fi
-
-# Static resources.
-echo Checking whether ui-bootstrap is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0" ]; then
-  echo Installing UI Bootstrap
-  mkdir -p $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0
-  wget https://raw.github.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-tpls-0.6.0.js -O $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0/ui-bootstrap-tpls-0.6.0.js
-  wget https://raw.github.com/angular-ui/bootstrap/gh-pages/ui-bootstrap-tpls-0.6.0.min.js -O $THIRD_PARTY_DIR/static/ui-bootstrap-0.6.0/ui-bootstrap-tpls-0.6.0.min.js
-fi
-
-echo Checking whether select2 is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/select2-3.4.1" ]; then
-  echo Installing select2
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/ivaynberg/select2/archive/3.4.1.zip -O select2-download.zip
-  unzip select2-download.zip -d $THIRD_PARTY_DIR/static/
-  rm select2-download.zip
-fi
-
-echo Checking whether jwysiwyg is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/jwysiwyg-496497" ]; then
-  echo Installing jwysiwyg
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/jwysiwyg/jwysiwyg/archive/496497b0772067a0064b627c02893d989ccc7cc9.zip -O jwysiwyg-download.zip
-  unzip jwysiwyg-download.zip -d $THIRD_PARTY_DIR/static/
-  rm jwysiwyg-download.zip
-  mv $THIRD_PARTY_DIR/static/jwysiwyg-496497b0772067a0064b627c02893d989ccc7cc9 $THIRD_PARTY_DIR/static/jwysiwyg-496497
-fi
-
-echo Checking whether jquery is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/jquery-2.0.3" ]; then
-  echo Installing JQuery
-  mkdir -p $THIRD_PARTY_DIR/static/jquery-2.0.3/
-  wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.js -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.js
-  wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.js -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.min.js
-  wget https://ajax.googleapis.com/ajax/libs/jquery/2.0.3/jquery.min.map -O $THIRD_PARTY_DIR/static/jquery-2.0.3/jquery.min.map
-fi
-
-echo Checking whether jqueryui is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/jqueryui-1.10.3" ]; then
-  echo Installing JQueryUI
-  mkdir -p $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
-  wget https://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js -O $THIRD_PARTY_DIR/static/jqueryui-1.10.3/jquery-ui.min.js
-  wget http://jqueryui.com/resources/download/jquery-ui-themes-1.10.3.zip -O jquery-ui-themes.zip
-  unzip jquery-ui-themes.zip -d $THIRD_PARTY_DIR/static/jqueryui-1.10.3/
-  rm jquery-ui-themes.zip
-fi
-
-echo Checking whether angularjs is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3" ]; then
-  echo Installing AngularJS and angular-sanitize
-  mkdir -p $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular.min.js.map
-
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-resource.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-resource.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-resource.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-resource.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-resource.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-resource.min.js.map
-
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-route.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-route.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-route.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-route.min.js.map
-
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.min.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js
-  wget https://ajax.googleapis.com/ajax/libs/angularjs/1.2.0-rc.3/angular-sanitize.min.js.map -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js.map
-
-  # Files for tests.
-  wget http://code.angularjs.org/1.2.0-rc.3/angular-mocks.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-mocks.js
-  wget http://code.angularjs.org/1.2.0-rc.3/angular-scenario.js -O $THIRD_PARTY_DIR/static/angularjs-1.2.0-rc.3/angular-scenario.js
-fi
-
-echo Checking whether d3.js is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/d3js-3.2.8" ]; then
-  echo Installing d3.js
-  mkdir -p $THIRD_PARTY_DIR/static/d3js-3.2.8/
-  wget https://raw.github.com/mbostock/d3/v3.2.8/d3.min.js -O $THIRD_PARTY_DIR/static/d3js-3.2.8/d3.min.js
-fi
-
-echo Checking whether CodeMirror is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/code-mirror-3.19.0" ]; then
-  echo Installing CodeMirror
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/marijnh/CodeMirror/archive/3.19.0.zip -O code-mirror-download.zip
-  unzip code-mirror-download.zip -d $THIRD_PARTY_DIR/static/
-  rm code-mirror-download.zip
-  mv $THIRD_PARTY_DIR/static/CodeMirror-3.19.0 $THIRD_PARTY_DIR/static/code-mirror-3.19.0
-fi
-
-echo Checking whether ui-codemirror is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/ui-codemirror-0.1.0" ]; then
-  echo Installing ui-codemirror
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/angular-ui/ui-codemirror/archive/src0.1.0.zip -O angular-ui-codemirror-download.zip
-  unzip angular-ui-codemirror-download.zip -d $THIRD_PARTY_DIR/static/
-  rm angular-ui-codemirror-download.zip
-  mv $THIRD_PARTY_DIR/static/ui-codemirror-src0.1.0 $THIRD_PARTY_DIR/static/ui-codemirror-0.1.0
-fi
-
-echo Checking whether MIDI.js is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/midi-js-09335a" ]; then
-  echo Installing MIDI.js
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/mudcube/MIDI.js/archive/09335aa7078be606f6d2389a3defb6d616db9ff7.zip -O midi-js-download.zip
-  unzip midi-js-download.zip -d $THIRD_PARTY_DIR/static/
-  rm midi-js-download.zip
-  mv $THIRD_PARTY_DIR/static/MIDI.js-09335aa7078be606f6d2389a3defb6d616db9ff7 $THIRD_PARTY_DIR/static/midi-js-09335a
-fi
-
-echo Checking whether ui-map is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/ui-map-0.5.0" ]; then
-  echo Installing ui-map
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/angular-ui/ui-map/archive/v0.5.0.zip -O angular-ui-map-download.zip
-  unzip angular-ui-map-download.zip -d $THIRD_PARTY_DIR/static/
-  rm angular-ui-map-download.zip
-fi
-
-# ui-utils contains ui-event, which is needed for ui-map.
-echo Checking whether ui-utils is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/static/ui-utils-0.1.1" ]; then
-  echo Installing ui-utils
-  mkdir -p $THIRD_PARTY_DIR/static/
-  wget https://github.com/angular-ui/ui-utils/archive/v0.1.1.zip -O angular-ui-utils-download.zip
-  unzip angular-ui-utils-download.zip -d $THIRD_PARTY_DIR/static/
-  rm angular-ui-utils-download.zip
-fi
-
-echo Checking whether bleach is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/bleach-1.2.2" ]; then
-  echo Installing bleach
-  mkdir -p $THIRD_PARTY_DIR/bleach-1.2.2
-  wget https://github.com/jsocol/bleach/archive/v1.2.2.zip -O bleach-download.zip
-  unzip bleach-download.zip -d $THIRD_PARTY_DIR/
-  rm bleach-download.zip
-fi
-
-echo Checking whether html5lib is installed in $THIRD_PARTY_DIR
-if [ ! -d "$THIRD_PARTY_DIR/html5lib-python-0.95" ]; then
-  echo Installing html5lib
-  mkdir -p $THIRD_PARTY_DIR/html5lib-python-0.95
-  wget https://github.com/html5lib/html5lib-python/archive/0.95.zip -O html5lib-download.zip
-  unzip html5lib-download.zip -d $THIRD_PARTY_DIR/
-  rm html5lib-download.zip
-fi
+# Download and install other required JS and zip files.
+python scripts/install_third_party.py
