@@ -568,7 +568,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             'fill': function(d) {
               return (
                 $scope.nodeFill ? $scope.nodeFill :
-                d.name == initStateName ? 'olive' :
+                d.name == initStateName ? '#bbedb1' :
                 d.name == END_DEST ? 'green' :
                 d.reachable === false ? 'pink' :
                 d.reachableFromEnd === false ? 'pink' :
@@ -595,7 +595,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           .on('mouseout', function(d) {
             var fill = (
               $scope.nodeFill ? $scope.nodeFill :
-              d.name == initStateName ? 'olive' :
+              d.name == initStateName ? '#bbedb1' :
               d.name == END_DEST ? 'green' :
               d.reachable === false ? 'pink' :
               d.reachableFromEnd === false ? 'pink' :
