@@ -47,8 +47,15 @@ class JobModel(base_models.BaseModel):
         random_int = random.randint(0, 1000)
         return '%s-%s-%s' % (job_name, current_time_str, random_int)
 
-    # The execution time of the job, in seconds.
-    execution_time_sec = ndb.FloatProperty(indexed=False)
+    # The job type.
+    job_type = ndb.StringProperty(indexed=True)
+    # The time at which the job was queued.
+    time_queued = ndb.FloatProperty(indexed=True)
+    # The time at which the job was started. This is never set if the job was
+    # canceled before it was started.
+    time_started = ndb.FloatProperty(indexed=True)
+    # The time at which the job was completed, failed or canceled.
+    time_finished = ndb.FloatProperty(indexed=True)
     # The current status code for the job.
     status_code = ndb.IntegerProperty(
         indexed=True,
@@ -57,5 +64,21 @@ class JobModel(base_models.BaseModel):
             STATUS_CODE_NEW, STATUS_CODE_QUEUED, STATUS_CODE_STARTED,
             STATUS_CODE_COMPLETED, STATUS_CODE_FAILED, STATUS_CODE_CANCELED
         ])
-    # The output of the job.
+    # The output of the job. This is only populated if the job has status code
+    # STATUS_CODE_COMPLETED, and is None otherwise.
     output = ndb.TextProperty(indexed=False)
+    # The error message, if applicable. Only populated if the job has status
+    # code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
+    error = ndb.TextProperty(indexed=False)
+
+    def is_status_queued_or_started(self):
+        return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
+
+    # A computed property stating whether the job is currently in queued or
+    # started status.
+    is_unfinished = ndb.ComputedProperty(is_status_queued_or_started)
+
+    @classmethod
+    def get_unfinished_jobs(cls, job_type):
+        return cls.query().filter(cls.job_type == job_type).filter(
+            cls.is_unfinished == True)

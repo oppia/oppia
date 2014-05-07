@@ -24,6 +24,7 @@ import traceback
 
 from core.platform import models
 (job_models,) = models.Registry.import_models([models.NAMES.job])
+taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
 
@@ -45,10 +46,6 @@ VALID_STATUS_CODE_TRANSITIONS = {
 }
 
 
-class PermanentTaskFailure(Exception):
-    pass
-
-
 class BaseJob(object):
     """Base class for durable jobs.
 
@@ -59,143 +56,166 @@ class BaseJob(object):
     # jobs (as opposed to abstract base superclasses).
     IS_VALID_JOB_CLASS = False
 
-    def __init__(self, job_id):
+    def __init__(self, job_id, status_code, time_queued, time_started,
+                 time_finished, output, error):
         self._job_id = job_id
-        self.execution_time_sec = None
-        self.status_code = None
-        self.output = None
+        self.status_code = status_code
+        self.time_queued = time_queued
+        self.time_started = time_started
+        self.time_finished = time_finished
+        self.output = output
+        self.error = error
 
-    def _post_failure_hook(self):
-        """Run after a job has failed. Can be overwritten by subclasses."""
-        pass
-
-    def _run_job(self):
-        logging.info('Job started')
-        time_started = time.time()
-
-        result = ''
-        try:
-            self.mark_started()
-            result = self.run()
-            self.mark_completed(time.time() - time_started, result)
-            logging.info('Job completed')
-        except Exception as e:
-            logging.error(traceback.format_exc())
-            logging.error('Job failed')
-            self.mark_failed(time.time() - time_started, unicode(e))
-            self._failure_hook()
-            raise PermanentTaskFailure(
-                '%s\n%s' % (unicode(e), traceback.format_exc()))
-
-    def enqueue(self):
-        self.mark_queued()
-        self._run_job()
+    @classmethod
+    def load_from_datastore_model(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        return cls(
+            model.id, model.status_code, model.time_queued, model.time_started,
+            model.time_finished, model.output, model.error)
 
     @classmethod
     def create_new(cls):
+        """Creates a new job of this class type."""
         if not cls.IS_VALID_JOB_CLASS:
             raise Exception(
                 'Tried to directly initialize a job using the abstract base '
                 'class %s, which is not allowed.' % cls.__name__)
 
         job_id = job_models.JobModel.get_new_id(cls.__name__)
-        job_model = job_models.JobModel(id=job_id)
+        job_model = job_models.JobModel(id=job_id, job_type=cls.__name__)
         job_model.put()
 
-        return cls(job_id)
+        return cls(
+            job_id, job_model.status_code, job_model.time_queued,
+            job_model.time_started, job_model.time_finished, job_model.output,
+            job_model.error)
 
-    def _reload_from_datastore(self):
-        """Loads the last known state of this job from the datastore."""
-        job_model = job_models.JobModel.get_by_id(self._job_id)
-        if job_model:
-            self.execution_time_sec = job_model.execution_time_sec
-            self.status_code = job_model.status_code
-            self.output = job_model.output
+    def enqueue(self):
+        """Adds the job to the default task queue."""
+        self._mark_queued()
+        taskqueue_services.defer(self._run_job)
 
-    def _update_status(self, strict=True):
-        """Saves the current status of a job domain object to the datastore.
+    def cancel(self, user_id):
+        cancel_message = 'Canceled by %s' % (user_id or 'system')
+        # Do job-specific cancellation work outside the transaction.
+        self._pre_cancel_hook(self._job_id)
+        self._mark_canceled(cancel_message)
 
-        If strict is True, raises an error if the job does not exist.
+    @classmethod
+    def cancel_all_unfinished_jobs(cls):
+        """Cancel all queued or started jobs of this job type."""
+        unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
+            cls.__name__)
+        for job_model in unfinished_job_models:
+            job = cls(
+                job_model.id, job_model.status_code, job_model.time_queued,
+                job_model.time_started, job_model.time_finished,
+                job_model.output, job_model.error)
+            job.cancel()
+
+    def _run(self):
+        """Function that performs the main business logic of the job.
+
+        Needs to be implemented by subclasses.
         """
+        raise NotImplementedError
+
+    def _pre_cancel_hook(self, job_id):
+        """Run before a job is canceled. Can be overwritten by subclasses."""
+        pass
+
+    def _post_failure_hook(self):
+        """Run after a job has failed. Can be overwritten by subclasses."""
+        pass
+
+    def _run_job(self):
+        """Starts the job."""
+        logging.info('Job %s started at %s' % (self._job_id, time.time()))
+        self._mark_started()
+
+        try:
+            result = self._run()
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            logging.error('Job %s failed at %s' % (self._job_id, time.time()))
+            self._mark_failed('%s\n%s' % (unicode(e), traceback.format_exc()))
+            self._post_failure_hook()
+            raise Exception(
+                'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
+
+        # Note that the job may have been canceled after it started and before
+        # it reached this stage. This will result in an exception when the
+        # validity of the status code transition is checked.
+        self._mark_completed(result)
+        logging.info('Job %s completed at %s' % (self._job_id, time.time()))
+
+    def _require_valid_transition(self, old_status_code, new_status_code):
+        valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
+        if new_status_code not in valid_new_status_codes:
+            raise Exception(
+                'Invalid status code change for job %s: from %s to %s.' %
+                (self._job_id, old_status_code, new_status_code))
+
+    def _update_status(self):
+        """Saves the current status of a job domain object to the datastore."""
         def _update_status_in_transaction(job_id):
-            job_model = job_models.JobModel.get_by_id(self._job_id)
-            if not job_model:
-                if strict:
-                    raise Exception(
-                        'Job was not created or was deleted: %s' %
-                        self._job_id)
-                else:
-                    job_model = job_models.JobModel(id=job_id)
-
-            valid_new_status_codes = (
-                VALID_STATUS_CODE_TRANSITIONS[job_model.status_code])
-            if self.status_code not in valid_new_status_codes:
-                raise Exception(
-                    'Invalid status code change for job %s: from %s to %s.' %
-                    (self._job_id, job_model.status_code, self.status_code))
-
-            job_model.execution_time_sec = self.execution_time_sec
+            job_model = job_models.JobModel.get(self._job_id, strict=True)
             job_model.status_code = self.status_code
+            job_model.time_queued = self.time_queued
+            job_model.time_started = self.time_started
+            job_model.time_finished = self.time_finished
             job_model.output = self.output
+            job_model.error = self.error
             job_model.put()
 
         transaction_services.run_in_transaction(
             _update_status_in_transaction, self._job_id)
 
-    def mark_queued(self):
-        """Mark the state of a job as enqueued in the datastore.
-
-        Creates a new job model if one does not already exist.
-        """
-        self.execution_time_sec = 0
+    def _mark_queued(self):
+        """Mark the state of a job as enqueued in the datastore."""
+        self._require_valid_transition(self.status_code, STATUS_CODE_QUEUED)
         self.status_code = STATUS_CODE_QUEUED
-        self.output = None
-        return self._update_status(strict=False)
+        self.time_queued = time.time()
+        self._update_status()
 
-    def mark_started(self, output=None):
-        self.execution_time_sec = 0
+    def _mark_started(self):
+        self._require_valid_transition(self.status_code, STATUS_CODE_STARTED)
         self.status_code = STATUS_CODE_STARTED
-        self.output = output
-        return self._update_status()
+        self.time_started = time.time()
+        self._update_status()
 
-    def mark_completed(self, execution_time_sec, output):
-        self.execution_time_sec = execution_time_sec
+    def _mark_completed(self, output):
+        self._require_valid_transition(self.status_code, STATUS_CODE_COMPLETED)
         self.status_code = STATUS_CODE_COMPLETED
+        self.time_finished = time.time()
         self.output = output
-        return self._update_status()
+        self._update_status()
 
-    def mark_failed(self, execution_time_sec, output):
-        self.execution_time_sec = execution_time_sec
+    def _mark_failed(self, error):
+        self._require_valid_transition(self.status_code, STATUS_CODE_FAILED)
         self.status_code = STATUS_CODE_FAILED
-        self.output = output
-        return self._update_status()
+        self.time_finished = time.time()
+        self.error = error
+        self._update_status()
 
-    def mark_canceled(self, execution_time_sec, message):
-        self.execution_time_sec = execution_time_sec
+    def _mark_canceled(self, cancel_message):
+        self._require_valid_transition(self.status_code, STATUS_CODE_CANCELED)
         self.status_code = STATUS_CODE_CANCELED
-        self.output = message
-        return self._update_status()
+        self.time_finished = time.time()
+        self.error = cancel_message
+        self._update_status()
 
     @property
     def is_active(self):
-        self._reload_from_datastore()
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @property
     def has_finished(self):
-        self._reload_from_datastore()
         return self.status_code in [STATUS_CODE_COMPLETED, STATUS_CODE_FAILED]
 
-    def cancel(self, user_id):
-        message = 'Canceled by %s' % (user_id or 'system')
-        # TODO(sll): Redo this.
-        execution_time_sec = time.time() - 0
-        # Do job-specific cancellation work outside the transaction.
-        self._cancel_queued_work()
-        # Update the job record.
-        transaction_services.run_in_transaction(
-            self.mark_canceled, execution_time_sec, message)
-
-    def _cancel_queued_work(self, job_id, message):
-        """Override in subclasses to cancel work outside the transaction."""
-        pass
+    @property
+    def execution_time_sec(self):
+        if self.time_started is None or self.time_finished is None:
+            return None
+        else:
+            return self.time_finished - self.time_started
