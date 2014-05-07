@@ -64,27 +64,44 @@ if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   mv $TOOLS_DIR/WebTest-1.4.2 $TOOLS_DIR/webtest-1.4.2
 fi
 
-# Install third party dependencies
+# Install third party dependencies.
 bash scripts/install_third_party.sh
 
-if [ ! -f "/opt/google/chrome/chrome" ]; then
+# Check that there isn't a server already running.
+if ( nc -vz localhost 8181 >/dev/null 2>&1 ); then
   echo ""
-  echo "  INFORMATION"
-  echo "  Setting up a local development server. You can access this server"
-  echo "  by navigating to localhost:8181 in a browser window."
+  echo "  WARNING"
+  echo "  Could not start new server. There is already an existing server"
+  echo "  running at port 8181."
   echo ""
-else
+  exit 1
+fi
+
+# Launch a browser window.
+if [ -f "/opt/google/chrome/chrome" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
   echo "  Chrome browser window pointing to this server."
   echo ""
   (sleep 5; /opt/google/chrome/chrome http://localhost:8181/ )&
+elif [ -f "/Applications/Google\ Chrome.app" ]; then
+  echo ""
+  echo "  INFORMATION"
+  echo "  Setting up a local development server at localhost:8181. Opening a"
+  echo "  Chrome browser window pointing to this server."
+  echo ""
+  (sleep 5; open "/Applications/Google\ Chrome.app" http://localhost:8181/ )&
+else
+  echo ""
+  echo "  INFORMATION"
+  echo "  Setting up a local development server. You can access this server"
+  echo "  by navigating to localhost:8181 in a browser window."
+  echo ""
 fi
 
-# Set up a local dev instance
-# TODO(sll): Do this in a new shell.
+# Set up a local dev instance.
+# TODO(sll): do this in a new shell.
 echo Starting GAE development server
 python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=yes .
-
 echo Done!
