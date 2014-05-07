@@ -254,7 +254,8 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_taskqueue_stub()
-        self.taskq = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
+        self.taskqueue_stub = self.testbed.get_stub(
+            testbed.TASKQUEUE_SERVICE_NAME)
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
@@ -262,6 +263,20 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):  # pylint: disable-msg=g-bad-name
         os.environ['USER_IS_ADMIN'] = '0'
         self.testbed.deactivate()
+
+    def count_jobs_in_taskqueue(self):
+        return len(self.taskqueue_stub.get_filtered_tasks())
+
+    def process_and_flush_pending_tasks(self):
+        from google.appengine.ext import deferred
+
+        tasks = self.taskqueue_stub.get_filtered_tasks()
+        self.taskqueue_stub.FlushQueue('default')
+        while tasks:
+            for task in tasks:
+                deferred.run(task.payload)
+            tasks = self.taskqueue_stub.get_filtered_tasks()
+            self.taskqueue_stub.FlushQueue('default')
 
 
 if feconf.PLATFORM == 'gae':

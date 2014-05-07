@@ -10,6 +10,7 @@ env_variables:
 
 builtins:
 - appstats: on
+- deferred: on
 - remote_api: on
 
 inbound_services:

@@ -18,8 +18,11 @@
 
 __author__ = 'Sean Lip'
 
+import random
+
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import utils
 
 from google.appengine.ext import ndb
 
@@ -30,24 +33,29 @@ STATUS_CODE_QUEUED = 1
 STATUS_CODE_STARTED = 2
 STATUS_CODE_COMPLETED = 3
 STATUS_CODE_FAILED = 4
+STATUS_CODE_CANCELED = 5
 
 
 class JobModel(base_models.BaseModel):
-    """Class representing a datastore entity for a long-running job.
+    """Class representing a datastore entity for a long-running job."""
 
-    The id of a job is, by default, its class name. Note that this means that,
-    for each type of job, only one instance may run at a particular time.
-    """
+    @classmethod
+    def get_new_id(cls, entity_name):
+        """Overwrites superclass method."""
+        job_name = entity_name
+        current_time_str = str(int(utils.get_current_time_in_millisecs()))
+        random_int = random.randint(0, 1000)
+        return '%s-%s-%s' % (job_name, current_time_str, random_int)
 
     # The execution time of the job, in seconds.
-    execution_time_sec = ndb.IntegerProperty(indexed=False)
+    execution_time_sec = ndb.FloatProperty(indexed=False)
     # The current status code for the job.
     status_code = ndb.IntegerProperty(
-        indexed=False,
+        indexed=True,
         default=STATUS_CODE_NEW,
         choices=[
             STATUS_CODE_NEW, STATUS_CODE_QUEUED, STATUS_CODE_STARTED,
-            STATUS_CODE_COMPLETED, STATUS_CODE_FAILED
+            STATUS_CODE_COMPLETED, STATUS_CODE_FAILED, STATUS_CODE_CANCELED
         ])
     # The output of the job.
     output = ndb.TextProperty(indexed=False)
