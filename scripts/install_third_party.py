@@ -47,10 +47,10 @@ def download_files(source_url_root, target_dir, source_filenames):
         and retains the same filename.
     """
     assert isinstance(source_filenames, list)
+    common.ensure_directory_exists(target_dir)
     for filename in source_filenames:
         if not os.path.exists(os.path.join(target_dir, filename)):
             print 'Downloading file %s to %s' % (filename, target_dir)
-            common.ensure_directory_exists(target_dir)
             urllib.urlretrieve(
                 '%s/%s' % (source_url_root, filename),
                 os.path.join(target_dir, filename))
