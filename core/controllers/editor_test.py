@@ -553,3 +553,114 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.logout()
+
+
+class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
+    """Test the handler for managing exploration editing rights."""
+
+    def test_exploration_rights_handler(self):
+        """Test exploration rights handler."""
+
+        # todo(marcel): test manager role
+                
+        # Create several users
+        self.admin_email = 'admin@example.com'
+        self.owner_email = 'owner@example.com'
+        self.manager_email = 'manager@example.com'
+        self.collaborator_email = 'collaborator@example.com'
+        self.collaborator2_email = 'collaborator2@example.com'
+        self.viewer_email = 'viewer@example.com'
+        self.viewer2_email = 'viewer2@example.com'
+
+        self.register_editor(self.admin_email, username='adm')
+        self.register_editor(self.owner_email, username='owner')
+        self.register_editor(self.manager_email, username='manager')
+        self.register_editor(self.collaborator_email, username='collab')
+        self.register_editor(self.viewer_email, username='viewer')
+        
+        self.admin_id = self.get_user_id_from_email(self.admin_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.manager_id = self.get_user_id_from_email(self.manager_email)
+        self.collaborator_id = self.get_user_id_from_email(self.collaborator_email)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+
+        self.viewer_role='viewer'
+        self.collaborator_role='editor'
+        
+        # Owner creates exploration
+        self.login(self.owner_email)
+        EXP_ID = 'eid'
+        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
+        csrf_token = self.get_csrf_token_from_response(response)
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'Title for rights handler test!',
+            'My category')
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exp_services.save_new_exploration(self.owner_id, exploration)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+        
+        # Owner adds rights for other users
+        url = str('%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID))
+        response_dict = self.put_json(
+            url, {
+                'version': exploration.version,
+                'new_member_email': self.viewer_email,
+                'new_member_role': self.viewer_role
+            }, csrf_token)
+        response_dict = self.put_json(
+            url, {
+                'version': exploration.version,
+                'new_member_email': self.collaborator_email,
+                'new_member_role': self.collaborator_role
+            }, csrf_token)
+        
+        self.logout()
+
+        # Check that viewer cannot access editor page
+        self.login(self.viewer_email)
+        response = self.testapp.get('/create/%s' % EXP_ID,expect_errors=True)
+        self.assertEqual(response.status_int, 401)        
+        self.logout()
+
+        # Check that collaborator can access editor page
+        self.login(self.collaborator_email)
+        response = self.testapp.get('/create/%s' % EXP_ID)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Check that collaborator can add a new state called 'State 4'
+        response_dict = self.post_json(
+            '/createhandler/new_state_template/%s' % EXP_ID, {
+                'state_name': 'State 4'
+            }, csrf_token)
+        self.assertTrue('widget' in response_dict['new_state'])
+        exp_services._save_exploration(self.collaborator_id, exploration, '', [])
+        response = self.testapp.get('/create/%s' % EXP_ID)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Check that collaborator cannot add new members
+        url = str('%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID))
+        response_dict = self.put_json(
+            url, {
+                'version': exploration.version,
+                'new_member_email': self.viewer2_email,
+                'new_member_role': self.viewer_role
+            }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['code'], 401)
+
+        response_dict = self.put_json(
+            url, {
+                'version': exploration.version,
+                'new_member_email': self.collaborator2_email,
+                'new_member_role': self.collaborator_role,
+                }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['code'], 401)
+
+        self.logout()
+        
