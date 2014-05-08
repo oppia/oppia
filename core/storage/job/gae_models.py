@@ -42,10 +42,10 @@ class JobModel(base_models.BaseModel):
     @classmethod
     def get_new_id(cls, entity_name):
         """Overwrites superclass method."""
-        job_name = entity_name
+        job_type = entity_name
         current_time_str = str(int(utils.get_current_time_in_millisecs()))
         random_int = random.randint(0, 1000)
-        return '%s-%s-%s' % (job_name, current_time_str, random_int)
+        return '%s-%s-%s' % (job_type, current_time_str, random_int)
 
     # The job type.
     job_type = ndb.StringProperty(indexed=True)
@@ -77,6 +77,10 @@ class JobModel(base_models.BaseModel):
     # A computed property stating whether the job is currently in queued or
     # started status.
     is_unfinished = ndb.ComputedProperty(is_status_queued_or_started)
+
+    @classmethod
+    def get_jobs(cls, job_type):
+        return cls.query().filter(cls.job_type == job_type)
 
     @classmethod
     def get_unfinished_jobs(cls, job_type):

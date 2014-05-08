@@ -56,22 +56,24 @@ class BaseJob(object):
     # jobs (as opposed to abstract base superclasses).
     IS_VALID_JOB_CLASS = False
 
-    def __init__(self, job_id, status_code, time_queued, time_started,
-                 time_finished, output, error):
+    def __init__(self, job_id):
         self._job_id = job_id
-        self.status_code = status_code
-        self.time_queued = time_queued
-        self.time_started = time_started
-        self.time_finished = time_finished
-        self.output = output
-        self.error = error
+        self.reload()
 
-    @classmethod
-    def load_from_datastore_model(cls, job_id):
-        model = job_models.JobModel.get(job_id, strict=True)
-        return cls(
-            model.id, model.status_code, model.time_queued, model.time_started,
-            model.time_finished, model.output, model.error)
+    def reload(self):
+        """Loads the last-known state of this job from the datastore."""
+        model = job_models.JobModel.get(self._job_id, strict=True)
+        if model.job_type != self.__class__.__name__:
+            raise Exception(
+                'Tried to load job of type %s using job class %s' %
+                (model.job_type, self.__class__.__name__))
+
+        self.status_code = model.status_code
+        self.time_queued = model.time_queued
+        self.time_started = model.time_started
+        self.time_finished = model.time_finished
+        self.output = model.output
+        self.error = model.error
 
     @classmethod
     def create_new(cls):
@@ -85,10 +87,7 @@ class BaseJob(object):
         job_model = job_models.JobModel(id=job_id, job_type=cls.__name__)
         job_model.put()
 
-        return cls(
-            job_id, job_model.status_code, job_model.time_queued,
-            job_model.time_started, job_model.time_finished, job_model.output,
-            job_model.error)
+        return cls(job_id)
 
     def enqueue(self):
         """Adds the job to the default task queue."""
@@ -102,16 +101,18 @@ class BaseJob(object):
         self._mark_canceled(cancel_message)
 
     @classmethod
-    def cancel_all_unfinished_jobs(cls):
+    def get_all_jobs(cls):
+        """Get a list of jobs of this job type."""
+        models = job_models.JobModel.get_jobs(cls.__name__)
+        return [cls(job_model.id) for job_model in models]
+
+    @classmethod
+    def cancel_all_unfinished_jobs(cls, user_id):
         """Cancel all queued or started jobs of this job type."""
         unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
             cls.__name__)
         for job_model in unfinished_job_models:
-            job = cls(
-                job_model.id, job_model.status_code, job_model.time_queued,
-                job_model.time_started, job_model.time_finished,
-                job_model.output, job_model.error)
-            job.cancel()
+            cls(job_model.id).cancel(user_id)
 
     def _run(self):
         """Function that performs the main business logic of the job.
@@ -140,7 +141,7 @@ class BaseJob(object):
             logging.error('Job %s failed at %s' % (self._job_id, time.time()))
             self._mark_failed('%s\n%s' % (unicode(e), traceback.format_exc()))
             self._post_failure_hook()
-            raise Exception(
+            raise taskqueue_services.PermanentTaskFailure(
                 'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
 
         # Note that the job may have been canceled after it started and before
@@ -173,18 +174,21 @@ class BaseJob(object):
 
     def _mark_queued(self):
         """Mark the state of a job as enqueued in the datastore."""
+        self.reload()
         self._require_valid_transition(self.status_code, STATUS_CODE_QUEUED)
         self.status_code = STATUS_CODE_QUEUED
         self.time_queued = time.time()
         self._update_status()
 
     def _mark_started(self):
+        self.reload()
         self._require_valid_transition(self.status_code, STATUS_CODE_STARTED)
         self.status_code = STATUS_CODE_STARTED
         self.time_started = time.time()
         self._update_status()
 
     def _mark_completed(self, output):
+        self.reload()
         self._require_valid_transition(self.status_code, STATUS_CODE_COMPLETED)
         self.status_code = STATUS_CODE_COMPLETED
         self.time_finished = time.time()
@@ -192,6 +196,7 @@ class BaseJob(object):
         self._update_status()
 
     def _mark_failed(self, error):
+        self.reload()
         self._require_valid_transition(self.status_code, STATUS_CODE_FAILED)
         self.status_code = STATUS_CODE_FAILED
         self.time_finished = time.time()
@@ -199,6 +204,7 @@ class BaseJob(object):
         self._update_status()
 
     def _mark_canceled(self, cancel_message):
+        self.reload()
         self._require_valid_transition(self.status_code, STATUS_CODE_CANCELED)
         self.status_code = STATUS_CODE_CANCELED
         self.time_finished = time.time()

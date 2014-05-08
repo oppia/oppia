@@ -19,10 +19,11 @@ import webtest
 
 from core.domain import config_domain
 from core.platform import models
-(base_models, exp_models, file_models, stats_models, user_models) = (
+(base_models, config_models, exp_models, file_models, job_models, stats_models,
+ user_models) = (
     models.Registry.import_models([
-        models.NAMES.base_model,
-        models.NAMES.exploration, models.NAMES.file, models.NAMES.statistics,
+        models.NAMES.base_model, models.NAMES.config, models.NAMES.exploration,
+        models.NAMES.file, models.NAMES.job, models.NAMES.statistics,
         models.NAMES.user
     ])
 )
@@ -66,13 +67,17 @@ class TestBase(unittest.TestCase):
 
     def _delete_all_models(self):
         versioned_model_classes = frozenset([
+            config_models.ConfigPropertyModel,
             exp_models.ExplorationModel,
             exp_models.ExplorationRightsModel,
             file_models.FileMetadataModel,
             file_models.FileModel,
+            job_models.JobModel,
         ])
 
         unversioned_model_classes = frozenset([
+            config_models.COnfigPropertySnapshotMetadataModel,
+            config_models.COnfigPropertySnapshotContentModel,
             exp_models.ExplorationSnapshotMetadataModel,
             exp_models.ExplorationSnapshotContentModel,
             exp_models.ExplorationRightsSnapshotMetadataModel,

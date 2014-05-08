@@ -25,3 +25,8 @@ from google.appengine.ext import deferred
 def defer(fn):
     """Adds a new task to the deferred queue."""
     deferred.defer(fn)
+
+
+# A special exception that ensures that the task is not tried again, if it
+# fails.
+PermanentTaskFailure = deferred.PermanentTaskFailure
