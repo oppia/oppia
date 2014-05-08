@@ -108,6 +108,7 @@ class PlaytestHandler(base.BaseHandler):
             'title': exp_data['title'],
             'category': exp_data['category'],
             'last_updated': exp_data['last_updated'],
+            'community_owned': exp_data['rights']['community_owned'],
             'to_playtest': False,
         } for (exp_id, exp_data) in explorations_dict.iteritems()]
 
