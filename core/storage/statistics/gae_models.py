@@ -188,28 +188,27 @@ class FeedbackItemModel(base_models.BaseModel):
 
 class BaseEventLogEntryModel(base_models.BaseModel): 
     """An individual event entry to be used for statistics."""
-    # Time the event occurred
-    timestamp = ndb.DateTimeProperty(auto_now_add=True)
     # Which specific type of event this is
-    event_type = ndb.StringProperty()
+    event_type = ndb.StringProperty(indexed=True)
 
 
 class ReaderEventLogEntryModel(BaseEventLogEntryModel):
     """A generic model for event log entries arising due to reader actions."""
     # Id of exploration currently being played.
-    exploration_id = ndb.StringProperty()
+    exploration_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
-    exploration_version = ndb.IntegerProperty()
+    exploration_version = ndb.IntegerProperty(indexed=True)
     # Name of current state.
-    state_name = ndb.StringProperty()
+    state_name = ndb.StringProperty(indexed=True)
     # ID of current student's session
-    session_id = ndb.StringProperty()
+    session_id = ndb.StringProperty(indexed=True)
     # Time since start of this state before this event occurred (in sec).
-    client_time_spent_in_secs = ndb.FloatProperty()
+    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
     # Current parameter values, map of parameter name to value
-    params = ndb.JsonProperty()
+    params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (preview, from gallery)
-    play_type = ndb.StringProperty(choices=[feconf.PLAY_TYPE_PLAYTEST,
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_GALLERY])
 
     @classmethod
