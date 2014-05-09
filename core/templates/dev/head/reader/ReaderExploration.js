@@ -173,6 +173,8 @@ function ReaderExploration(
     $scope.stateName = data.state_name;
     $scope.title = data.title;
     $scope.stateHistory = data.state_history;
+    $scope.sessionId = data.session_id;
+    $scope.stateStartTime = new Date().getTime();
 
     messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
     $scope.showPage = true;
@@ -183,13 +185,18 @@ function ReaderExploration(
     if ($scope.answerIsBeingProcessed) {
       return;
     }
+      
+    $scope.client_time_spent_in_secs = 
+      (new Date().getTime() - $scope.stateStartTime)/1000;
 
     var requestMap = {
       answer: answer,
       handler: handler,
       params: $scope.params,
       state_history: $scope.stateHistory,
-      version: GLOBALS.explorationVersion
+      version: GLOBALS.explorationVersion,
+      session_id: $scope.session_id,
+      client_time_spent_in_secs: $scope.client_time_spent_in_secs,
     };
 
     $scope.answerIsBeingProcessed = true;
@@ -243,6 +250,7 @@ function ReaderExploration(
 
     $scope.params = data.params;
     $scope.stateHistory = data.state_history;
+    $scope.stateStartTime = new Date().getTime();
 
     $scope.responseLog = $scope.responseLog || [];
 

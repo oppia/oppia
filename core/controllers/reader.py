@@ -22,8 +22,10 @@ from core.domain import rights_manager
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import widget_registry
+import base64
 import feconf
 import jinja_utils
+import os
 
 import jinja2
 
@@ -126,6 +128,7 @@ class ExplorationHandler(base.BaseHandler):
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
             'title': exploration.title,
+            'session_id': base64.urlsafe_b64encode(os.urandom(24)),
         })
         self.render_json(self.values)
 
@@ -193,6 +196,10 @@ class FeedbackHandler(base.BaseHandler):
         state_history = self.payload['state_history']
         # The version of the exploration.
         version = self.payload.get('version')
+        # Current session id.
+        session_id = self.payload.get('session_id')
+        # Time spent in state.
+        client_time_spent_in_secs = self.payload.get('client_time_spent_in_secs')
 
         values = {}
         exploration = exp_services.get_exploration_by_id(
