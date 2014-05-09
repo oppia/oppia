@@ -24,14 +24,14 @@
 
       <div class="span1 oppia-rule-swap-arrows">
         <span class="pull-right">
-          <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="btn btn-mini oppia-rule-ctrl">
+          <button type="button" class="btn btn-mini oppia-rule-ctrl" ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)">
             <i class="icon-arrow-up" title="Move Rule Up"></i>
           </button>
           <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">
             <i class="icon-arrow-up" title="Move Rule Up"></i>
           </span>
 
-          <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)" class="btn btn-mini oppia-rule-ctrl">
+          <button type="button" class="btn btn-mini oppia-rule-ctrl" ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)">
             <i class="icon-arrow-down" title="Move Rule Down"></i>
           </button>
           <span ng-hide="$index < handler.length - 2" class="oppia-grayed oppia-rule-ctrl">
@@ -47,7 +47,7 @@
   <div class="row-fluid" ng-show="widgetId != 'Continue'">
     <div class="span11 oppia-rule-block">
       <div ng-if="!tmpRule">
-        <button class="btn oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
+        <button type="button" class="btn oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
           Add new rule
         </button>
       </div>

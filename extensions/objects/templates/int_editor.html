@@ -5,7 +5,7 @@
  
 <span ng-if="active || alwaysEditable">
   <input type="number" ng-model="localValue.label" placeholder="Enter an integer.">
-  <button ng-if="!alwaysEditable" type="button" ng-click="replaceValue(localValue.label)">
+  <button type="button" class="btn" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
     Close
   </button>
 </span>

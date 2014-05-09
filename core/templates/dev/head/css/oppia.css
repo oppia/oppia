@@ -651,6 +651,14 @@ textarea {
   margin-top: 10px;
 }
 
+.oppia-add-state-input {
+  width: 87%;
+}
+
+.oppia-add-state-button {
+  margin-bottom: 10px;
+}
+
 .oppia-graph-viz path.link {
   fill: none;
   stroke: #666;

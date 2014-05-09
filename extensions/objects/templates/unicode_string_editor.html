@@ -6,7 +6,7 @@
 
   <span ng-if="active || alwaysEditable">
     <input ng-if="!largeInput" type="text" ng-model="localValue.label" select-on-click>
-    <button ng-if="!alwaysEditable" type="button" ng-click="replaceValue(localValue.label)">
+    <button type="button" class="btn" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
       Close
     </button>
   </span>
@@ -22,7 +22,7 @@
 
   <div ng-if="active || alwaysEditable">
     <textarea ng-model="localValue.label"></textarea>
-    <button ng-if="!alwaysEditable" type="button" ng-click="replaceValue(localValue.label)">
+    <button type="button" class="btn"  ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
       Close
     </button>
   </div>
