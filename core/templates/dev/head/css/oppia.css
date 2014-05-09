@@ -557,6 +557,14 @@ textarea {
   max-width: 700px;
 }
 
+.oppia-missing-objective-error {
+   background-color: #f2dede;
+   border-color: #eed3d7;
+   color: #b94a48;
+   cursor: pointer;
+   padding: 3px;
+}
+
 .oppia-cursor-pointer {
   cursor: pointer;
 }
@@ -582,47 +590,27 @@ textarea {
 
 .oppia-state-name-container {
   padding: 2px;
-  width: 60%;
 }
 
 .oppia-editable {
-  border: 1px dotted gray;
   cursor: pointer;
   padding: 1px 3px;
 }
 .oppia-editable:hover {
-  border: 1px solid #111;
-  opacity: 0.95;
-}
-
-.oppia-state-editor-container {
-  min-height: 800px;
-  position: relative;
-}
-
-.oppia-state-editor {
-  background-color: white;
-  border: 3px solid black;
-  border-radius: 5px;
-  height: 88%;
-  position: fixed;
-  right: 0;
-  top: 10%;
-  width: 70%;
-  z-index: 100;
+  opacity: 0.9;
 }
 
 .oppia-state-editor-header {
-  background: #ddd;
-  max-height: 7%;
-  padding: 1px 10px;
+  text-align: center;
 }
 
 .oppia-state-editor-body {
-  max-height: 90%;
-  overflow-y: scroll;
   padding: 5px 10px;
   position: relative;
+}
+
+.oppia-state-editor-footer {
+  margin-bottom: 30px;
 }
 
 .oppia-state-content {
@@ -646,6 +634,22 @@ textarea {
 }
 
 /* Styles for the state graph vizualization. */
+
+.oppia-graph-viz-container {
+  height: 250px;
+  border-radius: 4px;
+  border: 1px solid black;
+}
+
+.oppia-graph-maximize-button {
+  height: 26px;
+  margin-left: 2px;
+  z-index: 300;
+}
+
+.oppia-add-state-container {
+  margin-top: 10px;
+}
 
 .oppia-graph-viz path.link {
   fill: none;
@@ -760,54 +764,95 @@ textarea {
   color: #444
 }
 
-.oppia-feedback-reader-link {
-  margin-left: 40px;
-  font-size: smaller;
-}
-
 .label-info {
   background-color: #18447E;
+}
+
+.oppia-rule-block {
+  margin-top: 10px;
+}
+
+.oppia-add-rule-button {
+  font-weight: bold;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  padding: 5px;
+  width: 100%;
+}
+
+.oppia-edit-rule-description-button {
+  margin-left: 5px;
+}
+
+.oppia-rule-swap-arrows {
+  margin-top: 10px;
 }
 
 .oppia-rule-bubble {
   background: #18447E;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  padding: 3px;
+  padding: 5px;
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.oppia-rule-header-bubble {
+  font-weight: bold; 
+  text-align: center;
+}
+
+.oppia-rule-description-picker-bubble {
+  text-align: center;
+}
+
+.oppia-rule-description-back-arrow {
+  float: left;
 }
 
 .oppia-rule-bubble-warning {
   background: #F9EDBE;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  padding: 3px;
+  padding: 5px;
+  color: #000;
+}
+
+.oppia-rule-bubble-description-picker {
+  background: #F9EDBE;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  padding: 5px;
   color: #000;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.oppia-rule-bubble-description-picker {
-  background: #89B5F0;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  padding: 3px;
-  color: #000;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+.oppia-rule-description-close-button {
+  margin-bottom: 10px;
+}
+
+.oppia-rule-description-editor {
+  display: inline-block;
+}
+
+.oppia-feedback-and-dest {
+  display: table;
+  width: 100%;
 }
 
 .oppia-feedback-bubble {
   background: #E0E0E0;
   border-bottom-left-radius: 8px;
+  display: table-cell;
   padding: 5px;
-  width: 80%;
 }
 
 .oppia-dest-bubble {
   background: #EEEEEE;
   border-bottom-right-radius: 8px;
+  display: table-cell;
   padding: 5px;
-  width: 20%;
+  vertical-align: middle;
 }
 
 .oppia-logo {

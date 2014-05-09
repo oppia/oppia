@@ -92,6 +92,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
             exploration_id, 'A title', 'A category')
         exploration.states[exploration.init_state_name].widget.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
+        exploration.objective = 'An objective'
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 
@@ -404,11 +405,16 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as zip files."""
 
     SAMPLE_YAML_CONTENT = (
-"""default_skin: conversation_v1
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
 init_state_name: (untitled state)
+language_code: en
+objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 2
+schema_version: 3
+skill_tags: []
 states:
   (untitled state):
     content:
@@ -447,11 +453,16 @@ states:
 """)
 
     UPDATED_YAML_CONTENT = (
-"""default_skin: conversation_v1
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
 init_state_name: (untitled state)
+language_code: en
+objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 2
+schema_version: 3
+skill_tags: []
 states:
   (untitled state):
     content:
@@ -494,6 +505,7 @@ states:
         exploration = self.save_new_default_exploration(
             self.EXP_ID, self.OWNER_ID)
         exploration.add_states(['New state'])
+        exploration.objective = 'The objective'
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
@@ -508,6 +520,7 @@ states:
         exploration = self.save_new_default_exploration(
             self.EXP_ID, self.OWNER_ID)
         exploration.add_states(['New state'])
+        exploration.objective = 'The objective'
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
@@ -531,6 +544,7 @@ states:
         self.assertEqual(exploration.version, 1)
 
         exploration.add_states(['New state'])
+        exploration.objective = 'The objective'
         with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
             raw_image = f.read()
         fs = fs_domain.AbstractFileSystem(

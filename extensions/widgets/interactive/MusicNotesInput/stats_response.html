@@ -1,0 +1,10 @@
+{% if (answer | length) == 0 -%}
+  No answer given.
+{% else -%}
+  [{% for note in answer -%}
+    {% for prop in note -%}
+      {% if prop == 'readableNoteName' %}{{note[prop]}}{% endif -%}
+    {% endfor -%}
+    {% if not loop.last -%},{% endif -%}
+  {% endfor -%}]
+{% endif -%}

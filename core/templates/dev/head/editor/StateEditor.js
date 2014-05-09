@@ -18,18 +18,18 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
-  warningsData, activeInputData, oppiaRequestCreator, editorContextService) {
+function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData,
+  warningsData, activeInputData, oppiaRequestCreator, editorContextService,
+  changeListService, validatorsService) {
 
   $scope.$on('guiTabSelected', function(evt) {
     $scope.initStateEditor();
   });
 
   $scope.initStateEditor = function() {
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open state editor outside a state context.');
-      return;
-    }
+    explorationData.getData().then(function(data) {
+      $scope.paramSpecs = data.param_specs || {};
+    });
 
     $scope.stateNameEditorIsShown = false;
 
@@ -46,48 +46,6 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
     }
   };
 
-  $scope.closeStateEditor = function() {
-    $scope.$broadcast('externalSave');
-    $scope.$parent.selectMainTab();
-  };
-
-  $scope.getIncomingStates = function(stateName) {
-    var incomingStates = {},
-        statesToRuleNames = {},
-        otherStateName;
-
-    for (otherStateName in $scope.states) {
-      var handlers = $scope.states[otherStateName].widget.handlers;
-      var widgetParams = $scope.states[otherStateName].widget.customization_args;
-      for (var i = 0; i < handlers.length; i++) {
-        for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-          if (handlers[i].rule_specs[j].dest == stateName) {
-            incomingStates[otherStateName] = $scope.states[otherStateName];
-
-            var previousChoices = null;
-            if (widgetParams.hasOwnProperty('choices')) {
-              previousChoices = widgetParams.choices;
-            }
-
-            var ruleName = $filter('parameterizeRuleDescription')(
-                handlers[i].rule_specs[j], previousChoices);
-
-            if (otherStateName in statesToRuleNames) {
-              statesToRuleNames[otherStateName].push(ruleName);
-            } else {
-              statesToRuleNames[otherStateName] = [ruleName];
-            }
-          }
-        }
-      }
-    }
-
-    for (otherStateName in incomingStates) {
-      incomingStates[otherStateName].rules = statesToRuleNames[otherStateName];
-    }
-    return incomingStates;
-  };
-
   $scope.openStateNameEditor = function() {
     $scope.stateNameEditorIsShown = true;
     $scope.tmpStateName = $scope.stateName;
@@ -95,7 +53,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   };
 
   $scope._getNormalizedStateName = function(newStateName) {
-    return $scope.normalizeWhitespace(newStateName);
+    return $filter('normalizeWhitespace')(newStateName);
   };
 
   $scope.saveStateNameAndRefresh = function(newStateName) {
@@ -106,7 +64,7 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
 
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope._getNormalizedStateName(newStateName);
-    if (!$scope.isValidEntityName(newStateName, true)) {
+    if (!validatorsService.isValidEntityName(newStateName, true)) {
       return;
     }
     if (newStateName.length > 50) {
@@ -148,12 +106,10 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
       }
 
       editorContextService.setActiveStateName(newStateName);
+      changeListService.renameState(newStateName, $scope.stateNameMemento);
 
-      $scope.$parent.addRenameStateChange(
-        newStateName, $scope.stateNameMemento);
       $scope.stateNameEditorIsShown = false;
-      $scope.drawGraph();
-
+      $scope.refreshGraph();
       $scope.initStateEditor();
     }
   };
@@ -171,26 +127,23 @@ function StateEditor($scope, $http, $filter, $sce, $modal, explorationData,
   });
 
   $scope.saveTextContent = function() {
-    $scope.$apply();
     if ($scope.contentMemento !== null && $scope.contentMemento !== $scope.content) {
-      // The $apply() call seems to be needed in order to ensure that the latest
-      // values from the RTE are captured.
-      $scope.addStateChange(
-          'content', angular.copy($scope.content),
-          angular.copy($scope.contentMemento)
-      );
+      changeListService.editStateProperty(
+        editorContextService.getActiveStateName(), 'content',
+        angular.copy($scope.content), angular.copy($scope.contentMemento));
     }
     $scope.contentMemento = null;
   };
 
   $scope.saveStateParamChanges = function(newValue, oldValue) {
     if (!angular.equals(newValue, oldValue)) {
-      $scope.addStateChange('param_changes', newValue, oldValue);
+      changeListService.editStateProperty(
+        editorContextService.getActiveStateName(), 'param_changes',
+        newValue, oldValue);
     }
   };
-
 }
 
-StateEditor.$inject = ['$scope', '$http', '$filter', '$sce', '$modal',
+StateEditor.$inject = ['$scope', '$http', '$filter', '$log', '$sce', '$modal',
     'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator',
-    'editorContextService'];
+    'editorContextService', 'changeListService', 'validatorsService'];

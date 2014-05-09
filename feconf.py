@@ -122,14 +122,17 @@ ADMIN_EMAIL_ADDRESS = 'admin@oppia'
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
+# The default language code for an exploration.
+DEFAULT_LANGUAGE_CODE = 'en'
+
 # An ordered list of links to stand-alone pages to display in the 'About' tab.
 # Each item is a dict with two keys: the human-readable name of the link and
 # the URL of the page.
 ABOUT_PAGES = [{
-    'name': 'About the site',
+    'name': 'About this site',
     'url': '/about'
 }, {
-    'name': 'Site guidelines',
+    'name': 'How to use Oppia',
     'url': '/site_guidelines',
 }, {
     'name': 'Blog',
@@ -234,8 +237,8 @@ EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
-PLAYTEST_GALLERY_URL = '/playtest'
-PLAYTEST_GALLERY_DATA_URL = '/playtesthandler/data'
+PLAYTEST_QUEUE_URL = '/playtest'
+PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 SPLASH_PAGE_URL = '/'

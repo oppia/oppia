@@ -82,7 +82,7 @@ class LearnHandler(base.BaseHandler):
 
 
 class PlaytestPage(base.BaseHandler):
-    """The exploration gallery page for playtesters."""
+    """The page for the playtesters' queue."""
 
     def get(self):
         """Handles GET requests."""
@@ -93,7 +93,7 @@ class PlaytestPage(base.BaseHandler):
 
 
 class PlaytestHandler(base.BaseHandler):
-    """Provides data for the exploration gallery page for playtesters."""
+    """Provides data for the playtest page."""
 
     def get(self):
         """Handles GET requests."""

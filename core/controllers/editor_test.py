@@ -350,7 +350,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
         # Check downloaded zip file
         self.assertEqual(response.headers['Content-Type'], 'text/plain')
         filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
-        self.assertEqual(response.headers['Content-Disposition'], 
+        self.assertEqual(response.headers['Content-Disposition'],
                          'attachment; filename=%s' % str(filename))
         zf_saved = zipfile.ZipFile(StringIO.StringIO(response.body))
         self.assertEqual(
@@ -359,7 +359,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
 
         # Load golden zip file
         with open(os.path.join(
-                feconf.TESTS_DATA_DIR, 
+                feconf.TESTS_DATA_DIR,
                 'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')) as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
@@ -374,7 +374,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
                 ).read())
 
         self.logout()
-        
+
 
 class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
 
@@ -475,15 +475,19 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
         exp_services.delete_demo(EXP_ID)
         exp_services.load_demo(EXP_ID)
 
-        # In version 2, change the initial state content.
+        # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_services.update_exploration(
             'editor@example.com', EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective',
+            }, {
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
                 'new_value': [{'type': 'text', 'value': 'ABC'}],
-            }], 'Change init state content')
+            }], 'Change objective and init state content')
 
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
@@ -548,4 +552,116 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         self.login('sandra@example.com')
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
+        self.logout()
+
+
+class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
+    """Test the handler for managing exploration editing rights."""
+
+    def test_exploration_rights_handler(self):
+        """Test exploration rights handler."""
+
+        # Create several users
+        self.admin_email = 'admin@example.com'
+        self.owner_email = 'owner@example.com'
+        self.collaborator_email = 'collaborator@example.com'
+        self.collaborator2_email = 'collaborator2@example.com'
+        self.viewer_email = 'viewer@example.com'
+        self.viewer2_email = 'viewer2@example.com'
+
+        self.register_editor(self.admin_email, username='adm')
+        self.register_editor(self.owner_email, username='owner')
+        self.register_editor(self.collaborator_email, username='collab')
+        self.register_editor(self.viewer_email, username='viewer')
+
+        self.admin_id = self.get_user_id_from_email(self.admin_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.collaborator_id = self.get_user_id_from_email(
+            self.collaborator_email)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+
+        self.viewer_role = rights_manager.ROLE_VIEWER
+        self.collaborator_role = rights_manager.ROLE_EDITOR
+
+        # Owner creates exploration
+        self.login(self.owner_email)
+        EXP_ID = 'eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'Title for rights handler test!',
+            'My category')
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exp_services.save_new_exploration(self.owner_id, exploration)
+
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Owner adds rights for other users
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID)
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_email': self.viewer_email,
+                'new_member_role': self.viewer_role
+            }, csrf_token)
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_email': self.collaborator_email,
+                'new_member_role': self.collaborator_role
+            }, csrf_token)
+
+        self.logout()
+
+        # Check that viewer cannot access editor page
+        self.login(self.viewer_email)
+        response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 401)
+        self.logout()
+
+        # Check that collaborator can access editor page
+        self.login(self.collaborator_email)
+        response = self.testapp.get('/create/%s' % EXP_ID)
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Check that collaborator can add a new state called 'State 4'
+        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, EXP_ID)
+        response_dict = self.put_json(
+            add_url,
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State 4',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 4'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200
+        )
+        self.assertIn('State 4', response_dict['states'])
+
+        # Check that collaborator cannot add new members
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID)
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_email': self.viewer2_email,
+                'new_member_role': self.viewer_role
+            }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['code'], 401)
+
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_email': self.collaborator2_email,
+                'new_member_role': self.collaborator_role,
+                }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['code'], 401)
+
         self.logout()

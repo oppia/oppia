@@ -7,7 +7,14 @@
     <br>
 
     <h4>Common student paths </h4>
-    <state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" forbid-node-deletion="true" highlight-states="highlightStates" state-stats="stats.stateStats"></state-graph-viz>
+    <div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span12">
+          <div state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stats.stateStats" on-click-function="onClickStateInStatsGraph">
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div ng-if="stats.numVisits == 0">
@@ -64,7 +71,10 @@
               <[rule]>
               <ul>
                 <li ng-repeat="answerData in ruleData.answers track by $index">
-                  <[answerData[0]]> (<[getNumTimesString(answerData[1])]>)
+                  <span class="label pull-right">
+                    <[getNumTimesString(answerData[1])]>
+                  </span>
+                  <pre><[answerData[0]]></pre>
                   <a href="#" onclick="return false;" ng-click="gotoStateEditor('rules')">
                     Add a rule for this answer
                   </a>

@@ -50,6 +50,8 @@ import os
 import shutil
 import subprocess
 
+import common
+
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--app_name', help='name of the app to deploy to', type=str)
@@ -73,25 +75,6 @@ APPCFG_PATH = os.path.join(
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
 
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
-
-
-class CD(object):
-    """Context manager for changing the current working directory."""
-    def __init__(self, new_path):
-        self.new_path = new_path
-
-    def __enter__(self):
-        self.saved_path = os.getcwd()
-        os.chdir(self.new_path)
-
-    def __exit__(self, etype, value, traceback):
-        os.chdir(self.saved_path)
-
-
-def ensure_directory_exists(f):
-    d = os.path.dirname(f)
-    if not os.path.exists(d):
-        os.makedirs(d)
 
 
 def preprocess_release():
@@ -135,8 +118,7 @@ def preprocess_release():
 
 
 # Check that the current directory is correct.
-if not os.getcwd().endswith('oppia'):
-    raise Exception('Please run this script from the oppia/ directory.')
+common.require_cwd_to_be_oppia()
 
 CURRENT_GIT_VERSION = subprocess.check_output(
     ['git', 'rev-parse', 'HEAD']).strip()
@@ -150,8 +132,8 @@ if not os.path.exists(THIRD_PARTY_DIR):
         'prior to running this script.' % THIRD_PARTY_DIR)
 
 # Create a folder in which to save the release candidate.
-print 'Creating new release directory %s' % RELEASE_DIR_PATH
-ensure_directory_exists(RELEASE_DIR_PATH)
+print 'Ensuring that the release directory parent exists'
+common.ensure_directory_exists(os.path.dirname(RELEASE_DIR_PATH))
 
 # Copy files to the release directory. Omits the .git subfolder.
 print 'Copying files to the release directory'
@@ -159,7 +141,7 @@ shutil.copytree(
     os.getcwd(), RELEASE_DIR_PATH, ignore=shutil.ignore_patterns('.git'))
 
 # Change the current directory to the release candidate folder.
-with CD(RELEASE_DIR_PATH):
+with common.CD(RELEASE_DIR_PATH):
     if not os.getcwd().endswith(RELEASE_DIR_NAME):
         raise Exception(
             'Invalid directory accessed during deployment: %s' % os.getcwd())
@@ -181,7 +163,7 @@ with CD(RELEASE_DIR_PATH):
     subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])
 
     # Writing log entry.
-    ensure_directory_exists(LOG_FILE_PATH)
+    common.ensure_directory_exists(os.path.dirname(LOG_FILE_PATH))
     with open(LOG_FILE_PATH, 'a') as log_file:
         log_file.write('Successfully deployed to %s at %s (version %s)\n' % (
             APP_NAME, CURRENT_DATETIME.strftime('%Y-%m-%d %H:%M:%S'),

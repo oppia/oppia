@@ -22,11 +22,6 @@
 function UnresolvedAnswers($scope, $log, warningsData, explorationData, editorContextService) {
 
   $scope.initUnresolvedAnswers = function(data) {
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open unresolved answers editor outside a state context.');
-      return;
-    }
-
     $scope.stateName = editorContextService.getActiveStateName();
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersMap();

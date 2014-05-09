@@ -3,6 +3,65 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.4 (5 May 2014)
+-------------------
+New pages:
+* Add a new 'playtest queue' page.
+* Add a new tab in the 'How to use Oppia' page that outlines the 'beta' and 'release' criteria for explorations, and further clarify the description of the exploration lifecycle.
+
+Editor interface improvements:
+* Redesign the exploration editor page to focus more on the state editor rather than the exploration graph, and make it generally tidier.
+* Make exploration graph nodes have a fixed width.
+* Rewrite and simplify the 'publish exploration' modal.
+
+Editor functionality improvements:
+* Allow each exploration to specify an objective, and make this mandatory for published explorations.
+
+Profile page improvements:
+* Show counts of a user's private/public explorations.
+
+Improvements to the workflow for embedding Oppia explorations in other pages:
+* Create a new version of the embedding script that allows explorations to be loaded only after the user clicks a button.
+* Add manual integration tests for the embedding workflow.
+
+Infrastructure:
+* Use PhantomJS instead of Firefox for running unit tests.
+* Add an integration test framework.
+* Add an integration test for the exploration download handler.
+
+
+v1.2.3 (26 Apr 2014)
+--------------------
+Interactive widgets:
+* Add a new widget (as well as corresponding rules and objects) for inputting music notes, together with a 'Pitch Perfect' exploration that demonstrates its use.
+
+Profile page:
+* On each user's profile page, display feedback that they have submitted to explorations, and the present status of this feedback.
+* Fix issue 120: change links to playtestable explorations to point to the reader view instead of the editor view.
+
+Editor interface improvements:
+* Fix the display of answers in the statistics viewer modal of the exploration editor, so that they accommodate newlines.
+* Fix an issue with 'Address this feedback' links not redirecting to the state editor.
+* Add a specific warning message to handle feedbackless self-loops.
+* Fix issue 151: clarify the 'feedback required' message.
+* Change the pencil icon in the editor page to point towards the editable content.
+
+Gallery interface improvements:
+* Move the 'Upload Exploration' button to the top of the contribute gallery page (when the uploading option is enabled).
+* Color buttons that represent a 'success' action in the contribute gallery green.
+
+Site interface improvements:
+* Separate the current 'About' page into two pages: 'About' and 'How to use this site'.
+
+Infrastructure:
+* Add a simple framework for handling widget dependencies, so that if multiple widgets in the same page use the same dependencies, the dependencies are loaded at most once.
+* Fix a bug in unescaping state names that have unicode characters in them.
+* Add backend models for long-running jobs.
+
+Moderator page:
+* Add a list of recent changes to explorations.
+
+
 v1.2.2 (24 Mar 2014)
 --------------------
 Editor interface improvements:
