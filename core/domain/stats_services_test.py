@@ -444,7 +444,9 @@ class EventLogEntryTests(test_utils.GenericTestBase):
 
     def test_create_events(self):
         """Basic test that makes sure there are no exceptions thrown."""
-        stats_services.EventHandler.start_exploration(1, 2, 'state', 'session',
-            {}, 'play_type')
-        stats_services.EventHandler.leave_exploration(1, 2, 'state', 'session',
-            27.2, {}, 'play_type')
+        stats_services.EventHandler.start_exploration('eid', 2, 'state', 'session',
+            {}, feconf.PLAY_TYPE_PLAYTEST)
+        stats_services.EventHandler.leave_exploration('eid', 2, 'state', 'session',
+            27.2, {}, feconf.PLAY_TYPE_PLAYTEST)
+        stats_services.EventHandler.complete_exploration('eid', 2, 'session',
+            12.9, {}, feconf.PLAY_TYPE_PLAYTEST)

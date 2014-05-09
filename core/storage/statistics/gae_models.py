@@ -18,6 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
+import feconf
 import logging
 
 from core.platform import models
@@ -187,19 +189,15 @@ class FeedbackItemModel(base_models.BaseModel):
 class BaseEventLogEntryModel(base_models.BaseModel): 
     """An individual event entry to be used for statistics."""
     # Time the event occurred
-    timestamp = ndb.DateTimeProperty()
-    # Which specific event this is
+    timestamp = ndb.DateTimeProperty(auto_now_add=True)
+    # Which specific type of event this is
     event_type = ndb.StringProperty()
-
-    @classmethod
-    def get_or_create(cls):
-        raise NotImplementedError 
 
 
 class ReaderEventLogEntryModel(BaseEventLogEntryModel):
-    """A generic model for event log entries for action from reader view."""
+    """A generic model for event log entries arising due to reader actions."""
     # Id of exploration currently being played.
-    exploration_id = ndb.IntegerProperty()
+    exploration_id = ndb.StringProperty()
     # Current version of exploration.
     exploration_version = ndb.IntegerProperty()
     # Name of current state.
@@ -207,57 +205,78 @@ class ReaderEventLogEntryModel(BaseEventLogEntryModel):
     # ID of current student's session
     session_id = ndb.StringProperty()
     # Time since start of this state before this event occurred (in sec).
-    time_spent = ndb.FloatProperty()
+    client_time_spent_in_secs = ndb.FloatProperty()
     # Current parameter values, map of parameter name to value
-    param_values = ndb.JsonProperty()
+    params = ndb.JsonProperty()
     # Which type of play-through this is (preview, from gallery)
-    play_type = ndb.StringProperty()
+    play_type = ndb.StringProperty(choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_GALLERY])
 
     @classmethod
-    def get_or_create(cls):
-        raise NotImplementedError 
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+                              utils.get_time_in_millisecs(timestamp),
+                              exp_id,
+                              session_id))
 
 
 class LeaveExplorationEventLogEntryModel(ReaderEventLogEntryModel):
-    """An event triggered by a student leaving the exploration.
-
-    Can represent completing the exploration or leaving early."""
+    """An event triggered by a reader leaving the exploration without completing."""
 
     @classmethod
-    def create(cls, timestamp, exp_id, exp_version, state_name, session_id,
-               time_spent, param_values, play_type):
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs, params, play_type):
         """Creates a new leave exploration event."""
-        entity_id = cls.get_new_id('%s:%s' % (
-                                   utils.get_time_in_millisecs(timestamp),
-                                   session_id))
-        leave_event_entity = cls(timestamp=timestamp, event_type='LEAVE',
+        entity_id = cls.get_new_event_entity_id(exp_id,
+                                                session_id)
+        leave_event_entity = cls(event_type=feconf.EVENT_TYPE_LEAVE,
                                  exploration_id=exp_id,
                                  exploration_version=exp_version,
-                                 state_name=state_name, session_id=session_id,
-                                 time_spent=time_spent,
-                                 param_values=param_values,
+                                 state_name=state_name,
+                                 session_id=session_id,
+                                 client_time_spent_in_secs=client_time_spent_in_secs,
+                                 params=params,
+                                 play_type=play_type)
+        leave_event_entity.put()
+
+
+class CompleteExplorationEventLogEntryModel(ReaderEventLogEntryModel):
+    """An event triggered by a reader completing the exploration."""
+
+    @classmethod
+    def create(cls, exp_id, exp_version, session_id,
+               client_time_spent_in_secs, params, play_type):
+        """Creates a new leave exploration event."""
+        entity_id = cls.get_new_event_entity_id(exp_id,
+                                                session_id)
+        leave_event_entity = cls(event_type=feconf.EVENT_TYPE_COMPLETE,
+                                 exploration_id=exp_id,
+                                 exploration_version=exp_version,
+                                 state_name=feconf.END_DEST,
+                                 session_id=session_id,
+                                 client_time_spent_in_secs=client_time_spent_in_secs,
+                                 params=params,
                                  play_type=play_type)
         leave_event_entity.put()
 
 
 class StartExplorationEventLogEntryModel(ReaderEventLogEntryModel):
-    """An event triggered by a student leaving the exploration.
-
-    Can represent completing the exploration or leaving early."""
+    """An event triggered by a student starting the exploration."""
 
     @classmethod
-    def create(cls, timestamp, exp_id, exp_version, state_name, session_id,
-               param_values, play_type):
-        """Creates a new leave exploration event."""
-        entity_id = cls.get_new_id('%s:%s' % (
-                                   utils.get_time_in_millisecs(timestamp),
-                                   session_id))
-        start_event_entity = cls(timestamp=timestamp, event_type='START',
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               params, play_type):
+        """Creates a new start exploration event."""
+        entity_id = cls.get_new_event_entity_id(exp_id,
+                                                session_id)
+        start_event_entity = cls(event_type=feconf.EVENT_TYPE_START,
                                  exploration_id=exp_id,
                                  exploration_version=exp_version,
-                                 state_name=state_name, session_id=session_id,
-                                 time_spent=0.0,
-                                 param_values=param_values,
+                                 state_name=state_name,
+                                 session_id=session_id,
+                                 client_time_spent_in_secs=0.0,
+                                 params=params,
                                  play_type=play_type)
         start_event_entity.put()
 
