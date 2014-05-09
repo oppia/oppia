@@ -316,6 +316,10 @@ def convert_to_hash(string, max_length):
     return encoded_string[:max_length]
 
 
+def base64_from_int(value):
+    return base64.b64encode(bytes([value]))
+
+
 def get_time_in_millisecs(datetime_obj):
     """Returns time in milliseconds since the Epoch.
 
@@ -323,3 +327,7 @@ def get_time_in_millisecs(datetime_obj):
       datetime_obj: An object of type datetime.datetime.
     """
     return time.mktime(datetime_obj.timetuple()) * 1000
+
+
+def get_epoch_time():
+    return int(time.time())
