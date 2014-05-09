@@ -11,11 +11,11 @@
 
   <div class="oppia-add-state-container">
     <form ng-submit="addState(newStateDesc)">
-      <div style="display:table; width: 100%;">
-        <div style="display:table-cell; width:80%;">
+      <div style="display: table; width: 100%;">
+        <div style="display: table-cell; width: 80%;">
           <input type="text" ng-model="newStateDesc" class="oppia-add-state-input" placeholder="New State Name">
         </div>
-        <div style="display:table-cell">
+        <div style="display: table-cell">
           <button type="submit" class="btn oppia-add-state-button" ng-disabled="!isNewStateNameValid(newStateDesc)">
             Create
           </button>
