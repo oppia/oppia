@@ -26,6 +26,7 @@ import base64
 import feconf
 import jinja_utils
 import os
+import utils
 
 import jinja2
 
@@ -128,7 +129,7 @@ class ExplorationHandler(base.BaseHandler):
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
             'title': exploration.title,
-            'session_id': base64.urlsafe_b64encode(os.urandom(24)),
+            'session_id': utils.generate_random_string(24),
         })
         self.render_json(self.values)
 

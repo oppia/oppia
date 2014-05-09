@@ -186,8 +186,8 @@ function ReaderExploration(
       return;
     }
       
-    $scope.client_time_spent_in_secs = 
-      (new Date().getTime() - $scope.stateStartTime)/1000;
+    $scope.clientTimeSpentInSecs = 
+      (new Date().getTime() - $scope.stateStartTime) / 1000;
 
     var requestMap = {
       answer: answer,
@@ -195,8 +195,8 @@ function ReaderExploration(
       params: $scope.params,
       state_history: $scope.stateHistory,
       version: GLOBALS.explorationVersion,
-      session_id: $scope.session_id,
-      client_time_spent_in_secs: $scope.client_time_spent_in_secs,
+      session_id: $scope.sessionId,
+      client_time_spent_in_secs: $scope.clientTimeSpentInSecs,
     };
 
     $scope.answerIsBeingProcessed = true;
