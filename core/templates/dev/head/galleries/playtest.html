@@ -9,8 +9,8 @@
     <div class="oppia-gallery">
       <table>
         <tr>
-          <th style="padding-left: 10px; width: 30%; text-align: left;">Exploration</th>
-          <th style="width: 20%"></th>
+          <th style="padding-left: 10px; width: 40%; text-align: left;">Exploration</th>
+          <th style="width: 10%"></th>
           <th style="width: 25%; text-align: left;">Category</th>
           <th style="width: 25%; text-align: left;">Last updated</th>
         </tr>
@@ -19,7 +19,10 @@
             <div class="oppia-gallery-tile-top">
               <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
                 <div class="oppia-gallery-tile-description">
-                  <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                  <span><[exploration.title]></span>
+                  <span ng-if="exploration.community_owned" class="label label-info">
+                    Community-owned
+                  </span>
                   <span class="oppia-gallery-tile-play">
                     <i class="icon-play-circle"></i>
                   </span>
