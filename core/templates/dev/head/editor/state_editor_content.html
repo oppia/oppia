@@ -10,7 +10,7 @@
 
 {% block center %}
   <div ng-if="!contentMemento">
-    <button ng-click="editContent()" class="btn btn-mini pull-right">
+    <button type="button" class="btn btn-mini pull-right" ng-click="editContent()">
       <i class="icon-pencil" title="Edit Content"></i>
     </button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
@@ -21,7 +21,7 @@
 
   <div ng-if="!!contentMemento">
     <object-editor obj-type="Html" value="content[0].value" always-editable="true"></object-editor>
-    <button ng-click="saveTextContent()">Close</button>
+    <button type="button" class="btn" ng-click="saveTextContent()">Close</button>
   </div>
 {% endblock %}
 

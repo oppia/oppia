@@ -1,9 +1,9 @@
 <div>
-  <form name="numericInputForm" ng-submit="submitAnswer(answer)" novalidate>
+  <form name="numericInputForm" class="form-horizontal" ng-submit="submitAnswer(answer)" novalidate>
     <input type="text" ng-model="answer" name="answer" validate-as-real-number
            autofocus ng-focus="setFocus()" ng-blur="setBlur()" autocomplete="off">
 
-    <button type="submit">Submit</button>
+    <button type="submit" class="btn">Submit</button>
 
     <span ng-show="errorMessage && numericInputForm.answer.$error.realNumber" style="color: red; margin-left: 30px;" aria-live="assertive">
 	  <[errorMessage]>

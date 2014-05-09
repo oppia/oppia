@@ -1,6 +1,6 @@
 <div>
   <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule()" class="oppia-rule-header-bubble">
-    <button ng-if="!isDefaultRule()" ng-click="deleteRule()" class="btn btn-mini pull-right">
+    <button type="button" class="btn btn-mini pull-right" ng-if="!isDefaultRule()" ng-click="deleteRule()" >
       <i class="icon-remove" title="Remove Rule"></i>
     </button>
     <div class="oppia-rule-description-editor" ng-class="getEditableCssClassForRule()" ng-click="openRuleDescriptionEditorIfNotDefault()">
@@ -9,7 +9,7 @@
       </span>
       <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
       <span ng-if="!isDefaultRule()">
-        <button class="btn btn-mini oppia-edit-rule-description-button">
+        <button type="button" class="btn btn-mini oppia-edit-rule-description-button">
           <i class="icon-pencil" title="Edit Rule"></i>
         </button>
       </span>
@@ -19,7 +19,7 @@
   <div ng-if="activeEditor === 'ruleDescription'">
     <div ng-if="!ruleDescriptionPickerIsOpen" ng-class="getCssClassForRule()" class="oppia-rule-description-picker-bubble">
       <span class="oppia-rule-description-back-arrow">
-        <button class="btn btn-mini" ng-click="openRuleDescriptionPicker()">
+        <button type="button" class="btn btn-mini" ng-click="openRuleDescriptionPicker()">
           <i class="icon-chevron-left" title="Return to rule type selection"></i>
         </button>
       </span>
@@ -42,7 +42,7 @@
           </span>
         </span>
         <span>
-          <button class="btn oppia-rule-description-close-button" ng-click="closeRuleDescriptionEditor()">
+          <button type="button" class="btn oppia-rule-description-close-button" ng-click="closeRuleDescriptionEditor()">
             Done
           </button>
         </span>
@@ -57,7 +57,7 @@
             Answer <span ng-bind-html="description | bracesToText"></span>
           </td>
           <td>
-            <button type="button" class="pull-right" ng-click="selectNewRuleType(description, name)">
+            <button type="button" class="btn btn-mini pull-right" ng-click="selectNewRuleType(description, name)">
               Select
             </button>
           </td>
@@ -90,7 +90,7 @@
             <[rule.dest]>
           </a>
         </span>
-        <button class="btn btn-mini" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
+        <button type="button" class="btn btn-mini" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
           <i class="icon-pencil" title="Edit Rule Destination"></i>
         </button>
       </div>
@@ -99,7 +99,7 @@
         <select2-dropdown item="rule.dest" choices="allDests" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9]+$">
         </select2-dropdown>
         <span ng-if="rule.dest == stateName"> ⟳ </span><br />
-        <button ng-click="closeRuleDestEditor()" ng-disabled="!rule.dest">Close</button>
+        <button type="button" class="btn" ng-click="closeRuleDestEditor()" ng-disabled="!rule.dest">Close</button>
       </div>
     </div>
 

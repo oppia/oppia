@@ -13,7 +13,7 @@
     <form ng-submit="addState(newStateDesc)">
       Add a new state:
       <input style="width: 30" type="text" ng-model="newStateDesc" placeholder="New State Name">
-      <button class="btn" type="submit" ng-disabled="!isNewStateNameValid(newStateDesc)">
+      <button type="submit" class="btn" ng-disabled="!isNewStateNameValid(newStateDesc)">
         Submit
       </button>
     </form>

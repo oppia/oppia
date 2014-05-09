@@ -13,7 +13,7 @@
             <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
           </div>
           <div class="span1">
-            <button ng-click="showInteractiveWidgetEditor()" class="btn btn-mini pull-right">
+            <button type="button" class="btn btn-mini pull-right" ng-click="showInteractiveWidgetEditor()" >
               <i class="icon-pencil" title="Edit Interaction"></i>
             </button>
           </div>
@@ -23,10 +23,10 @@
 
     <div ng-if="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
       <span class="pull-right" ng-if="tmpWidget">
-        <button ng-click="selectInteractiveWidget(tmpWidget)">
+        <button type="button" class="btn" ng-click="selectInteractiveWidget(tmpWidget)">
           Use this interaction
         </button>
-        <button ng-click="resetInteractiveWidgetEditor()">
+        <button type="button" class="btn" ng-click="resetInteractiveWidgetEditor()">
           Cancel
         </button>
       </span>

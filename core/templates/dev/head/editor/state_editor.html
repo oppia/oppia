@@ -5,9 +5,9 @@
       <i class="icon-pencil" title="Edit State Name"></i>
     </h4>
 
-    <span ng-if="stateNameEditorIsShown">
+    <span ng-if="stateNameEditorIsShown" class="form-horizontal">
       <input type="text" ng-model="$parent.tmpStateName" autofocus>
-      <button ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Close</button>
+      <button type="button" class="btn" ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Close</button>
     </span>
   </div>
 </div>

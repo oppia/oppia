@@ -45,7 +45,7 @@
 
       <div class="span3">
         <span class="pull-right">
-          <button type="button" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
+          <button type="button" class="btn" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
             Edit
           </button>
 
@@ -55,7 +55,7 @@
           <button ng-show="$index < paramChanges.length - 1" ng-disabled="activeItem !== -1" ng-click="swapParamChanges($index, $index + 1)">⇓</button>
           <span ng-hide="$index < paramChanges.length - 1" class="oppia-grayed">⇓</span>
 
-          <button type="button" ng-disabled="activeItem !== -1 && activeItem !== $index" ng-click="deleteParamChange($index)">
+          <button type="button" class="btn" ng-disabled="activeItem !== -1 && activeItem !== $index" ng-click="deleteParamChange($index)">
             &times;
           </button>
         </span>
@@ -69,7 +69,7 @@
     <div class="span8"></div>
 
     <div class="span3">
-      <button type="button" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()" class="pull-right">
+      <button type="button" class="btn pull-right" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()">
         Add new
       </a>
     </div>
