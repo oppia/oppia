@@ -643,7 +643,7 @@ class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
             csrf_token=csrf_token,
             expected_status_int=200
         )
-        self.assertTrue('State 4' in response_dict['states'])
+        self.assertIn('State 4', response_dict['states'])
 
         # Check that collaborator cannot add new members
         exploration = exp_services.get_exploration_by_id(EXP_ID)
