@@ -103,7 +103,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="transfer()">Transfer Ownership</button>
+        <button class="btn btn-success" ng-click="transfer()">Transfer Ownership</button>
         <button class="btn" ng-click="cancel()">Cancel</button>
       </div>
     </script>
@@ -305,7 +305,7 @@
 
             {% if can_release_ownership %}
               <span ng-hide="explorationRightsService.isCommunityOwned()" class="oppia-exploration-ctrl">
-                <button type="button" class="btn btn-success" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+                <button type="button" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
                   Transfer ownership to the community
                 </button>
                 <img class="oppia-help" src="/images/help.png"
