@@ -347,11 +347,12 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         var LETTER_WIDTH_IN_PIXELS = 10.5;
         var GRAPH_WIDTH = MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS;
 
+        var VIS_HEIGHT = $scope.getElementDimensions().h === 0 ? GRAPH_HEIGHT : '100%';
         var outerVis = d3.select($element[0]).append('svg:svg')
           .attr({
             'class': 'oppia-graph-viz',
             'width': '100%',
-            'height': '100%'
+            'height': VIS_HEIGHT
           });
 
         var dimensions = $scope.getElementDimensions();
