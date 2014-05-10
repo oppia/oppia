@@ -89,24 +89,17 @@ class EventHandler(object):
 
     @classmethod
     def start_exploration(cls, exp_id, exp_version, state_name, session_id,
-                          param_values, play_type):
+                          params, play_type):
         stats_models.StartExplorationEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id, param_values,
+            exp_id, exp_version, state_name, session_id, params,
             play_type)
 
     @classmethod
-    def leave_exploration(cls, exp_id, exp_version, state_name, session_id,
-                          time_spent, param_values, play_type):
-        stats_models.LeaveExplorationEventLogEntryModel.create(
+    def maybe_leave_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          time_spent, params, play_type):
+        stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
-            param_values, play_type)
-
-    @classmethod
-    def complete_exploration(cls, exp_id, exp_version, session_id,
-                             time_spent, param_values, play_type):
-        stats_models.CompleteExplorationEventLogEntryModel.create(
-            exp_id, exp_version, session_id, time_spent, param_values,
-            play_type)
+            params, play_type)
 
 
 def get_unresolved_answers_for_default_rule(exploration_id, state_name):

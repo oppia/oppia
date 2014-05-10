@@ -220,8 +220,13 @@ class ReaderEventLogEntryModel(BaseEventLogEntryModel):
                               session_id))
 
 
-class LeaveExplorationEventLogEntryModel(ReaderEventLogEntryModel):
-    """An event triggered by a reader leaving the exploration without completing."""
+class MaybeLeaveExplorationEventLogEntryModel(ReaderEventLogEntryModel):
+    """An event triggered by a reader attempting to leave the
+    exploration without completing.
+
+    Due to complexity on browser end, this event may be logged when user clicks
+    close and then cancel. Thus, the real event is the last event of this type
+    logged for the session id."""
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
@@ -233,26 +238,6 @@ class LeaveExplorationEventLogEntryModel(ReaderEventLogEntryModel):
                                  exploration_id=exp_id,
                                  exploration_version=exp_version,
                                  state_name=state_name,
-                                 session_id=session_id,
-                                 client_time_spent_in_secs=client_time_spent_in_secs,
-                                 params=params,
-                                 play_type=play_type)
-        leave_event_entity.put()
-
-
-class CompleteExplorationEventLogEntryModel(ReaderEventLogEntryModel):
-    """An event triggered by a reader completing the exploration."""
-
-    @classmethod
-    def create(cls, exp_id, exp_version, session_id,
-               client_time_spent_in_secs, params, play_type):
-        """Creates a new leave exploration event."""
-        entity_id = cls.get_new_event_entity_id(exp_id,
-                                                session_id)
-        leave_event_entity = cls(event_type=feconf.EVENT_TYPE_COMPLETE,
-                                 exploration_id=exp_id,
-                                 exploration_version=exp_version,
-                                 state_name=feconf.END_DEST,
                                  session_id=session_id,
                                  client_time_spent_in_secs=client_time_spent_in_secs,
                                  params=params,

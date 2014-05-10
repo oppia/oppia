@@ -47,6 +47,20 @@ function ReaderExploration(
   $scope.hasInteractedAtLeastOnce = false;
 
   $window.addEventListener('beforeunload', function(e) {
+    if (!$scope.finished) {
+      var requestMap = {
+        params: $scope.params,
+        version: GLOBALS.explorationVersion,
+        session_id: $scope.sessionId,
+        client_time_spent_in_secs: 
+          (new Date().getTime() - $scope.stateStartTime) / 1000,
+      };
+
+      $http.post(
+          '/explorehandler/leave/' + $scope.explorationId + '/' + encodeURIComponent($scope.stateName),
+          oppiaRequestCreator.createRequest(requestMap),
+          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}});
+    }
     if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
       var confirmationMessage = (
           'If you navigate away from this page, your progress on the ' +

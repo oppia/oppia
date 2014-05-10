@@ -53,6 +53,8 @@ class ExplorationPage(base.BaseHandler):
         if not version:
             # The default value for a missing parameter seems to be ''.
             version = None
+        else:
+            version = int(version)
 
         try:
             exploration = exp_services.get_exploration_by_id(
@@ -77,7 +79,7 @@ class ExplorationPage(base.BaseHandler):
 
         self.values.update({
             'content': skins_services.get_skin_html(exploration.default_skin),
-            'exploration_version': version,
+            'exploration_version': int(version) if version is not None else None,
             'iframed': is_iframed,
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
@@ -102,8 +104,7 @@ class ExplorationHandler(base.BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         version = self.request.get('v')
-        if not version:
-            version = None
+        version = int(version) if version else None
 
         try:
             exploration = exp_services.get_exploration_by_id(
@@ -121,6 +122,7 @@ class ExplorationHandler(base.BaseHandler):
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_interactive_widget_tag(
             init_state.widget.customization_args, reader_params)
+        session_id = utils.generate_random_string(24)
 
         self.values.update({
             'init_html': init_state.content[0].to_html(reader_params),
@@ -129,12 +131,15 @@ class ExplorationHandler(base.BaseHandler):
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
             'title': exploration.title,
-            'session_id': utils.generate_random_string(24),
+            'session_id': session_id,
         })
         self.render_json(self.values)
 
         stats_services.EventHandler.record_state_hit(
             exploration_id, exploration.init_state_name, True)
+        stats_services.EventHandler.start_exploration(
+            exploration_id, version, exploration.init_state_name,
+            session_id, reader_params, feconf.PLAY_TYPE_GALLERY)
 
 
 class FeedbackHandler(base.BaseHandler):
@@ -222,6 +227,12 @@ class FeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_state_hit(
             exploration_id, new_state_name,
             (new_state_name not in state_history))
+        if new_state_name == feconf.END_DEST:
+            stats_services.EventHandler.maybe_leave_exploration(
+                exploration_id, version, feconf.END_DEST, 
+                session_id, client_time_spent_in_secs, old_params,
+                feconf.PLAY_TYPE_GALLERY)
+
         state_history.append(new_state_name)
 
         # If the new state widget is the same as the old state widget, and the
@@ -290,3 +301,20 @@ class ReaderFeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_state_feedback_from_reader(
             exploration_id, state_name, feedback,
             {'state_history': state_history}, self.user_id)
+
+class ReaderLeaveHandler(base.BaseHandler):
+    """Tracks a reader leaving an exploration before completion."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @require_viewer
+    def post(self, exploration_id, escaped_state_name):
+        """Handles POST requests."""
+        stats_services.EventHandler.maybe_leave_exploration(
+            exploration_id,
+            self.payload.get('version'),
+            self.unescape_state_name(escaped_state_name),
+            self.payload.get('session_id'),
+            self.payload.get('client_time_spent_in_secs'),
+            self.payload.get('params'),
+            feconf.PLAY_TYPE_GALLERY)
