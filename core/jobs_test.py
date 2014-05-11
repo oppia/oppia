@@ -26,28 +26,28 @@ import test_utils
 from google.appengine.ext import ndb
 
 
-class DummyJob(jobs.BaseJob):
+class DummyJob(jobs.BaseDeferredJob):
     IS_VALID_JOB_CLASS = True
 
     def _run(self):
         return 'output'
 
 
-class AnotherDummyJob(jobs.BaseJob):
+class AnotherDummyJob(jobs.BaseDeferredJob):
     IS_VALID_JOB_CLASS = True
 
     def _run(self):
         return 'output'
 
 
-class DummyFailingJob(jobs.BaseJob):
+class DummyFailingJob(jobs.BaseDeferredJob):
     IS_VALID_JOB_CLASS = True
 
     def _run(self):
         raise Exception('failed')
 
 
-class JobWithNoRunMethod(jobs.BaseJob):
+class JobWithNoRunMethod(jobs.BaseDeferredJob):
     IS_VALID_JOB_CLASS = True
 
 
@@ -92,14 +92,6 @@ class JobUnitTests(test_utils.GenericTestBase):
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         with self.assertRaisesRegexp(Exception, 'NotImplementedError'):
             self.process_and_flush_pending_tasks()
-
-    def test_job_loading(self):
-        job = DummyJob.create_new()
-
-        with self.assertRaisesRegexp(Exception, 'Tried to load job of type'):
-            AnotherDummyJob(job._job_id)
-
-        DummyJob(job._job_id)
 
     def test_complete_job(self):
         job = DummyJob.create_new()
@@ -312,24 +304,27 @@ class SumModel(ndb.Model):
     failed = ndb.BooleanProperty(default=False)
 
 
-class TestJob(jobs.BaseJob):
-    """Base class for test jobs."""
-    IS_VALID_JOB_CLASS = True
+class TestDeferredJob(jobs.BaseDeferredJob):
+    """Base class for testing deferred jobs."""
+    IS_VALID_JOB_CLASS = False
 
 
-class TestAdditionJob(TestJob):
+class TestAdditionJob(TestDeferredJob):
     """Test job that sums all NumbersModel data.
 
     The result is stored in a SumModel entity with id SUM_MODEL_ID.
     """
+    IS_VALID_JOB_CLASS = True
+
     def _run(self):
         total = sum([
             numbers_model.number for numbers_model in NumbersModel.query()])
         SumModel(id=SUM_MODEL_ID, total=total).put()
 
 
-class FailingAdditionJob(TestJob):
+class FailingAdditionJob(TestDeferredJob):
     """Test job that stores stuff in SumModel and then fails."""
+    IS_VALID_JOB_CLASS = True
 
     def _run(self):
         total = sum([

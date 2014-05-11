@@ -46,6 +46,8 @@ def empty_environ():
     os.environ['USER_EMAIL'] = ''
     os.environ['USER_ID'] = ''
     os.environ['USER_IS_ADMIN'] = '0'
+    os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
+        os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
 
 class TestTags(object):

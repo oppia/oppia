@@ -64,9 +64,12 @@ class JobModel(base_models.BaseModel):
             STATUS_CODE_NEW, STATUS_CODE_QUEUED, STATUS_CODE_STARTED,
             STATUS_CODE_COMPLETED, STATUS_CODE_FAILED, STATUS_CODE_CANCELED
         ])
+    # Any metadata for the job, such as the root pipeline id for mapreduce
+    # jobs.
+    metadata = ndb.JsonProperty(indexed=False)
     # The output of the job. This is only populated if the job has status code
     # STATUS_CODE_COMPLETED, and is None otherwise.
-    output = ndb.TextProperty(indexed=False)
+    output = ndb.JsonProperty(indexed=False)
     # The error message, if applicable. Only populated if the job has status
     # code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
     error = ndb.TextProperty(indexed=False)

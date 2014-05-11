@@ -16,6 +16,7 @@
 
 import itertools
 import os
+import tarfile
 import urllib
 import zipfile
 
@@ -86,6 +87,39 @@ def download_and_unzip_files(
         # Rename the target directory.
         os.rename(
             os.path.join(target_parent_dir, zip_root_name),
+            os.path.join(target_parent_dir, target_root_name))
+
+
+def download_and_untar_files(
+        source_url, target_parent_dir, tar_root_name, target_root_name):
+    """Downloads a tar file, untars it, and saves the result in a given dir.
+
+    The download occurs only if the target directory that the tar file untars
+    to does not exist.
+
+    NB: This function assumes that the root level of the tar file has exactly
+    one folder.
+
+    Args:
+      source_url: the URL from which to download the tar file.
+      target_parent_dir: the directory to save the contents of the tar file to.
+      tar_root_name: the name of the top-level folder in the tar directory.
+      target_root_name: the name that the top-level folder should be renamed to
+        in the local directory.
+    """
+    if not os.path.exists(os.path.join(target_parent_dir, target_root_name)):
+        print 'Downloading and untarring file %s to %s' % (
+            tar_root_name, target_parent_dir)
+        common.ensure_directory_exists(target_parent_dir)
+
+        urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
+        with tarfile.open(TMP_UNZIP_PATH, 'r:gz') as t:
+            t.extractall(target_parent_dir)
+        os.remove(TMP_UNZIP_PATH)
+
+        # Rename the target directory.
+        os.rename(
+            os.path.join(target_parent_dir, tar_root_name),
             os.path.join(target_parent_dir, target_root_name))
 
 
@@ -244,3 +278,30 @@ download_and_unzip_files(
 download_and_unzip_files(
     HTML5LIB_ZIP_URL, THIRD_PARTY_DIR,
     HTML5LIB_ZIP_ROOT_NAME, HTML5LIB_TARGET_ROOT_NAME)
+
+
+GAE_MAPREDUCE_REV = '1.9.0.0'
+GAE_MAPREDUCE_ROOT_NAME = 'gae-mapreduce-%s' % GAE_MAPREDUCE_REV
+GAE_MAPREDUCE_TAR_URL = (
+    'https://pypi.python.org/packages/source/G/GoogleAppEngineMapReduce/'
+    'GoogleAppEngineMapReduce-%s.tar.gz' % GAE_MAPREDUCE_REV)
+GAE_MAPREDUCE_TAR_ROOT_NAME = 'GoogleAppEngineMapReduce-%s' % GAE_MAPREDUCE_REV
+GAE_MAPREDUCE_TARGET_ROOT_NAME = GAE_MAPREDUCE_ROOT_NAME
+
+GAE_CLOUD_STORAGE_REV = '1.9.0.0'
+GAE_CLOUD_STORAGE_ROOT_NAME = 'gae-cloud-storage-%s' % GAE_CLOUD_STORAGE_REV
+GAE_CLOUD_STORAGE_TAR_URL = (
+    'https://pypi.python.org/packages/source/G/'
+    'GoogleAppEngineCloudStorageClient/'
+    'GoogleAppEngineCloudStorageClient-%s.tar.gz' % GAE_CLOUD_STORAGE_REV)
+GAE_CLOUD_STORAGE_TAR_ROOT_NAME = (
+    'GoogleAppEngineCloudStorageClient-%s' % GAE_MAPREDUCE_REV)
+GAE_CLOUD_STORAGE_TARGET_ROOT_NAME = GAE_CLOUD_STORAGE_ROOT_NAME
+
+
+download_and_untar_files(
+    GAE_MAPREDUCE_TAR_URL, THIRD_PARTY_DIR,
+    GAE_MAPREDUCE_TAR_ROOT_NAME, GAE_MAPREDUCE_TARGET_ROOT_NAME)
+download_and_untar_files(
+    GAE_CLOUD_STORAGE_TAR_URL, THIRD_PARTY_DIR,
+    GAE_CLOUD_STORAGE_TAR_ROOT_NAME, GAE_CLOUD_STORAGE_TARGET_ROOT_NAME)
