@@ -76,14 +76,14 @@
       </div>
     </script>
 
-    <script type="text/ng-template" id="modals/releaseExplorationOwnership">
+    <script type="text/ng-template" id="modals/transferExplorationOwnership">
       <div class="modal-header">
-        <h3>Release Exploration Ownership</h3>
+        <h3>Transfer Ownership to the Community</h3>
       </div>
 
       <div class="modal-body">
         <p>
-          You are about to release ownership of this exploration to the
+          You are about to transfer ownership of this exploration to the
           community! This will allow anyone to freely edit and improve
           the exploration. Your previous contributions will still be visible
           in the version history logs, and you will still be able to view and
@@ -91,20 +91,55 @@
         </p>
 
         <p>
-          Please note that after an exploration is released to the community, it will
-          no longer have an explicit list of managers,
+          Please note that after the ownership of an exploration is transferred
+          to the community, it will no longer have an explicit list of managers,
           so this action is <strong>not reversible</strong>.
         </p>
 
         <p>
-          Would you like to release ownership of this exploration to the
+          Would you like to transfer ownership of this exploration to the
           community?
         </p>
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="release()">Release Ownership</button>
+        <button class="btn btn-success" ng-click="transfer()">Transfer Ownership</button>
         <button class="btn" ng-click="cancel()">Cancel</button>
+      </div>
+    </script>
+
+    <script type="text/ng-template" id="modals/nominateExploration">
+      <div class="modal-header">
+        <h3>Nominate exploration for release</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          Congratulations, you are about to submit your exploration for release
+          review!
+        </p>
+
+        <p>
+          Currently, the review process is a manual, moderator-driven process.
+          When you submit an exploration for review, a moderator will play through
+          it, look at its structure, and decide whether it fits the
+          <a href="/site_guidelines#publish-and-release-criteria">release criteria</a>.
+          If so, the exploration will be released and appear in the Learn
+          gallery. Otherwise, the moderator will make a series of specific
+          suggestions on how to make the exploration satisfy the criteria,
+          and work with the editor(s) to get it ready for release.
+        </p>
+
+        <p>
+          <strong>To kick off the review process</strong>, please make a post to the
+          <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
+          include a link to your exploration.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
+        <button class="btn" ng-click="close()">Close</button>
       </div>
     </script>
 
@@ -271,14 +306,23 @@
 
             {% if can_release_ownership %}
               <span ng-hide="explorationRightsService.isCommunityOwned()" class="oppia-exploration-ctrl">
-                <button type="button" class="btn" ng-click="showReleaseExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Release Ownership
+                <button type="button" class="btn" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+                  Transfer ownership to the community
                 </button>
                 <img class="oppia-help" src="/images/help.png"
-                     tooltip="Click this button to release ownership of this exploration to the community."
+                     tooltip="Click this button to transfer ownership of this exploration to the community."
                      tooltip-placement="bottom">
               </span>
             {% endif %}
+
+            <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
+              <button type="button" class="btn" ng-click="showNominateExplorationModal()">
+                Nominate for release
+              </button>
+              <img class="oppia-help" src="/images/help.png"
+                   tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the Learn Gallery by default."
+                   tooltip-placement="bottom">
+            </span>
 
             <a class="btn oppia-exploration-ctrl" target="_blank" href="/explore/<[explorationId]>"
                title="Play this exploration in a new window.">
