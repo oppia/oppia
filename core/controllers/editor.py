@@ -66,7 +66,7 @@ EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', 'UnicodeString',
     'A link to the forum for nominating explorations for release.',
-    default_value='')
+    default_value='https://moderator/request/forum/url')
 
 
 def _require_valid_version(version_from_payload, exploration_version):
