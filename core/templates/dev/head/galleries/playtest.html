@@ -6,39 +6,37 @@
 
 {% block content %}
   <script type="text/ng-template" id="playtestQueue/main">
-    <div class="oppia-gallery">
-      <table>
-        <tr>
-          <th style="padding-left: 10px; width: 40%; text-align: left;">Exploration</th>
-          <th style="width: 10%"></th>
-          <th style="width: 25%; text-align: left;">Category</th>
-          <th style="width: 25%; text-align: left;">Last updated</th>
-        </tr>
-        <tr ng-repeat="exploration in explorations track by $index">
-          <td>
-            <div class="oppia-gallery-tile-top">
-              <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
-                <div class="oppia-gallery-tile-description">
-                  <span><[exploration.title]></span>
-                  <span ng-if="exploration.community_owned" class="label label-info">
-                    Community-owned
-                  </span>
-                  <span class="oppia-gallery-tile-play">
+    <div class="row">
+      <div class="oppia-gallery span8">
+        <table class="table">
+          <thead>
+            <th class="span4"><h4>Exploration</h4></th>
+            <th class="span2"><h4>Category</h4></th>
+            <th class="span2"><h4>Last updated</h4></th>
+          </thead>
+          <tr ng-repeat="exploration in explorations track by $index">
+            <td class="span4">
+              <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile">
+                <div class="">
+                  <span class="">
                     <i class="icon-play-circle"></i>
+                  </span>
+                  <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                  <span ng-if="exploration.community_owned" class="label label-info pull-right">
+                    Community-owned
                   </span>
                 </div>
               </a>
-            </div>
-          </td>
-          <td></td>
-          <td>
-            <[exploration.category]>
-          </td>
-          <td>
-            <[getLocaleStringForDate(exploration.last_updated)]>
-          </td>
-        </tr>
-      </table>
+            </td>
+            <td class="span2">
+              <[exploration.category]>
+            </td>
+            <td class="span2">
+              <[getLocaleStringForDate(exploration.last_updated)]>
+            </td>
+          </tr>
+        </table>
+      </div>
     </div>
   </script>
 

@@ -250,22 +250,16 @@ textarea {
   100% { opacity: 1; }
 }
 
-.oppia-gallery {
-  background-color: #f6f6f6;
-  border: 1px solid #bbb;
-  border-radius: 3px;
-}
-
 .oppia-gallery-menu {
   border-right: 1px solid #bbb;
   float: left;
   min-height: 600px;
-  padding: 10px 15px 0 15px;
+  padding: 0 15px 0 15px;
   width: 150px;
 }
 .oppia-gallery-menu-title {
   font-size: 120%;
-  padding: 12px 0;
+  padding: 0 0 12px 0;
 }
 
 .oppia-gallery-tiles-container {
@@ -274,6 +268,11 @@ textarea {
   height: 100%;
   /* This is the same as the min-height in .oppia-gallery-menu. */
   min-height: 600px;
+  padding-left: 20px;
+}
+
+.playtest-headers {
+  border-bottom: 1pt solid #333;
 }
 
 .oppia-gallery-tile {
@@ -283,24 +282,20 @@ textarea {
   box-shadow: 0 1px 2px rgba(100,100,100,0.5);
   display: block;
   float: left;
-  margin: 7px;
-  min-width: 200px;
-  width: 30%;
+  margin: 0 7px 7px 0;
+  display: block;
+  padding: 10px;
+  box-sizing: border-box;
+  width: 100%;
 }
 
-.oppia-gallery-tile-top, .oppia-gallery-tile-bottom {
-  padding: 0 10px;
-}
-.oppia-gallery-tile-top:hover {
+.oppia-gallery-tile:hover, .oppia-gallery-tile-anchor:hover {
   background-color: #ddd;
+  text-decoration: none;
 }
 .oppia-gallery-tile-bottom {
   padding-bottom: 5px;
   white-space: nowrap;
-}
-
-.oppia-gallery-tile-anchor:hover {
-  text-decoration: none;
 }
 
 .oppia-gallery-tile-description {
@@ -308,7 +303,7 @@ textarea {
 }
 
 .oppia-gallery-tile-title {
-  color: #888;
+  color: #18447E;
   font-size: 120%;
   font-weight: bold;
 }
@@ -317,18 +312,6 @@ textarea {
 }
 .oppia-gallery-tile-top:hover .oppia-gallery-tile-title {
   color: black;
-}
-
-.oppia-gallery-tile-play {
-  float: right;
-  opacity: .5;
-  -webkit-transform: scale(1.5, 1.5);
-  -moz-transform: scale(1.5, 1.5);
-  transform: scale(1.5, 1.5);
-}
-
-.oppia-gallery-tile-top:hover .oppia-gallery-tile-play {
-  opacity: 1;
 }
 
 .oppia-page-title {
@@ -937,4 +920,8 @@ table.oppia-padded-table {
 table.oppia-padded-table th, table.oppia-padded-table td {
   border: 1px solid black;
   padding: 5px;
+}
+
+.modal, .modal-body {
+  min-height: 200px;
 }
