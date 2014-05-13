@@ -5,7 +5,7 @@
 {% endblock subtitle %}
 
 {% block content %}
-  <script type="text/ng-template" id="playtestGallery/gallerySection">
+  <script type="text/ng-template" id="playtestQueue/main">
     <div class="row">
     <div class="oppia-gallery span8">
         <table class="table">
@@ -47,8 +47,8 @@
           </h3>
 
           <p>All explorations on this page are still in beta. Play them and give feedback to make them better!</p>
-          <playtest-gallery-section explorations="publicExplorations">
-          </playtest-gallery-section>
+          <playtest-queue-section explorations="publicExplorations">
+          </playtest-queue-section>
 
           <div ng-if="privateExplorations">
             <br><br>

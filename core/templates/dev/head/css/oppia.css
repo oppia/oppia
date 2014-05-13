@@ -254,12 +254,12 @@ textarea {
   border-right: 1px solid #bbb;
   float: left;
   min-height: 600px;
-  padding: 10px 15px 0 15px;
+  padding: 0 15px 0 15px;
   width: 150px;
 }
 .oppia-gallery-menu-title {
   font-size: 120%;
-  padding: 12px 0;
+  padding: 0 0 12px 0;
 }
 
 .oppia-gallery-tiles-container {
@@ -268,6 +268,7 @@ textarea {
   height: 100%;
   /* This is the same as the min-height in .oppia-gallery-menu. */
   min-height: 600px;
+  padding-left: 20px;
 }
 
 .playtest-headers {
@@ -288,7 +289,7 @@ textarea {
   width: 100%;
 }
 
-.oppia-gallery-tile:hover {
+.oppia-gallery-tile:hover, .oppia-gallery-tile-anchor:hover {
   background-color: #ddd;
   text-decoration: none;
 }
