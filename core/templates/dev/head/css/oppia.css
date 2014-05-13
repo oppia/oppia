@@ -913,3 +913,7 @@ table.oppia-padded-table th, table.oppia-padded-table td {
   border: 1px solid black;
   padding: 5px;
 }
+
+.modal, .modal-body {
+  min-height: 200px;
+}
