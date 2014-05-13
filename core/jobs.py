@@ -71,9 +71,12 @@ class BaseJobManager(object):
                 'Tried to directly create a job using the abstract base '
                 'manager class %s, which is not allowed.' % cls.__name__)
 
-        job_id = job_models.JobModel.get_new_id(cls.__name__)
-        job_models.JobModel(id=job_id, job_type=cls.__name__).put()
-        return job_id
+        def _create_new_job():
+            job_id = job_models.JobModel.get_new_id(cls.__name__)
+            job_models.JobModel(id=job_id, job_type=cls.__name__).put()
+            return job_id
+
+        return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
     def enqueue(cls, job_id):
