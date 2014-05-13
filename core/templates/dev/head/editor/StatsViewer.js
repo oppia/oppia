@@ -20,6 +20,12 @@
 
 function StatsViewer($scope, $http, $location, $modal, warningsData, activeInputData) {
 
+  $scope.onClickStateInStatsGraph = function(stateName) {
+    if (stateName !== END_DEST) {
+      $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
+    }
+  };
+
   $scope.showStateStatsModal = function(stateName, improvementType) {
     warningsData.clear();
 

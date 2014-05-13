@@ -14,6 +14,10 @@
 
 __author__ = 'Sean Lip'
 
+import os
+import StringIO
+import zipfile
+
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -283,6 +287,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
 
         # Switch to the reader perspective. First submit the first
         # multiple-choice answer, then submit 'blah'.
+        self.logout()
         exploration_dict = self.get_json(
             '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
         self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
@@ -312,6 +317,61 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
 
         # TODO(sll): Add more checks here.
+
+        self.logout()
+
+
+class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
+    """Test handler for exploration download."""
+
+    def test_exploration_download_handler_for_default_exploration(self):
+
+        # Register and log in as an editor.
+        self.register_editor('editor@example.com')
+        self.login('editor@example.com')
+        self.OWNER_ID = self.get_user_id_from_email('editor@example.com')
+
+        # Create a simple exploration
+        EXP_ID = 'eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'The title for ZIP download handler test!',
+            'This is just a test category')
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        exploration.rename_state('State 2', 'State B')
+        exploration.delete_state('State 3')
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        response = self.testapp.get('/create/%s' % EXP_ID)
+
+        # Download to zip file using download handler
+        EXPLORATION_DOWNLOAD_URL = '/createhandler/download/%s' % EXP_ID
+        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+
+        # Check downloaded zip file
+        self.assertEqual(response.headers['Content-Type'], 'text/plain')
+        filename = 'oppia-ThetitleforZIPdownloadhandlertest!-v2.zip'
+        self.assertEqual(response.headers['Content-Disposition'],
+                         'attachment; filename=%s' % str(filename))
+        zf_saved = zipfile.ZipFile(StringIO.StringIO(response.body))
+        self.assertEqual(
+            zf_saved.namelist(),
+            ['The title for ZIP download handler test!.yaml'])
+
+        # Load golden zip file
+        with open(os.path.join(
+                feconf.TESTS_DATA_DIR,
+                'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')) as f:
+            golden_zipfile = f.read()
+        zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
+
+        # Compare saved with golden file
+        self.assertEqual(
+            zf_saved.open(
+                'The title for ZIP download handler test!.yaml'
+                ).read(),
+            zf_gold.open(
+                'The title for ZIP download handler test!.yaml'
+                ).read())
 
         self.logout()
 
@@ -415,15 +475,19 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
         exp_services.delete_demo(EXP_ID)
         exp_services.load_demo(EXP_ID)
 
-        # In version 2, change the initial state content.
+        # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_services.update_exploration(
             'editor@example.com', EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'objective',
+                'new_value': 'the objective',
+            }, {
                 'cmd': 'edit_state_property',
                 'property_name': 'content',
                 'state_name': exploration.init_state_name,
                 'new_value': [{'type': 'text', 'value': 'ABC'}],
-            }], 'Change init state content')
+            }], 'Change objective and init state content')
 
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(

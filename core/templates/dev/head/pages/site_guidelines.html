@@ -5,12 +5,21 @@
 {% endblock subtitle %}
 
 {% block content %}
+  <script>
+    // Navigate to the active tab on page load, if one is specified in the
+    // location hash.
+    $(function () {
+      var activeTab = $('[href=#' + location.hash.substring(2) + ']');
+      activeTab && activeTab.tab('show');
+    });
+  </script>
   <div class="container">
     <div class="row">
       <div class="span8">
         <div class="tabbable">
           <ul class="nav nav-tabs about-tabs">
-            <li class="active"><a href="#how-to-use" data-toggle="tab">How to Use Oppia</a></li>
+            <li class="active"><a href="#how-to-use" data-toggle="tab">How to use Oppia</a></li>
+            <li><a href="#publish-and-release-criteria" data-toggle="tab">Exploration publishing criteria</a></li>
           </ul>
 
           <div class="tab-content">
@@ -52,13 +61,85 @@
 
                 <h2 id="lifecycle">Lifecycle of an Exploration</h2>
                 <p>
-                  All explorations start off as private, which means that they can only be viewed by the exploration editors, invited playtesters, and site admins. When an exploration is in a good enough state for general use, any owner of the exploration may decide to publish it. Currently, publishing is a one-way process. After an exploration is published, it will enter "beta" status, and be visible in the public gallery to users who click "Show all explorations". Anyone will be able to play it, give feedback, and suggest edits. Owners are encouraged to submit high-quality explorations to the <a href="https://groups.google.com/forum/#!forum/oppia-moderator-requests">moderators' request forum</a>, and those that are approved will move out of beta status and become directly visible in the gallery.
+                  The core of this site is the <a href="/learn">Learn gallery</a>, which is the primary location for high-quality effective and enjoyable learning experiences. All explorations hosted here should ultimately be improved to the point where they are useful to learners and can be hosted in the Learn gallery.
+                </p>
+
+                <p>
+                  More specifically, an exploration goes through three stages as it becomes ready for learners to use:
+                  <ul>
+                    <li style="line-height: 25px;">
+                      Each exploration starts out as <strong>private</strong>: only the creator of the exploration, any editors they assign, invited playtesters, and the site moderators can see it.
+                    </li>
+                    <li style="line-height: 25px;">
+                      Once the creators of the exploration are ready for it to be publicly playtested, they can publish the exploration, at which point its status changes to <strong>beta</strong>. The exploration immediately enters the <a href="/playtest">playtesting queue</a>, and community members can see and play the exploration, and leave feedback and suggestions.
+                    </li>
+                    <li style="line-height: 25px;">
+                      Once the exploration satisfies the <a href="site_guidelines/#publish-and-release-criteria">release criteria</a>, the exploration is officially <strong>released</strong> and can be seen and played via the <a href="/learn">Learn gallery</a>.
+                    </li>
+                  </ul>
                 </p>
                 <p>
                   The editors of an exploration can retain exclusive editing rights as long as they continue to maintain the exploration and respond to feedback and change suggestions in a timely manner. Otherwise, the exploration will be considered 'orphaned' and ownership of it will revert to the community, who will then be able to collectively improve the exploration over time. The owner(s) of an exploration may also choose to release ownership to the community at any time.
                 </p>
               </div>
             </div>
+
+            <div class="tab-pane" id="publish-and-release-criteria">
+              <div class="oppia-about">
+                <h1>Exploration publishing criteria</h1>
+                <p>
+                  In order to ensure that Oppia is filled with high-quality explorations that do a good job of helping people learn something new, there are some minimal criteria for publishing an exploration to the "beta" stage and later moving it to the "released" stage. These are described below:
+                </p>
+
+                <h2>"Beta" criteria</h2>
+                <p>
+                  The following criteria for publishing an exploration to "beta" stage are meant to ensure that playtesters can test beta explorations meaningfully and leave helpful feedback, and that it is possible to continue developing and refining these explorations to move towards the Released stage. These criteria are intended to be objective and precise, so that it is easy for anyone to determine whether a particular exploration fits the criteria.
+                </p>
+
+                <p>
+                  <ul>
+                    <li style="line-height: 25px;">
+                      <strong>It teaches something.</strong> The exploration should present information that is new to the target audience, and not just test knowledge that its target audience is already assumed to have.
+                    </li>
+                    <li style="line-height: 25px;">
+                      <strong>It teaches more than a single factoid.</strong> The information presented should be either "deep" - an involved and tricky concept that has nuances and depth to it, or "broad" - a collection of related interesting facts that the learner can understand and remember better after playing through the exploration.
+                    </li>
+                    <li style="line-height: 25px;">
+                      <strong>It provides informative feedback.</strong> The feedback that it provides to the players should be more than just "Correct" or "Incorrect"; it should provide (or guide players toward) the reasoning about why something is right or wrong, and how to correct it if necessary. An exploration should be more than just a quiz!
+                    </li>
+                    <li style="line-height: 25px;">
+                      <strong>It doesn't duplicate an existing Beta or Released exploration</strong>. It's fine to teach the same thing using a significantly different way of teaching, but if a new exploration teaches the exact same things as an existing one, in the same way, then the effort would be better spent submitting feedback to, and improving, the existing one.
+                    </li>
+                  </ul>
+                </p>
+
+                <h2>"Released" criteria</h2>
+                <p>
+                  The criteria for releasing an exploration are meant to ensure that the explorations in the Learn gallery are educational, interesting to our learners, and make appropriate use of the interactive, discovery-based learning style that the Oppia tool enables. The <a href="https://code.google.com/p/oppia/wiki/DesignTips">Design Tips</a> wiki page has some constructive advice on how to create explorations that fit these criteria, especially how to design useful, formative feedback.
+                </p>
+
+                <p>
+                  <ul>
+                    <li style="line-height: 25px;">
+                      <strong>Understanding, not memorization.</strong> Does the exploration attempt to teach some interesting concept, or does it merely provide facts for the student to memorize?
+                    </li>
+                    <li style="line-height: 25px;">
+                      <strong>Learning, not assessment.</strong> Does the exploration present new concepts to the learners, or does it simply quiz them on some set of topics? (Even if a quiz later gives out the right answers, this does not necessarily help a learner master the new concepts effectively.)
+                    </li>
+                    <li style="line-height: 25px;">
+                      <strong>Learn by doing.</strong> How is the new information presented to the learner? Does he have a chance to reason about the concepts himself, try out using them, and receive feedback on what he did?
+                    </li>
+                    <li style="line-height: 25px;">
+                      <strong>Formative feedback.</strong> Does the feedback that you provide to the learner give him new useful insights into the problem? Does it find a good middle ground between simply telling the user he's wrong (or right), and giving the entire answer away? Do the feedback rules cover a wide range of possible answers and misconceptions? Is there a catch-all default rule that nevertheless tries to guide the learner toward a good solution?
+                    </li>
+                    <li style="line-height: 25px;">
+                      <strong>Complete and polished.</strong> Is the exploration free of typos, factual errors and bugs? Is the text well-written and easy to read? Does the exploration deliver all the content it has promised to the learner, either within the exploration or as stated the learning objective?
+                    </li>
+                  </ul>
+                </p>
+              </div>
+            </div>
+
           </div>
         </div>
       </div>

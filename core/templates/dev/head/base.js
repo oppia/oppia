@@ -20,6 +20,8 @@
 
 // Global utility methods.
 function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
+  $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
+
   $scope.warningsData = warningsData;
   $scope.activeInputData = activeInputData;
 
@@ -77,49 +79,6 @@ function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInpu
    */
   $scope.addContentToIframeWithId = function(iframeId, content) {
     $scope.addContentToIframe(document.getElementById(iframeId), content);
-  };
-
-  $scope.normalizeWhitespace = function(input) {
-    if (typeof input == 'string' || input instanceof String) {
-      // Remove whitespace from the beginning and end of the string, and
-      // replace interior whitespace with a single space character.
-      input = input.trim();
-      input = input.replace(/\s{2,}/g, ' ');
-      return input;
-    } else {
-      return input;
-    }
-  };
-
-  /**
-   * Checks whether an entity name is valid, and displays a warning message
-   * if it isn't.
-   * @param {string} input The input to be checked.
-   * @param {boolean} showWarnings Whether to show warnings in the butterbar.
-   * @return {boolean} True if the entity name is valid, false otherwise.
-   */
-  $scope.isValidEntityName = function(input, showWarnings) {
-    input = $scope.normalizeWhitespace(input);
-
-    if (!input) {
-      if (showWarnings) {
-        warningsData.addWarning('Please enter a non-empty name.');
-      }
-      return false;
-    }
-
-    for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
-      if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
-        if (showWarnings) {
-          warningsData.addWarning(
-           'Invalid input. Please use a non-empty description consisting ' +
-           'of alphanumeric characters, underscores, spaces and/or hyphens.'
-          );
-        }
-        return false;
-      }
-    }
-    return true;
   };
 
   /**
@@ -183,4 +142,6 @@ function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInpu
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Base.$inject = ['$scope', '$http', '$rootScope', '$window', '$log', 'warningsData', 'activeInputData', 'messengerService'];
+Base.$inject = [
+  '$scope', '$http', '$rootScope', '$window', '$log', 'warningsData',
+  'activeInputData', 'messengerService'];

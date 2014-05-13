@@ -118,3 +118,19 @@ oppia.filter('commaSeparatedList', function() {
     return input.join(', ');
   };
 });
+
+// Filter that removes whitespace from the beginning and end of a string, and
+// replaces interior whitespace with a single space character.
+oppia.filter('normalizeWhitespace', function() {
+  return function(input) {
+    if (typeof input == 'string' || input instanceof String) {
+      // Remove whitespace from the beginning and end of the string, and
+      // replace interior whitespace with a single space character.
+      input = input.trim();
+      input = input.replace(/\s{2,}/g, ' ');
+      return input;
+    } else {
+      return input;
+    }
+  };
+});

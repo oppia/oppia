@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ContributeGallery($scope, $http, $rootScope, $modal, warningsData, oppiaRequestCreator) {
+function ContributeGallery($scope, $http, $rootScope, $filter, $modal, warningsData, oppiaRequestCreator, validatorsService) {
   $scope.contributeGalleryDataUrl = '/contributehandler/data';
   $scope.cloneExplorationUrl = '/contributehandler/clone';
   $scope.categoryList = [];
@@ -146,8 +146,8 @@ function ContributeGallery($scope, $http, $rootScope, $modal, warningsData, oppi
 
     modalInstance.result.then(function(result) {
       var title = result.title;
-      var category = $scope.normalizeWhitespace(result.category);
-      if (!$scope.isValidEntityName(category, true)) {
+      var category = $filter('normalizeWhitespace')(result.category);
+      if (!validatorsService.isValidEntityName(category, true)) {
         return;
       }
 
@@ -218,10 +218,10 @@ function ContributeGallery($scope, $http, $rootScope, $modal, warningsData, oppi
 
     modalInstance.result.then(function(result) {
       var title = result.title;
-      var category = $scope.normalizeWhitespace(result.category);
+      var category = $filter('normalizeWhitespace')(result.category);
       var yamlFile = result.yamlFile;
 
-      if (!$scope.isValidEntityName(category, true)) {
+      if (!validatorsService.isValidEntityName(category, true)) {
         return;
       }
 
@@ -262,4 +262,6 @@ function ContributeGallery($scope, $http, $rootScope, $modal, warningsData, oppi
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-ContributeGallery.$inject = ['$scope', '$http', '$rootScope', '$modal', 'warningsData', 'oppiaRequestCreator'];
+ContributeGallery.$inject = [
+  '$scope', '$http', '$rootScope', '$filter', '$modal', 'warningsData',
+  'oppiaRequestCreator', 'validatorsService'];

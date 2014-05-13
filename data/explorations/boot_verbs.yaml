@@ -1,176 +1,183 @@
+author_notes: ''
+blurb: ''
 default_skin: conversation_v1
+init_state_name: Sentence
+language_code: en
+objective: master the conjugation of Spanish boot verbs.
 param_changes: []
 param_specs: {}
-schema_version: 1
+schema_version: 3
+skill_tags: []
 states:
-- content:
-  - type: text
-    value: "Yo __________ (jugar) al f\xFAtbol con amigos los domingos\n\nWhat verb\
-      \ conjugation goes in the blank? \nOr type 'I don't know'"
-  name: Sentence
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: juego
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: END
-        feedback:
-        - That is correct! Great job!
-        param_changes: []
-      - definition:
-          inputs:
-            x: jugo
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: boot verb
-        feedback:
-        - No, remember jugo means 'juice'. It sounds about right, but it isn't quite
-          because jugar is a boot verb.
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: subject
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: So now put that stem together with the ending, and what is the answer?
-  name: So...
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: juego
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: END
-        feedback: []
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: So...
-        feedback:
-        - Try that again. Put jueg- together with -o and you get...?
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: "Boot verbs can also be called stem-changing verbs.<br>\nWhat is it that\
-      \ makes it a boot verb? Well... if you use the normal way of writing out verb\
-      \ conjugations it looks like this:<br><pre>\nyo                          nosotros<br>\n\
-      t\xFA                          vosotros<br>\n\xE9l/ella/usted              \
-      \ ustedes<br>\n</pre>\n<br>\nAnd in a boot verb the stem changes only in the\
-      \ yo, t\xFA, \xE9l/ella/usted and ustedes forms. And if you draw a line around\
-      \ those, it looks like a boot.<br>\n<br>\nIn the case of jugar, since it is\
-      \ a verb ending in -gar, it uses the u > ue stem, so what does the stem become?"
-  name: boot verb
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: jueg
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: So...
-        feedback: []
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: So...
-        feedback:
-        - Not quite. Just change the u to a ue and you get jueg-
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: So what is the subject of the sentence?
-  name: subject
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: yo
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: verb endings
-        feedback: []
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: subject
-        feedback:
-        - The subject of the sentence is the noun in the sentence that is doing the
-          action. It is usually near the beginning of the sentence.
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: So what is the correct verb ending for yo?
-  name: verb endings
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: -o
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: boot verb
-        feedback:
-        - But if you just drop the -ar and at -o, you get jugo which means juice,
-          so that's not quite right. That's because jugar is a boot verb!
-        param_changes: []
-      - definition:
-          inputs:
-            x: o
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: boot verb
-        feedback:
-        - But if you just drop the -ar and at -o, you get jugo which means juice,
-          so that's not quite right. That's because jugar is a boot verb!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: verb endings
-        feedback:
-        - "That doesn't look right. Here is the conjugation of hablo (to speak): yo\
-          \ hablo, t\xFA hablas, usted/\xE9l/ella habla, nosotros/as hablamos, vosotros/as\
-          \ habl\xE1is, ustedes/ellos/ellas hablan. From this list, what do you think\
-          \ the corresponding ending for 'yo' is?"
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
+  Sentence:
+    content:
+    - type: text
+      value: "Yo __________ (jugar) al f\xFAtbol con amigos los domingos\n\nWhat verb\
+        \ conjugation goes in the blank? \nOr type 'I don't know'"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: juego
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: END
+          feedback:
+          - That is correct! Great job!
+          param_changes: []
+        - definition:
+            inputs:
+              x: jugo
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: boot verb
+          feedback:
+          - No, remember jugo means 'juice'. It sounds about right, but it isn't quite
+            because jugar is a boot verb.
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: subject
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  So...:
+    content:
+    - type: text
+      value: So now put that stem together with the ending, and what is the answer?
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: juego
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: END
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: So...
+          feedback:
+          - Try that again. Put jueg- together with -o and you get...?
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  boot verb:
+    content:
+    - type: text
+      value: "Boot verbs can also be called stem-changing verbs.<br>\nWhat is it that\
+        \ makes it a boot verb? Well... if you use the normal way of writing out verb\
+        \ conjugations it looks like this:<br>\nyo                          nosotros<br>\n\
+        t\xFA                          vosotros<br>\n\xE9l/ella/usted            \
+        \   ustedes<br>\n\n<br>\nAnd in a boot verb the stem changes only in the yo,\
+        \ t\xFA, \xE9l/ella/usted and ustedes forms. And if you draw a line around\
+        \ those, it looks like a boot.<br>\n<br>\nIn the case of jugar, since it is\
+        \ a verb ending in -gar, it uses the u &gt; ue stem, so what does the stem\
+        \ become?"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: jueg
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: So...
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: So...
+          feedback:
+          - Not quite. Just change the u to a ue and you get jueg-
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  subject:
+    content:
+    - type: text
+      value: So what is the subject of the sentence?
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: yo
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: verb endings
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: subject
+          feedback:
+          - The subject of the sentence is the noun in the sentence that is doing
+            the action. It is usually near the beginning of the sentence.
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  verb endings:
+    content:
+    - type: text
+      value: So what is the correct verb ending for yo?
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: -o
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: boot verb
+          feedback:
+          - But if you just drop the -ar and at -o, you get jugo which means juice,
+            so that's not quite right. That's because jugar is a boot verb!
+          param_changes: []
+        - definition:
+            inputs:
+              x: o
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: boot verb
+          feedback:
+          - But if you just drop the -ar and at -o, you get jugo which means juice,
+            so that's not quite right. That's because jugar is a boot verb!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: verb endings
+          feedback:
+          - "That doesn't look right. Here is the conjugation of hablo (to speak):\
+            \ yo hablo, t\xFA hablas, usted/\xE9l/ella habla, nosotros/as hablamos,\
+            \ vosotros/as habl\xE1is, ustedes/ellos/ellas hablan. From this list,\
+            \ what do you think the corresponding ending for 'yo' is?"
+          param_changes: []
+      sticky: false
+      widget_id: TextInput

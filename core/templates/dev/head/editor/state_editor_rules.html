@@ -2,14 +2,12 @@
 
 {% block id %}rules{% endblock %}
 
+{% block label %}rules{% endblock %}
+
 {% block row %}
   <div ng-repeat="(handlerName, handler) in widgetHandlers">
     {{ super() }}
   </div>
-{% endblock %}
-
-{% block label %}
-  when readers <[handlerName]>:
 {% endblock %}
 
 {% block link %}
@@ -19,18 +17,26 @@
 {% block line1 %}
   <div class="row-fluid">
     <div ng-repeat="rule in handler" ng-hide="$last">
-      <div class="span11" style="padding: 5px;">
+      <div class="span11 oppia-rule-block">
         <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)">
         </rule-editor>
       </div>
 
-      <div class="span1">
+      <div class="span1 oppia-rule-swap-arrows">
         <span class="pull-right">
-          <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="oppia-rule-ctrl">⇑</button>
-          <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">⇑</span>
+          <button ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)" class="btn btn-mini oppia-rule-ctrl">
+            <i class="icon-arrow-up" title="Move Rule Up"></i>
+          </button>
+          <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">
+            <i class="icon-arrow-up" title="Move Rule Up"></i>
+          </span>
 
-          <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)" class="oppia-rule-ctrl">⇓</button>
-          <span ng-hide="$index < handler.length - 2" class="oppia-grayed oppia-rule-ctrl">⇓</span>
+          <button ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)" class="btn btn-mini oppia-rule-ctrl">
+            <i class="icon-arrow-down" title="Move Rule Down"></i>
+          </button>
+          <span ng-hide="$index < handler.length - 2" class="oppia-grayed oppia-rule-ctrl">
+            <i class="icon-arrow-down" title="Move Rule Down"></i>
+          </span>
         </span>
       </div>
     </div>
@@ -39,17 +45,11 @@
 
 {% block line2 %}
   <div class="row-fluid" ng-show="widgetId != 'Continue'">
-    <div class="span11">
+    <div class="span11 oppia-rule-block">
       <div ng-if="!tmpRule">
-        <table style="width: 100%">
-          <tr>
-            <td style="vertical-align: top; padding: 10px;" class="oppia-lightly-grayed">
-              <button class="oppia-align-center" style="width: 100%;" ng-click="createTmpRule()">
-                Add new rule
-              </button>
-            </td>
-          </tr>
-        </table>
+        <button class="btn oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
+          Add new rule
+        </button>
       </div>
 
       <div ng-if="tmpRule">
@@ -57,23 +57,16 @@
         </rule-editor>
       </div>
     </div>
-
-    <div class="span1">
-    </div>
   </div>
 {% endblock %}
 
 {% block line3 %}
   <div class="row-fluid">
-    <div class="span11" style="padding: 5px;">
+    <div class="span11 oppia-rule-block">
       <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
       </rule-editor>
     </div>
-    <div class="span1">
-      <span class="pull-right">
-        <span class="oppia-grayed oppia-rule-ctrl"> ⇑ </span>
-        <span class="oppia-grayed oppia-rule-ctrl"> ⇓ </span>
-      </span>
+    <div class="span1" >
     </div>
   </div>
 {% endblock %}

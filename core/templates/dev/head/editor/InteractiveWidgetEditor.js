@@ -18,7 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppiaRequestCreator, editorContextService) {
+function InteractiveWidgetEditor(
+    $scope, $http, $modal, $log, warningsData, oppiaRequestCreator,
+    editorContextService, changeListService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -51,11 +53,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   $scope.initInteractiveWidget = function(data) {
     $scope.resetInteractiveWidgetEditor();
 
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open interactive widget editor outside a state context.');
-      return;
-    }
-
     $scope.stateName = editorContextService.getActiveStateName();
 
     // Stores rules in the form of key-value pairs. For each pair, the key is
@@ -83,8 +80,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   });
 
   $scope.toggleWidgetSticky = function() {
-    $scope.addStateChange('widget_sticky', $scope.widgetSticky, !$scope.widgetSticky);
     var activeStateName = editorContextService.getActiveStateName();
+    changeListService.editStateProperty(
+      activeStateName, 'widget_sticky', $scope.widgetSticky,
+      !$scope.widgetSticky);
     $scope.states[activeStateName].widget.sticky = $scope.widgetSticky;
   };
 
@@ -131,31 +130,35 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
     $scope.$broadcast('externalSave');
 
     var newWidget = $scope.cloneObject(tmpWidget);
+    var activeStateName = editorContextService.getActiveStateName();
 
     $scope.tmpRule = null;
 
     if (!angular.equals(newWidget.widget_id, $scope.widgetIdMemento)) {
       $scope.widgetId = angular.copy(newWidget.widget_id);
-      $scope.addStateChange('widget_id', $scope.widgetId, $scope.widgetIdMemento);
+
+      changeListService.editStateProperty(
+        activeStateName, 'widget_id', $scope.widgetId, $scope.widgetIdMemento);
 
       // Change the widget handlers, but preserve the old default rule.
       $scope.widgetHandlers = {
         'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
       };
-      $scope.addStateChange('widget_handlers', $scope.widgetHandlers, $scope.widgetHandlersMemento);
+      changeListService.editStateProperty(
+        activeStateName, 'widget_handlers', $scope.widgetHandlers,
+        $scope.widgetHandlersMemento);
     }
 
     if (!angular.equals(newWidget.customization_args, $scope.widgetCustomizationArgsMemento)) {
       $scope.widgetCustomizationArgs = angular.copy(newWidget.customization_args);
-      $scope.addStateChange(
-        'widget_customization_args', $scope.widgetCustomizationArgs,
-        $scope.widgetCustomizationArgsMemento
-      );
+      changeListService.editStateProperty(
+        activeStateName, 'widget_customization_args',
+        $scope.widgetCustomizationArgs, $scope.widgetCustomizationArgsMemento);
     }
 
     $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
     $scope.updateStatesData();
-    $scope.drawGraph();
+    $scope.refreshGraph();
 
     var activeStateName = editorContextService.getActiveStateName();
     $scope.states[activeStateName].widget.widget_id = $scope.widgetId;
@@ -226,10 +229,10 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
   $scope.swapRules = function(handlerName, index1, index2) {
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
 
-    $scope.tmpRule = $scope.widgetHandlers[handlerName][index1];
+    var tmpSwapRule = $scope.widgetHandlers[handlerName][index1];
     $scope.widgetHandlers[handlerName][index1] =
         $scope.widgetHandlers[handlerName][index2];
-    $scope.widgetHandlers[handlerName][index2] = $scope.tmpRule;
+    $scope.widgetHandlers[handlerName][index2] = tmpSwapRule;
 
     $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
   };
@@ -249,10 +252,11 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
 
   $scope.saveWidgetHandlers = function(newHandlers, oldHandlers) {
     if (newHandlers && oldHandlers && !angular.equals(newHandlers, oldHandlers)) {
-      $scope.addStateChange(
-        'widget_handlers', angular.copy(newHandlers), angular.copy(oldHandlers));
+      changeListService.editStateProperty(
+        editorContextService.getActiveStateName(), 'widget_handlers',
+        angular.copy(newHandlers), angular.copy(oldHandlers));
       $scope.updateStatesData();
-      $scope.drawGraph();
+      $scope.refreshGraph();
       $scope.widgetHandlersMemento = angular.copy(newHandlers);
     }
   };
@@ -269,5 +273,6 @@ function InteractiveWidgetEditor($scope, $http, $modal, $log, warningsData, oppi
 }
 
 InteractiveWidgetEditor.$inject = [
-  '$scope', '$http', '$modal', '$log', 'warningsData', 'oppiaRequestCreator', 'editorContextService'
+  '$scope', '$http', '$modal', '$log', 'warningsData', 'oppiaRequestCreator',
+  'editorContextService', 'changeListService'
 ];

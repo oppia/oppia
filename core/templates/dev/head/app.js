@@ -32,7 +32,7 @@ oppia.config(['$provide', function($provide) {
   $provide.decorator('$log', ['$delegate', function($delegate) {
     var _originalError = $delegate.error;
 
-    if (!GLOBALS.DEV_MODE) {
+    if (window.GLOBALS && !window.GLOBALS.DEV_MODE) {
       $delegate.log = function(message) { };
       $delegate.info = function(message) { };
       // TODO(sll): Send errors (and maybe warnings) to the backend.
@@ -119,3 +119,50 @@ oppia.factory('oppiaDateFormatter', [function() {
   };
 }]);
 
+// Service for validating things and (optionally) displaying warning messages
+// if the validation fails.
+oppia.factory('validatorsService', [
+    '$filter', 'warningsData', function($filter, warningsData) {
+  return {
+    /**
+     * Checks whether an entity name is valid, and displays a warning message
+     * if it isn't.
+     * @param {string} input The input to be checked.
+     * @param {boolean} showWarnings Whether to show warnings in the butterbar.
+     * @return {boolean} True if the entity name is valid, false otherwise.
+     */
+    isValidEntityName: function(input, showWarnings) {
+      input = $filter('normalizeWhitespace')(input);
+      if (!input) {
+        if (showWarnings) {
+          warningsData.addWarning('Please enter a non-empty name.');
+        }
+        return false;
+      }
+
+      for (var i = 0; i < GLOBALS.INVALID_NAME_CHARS.length; i++) {
+        if (input.indexOf(GLOBALS.INVALID_NAME_CHARS[i]) !== -1) {
+          if (showWarnings) {
+            warningsData.addWarning(
+             'Invalid input. Please use a non-empty description consisting ' +
+             'of alphanumeric characters, underscores, spaces and/or hyphens.'
+            );
+          }
+          return false;
+        }
+      }
+      return true;
+    },
+    isNonempty: function(input, showWarnings) {
+      if (!input) {
+        if (showWarnings) {
+          // TODO(sll): Allow this warning to be more specific in terms of what
+          // needs to be entered.
+          warningsData.addWarning('Please enter a non-empty value.');
+        }
+        return false;
+      }
+      return true;
+    }
+  }
+}]);

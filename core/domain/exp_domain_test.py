@@ -109,6 +109,24 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         }
         exploration.validate()
 
+    def test_objective_validation(self):
+        """Test that objectives are validated only in 'strict' mode."""
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', 'Title', 'Category')
+        exploration.validate()
+
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'objective must be specified'):
+            exploration.validate(strict=True)
+
+        exploration.objective = 'An objective'
+        # Link the start state to the END state in order to make the
+        # exploration valid.
+        exploration.states[exploration.init_state_name].widget.handlers[
+            0].rule_specs[0].dest = feconf.END_DEST
+
+        exploration.validate(strict=True)
+
     def test_is_demo_property(self):
         """Test the is_demo property."""
         demo = exp_domain.Exploration.create_default_exploration(
@@ -165,11 +183,16 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
     """Test creation of explorations from YAML files."""
 
     SAMPLE_YAML_CONTENT = (
-"""default_skin: conversation_v1
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
 init_state_name: (untitled state)
+language_code: en
+objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 2
+schema_version: 3
+skill_tags: []
 states:
   (untitled state):
     content:
@@ -326,19 +349,71 @@ states:
       widget_id: TextInput
 """)
 
+    YAML_CONTENT_V3 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 3
+skill_tags: []
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  New state:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+""")
+
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V1)
-        v2_yaml = exploration.to_yaml()
-        self.assertEqual(v2_yaml, self.YAML_CONTENT_V2)
+        self.assertEqual(exploration.to_yaml(), self.YAML_CONTENT_V3)
 
     def test_load_from_v2(self):
         """Test direct loading from a v2 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V2)
-        v2_yaml = exploration.to_yaml()
-        self.assertEqual(v2_yaml, self.YAML_CONTENT_V2)
+        self.assertEqual(exploration.to_yaml(), self.YAML_CONTENT_V3)
+
+    def test_load_from_v3(self):
+        """Test direct loading from a v3 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V3)
+        self.assertEqual(exploration.to_yaml(), self.YAML_CONTENT_V3)
 
 
 class StateOperationsUnitTests(test_utils.GenericTestBase):

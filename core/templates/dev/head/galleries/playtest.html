@@ -12,7 +12,7 @@
         <thead>
           <th class="span4"><h4>Exploration</h4></th>
           <th class="span2"><h4>Category</h4></th>
-          <th class="span2"><h4>Last edited</h4></th>
+          <th class="span2"><h4>Last updated</h4></th>
         </thead>
         <tr ng-repeat="exploration in explorations track by $index">
           <td class="span4">
@@ -37,24 +37,33 @@
     </div>
   </script>
 
-  <div class="container" ng-controller="PlaytestGallery">
+  <div class="container" ng-controller="PlaytestQueue">
     <div class="row">
       <div class="span8">
         <div class="oppia-gallery-frame">
 
           <h3 class="oppia-page-title">
+<<<<<<< HEAD
             Playtest Queue
           </h3>
 
           <p>All explorations on this page are still in beta. Play them and give feedback to make them better!</p>
           <playtest-gallery-section explorations="publicExplorations">
           </playtest-gallery-section>
+=======
+            Playtesters' Queue
+          </h3>
+
+          <p>All explorations on this page are still in beta. Play them and give feedback to make them better!</p>
+          <playtest-queue-section explorations="publicExplorations">
+          </playtest-queue-section>
+>>>>>>> 3476c35f596077982026ba82ab6540992dc23ce6
 
           <div ng-if="privateExplorations">
             <br><br>
             <h4>Private explorations you've been invited to playtest</h4>
-            <playtest-gallery-section explorations="privateExplorations">
-            </playtest-gallery-section>
+            <playtest-queue-section explorations="privateExplorations">
+            </playtest-queue-section>
           </div>
         </div>
       </div>
@@ -65,6 +74,6 @@
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('galleries/PlaytestGallery.js') }}
+    {{ include_js_file('galleries/PlaytestQueue.js') }}
   </script>
 {% endblock footer_js %}

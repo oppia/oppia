@@ -49,9 +49,9 @@ describe('RTE directive', function() {
       ['<div>abc</div><br>', '<div>abc</div><br>'],
       ['<div>abc<span>def</span></div><b>ghi</b>', '<div>abc<span>def</span></div><b>ghi</b>'],
       ['<oppia-noninteractive-image></oppia-noninteractive-image>',
-       '<img class="oppia-noninteractive-image" src="data:123">'],
+       '<img src="data:123" class="oppia-noninteractive-image">'],
       ['<oppia-noninteractive-image image_id-with-value="&amp;quot;T&amp;quot;"></oppia-noninteractive-image>',
-       '<img image_id-with-value="&amp;quot;T&amp;quot;" class="oppia-noninteractive-image" src="data:123">']
+       '<img src="data:123" class="oppia-noninteractive-image" image_id-with-value="&amp;quot;T&amp;quot;">']
     ];
 
     var rteControllerScope = elm.scope();

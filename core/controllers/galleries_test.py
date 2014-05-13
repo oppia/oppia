@@ -93,14 +93,14 @@ class LearnGalleryTest(test_utils.GenericTestBase):
         self.assertEqual(len(exp_a_id), 12)
 
 
-class PlaytestGalleryTest(test_utils.GenericTestBase):
+class PlaytestQueueTest(test_utils.GenericTestBase):
 
-    def test_playtest_gallery_page(self):
-        """Test access to the playtesters' gallery page."""
-        response = self.testapp.get(feconf.PLAYTEST_GALLERY_URL)
+    def test_playtest_queue_page(self):
+        """Test access to the playtesters' queue page."""
+        response = self.testapp.get(feconf.PLAYTEST_QUEUE_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Playtesters\' Gallery',
+            'Playtesters\' Queue',
             # Test that no edit/copy links are shown (at least in the HTML
             # template; a full test should check what happens after the JS is
             # loaded and data is fetched from the backend).
@@ -112,12 +112,12 @@ class PlaytestGalleryTest(test_utils.GenericTestBase):
         self.assertRegexpMatches(
             response.body, r'class="active">\s+<a href="/playtest">Playtest')
 
-    def test_playtest_gallery_handler(self):
-        """Test access to the playtesters' gallery data handler."""
+    def test_playtest_queue_handler(self):
+        """Test access to the playtesters' queue data handler."""
         # Load a demo exploration, which ends up being in beta.
         exp_services.load_demo('0')
 
-        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.PLAYTEST_QUEUE_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,
             'is_moderator': False,
@@ -182,7 +182,7 @@ class PlaytestGalleryTest(test_utils.GenericTestBase):
         self.logout()
 
         # An anonymous user sees nothing to playtest on the Playtest page.
-        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.PLAYTEST_QUEUE_DATA_URL)
         self.assertEqual({
             'is_admin': False,
             'is_moderator': False,
@@ -194,7 +194,7 @@ class PlaytestGalleryTest(test_utils.GenericTestBase):
         # If PA logs in, he sees exploration A but not exploration B on the
         # Learn page.
         self.login(PLAYTESTER_A_EMAIL)
-        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.PLAYTEST_QUEUE_DATA_URL)
         self.assertEqual(len(response_dict['public_explorations_list']), 0)
         self.assertEqual(len(response_dict['private_explorations_list']), 1)
         self.assertDictContainsSubset({
@@ -207,7 +207,7 @@ class PlaytestGalleryTest(test_utils.GenericTestBase):
 
         # E does not see either exploration on the Playtest page.
         self.login(EDITOR_EMAIL)
-        response_dict = self.get_json(feconf.PLAYTEST_GALLERY_DATA_URL)
+        response_dict = self.get_json(feconf.PLAYTEST_QUEUE_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,
             'is_moderator': False,
@@ -385,6 +385,10 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                     'state_name': exp_dict['init_state_name'],
                     'property_name': 'widget_handlers',
                     'new_value': {'submit': widget_handlers[0]['rule_specs']},
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'An objective',
                 }]
             },
             csrf_token
@@ -425,6 +429,10 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                     'state_name': exp_dict['init_state_name'],
                     'property_name': 'widget_handlers',
                     'new_value': {'submit': widget_handlers[0]['rule_specs']},
+                }, {
+                    'cmd': 'edit_exploration_property',
+                    'property_name': 'objective',
+                    'new_value': 'An objective',
                 }]
             },
             csrf_token

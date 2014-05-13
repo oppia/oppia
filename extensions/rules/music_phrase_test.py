@@ -75,7 +75,7 @@ class MusicPhraseRuleUnitTests(test_utils.GenericTestBase):
             {'readableNoteName': 'B4', 'noteDuration': {'num': 1, 'den': 1}}
         ]))
 
-        self.assertTrue(music_phrase.IsEqualToExceptFor([
+        self.assertFalse(music_phrase.IsEqualToExceptFor([
             {'readableNoteName': 'C4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'E4', 'noteDuration': {'num': 1, 'den': 1}},
             {'readableNoteName': 'G4', 'noteDuration': {'num': 1, 'den': 1}}
