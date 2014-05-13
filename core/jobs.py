@@ -95,7 +95,7 @@ class BaseJobManager(object):
         cls._post_enqueue_hook(job_id)
 
     @classmethod
-    def start(cls, job_id, metadata=None):
+    def register_start(cls, job_id, metadata=None):
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_valid_transition(
             job_id, model.status_code, STATUS_CODE_STARTED)
@@ -150,15 +150,17 @@ class BaseJobManager(object):
             job_id, model.status_code, STATUS_CODE_CANCELED)
         cls._require_correct_job_type(model.job_type)
 
+        cancel_message = 'Canceled by %s' % (user_id or 'system')
+
         # Cancel the job.
-        cls._pre_cancel_hook(job_id)
+        cls._pre_cancel_hook(job_id, cancel_message)
 
         model.status_code = STATUS_CODE_CANCELED
         model.time_finished = time.time()
-        model.error = 'Canceled by %s' % (user_id or 'system')
+        model.error = cancel_message
         model.put()
 
-        cls._post_cancel_hook(job_id)
+        cls._post_cancel_hook(job_id, cancel_message)
 
     @classmethod
     def is_active(cls, job_id):
@@ -271,11 +273,11 @@ class BaseJobManager(object):
         pass
 
     @classmethod
-    def _pre_cancel_hook(cls, job_id):
+    def _pre_cancel_hook(cls, job_id, cancel_message):
         pass
 
     @classmethod
-    def _post_cancel_hook(cls, job_id):
+    def _post_cancel_hook(cls, job_id, cancel_message):
         pass
 
 
@@ -293,7 +295,7 @@ class BaseDeferredJobManager(BaseJobManager):
     def _run_job(cls, job_id):
         """Starts the job."""
         logging.info('Job %s started at %s' % (job_id, time.time()))
-        cls.start(job_id)
+        cls.register_start(job_id)
 
         try:
             result = cls._run()
@@ -319,11 +321,10 @@ class BaseDeferredJobManager(BaseJobManager):
 class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, kwargs):
-        transaction_services.run_in_transaction(
-            BaseMapReduceJobManager.start, job_id, {
-                BaseMapReduceJobManager._OUTPUT_KEY_ROOT_PIPELINE_ID: (
-                    self.root_pipeline_id)
-            })
+        BaseMapReduceJobManager.register_start(job_id, {
+            BaseMapReduceJobManager._OUTPUT_KEY_ROOT_PIPELINE_ID: (
+                self.root_pipeline_id)
+        })
         output = yield mapreduce_pipeline.MapreducePipeline(**kwargs)
         yield StoreMapReduceResults(job_id, output)
 
@@ -365,10 +366,12 @@ class BaseMapReduceJobManager(BaseJobManager):
     # to generate URLs pointing at the pipeline support UI.
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
 
-    def entity_class(self):
-        """Return a reference to the class for the DB/NDB type to map over."""
-        raise NotImplementedError('Classes derived from MapReduceJob must '
-                                  'implement entity_class()')
+    @classmethod
+    def entity_class_to_map_over(cls):
+        """Return a reference to the datastore class to map over."""
+        raise NotImplementedError(
+            'Classes derived from BaseMapReduceJobManager must implement '
+            'entity_class()')
 
     @staticmethod
     def map(item):
@@ -381,8 +384,9 @@ class BaseMapReduceJobManager(BaseJobManager):
           For example, to get a count of all explorations, one might yield
           (exploration.id, 1).
         """
-        raise NotImplementedError('Classes derived from MapReduceJob must '
-                                  'implement map as a @staticmethod.')
+        raise NotImplementedError(
+            'Classes derived from BaseMapReduceJobManager must implement map '
+            'as a @staticmethod.')
 
     @staticmethod
     def reduce(key, values):
@@ -403,47 +407,39 @@ class BaseMapReduceJobManager(BaseJobManager):
           it will be called exactly once for each key with all of the output,
           but this needs to be verified.)
         """
-        raise NotImplementedError('Classes derived from MapReduceJob must '
-                                  'implement reduce as a @staticmethod.')
+        raise NotImplementedError(
+            'Classes derived from BaseMapReduceJobManager must implement '
+            'reduce as a @staticmethod.')
 
-    def _real_enqueue(self):
-        entity_class_type = self.entity_class()
+    @classmethod
+    def _real_enqueue(cls, job_id):
+        entity_class_type = cls.entity_class_to_map_over()
         entity_class_name = '%s.%s' % (entity_class_type.__module__,
                                        entity_class_type.__name__)
         kwargs = {
-            'job_name': self._job_id,
-            'mapper_spec': '%s.%s.map' % (
-                self.__class__.__module__, self.__class__.__name__),
-            'reducer_spec': '%s.%s.reduce' % (
-                self.__class__.__module__, self.__class__.__name__),
+            'job_name': job_id,
+            'mapper_spec': '%s.%s.map' % (cls.__module__, cls.__name__),
+            'reducer_spec': '%s.%s.reduce' % (cls.__module__, cls.__name__),
             'input_reader_spec': (
                 'mapreduce.input_readers.DatastoreInputReader'),
             'output_writer_spec': (
                 'mapreduce.output_writers.BlobstoreRecordsOutputWriter'),
             'mapper_params': {
                 'entity_kind': entity_class_name,
-            },
+            }
         }
-        MapReduceJobPipeline(self._job_id, kwargs).start(
-            base_path='/mapreduce/worker/pipeline')
+        mr_pipeline = MapReduceJobPipeline(job_id, kwargs)
+        mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
 
-    def _cancel_queued_work(cls, job, message):
-        if job and job.metadata:
-            root_pipeline_id = job.metadata[
-                cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
-            pipeline.Pipeline.from_id(root_pipeline_id).abort(message)
+    @classmethod
+    def _pre_cancel_hook(cls, job_id, cancel_message):
+        metadata = cls.get_metadata(job_id)
+        if metadata:
+            root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
+            pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
-
-class SampleMapReduceJobManager(BaseMapReduceJobManager):
-    """Test job that counts the total number of explorations."""
-    def entity_class(self):
-        from core.storage.exploration import gae_models
-        return gae_models.ExplorationModel
-
-    @staticmethod
-    def map(item):
-        yield ('sum', 1)
-
-    @staticmethod
-    def reduce(key, values):
-        yield (key, sum([int(value) for value in values]))
+    @classmethod
+    def _require_correct_job_type(cls, job_type):
+        # Suppress check for correct job type since we cannot pass the specific
+        # entity class in the kwargs.
+        pass

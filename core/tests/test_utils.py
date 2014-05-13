@@ -263,6 +263,9 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_taskqueue_stub()
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_files_stub()
+        self.testbed.init_blobstore_stub()
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
@@ -281,7 +284,21 @@ class AppEngineTestBase(TestBase):
         self.taskqueue_stub.FlushQueue('default')
         while tasks:
             for task in tasks:
-                deferred.run(task.payload)
+                if task.url == '/_ah/queue/deferred':
+                    deferred.run(task.payload)
+                else:
+                    # All other tasks are expected to be mapreduce ones.
+                    headers = {
+                        key: str(val) for key, val in task.headers.iteritems()
+                    }
+                    headers['Content-Length'] = str(len(task.payload or ''))
+                    response = self.testapp.post(
+                        url=str(task.url), params=(task.payload or ''),
+                        headers=headers)
+                    if response.status_code != 200:
+                        raise RuntimeError(
+                            'MapReduce task to URL %s failed' % task.url)
+
             tasks = self.taskqueue_stub.get_filtered_tasks()
             self.taskqueue_stub.FlushQueue('default')
 

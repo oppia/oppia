@@ -19,7 +19,10 @@
 __author__ = 'Sean Lip'
 
 from core import jobs
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.platform import models
+(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 taskqueue_services = models.Registry.import_taskqueue_services()
 import test_utils
 
@@ -151,7 +154,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         """Test that invalid status code transitions are caught."""
         job_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job_id)
-        DummyJobManager.start(job_id)
+        DummyJobManager.register_start(job_id)
         DummyJobManager.register_completion(job_id, 'output')
 
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
@@ -166,7 +169,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         another_job_id = AnotherDummyJobManager.create_new()
 
         DummyJobManager.enqueue(job_id)
-        DummyJobManager.start(job_id)
+        DummyJobManager.register_start(job_id)
         AnotherDummyJobManager.enqueue(another_job_id)
 
         self.assertEqual(
@@ -203,7 +206,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job_id)
         self.assertTrue(DummyJobManager.is_active(job_id))
-        DummyJobManager.start(job_id)
+        DummyJobManager.register_start(job_id)
 
         # Cancel the job immediately after it has started.
         DummyJobManager.cancel(job_id, 'admin_user_id')
@@ -273,8 +276,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job2_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job2_id)
 
-        DummyJobManager.start(job1_id)
-        DummyJobManager.start(job2_id)
+        DummyJobManager.register_start(job1_id)
+        DummyJobManager.register_start(job2_id)
         DummyJobManager.cancel_all_unfinished_jobs('admin_user_id')
 
         self.assertFalse(DummyJobManager.is_active(job1_id))
@@ -298,8 +301,8 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         job2_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job2_id)
 
-        DummyJobManager.start(job1_id)
-        DummyJobManager.start(job2_id)
+        DummyJobManager.register_start(job1_id)
+        DummyJobManager.register_start(job2_id)
         DummyJobManager.cancel(job1_id, 'admin_user_id')
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
             self.process_and_flush_pending_tasks()
@@ -436,3 +439,42 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         self.assertTrue(
             FailingAdditionJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_FAILED)
+
+
+class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
+    """Test job that counts the total number of explorations."""
+
+    @classmethod
+    def entity_class_to_map_over(cls):
+        return exp_models.ExplorationModel
+
+    @staticmethod
+    def map(item):
+        yield ('sum', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum([int(value) for value in values]))
+
+
+class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
+    """Tests MapReduce jobs end-to-end."""
+
+    def setUp(self):
+        """Create an exploration so that there is something to count."""
+        super(MapReduceJobIntegrationTests, self).setUp()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', 'title', 'A category')
+        exp_services.save_new_exploration('owner_id', exploration)
+
+    def test_count_all_explorations(self):
+        job_id = SampleMapReduceJobManager.create_new()
+        SampleMapReduceJobManager.enqueue(job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            SampleMapReduceJobManager.get_output(job_id), [['sum', 1]])
+        self.assertEqual(
+            SampleMapReduceJobManager.get_status_code(job_id),
+            jobs.STATUS_CODE_COMPLETED)

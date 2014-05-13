@@ -75,7 +75,7 @@ handlers:
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.0.0/mapreduce/lib/pipeline/ui/images
   secure: always
-- url: /mapreduce(/.*)?
+- url: /mapreduce/worker(/.*)?
   script: mapreduce.main.APP
   login: admin
   secure: always
