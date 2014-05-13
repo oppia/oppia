@@ -405,7 +405,7 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 9)
 
-    def test_queued_jobs(self):
+    def test_multiple_enqueued_jobs(self):
         self._populate_data()
         TestAdditionJobManager.enqueue(
             TestAdditionJobManager.create_new())
@@ -418,7 +418,7 @@ class DatastoreJobIntegrationTests(test_utils.GenericTestBase):
         self.process_and_flush_pending_tasks()
         self.assertEqual(self._get_stored_total(), 9)
 
-    def test_failed_job(self):
+    def test_failing_job(self):
         self._populate_data()
         job_id = FailingAdditionJobManager.create_new()
         FailingAdditionJobManager.enqueue(job_id)
