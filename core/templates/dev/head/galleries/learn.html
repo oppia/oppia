@@ -7,7 +7,7 @@
 {% block content %}
   <div class="container" ng-controller="LearnGallery">
     <div class="row">
-      <div class="span8">
+      <div class="col-lg-8 col-md-8 col-sm-8">
         <div class="oppia-gallery-frame">
 
           <h3 class="oppia-page-title">
@@ -15,26 +15,29 @@
           </h3>
 
           <div class="oppia-gallery" ng-if="displayedCategories">
-            <div class="tabbable tabs-left">
-
-              <div class="oppia-gallery-menu">
-                <div class="oppia-gallery-menu-title">
-                  <strong>Categories</strong>
+            <div class="row">
+              <div class="col-lg-3 col-md-3 col-sm-3">
+                <div class="nav nav-tabs">
+                  <div class="oppia-gallery-menu">
+                    <div class="oppia-gallery-menu-title">
+                      <strong>Categories</strong>
+                    </div>
+                    <ul class="nav nav-pills nav-stacked" id="navTabs">
+                      <li ng-repeat="(category, explorations) in displayedCategories"
+                          ng-class="{active: $index == 0}">
+                        <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
+                          <[category]>
+                        </a>
+                      </li>
+                    </ul>
+                  </div>
                 </div>
-                <ul class="nav nav-pills nav-stacked" id="navTabs">
-                  <li ng-repeat="(category, explorations) in displayedCategories"
-                      ng-class="{active: $index == 0}">
-                    <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
-                      <[category]>
-                    </a>
-                  </li>
-                </ul>
               </div>
 
-              <div class="tab-content oppia-gallery-tiles-container">
-                <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
-                  <div class="container-fluid">
-                    <div class="row-fluid">
+              <div class="col-lg-9 col-md-9 col-sm-9">
+                <div class="tab-content oppia-gallery-tiles-container">
+                  <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
+                    <div class="row">
 
                       <a ng-repeat="exploration in explorations" class="oppia-gallery-tile" href="/explore/<[exploration.id]>">
 
@@ -42,7 +45,7 @@
                             <div class="oppia-gallery-tile-description">
                               <span class="oppia-gallery-tile-title"><[exploration.title]></span>
                               <span class="oppia-gallery-tile-play">
-                                <i class="icon-play-circle"></i>
+                                <span class="glyphicon glyphicon-play-circle"></span>
                               </span>
                             </div>
                         </div>

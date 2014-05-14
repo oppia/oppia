@@ -35,15 +35,15 @@
 
     <h3>Configuration</h3>
 
-    <div class="container-fluid" ng-if="isNonemptyObject(configProperties)">
-      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties" class="row-fluid" style="padding-bottom: 10px;">
-        <span class="span2">
+    <div class="container" ng-if="isNonemptyObject(configProperties)">
+      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties" class="row" style="padding-bottom: 10px;">
+        <span class="col-lg-2 col-md-2 col-sm-2">
           <em><[configPropertyData.description]></em>
         </span>
-        <span class="span4">
+        <span class="col-lg-4 col-md-4 col-sm-4">
           <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
         </span>
-        <span class="span2">
+        <span class="col-lg-2 col-md-2 col-sm-2">
           <button ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
         </span>
       </div>

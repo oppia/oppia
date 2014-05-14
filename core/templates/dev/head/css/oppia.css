@@ -57,16 +57,6 @@ input.ng-dirty.ng-invalid {
   border: 1px solid red;
 }
 
-/*
-  Override the Bootstrap default (which had the horizontal padding set to 20px
-  on both sides, leading to alignment issues when nesting container-fluid
-  elements in the exploration editor).
-*/
-.container-fluid {
-  padding-right: 0;
-  padding-left: 0;
-}
-
 .oppia-editor h3 {
   font-size: 18px;
   margin: 0;
@@ -116,45 +106,49 @@ textarea {
 
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
 */
-.nav, .pagination {
+.navbar-nav, .pagination {
   cursor: pointer;
 }
 
 .navbar {
-  margin-bottom: 20px;
+  margin-bottom: 0;
 }
 
-.navbar .nav > li > a, .navbar .brand {
+.navbar-nav > li > a, .navbar .navbar-brand {
   color: white;
   text-shadow: 0 1px 0 #092c66;
 }
 
-.navbar .brand {
+.navbar .navbar-brand {
   font-weight: bold;
 }
 
-.navbar .brand:hover {
+.navbar .navbar-brand:hover {
   text-shadow: 0 1px 2px #000;
 }
 
-.brand sup {
+.navbar-brand sup {
   font-size: .6em;
 }
 
-.navbar .nav > li > a:hover {
+.navbar-nav > li > a:hover {
   background: rgb(10, 48, 106);
   color: white;
 }
 
-.navbar .nav > li.active > a, .navbar .nav > li.active > a:hover {
+.navbar-nav > li.active > a, .navbar-nav > li.active > a:hover {
   color: white;
   background: rgb(2, 38, 86);
 }
 
-.navbar-static-top .navbar-inner {
+.navbar-default .navbar-container {
   background: #18447E;
   border-bottom: 1pt solid #2f2f3f;
   box-shadow: 0 1px 5px rgba(12,12,24, .3);
+}
+
+.navbar-default .navbar-nav > li > a {
+  color: white;
 }
 
 .oppia-editor-header {
@@ -624,12 +618,6 @@ textarea {
   border: 1px solid black;
 }
 
-.oppia-graph-maximize-button {
-  height: 26px;
-  margin-left: 2px;
-  z-index: 300;
-}
-
 .oppia-add-state-container {
   margin-top: 10px;
 }
@@ -686,17 +674,6 @@ textarea {
 .oppia-stats-table {
   border: 1px solid black;
   padding: 10px;
-}
-
-@media screen and (max-width: 460px) {
-  .pull-right {
-    float: none;
-    width: auto;
-  }
-
-  .oppia-hide-if-small-screenwidth {
-    display: none;
-  }
 }
 
 .oppia-feedback-button {
@@ -789,7 +766,7 @@ textarea {
 }
 
 .oppia-rule-header-bubble {
-  font-weight: bold; 
+  font-weight: bold;
   text-align: center;
 }
 
@@ -852,9 +829,6 @@ textarea {
   margin-bottom: -5px;
 }
 
-.oppia-splash-image-row {
-  margin-top: -20px;
-}
 .oppia-splash-image {
   width: 100%;
 }

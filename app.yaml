@@ -47,12 +47,6 @@ handlers:
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
   secure: always
-- url: /img
-  static_dir: third_party/bootstrap/img
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=2592000'
-    Vary: Accept-Encoding
 - url: /third_party/static
   static_dir: third_party/static
   secure: always

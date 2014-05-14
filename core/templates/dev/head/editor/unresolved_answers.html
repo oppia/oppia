@@ -1,16 +1,16 @@
 <div ng-controller="UnresolvedAnswers">
-  <div class="row-fluid" ng-show="!isEmpty(unresolvedAnswersMap)">
-    <div class="span2">
+  <div class="row" ng-show="!isEmpty(unresolvedAnswersMap)">
+    <div class="col-lg-2 col-md-2 col-sm-2">
       <span class="oppia-editor-header">
         answers received
       </span>
     </div>
 
-    <div class="span10">
-      <div class="container-fluid">
-        <div class="row-fluid">
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <div class="container">
+        <div class="row">
           <div ng-repeat="item in unresolvedAnswersMap | orderBy:'-count'">
-            <div class="span10">
+            <div class="col-lg-10 col-md-10 col-sm-10">
               <span ng-show="item.count == 0">
                 <del><[item.answer]></del>
               </span>
@@ -21,13 +21,13 @@
               </span>
             </div>
 
-            <div class="span1">
+            <div class="col-lg-1 col-md-1 col-sm-1">
               <span ng-show="item.count > 0">
-                <button type="button" class="btn" ng-click="deleteUnresolvedAnswer(item.answer)">Delete</button>
+                <button type="button" class="btn btn-default" ng-click="deleteUnresolvedAnswer(item.answer)">Delete</button>
               </span>
             </div>
 
-            <div class="span1">
+            <div class="col-lg-1 col-md-1 col-sm-1">
             </div>
           </div>
         </div>

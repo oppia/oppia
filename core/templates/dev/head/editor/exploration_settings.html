@@ -1,6 +1,6 @@
 <div ng-controller="ExplorationSettings">
-  <div class="row-fluid">
-    <div class="span6">
+  <div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6">
       <div>
         <strong>Title</strong>: <input type="text" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
         <br>
@@ -10,7 +10,7 @@
       </div>
     </div>
 
-    <div class="span6">
+    <div class="col-lg-6 col-md-6 col-sm-6">
       <div ng-show="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
         <strong>Managers</strong>
         <ul>
@@ -40,7 +40,7 @@
 
       {% if can_modify_roles %}
         <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
-          <button type="button" class="btn" ng-click="openEditRolesForm()">
+          <button type="button" class="btn btn-default" ng-click="openEditRolesForm()">
             Edit Roles
           </button>
         </div>
@@ -58,7 +58,7 @@
             <em>Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
             <br>
             <input type="submit" value="Save">
-            <button type="button" class="btn" ng-click="closeEditRolesForm()"
+            <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
               ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
               Cancel
             </button>
@@ -70,8 +70,8 @@
 
   <hr>
 
-  <div class="row-fluid">
-    <div class="span6">
+  <div class="row">
+    <div class="col-lg-6 col-md-6 col-sm-6">
       <h5>Parameters used in this exploration</h5>
       <div ng-show="isEmpty(paramSpecs)">
         <em>No parameters used.</em>
@@ -83,7 +83,7 @@
       </ol>
     </div>
 
-    <div class="span6">
+    <div class="col-lg-6 col-md-6 col-sm-6">
       <h5>
         Parameters initialized at start of exploration
         <img class="oppia-help" src="/images/help.png"

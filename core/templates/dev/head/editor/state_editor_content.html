@@ -10,8 +10,8 @@
 
 {% block center %}
   <div ng-if="!contentMemento">
-    <button type="button" class="btn btn-mini pull-right" ng-click="editContent()">
-      <i class="icon-pencil" title="Edit Content"></i>
+    <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()">
+      <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
     </button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
       In this section, type what you want the reader to see before interacting with this state.
@@ -21,7 +21,7 @@
 
   <div ng-if="!!contentMemento">
     <object-editor obj-type="Html" value="content[0].value" always-editable="true"></object-editor>
-    <button type="button" class="btn" ng-click="saveTextContent()">Close</button>
+    <button type="button" class="btn btn-default" ng-click="saveTextContent()">Close</button>
   </div>
 {% endblock %}
 
