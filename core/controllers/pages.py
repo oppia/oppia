@@ -45,7 +45,6 @@ SPLASH_PAGE_EXPLORATION_VERSION = config_domain.ConfigProperty(
      '(a blank value indicates that the latest version should be used)'),
     default_value='')
 
-
 class SplashPage(base.BaseHandler):
     """Splash page for Oppia."""
 
@@ -89,6 +88,7 @@ class SiteGuidelinesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_ABOUT,
+            'SITE_NAME': SITE_NAME.value,
         })
         self.render_template('pages/site_guidelines.html')
 
