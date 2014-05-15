@@ -237,7 +237,7 @@
     <div class="container">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-align-center oppia-warning">
+          <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
             <strong>Note:</strong> This is a private, unpublishable copy of a
             <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
             You are very welcome to submit feedback to improve the original exploration: to do this,
@@ -249,7 +249,7 @@
 
       <div class="row">
         <div class="col-lg-6 col-md-6 col-sm-6">
-          <div class="row">
+          <div>
             <span style="font-size: x-large;">
               <[explorationTitleService.displayed]>
             </span>
@@ -267,11 +267,11 @@
             </span>
           </div>
 
-          <div class="row">
+          <div>
             <span ng-if="explorationObjectiveService.displayed">
               <strong>Aim of the exploration:</strong> to help learners <[explorationObjectiveService.displayed]>.
             </span>
-            <span ng-if="!explorationObjectiveService.displayed" class="oppia-missing-objective-error" ng-click="selectSettingsTab()">
+            <span ng-if="!explorationObjectiveService.displayed" class="oppia-missing-objective-error">
               Please specify this exploration's objective (in the Settings tab).
             </span>
           </div>

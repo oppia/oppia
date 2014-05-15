@@ -1,36 +1,49 @@
 <div ng-controller="ExplorationSettings">
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
-      <h4>General</h4>
-    </div>
-
-    <div class="col-lg-6 col-md-6 col-sm-6">
-      <div role="form" class="form-horizontal">
-        <div class="form-group">
-          <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
-          <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" id="explorationTitle" ng-blur="saveExplorationTitle()">
-          </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <h4>General</h4>
         </div>
-        <div class="form-group">
-          <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
-          <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+      </div>
+
+      <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          <div role="form" class="form-horizontal">
+            <div class="form-group">
+              <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+              <div class="col-lg-10 col-md-10 col-sm-10">
+                <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" id="explorationTitle" ng-blur="saveExplorationTitle()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
+              <div class="col-lg-10 col-md-10 col-sm-10">
+                <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Objective</label>
+              <div class="col-lg-10 col-md-10 col-sm-10">
+                <div class="input-group">
+                  <span class="input-group-addon">This exploration helps learners to</span>
+                  <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="learn how to multiply two numbers" required>
+                  <span class="input-group-addon">.</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-      <div role="form">
-        <div class="form-group">
-          <label for="explorationObjective">Objective</label>
-          <div class="input-group">
-            <span class="input-group-addon">This exploration helps learners to</span>
-            <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="learn how to multiply two numbers" required>
-            <span class="input-group-addon">.</span>
-          </div>
-        </div>
-      </div>
     </div>
+  </div>
 
+  <hr>
+
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <h4>Roles</h4>
+    </div>
     <div class="col-lg-6 col-md-6 col-sm-6">
       <div ng-show="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
         <strong>Managers</strong>
@@ -89,13 +102,15 @@
     </div>
   </div>
 
+  <hr>
+
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">
       <h4>Controls</h4>
 
       {% if can_publicize %}
         <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
-          <button type="button" class="btn btn-primary" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+          <button type="button" class="btn btn-default" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
             Move out of beta
             <span ng-if="currentUserIsAdmin">
               (as admin)
@@ -109,7 +124,7 @@
 
       {% if can_unpublicize %}
         <span ng-show="explorationRightsService.isPublicized()" class="oppia-exploration-ctrl">
-          <button type="button" class="btn btn-primary" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+          <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
             Move back into beta
             <span ng-if="currentUserIsAdmin">
               (as admin)
@@ -123,8 +138,8 @@
 
       {% if can_publish %}
         <span ng-show="explorationRightsService.isPrivate()" class="oppia-exploration-ctrl">
-          <button type="button" class="btn btn-primary" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
-            Publish
+          <button type="button" class="btn btn-success" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
+            Publish Exploration
           </button>
           <img class="oppia-help" src="/images/help.png"
                tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
@@ -134,7 +149,7 @@
 
       {% if can_unpublish %}
         <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
-          <button type="button" class="btn btn-primary" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
+          <button type="button" class="btn btn-default" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
             Unpublish
             <span ng-if="currentUserIsAdmin">
               (as admin)
@@ -148,7 +163,7 @@
 
       {% if can_release_ownership %}
         <span ng-hide="explorationRightsService.isCommunityOwned()" class="oppia-exploration-ctrl">
-          <button type="button" class="btn btn-primary" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+          <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
             Transfer ownership to the community
           </button>
           <img class="oppia-help" src="/images/help.png"
@@ -157,7 +172,7 @@
         </span>
       {% endif %}
 
-      <button type="button" class="btn btn-info oppia-exploration-ctrl" ng-click="downloadExploration()"
+      <button type="button" class="btn btn-default oppia-exploration-ctrl" ng-click="downloadExploration()"
          title="Download exploration as a zip file.">
         Download exploration as a zip file
       </a>
@@ -184,6 +199,8 @@
       </span>
     </div>
   </div>
+
+  <hr>
 
   <div class="row">
     <div class="col-lg-12 col-md-12 col-sm-12">

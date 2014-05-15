@@ -45,18 +45,26 @@
 
       <div class="col-lg-3 col-md-3 col-sm-3">
         <span class="pull-right">
-          <button type="button" class="btn btn-default" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
-            Edit
+          <button type="button" class="btn btn-default btn-xs" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
+            <span class="glyphicon glyphicon-pencil" title="Edit parameter change"></span>
           </button>
 
-          <button ng-show="$index != 0" ng-disabled="activeItem !== -1" ng-click="swapParamChanges($index, $index - 1)">⇑</button>
-          <span ng-hide="$index != 0" class="oppia-grayed">⇑</span>
+          <button type="button" class="btn btn-default btn-xs" ng-show="$index != 0" ng-disabled="activeItem !== -1" ng-click="swapParamChanges($index, $index - 1)">
+            <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
+          </button>
+          <span ng-hide="$index != 0" class="oppia-grayed">
+            <span class="glyphicon glyphicon-arrow-up" title="Move parameter change up"></span>
+          </span>
 
-          <button ng-show="$index < paramChanges.length - 1" ng-disabled="activeItem !== -1" ng-click="swapParamChanges($index, $index + 1)">⇓</button>
-          <span ng-hide="$index < paramChanges.length - 1" class="oppia-grayed">⇓</span>
+          <button type="button" class="btn btn-default btn-xs" ng-show="$index < paramChanges.length - 1" ng-disabled="activeItem !== -1" ng-click="swapParamChanges($index, $index + 1)">
+            <span class="glyphicon glyphicon-arrow-down" title="Move parameter change down"></span>
+          </button>
+          <span ng-hide="$index < paramChanges.length - 1" class="oppia-grayed">
+            <span class="glyphicon glyphicon-arrow-down" title="Move parameter change down"></span>
+          </span>
 
-          <button type="button" class="btn btn-default" ng-disabled="activeItem !== -1 && activeItem !== $index" ng-click="deleteParamChange($index)">
-            &times;
+          <button type="button" class="btn btn-default btn-xs" ng-disabled="activeItem !== -1 && activeItem !== $index" ng-click="deleteParamChange($index)">
+            <span class="glyphicon glyphicon-remove" title="Delete parameter change"></span>
           </button>
         </span>
       </div>

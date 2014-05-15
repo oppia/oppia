@@ -726,9 +726,9 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         if ($scope.onMaximizeFunction) {
           outerVis.append('foreignObject')
-            .attr('x', dimensions.w - 30)
+            .attr('x', dimensions.w - 20)
             .attr('y', 0)
-            .attr('width', 30)
+            .attr('width', 20)
             .attr('height', 30)
             .html('<button class="btn btn-default btn-xs"><span title="Expand Map"><strong style="font-size: larger;">+</strong></span></button>')
             .on('click', $scope.onMaximizeFunction);

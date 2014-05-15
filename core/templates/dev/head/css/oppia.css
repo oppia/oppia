@@ -443,6 +443,12 @@ textarea {
   width: 100%;
 }
 
+.oppia-main-content {
+  margin: 10px;
+  padding: 10px;
+  width: 100%;
+}
+
 .oppia-lightly-grayed {
   color: #888;
 }
@@ -544,11 +550,10 @@ textarea {
 }
 
 .oppia-missing-objective-error {
-   background-color: #f2dede;
-   border-color: #eed3d7;
-   color: #b94a48;
-   cursor: pointer;
-   padding: 3px;
+  background-color: #fcf8e3;
+  border-color: #faebcc;
+  color: #8a6d3b;
+  padding: 3px;
 }
 
 .oppia-cursor-pointer {

@@ -6,36 +6,32 @@
 
 {% block content %}
   <script type="text/ng-template" id="playtestQueue/main">
-    <div class="row">
-      <div class="oppia-gallery">
-        <table class="table">
-          <thead>
-            <th class="col-lg-4 col-md-4 col-sm-4"><h4>Exploration</h4></th>
-            <th class="col-lg-2 col-md-2 col-sm-2"><h4>Category</h4></th>
-            <th class="col-lg-2 col-md-2 col-sm-2"><h4>Last updated</h4></th>
-          </thead>
-          <tr ng-repeat="exploration in explorations track by $index">
-            <td class="col-lg-4 col-md-4 col-sm-4">
-              <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile">
-                <div>
-                  <span class="glyphicon glyphicon-play-circle"></span>
-                  <span class="oppia-gallery-tile-title"><[exploration.title]></span>
-                  <span ng-if="exploration.community_owned" class="label label-info pull-right">
-                    Community-owned
-                  </span>
-                </div>
-              </a>
-            </td>
-            <td class="col-lg-2 col-md-2 col-sm-2">
-              <[exploration.category]>
-            </td>
-            <td class="col-lg-2 col-md-2 col-sm-2">
-              <[getLocaleStringForDate(exploration.last_updated)]>
-            </td>
-          </tr>
-        </table>
-      </div>
-    </div>
+    <table class="table">
+      <thead>
+        <th class="col-lg-4 col-md-4 col-sm-4"><h4>Exploration</h4></th>
+        <th class="col-lg-2 col-md-2 col-sm-2"><h4>Category</h4></th>
+        <th class="col-lg-2 col-md-2 col-sm-2"><h4>Last updated</h4></th>
+      </thead>
+      <tr ng-repeat="exploration in explorations track by $index">
+        <td class="col-lg-4 col-md-4 col-sm-4">
+          <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile">
+            <div>
+              <span class="glyphicon glyphicon-play-circle"></span>
+              <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+              <span ng-if="exploration.community_owned" class="label label-info pull-right">
+                Community-owned
+              </span>
+            </div>
+          </a>
+        </td>
+        <td class="col-lg-2 col-md-2 col-sm-2">
+          <[exploration.category]>
+        </td>
+        <td class="col-lg-2 col-md-2 col-sm-2">
+          <[getLocaleStringForDate(exploration.last_updated)]>
+        </td>
+      </tr>
+    </table>
   </script>
 
   <div class="container" ng-controller="PlaytestQueue">

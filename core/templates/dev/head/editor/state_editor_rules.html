@@ -25,17 +25,17 @@
       <div class="col-lg-1 col-md-1 col-sm-1 oppia-rule-swap-arrows">
         <span class="pull-right">
           <button type="button" class="btn btn-default btn-xs oppia-rule-ctrl" ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)">
-            <span class="glyphicon glyphicon-arrow-up" title="Move Rule Up"></span>
+            <span class="glyphicon glyphicon-arrow-up" title="Move rule up"></span>
           </button>
           <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">
-            <span class="glyphicon glyphicon-arrow-up" title="Move Rule Up"></span>
+            <span class="glyphicon glyphicon-arrow-up" title="Move rule up"></span>
           </span>
 
           <button type="button" class="btn btn-default btn-xs oppia-rule-ctrl" ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)">
-            <span class="glyphicon glyphicon-arrow-down" title="Move Rule Down"></span>
+            <span class="glyphicon glyphicon-arrow-down" title="Move rule down"></span>
           </button>
           <span ng-hide="$index < handler.length - 2" class="oppia-grayed oppia-rule-ctrl">
-            <span class="glyphicon glyphicon-arrow-down" title="Move Rule Down"></span>
+            <span class="glyphicon glyphicon-arrow-down" title="Move rule down"></span>
           </span>
         </span>
       </div>
