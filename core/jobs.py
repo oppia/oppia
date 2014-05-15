@@ -62,6 +62,21 @@ class BaseJobManager(object):
     may run at once and overlap. Individual jobs should account for this. In
     particular, if a job writes to some location, no other enqueued or running
     job should be writing to, or reading from, that location.
+
+    This is expected to be the case for one-off migration jobs, as well as
+    batch reporting jobs. One-off migration jobs are expected to be transient
+    and will not be a permanent part of the codebase. Batch reporting jobs are
+    expected to write to a particular datastore model that is optimized for
+    fast querying; each batch reporting job should correspond to exactly one of
+    these models. The reporting jobs are expected to be run as MapReduces; to
+    find existing ones, search for subclasses of BaseMapReduceJobManager.
+
+    Note that the enqueue(), register_start(), register_completion(),
+    register_failure() and cancel() methods in this class batch the following
+    operations: (a) pre- and post-hooks, (b) updating the status of the job in
+    the datastore, and (c) actually performing the operation. Each entire batch
+    is not run in a transaction, but subclasses can still perform (a) or (c)
+    transactionally if they wish to.
     """
     @classmethod
     def create_new(cls):
