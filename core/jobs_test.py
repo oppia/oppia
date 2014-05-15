@@ -189,6 +189,12 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         with self.assertRaisesRegexp(Exception, 'Invalid status code change'):
             DummyJobManager.enqueue(job_id)
 
+    def test_can_enqueue_two_instances_of_the_same_job(self):
+        job_id = DummyJobManager.create_new()
+        DummyJobManager.enqueue(job_id)
+        job_id_2 = DummyJobManager.create_new()
+        DummyJobManager.enqueue(job_id_2)
+
     def test_cancel_kills_queued_job(self):
         job_id = DummyJobManager.create_new()
         DummyJobManager.enqueue(job_id)
