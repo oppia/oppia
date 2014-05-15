@@ -2,10 +2,10 @@
   <[localValue.label]>
   (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
 </span>
- 
+
 <span ng-if="active || alwaysEditable">
   <input type="number" ng-model="localValue.label" placeholder="Enter a nonnegative integer.">
-  <button type="button" class="btn" ng-if="!alwaysEditable"  ng-click="replaceValue(localValue.label)">
+  <button type="button" class="btn btn-default" ng-if="!alwaysEditable"  ng-click="replaceValue(localValue.label)">
     Close
   </button>
 </span>

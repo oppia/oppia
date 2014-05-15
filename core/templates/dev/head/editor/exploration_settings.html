@@ -1,12 +1,33 @@
 <div ng-controller="ExplorationSettings">
   <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <h4>General</h4>
+    </div>
+
     <div class="col-lg-6 col-md-6 col-sm-6">
-      <div>
-        <strong>Title</strong>: <input type="text" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
-        <br>
-        <strong>Category</strong>: <input type="text" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
-        <br>
-        <strong>Objective</strong>: <em>This exploration helps learners to ...</em> <input type="text" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="learn how to multiply two numbers" required>.
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" id="explorationTitle" ng-blur="saveExplorationTitle()">
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+          </div>
+        </div>
+      </div>
+      <div role="form">
+        <div class="form-group">
+          <label for="explorationObjective">Objective</label>
+          <div class="input-group">
+            <span class="input-group-addon">This exploration helps learners to</span>
+            <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="learn how to multiply two numbers" required>
+            <span class="input-group-addon">.</span>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -68,9 +89,107 @@
     </div>
   </div>
 
-  <hr>
+  <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <h4>Controls</h4>
+
+      {% if can_publicize %}
+        <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
+          <button type="button" class="btn btn-primary" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+            Move out of beta
+            <span ng-if="currentUserIsAdmin">
+              (as admin)
+            </span>
+            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+              (as moderator)
+            </span>
+          </button>
+        </span>
+      {% endif %}
+
+      {% if can_unpublicize %}
+        <span ng-show="explorationRightsService.isPublicized()" class="oppia-exploration-ctrl">
+          <button type="button" class="btn btn-primary" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+            Move back into beta
+            <span ng-if="currentUserIsAdmin">
+              (as admin)
+            </span>
+            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+              (as moderator)
+            </span>
+          </button>
+        </span>
+      {% endif %}
+
+      {% if can_publish %}
+        <span ng-show="explorationRightsService.isPrivate()" class="oppia-exploration-ctrl">
+          <button type="button" class="btn btn-primary" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
+            Publish
+          </button>
+          <img class="oppia-help" src="/images/help.png"
+               tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
+               tooltip-placement="bottom">
+        </span>
+      {% endif %}
+
+      {% if can_unpublish %}
+        <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
+          <button type="button" class="btn btn-primary" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
+            Unpublish
+            <span ng-if="currentUserIsAdmin">
+              (as admin)
+            </span>
+            <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+              (as moderator)
+            </span>
+          </button>
+        </span>
+      {% endif %}
+
+      {% if can_release_ownership %}
+        <span ng-hide="explorationRightsService.isCommunityOwned()" class="oppia-exploration-ctrl">
+          <button type="button" class="btn btn-primary" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+            Transfer ownership to the community
+          </button>
+          <img class="oppia-help" src="/images/help.png"
+               tooltip="Click this button to transfer ownership of this exploration to the community."
+               tooltip-placement="bottom">
+        </span>
+      {% endif %}
+
+      <button type="button" class="btn btn-info oppia-exploration-ctrl" ng-click="downloadExploration()"
+         title="Download exploration as a zip file.">
+        Download exploration as a zip file
+      </a>
+
+      <button type="button" ng-if="explorationRightsService.isPrivate()"
+              class="btn btn-danger oppia-exploration-ctrl"
+              ng-click="deleteExploration('')"
+              title="Delete this exploration">
+        Delete Exploration
+      </button>
+
+      <span ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)" class="oppia-exploration-ctrl">
+        <button type="button"
+                class="btn btn-danger"
+                ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
+          Delete Exploration
+          <span ng-if="currentUserIsAdmin">
+            (as admin)
+          </span>
+          <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
+            (as moderator)
+          </span>
+        </button>
+      </span>
+    </div>
+  </div>
 
   <div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <h4>Parameters</h4>
+    </div>
+
     <div class="col-lg-6 col-md-6 col-sm-6">
       <h5>Parameters used in this exploration</h5>
       <div ng-show="isEmpty(paramSpecs)">

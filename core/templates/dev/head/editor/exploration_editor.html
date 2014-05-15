@@ -248,12 +248,11 @@
       </div>
 
       <div class="row">
-        <div class="col-lg-4 col-md-4 col-sm-4">
+        <div class="col-lg-6 col-md-6 col-sm-6">
           <div class="row">
-            <h3>
+            <span style="font-size: x-large;">
               <[explorationTitleService.displayed]>
-            </h3>
-
+            </span>
             <span ng-if="!explorationRightsService.isPrivate()" class="label label-info">
               Published
             </span>
@@ -267,73 +266,19 @@
               Community-owned
             </span>
           </div>
+
+          <div class="row">
+            <span ng-if="explorationObjectiveService.displayed">
+              <strong>Aim of the exploration:</strong> to help learners <[explorationObjectiveService.displayed]>.
+            </span>
+            <span ng-if="!explorationObjectiveService.displayed" class="oppia-missing-objective-error" ng-click="selectSettingsTab()">
+              Please specify this exploration's objective (in the Settings tab).
+            </span>
+          </div>
         </div>
 
-        <div class="col-lg-8 col-md-8 col-sm-8">
+        <div class="col-lg-6 col-md-6 col-sm-6">
           <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
-            {% if can_publicize %}
-              <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
-                <button type="button" class="btn btn-default" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Move out of beta
-                  <span ng-if="currentUserIsAdmin">
-                    (as admin)
-                  </span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                    (as moderator)
-                  </span>
-                </button>
-              </span>
-            {% endif %}
-
-            {% if can_unpublicize %}
-              <span ng-show="explorationRightsService.isPublicized()" class="oppia-exploration-ctrl">
-                <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Move back into beta
-                  <span ng-if="currentUserIsAdmin">
-                    (as admin)
-                  </span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                    (as moderator)
-                  </span>
-                </button>
-              </span>
-            {% endif %}
-
-            {% if can_publish %}
-              <span ng-show="explorationRightsService.isPrivate()" class="oppia-exploration-ctrl">
-                <button type="button" class="btn btn-default" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Publish
-                </button>
-                <img class="oppia-help" src="/images/help.png"
-                     tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
-                     tooltip-placement="bottom">
-              </span>
-            {% endif %}
-
-            {% if can_unpublish %}
-              <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
-                <button type="button" class="btn btn-default" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Unpublish
-                  <span ng-if="currentUserIsAdmin">
-                    (as admin)
-                  </span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                    (as moderator)
-                  </span>
-                </button>
-              </span>
-            {% endif %}
-
-            {% if can_release_ownership %}
-              <span ng-hide="explorationRightsService.isCommunityOwned()" class="oppia-exploration-ctrl">
-                <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Transfer ownership to the community
-                </button>
-                <img class="oppia-help" src="/images/help.png"
-                     tooltip="Click this button to transfer ownership of this exploration to the community."
-                     tooltip-placement="bottom">
-              </span>
-            {% endif %}
 
             <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
               <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()">
@@ -349,47 +294,11 @@
               <span class="glyphicon glyphicon-play"></span>
             </a>
 
-            <a class="btn btn-default oppia-exploration-ctrl" ng-click="downloadExploration()"
-               title="Download exploration as a zip file.">
-              <span class="glyphicon glyphicon-download-alt"></span>
-            </a>
+            <button class="btn oppia-save-exploration-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">save changes</button>
 
-            <button type="button" ng-if="explorationRightsService.isPrivate()"
-                    class="btn btn-danger oppia-exploration-ctrl"
-                    ng-click="deleteExploration('')"
-                    title="Delete this exploration">
-              <span class="glyphicon glyphicon-trash"></span>
-            </button>
-
-            <span ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)" class="oppia-exploration-ctrl">
-              <button type="button"
-                      class="btn btn-danger"
-                      ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
-                <span class="glyphicon glyphicon-trash"></span>
-                <span ng-if="currentUserIsAdmin">
-                  (as admin)
-                </span>
-                <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                  (as moderator)
-                </span>
-              </button>
-            </span>
+            <button class="btn btn-default oppia-save-exploration-button" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
           </span>
         </div>
-      </div>
-
-      <div class="row">
-        <span ng-if="explorationObjectiveService.displayed">
-          <strong>Aim of the exploration:</strong> to help learners <[explorationObjectiveService.displayed]>.
-        </span>
-        <span ng-if="!explorationObjectiveService.displayed" class="oppia-missing-objective-error" ng-click="selectSettingsTab()">
-          Please specify this exploration's objective (in the Settings tab).
-        </span>
-
-        <span class="pull-right">
-          <button class="btn btn-default oppia-save-exploration-button pull-right" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
-          <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">save changes</button>
-        </span>
       </div>
 
       <div class="row">
@@ -414,7 +323,7 @@
               {% include 'editor/exploration_settings.html' %}
             </tab>
 
-            <tab heading="History" active="historyTabActive" select="selectHistoryTab()" ng-disabled="explorationRightsService.isCloned()">
+            <tab heading="History" active="historyTabActive" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
               {% include 'editor/exploration_history.html' %}
             </tab>
           </tabset>

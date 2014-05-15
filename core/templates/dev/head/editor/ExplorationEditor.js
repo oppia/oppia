@@ -67,6 +67,7 @@ function ExplorationEditor(
       $scope.isDiscardInProgress = true;
 
       changeListService.discardAllChanges();
+      $scope.doFullRefresh = true;
       $scope.initExplorationPage(function() {
         // The $apply() is needed to call all the exploration field $watch()
         // methods before flipping isDiscardInProgress.
@@ -409,12 +410,29 @@ function ExplorationEditor(
     if (!$scope.graphData) {
       return true;
     }
-    for (var i = 0; i < $scope.graphData.nodes.length; i++) {
-      if ($scope.graphData.nodes[i].name == END_DEST) {
-        return $scope.graphData.nodes[i].reachable;
+
+    var queue = [$scope.graphData.initStateName];
+    var seen = [$scope.graphData.initStateName];
+    var reachedEnd = false;
+    while (queue.length > 0) {
+      var currNodeName = queue[0];
+      queue.shift();
+
+      if (currNodeName === $scope.graphData.finalStateName) {
+        reachedEnd = true;
+        break;
+      }
+
+      for (var i = 0; i < $scope.graphData.links.length; i++) {
+        if ($scope.graphData.links[i].source === currNodeName &&
+            seen.indexOf($scope.graphData.links[i].target) === -1) {
+          queue.push($scope.graphData.links[i].target);
+          seen.push($scope.graphData.links[i].target);
+        }
       }
     }
-    return true;
+
+    return reachedEnd;
   };
 
 
@@ -561,6 +579,10 @@ function ExplorationEditor(
     return explorationId ? ('/explore/' + explorationId) : '';
   };
 
+  // This is true on the initial page load and on clicking 'Discard changes'.
+  // It ensures that the user is taken to the initial state.
+  $scope.doFullRefresh = true;
+
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
@@ -589,12 +611,13 @@ function ExplorationEditor(
 
       $scope.refreshGraph();
 
-      if (!editorContextService.getActiveStateName()) {
-        editorContextService.setActiveStateName($scope.initStateName);
-      }
-
-      if ($scope.mainTabActive) {
+      if ($scope.doFullRefresh) {
+        if (!editorContextService.getActiveStateName() ||
+            !$scope.states.hasOwnProperty(editorContextService.getActiveStateName())) {
+          editorContextService.setActiveStateName($scope.initStateName);
+        }
         $scope.showStateEditor(editorContextService.getActiveStateName());
+        $scope.doFullRefresh = false;
       }
 
       $rootScope.loadingMessage = '';

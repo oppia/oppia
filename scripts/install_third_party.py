@@ -98,7 +98,7 @@ YUICOMPRESSOR_URL = (
 YUICOMPRESSOR_DST = os.path.join(TOOLS_DIR, YUICOMPRESSOR_FILENAME)
 YUICOMPRESSOR_FILES = ['%s.jar' % YUICOMPRESSOR_FILENAME]
 
-UI_BOOTSTRAP_REV = '0.11.0'
+UI_BOOTSTRAP_REV = '0.10.0'
 UI_BOOTSTRAP_URL = (
     'https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages')
 UI_BOOTSTRAP_DST = os.path.join(

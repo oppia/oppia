@@ -39,6 +39,7 @@ h3 {
 
 a {
   color: #0844aa;
+  cursor: pointer;
 }
 
 a:hover {
@@ -124,6 +125,7 @@ textarea {
 }
 
 .navbar .navbar-brand:hover {
+  color: white;
   text-shadow: 0 1px 2px #000;
 }
 
@@ -131,7 +133,7 @@ textarea {
   font-size: .6em;
 }
 
-.navbar-nav > li > a:hover {
+.navbar-default .navbar-nav > li > a:hover {
   background: rgb(10, 48, 106);
   color: white;
 }
@@ -147,7 +149,29 @@ textarea {
   box-shadow: 0 1px 5px rgba(12,12,24, .3);
 }
 
-.navbar-default .navbar-nav > li > a {
+.navbar-default .dropdown-menu {
+  background: #18447E;
+}
+
+.navbar-default .navbar-nav > li > a,
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav .open > a:hover,
+.navbar-default .navbar-nav .open .dropdown-menu > li > a,
+.navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
+  color: white;
+}
+
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav .open > a:hover,
+.navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
+  background: rgb(10, 48, 106);
+}
+
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:focus,
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover {
+  background: rgb(10, 48, 106);
   color: white;
 }
 
@@ -326,6 +350,7 @@ textarea {
 }
 
 .oppia-alert-blocks {
+  left: 10%;
   position: fixed;
   width: 80%;
   z-index: 3000;
@@ -394,22 +419,6 @@ textarea {
   border: 1px solid black;
   border-radius: 5px;
   padding: 2px 10px;
-}
-
-/* Adds to existing Bootstrap CSS rule. */
-.alert-block {
-  border: 1px solid black;
-  -moz-border-radius: 5px;
-  -webkit-border-radius: px;
-  border-radius: 5px;
-  -moz-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  -webkit-box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  font-size: 1.2em;
-  margin: 0 25% 0 25%;
-  opacity: 1;
-  width: 80%;
-  z-index: 3000;
 }
 
 .oppia-form input.ng-invalid.ng-dirty {
@@ -887,6 +896,10 @@ textarea {
   background-color: #18447E;
 }
 
+.oppia-gallery-nav-tabs {
+  border-bottom: 0;
+}
+
 table.oppia-padded-table {
   border: 1px solid black;
   padding: 5px;
@@ -894,8 +907,4 @@ table.oppia-padded-table {
 table.oppia-padded-table th, table.oppia-padded-table td {
   border: 1px solid black;
   padding: 5px;
-}
-
-.modal, .modal-body {
-  min-height: 200px;
 }

@@ -129,7 +129,7 @@ function InteractiveWidgetEditor(
   $scope.selectInteractiveWidget = function(tmpWidget) {
     $scope.$broadcast('externalSave');
 
-    var newWidget = $scope.cloneObject(tmpWidget);
+    var newWidget = angular.copy(tmpWidget);
     var activeStateName = editorContextService.getActiveStateName();
 
     $scope.tmpRule = null;
