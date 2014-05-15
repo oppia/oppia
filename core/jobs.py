@@ -51,10 +51,6 @@ VALID_STATUS_CODE_TRANSITIONS = {
 }
 
 
-ABSTRACT_BASE_CLASSES = frozenset([
-    'BaseJobManager', 'BaseDeferredJobManager', 'BaseMapReduceJobManager'])
-
-
 class BaseJobManager(object):
     """Base class for managing long-running jobs.
 
@@ -79,9 +75,13 @@ class BaseJobManager(object):
     transactionally if they wish to.
     """
     @classmethod
+    def _is_abstract(cls):
+        return cls in ABSTRACT_BASE_CLASSES
+
+    @classmethod
     def create_new(cls):
         """Creates a new job of this class type. Returns the id of this job."""
-        if cls.__name__ in ABSTRACT_BASE_CLASSES:
+        if cls._is_abstract():
             raise Exception(
                 'Tried to directly create a job using the abstract base '
                 'manager class %s, which is not allowed.' % cls.__name__)
@@ -461,3 +461,7 @@ class BaseMapReduceJobManager(BaseJobManager):
         # Suppress check for correct job type since we cannot pass the specific
         # entity class in the kwargs.
         pass
+
+
+ABSTRACT_BASE_CLASSES = frozenset([
+    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager])
