@@ -33,14 +33,14 @@
           </span>
 
           <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-            <object-editor obj-type="<[item.type]>" always-editable="true" value="rule.definition.inputs[item.varName]"></object-editor>
+            <object-editor obj-type="<[item.type]>" always-editable="true" value="rule.definition.inputs[item.varName]" style="color: black;"></object-editor>
           </span>
           <span ng-if="item.type == 'noneditable'">
             <[item.text]>
           </span>
         </span>
         <span>
-          <button type="button" class="btn btn-default oppia-rule-description-close-button" ng-click="closeRuleDescriptionEditor()">
+          <button type="button" class="btn btn-default btn-sm oppia-rule-description-close-button" ng-click="closeRuleDescriptionEditor()">
             Done
           </button>
         </span>

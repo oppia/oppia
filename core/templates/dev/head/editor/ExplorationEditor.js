@@ -406,6 +406,19 @@ function ExplorationEditor(
       $scope.states, $scope.initStateName);
   };
 
+  $scope.areExplorationWarningsVisible = false;
+  $scope.toggleExplorationWarningVisibility = function() {
+    $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
+  };
+
+  $scope.getExplorationWarningsList = function() {
+    var warningsList = [];
+    if (!$scope.isEndStateReachable()) {
+      warningsList.push('The END state is unreachable.');
+    }
+    return warningsList;
+  };
+
   $scope.isEndStateReachable = function() {
     if (!$scope.graphData) {
       return true;

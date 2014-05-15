@@ -729,7 +729,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             .attr('x', dimensions.w - 20)
             .attr('y', 0)
             .attr('width', 20)
-            .attr('height', 30)
+            .attr('height', 25)
             .html('<button class="btn btn-default btn-xs"><span title="Expand Map"><strong style="font-size: larger;">+</strong></span></button>')
             .on('click', $scope.onMaximizeFunction);
         }

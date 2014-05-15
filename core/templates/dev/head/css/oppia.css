@@ -175,6 +175,12 @@ textarea {
   color: white;
 }
 
+.oppia-main-content {
+  margin: 10px;
+  padding: 10px;
+  width: 100%;
+}
+
 .oppia-editor-header {
   font-size: 110%;
   font-variant: small-caps;
@@ -268,16 +274,15 @@ textarea {
   100% { opacity: 1; }
 }
 
-.oppia-gallery-menu {
+.oppia-light-border-right {
   border-right: 1px solid #bbb;
+}
+
+.oppia-gallery-menu {
   float: left;
   min-height: 600px;
   padding: 0 15px 0 15px;
   width: 150px;
-}
-.oppia-gallery-menu-title {
-  font-size: 120%;
-  padding: 0 0 12px 0;
 }
 
 .oppia-gallery-tiles-container {
@@ -300,8 +305,7 @@ textarea {
   box-shadow: 0 1px 2px rgba(100,100,100,0.5);
   display: block;
   float: left;
-  margin: 0 7px 7px 0;
-  display: block;
+  margin-bottom: 7px;
   padding: 10px;
   box-sizing: border-box;
   width: 100%;
@@ -438,12 +442,6 @@ textarea {
 
 .oppia-gallery-frame {
   border-radius: 20px;
-  margin: 10px;
-  padding: 10px;
-  width: 100%;
-}
-
-.oppia-main-content {
   margin: 10px;
   padding: 10px;
   width: 100%;
