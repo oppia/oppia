@@ -134,7 +134,7 @@ function Admin($scope, $http) {
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
         action: 'reload_exploration',
-        explorationId: String(explorationId)
+        exploration_id: String(explorationId)
       })
     }, true);
 
@@ -144,6 +144,51 @@ function Admin($scope, $http) {
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function(data) {
         $scope.message = 'Data reloaded successfully.';
+      }).error(function(errorResponse) {
+        $scope.message = 'Server error: ' + errorResponse.error;
+      });
+  };
+
+  $scope.startNewJob = function(jobType) {
+    $scope.message = 'Starting new job...';
+    var request = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'start_new_job',
+        job_type: jobType
+      })
+    }, true);
+
+    $http.post(
+      $scope.adminHandlerUrl,
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+    success(function(data) {
+        $scope.message = 'Data reloaded successfully.';
+        window.location.reload();
+      }).error(function(errorResponse) {
+        $scope.message = 'Server error: ' + errorResponse.error;
+      });
+  };
+
+  $scope.cancelJob = function(jobId, jobType) {
+    $scope.message = 'Cancelling job...';
+    var request = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'cancel_job',
+        job_id: jobId,
+        job_type: jobType
+      })
+    }, true);
+
+    $http.post(
+      $scope.adminHandlerUrl,
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+    success(function(data) {
+        $scope.message = 'Data reloaded successfully.';
+        window.location.reload();
       }).error(function(errorResponse) {
         $scope.message = 'Server error: ' + errorResponse.error;
       });

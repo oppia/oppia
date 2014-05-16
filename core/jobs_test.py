@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core import jobs
+from core import jobs_registry
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
@@ -484,3 +485,34 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             SampleMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
+
+
+class JobRegistryTests(test_utils.GenericTestBase):
+    """Tests job registry."""
+
+    def test_each_class_is_subclass_of_BaseJobManager(self):
+        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+            self.assertTrue(issubclass(klass, jobs.BaseJobManager))
+
+    def test_each_class_is_not_abstract(self):
+        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+            self.assertFalse(klass._is_abstract())
+
+
+class JobQueriesTests(test_utils.GenericTestBase):
+    """Tests queries for jobs."""
+
+    def test_get_data_for_recent_jobs(self):
+        self.assertEqual(jobs.get_data_for_recent_jobs(), [])
+
+        job_id = DummyJobManager.create_new()
+        DummyJobManager.enqueue(job_id)
+        recent_jobs = jobs.get_data_for_recent_jobs()
+        self.assertEqual(len(recent_jobs), 1)
+        self.assertDictContainsSubset({
+            'id': job_id,
+            'status_code': jobs.STATUS_CODE_QUEUED,
+            'job_type': 'DummyJobManager',
+            'is_cancelable': True,
+            'error': None
+        }, recent_jobs[0])
