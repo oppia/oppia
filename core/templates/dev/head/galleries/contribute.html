@@ -107,68 +107,54 @@
           <script type="text/ng-template" id="modals/galleryCreateNew">
             <div class="modal-header">
               <h3>
-                Add New Exploration
-              </h3>
-            </div>
-
-            <form class="">
-                <fieldset>
-              <div class="modal-body">
-                <div class="control-group">
-                  <label class="control-label">Title: </label>
-                  <div class="controls">
-                    <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
-                  </div>
-                </div>
-
-                <div class="control-group">
-                  <label class="control-label">Category:</label>
-                  <div class="controls">
-                    <select2-dropdown item="newExplorationCategory" choices="categoryList" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px">
-                  </select2-dropdown>
-                  </div>
-                </div>
-              </div>
-              </fieldset>
-            </form>
-              <div class="modal-footer">
-                <button class="btn btn-success" type="submit" ng-click="create(newExplorationTitle, newExplorationCategory)" ng-disabled="!newExplorationTitle || !newExplorationCategory">Save</button>
-                <button class="btn btn-default" ng-click="cancel()">Close</button>
-              </div>
-          </script>
-
-          <script type="text/ng-template" id="modals/galleryUpload">
-            <div class="modal-header">
-              <h3>
-                Upload New Exploration
+                <span ng-if="isUploadModal">Upload Exploration</span>
+                <span ng-if="!isUploadModal">Add New Exploration</span>
               </h3>
             </div>
 
             <div class="modal-body">
-              <em>
-                This form allows you to upload the YAML file corresponding to an exploration. Currently, you will need to upload any associated image files separately in the relevant states.
-              </em>
-
-              <div>
-                Title: <input type="text" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
+              <div ng-if="isUploadModal">
+                <em>
+                  This form allows you to upload the YAML file corresponding to an exploration. Currently, you will need to upload any associated image files separately in the relevant states.
+                </em>
               </div>
 
-              <div>
-                Category:
-                <select2-dropdown item="newExplorationCategory" choices="categoryList" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px">
-                </select2-dropdown>
-              </div>
+              <br>
 
-              <div>
-                Upload YAML file:
-                <input id="newFileInput" type="file">
-              </div>
+              <form role="form" class="form-horizontal">
+                <fieldset>
+                  <div class="form-group" ng-class="{'has-error': !newExplorationTitle}">
+                    <label for="newExplorationTitle" class="col-lg-2 col-md-2 col-sm-2">
+                      Title
+                    </label>
+                    <div class="col-lg-10 col-md-10 col-sm-10">
+                      <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
+                    </div>
+                  </div>
+
+                  <div class="form-group" ng-class="{'has-error': !newExplorationCategory}">
+                    <label for="newExplorationCategory" class="col-lg-2 col-md-2 col-sm-2">
+                      Category
+                    </label>
+                    <div class="col-lg-10 col-md-10 col-sm-10">
+                      <select2-dropdown item="newExplorationCategory" choices="categoryList" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px">
+                      </select2-dropdown>
+                    </div>
+                  </div>
+
+                  <div ng-if="isUploadModal" class="form-group">
+                    <label for="newFileInput" class="col-lg-2 col-md-2 col-sm-2">
+                      Upload YAML file
+                    </label>
+                    <div class="col-lg-10 col-md-10 col-sm-10">
+                      <input id="newFileInput" type="file">
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
             </div>
-
             <div class="modal-footer">
-              <button class="btn btn-success"
-                      ng-click="upload(newExplorationTitle, newExplorationCategory)"
-                      ng-disabled="!newExplorationTitle || !newExplorationCategory">Save</button>
+              <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory)" ng-disabled="!newExplorationTitle || !newExplorationCategory">Save</button>
               <button class="btn btn-default" ng-click="cancel()">Close</button>
             </div>
           </script>
