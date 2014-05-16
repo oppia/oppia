@@ -694,64 +694,10 @@ function ExplorationEditor(
   };
 
   /**
-   * Downloads the YAML representation of an exploration.
+   * Downloads the zip file for an exploration.
    */
-  $scope.downloadExploration = function() {
-    document.location.href = $scope.explorationDownloadUrl;
-  };
-
   $scope.downloadExplorationWithVersion = function(versionNumber) {
     document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
-  };
-
-  $scope.publicizeExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_publicized: true});
-  };
-
-  $scope.unpublicizeExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_publicized: false});
-  };
-
-  $scope.unpublishExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_public: false});
-  };
-
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
-  $scope.showTransferExplorationOwnershipModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/transferExplorationOwnership',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.transfer = $modalInstance.close;
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_community_owned: true});
-    });
   };
 
   $scope.showNominateExplorationModal = function() {
@@ -766,33 +712,6 @@ function ExplorationEditor(
           };
         }
       ]
-    });
-  };
-
-  $scope.deleteExploration = function(role) {
-    warningsData.clear();
-
-    var modalInstance = $modal.open({
-      templateUrl: 'modals/deleteExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.reallyDelete = $modalInstance.close;
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    });
-
-    modalInstance.result.then(function() {
-      var deleteUrl = $scope.explorationDataUrl;
-      if (role) {
-        deleteUrl += ('?role=' + role);
-      }
-      $http['delete'](deleteUrl).success(function(data) {
-        $window.location = CONTRIBUTE_GALLERY_PAGE;
-      });
     });
   };
 
