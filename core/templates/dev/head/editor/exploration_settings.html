@@ -40,7 +40,7 @@
 
       {% if can_modify_roles %}
         <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
-          <button type="button" ng-click="openEditRolesForm()">
+          <button type="button" class="btn" ng-click="openEditRolesForm()">
             Edit Roles
           </button>
         </div>
@@ -58,7 +58,7 @@
             <em>Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
             <br>
             <input type="submit" value="Save">
-            <button type="button" ng-click="closeEditRolesForm()"
+            <button type="button" class="btn" ng-click="closeEditRolesForm()"
               ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
               Cancel
             </button>

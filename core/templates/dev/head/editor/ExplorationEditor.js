@@ -686,9 +686,7 @@ function ExplorationEditor(
       templateUrl: 'modals/publishExploration',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = function() {
-            $modalInstance.close();
-          };
+          $scope.publish = $modalInstance.close;
 
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
@@ -701,15 +699,13 @@ function ExplorationEditor(
     });
   };
 
-  $scope.showReleaseExplorationOwnershipModal = function() {
+  $scope.showTransferExplorationOwnershipModal = function() {
     warningsData.clear();
     $modal.open({
-      templateUrl: 'modals/releaseExplorationOwnership',
+      templateUrl: 'modals/transferExplorationOwnership',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.release = function() {
-            $modalInstance.close();
-          };
+          $scope.transfer = $modalInstance.close;
 
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
@@ -722,6 +718,21 @@ function ExplorationEditor(
     });
   };
 
+  $scope.showNominateExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/nominateExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.close = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    });
+  };
+
   $scope.deleteExploration = function(role) {
     warningsData.clear();
 
@@ -729,9 +740,7 @@ function ExplorationEditor(
       templateUrl: 'modals/deleteExploration',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.reallyDelete = function() {
-          $modalInstance.close();
-        };
+        $scope.reallyDelete = $modalInstance.close;
 
         $scope.cancel = function() {
           $modalInstance.dismiss('cancel');

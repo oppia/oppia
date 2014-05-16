@@ -6,7 +6,7 @@
 
     <br>
 
-    <h4>Common student paths </h4>
+    <h4>Common learner paths </h4>
     <div class="container-fluid">
       <div class="row-fluid">
         <div class="span12">
@@ -19,7 +19,7 @@
 
   <div ng-if="stats.numVisits == 0">
     <em>
-      This exploration has not been viewed by readers yet, so there are no
+      This exploration has not been viewed by anyone yet, so there are no
       statistics to display.
     </em>
   </div>
@@ -33,14 +33,14 @@
       <div ng-if="improvementType == 'May be confusing'">
         <i class="icon-warning-sign"></i>
         <em>
-          This state may be confusing. Students often leave the exploration when encountering it.
+          This state may be confusing. Learners often leave the exploration when encountering it.
         </em>
       </div>
 
       <div ng-if="improvementType == 'Needs more feedback'">
         <i class="icon-warning-sign"></i>
         <em>
-          This state may need more feedback. Students often return to it after giving an answer.
+          This state may need more feedback. Learners often return to it after giving an answer.
         </em>
       </div>
 
@@ -51,7 +51,7 @@
       <div ng-if="!isEmpty(stateStats.readerFeedback)">
         <h5>
           Feedback
-          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from students when they were at this state when they click the feedback button." tooltip-placement="right">
+          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from learners who clicked the feedback button when they were at this state." tooltip-placement="right">
         </h5>
         <ul>
           <li ng-repeat="(feedbackId, feedbackItem) in stateStats.readerFeedback">
@@ -85,7 +85,7 @@
         </div>
 
         <div ng-if="!doesAnswerExist()">
-          <em>No students gave answers.</em>
+          <em>No one has given any answers.</em>
           <a href="#" onclick="return false;" ng-click="gotoStateEditor('content')">
             Edit content
           </a>

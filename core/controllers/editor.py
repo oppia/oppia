@@ -63,6 +63,10 @@ EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     'editor_page_announcement', 'Html',
     'A persistent announcement to display on top of all editor pages.',
     default_value='')
+MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
+    'moderator_request_forum_url', 'UnicodeString',
+    'A link to the forum for nominating explorations for release.',
+    default_value='https://moderator/request/forum/url')
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -183,6 +187,7 @@ class ExplorationPage(EditorHandler):
                 self.user_id).can_unpublicize(exploration_id),
             'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
                 exploration_id),
+            'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),

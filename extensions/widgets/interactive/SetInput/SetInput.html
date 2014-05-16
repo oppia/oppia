@@ -3,16 +3,18 @@
   <ul>
     <li ng-repeat="element in answer track by $index">
       <[element]>
-      <button type="button" ng-click="deleteElement($index)">
+      <button type="button" class="btn btn-mini" ng-click="deleteElement($index)">
         Delete
       </button>
     </li>
   </ul>
 
-  <form ng-submit="addElement(newElement)">
+  <form class="form-horizontal" ng-submit="addElement(newElement)">
     <input type="text" ng-model="newElement" placeholder="Add Element" autofocus required>
-    <button type="submit">+</button>
+    <button type="submit" class="btn"><b>+</b></button>
   </form>
 
-  <button type="button" ng-click="submitAnswer(answer)">Submit</button>
+  <br>
+
+  <button type="button" class="btn" ng-click="submitAnswer(answer)">Submit</button>
 </div>

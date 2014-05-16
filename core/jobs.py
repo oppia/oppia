@@ -18,120 +18,450 @@
 
 __author__ = 'Sean Lip'
 
+import ast
+import logging
+import time
+import traceback
 
 from core.platform import models
 (job_models,) = models.Registry.import_models([models.NAMES.job])
+taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
+from mapreduce import base_handler
+from mapreduce import input_readers
+from mapreduce import mapreduce_pipeline
+from mapreduce.lib.pipeline import pipeline
 
 STATUS_CODE_NEW = job_models.STATUS_CODE_NEW
 STATUS_CODE_QUEUED = job_models.STATUS_CODE_QUEUED
 STATUS_CODE_STARTED = job_models.STATUS_CODE_STARTED
 STATUS_CODE_COMPLETED = job_models.STATUS_CODE_COMPLETED
 STATUS_CODE_FAILED = job_models.STATUS_CODE_FAILED
+STATUS_CODE_CANCELED = job_models.STATUS_CODE_CANCELED
 
 VALID_STATUS_CODE_TRANSITIONS = {
     STATUS_CODE_NEW: [STATUS_CODE_QUEUED],
-    STATUS_CODE_QUEUED: [STATUS_CODE_QUEUED, STATUS_CODE_STARTED],
+    STATUS_CODE_QUEUED: [STATUS_CODE_STARTED, STATUS_CODE_CANCELED],
     STATUS_CODE_STARTED: [
-        STATUS_CODE_QUEUED, STATUS_CODE_COMPLETED, STATUS_CODE_FAILED
-    ],
-    STATUS_CODE_COMPLETED: [STATUS_CODE_QUEUED],
-    STATUS_CODE_FAILED: [STATUS_CODE_QUEUED],
+        STATUS_CODE_COMPLETED, STATUS_CODE_FAILED, STATUS_CODE_CANCELED],
+    STATUS_CODE_COMPLETED: [],
+    STATUS_CODE_FAILED: [],
+    STATUS_CODE_CANCELED: [],
 }
 
 
-class BaseJob(object):
-    """A class that represents a durable job at runtime.
+class BaseJobManager(object):
+    """Base class for managing long-running jobs.
 
-    Note that only one instance of a job should actually be running at a
-    particular time.
+    These jobs are not transaction-safe, and multiple jobs of the same kind
+    may run at once and overlap. Individual jobs should account for this. In
+    particular, if a job writes to some location, no other enqueued or running
+    job should be writing to, or reading from, that location.
+
+    This is expected to be the case for one-off migration jobs, as well as
+    batch reporting jobs. One-off migration jobs are expected to be transient
+    and will not be a permanent part of the codebase. Batch reporting jobs are
+    expected to write to a particular datastore model that is optimized for
+    fast querying; each batch reporting job should correspond to exactly one of
+    these models. The reporting jobs are expected to be run as MapReduces; to
+    find existing ones, search for subclasses of BaseMapReduceJobManager.
+
+    Note that the enqueue(), register_start(), register_completion(),
+    register_failure() and cancel() methods in this class batch the following
+    operations: (a) pre- and post-hooks, (b) updating the status of the job in
+    the datastore, and (c) actually performing the operation. Each entire batch
+    is not run in a transaction, but subclasses can still perform (a) or (c)
+    transactionally if they wish to.
     """
-    # IMPORTANT! This should be set to True for classes which actually define
-    # jobs (as opposed to abstract base superclasses).
-    IS_VALID_JOB_CLASS = False
+    @classmethod
+    def _is_abstract(cls):
+        return cls in ABSTRACT_BASE_CLASSES
 
-    _job_id = None
-    execution_time_sec = None
-    status_code = None
-    output = None
-
-    def __init__(self):
-        if not self.IS_VALID_JOB_CLASS:
+    @classmethod
+    def create_new(cls):
+        """Creates a new job of this class type. Returns the id of this job."""
+        if cls._is_abstract():
             raise Exception(
-                'Tried to directly initialize a job using the abstract base '
-                'class %s, which is not allowed.' % self.__class__.__name__)
+                'Tried to directly create a job using the abstract base '
+                'manager class %s, which is not allowed.' % cls.__name__)
 
-        self._job_id = 'job-%s' % self.__class__.__name__
-        self._reload_from_datastore()
+        def _create_new_job():
+            job_id = job_models.JobModel.get_new_id(cls.__name__)
+            job_models.JobModel(id=job_id, job_type=cls.__name__).put()
+            return job_id
 
-    def _reload_from_datastore(self):
-        """Loads the last known state of this job from the datastore."""
-        job_model = job_models.JobModel.get_by_id(self._job_id)
-        if job_model:
-            self.execution_time_sec = job_model.execution_time_sec
-            self.status_code = job_model.status_code
-            self.output = job_model.output
+        return transaction_services.run_in_transaction(_create_new_job)
 
-    def _update_status(self, strict=True):
-        """Saves the current status of a job domain object to the datastore.
+    @classmethod
+    def enqueue(cls, job_id):
+        """Marks a job as queued and adds it to a queue for processing."""
+        # Ensure that preconditions are met.
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_valid_transition(
+            job_id, model.status_code, STATUS_CODE_QUEUED)
+        cls._require_correct_job_type(model.job_type)
 
-        If strict is True, raises an error if the job does not exist.
+        # Enqueue the job.
+        cls._pre_enqueue_hook(job_id)
+        cls._real_enqueue(job_id)
+
+        model.status_code = STATUS_CODE_QUEUED
+        model.time_queued = time.time()
+        model.put()
+
+        cls._post_enqueue_hook(job_id)
+
+    @classmethod
+    def register_start(cls, job_id, metadata=None):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_valid_transition(
+            job_id, model.status_code, STATUS_CODE_STARTED)
+        cls._require_correct_job_type(model.job_type)
+
+        cls._pre_start_hook(job_id)
+
+        model.metadata = metadata
+        model.status_code = STATUS_CODE_STARTED
+        model.time_started = time.time()
+        model.put()
+
+        cls._post_start_hook(job_id)
+
+    @classmethod
+    def register_completion(cls, job_id, output):
+        """Marks a job as completed."""
+        # Ensure that preconditions are met.
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_valid_transition(
+            job_id, model.status_code, STATUS_CODE_COMPLETED)
+        cls._require_correct_job_type(model.job_type)
+
+        model.status_code = STATUS_CODE_COMPLETED
+        model.time_finished = time.time()
+        model.output = output
+        model.put()
+
+        cls._post_completed_hook(job_id)
+
+    @classmethod
+    def register_failure(cls, job_id, error):
+        """Marks a job as failed."""
+        # Ensure that preconditions are met.
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_valid_transition(
+            job_id, model.status_code, STATUS_CODE_FAILED)
+        cls._require_correct_job_type(model.job_type)
+
+        model.status_code = STATUS_CODE_FAILED
+        model.time_finished = time.time()
+        model.error = error
+        model.put()
+
+        cls._post_failure_hook(job_id)
+
+    @classmethod
+    def cancel(cls, job_id, user_id):
+        # Ensure that preconditions are met.
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_valid_transition(
+            job_id, model.status_code, STATUS_CODE_CANCELED)
+        cls._require_correct_job_type(model.job_type)
+
+        cancel_message = 'Canceled by %s' % (user_id or 'system')
+
+        # Cancel the job.
+        cls._pre_cancel_hook(job_id, cancel_message)
+
+        model.status_code = STATUS_CODE_CANCELED
+        model.time_finished = time.time()
+        model.error = cancel_message
+        model.put()
+
+        cls._post_cancel_hook(job_id, cancel_message)
+
+    @classmethod
+    def is_active(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
+
+    @classmethod
+    def has_finished(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.status_code in [STATUS_CODE_COMPLETED, STATUS_CODE_FAILED]
+
+    @classmethod
+    def cancel_all_unfinished_jobs(cls, user_id):
+        """Cancel all queued or started jobs of this job type."""
+        unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
+            cls.__name__)
+        for model in unfinished_job_models:
+            cls.cancel(model.id, user_id)
+
+    @classmethod
+    def _real_enqueue(cls, job_id):
+        """Does the actual work of enqueueing a job for deferred execution.
+
+        Must be implemented by subclasses.
         """
-        def _update_status_in_transaction(job_id):
-            job_model = job_models.JobModel.get_by_id(self._job_id)
-            if not job_model:
-                if strict:
-                    raise Exception(
-                        'Job was not created or was deleted: %s' %
-                        self._job_id)
-                else:
-                    job_model = job_models.JobModel(id=job_id)
+        raise NotImplementedError(
+            'Subclasses of BaseJobManager should implement _real_enqueue().')
 
-            valid_new_status_codes = (
-                VALID_STATUS_CODE_TRANSITIONS[job_model.status_code])
-            if self.status_code not in valid_new_status_codes:
-                raise Exception(
-                    'Invalid status code change for job %s: from %s to %s.' %
-                    (self._job_id, job_model.status_code, self.status_code))
+    @classmethod
+    def get_status_code(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.status_code
 
-            job_model.execution_time_sec = self.execution_time_sec
-            job_model.status_code = self.status_code
-            job_model.output = self.output
-            job_model.put()
+    @classmethod
+    def get_time_queued(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.time_queued
 
-        transaction_services.run_in_transaction(
-            _update_status_in_transaction, self._job_id)
+    @classmethod
+    def get_time_started(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.time_started
 
-    def mark_queued(self):
-        """Mark the state of a job as enqueued in the datastore.
+    @classmethod
+    def get_time_finished(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.time_finished
 
-        Creates a new job model if one does not already exist.
+    @classmethod
+    def get_metadata(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.metadata
+
+    @classmethod
+    def get_output(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.output
+
+    @classmethod
+    def get_error(cls, job_id):
+        model = job_models.JobModel.get(job_id, strict=True)
+        cls._require_correct_job_type(model.job_type)
+        return model.error
+
+    @classmethod
+    def _require_valid_transition(
+            cls, job_id, old_status_code, new_status_code):
+        valid_new_status_codes = VALID_STATUS_CODE_TRANSITIONS[old_status_code]
+        if new_status_code not in valid_new_status_codes:
+            raise Exception(
+                'Invalid status code change for job %s: from %s to %s' %
+                (job_id, old_status_code, new_status_code))
+
+    @classmethod
+    def _require_correct_job_type(cls, job_type):
+        if job_type != cls.__name__:
+            raise Exception(
+                'Invalid job type %s for class %s' % (job_type, cls.__name__))
+
+    @classmethod
+    def _pre_enqueue_hook(cls, job_id):
+        pass
+
+    @classmethod
+    def _post_enqueue_hook(cls, job_id):
+        pass
+
+    @classmethod
+    def _pre_start_hook(cls, job_id):
+        pass
+
+    @classmethod
+    def _post_start_hook(cls, job_id):
+        pass
+
+    @classmethod
+    def _post_completed_hook(cls, job_id):
+        pass
+
+    @classmethod
+    def _post_failure_hook(cls, job_id):
+        pass
+
+    @classmethod
+    def _pre_cancel_hook(cls, job_id, cancel_message):
+        pass
+
+    @classmethod
+    def _post_cancel_hook(cls, job_id, cancel_message):
+        pass
+
+
+class BaseDeferredJobManager(BaseJobManager):
+
+    @classmethod
+    def _run(cls):
+        """Function that performs the main business logic of the job.
+
+        Needs to be implemented by subclasses.
         """
-        self.execution_time_sec = 0
-        self.status_code = STATUS_CODE_QUEUED
-        self.output = None
-        return self._update_status(strict=False)
+        raise NotImplementedError
 
-    def mark_started(self, output=None):
-        self.execution_time_sec = 0
-        self.status_code = STATUS_CODE_STARTED
-        self.output = output
-        return self._update_status()
+    @classmethod
+    def _run_job(cls, job_id):
+        """Starts the job."""
+        logging.info('Job %s started at %s' % (job_id, time.time()))
+        cls.register_start(job_id)
 
-    def mark_completed(self, execution_time_sec, output):
-        self.execution_time_sec = execution_time_sec
-        self.status_code = STATUS_CODE_COMPLETED
-        self.output = output
-        return self._update_status()
+        try:
+            result = cls._run()
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            logging.error('Job %s failed at %s' % (job_id, time.time()))
+            cls.register_failure(
+                job_id, '%s\n%s' % (unicode(e), traceback.format_exc()))
+            raise taskqueue_services.PermanentTaskFailure(
+                'Task failed: %s\n%s' % (unicode(e), traceback.format_exc()))
 
-    def mark_failed(self, execution_time_sec, output):
-        self.execution_time_sec = execution_time_sec
-        self.status_code = STATUS_CODE_FAILED
-        self.output = output
-        return self._update_status()
+        # Note that the job may have been canceled after it started and before
+        # it reached this stage. This will result in an exception when the
+        # validity of the status code transition is checked.
+        cls.register_completion(job_id, result)
+        logging.info('Job %s completed at %s' % (job_id, time.time()))
 
-    @property
-    def is_active(self):
-        self._reload_from_datastore()
-        return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
+    @classmethod
+    def _real_enqueue(cls, job_id):
+        taskqueue_services.defer(cls._run_job, job_id)
+
+
+class MapReduceJobPipeline(base_handler.PipelineBase):
+
+    def run(self, job_id, kwargs):
+        BaseMapReduceJobManager.register_start(job_id, {
+            BaseMapReduceJobManager._OUTPUT_KEY_ROOT_PIPELINE_ID: (
+                self.root_pipeline_id)
+        })
+        output = yield mapreduce_pipeline.MapreducePipeline(**kwargs)
+        yield StoreMapReduceResults(job_id, output)
+
+    def finalized(self):
+        # Suppress the default Pipeline behavior of sending email.
+        pass
+
+
+class StoreMapReduceResults(base_handler.PipelineBase):
+
+    def run(self, job_id, output):
+        try:
+            iterator = input_readers.RecordsReader(output, 0)
+            results_list = []
+            for item in iterator:
+                # Map/reduce puts reducer output into blobstore files as a
+                # string obtained via "str(result)".  Use AST as a safe
+                # alternative to eval() to get the Python object back.
+                results_list.append(ast.literal_eval(item))
+            transaction_services.run_in_transaction(
+                BaseMapReduceJobManager.register_completion,
+                job_id, results_list)
+        except Exception as e:
+            logging.error(traceback.format_exc())
+            logging.error('Job %s failed at %s' % (job_id, time.time()))
+            transaction_services.run_in_transaction(
+                BaseMapReduceJobManager.register_failure, job_id,
+                '%s\n%s' % (unicode(e), traceback.format_exc()))
+
+
+class BaseMapReduceJobManager(BaseJobManager):
+    # The output for this job is a list of individual results. Each item in
+    # the list will be of whatever type is yielded from the 'reduce' method.
+    #
+    # The 'metadata' field in the BaseJob representing a MapReduceJob
+    # is a dict with one key, _OUTPUT_KEY_ROOT_PIPELINE_ID. The corresponding
+    # value is a string representing the ID of the MapReduceJobPipeline
+    # as known to the mapreduce/lib/pipeline internals. This is used
+    # to generate URLs pointing at the pipeline support UI.
+    _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
+
+    @classmethod
+    def entity_class_to_map_over(cls):
+        """Return a reference to the datastore class to map over."""
+        raise NotImplementedError(
+            'Classes derived from BaseMapReduceJobManager must implement '
+            'entity_class()')
+
+    @staticmethod
+    def map(item):
+        """Implements the map function.  Must be declared @staticmethod.
+
+        Args:
+          item: The parameter passed to this function is a single element of
+          the type given by entity_class(). This function may yield as many
+          times as appropriate (including zero) to return key/value 2-tuples.
+          For example, to get a count of all explorations, one might yield
+          (exploration.id, 1).
+        """
+        raise NotImplementedError(
+            'Classes derived from BaseMapReduceJobManager must implement map '
+            'as a @staticmethod.')
+
+    @staticmethod
+    def reduce(key, values):
+        """Implements the reduce function.  Must be declared @staticmethod.
+
+        This function should yield whatever it likes; the recommended thing to
+        do is emit entities. All emitted outputs from all reducers will be
+        collected in an array and set into the output value for the job, so
+        don't pick anything huge. If you need something huge, persist it out
+        into the datastore instead and return a reference (and dereference it
+        later to load content as needed).
+
+        Args:
+          key: A key value as emitted from the map() function, above.
+          values: A list of all values from all mappers that were tagged with
+          the given key. This code can assume that it is the only process
+          handling values for this key. (It can probably also assume that
+          it will be called exactly once for each key with all of the output,
+          but this needs to be verified.)
+        """
+        raise NotImplementedError(
+            'Classes derived from BaseMapReduceJobManager must implement '
+            'reduce as a @staticmethod.')
+
+    @classmethod
+    def _real_enqueue(cls, job_id):
+        entity_class_type = cls.entity_class_to_map_over()
+        entity_class_name = '%s.%s' % (entity_class_type.__module__,
+                                       entity_class_type.__name__)
+        kwargs = {
+            'job_name': job_id,
+            'mapper_spec': '%s.%s.map' % (cls.__module__, cls.__name__),
+            'reducer_spec': '%s.%s.reduce' % (cls.__module__, cls.__name__),
+            'input_reader_spec': (
+                'mapreduce.input_readers.DatastoreInputReader'),
+            'output_writer_spec': (
+                'mapreduce.output_writers.BlobstoreRecordsOutputWriter'),
+            'mapper_params': {
+                'entity_kind': entity_class_name,
+            }
+        }
+        mr_pipeline = MapReduceJobPipeline(job_id, kwargs)
+        mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
+
+    @classmethod
+    def _pre_cancel_hook(cls, job_id, cancel_message):
+        metadata = cls.get_metadata(job_id)
+        if metadata:
+            root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
+            pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
+
+    @classmethod
+    def _require_correct_job_type(cls, job_type):
+        # Suppress check for correct job type since we cannot pass the specific
+        # entity class in the kwargs.
+        pass
+
+
+ABSTRACT_BASE_CLASSES = frozenset([
+    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager])

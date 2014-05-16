@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import base64
+import datetime
 import hashlib
 import json
 import os
@@ -327,6 +328,15 @@ def get_time_in_millisecs(datetime_obj):
       datetime_obj: An object of type datetime.datetime.
     """
     return time.mktime(datetime_obj.timetuple()) * 1000
+
+
+def get_current_time_in_millisecs():
+    """Returns time in milliseconds since the Epoch.
+
+    Args:
+      datetime_obj: An object of type datetime.datetime.
+    """
+    return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
 def get_epoch_time():
