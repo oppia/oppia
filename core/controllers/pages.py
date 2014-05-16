@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
+from core.controllers import editor
 from core.domain import config_domain
 from core.domain import exp_services
 import feconf
@@ -44,6 +45,7 @@ SPLASH_PAGE_EXPLORATION_VERSION = config_domain.ConfigProperty(
     ('The version number for the exploration on the splash page '
      '(a blank value indicates that the latest version should be used)'),
     default_value='')
+
 
 class SplashPage(base.BaseHandler):
     """Splash page for Oppia."""
@@ -88,6 +90,8 @@ class SiteGuidelinesPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_ABOUT,
+            'MODERATOR_REQUEST_FORUM_URL': (
+                editor.MODERATOR_REQUEST_FORUM_URL.value),
             'SITE_NAME': SITE_NAME.value,
         })
         self.render_template('pages/site_guidelines.html')
