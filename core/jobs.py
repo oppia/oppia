@@ -50,6 +50,11 @@ VALID_STATUS_CODE_TRANSITIONS = {
     STATUS_CODE_CANCELED: [],
 }
 
+# The default amount of time that defines a 'recent' job. Jobs that were
+# queued more recently than this number of seconds ago are considered
+# 'recent'.
+DEFAULT_RECENCY_SECS = 14 * 24 * 60 * 60
+
 
 class BaseJobManager(object):
     """Base class for managing long-running jobs.
@@ -465,3 +470,36 @@ class BaseMapReduceJobManager(BaseJobManager):
 
 ABSTRACT_BASE_CLASSES = frozenset([
     BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager])
+
+
+def get_data_for_recent_jobs(recency_secs=DEFAULT_RECENCY_SECS):
+    """Get a list containing data about all jobs.
+
+    This list is arranged in descending order based on the time the job
+    was enqueued.
+
+    Args:
+    - recency_secs: the threshold for a recent job, in seconds.
+
+    Each element of this list is a dict that represents a job. The dict has the
+    following keys:
+    - 'id': the job id
+    - 'time_started': when the job was started
+    - 'time_finished': when the job was finished
+    - 'status_code': the current status of the job
+    - 'job_type': the type of this job
+    - 'is_cancelable': whether the job can be canceled
+    - 'error': any errors pertaining to this job
+    """
+    recent_job_models = job_models.JobModel.get_recent_jobs(
+        recency_secs=recency_secs)
+    result = [{
+        'id': model.id,
+        'time_started': model.time_started,
+        'time_finished': model.time_finished,
+        'status_code': model.status_code,
+        'job_type': model.job_type,
+        'is_cancelable': model.is_cancelable,
+        'error': model.error,
+    } for model in recent_job_models]
+    return result
