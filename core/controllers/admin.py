@@ -17,8 +17,11 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import logging
+import time
 
 from core import counters
+from core import jobs
+from core import jobs_registry
 from core.controllers import base
 from core.controllers import editor
 from core.domain import config_domain
@@ -87,6 +90,19 @@ class AdminPage(base.BaseHandler):
             (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
 
+        new_job_types = [
+            klass.__name__ for klass in
+            jobs_registry.JOB_MANAGER_CLASSES]
+
+        job_data = jobs.get_data_for_recent_jobs()
+        for job in job_data:
+            job['human_readable_time_started'] = time.strftime(
+                '%B %d %H:%M:%S',
+                time.gmtime(job['time_started']))
+            job['human_readable_time_finished'] = time.strftime(
+                '%B %d %H:%M:%S',
+                time.gmtime(job['time_finished']))
+
         self.values.update({
             'demo_explorations': demo_explorations,
             'object_editors_js': jinja2.utils.Markup(
@@ -95,6 +111,8 @@ class AdminPage(base.BaseHandler):
                 editor.VALUE_GENERATORS_JS.value),
             'widget_js_directives': jinja2.utils.Markup(
                 widget_registry.Registry.get_noninteractive_widget_js()),
+            'new_job_types': new_job_types,
+            'job_data': job_data,
         })
 
         self.render_template('admin/admin.html')
@@ -121,7 +139,7 @@ class AdminHandler(base.BaseHandler):
         """Handles POST requests."""
         try:
             if self.payload.get('action') == 'reload_exploration':
-                exploration_id = self.payload.get('explorationId')
+                exploration_id = self.payload.get('exploration_id')
                 logging.info(
                     '[ADMIN] %s reloaded exploration %s' %
                     (self.user_id, exploration_id))
@@ -145,6 +163,18 @@ class AdminHandler(base.BaseHandler):
                     'computed_property_name')
                 config_domain.Registry.get_config_property(
                     computed_property_name).refresh_default_value()
+            elif self.payload.get('action') == 'start_new_job':
+                for klass in jobs_registry.JOB_MANAGER_CLASSES:
+                    if klass.__name__ == self.payload.get('job_type'):
+                        klass.enqueue(klass.create_new())
+                        break
+            elif self.payload.get('action') == 'cancel_job':
+                job_id = self.payload.get('job_id')
+                job_type = self.payload.get('job_type')
+                for klass in jobs_registry.JOB_MANAGER_CLASSES:
+                    if klass.__name__ == self.payload.get('job_type'):
+                        klass.cancel(job_id, self.user_id)
+                        break
 
             self.render_json({})
         except Exception as e:

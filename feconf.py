@@ -95,7 +95,6 @@ PATH_MAP = {
     '/extensions/widgets': 'extensions/widgets',
     '/favicon.ico': 'static/images/favicon.ico',
     '/images': 'static/images',
-    '/img': 'third_party/bootstrap/img',
     '/lib/static': 'lib/static',
     '/third_party/static': 'third_party/static',
 }

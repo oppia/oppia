@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 import random
+import time
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -28,12 +29,12 @@ from google.appengine.ext import ndb
 
 
 # These are the possible status codes for a job.
-STATUS_CODE_NEW = 0
-STATUS_CODE_QUEUED = 1
-STATUS_CODE_STARTED = 2
-STATUS_CODE_COMPLETED = 3
-STATUS_CODE_FAILED = 4
-STATUS_CODE_CANCELED = 5
+STATUS_CODE_NEW = 'new'
+STATUS_CODE_QUEUED = 'queued'
+STATUS_CODE_STARTED = 'started'
+STATUS_CODE_COMPLETED = 'completed'
+STATUS_CODE_FAILED = 'failed'
+STATUS_CODE_CANCELED = 'canceled'
 
 
 class JobModel(base_models.BaseModel):
@@ -57,7 +58,7 @@ class JobModel(base_models.BaseModel):
     # The time at which the job was completed, failed or canceled.
     time_finished = ndb.FloatProperty(indexed=True)
     # The current status code for the job.
-    status_code = ndb.IntegerProperty(
+    status_code = ndb.StringProperty(
         indexed=True,
         default=STATUS_CODE_NEW,
         choices=[
@@ -74,12 +75,18 @@ class JobModel(base_models.BaseModel):
     # code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
     error = ndb.TextProperty(indexed=False)
 
-    def is_status_queued_or_started(self):
+    def can_be_canceled(self):
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     # A computed property stating whether the job is currently in queued or
     # started status.
-    is_unfinished = ndb.ComputedProperty(is_status_queued_or_started)
+    is_cancelable = ndb.ComputedProperty(can_be_canceled)
+
+    @classmethod
+    def get_recent_jobs(cls, recency_secs):
+        earliest_time = time.time() - recency_secs
+        return cls.query().filter(
+            cls.time_queued > earliest_time).order(-cls.time_queued)
 
     @classmethod
     def get_jobs(cls, job_type):
@@ -88,4 +95,4 @@ class JobModel(base_models.BaseModel):
     @classmethod
     def get_unfinished_jobs(cls, job_type):
         return cls.query().filter(cls.job_type == job_type).filter(
-            cls.is_unfinished == True)
+            cls.is_cancelable == True)
