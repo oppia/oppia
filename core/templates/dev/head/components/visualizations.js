@@ -167,6 +167,10 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           };
         }
 
+        console.log(nodes);
+        console.log(links);
+        console.log(initStateName);
+
         // Do a breadth-first search to calculate the depths and offsets.
         var maxDepth = 0;
         var maxOffsetInEachLevel = {0: 0};
@@ -722,11 +726,11 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         if ($scope.onMaximizeFunction) {
           outerVis.append('foreignObject')
-            .attr('x', dimensions.w - 30)
+            .attr('x', dimensions.w - 20)
             .attr('y', 0)
-            .attr('width', 30)
-            .attr('height', 30)
-            .html('<button class="btn btn-mini oppia-graph-maximize-button"><i class="icon-plus" title="Expand Map"></i></button>')
+            .attr('width', 20)
+            .attr('height', 25)
+            .html('<button class="btn btn-default btn-xs"><span title="Expand Map"><strong style="font-size: larger;">+</strong></span></button>')
             .on('click', $scope.onMaximizeFunction);
         }
       }

@@ -14,8 +14,6 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 import feconf
 import test_utils
 
@@ -33,7 +31,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         response = response.follow()
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'A few notes before you start editing',
+            'Welcome to the Oppia contributor community!',
             'My preferred Oppia username')
 
         self.logout()
