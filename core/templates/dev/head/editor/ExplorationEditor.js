@@ -416,6 +416,9 @@ function ExplorationEditor(
     if (!$scope.isEndStateReachable()) {
       warningsList.push('The END state is unreachable.');
     }
+    if (!explorationObjectiveService.displayed) {
+      warningsList.push('An objective should be specified.');
+    }
     return warningsList;
   };
 

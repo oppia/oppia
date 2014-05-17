@@ -807,10 +807,6 @@ textarea {
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
-.oppia-rule-description-close-button {
-  margin-bottom: 10px;
-}
-
 .oppia-rule-description-editor {
   display: inline-block;
 }
