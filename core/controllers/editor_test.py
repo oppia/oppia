@@ -22,6 +22,7 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
+from core.domain import stats_services
 from core.domain import rights_manager
 import feconf
 import test_utils
@@ -467,14 +468,21 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
 
 
 class VersioningIntegrationTest(test_utils.GenericTestBase):
-    """Test retrieval of old exploration versions."""
+    """Test retrieval of and reverting to old exploration versions."""
 
-    def test_versioning_for_default_exploration(self):
-        EXP_ID = '0'
+    def setUp(self):
+        """Create exploration with two versions"""
+        super(VersioningIntegrationTest, self).setUp()
+
+        self.EXP_ID = '0'
+        EXP_ID = self.EXP_ID        
 
         exp_services.delete_demo(EXP_ID)
         exp_services.load_demo(EXP_ID)
 
+        self.register_editor('editor@example.com')
+        self.login('editor@example.com')
+        
         # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_services.update_exploration(
@@ -489,6 +497,57 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
                 'new_value': [{'type': 'text', 'value': 'ABC'}],
             }], 'Change objective and init state content')
 
+        
+    def test_reverting_to_old_exploration(self):
+        """Test reverting to old exploration versions."""
+        EXP_ID = self.EXP_ID
+
+        # Open editor page
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # May not revert to any version that's not 1
+        for rev_version in (-1, 0, 2, 3, 4, '1', ()):
+            response_dict = self.post_json(
+                '/createhandler/revert/%s' % EXP_ID,
+                {
+                'current_version': 2,
+                'revert_to_version': rev_version
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+
+            # Check error message
+            if not isinstance(rev_version, int):
+                self.assertIn('Expected an integer', response_dict['error'])
+            else:
+                self.assertIn('Cannot revert to version', response_dict['error'])
+
+            # Check that exploration is really not reverted to old version
+            reader_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            self.assertIn('ABC', reader_dict['init_html'])
+            self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+
+        # Revert to version 1
+        rev_version=1
+        response_dict = self.post_json(
+            '/createhandler/revert/%s' % EXP_ID,
+            {
+                'current_version': 2,
+                'revert_to_version': rev_version
+            }, csrf_token)
+
+        # Check that exploration is really reverted to version 1
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+        self.assertNotIn('ABC', reader_dict['init_html'])
+        self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+
+        
+    def test_versioning_for_default_exploration(self):
+        """Test retrieval of old exploration versions."""
+        EXP_ID = self.EXP_ID
+                
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
@@ -664,4 +723,101 @@ class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
                 }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
 
+        self.logout()
+
+
+class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
+    """Test the handler for resolving feedback."""
+
+    # todo(msl): other tests should also call this fct, modify other tests and pull setup on higher level
+    def setUp(self):
+        """Create dummy users."""
+        super(ResolvedFeedbackIntegrationTest, self).setUp()
+        # Create several users
+        self.admin_email = 'admin@example.com'
+        self.owner_email = 'owner@example.com'
+        self.collaborator_email = 'collaborator@example.com'
+        self.viewer_email = 'viewer@example.com'
+        
+        self.register_editor(self.admin_email, username='adm')
+        self.register_editor(self.owner_email, username='owner')
+        self.register_editor(self.collaborator_email, username='collab')
+        self.register_editor(self.viewer_email, username='viewer')
+        
+        self.admin_id = self.get_user_id_from_email(self.admin_email)
+        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.collaborator_id = self.get_user_id_from_email(
+            self.collaborator_email)
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+        
+        config_services.set_property(
+            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+        
+        
+    def test_resolved_feedback_handler(self):
+        """Test resolved feedback handler."""
+        # Owner creates exploration
+        self.login(self.owner_email)
+        EXP_ID = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exp_version = exploration.version
+        self.logout()
+
+        # Viewer opens exploration
+        self.login(self.viewer_email)
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+        state_name = exploration_dict['state_name']
+
+        # Viewer gives 1st feedback
+        feedback_dict = self.post_json(
+            '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name),
+            {
+                'feedback': 'This is a feedback message.', 
+                'state_history': exploration_dict['state_history'],
+                'version': exp_version
+            }
+        )
+        print '\nfeedback_dict1:', feedback_dict
+        
+        # Viewer submits answer '0'
+        exploration_dict = self.post_json(
+            '%s/%s/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, 
+                          EXP_ID, 
+                          state_name),
+            {
+                'answer': '0', 'handler': 'submit',
+                'state_history': exploration_dict['state_history']
+            }
+        )
+        state_name = exploration_dict['state_name']
+
+        # Viewer gives 2nd feedback
+        feedback_dict = self.post_json(
+            '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name),
+            {
+                'feedback': 'This is a 2nd feedback message.', 
+                'state_history': exploration_dict['state_history'],
+                'version': exp_version
+            }
+        )
+        print '\nfeedback_dict2:', feedback_dict
+        self.logout()
+
+        # Owner resolves 1st feedback
+        self.login(self.owner_email)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+        # todo(msl): get feedback_id, test outcome
+        resolve_dict = self.put_json(
+            '/createhandler/resolved_feedback/%s/%s' % (EXP_ID, state_name),
+            {
+                'feedback_id': '0', 
+                'new_status': stats_services.STATUS_FIXED
+            }, csrf_token)
+
+        # todo(msl): somebody else should resolv 2nd feedback
         self.logout()
