@@ -61,7 +61,10 @@ if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip --no-check-certificate -O webtest-download.zip
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip
-  mv $TOOLS_DIR/WebTest-1.4.2 $TOOLS_DIR/webtest-1.4.2
+  # Move WebTest-1.4.2 to tmp directory first to get around case insensitivity
+  # on Windows.
+  mv $TOOLS_DIR/WebTest-1.4.2 $TOOLS_DIR/tmp-webtest-1.4.2
+  mv $TOOLS_DIR/tmp-webtest-1.4.2 $TOOLS_DIR/webtest-1.4.2
 fi
 
 # Install third party dependencies.
