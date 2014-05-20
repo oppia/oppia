@@ -744,14 +744,12 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
 
     def test_resolved_feedback_handler(self):
         """Test resolved feedback handler."""
-        # Editor loads exploration
-        self.login(self.editor_email)
+        # Load demo exploration
         EXP_ID = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
         exploration = exp_services.get_exploration_by_id(EXP_ID)
         exp_version = exploration.version
-        self.logout()
 
         # Viewer opens exploration
         self.login(self.viewer_email)
@@ -810,27 +808,18 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
         # check if resolved
         stats = stats_services.get_state_stats_for_exploration(EXP_ID)
         self.assertEqual(stats[state_name1]['readerFeedback'], {})
-        self.logout()
-
-        # Continue as admin
-        self.login(self.admin_email)
-        response = self.testapp.get(
-            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
-        csrf_token = self.get_csrf_token_from_response(response)
-        self.assertEqual(len(stats[state_name2]['readerFeedback']), 1)
-        feedback_id = stats[state_name2]['readerFeedback'].keys()[0]
 
         # Cannot resolve non-existing feedback
-        invalid_id = feedback_id + '/'
+        invalid_id = '%s/' % feedback_id
         resolve_dict = self.put_json(
             '/createhandler/resolved_feedback/%s/%s' % (EXP_ID, state_name2),
             {
                 'feedback_id': invalid_id,
                 'new_status': stats_services.STATUS_FIXED
             }, csrf_token, expect_errors=True, expected_status_int=500)
-        self.assertEqual(
-            'Entity for class FeedbackItemModel with id ' \
-            + invalid_id + ' not found', 
+        self.assertEqual((
+            'Entity for class FeedbackItemModel with id %s not found'
+            % invalid_id),
             resolve_dict['error'])
 
         # Cannot set to invalid status
@@ -841,11 +830,18 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
                 'feedback_id': feedback_id,
                 'new_status': invalid_status
             }, csrf_token, expect_errors=True, expected_status_int=500)
-        self.assertEqual('Unexpected status: ' + invalid_status, 
+        self.assertEqual('Unexpected status: %s' % invalid_status, 
                          resolve_dict['error'])
-        
-        # Resolve 2nd feedback
+        self.logout()
+
+        # Admin resolves 2nd feedback
+        self.login(self.admin_email)
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+        stats = stats_services.get_state_stats_for_exploration(EXP_ID)
         self.assertEqual(len(stats[state_name2]['readerFeedback']), 1)
+        feedback_id = stats[state_name2]['readerFeedback'].keys()[0]
         resolve_dict = self.put_json(
             '/createhandler/resolved_feedback/%s/%s' % (EXP_ID, state_name2),
             {
