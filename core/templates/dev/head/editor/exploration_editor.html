@@ -75,6 +75,34 @@
       </div>
     </script>
 
+    <script type="text/ng-template" id="modals/embedExploration">
+      <div class="modal-header">
+        <h3>Embed exploration in another web page</h3>
+      </div>
+
+      <div class="modal-body">
+        <p>
+          To embed this exploration in another webpage, use the following HTML code:
+        </p>
+
+        <pre>
+&lt;oppia oppia-id="<[explorationId]>" src="<[serverName]>"
+       exploration-version="<[explorationVersion]>"&gt;
+&lt;/oppia&gt;
+
+&lt;script src="https://cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"&gt;
+&lt;/script&gt;</pre>
+
+        <p>
+          Note that the last two lines only need to be included once in the embedding webpage, even if you are embedding multiple explorations. For more information, please have a look at our <a href="https://code.google.com/p/oppia/wiki/EmbeddingYourExploration">documentation</a>.
+        </p>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="close()">Close</button>
+      </div>
+    </script>
+
     <script type="text/ng-template" id="modals/deleteExploration">
       <div class="modal-header">
         <h3>Delete Exploration</h3>
@@ -213,9 +241,8 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <span class="pull-right" style="margin-top: 10px;">
-
                 <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
-                  <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()">
+                  <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()">
                     Nominate for release
                   </button>
                   <img class="oppia-help" src="/images/help.png"
@@ -223,7 +250,13 @@
                        tooltip-placement="bottom">
                 </span>
 
-                <a class="btn btn-default oppia-exploration-ctrl" target="_blank" href="/explore/<[explorationId]>"
+                <span ng-show="!explorationRightsService.isPrivate()" class="oppia-exploration-ctrl">
+                  <button class="btn btn-default" title="Embed this exploration in another webpage." ng-click="showEmbedExplorationModal()" ng-disabled="isExplorationSaveable()">
+                    <span class="glyphicon glyphicon-share"></span>
+                  </button>
+                </span>
+
+                <a class="btn btn-default" target="_blank" href="/explore/<[explorationId]>" ng-disabled="isExplorationSaveable()"
                    title="Play this exploration in a new window.">
                   <span class="glyphicon glyphicon-play"></span>
                 </a>
