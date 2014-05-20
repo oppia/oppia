@@ -475,18 +475,18 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
         super(VersioningIntegrationTest, self).setUp()
 
         self.EXP_ID = '0'
-        EXP_ID = self.EXP_ID
 
-        exp_services.delete_demo(EXP_ID)
-        exp_services.load_demo(EXP_ID)
+        exp_services.delete_demo(self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
 
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
+        EDITOR_EMAIL = 'editor@example.com'
+        self.register_editor(EDITOR_EMAIL)
+        self.login(EDITOR_EMAIL)
 
         # In version 2, change the objective and the initial state content.
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(
-            'editor@example.com', EXP_ID, [{
+           EDITOR_EMAIL, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective',
@@ -499,20 +499,17 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
 
     def test_reverting_to_old_exploration(self):
         """Test reverting to old exploration versions."""
-        EXP_ID = self.EXP_ID
-
         # Open editor page
         response = self.testapp.get(
-            '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.EXP_ID))
         csrf_token = self.get_csrf_token_from_response(response)
 
         # May not revert to any version that's not 1
         for rev_version in (-1, 0, 2, 3, 4, '1', ()):
             response_dict = self.post_json(
-                '/createhandler/revert/%s' % EXP_ID,
-                {
-                'current_version': 2,
-                'revert_to_version': rev_version
+                '/createhandler/revert/%s' % self.EXP_ID, {
+                    'current_version': 2,
+                    'revert_to_version': rev_version
                 }, csrf_token, expect_errors=True, expected_status_int=400)
 
             # Check error message
@@ -524,51 +521,48 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
 
             # Check that exploration is really not reverted to old version
             reader_dict = self.get_json(
-                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
             self.assertIn('ABC', reader_dict['init_html'])
             self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
 
         # Revert to version 1
         rev_version = 1
         response_dict = self.post_json(
-            '/createhandler/revert/%s' % EXP_ID,
-            {
+            '/createhandler/revert/%s' % self.EXP_ID, {
                 'current_version': 2,
                 'revert_to_version': rev_version
             }, csrf_token)
 
         # Check that exploration is really reverted to version 1
         reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
         self.assertNotIn('ABC', reader_dict['init_html'])
         self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
 
 
     def test_versioning_for_default_exploration(self):
         """Test retrieval of old exploration versions."""
-        EXP_ID = self.EXP_ID
-
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
         self.assertIn('ABC', reader_dict['init_html'])
         self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
 
         # v1 contains 'Hi, welcome to Oppia!'.
         reader_dict = self.get_json(
-            '%s/%s?v=1' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s?v=1' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
         self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
         self.assertNotIn('ABC', reader_dict['init_html'])
 
         # v2 contains 'ABC'.
         reader_dict = self.get_json(
-            '%s/%s?v=2' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s?v=2' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
         self.assertIn('ABC', reader_dict['init_html'])
         self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
 
         # v3 does not exist.
         response = self.testapp.get(
-            '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID),
+            '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
@@ -729,22 +723,20 @@ class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
 class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
     """Test the handler for resolving feedback."""
 
-    # TODO(msl): other tests should also call this fct,
-    # modify other tests and pull setUp() on higher level
+    # TODO(msl): other tests should also call this method
     def setUp(self):
         """Create dummy users."""
         super(ResolvedFeedbackIntegrationTest, self).setUp()
         # Create several users
         self.admin_email = 'admin@example.com'
-        self.owner_email = 'owner@example.com'
+        self.editor_email = 'editor@example.com'
         self.viewer_email = 'viewer@example.com'
 
         self.register_editor(self.admin_email, username='adm')
-        self.register_editor(self.owner_email, username='owner')
-        self.register_editor(self.viewer_email, username='viewer')
+        self.register_editor(self.editor_email, username='editor')
 
         self.admin_id = self.get_user_id_from_email(self.admin_email)
-        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.editor_id = self.get_user_id_from_email(self.editor_email)
         self.viewer_id = self.get_user_id_from_email(self.viewer_email)
 
         config_services.set_property(
@@ -752,8 +744,8 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
 
     def test_resolved_feedback_handler(self):
         """Test resolved feedback handler."""
-        # Owner creates exploration
-        self.login(self.owner_email)
+        # Editor loads exploration
+        self.login(self.editor_email)
         EXP_ID = '0'
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
@@ -800,14 +792,15 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
         )
         self.logout()
 
-        # Owner resolves 1st feedback
-        self.login(self.owner_email)
+        # Editor resolves 1st feedback
+        self.login(self.editor_email)
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
         csrf_token = self.get_csrf_token_from_response(response)
         # get feedback_id
         stats = stats_services.get_state_stats_for_exploration(EXP_ID)
-        feedback_id = stats['Welcome!']['readerFeedback'].keys()[0]
+        self.assertEqual(len(stats[state_name1]['readerFeedback']), 1)
+        feedback_id = stats[state_name1]['readerFeedback'].keys()[0]
         resolve_dict = self.put_json(
             '/createhandler/resolved_feedback/%s/%s' % (EXP_ID, state_name1),
             {
@@ -816,15 +809,43 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token)
         # check if resolved
         stats = stats_services.get_state_stats_for_exploration(EXP_ID)
-        self.assertEqual(stats['Welcome!']['readerFeedback'], {})
+        self.assertEqual(stats[state_name1]['readerFeedback'], {})
         self.logout()
 
-        # Admin resolves 2nd feedback
+        # Continue as admin
         self.login(self.admin_email)
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, EXP_ID))
         csrf_token = self.get_csrf_token_from_response(response)
-        feedback_id = stats['What language']['readerFeedback'].keys()[0]
+        self.assertEqual(len(stats[state_name2]['readerFeedback']), 1)
+        feedback_id = stats[state_name2]['readerFeedback'].keys()[0]
+
+        # Cannot resolve non-existing feedback
+        invalid_id = feedback_id + '/'
+        resolve_dict = self.put_json(
+            '/createhandler/resolved_feedback/%s/%s' % (EXP_ID, state_name2),
+            {
+                'feedback_id': invalid_id,
+                'new_status': stats_services.STATUS_FIXED
+            }, csrf_token, expect_errors=True, expected_status_int=500)
+        self.assertEqual(
+            'Entity for class FeedbackItemModel with id ' \
+            + invalid_id + ' not found', 
+            resolve_dict['error'])
+
+        # Cannot set to invalid status
+        invalid_status = 'an_invalid_status'
+        resolve_dict = self.put_json(
+            '/createhandler/resolved_feedback/%s/%s' % (EXP_ID, state_name2),
+            {
+                'feedback_id': feedback_id,
+                'new_status': invalid_status
+            }, csrf_token, expect_errors=True, expected_status_int=500)
+        self.assertEqual('Unexpected status: ' + invalid_status, 
+                         resolve_dict['error'])
+        
+        # Resolve 2nd feedback
+        self.assertEqual(len(stats[state_name2]['readerFeedback']), 1)
         resolve_dict = self.put_json(
             '/createhandler/resolved_feedback/%s/%s' % (EXP_ID, state_name2),
             {
@@ -833,9 +854,9 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
             }, csrf_token)
         # check if resolved
         stats = stats_services.get_state_stats_for_exploration(EXP_ID)
-        self.assertEqual(stats['What language']['readerFeedback'], {})
+        self.assertEqual(stats[state_name2]['readerFeedback'], {})
         self.logout()
 
         # Check that no unresolved feedbacks remain
-        for key in stats.keys():
+        for key in stats:
             self.assertEqual(stats[key]['readerFeedback'], {})
