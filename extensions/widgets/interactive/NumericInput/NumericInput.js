@@ -67,7 +67,7 @@ oppia.directive('oppiaInteractiveNumericInput', [
 ]);
 
 oppia.directive('validateAsRealNumber', function() {
-  var FLOAT_REGEXP = /^\-?\d+((\.|\,)\d+)?$/;
+  var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
   return {
     require: 'ngModel',
     restrict: 'A',
