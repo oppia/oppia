@@ -20,9 +20,11 @@
  */
 
 function StateStats($scope, $log, warningsData, explorationData, editorContextService) {
+  $scope.unresolvedAnswersList = [];
+
   $scope.initStateStats = function(data) {
     $scope.unresolvedAnswers = data.unresolved_answers;
-    $scope.generateUnresolvedAnswersMap();
+    $scope.generateUnresolvedAnswersList();
   };
 
   $scope.$on('guiTabSelected', function(evt) {
@@ -31,10 +33,10 @@ function StateStats($scope, $log, warningsData, explorationData, editorContextSe
     $scope.initStateStats(stateData);
   });
 
-  $scope.generateUnresolvedAnswersMap = function() {
-    $scope.unresolvedAnswersMap = [];
+  $scope.generateUnresolvedAnswersList = function() {
+    $scope.unresolvedAnswersList = [];
     for (var answerItem in $scope.unresolvedAnswers) {
-      $scope.unresolvedAnswersMap.push({
+      $scope.unresolvedAnswersList.push({
         'answer': answerItem,
         'count': $scope.unresolvedAnswers[answerItem]
       });
@@ -44,7 +46,7 @@ function StateStats($scope, $log, warningsData, explorationData, editorContextSe
   $scope.deleteUnresolvedAnswer = function(answer) {
     $scope.unresolvedAnswers[answer] = 0;
     explorationData.resolveAnswers($scope.stateName, [answer]);
-    $scope.generateUnresolvedAnswersMap();
+    $scope.generateUnresolvedAnswersList();
   };
 }
 

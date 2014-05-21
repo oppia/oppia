@@ -101,22 +101,6 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
   };
 }
 
-oppia.directive('customPopover', ['$sce', function($sce) {
-  return {
-    restrict: 'A',
-    template: '<span><[label]></span>',
-    link: function(scope, elt, attrs) {
-      scope.label = attrs.popoverLabel;
-      $(elt).popover({
-        trigger: 'hover',
-        html: true,
-        content: $sce.getTrustedHtml('<pre>' + attrs.popoverText + '</pre>'),
-        placement: attrs.popoverPlacement
-      });
-    }
-  };
-}]);
-
 /**
  * Injects dependencies in a way that is preserved by minification.
  */

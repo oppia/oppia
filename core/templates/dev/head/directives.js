@@ -89,3 +89,20 @@ oppia.directive('whenScrolledToBottom', function() {
     });
   };
 });
+
+
+oppia.directive('customPopover', ['$sce', function($sce) {
+  return {
+    restrict: 'A',
+    template: '<div style="cursor: pointer;"><[label]></div>',
+    link: function(scope, elt, attrs) {
+      scope.label = attrs.popoverLabel;
+      $(elt).popover({
+        trigger: 'click',
+        html: true,
+        content: $sce.getTrustedHtml('<pre>' + attrs.popoverText + '</pre>'),
+        placement: attrs.popoverPlacement
+      });
+    }
+  };
+}]);

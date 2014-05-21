@@ -1,18 +1,20 @@
 <div ng-controller="StateStats">
-  <h4>
+  <h4 ng-if="unresolvedAnswersList.length">
     <strong>Common responses</strong>
   </h4>
-  <table style="width: 100%;">
-    <tr ng-repeat="item in unresolvedAnswersMap | orderBy:'-count' | limitTo:10">
+  <table style="width: 100%;" class="table-striped">
+    <tr ng-repeat="item in unresolvedAnswersList | orderBy:'-count' | limitTo:10">
       <td style="width: 70%;">
-        <span ng-show="item.count === 0">
+        <div ng-show="item.count === 0">
           <del><[item.answer]></del>
-        </span>
-        <span ng-show="item.count > 0" custom-popover popover-text="<[item.answer]>" popover-placement="left" popover-label="<[item.answer | truncate:40]>" popover-trigger="mouseenter">
-        </span>
+        </div>
+        <div ng-show="item.count > 0" custom-popover popover-text="<[item.answer]>" popover-placement="top" popover-label="<[item.answer | truncate:40]>">
+        </div>
       </td>
 
-      <td style="width: 20%;">
+      <td style="width: 5%"></td>
+
+      <td style="width: 15%;">
         <span ng-show="item.count > 0">
           <[item.count]> time<span ng-show="item.count != 1">s</span>
         </span>
@@ -20,7 +22,9 @@
 
       <td style="width: 10%;">
         <span ng-show="item.count > 0">
-          <button class="btn btn-default btn-xs" ng-click="deleteUnresolvedAnswer(item.answer)">Delete</button>
+          <button class="btn btn-default btn-xs" ng-click="deleteUnresolvedAnswer(item.answer)">
+            <span class="glyphicon glyphicon-remove"></span>
+          </button>
         </span>
       </td>
     </tr>
