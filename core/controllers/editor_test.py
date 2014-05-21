@@ -360,7 +360,8 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
         # Load golden zip file
         with open(os.path.join(
                 feconf.TESTS_DATA_DIR,
-                'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip')) as f:
+                'oppia-ThetitleforZIPdownloadhandlertest!-v2-gold.zip'),
+                'rb') as f:
             golden_zipfile = f.read()
         zf_gold = zipfile.ZipFile(StringIO.StringIO(golden_zipfile))
 
