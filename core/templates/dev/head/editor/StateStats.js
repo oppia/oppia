@@ -19,16 +19,16 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function UnresolvedAnswers($scope, $log, warningsData, explorationData, editorContextService) {
-
-  $scope.initUnresolvedAnswers = function(data) {
-    $scope.stateName = editorContextService.getActiveStateName();
+function StateStats($scope, $log, warningsData, explorationData, editorContextService) {
+  $scope.initStateStats = function(data) {
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersMap();
   };
 
-  $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    $scope.initUnresolvedAnswers(stateData);
+  $scope.$on('guiTabSelected', function(evt) {
+    $scope.stateName = editorContextService.getActiveStateName();
+    var stateData = explorationData.data.states[$scope.stateName];
+    $scope.initStateStats(stateData);
   });
 
   $scope.generateUnresolvedAnswersMap = function() {
@@ -48,4 +48,5 @@ function UnresolvedAnswers($scope, $log, warningsData, explorationData, editorCo
   };
 }
 
-UnresolvedAnswers.$inject = ['$scope', '$log', 'warningsData', 'explorationData', 'editorContextService'];
+StateStats.$inject = [
+  '$scope', '$log', 'warningsData', 'explorationData', 'editorContextService'];
