@@ -21,7 +21,8 @@
 function ExplorationSettings(
     $scope, $modal, activeInputData, explorationData, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
-    explorationRightsService, changeListService, warningsData) {
+    explorationRightsService, changeListService, editabilityService,
+    warningsData) {
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
     $scope.explorationCategoryService = explorationCategoryService;
@@ -176,5 +177,6 @@ function ExplorationSettings(
 ExplorationSettings.$inject = [
   '$scope', '$modal', 'activeInputData', 'explorationData', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
-  'explorationRightsService', 'changeListService', 'warningsData'
+  'explorationRightsService', 'changeListService', 'editabilityService',
+  'warningsData'
 ];
