@@ -23,7 +23,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
     def test_redirect_to_prerequisites_page_happens(self):
         self.login('editor@example.com')
 
-        response = self.testapp.get('/create/0')
+        response = self.testapp.get('/contribute')
         self.assertEqual(response.status_int, 302)
         self.assertIn(
             feconf.EDITOR_PREREQUISITES_URL, response.headers['location'])

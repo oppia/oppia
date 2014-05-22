@@ -462,10 +462,9 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id),
-            expect_errors=expect_errors
-        )
+            expect_errors=expect_errors)
+        self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        self.assertEqual(response.status_int, expected_status_int)
 
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exploration_id),

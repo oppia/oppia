@@ -301,7 +301,8 @@ class Actor(object):
                 self.user_id in exp_rights.editor_ids or
                 self.user_id in exp_rights.owner_ids)
 
-    def can_view(self, exploration_id):
+    def can_play(self, exploration_id):
+        """Whether the user can play the reader view of this exploration."""
         try:
             exp_rights = get_exploration_rights(exploration_id)
         except Exception:
@@ -312,6 +313,10 @@ class Actor(object):
                     or self.is_moderator())
         else:
             return True
+
+    def can_view(self, exploration_id):
+        """Whether the user can view the editor page for this exploration."""
+        return self.can_play(exploration_id)
 
     def can_clone(self, exploration_id):
         exp_rights = get_exploration_rights(exploration_id)
