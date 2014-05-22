@@ -18,7 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+import os
+
 from core.domain import fs_domain
+import feconf
 import test_utils
 
 
@@ -58,12 +61,10 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
         fs.commit(self.user_id, 'abc/abcd.png', 'file_contents_3')
         fs.commit(self.user_id, 'bcd/bcde.png', 'file_contents_4')
 
-        self.assertEqual(
-            fs.listdir(''),
-            ['abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png'])
+        self.assertEqual(fs.listdir(''), [
+            'abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png'])
 
-        self.assertEqual(
-            fs.listdir('abc'), ['abc/abcd.png'])
+        self.assertEqual(fs.listdir('abc'), ['abc/abcd.png'])
 
         with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
             fs.listdir('/abc')
@@ -111,8 +112,8 @@ class DiskBackedFileSystemTests(test_utils.GenericTestBase):
     """Tests for the disk-backed file system."""
 
     def test_get(self):
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.DiskBackedFileSystem('core/tests/data'))
+        fs = fs_domain.AbstractFileSystem(fs_domain.DiskBackedFileSystem(
+            feconf.TESTS_DATA_DIR))
         self.assertTrue(fs.get('img.png'))
         with self.assertRaisesRegexp(IOError, 'No such file or directory'):
             fs.get('non_existent_file.png')
@@ -130,8 +131,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             fs_domain.ExplorationFileSystem('eid'))
 
         invalid_filepaths = [
-            '..', '../another_exploration', '../', '/..', '/abc'
-        ]
+            '..', '../another_exploration', '../', '/..', '/abc']
 
         for filepath in invalid_filepaths:
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
