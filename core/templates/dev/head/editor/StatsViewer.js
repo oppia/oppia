@@ -51,8 +51,12 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
             return rulesStats;
           }
         },
-        controller: ['$scope', '$modalInstance', 'stateName', 'stateStats', 'improvementType', 'rulesStats',
-          function($scope, $modalInstance, stateName, stateStats, improvementType, rulesStats) {
+        controller: [
+            '$scope', '$modalInstance', 'editabilityService', 'stateName',
+            'stateStats', 'improvementType', 'rulesStats', function(
+               $scope, $modalInstance, editabilityService, stateName,
+               stateStats, improvementType, rulesStats) {
+            $scope.editabilityService = editabilityService;
             $scope.stateName = stateName;
             $scope.stateStats = stateStats;
             $scope.improvementType = improvementType;

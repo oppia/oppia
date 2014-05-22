@@ -19,7 +19,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateStats($scope, $log, warningsData, explorationData, editorContextService) {
+function StateStats(
+    $scope, $log, warningsData, explorationData, editorContextService) {
+
   $scope.unresolvedAnswersList = [];
 
   $scope.initStateStats = function(data) {
