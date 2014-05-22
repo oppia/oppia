@@ -44,7 +44,7 @@
       </div>
 
       <div class="col-lg-3 col-md-3 col-sm-3">
-        <span class="pull-right">
+        <span class="pull-right" ng-if="isEditable">
           <button type="button" class="btn btn-default btn-xs" ng-disabled="activeItem !== -1" ng-click="startEditParamChange($index)">
             <span class="glyphicon glyphicon-pencil" title="Edit parameter change"></span>
           </button>
@@ -73,7 +73,7 @@
     </div>
   </div>
 
-  <div class="row">
+  <div class="row" ng-if="isEditable">
     <div class="col-lg-8 col-md-8 col-sm-8"></div>
 
     <div class="col-lg-3 col-md-3 col-sm-3">

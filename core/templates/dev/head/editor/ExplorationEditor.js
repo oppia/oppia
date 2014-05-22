@@ -26,7 +26,9 @@ function ExplorationEditor(
     $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
-    explorationRightsService, validatorsService) {
+    explorationRightsService, validatorsService, editabilityService) {
+
+  $scope.editabilityService = editabilityService;
 
   $scope.getActiveStateName = function() {
     return editorContextService.getActiveStateName();
@@ -653,6 +655,8 @@ function ExplorationEditor(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from, data.rights.community_owned);
 
+      editabilityService.markEditable();
+
       $scope.refreshGraph();
 
       if ($scope.doFullRefresh) {
@@ -942,5 +946,6 @@ ExplorationEditor.$inject = [
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
   'activeInputData', 'oppiaRequestCreator', 'editorContextService',
   'changeListService', 'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationRightsService', 'validatorsService'
+  'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
+  'editabilityService'
 ];

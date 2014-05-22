@@ -1,14 +1,20 @@
 <div class="oppia-state-editor-header">
   <div class="oppia-state-name-container">
-    <h4 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable">
-      <[stateName]>
-      <span class="glyphicon glyphicon-pencil" title="Edit State Name"></span>
-    </h4>
+    <div ng-if="editabilityService.isEditable()">
+      <h4 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable">
+        <[stateName]>
+        <span class="glyphicon glyphicon-pencil" title="Edit State Name"></span>
+      </h4>
 
-    <span ng-if="stateNameEditorIsShown" class="form-horizontal">
-      <input type="text" ng-model="$parent.tmpStateName" autofocus>
-      <button type="button" class="btn btn-default" ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Close</button>
-    </span>
+      <span ng-if="stateNameEditorIsShown" class="form-horizontal">
+        <input type="text" ng-model="$parent.tmpStateName" autofocus>
+        <button type="button" class="btn btn-default" ng-click="saveStateNameAndRefresh($parent.tmpStateName)">Close</button>
+      </span>
+    </div>
+
+    <div ng-if="!editabilityService.isEditable()">
+      <h4><[stateName]></h4>
+    </div>
   </div>
 </div>
 

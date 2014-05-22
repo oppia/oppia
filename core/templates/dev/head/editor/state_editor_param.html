@@ -11,6 +11,7 @@
 {% block center_right %}
   <param-change-editor param-changes="stateParamChanges"
       param-specs="paramSpecs" save-param-changes="saveStateParamChanges"
-      add-exploration-param-spec="addExplorationParamSpec">
+      add-exploration-param-spec="addExplorationParamSpec"
+      is-editable="editabilityService.isEditable()">
   </param-change-editor>
 {% endblock %}

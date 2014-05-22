@@ -4,13 +4,11 @@
 
 {% block label %}content{% endblock %}
 
-{% block info %}{% endblock %}
-
 {% block cls %}oppia-state-content{% endblock %}
 
 {% block center %}
   <div ng-if="!contentMemento">
-    <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()">
+    <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()" ng-if="editabilityService.isEditable()">
       <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
     </button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">

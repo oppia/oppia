@@ -1,7 +1,9 @@
 <div ng-if="!active && !alwaysEditable">
   <div>
     <span angular-html-bind="localValue.label"></span>
-    (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+    <span ng-if="isEditable">
+      (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+    </span>
   </div>
 </div>
 

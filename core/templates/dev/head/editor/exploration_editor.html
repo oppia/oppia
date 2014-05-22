@@ -241,7 +241,7 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <span class="pull-right" style="margin-top: 10px;">
-                <span ng-show="explorationRightsService.isPublic()" class="oppia-exploration-ctrl">
+                <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
                   <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()">
                     Nominate for release
                   </button>
@@ -261,9 +261,11 @@
                   <span class="glyphicon glyphicon-play"></span>
                 </a>
 
-                <button class="btn oppia-save-exploration-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">save changes</button>
+                <span ng-if="editabilityService.isEditable()">
+                  <button class="btn oppia-save-exploration-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">save changes</button>
 
-                <button class="btn btn-default oppia-save-exploration-button" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
+                  <button class="btn btn-default oppia-save-exploration-button" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
+                </span>
               </span>
             </div>
           </div>
