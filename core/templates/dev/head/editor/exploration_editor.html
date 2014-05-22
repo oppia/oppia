@@ -307,6 +307,8 @@
               </div>
               <div class="col-lg-3 col-md-3 col-sm-3">
                 {% include 'editor/exploration_graph.html' %}
+                <hr>
+                {% include 'editor/state_stats.html' %}
               </div>
             </div>
           </tab>
@@ -351,7 +353,7 @@
     {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateReaderFeedback.js') }}
-    {{ include_js_file('editor/UnresolvedAnswers.js') }}
+    {{ include_js_file('editor/StateStats.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/InteractiveWidgetEditor.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
