@@ -65,8 +65,7 @@ sys.path.append(root_dir)
 
 import feconf
 
-EXPECTED_TEST_COUNT = 269
-
+EXPECTED_TEST_COUNT = 286
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -143,6 +142,10 @@ def main():
         os.getcwd(), 'third_party', 'bleach-1.2.2'))
     HTML5LIB_DIR = os.path.abspath(os.path.join(
         os.getcwd(), 'third_party', 'html5lib-python-0.95'))
+    GAE_MAPREDUCE_DIR = os.path.abspath(os.path.join(
+        os.getcwd(), 'third_party', 'gae-mapreduce-1.9.0.0'))
+    GAE_CLOUD_STORAGE_DIR = os.path.abspath(os.path.join(
+        os.getcwd(), 'third_party', 'gae-cloud-storage-1.9.0.0'))
 
     _require_dir_exists(GAE_DIR)
     _require_dir_exists(CURR_DIR)
@@ -150,6 +153,8 @@ def main():
     _require_dir_exists(WEBOB_DIR)
     _require_dir_exists(BLEACH_DIR)
     _require_dir_exists(HTML5LIB_DIR)
+    _require_dir_exists(GAE_MAPREDUCE_DIR)
+    _require_dir_exists(GAE_CLOUD_STORAGE_DIR)
 
     sys.path.insert(0, GAE_DIR)
     sys.path.insert(0, CURR_DIR)
@@ -157,6 +162,8 @@ def main():
     sys.path.append(WEBOB_DIR)
     sys.path.append(BLEACH_DIR)
     sys.path.append(HTML5LIB_DIR)
+    sys.path.append(GAE_MAPREDUCE_DIR)
+    sys.path.append(GAE_CLOUD_STORAGE_DIR)
 
     import dev_appserver
     dev_appserver.fix_sys_path()

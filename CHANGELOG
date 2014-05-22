@@ -3,6 +3,26 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.5 (16 May 2014)
+--------------------
+UI changes:
+* Add a 'Publication Policies' tab to the site guidelines page.
+* Add a 'Nominate for release' button (and associated modal) to the exploration editor page.
+* Add 'community-owned' tags to community-owned explorations in the playtest queue.
+* Clean up the gallery user interfaces.
+* Change the color of the initial state of an exploration to pale green.
+
+Developer-facing changes:
+* Refactor the startup scripts, moving some functionality from bash to Python to make the setup process work on more operating systems.
+* Fix issue 148: open a browser using the correct command in Macs, and do not fail noisily on other operating systems.
+
+Infrastructure:
+* Add a backend integration test for exploration rights.
+* Add a jobs dashboard to the admin page.
+* Add functionality for running mapreduce jobs.
+* Add backend models for feedback threads.
+
+
 v1.2.4 (5 May 2014)
 -------------------
 New pages:

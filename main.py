@@ -34,6 +34,8 @@ from core.controllers import widgets
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
+from mapreduce import main as mapreduce_main
+from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
 
@@ -67,7 +69,7 @@ def generate_static_url_tuples():
     static_urls = []
     url_tuples = []
     for url in feconf.PATH_MAP:
-        static_urls.append(url+'.+')
+        static_urls.append(url + '.+')
     for url in static_urls:
         url_tuples.append((url, resources.StaticFileHandler))
     return url_tuples
@@ -83,6 +85,55 @@ def get_redirect_route(regex_route, handler, name, defaults=None):
         defaults = {}
     return RedirectRoute(
         regex_route, handler, name, strict_slash=True, defaults=defaults)
+
+
+def authorization_wrapper(self, *args, **kwargs):
+    # developers.google.com/appengine/docs/python/taskqueue/overview-push
+    # promises that this header cannot be set by external callers. If this
+    # is present, we can be certain that the request is internal and from
+    # the task queue worker.
+    if 'X-AppEngine-TaskName' not in self.request.headers:
+        self.response.out.write('Forbidden')
+        self.response.set_status(403)
+        return
+    self.real_dispatch(*args, **kwargs)
+
+
+def ui_access_wrapper(self, *args, **kwargs):
+    self.real_dispatch(*args, **kwargs)
+
+
+mapreduce_handlers = []
+
+for path, handler_class in mapreduce_main.create_handlers_map():
+    if path.startswith('.*/pipeline'):
+        if 'pipeline/rpc/' in path or path == '.*/pipeline(/.+)':
+            path = path.replace('.*/pipeline', '/mapreduce/ui/pipeline')
+        else:
+            path = path.replace('.*/pipeline', '/mapreduce/worker/pipeline')
+    else:
+        if '_callback' in path:
+            path = path.replace('.*', '/mapreduce/worker', 1)
+        elif '/list_configs' in path:
+            continue
+        else:
+            path = path.replace('.*', '/mapreduce/ui', 1)
+
+    if '/ui/' in path or path.endswith('/ui'):
+        if (hasattr(handler_class, 'dispatch') and
+            not hasattr(handler_class, 'real_dispatch')):
+            handler_class.real_dispatch = handler_class.dispatch
+            handler_class.dispatch = ui_access_wrapper
+        mapreduce_handlers.append((path, handler_class))
+    else:
+        if (hasattr(handler_class, 'dispatch') and
+            not hasattr(handler_class, 'real_dispatch')):
+            handler_class.real_dispatch = handler_class.dispatch
+            handler_class.dispatch = authorization_wrapper
+        mapreduce_handlers.append((path, handler_class))
+
+# Tell map/reduce internals that this is now the base path to use.
+mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 
 # Register the URL with the responsible classes
@@ -246,7 +297,7 @@ if feconf.SHOW_FEEDBACK_TAB:
 # 404 error handler.
 error404_handler = [webapp2.Route(r'/.*', Error404Handler)]
 
-urls = urls + error404_handler
+urls = mapreduce_handlers + urls + error404_handler
 
 
 app = transaction_services.toplevel_wrapper(

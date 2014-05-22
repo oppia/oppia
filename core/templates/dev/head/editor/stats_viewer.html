@@ -7,9 +7,9 @@
     <br>
 
     <h4>Common learner paths </h4>
-    <div class="container-fluid">
-      <div class="row-fluid">
-        <div class="span12">
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
           <div state-graph-viz val="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stats.stateStats" on-click-function="onClickStateInStatsGraph">
           </div>
         </div>
@@ -31,14 +31,14 @@
 
     <div class="modal-body">
       <div ng-if="improvementType == 'May be confusing'">
-        <i class="icon-warning-sign"></i>
+        <span class="glyphicon glyphicon-warning-sign"></span>
         <em>
           This state may be confusing. Learners often leave the exploration when encountering it.
         </em>
       </div>
 
       <div ng-if="improvementType == 'Needs more feedback'">
-        <i class="icon-warning-sign"></i>
+        <span class="glyphicon glyphicon-warning-sign"></span>
         <em>
           This state may need more feedback. Learners often return to it after giving an answer.
         </em>
@@ -95,7 +95,7 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn" ng-click="cancel()">Close</button>
+      <button class="btn btn-default" ng-click="cancel()">Close</button>
     </div>
   </script>
 </div>

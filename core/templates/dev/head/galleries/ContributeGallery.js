@@ -101,25 +101,27 @@ function ContributeGallery($scope, $http, $rootScope, $filter, $modal, warningsD
         });
   };
 
-  $scope.showCreateExplorationModal = function(categoryList) {
-    warningsData.clear();
-
-    var modalInstance = $modal.open({
+  $scope._getCreateModalInstance = function(categoryList, isUploadModal) {
+    return $modal.open({
       templateUrl: 'modals/galleryCreateNew',
       backdrop: 'static',
       resolve: {
         categoryList: function() {
           return categoryList;
+        },
+        isUploadModal: function() {
+          return isUploadModal;
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'categoryList',
-        function($scope, $modalInstance, categoryList) {
+        '$scope', '$modalInstance', 'categoryList', 'isUploadModal',
+        function($scope, $modalInstance, categoryList, isUploadModal) {
           $scope.categoryList = categoryList;
           $scope.newExplorationTitle = '';
           $scope.newExplorationCategory = '';
+          $scope.isUploadModal = isUploadModal;
 
-          $scope.create = function(title, newCategory) {
+          $scope.save = function(title, newCategory) {
             if (!title) {
               warningsData.addWarning('Please specify an exploration title.');
               return;
@@ -130,10 +132,21 @@ function ContributeGallery($scope, $http, $rootScope, $filter, $modal, warningsD
               return;
             }
 
-            $modalInstance.close({
+            var returnObj = {
               title: title,
               category: newCategory
-            });
+            };
+
+            if ($scope.isUploadModal) {
+              var file = document.getElementById('newFileInput').files[0];
+              if (!file || !file.size) {
+                warningsData.addWarning('Empty file detected.');
+                return;
+              }
+              returnObj.yamlFile = file;
+            }
+
+            $modalInstance.close(returnObj);
           };
 
           $scope.cancel = function() {
@@ -143,7 +156,12 @@ function ContributeGallery($scope, $http, $rootScope, $filter, $modal, warningsD
         }
       ]
     });
+  }
 
+  $scope.showCreateExplorationModal = function(categoryList) {
+    warningsData.clear();
+
+    var modalInstance = $scope._getCreateModalInstance(categoryList, false);
     modalInstance.result.then(function(result) {
       var title = result.title;
       var category = $filter('normalizeWhitespace')(result.category);
@@ -169,53 +187,7 @@ function ContributeGallery($scope, $http, $rootScope, $filter, $modal, warningsD
   $scope.showUploadExplorationModal = function(categoryList) {
     warningsData.clear();
 
-    var modalInstance = $modal.open({
-      templateUrl: 'modals/galleryUpload',
-      backdrop: 'static',
-      resolve: {
-        categoryList: function() {
-          return categoryList;
-        }
-      },
-      controller: [
-        '$scope', '$modalInstance', 'categoryList',
-        function($scope, $modalInstance, categoryList) {
-          $scope.categoryList = categoryList;
-
-          $scope.newExplorationTitle = '';
-          $scope.newExplorationCategory = '';
-
-          $scope.upload = function(title, newCategory) {
-            if (!title) {
-              warningsData.addWarning('Please specify an exploration title.');
-              return;
-            }
-            if (!newCategory) {
-              warningsData.addWarning('Please specify a category for this exploration.');
-              return;
-            }
-
-            var file = document.getElementById('newFileInput').files[0];
-            if (!file || !file.size) {
-              warningsData.addWarning('Empty file detected.');
-              return;
-            }
-
-            $modalInstance.close({
-              title: title,
-              category: newCategory,
-              yamlFile: file
-            });
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    });
-
+    var modalInstance = $scope._getCreateModalInstance(categoryList, true);
     modalInstance.result.then(function(result) {
       var title = result.title;
       var category = $filter('normalizeWhitespace')(result.category);

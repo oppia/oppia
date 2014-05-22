@@ -6,46 +6,38 @@
 
 {% block content %}
   <script type="text/ng-template" id="playtestQueue/main">
-    <div class="oppia-gallery">
-      <table>
-        <tr>
-          <th style="padding-left: 10px; width: 40%; text-align: left;">Exploration</th>
-          <th style="width: 10%"></th>
-          <th style="width: 25%; text-align: left;">Category</th>
-          <th style="width: 25%; text-align: left;">Last updated</th>
-        </tr>
-        <tr ng-repeat="exploration in explorations track by $index">
-          <td>
-            <div class="oppia-gallery-tile-top">
-              <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
-                <div class="oppia-gallery-tile-description">
-                  <span><[exploration.title]></span>
-                  <span ng-if="exploration.community_owned" class="label label-info">
-                    Community-owned
-                  </span>
-                  <span class="oppia-gallery-tile-play">
-                    <i class="icon-play-circle"></i>
-                  </span>
-                </div>
-              </a>
+    <table class="table">
+      <thead>
+        <th class="col-lg-4 col-md-4 col-sm-4"><h4>Exploration</h4></th>
+        <th class="col-lg-2 col-md-2 col-sm-2"><h4>Category</h4></th>
+        <th class="col-lg-2 col-md-2 col-sm-2"><h4>Last updated</h4></th>
+      </thead>
+      <tr ng-repeat="exploration in explorations track by $index">
+        <td class="col-lg-4 col-md-4 col-sm-4">
+          <a ng-href="/explore/<[exploration.id]>" class="oppia-gallery-tile">
+            <div>
+              <span class="glyphicon glyphicon-play-circle"></span>
+              <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+              <span ng-if="exploration.community_owned" class="label label-info pull-right">
+                Community-owned
+              </span>
             </div>
-          </td>
-          <td></td>
-          <td>
-            <[exploration.category]>
-          </td>
-          <td>
-            <[getLocaleStringForDate(exploration.last_updated)]>
-          </td>
-        </tr>
-      </table>
-    </div>
+          </a>
+        </td>
+        <td class="col-lg-2 col-md-2 col-sm-2">
+          <[exploration.category]>
+        </td>
+        <td class="col-lg-2 col-md-2 col-sm-2">
+          <[getLocaleStringForDate(exploration.last_updated)]>
+        </td>
+      </tr>
+    </table>
   </script>
 
   <div class="container" ng-controller="PlaytestQueue">
     <div class="row">
-      <div class="span8">
-        <div class="oppia-gallery-frame">
+      <div class="col-lg-8 col-md-8 col-sm-8">
+        <div class="oppia-main-content">
 
           <h3 class="oppia-page-title">
             Playtesters' Queue

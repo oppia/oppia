@@ -67,6 +67,7 @@ function ExplorationEditor(
       $scope.isDiscardInProgress = true;
 
       changeListService.discardAllChanges();
+      $scope.doFullRefresh = true;
       $scope.initExplorationPage(function() {
         // The $apply() is needed to call all the exploration field $watch()
         // methods before flipping isDiscardInProgress.
@@ -409,16 +410,49 @@ function ExplorationEditor(
       $scope.states, $scope.initStateName);
   };
 
+  $scope.areExplorationWarningsVisible = false;
+  $scope.toggleExplorationWarningVisibility = function() {
+    $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
+  };
+
+  $scope.getExplorationWarningsList = function() {
+    var warningsList = [];
+    if (!$scope.isEndStateReachable()) {
+      warningsList.push('The END state is unreachable.');
+    }
+    if (!explorationObjectiveService.displayed) {
+      warningsList.push('An objective should be specified.');
+    }
+    return warningsList;
+  };
+
   $scope.isEndStateReachable = function() {
     if (!$scope.graphData) {
       return true;
     }
-    for (var i = 0; i < $scope.graphData.nodes.length; i++) {
-      if ($scope.graphData.nodes[i].name == END_DEST) {
-        return $scope.graphData.nodes[i].reachable;
+
+    var queue = [$scope.graphData.initStateName];
+    var seen = [$scope.graphData.initStateName];
+    var reachedEnd = false;
+    while (queue.length > 0) {
+      var currNodeName = queue[0];
+      queue.shift();
+
+      if (currNodeName === $scope.graphData.finalStateName) {
+        reachedEnd = true;
+        break;
+      }
+
+      for (var i = 0; i < $scope.graphData.links.length; i++) {
+        if ($scope.graphData.links[i].source === currNodeName &&
+            seen.indexOf($scope.graphData.links[i].target) === -1) {
+          queue.push($scope.graphData.links[i].target);
+          seen.push($scope.graphData.links[i].target);
+        }
       }
     }
-    return true;
+
+    return reachedEnd;
   };
 
 
@@ -463,6 +497,34 @@ function ExplorationEditor(
           'autoSummary': data.snapshots[i].auto_summary
         });
       }
+    });
+  };
+
+  $scope.showEmbedExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/embedExploration',
+      backdrop: 'static',
+      resolve: {
+        explorationId: function() {
+          return $scope.explorationId;
+        },
+        explorationVersion: function() {
+          return $scope.currentVersion;
+        }
+      },
+      controller: ['$scope', '$modalInstance', 'explorationId', 'explorationVersion',
+        function($scope, $modalInstance, explorationId, explorationVersion) {
+          $scope.explorationId = explorationId;
+          $scope.serverName = window.location.protocol + '//' + window.location.host;
+          $scope.explorationVersion = explorationVersion;
+
+          $scope.close = function() {
+            $modalInstance.dismiss('close');
+            warningsData.clear();
+          };
+        }
+      ]
     });
   };
 
@@ -565,6 +627,10 @@ function ExplorationEditor(
     return explorationId ? ('/explore/' + explorationId) : '';
   };
 
+  // This is true on the initial page load and on clicking 'Discard changes'.
+  // It ensures that the user is taken to the initial state.
+  $scope.doFullRefresh = true;
+
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
@@ -593,12 +659,13 @@ function ExplorationEditor(
 
       $scope.refreshGraph();
 
-      if (!editorContextService.getActiveStateName()) {
-        editorContextService.setActiveStateName($scope.initStateName);
-      }
-
-      if ($scope.mainTabActive) {
+      if ($scope.doFullRefresh) {
+        if (!editorContextService.getActiveStateName() ||
+            !$scope.states.hasOwnProperty(editorContextService.getActiveStateName())) {
+          editorContextService.setActiveStateName($scope.initStateName);
+        }
         $scope.showStateEditor(editorContextService.getActiveStateName());
+        $scope.doFullRefresh = false;
       }
 
       $rootScope.loadingMessage = '';
@@ -662,64 +729,10 @@ function ExplorationEditor(
   };
 
   /**
-   * Downloads the YAML representation of an exploration.
+   * Downloads the zip file for an exploration.
    */
-  $scope.downloadExploration = function() {
-    document.location.href = $scope.explorationDownloadUrl;
-  };
-
   $scope.downloadExplorationWithVersion = function(versionNumber) {
     document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
-  };
-
-  $scope.publicizeExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_publicized: true});
-  };
-
-  $scope.unpublicizeExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_publicized: false});
-  };
-
-  $scope.unpublishExploration = function() {
-    explorationRightsService.saveChangeToBackend({is_public: false});
-  };
-
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
-  $scope.showTransferExplorationOwnershipModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/transferExplorationOwnership',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.transfer = $modalInstance.close;
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_community_owned: true});
-    });
   };
 
   $scope.showNominateExplorationModal = function() {
@@ -734,33 +747,6 @@ function ExplorationEditor(
           };
         }
       ]
-    });
-  };
-
-  $scope.deleteExploration = function(role) {
-    warningsData.clear();
-
-    var modalInstance = $modal.open({
-      templateUrl: 'modals/deleteExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.reallyDelete = $modalInstance.close;
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    });
-
-    modalInstance.result.then(function() {
-      var deleteUrl = $scope.explorationDataUrl;
-      if (role) {
-        deleteUrl += ('?role=' + role);
-      }
-      $http['delete'](deleteUrl).success(function(data) {
-        $window.location = CONTRIBUTE_GALLERY_PAGE;
-      });
     });
   };
 

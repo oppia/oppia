@@ -58,37 +58,38 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
 
   $scope.saveStateNameAndRefresh = function(newStateName) {
     var normalizedStateName = $scope._getNormalizedStateName(newStateName);
-    $scope.saveStateName(normalizedStateName);
-    $scope.$parent.showStateEditor(normalizedStateName);
+    var valid = $scope.saveStateName(normalizedStateName);
+    if (valid) {
+      $scope.$parent.showStateEditor(normalizedStateName);
+    }
   };
 
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope._getNormalizedStateName(newStateName);
     if (!validatorsService.isValidEntityName(newStateName, true)) {
-      return;
+      return false;
     }
     if (newStateName.length > 50) {
       warningsData.addWarning(
         'State names should be at most 50 characters long.');
-      return;
+      return false;
     }
     var activeStateName = editorContextService.getActiveStateName();
     if (newStateName !== activeStateName &&
         $scope.states.hasOwnProperty(newStateName)) {
       warningsData.addWarning(
         'The name \'' + newStateName + '\' is already in use.');
-      return;
+      return false;
     }
 
     if ($scope.stateNameMemento === newStateName) {
       $scope.stateNameEditorIsShown = false;
-      return;
-    }
-
-    if ($scope.stateNameMemento !== newStateName) {
+      return false;
+    } else {
       // Tidy up the rest of the states.
-      if ($scope.$parent.initStateName == activeStateName) {
-        $scope.$parent.initStateName = newStateName;
+      // TODO(sll): Pull initStateName out into a service.
+      if ($scope.$parent.$parent.initStateName == activeStateName) {
+        $scope.$parent.$parent.initStateName = newStateName;
       }
 
       $scope.states[newStateName] = angular.copy(
@@ -111,6 +112,7 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
       $scope.stateNameEditorIsShown = false;
       $scope.refreshGraph();
       $scope.initStateEditor();
+      return true;
     }
   };
 
@@ -120,7 +122,6 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
 
   $scope.$on('externalSave', function() {
     $scope.saveTextContent();
-
     if ($scope.stateNameEditorIsShown) {
       $scope.saveStateName($scope.tmpStateName);
     }

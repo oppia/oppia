@@ -1,0 +1,30 @@
+<div ng-controller="StateStats">
+  <h4 ng-if="unresolvedAnswersList.length">
+    <strong>Common responses</strong>
+  </h4>
+  <table style="width: 100%;" class="table table-striped">
+    <tr ng-repeat="item in unresolvedAnswersList | orderBy:'-count' | limitTo:10">
+      <td style="width: 65%;">
+        <div ng-show="item.count === 0">
+          <del><[item.answer]></del>
+        </div>
+        <div ng-show="item.count > 0" custom-popover popover-text="<[item.answer]>" popover-placement="top" popover-label="<[item.answer | truncate:40]>">
+        </div>
+      </td>
+
+      <td style="width: 25%;">
+        <span ng-show="item.count > 0">
+          <[item.count]> time<span ng-show="item.count != 1">s</span>
+        </span>
+      </td>
+
+      <td style="width: 10%;">
+        <span ng-show="item.count > 0">
+          <button class="btn btn-default btn-xs" ng-click="deleteUnresolvedAnswer(item.answer)">
+            <span class="glyphicon glyphicon-remove"></span>
+          </button>
+        </span>
+      </td>
+    </tr>
+  </table>
+</div>

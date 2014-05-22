@@ -83,6 +83,11 @@ class _Gae(_Platform):
         from core.platform.memcache import gae_memcache_services
         return gae_memcache_services
 
+    @classmethod
+    def import_taskqueue_services(cls):
+        from core.platform.taskqueue import gae_taskqueue_services
+        return gae_taskqueue_services
+
     NAME = 'gae'
 
 
@@ -110,3 +115,7 @@ class Registry(object):
     @classmethod
     def import_memcache_services(cls):
         return cls._get().import_memcache_services()
+
+    @classmethod
+    def import_taskqueue_services(cls):
+        return cls._get().import_taskqueue_services()

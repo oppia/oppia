@@ -15,7 +15,6 @@
 __author__ = 'Sean Lip'
 
 import os
-import unittest
 
 from core.domain import exp_services
 import feconf

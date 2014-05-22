@@ -28,9 +28,9 @@ class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
 
     # When this entity was first created.
-    created_on = ndb.DateTimeProperty(auto_now_add=True)
+    created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
     # When this entity was last updated.
-    last_updated = ndb.DateTimeProperty(auto_now=True)
+    last_updated = ndb.DateTimeProperty(auto_now=True, indexed=True)
     # Whether the current version of the file is deleted.
     deleted = ndb.BooleanProperty(indexed=True, default=False)
 

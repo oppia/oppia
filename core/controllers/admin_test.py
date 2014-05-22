@@ -35,7 +35,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Performance Counters',
             'Total processing time for all JSON responses',
             'Configuration',
-            'Actions',
             'Reload a single exploration',
             'counting.yaml')
 

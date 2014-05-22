@@ -429,7 +429,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Pitch-3
+          dest: Melody Trainer-1
           feedback:
           - I think you can handle this now. Your ears are all warmed up.
           param_changes: []
@@ -439,7 +439,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Pitch-3
+          dest: Pitch Trainer-1
           feedback:
           - Sounds good to me. Practice makes perfect!
           param_changes: []
@@ -449,13 +449,13 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Pitch-3
+          dest: END
           feedback:
           - Thanks for playing. We look forward to seeing you next time!
           param_changes: []
         - definition:
             rule_type: default
-          dest: Choice from Interval-1
+          dest: Interval Trainer-1
           feedback:
           - Let's move on to the Interval Trainer.
           param_changes: []

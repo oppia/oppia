@@ -27,12 +27,13 @@ from extensions.rules import tar_file_string
 import utils
 
 
+TEST_DATA_DIR = os.path.join('extensions', 'rules', 'testdata')
+
+
 class TarFileStringRuleUnitTests(unittest.TestCase):
     """Tests for rules operating on UnicodeString objects."""
 
     def test_wrapper_name_rule(self):
-
-        TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.ChecksWrapperDirName('myproject-0.1')
 
         file_name = 'wrong-wrapper-name.tar.gz'
@@ -46,8 +47,6 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         self.assertFalse(rule.eval(encoded_content))
 
     def test_wrapper_presence_rule(self):
-
-        TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.ChecksWrapperDirPresence()
 
         file_name = 'no-wrapper-dir.tar.gz'
@@ -61,8 +60,6 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         self.assertFalse(rule.eval(encoded_content))
 
     def test_unexpected_file_rule(self):
-
-        TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.HasUnexpectedFile(
             ["myproject-0.1", "myproject-0.1/hello.c",
              "myproject-0.1/Makefile"]
@@ -79,12 +76,10 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         self.assertFalse(rule.eval(encoded_content))
 
     def test_unexpected_content_rule(self):
-
-        TEST_DATA_DIR = 'extensions/rules/testdata'
         fs = fs_domain.AbstractFileSystem(
             fs_domain.DiskBackedFileSystem(TEST_DATA_DIR))
 
-        CANONICAL_DATA_DIR = 'extensions/rules/testdata/canonical'
+        CANONICAL_DATA_DIR = os.path.join(TEST_DATA_DIR, 'canonical')
         canonical_fs = fs_domain.AbstractFileSystem(
             fs_domain.DiskBackedFileSystem(CANONICAL_DATA_DIR))
 
@@ -100,8 +95,6 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         self.assertFalse(rule.eval(encoded_content))
 
     def test_missing_expected_file_rule(self):
-
-        TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.MissingExpectedFile(
             ["myproject-0.1", "myproject-0.1/hello.c",
              "myproject-0.1/Makefile"]
@@ -118,8 +111,6 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
         self.assertFalse(rule.eval(encoded_content))
 
     def test_apple_double_file_rule(self):
-
-        TEST_DATA_DIR = 'extensions/rules/testdata'
         rule = tar_file_string.HasAppleDoubleFile()
 
         file_name = 'apple-double.tar.gz'

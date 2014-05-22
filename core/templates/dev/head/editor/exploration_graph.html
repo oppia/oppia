@@ -1,27 +1,24 @@
 <div>
-  <center ng-show="!isEndStateReachable()" class="oppia-warning">
-    <i class="icon-warning-sign"></i>
-    <strong>Warning: </strong>This exploration cannot be completed. The END state is unreachable.
-  </center>
-
   <div class="oppia-graph-viz-container">
     <div state-graph-viz val="graphData" current-state-name="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" allow-panning="true" center-at-current-state="true" style="height: 100%;">
     </div>
   </div>
 
-  <div class="oppia-add-state-container">
-    <form ng-submit="addState(newStateDesc)">
-      <div style="display: table; width: 100%;">
-        <div style="display: table-cell; width: 80%;">
-          <input type="text" ng-model="newStateDesc" class="oppia-add-state-input" placeholder="New State Name">
+  <div>
+    <div class="oppia-add-state-container">
+      <form role="form" class="form-horizontal" ng-submit="addState(newStateDesc)">
+        <div class="form-group">
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <input type="text" class="form-control" ng-model="newStateDesc" class="oppia-add-state-input" placeholder="New State Name">
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4">
+            <button type="submit" class="btn btn-default oppia-add-state-button" ng-disabled="!isNewStateNameValid(newStateDesc)">
+              Create
+            </button>
+          </div>
         </div>
-        <div style="display: table-cell">
-          <button type="submit" class="btn oppia-add-state-button" ng-disabled="!isNewStateNameValid(newStateDesc)">
-            Create
-          </button>
-        </div>
-      </div>
-    </form>
+      </form>
+    </div>
   </div>
 
   <script type="text/ng-template" id="modals/stateGraph">
@@ -29,13 +26,13 @@
       <h3>State Graph Visualization</h3>
     </div>
 
-    <div class="modal-body">
-      <div state-graph-viz val="graphData" allow-panning="true" current-state-name="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true">
+    <div class="modal-body" style="padding-bottom: 0;">
+      <div state-graph-viz style="height: 300px;" val="graphData" allow-panning="true" current-state-name="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true">
       </div>
     </div>
 
-    <div class="modal-footer">
-      <button class="btn" ng-click="cancel()">Close</button>
+    <div class="modal-footer" style="margin-top: 0;">
+      <button class="btn btn-default" ng-click="cancel()">Close</button>
     </div>
   </script>
 </div>
