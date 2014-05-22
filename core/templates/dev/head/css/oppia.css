@@ -58,6 +58,12 @@ input.ng-dirty.ng-invalid {
   border: 1px solid red;
 }
 
+/* Change the color of odd-numbered lines in a table. */
+.table-striped > tbody > tr:nth-child(odd) > td,
+.table-striped > tbody > tr:nth-child(odd) > th {
+   background-color: #f0f0f0;
+ }
+
 .oppia-editor h3 {
   font-size: 18px;
   margin: 0;

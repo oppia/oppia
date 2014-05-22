@@ -2,9 +2,9 @@
   <h4 ng-if="unresolvedAnswersList.length">
     <strong>Common responses</strong>
   </h4>
-  <table style="width: 100%;" class="table-striped">
+  <table style="width: 100%;" class="table table-striped">
     <tr ng-repeat="item in unresolvedAnswersList | orderBy:'-count' | limitTo:10">
-      <td style="width: 70%;">
+      <td style="width: 65%;">
         <div ng-show="item.count === 0">
           <del><[item.answer]></del>
         </div>
@@ -12,9 +12,7 @@
         </div>
       </td>
 
-      <td style="width: 5%"></td>
-
-      <td style="width: 15%;">
+      <td style="width: 25%;">
         <span ng-show="item.count > 0">
           <[item.count]> time<span ng-show="item.count != 1">s</span>
         </span>
