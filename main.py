@@ -21,6 +21,7 @@ import feconf
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import editor
+from core.controllers import feedback
 from core.controllers import galleries
 from core.controllers import moderator
 from core.controllers import pages
@@ -225,6 +226,22 @@ urls = [
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
 ]
+if feconf.SHOW_FEEDBACK_TAB:
+  urls += [
+      get_redirect_route(
+          r'%s/<exploration_id>' % feconf.THREADLIST_URL_PREFIX,
+          feedback.ThreadListHandler, 'threadlist_handler'),
+      get_redirect_route(
+          r'%s/create/<exploration_id>' % feconf.THREADLIST_URL_PREFIX,
+          feedback.ThreadCreateHandler, 'threadcreate_handler'),
+      get_redirect_route(
+          r'%s/<thread_id>' % feconf.THREAD_URL_PREFIX,
+          feedback.ThreadHandler, 'thread_handler'),
+      get_redirect_route(
+          r'%s/create/<thread_id>' % feconf.THREAD_URL_PREFIX,
+          feedback.MessageCreateHandler, 'messagecreate_handler'),
+  ]
+
 
 # 404 error handler.
 error404_handler = [webapp2.Route(r'/.*', Error404Handler)]

@@ -1,0 +1,52 @@
+<div ng-controller="ExplorationFeedback">
+  <h4>Feedback Threads</h4>
+
+  <div ng-show="threads === undefined" class="oppia-align-center">
+    Loading
+    <span class="oppia-loading-dot-one">.</span>
+    <span class="oppia-loading-dot-two">.</span>
+    <span class="oppia-loading-dot-three">.</span>
+  </div>
+
+  <div ng-show="threads !== undefined">
+    <div ng-show="messages === undefined">
+      <div ng-show="threads !== undefined" class="oppia-align-center">
+        Create a new thread:<br>
+        state: <input type="text" ng-model="newThreadStateId"><br>
+        User ID: <input type="text" ng-model="newThreadAuthorId"><br>
+        Subject: <input type="text" ng-model="newThreadSubject"><br>
+        Text: <input type="text" ng-model="newThreadText"><br>
+        <button ng-click="createThread()">Send</button>
+      </div>
+
+      <div ng-repeat="t in threads" ng-click="selectThread(t)">
+        #<[t.thread_id]>,
+        state=<[t.state_id]>,
+        author=<[t.original_author_id]>,
+        status=<[t.status]>,
+        [<[t.subject]>]
+        <[t.summary]>
+      </div>
+    </div>
+
+    <div ng-show="messages !== undefiend">
+      <div ng-click="unselectThread()">&lt; back</div>
+      <div ng-show="messages !== undefined" class="oppia-align-center">
+        Create a new message:<br>
+        User ID: <input type="text" ng-model="newMessageUserId"><br>
+        status: <input type="text" ng-model="newMessageStatus"><br>
+        Subject: <input type="text" ng-model="newMessageSubject"><br>
+        Text: <input type="text" ng-model="newMessageText"><br>
+        <button ng-click="createMessage()">Send</button>
+      </div>
+
+      <div ng-repeat="m in messages">
+        #<[m.message_id]>,
+        author=<[m.author_id]>,
+        status=<[m.updated_status]>,
+        subject=<[m.updated_subject]>,
+        <[m.text]>
+      </div>
+    </div>
+  </div>
+</div>

@@ -242,6 +242,8 @@ PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 SPLASH_PAGE_URL = '/'
+THREADLIST_URL_PREFIX = '/threadlist'
+THREAD_URL_PREFIX = '/thread'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CONTACT = 'contact'
@@ -251,3 +253,6 @@ NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LEARN = 'learn'
 NAV_MODE_PLAYTEST = 'playtest'
 NAV_MODE_PROFILE = 'profile'
+
+# Unlaunched feature.
+SHOW_FEEDBACK_TAB = False

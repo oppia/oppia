@@ -39,6 +39,8 @@ STATUS_CHOICES = [
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
 
+QUERY_LIMIT = 100
+
 
 class FeedbackThreadModel(base_models.BaseModel):
     """Threads for each exploration.
@@ -74,10 +76,10 @@ class FeedbackThreadModel(base_models.BaseModel):
         MAX_RETRIES = 10
         RAND_RANGE = 127 * 127
         for i in range(MAX_RETRIES):
-            thread_id = utils.base64_from_int(utils.get_epoch_time()) + 
-                utils.base64_from_int(utils.get_random_int(RAND_RANGE))
-            if not cls.get(exploration_id, thread_id):
-                return new_id
+            thread_id = (utils.base64_from_int(utils.get_epoch_time()) +
+                utils.base64_from_int(utils.get_random_int(RAND_RANGE)))
+            if not cls.get_by_exp_and_thread_id(exploration_id, thread_id):
+                return thread_id
         raise Exception(
             'New thread id generator is producing too many collisions.')
 
@@ -99,13 +101,29 @@ class FeedbackThreadModel(base_models.BaseModel):
         return cls(id=instance_id)
 
     @classmethod
-    def get(cls, exploration_id, thread_id):
+    def get_by_exp_and_thread_id(cls, exploration_id, thread_id):
         """Gets the FeedbackThreadModel entry for the given ID.
 
         Returns None if the thread is not found or is already deleted.
         """
-        instance_id = cls._generate_id(exploration_id, thread_id)
-        return super(FeedbackThreadModel, cls).get(instance_id)
+        return cls.get_by_id(cls._generate_id(exploration_id, thread_id))
+
+    @classmethod
+    def get(cls, instance_id):
+        """Gets the FeedbackThreadModel entry for the given ID.
+
+        Returns None if the thread is not found or is already deleted.
+        """
+        return super(FeedbackThreadModel, cls).get(instance_id, strict=False)
+
+    @classmethod
+    def get_threads(cls, exploration_id):
+        """Returns an array of threads associated to the exploration.
+
+        Does not include the deleted entries.
+        """
+        return cls.get_all().filter(
+            cls.exploration_id == exploration_id).fetch(QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -133,7 +151,7 @@ class FeedbackMessageModel(base_models.BaseModel):
 
     @classmethod
     def _generate_id(cls, thread_id, message_id):
-        return '.'.join([thread_id, message_id])
+        return '.'.join([thread_id, str(message_id)])
 
     @classmethod
     def create(cls, thread_id, message_id):
@@ -155,4 +173,13 @@ class FeedbackMessageModel(base_models.BaseModel):
         Returns None if the message is not found or is already deleted.
         """
         instance_id = cls._generate_id(thread_id, message_id)
-        return super(FeedbackMessageModel, cls).get(instance_id)
+        return super(FeedbackMessageModel, cls).get(instance_id, strict=False)
+
+    @classmethod
+    def get_thread(cls, thread_id):
+        """Returns an array of messages in the thread.
+
+        Does not include the deleted entries.
+        """
+        return cls.get_all().filter(
+            cls.thread_id == thread_id).fetch(QUERY_LIMIT)

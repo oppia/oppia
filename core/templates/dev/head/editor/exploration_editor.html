@@ -412,6 +412,11 @@
               <tab heading="History" active="historyTabActive" select="selectHistoryTab()" ng-disabled="explorationRightsService.isCloned()">
                 {% include 'editor/exploration_history.html' %}
               </tab>
+              {% if SHOW_FEEDBACK_TAB %}
+                <tab heading="Feedback" active="feedbackTabActive" select="selectFeedbackTab()">
+                  {% include 'editor/exploration_feedback.html' %}
+                </tab>
+              {% endif %}
             </tabset>
           </div>
         </div>
@@ -441,6 +446,7 @@
     {{ object_editors_js }}
     {{ include_js_file('editor/StatsViewer.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}
+    {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateReaderFeedback.js') }}
     {{ include_js_file('editor/UnresolvedAnswers.js') }}
