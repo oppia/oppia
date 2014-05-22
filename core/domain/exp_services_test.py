@@ -532,12 +532,10 @@ states:
         zip_file_output = exp_services.export_to_zip_file(self.EXP_ID)
         zf = zipfile.ZipFile(StringIO.StringIO(zip_file_output))
 
-        self.assertEqual(
-            zf.namelist(), ['A title.yaml', os.path.join('assets', 'abc.png')])
+        self.assertEqual(zf.namelist(), ['A title.yaml', 'assets/abc.png'])
         self.assertEqual(
             zf.open('A title.yaml').read(), self.SAMPLE_YAML_CONTENT)
-        self.assertEqual(
-            zf.open(os.path.join('assets', 'abc.png')).read(), raw_image)
+        self.assertEqual(zf.open('assets/abc.png').read(), raw_image)
 
     def test_export_by_versions(self):
         """Test export_to_zip_file() for different versions."""

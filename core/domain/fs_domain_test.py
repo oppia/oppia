@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 import os
 
 from core.domain import fs_domain
+import feconf
 import test_utils
 
 
@@ -57,22 +58,16 @@ class ExplorationFileSystemUnitTests(test_utils.GenericTestBase):
             fs_domain.ExplorationFileSystem('eid'))
         fs.commit(self.user_id, 'abc.png', 'file_contents')
         fs.commit(self.user_id, 'abcd.png', 'file_contents_2')
-        fs.commit(
-            self.user_id, os.path.join('abc', 'abcd.png'), 'file_contents_3')
-        fs.commit(
-            self.user_id, os.path.join('bcd', 'bcde.png'), 'file_contents_4')
+        fs.commit(self.user_id, 'abc/abcd.png', 'file_contents_3')
+        fs.commit(self.user_id, 'bcd/bcde.png', 'file_contents_4')
 
         self.assertEqual(fs.listdir(''), [
-            'abc.png',
-            os.path.join('abc', 'abcd.png'),
-            'abcd.png',
-            os.path.join('bcd', 'bcde.png')])
+            'abc.png', 'abc/abcd.png', 'abcd.png', 'bcd/bcde.png'])
 
-        self.assertEqual(
-            fs.listdir('abc'), [os.path.join('abc', 'abcd.png')])
+        self.assertEqual(fs.listdir('abc'), ['abc/abcd.png'])
 
         with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
-            fs.listdir(os.path.join(os.sep, 'abc'))
+            fs.listdir('/abc')
 
         self.assertEqual(fs.listdir('fake_dir'), [])
 
@@ -118,7 +113,7 @@ class DiskBackedFileSystemTests(test_utils.GenericTestBase):
 
     def test_get(self):
         fs = fs_domain.AbstractFileSystem(fs_domain.DiskBackedFileSystem(
-            os.path.join('core', 'tests', 'data')))
+            feconf.TESTS_DATA_DIR))
         self.assertTrue(fs.get('img.png'))
         with self.assertRaisesRegexp(IOError, 'No such file or directory'):
             fs.get('non_existent_file.png')
@@ -136,12 +131,7 @@ class DirectoryTraversalTests(test_utils.GenericTestBase):
             fs_domain.ExplorationFileSystem('eid'))
 
         invalid_filepaths = [
-            '..',
-            os.path.join('..', 'another_exploration'),
-            os.path.join('..', os.sep),
-            os.path.join(os.sep, '..'),
-            os.path.join(os.sep, 'abc')
-        ]
+            '..', '../another_exploration', '../', '/..', '/abc']
 
         for filepath in invalid_filepaths:
             with self.assertRaisesRegexp(IOError, 'Invalid filepath'):
