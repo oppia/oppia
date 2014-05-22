@@ -37,6 +37,19 @@
             <div ng-if="!editabilityService.isEditable()">
               <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationTitle">
+                    Title
+                  </label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  <span id="explorationTitle" type="text">
+                    <[explorationTitleService.displayed]>
+                  </span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
                   <label for="explorationCategory">
                     Category
                   </label>
@@ -45,6 +58,18 @@
                   <span id="explorationCategory" type="text">
                     <[explorationCategoryService.displayed]>
                   </span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationObjective">
+                    Objective
+                  </label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  This exploration helps learners to
+                  <span id="explorationObjective" type="text"><[explorationObjectiveService.displayed]></span>.
                 </div>
               </div>
             </div>
