@@ -176,17 +176,14 @@ class ExplorationPage(EditorHandler):
             widget_registry.Registry.get_interactive_widget_js(
                 all_interactive_widget_ids))
 
-        can_edit = (
-            bool(self.user_id) and
-            self.username not in config_domain.BANNED_USERNAMES.value and
-            user_services.has_user_registered_as_editor(self.user_id) and
-            (rights_manager.Actor(self.user_id).can_edit(exploration_id) or
-                self.is_super_admin))
-
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
-            'can_edit': can_edit,
+            'can_edit': (
+                bool(self.user_id) and
+                self.username not in config_domain.BANNED_USERNAMES.value and
+                rights_manager.Actor(self.user_id).can_edit(exploration_id)
+            ),
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(exploration_id),
             'can_publicize': rights_manager.Actor(

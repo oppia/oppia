@@ -327,6 +327,8 @@ class Actor(object):
         return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):
+        # TODO(sll): Add a check here for whether a user is banned or not,
+        # rather than having this check in the controller.
         exp_rights = get_exploration_rights(exploration_id)
         return (
             self.has_explicit_editing_rights(exploration_id) or (
