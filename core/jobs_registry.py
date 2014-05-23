@@ -24,4 +24,4 @@ from core.domain import stats_jobs
 # Add a list of job manager classes (i.e., subclasses of jobs.BaseJobManager)
 # here. 'Create new' buttons for these jobs will be displayed on the admin
 # dashboard.
-JOB_MANAGER_CLASSES = [stats_jobs.ExplorationAnnotationsMapReduceJobManager]
+JOB_MANAGER_CLASSES = [stats_jobs.StatisticsPageJobManager]

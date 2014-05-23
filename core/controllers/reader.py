@@ -309,7 +309,7 @@ class ReaderLeaveHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_viewer
+    @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles POST requests."""
         stats_services.EventHandler.maybe_leave_exploration(
