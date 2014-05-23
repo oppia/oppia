@@ -51,7 +51,6 @@ class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
                 session_id = value['session_id']
                 if session_id in leave_by_session_id:
                     former_value = leave_by_session_id[session_id]
-#                    raise Exception(session_id + ' ' + str(value['created_on']) + ' ' + str(former_value))
                     leave_by_session_id[session_id] = (
                         former_value 
                           if former_value['created_on'] > value['created_on']

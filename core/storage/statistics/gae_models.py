@@ -186,14 +186,16 @@ class FeedbackItemModel(base_models.BaseModel):
         ).filter(cls.status == 'new').fetch(QUERY_LIMIT)
 
 
-class BaseEventLogEntryModel(base_models.BaseModel): 
-    """An individual event entry to be used for statistics."""
+class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a reader attempting to leave the
+    exploration without completing.
+
+    Due to complexity on browser end, this event may be logged when user clicks
+    close and then cancel. Thus, the real event is the last event of this type
+    logged for the session id."""
+
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
-
-
-class ReaderEventLogEntryModel(BaseEventLogEntryModel):
-    """A generic model for event log entries arising due to reader actions."""
     # Id of exploration currently being played.
     exploration_id = ndb.StringProperty(indexed=True)
     # Current version of exploration.
@@ -219,15 +221,6 @@ class ReaderEventLogEntryModel(BaseEventLogEntryModel):
                               exp_id,
                               session_id))
 
-
-class MaybeLeaveExplorationEventLogEntryModel(ReaderEventLogEntryModel):
-    """An event triggered by a reader attempting to leave the
-    exploration without completing.
-
-    Due to complexity on browser end, this event may be logged when user clicks
-    close and then cancel. Thus, the real event is the last event of this type
-    logged for the session id."""
-
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs, params, play_type):
@@ -245,8 +238,35 @@ class MaybeLeaveExplorationEventLogEntryModel(ReaderEventLogEntryModel):
         leave_event_entity.put()
 
 
-class StartExplorationEventLogEntryModel(ReaderEventLogEntryModel):
+class StartExplorationEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student starting the exploration."""
+
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    # Current parameter values, map of parameter name to value
+    params = ndb.JsonProperty(indexed=False)
+    # Which type of play-through this is (preview, from gallery)
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_GALLERY])
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+                              utils.get_time_in_millisecs(timestamp),
+                              exp_id,
+                              session_id))
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
