@@ -301,7 +301,8 @@ class Actor(object):
                 self.user_id in exp_rights.editor_ids or
                 self.user_id in exp_rights.owner_ids)
 
-    def can_view(self, exploration_id):
+    def can_play(self, exploration_id):
+        """Whether the user can play the reader view of this exploration."""
         try:
             exp_rights = get_exploration_rights(exploration_id)
         except Exception:
@@ -313,6 +314,10 @@ class Actor(object):
         else:
             return True
 
+    def can_view(self, exploration_id):
+        """Whether the user can view the editor page for this exploration."""
+        return self.can_play(exploration_id)
+
     def can_clone(self, exploration_id):
         exp_rights = get_exploration_rights(exploration_id)
         if exp_rights.cloned_from:
@@ -322,6 +327,8 @@ class Actor(object):
         return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):
+        # TODO(sll): Add a check here for whether a user is banned or not,
+        # rather than having this check in the controller.
         exp_rights = get_exploration_rights(exploration_id)
         return (
             self.has_explicit_editing_rights(exploration_id) or (

@@ -13,7 +13,7 @@
   <[snapshot.commitMessage]>
   <span class="pull-right">
     <em><[snapshot.createdOn]></em>
-    <span ng-show="snapshot.versionNumber !== currentVersion">
+    <span ng-if="snapshot.versionNumber !== currentVersion && editabilityService.isEditable()">
       | <a href="#" ng-click="showRevertExplorationModal(snapshot.versionNumber)">Revert</a>
     </span>
     <span>
@@ -31,11 +31,9 @@
     <p>
       You are about to revert this exploration to version <[version]>. All changes made since that older version will be retracted.
     </p>
-
     <p>
       Before reverting, you can preview the exploration you are reverting to by following <a href="/explore/<[explorationId]>?v=<[version]>" target="_blank">this link</a>. (It opens in a new window.)
     </p>
-
     <p>
       Are you sure you want to revert this exploration to version <[version]>?
     </p>

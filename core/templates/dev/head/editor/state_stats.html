@@ -19,7 +19,7 @@
       </td>
 
       <td style="width: 10%;">
-        <span ng-show="item.count > 0">
+        <span ng-if="item.count > 0 && editabilityService.isEditable()">
           <button class="btn btn-default btn-xs" ng-click="deleteUnresolvedAnswer(item.answer)">
             <span class="glyphicon glyphicon-remove"></span>
           </button>

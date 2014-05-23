@@ -22,7 +22,6 @@ from core.domain import exp_services
 from core.domain import rights_manager
 import feconf
 import test_utils
-import unittest
 
 
 class ExplorationRightsTests(test_utils.GenericTestBase):
@@ -55,10 +54,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         exp_services.load_demo('1')
 
+        self.assertTrue(rights_manager.Actor(self.user_id_a).can_play('1'))
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('1'))
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit('1'))
         self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('1'))
 
+        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_play('1'))
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view('1'))
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_edit('1'))
         self.assertTrue(
@@ -69,10 +70,12 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         # explorations, whether or not they are on the splash page.
         exp_services.load_demo('3')
 
+        self.assertTrue(rights_manager.Actor(self.user_id_a).can_play('3'))
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_view('3'))
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_edit('3'))
         self.assertFalse(rights_manager.Actor(self.user_id_a).can_delete('3'))
 
+        self.assertTrue(rights_manager.Actor(self.user_id_admin).can_play('3'))
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_view('3'))
         self.assertTrue(rights_manager.Actor(self.user_id_admin).can_edit('3'))
         self.assertTrue(
@@ -101,6 +104,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_play(self.EXP_ID))
+        self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_view(self.EXP_ID))
         self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_edit(self.EXP_ID))
@@ -108,12 +113,16 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_a).can_delete(self.EXP_ID))
 
         self.assertTrue(
+            rights_manager.Actor(self.user_id_admin).can_play(self.EXP_ID))
+        self.assertTrue(
             rights_manager.Actor(self.user_id_admin).can_view(self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_admin).can_edit(self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_admin).can_delete(self.EXP_ID))
 
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_play(self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
         self.assertFalse(
@@ -131,6 +140,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.ROLE_EDITOR)
 
         self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_play(self.EXP_ID))
+        self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
         self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
@@ -143,6 +154,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration(self.user_id_a, exp)
 
         self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_play(self.EXP_ID))
+        self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
@@ -153,6 +166,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             self.user_id_a, self.EXP_ID, self.user_id_b,
             rights_manager.ROLE_VIEWER)
 
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_play(self.EXP_ID))
         self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
         self.assertFalse(
@@ -204,6 +219,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
         self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_play(self.EXP_ID))
+        self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
 
         self.assertFalse(
@@ -211,7 +228,11 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
         self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_play(self.EXP_ID))
+        self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_view(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_play(self.EXP_ID))
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
 
@@ -246,6 +267,8 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertFalse(
             rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
 
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_play(new_exp_id))
         self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_view(new_exp_id))
         self.assertTrue(

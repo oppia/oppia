@@ -62,7 +62,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       centerAtCurrentState: '@',
       onClickFunction: '=',
       onDeleteFunction: '=',
-      onMaximizeFunction: '='
+      onMaximizeFunction: '=',
+      isEditable: '='
     },
     template: '<div></div>',
     replace: true,
@@ -166,10 +167,6 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             reachable: false
           };
         }
-
-        console.log(nodes);
-        console.log(links);
-        console.log(initStateName);
 
         // Do a breadth-first search to calculate the depths and offsets.
         var maxDepth = 0;
@@ -687,7 +684,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             });
         }
 
-        if ($scope.onDeleteFunction) {
+        if ($scope.isEditable && $scope.onDeleteFunction) {
           // Add a 'delete node' handler.
           nodeEnter.append('svg:rect')
             .attr({

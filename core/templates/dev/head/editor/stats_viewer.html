@@ -56,7 +56,7 @@
         <ul>
           <li ng-repeat="(feedbackId, feedbackItem) in stateStats.readerFeedback">
             <[feedbackItem.content]>
-            <a href="#" onclick="return false;" ng-click="gotoStateEditor('feedback')">
+            <a href="#" onclick="return false;" ng-if="editabilityService.isEditable()" ng-click="gotoStateEditor('feedback')">
               Address this feedback
             </a>
           </li>
@@ -75,7 +75,7 @@
                     <[getNumTimesString(answerData[1])]>
                   </span>
                   <pre><[answerData[0]]></pre>
-                  <a href="#" onclick="return false;" ng-click="gotoStateEditor('rules')">
+                  <a href="#" onclick="return false;" ng-if="editabilityService.isEditable()" ng-click="gotoStateEditor('rules')">
                     Add a rule for this answer
                   </a>
                 </li>
@@ -86,7 +86,7 @@
 
         <div ng-if="!doesAnswerExist()">
           <em>No one has given any answers.</em>
-          <a href="#" onclick="return false;" ng-click="gotoStateEditor('content')">
+          <a href="#" onclick="return false;" ng-if="editabilityService.isEditable()" ng-click="gotoStateEditor('content')">
             Edit content
           </a>
         </div>

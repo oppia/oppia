@@ -22,31 +22,29 @@ from core.domain import rights_manager
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import widget_registry
-import base64
 import feconf
 import jinja_utils
-import os
 import utils
 
 import jinja2
 
 
-def require_viewer(handler):
-    """Decorator that checks if the user can view the given exploration."""
-    def test_can_view(self, exploration_id, **kwargs):
+def require_playable(handler):
+    """Decorator that checks if the user can play the given exploration."""
+    def test_can_play(self, exploration_id, **kwargs):
         """Checks if the user for the current session is logged in."""
-        if rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if rights_manager.Actor(self.user_id).can_play(exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
 
-    return test_can_view
+    return test_can_play
 
 
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    @require_viewer
+    @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
         version = self.request.get('v')
@@ -186,8 +184,7 @@ class FeedbackHandler(base.BaseHandler):
 
         return (new_params, question_html, interactive_html)
 
-
-    @require_viewer
+    @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles feedback interactions with readers."""
         old_state_name = self.unescape_state_name(escaped_state_name)
@@ -289,7 +286,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_viewer
+    @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles POST requests."""
         state_name = self.unescape_state_name(escaped_state_name)
@@ -302,7 +299,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
             exploration_id, state_name, feedback,
             {'state_history': state_history}, self.user_id)
         # msl: need to call render_json for ReaderFeedbackHandler integration test
-        # (otherwise get AssertionError: 'text/html' != 'application/javascript' from 
+        # (otherwise get AssertionError: 'text/html' != 'application/javascript' from
         # test_utils.py", line 131, in _parse_json_response)
         self.render_json({})
 

@@ -20,9 +20,7 @@
 
 function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData,
     warningsData, activeInputData, oppiaRequestCreator, editorContextService,
-    changeListService, validatorsService, editabilityService) {
-
-  $scope.editabilityService = editabilityService;
+    changeListService, validatorsService) {
 
   $scope.$on('guiTabSelected', function(evt) {
     $scope.initStateEditor();
@@ -149,5 +147,4 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
 
 StateEditor.$inject = ['$scope', '$http', '$filter', '$log', '$sce', '$modal',
   'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator',
-  'editorContextService', 'changeListService', 'validatorsService',
-  'editabilityService'];
+  'editorContextService', 'changeListService', 'validatorsService'];

@@ -655,7 +655,9 @@ function ExplorationEditor(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from, data.rights.community_owned);
 
-      editabilityService.markEditable();
+      if (GLOBALS.can_edit) {
+        editabilityService.markEditable();
+      }
 
       $scope.refreshGraph();
 

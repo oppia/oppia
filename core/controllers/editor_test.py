@@ -28,7 +28,24 @@ import feconf
 import test_utils
 
 
-class EditorTest(test_utils.GenericTestBase):
+class BaseEditorControllerTest(test_utils.GenericTestBase):
+
+    CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
+    CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
+
+    def assert_can_edit(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        editable."""
+
+        self.assertIn(self.CAN_EDIT_STR, response_body)
+
+    def assert_cannot_edit(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        not editable."""
+        self.assertIn(self.CANNOT_EDIT_STR, response_body)
+
+
+class EditorTest(BaseEditorControllerTest):
 
     TAGS = [test_utils.TestTags.SLOW_TEST]
 
@@ -37,17 +54,19 @@ class EditorTest(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Check that non-editors cannot access the editor page.
+        # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
-        self.assertEqual(response.status_int, 302)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
 
         # Register and login as an editor.
         self.register_editor('editor@example.com')
         self.login('editor@example.com')
 
-        # Check that it is now possible to access the editor page.
+        # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
         self.assertIn('History', response.body)
         # Test that the value generator JS is included.
@@ -269,7 +288,7 @@ class EditorTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class StatsIntegrationTest(test_utils.GenericTestBase):
+class StatsIntegrationTest(BaseEditorControllerTest):
     """Test statistics recording using the default exploration."""
 
     def test_state_stats_for_default_exploration(self):
@@ -322,7 +341,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
+class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration download."""
 
     def test_exploration_download_handler_for_default_exploration(self):
@@ -378,7 +397,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
+class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
     def setUp(self):
         """Creates dummy users."""
@@ -468,7 +487,7 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class VersioningIntegrationTest(test_utils.GenericTestBase):
+class VersioningIntegrationTest(BaseEditorControllerTest):
     """Test retrieval of and reverting to old exploration versions."""
 
     def setUp(self):
@@ -540,7 +559,6 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
         self.assertNotIn('ABC', reader_dict['init_html'])
         self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
 
-
     def test_versioning_for_default_exploration(self):
         """Test retrieval of old exploration versions."""
         # The latest version contains 'ABC'.
@@ -568,7 +586,7 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
 
-class ExplorationEditRightsTest(test_utils.GenericTestBase):
+class ExplorationEditRightsTest(BaseEditorControllerTest):
     """Test the handling of edit rights for explorations."""
 
     def test_user_banning(self):
@@ -588,6 +606,7 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
 
         # Ban joe.
         config_services.set_property(
@@ -597,7 +616,8 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         response = self.testapp.get('/contribute', expect_errors=True)
         self.assertEqual(response.status_int, 401)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
 
         # Joe logs out.
         self.logout()
@@ -606,10 +626,11 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         self.login('sandra@example.com')
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
         self.logout()
 
 
-class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
+class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     """Test the handler for managing exploration editing rights."""
 
     def test_exploration_rights_handler(self):
@@ -670,16 +691,18 @@ class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-        # Check that viewer cannot access editor page
+        # Check that viewer can access editor page but cannot edit.
         self.login(self.viewer_email)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
         self.logout()
 
-        # Check that collaborator can access editor page
+        # Check that collaborator can access editor page and can edit.
         self.login(self.collaborator_email)
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that collaborator can add a new state called 'State 4'
@@ -721,7 +744,7 @@ class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
+class ResolvedFeedbackIntegrationTest(BaseEditorControllerTest):
     """Test the handler for resolving feedback."""
 
     # TODO(msl): other tests should also call this method
@@ -759,7 +782,7 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
         state_name1 = exploration_dict['state_name']
 
         # Viewer gives 1st feedback
-        feedback_dict = self.post_json(
+        self.post_json(
             '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name1),
             {
                 'feedback': 'This is a feedback message.',
@@ -781,7 +804,7 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
         state_name2 = exploration_dict['state_name']
 
         # Viewer gives 2nd feedback
-        feedback_dict = self.post_json(
+        self.post_json(
             '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name2),
             {
                 'feedback': 'This is a 2nd feedback message.',
@@ -831,7 +854,7 @@ class ResolvedFeedbackIntegrationTest(test_utils.GenericTestBase):
                 'feedback_id': feedback_id,
                 'new_status': invalid_status
             }, csrf_token, expect_errors=True, expected_status_int=500)
-        self.assertEqual('Unexpected status: %s' % invalid_status, 
+        self.assertEqual('Unexpected status: %s' % invalid_status,
                          resolve_dict['error'])
         self.logout()
 
