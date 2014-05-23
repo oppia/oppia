@@ -5,9 +5,18 @@
 {% endblock subtitle %}
 
 {% block content %}
+  <script>
+    // Navigate to the active tab on page load, if one is specified in the
+    // location hash.
+    $(function () {
+      var activeTab = $('[href=#' + location.hash.substring(2) + ']');
+      activeTab && activeTab.tab('show');
+    });
+  </script>
+
   <div class="container">
     <div class="row">
-      <div class="span8">
+      <div class="col-lg-8 col-md-8 col-sm-8">
         <div class="tabbable">
           <ul class="nav nav-tabs about-tabs">
             <li class="active"><a href="#what-is-oppia" data-toggle="tab">About Oppia</a></li>
@@ -39,7 +48,7 @@
                 </p>
 
                 <p>
-                  Creators, editors, and readers of explorations as well as developers of the codebase are recognized as the Oppia community. In the spirit of maintaining {{SITE_NAME}} as a service for learners by learners, community members are encouraged to participate in the discussion <a href="{{SITE_FORUM_URL}}">forum</a> and to peruse the community guidelines (see below).
+                  Creators, editors, and readers of explorations as well as developers of the codebase are recognized as the Oppia community. In the spirit of maintaining {{SITE_NAME}} as a service for learners by learners, community members are encouraged to participate in the discussion <a href="{{SITE_FORUM_URL}}">forum</a> and to peruse the <a href="/site_guidelines">community guidelines</a>.
                 </p>
 
                 <p>
@@ -58,11 +67,13 @@
                 <p>
                   Oppia was (and is still being) built by a small group of contributors. Past and present contributors to the codebase include:
                   <ul>
+                    <li>Amit Deutsch</li>
                     <li>Jacob Davis</li>
                     <li>Jeremy Emerson</li>
                     <li>Karen Rustad</li>
                     <li>Koji Ashida</li>
                     <li>Manas Tungare</li>
+                    <li>Marcel Schmittfull</li>
                     <li>Michael Wagner</li>
                     <li>Phil Wagner</li>
                     <li>Reinaldo Aguiar</li>
@@ -75,7 +86,7 @@
                   </ul>
                 </p>
                 <p>
-                  The maintainers of {{SITE_NAME}} are also very grateful for feedback, ideas and suggestions from the following people: Albert Gural, Alex Kauffmann, Amit Deutsch, Catherine Colman, John Cox, John Orr, Michael Anuzis, Mike Gainer, Neil Fraser, Pavel Simakov, Peter Norvig, Philip Guo, Piotr Mitros and Vikrant Nanda.
+                  The maintainers of {{SITE_NAME}} are also very grateful for feedback, ideas and suggestions from the following people: Albert Gural, Alex Kauffmann, Catherine Colman, John Cox, John Orr, Michael Anuzis, Mike Gainer, Neil Fraser, Pavel Simakov, Peter Norvig, Philip Guo, Piotr Mitros and Vikrant Nanda.
                 </p>
               </div>
             </div>

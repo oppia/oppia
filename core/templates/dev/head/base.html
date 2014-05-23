@@ -38,22 +38,24 @@
       <div id="wrapper">
         <div class="oppia-main-body">
           <!-- nav bar -->
-          <div class="navbar navbar-static-top" role="navigation">
-            <div class="navbar-inner">
+          <nav class="navbar navbar-default" role="navigation">
+            <div class="navbar-container">
               <div class="container">
-                <a href="#" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
                   <span class="icon-bar"></span>
-                </a>
+                </button>
 
-                <a class="brand" href="/">
-                  <img src="/images/logo.png" class="oppia-logo">
-                  Oppia&nbsp;<sup>beta</sup>
-                </a>
+                <div class="navbar-header">
+                  <a class="navbar-brand" href="/">
+                    <img src="/images/logo.png" class="oppia-logo">
+                    Oppia&nbsp;<sup>beta</sup>
+                  </a>
+                </div>
 
-                <div class="nav-collapse collapse">
-                  <ul class="nav">
+                <div class="collapse navbar-collapse">
+                  <ul class="nav navbar-nav">
                     <li {% if nav_mode == 'learn' %}class="active"{% endif %}>
                       <a href="/learn">Learn</a>
                     </li>
@@ -64,13 +66,13 @@
                       <a href="/contribute">Contribute</a>
                     </li>
                     <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                      <a class="dropdown-toggle" data-toggle="dropdown">
                         About
                         <b class="caret"></b>
                       </a>
                       <ul class="dropdown-menu">
                         {% for page in ABOUT_PAGES %}
-                          <li class="dropdown">
+                          <li>
                             <a href="{{page['url']}}">{{page['name']}}</a>
                           </li>
                         {% endfor %}
@@ -80,13 +82,13 @@
                     {% endblock %}
                   </ul>
 
-                  <ul class="nav pull-right">
+                  <ul class="nav navbar-nav navbar-right">
                     {% if user_email %}
                       <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
                         <a href="/profile">Profile</a>
                       </li>
                       <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown">
                           {% if username %}
                             {{username}}
                           {% else %}
@@ -106,7 +108,7 @@
                           </li>
 
                           {% if is_super_admin %}
-                            <li class="dropdown">
+                            <li>
                               <a href="/admin" target="_blank">
                                 Admin Page
                               </a>
@@ -121,16 +123,15 @@
                     {% endif %}
                   </ul>
                 </div>
-
               </div>
             </div>
-          </div>
+          </nav>
     {% endif %}
 
     <div ng-cloak>
       <div class="oppia-alert-blocks">
         <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
-          <p class="alert alert-block">
+          <p class="alert alert-warning">
             <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
             <strong>Warning!</strong>
             <[warning]>
@@ -156,12 +157,15 @@
 
         <div class="oppia-footer" role="contentinfo">
           <div class="container">
-            <ul class="oppia-footer-nav span8">
+            <ul class="oppia-footer-nav col-lg-8 col-md-8 col-sm-8">
               <li>
                 <a href="/">Home</a>
               </li>
               <li>
                 <a href="/learn">Learn</a>
+              </li>
+              <li>
+                <a href="/playtest">Playtest</a>
               </li>
               {% if user_email %}
                 <li>
@@ -175,7 +179,7 @@
               {% endfor %}
             </ul>
             {% if nav_mode in ['explore', 'create'] %}
-              <span class="span4" style="margin-top: 10px;">
+              <span class="col-lg-4 col-md-4 col-sm-4" style="margin-top: 10px;">
                 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
                   <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
                 </a>

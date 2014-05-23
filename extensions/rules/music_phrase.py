@@ -46,12 +46,19 @@ class Equals(base.MusicPhraseRule):
                 _convert_sequence_to_midi(self.x))
 
 
-class IsLongerSequence(base.MusicPhraseRule):
-    description = 'is a longer sequence than {{x|MusicPhrase}}'
+class IsLongerThan(base.MusicPhraseRule):
+    description = 'has more than {{k|NonnegativeInt}} notes'
 
     def _evaluate(self, subject):
-        return (len(_convert_sequence_to_midi(subject)) >
-                len(_convert_sequence_to_midi(self.x)))
+        return len(_convert_sequence_to_midi(subject)) > self.k
+
+
+class HasLengthInclusivelyBetween(base.MusicPhraseRule):
+    description = ('has between {{a|NonnegativeInt}} and '
+                   '{{b|NonnegativeInt}} notes, inclusive')
+
+    def _evaluate(self, subject):
+        return (self.a <= len(_convert_sequence_to_midi(subject)) <= self.b)
 
 
 class IsEqualToExceptFor(base.MusicPhraseRule):
@@ -61,13 +68,14 @@ class IsEqualToExceptFor(base.MusicPhraseRule):
     def _evaluate(self, subject):
         midi_target_sequence = _convert_sequence_to_midi(self.x)
         midi_user_sequence = _convert_sequence_to_midi(subject)
-        counter = 0
         num_correct_notes_needed = len(midi_target_sequence) - self.k
-        for i in range(min(
-                len(midi_target_sequence), len(midi_user_sequence))):
-            if midi_user_sequence[i] == midi_target_sequence[i]:
-                counter += 1
-        return counter >= num_correct_notes_needed
+        if len(midi_user_sequence) != len(midi_target_sequence):
+            return False
+        num_correct_notes = (
+            sum(1 for x in zip(
+                midi_target_sequence, midi_user_sequence) if x[0] == x[1])
+        )
+        return len(midi_target_sequence) - num_correct_notes <= self.k
 
 
 class IsTranspositionOf(base.MusicPhraseRule):
@@ -76,16 +84,14 @@ class IsTranspositionOf(base.MusicPhraseRule):
 
     def _evaluate(self, subject):
         target_sequence_length = len(self.x)
-        if (len(subject) == target_sequence_length):
-            midi_target_sequence = _convert_sequence_to_midi(self.x)
-            midi_user_sequence = _convert_sequence_to_midi(subject)
-            is_transposition = True
-            for i in range(target_sequence_length):
-                if midi_user_sequence[i] - self.y != midi_target_sequence[i]:
-                    return False
-            return is_transposition
-        else:
+        if len(subject) != target_sequence_length:
             return False
+        midi_target_sequence = _convert_sequence_to_midi(self.x)
+        midi_user_sequence = _convert_sequence_to_midi(subject)
+        for i in range(target_sequence_length):
+            if midi_user_sequence[i] - self.y != midi_target_sequence[i]:
+                return False
+        return True
 
 
 class IsTranspositionOfExceptFor(base.MusicPhraseRule):
@@ -94,19 +100,13 @@ class IsTranspositionOfExceptFor(base.MusicPhraseRule):
                    'except for {{k|NonnegativeInt}} notes')
 
     def _evaluate(self, subject):
-        counter = 0
         midi_target_sequence = _convert_sequence_to_midi(self.x)
         midi_user_sequence = _convert_sequence_to_midi(subject)
         target_sequence_length = len(midi_target_sequence)
-        if (len(midi_user_sequence) == target_sequence_length or
-                len(midi_user_sequence) >= target_sequence_length - self.k):
-            num_correct_notes_needed = target_sequence_length - self.k
-            if len(midi_user_sequence) > 1:
-                for i in range(min(
-                        len(midi_target_sequence), len(midi_user_sequence))):
-                    if (midi_user_sequence[i] - self.y ==
-                            midi_target_sequence[i]):
-                        counter += 1
-            return counter >= num_correct_notes_needed
-        else:
+        if len(midi_user_sequence) != target_sequence_length:
             return False
+        num_correct_notes = (
+            sum(1 for x in zip(
+                midi_target_sequence, midi_user_sequence) if x[0] == x[1] - self.y)
+        )
+        return len(midi_target_sequence) - num_correct_notes <= self.k

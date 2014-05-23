@@ -24,26 +24,27 @@ from core.domain import stats_services
 from core.domain import widget_registry
 import feconf
 import jinja_utils
+import utils
 
 import jinja2
 
 
-def require_viewer(handler):
-    """Decorator that checks if the user can view the given exploration."""
-    def test_can_view(self, exploration_id, **kwargs):
+def require_playable(handler):
+    """Decorator that checks if the user can play the given exploration."""
+    def test_can_play(self, exploration_id, **kwargs):
         """Checks if the user for the current session is logged in."""
-        if rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if rights_manager.Actor(self.user_id).can_play(exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
 
-    return test_can_view
+    return test_can_play
 
 
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    @require_viewer
+    @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
         version = self.request.get('v')
@@ -126,6 +127,7 @@ class ExplorationHandler(base.BaseHandler):
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
             'title': exploration.title,
+            'session_id': utils.generate_random_string(24),
         })
         self.render_json(self.values)
 
@@ -177,8 +179,7 @@ class FeedbackHandler(base.BaseHandler):
 
         return (new_params, question_html, interactive_html)
 
-
-    @require_viewer
+    @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles feedback interactions with readers."""
         old_state_name = self.unescape_state_name(escaped_state_name)
@@ -193,6 +194,10 @@ class FeedbackHandler(base.BaseHandler):
         state_history = self.payload['state_history']
         # The version of the exploration.
         version = self.payload.get('version')
+        # Current session id.
+        session_id = self.payload.get('session_id')
+        # Time spent in state.
+        client_time_spent_in_secs = self.payload.get('client_time_spent_in_secs')
 
         values = {}
         exploration = exp_services.get_exploration_by_id(
@@ -270,7 +275,7 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_viewer
+    @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles POST requests."""
         state_name = self.unescape_state_name(escaped_state_name)
@@ -282,3 +287,8 @@ class ReaderFeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_state_feedback_from_reader(
             exploration_id, state_name, feedback,
             {'state_history': state_history}, self.user_id)
+
+        # msl: need to call render_json for ReaderFeedbackHandler integration test
+        # (otherwise get AssertionError: 'text/html' != 'application/javascript' from
+        # test_utils.py", line 131, in _parse_json_response)
+        self.render_json({})

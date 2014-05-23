@@ -9,6 +9,7 @@
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
     google.load("visualization", "1", {packages:["corechart"]});
+    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
   </script>
   {{widget_dependencies}}
 {% endblock header_js %}
@@ -42,73 +43,64 @@
   {% endif %}
 
   <div ng-controller="ExplorationEditor" ng-cloak>
-    <script type="text/ng-template" id="modals/publishExploration">
+    <script type="text/ng-template" id="modals/nominateExploration">
       <div class="modal-header">
-        <h3>Publish Exploration</h3>
+        <h3>Nominate exploration for release</h3>
       </div>
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to
-          <a href="../site_guidelines#/how-to-use#lifecycle" target="_blank">publish</a> an
-          exploration!
+          Congratulations, you are about to submit your exploration to be reviewed for release! Once released, the exploration will appear in the Learn gallery for everyone to learn from.
         </p>
 
         <p>
-          This means that this exploration will be added to the public gallery,
-          visible to all users of the site. It will also be possible to view
-          statistics on readers' attempts at the exploration, so that the
-          exploration can be improved over time.
+          Currently, the review process is a manual, moderator-driven process.
+          When you submit an exploration for review, a moderator will play through
+          it, look at its structure, and decide whether it fits the
+          <a href="/site_guidelines#publish-and-release-criteria">release criteria</a>.
+          If not, the moderator will make a series of specific suggestions on how
+          to make the exploration satisfy the criteria, and work with the editor(s)
+          to get it ready for release.
         </p>
 
         <p>
-          Please only publish this exploration if it contains significant
-          educational content. Publishing an exploration is currently a
-          <strong>one-way</strong> action, since once you publish the
-          exploration, the Oppia community will be able to contribute feedback
-          and suggest improvements to it.
-        </p>
-
-        <p>
-          Would you like to publish this exploration?
+          <strong>To kick off the review process</strong>, please make a post to the
+          <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
+          include a link to your exploration.
         </p>
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="publish()">Publish</button>
-        <button class="btn" ng-click="cancel()">Cancel</button>
+        <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
+        <button class="btn btn-default" ng-click="close()">Close</button>
       </div>
     </script>
 
-    <script type="text/ng-template" id="modals/releaseExplorationOwnership">
+    <script type="text/ng-template" id="modals/embedExploration">
       <div class="modal-header">
-        <h3>Release Exploration Ownership</h3>
+        <h3>Embed exploration in another web page</h3>
       </div>
 
       <div class="modal-body">
         <p>
-          You are about to release ownership of this exploration to the
-          community! This will allow anyone to freely edit and improve
-          the exploration. Your previous contributions will still be visible
-          in the version history logs, and you will still be able to view and
-          edit the exploration.
+          To embed this exploration, copy the following HTML into the source code of your webpage:
         </p>
 
-        <p>
-          Please note that after an exploration is released to the community, it will
-          no longer have an explicit list of managers,
-          so this action is <strong>not reversible</strong>.
-        </p>
+        <pre>
+&lt;oppia oppia-id="<[explorationId]>" src="<[serverName]>"
+       exploration-version="<[explorationVersion]>"&gt;
+&lt;/oppia&gt;
+
+&lt;script src="https://cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"&gt;
+&lt;/script&gt;</pre>
 
         <p>
-          Would you like to release ownership of this exploration to the
-          community?
+          Note that the last two lines only need to be included once in the embedding webpage, even if you are embedding multiple explorations. For more information, please have a look at our <a href="https://code.google.com/p/oppia/wiki/EmbeddingYourExploration">documentation</a>.
         </p>
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="release()">Release Ownership</button>
-        <button class="btn" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-default" ng-click="close()">Close</button>
       </div>
     </script>
 
@@ -124,8 +116,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="reallyDelete()">Delete</button>
-        <button class="btn" ng-click="cancel()">Close</button>
+        <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
+        <button class="btn btn-default" ng-click="cancel()">Close</button>
       </div>
     </script>
 
@@ -141,8 +133,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="reallyDelete()">Delete</button>
-        <button class="btn" ng-click="cancel()">Close</button>
+        <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
+        <button class="btn btn-default" ng-click="cancel()">Close</button>
       </div>
     </script>
 
@@ -199,16 +191,16 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-success" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save</button>
-        <button class="btn" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
     </script>
 
     <div class="container">
-      <div class="row" ng-if="isCloned">
-        <div class="span12">
-          <div class="oppia-align-center oppia-warning">
+      <div class="row" ng-if="explorationRightsService.isCloned()">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
             <strong>Note:</strong> This is a private, unpublishable copy of a
-            <a ng-href="<[getExplorationUrl(clonedFrom)]>" target="_blank">public exploration</a>.
+            <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
             You are very welcome to submit feedback to improve the original exploration: to do this,
             click the previous link, then click the green Feedback button on the left of the page.
             Thank you!
@@ -217,153 +209,125 @@
       </div>
 
       <div class="row">
-        <div class="span12">
-
-          <span class="pull-right" style="margin-top: 10px; margin-right: 5px;">
-            {% if can_publicize %}
-              <span ng-show="isPublic" class="oppia-exploration-ctrl">
-                <button type="button" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Move out of beta
-                  <span ng-if="currentUserIsAdmin">
-                    (as admin)
-                  </span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                    (as moderator)
-                  </span>
-                </button>
-              </span>
-            {% endif %}
-
-            {% if can_unpublicize %}
-              <span ng-show="isPublicized" class="oppia-exploration-ctrl">
-                <button type="button" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Move back into beta
-                  <span ng-if="currentUserIsAdmin">
-                    (as admin)
-                  </span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                    (as moderator)
-                  </span>
-                </button>
-              </span>
-            {% endif %}
-
-            {% if can_publish %}
-              <span ng-show="isPrivate" class="oppia-exploration-ctrl">
-                <button type="button" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Publish
-                </button>
-                <img class="oppia-help" src="/images/help.png"
-                     tooltip="Click this button to publish your exploration in the gallery, so that others can read it."
-                     tooltip-placement="bottom">
-              </span>
-            {% endif %}
-
-            {% if can_unpublish %}
-              <span ng-show="isPublic" class="oppia-exploration-ctrl">
-                <button type="button" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Unpublish
-                  <span ng-if="currentUserIsAdmin">
-                    (as admin)
-                  </span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                    (as moderator)
-                  </span>
-                </button>
-              </span>
-            {% endif %}
-
-            {% if can_release_ownership %}
-              <span ng-hide="isCommunityOwned" class="oppia-exploration-ctrl">
-                <button type="button" ng-click="showReleaseExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Release Ownership
-                </button>
-                <img class="oppia-help" src="/images/help.png"
-                     tooltip="Click this button to release ownership of this exploration to the community."
-                     tooltip-placement="bottom">
-              </span>
-            {% endif %}
-
-            <a class="btn oppia-exploration-ctrl" target="_blank" href="/explore/<[explorationId]>"
-               title="Play this exploration in a new window.">
-              <i class="icon-play"></i>
-            </a>
-
-            <a class="btn oppia-exploration-ctrl" ng-click="downloadExploration()"
-               title="Download exploration as a zip file.">
-              <i class="icon-download-alt"></i>
-            </a>
-
-            <button type="button"
-                    ng-if="isPrivate"
-                    class="btn btn-danger oppia-exploration-ctrl"
-                    ng-click="deleteExploration('')"
-                    title="Delete this exploration">
-              <i class="icon-trash" title="Delete Exploration"></i>
-            </button>
-
-            <span ng-if="isPublic && (currentUserIsAdmin || currentUserIsModerator)" class="oppia-exploration-ctrl">
-              <button type="button"
-                      class="btn btn-danger"
-                      ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
-                <i class="icon-trash"></i>
-                <span ng-if="currentUserIsAdmin">
-                  (as admin)
-                </span>
-                <span ng-if="!currentUserIsAdmin && currentUserIsModerator">
-                  (as moderator)
-                </span>
-              </button>
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <div>
+            <span class="oppia-page-title">
+              <[explorationTitleService.displayed]>
             </span>
-
-          </span>
-
-          <h3>
-            <[explorationTitle]>
-            <span ng-if="!isPrivate" class="label label-info">
+            <span ng-if="!explorationRightsService.isPrivate()" class="label label-info">
               Published
             </span>
-            <span ng-if="isPublic" class="label label-info">
+            <span ng-if="explorationRightsService.isPublic()" class="label label-info">
               Beta
             </span>
-            <span ng-if="isCloned" class="label label-info">
+            <span ng-if="explorationRightsService.isCloned()" class="label label-info">
               Cloned
             </span>
-            <span ng-if="isCommunityOwned" class="label label-info">
+            <span ng-if="explorationRightsService.isCommunityOwned()" class="label label-info">
               Community-owned
             </span>
-          </h3>
+          </div>
 
           <div>
-            <div style="float: right;">
-              <button class="btn oppia-save-exploration-button pull-right" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
-              <button class="btn oppia-save-exploration-button pull-right" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">save changes</button>
-            </div>
-
-            <tabset>
-              <tab heading="Main" active="mainTabActive" select="selectMainTab()">
-                <div class="oppia-state-editor-container">
-                  {% include 'editor/exploration_graph.html' %}
-                  <div ng-controller="StateEditor" ng-show="currentlyInStateContext()" class="pull-right oppia-state-editor" draggable="{containment: 'window', delay: 200, distance: 5, handle: '.oppia-state-editor-header'}">
-                    {% include 'editor/state_editor.html' %}
-                  </div>
-                </div>
-              </tab>
-
-              <tab heading="Statistics" active="statsTabActive" select="selectStatsTab()">
-                {% include 'editor/stats_viewer.html' %}
-              </tab>
-
-              <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
-                {% include 'editor/exploration_settings.html' %}
-              </tab>
-
-              <tab heading="History" active="historyTabActive" select="selectHistoryTab()" ng-disabled="isCloned">
-                {% include 'editor/exploration_history.html' %}
-              </tab>
-            </tabset>
+            <span ng-if="explorationObjectiveService.displayed">
+              <strong>Aim of the exploration:</strong> to help learners <[explorationObjectiveService.displayed]>.
+            </span>
+            <span ng-if="!explorationObjectiveService.displayed" class="oppia-missing-objective-error">
+              Please specify this exploration's objective (in the Settings tab).
+            </span>
           </div>
         </div>
+
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <span class="pull-right" style="margin-top: 10px;">
+                <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
+                  <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()">
+                    Nominate for release
+                  </button>
+                  <img class="oppia-help" src="/images/help.png"
+                       tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the Learn Gallery by default."
+                       tooltip-placement="bottom">
+                </span>
+
+                <span ng-show="!explorationRightsService.isPrivate()" class="oppia-exploration-ctrl">
+                  <button class="btn btn-default" title="Embed this exploration in another webpage." ng-click="showEmbedExplorationModal()" ng-disabled="isExplorationSaveable()">
+                    <span class="glyphicon glyphicon-share"></span>
+                  </button>
+                </span>
+
+                <a class="btn btn-default" target="_blank" href="/explore/<[explorationId]>" ng-disabled="isExplorationSaveable()"
+                   title="Play this exploration in a new window.">
+                  <span class="glyphicon glyphicon-play"></span>
+                </a>
+
+                <span ng-if="editabilityService.isEditable()">
+                  <button class="btn oppia-save-exploration-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">save changes</button>
+
+                  <button class="btn btn-default oppia-save-exploration-button" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
+                </span>
+              </span>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <div ng-show="getExplorationWarningsList().length" ng-click="toggleExplorationWarningVisibility()">
+                <div class="alert alert-warning pull-right" style="padding: 2px 5px; margin-bottom: 2px; cursor: pointer; position: absolute; opacity: 1; z-index: 5;">
+                  <div>
+                    <span ng-if="!areExplorationWarningsVisible" style="color: black;">
+                      <span class="glyphicon glyphicon-plus-sign"></span>
+                    </span>
+                    <span ng-if="areExplorationWarningsVisible" style="color: black;">
+                      <span class="glyphicon glyphicon-minus-sign"></span>
+                    </span>
+                    <span class="glyphicon glyphicon-warning-sign"></span>
+                    This exploration has <strong><[getExplorationWarningsList().length]></strong> warning(s).
+                  </div>
+                  <div collapse="!areExplorationWarningsVisible">
+                    <ul>
+                      <li ng-repeat="warningText in getExplorationWarningsList() track by $index">
+                        <[warningText]>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <tabset>
+          <tab heading="Main" active="mainTabActive" select="selectMainTab()">
+            <div class="row">
+              <div class="col-lg-9 col-md-9 col-sm-9" ng-controller="StateEditor">
+                {% include 'editor/state_editor.html' %}
+              </div>
+              <div class="col-lg-3 col-md-3 col-sm-3">
+                {% include 'editor/exploration_graph.html' %}
+                <hr>
+                {% include 'editor/state_stats.html' %}
+              </div>
+            </div>
+          </tab>
+
+          <tab heading="Statistics" active="statsTabActive" select="selectStatsTab()">
+            {% include 'editor/stats_viewer.html' %}
+          </tab>
+
+          <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
+            {% include 'editor/exploration_settings.html' %}
+          </tab>
+
+          <tab heading="History" active="historyTabActive" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
+            {% include 'editor/exploration_history.html' %}
+          </tab>
+        </tabset>
       </div>
     </div>
   </div>
@@ -382,16 +346,17 @@
   {{ super() }}
   <script src="/third_party/static/d3js-3.2.8/d3.min.js"></script>
   <script>
-    {{ include_js_file('services/explorationData.js') }}
+    {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}
     {{ object_editors_js }}
     {{ include_js_file('editor/StatsViewer.js') }}
+    {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateReaderFeedback.js') }}
-    {{ include_js_file('editor/UnresolvedAnswers.js') }}
+    {{ include_js_file('editor/StateStats.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/InteractiveWidgetEditor.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}

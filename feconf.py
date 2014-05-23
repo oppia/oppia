@@ -33,20 +33,22 @@ if PLATFORM == 'gae':
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
-TESTS_DATA_DIR = 'core/tests/data'
-SAMPLE_EXPLORATIONS_DIR = 'data/explorations'
-WIDGETS_DIR = 'extensions/widgets'
-RULES_DIR = 'extensions/rules'
-INTERACTIVE_WIDGETS_DIR = 'extensions/widgets/interactive'
-NONINTERACTIVE_WIDGETS_DIR = 'extensions/widgets/noninteractive'
+TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
+SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
+WIDGETS_DIR = os.path.join('extensions', 'widgets')
+RULES_DIR = os.path.join('extensions', 'rules')
+INTERACTIVE_WIDGETS_DIR = os.path.join('extensions', 'widgets', 'interactive')
+NONINTERACTIVE_WIDGETS_DIR = os.path.join(
+    'extensions', 'widgets', 'noninteractive')
 
-OBJECT_TEMPLATES_DIR = 'extensions/objects/templates'
-OBJECTS_DIR = 'extensions/objects'
-SKINS_TEMPLATES_DIR = 'extensions/skins'
-FRONTEND_TEMPLATES_DIR = ('core/templates/dev/head' if DEV_MODE
-                          else 'core/templates/prod/head')
-DEPENDENCIES_TEMPLATES_DIR = 'extensions/dependencies'
-VALUE_GENERATORS_DIR = 'extensions/value_generators'
+OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
+OBJECTS_DIR = os.path.join('extensions', 'objects')
+SKINS_TEMPLATES_DIR = os.path.join('extensions', 'skins')
+TEMPLATES_DIR_PREFIX = 'dev' if DEV_MODE else 'prod'
+FRONTEND_TEMPLATES_DIR = os.path.join(
+    'core', 'templates', TEMPLATES_DIR_PREFIX, 'head')
+DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
+VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
@@ -95,7 +97,6 @@ PATH_MAP = {
     '/extensions/widgets': 'extensions/widgets',
     '/favicon.ico': 'static/images/favicon.ico',
     '/images': 'static/images',
-    '/img': 'third_party/bootstrap/img',
     '/lib/static': 'lib/static',
     '/third_party/static': 'third_party/static',
 }
@@ -122,14 +123,17 @@ ADMIN_EMAIL_ADDRESS = 'admin@oppia'
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576
 
+# The default language code for an exploration.
+DEFAULT_LANGUAGE_CODE = 'en'
+
 # An ordered list of links to stand-alone pages to display in the 'About' tab.
 # Each item is a dict with two keys: the human-readable name of the link and
 # the URL of the page.
 ABOUT_PAGES = [{
-    'name': 'About the site',
+    'name': 'About this site',
     'url': '/about'
 }, {
-    'name': 'Site guidelines',
+    'name': 'How to use Oppia',
     'url': '/site_guidelines',
 }, {
     'name': 'Blog',
@@ -237,8 +241,8 @@ EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
-PLAYTEST_GALLERY_URL = '/playtest'
-PLAYTEST_GALLERY_DATA_URL = '/playtesthandler/data'
+PLAYTEST_QUEUE_URL = '/playtest'
+PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 SPLASH_PAGE_URL = '/'

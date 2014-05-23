@@ -54,7 +54,7 @@ class Contains(base.NormalizedStringRule):
 
 
 class FuzzyEquals(base.NormalizedStringRule):
-    description = 'is equal to {{x|NormalizedString}}, but misspelled by one character'
+    description = 'is equal to {{x|NormalizedString}}, misspelled by one character'
     is_generic = False
 
     def _evaluate(self, subject):

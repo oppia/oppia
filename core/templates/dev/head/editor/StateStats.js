@@ -19,27 +19,26 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function UnresolvedAnswers($scope, $log, warningsData, explorationData, editorContextService) {
+function StateStats(
+    $scope, $log, warningsData, explorationData, editorContextService) {
 
-  $scope.initUnresolvedAnswers = function(data) {
-    if (!editorContextService.isInStateContext()) {
-      $log.error('Attempted to open unresolved answers editor outside a state context.');
-      return;
-    }
+  $scope.unresolvedAnswersList = [];
 
-    $scope.stateName = editorContextService.getActiveStateName();
+  $scope.initStateStats = function(data) {
     $scope.unresolvedAnswers = data.unresolved_answers;
-    $scope.generateUnresolvedAnswersMap();
+    $scope.generateUnresolvedAnswersList();
   };
 
-  $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    $scope.initUnresolvedAnswers(stateData);
+  $scope.$on('guiTabSelected', function(evt) {
+    $scope.stateName = editorContextService.getActiveStateName();
+    var stateData = explorationData.data.states[$scope.stateName];
+    $scope.initStateStats(stateData);
   });
 
-  $scope.generateUnresolvedAnswersMap = function() {
-    $scope.unresolvedAnswersMap = [];
+  $scope.generateUnresolvedAnswersList = function() {
+    $scope.unresolvedAnswersList = [];
     for (var answerItem in $scope.unresolvedAnswers) {
-      $scope.unresolvedAnswersMap.push({
+      $scope.unresolvedAnswersList.push({
         'answer': answerItem,
         'count': $scope.unresolvedAnswers[answerItem]
       });
@@ -49,8 +48,9 @@ function UnresolvedAnswers($scope, $log, warningsData, explorationData, editorCo
   $scope.deleteUnresolvedAnswer = function(answer) {
     $scope.unresolvedAnswers[answer] = 0;
     explorationData.resolveAnswers($scope.stateName, [answer]);
-    $scope.generateUnresolvedAnswersMap();
+    $scope.generateUnresolvedAnswersList();
   };
 }
 
-UnresolvedAnswers.$inject = ['$scope', '$log', 'warningsData', 'explorationData', 'editorContextService'];
+StateStats.$inject = [
+  '$scope', '$log', 'warningsData', 'explorationData', 'editorContextService'];

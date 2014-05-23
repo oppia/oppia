@@ -89,3 +89,38 @@ oppia.directive('whenScrolledToBottom', function() {
     });
   };
 });
+
+
+// A popover that is shown when its label is hovered or clicked upon, and
+// disappears when focus moves away from its label.
+oppia.directive('customPopover', ['$sce', function($sce) {
+  return {
+    restrict: 'A',
+    template: '<div style="cursor: pointer;" ng-click="showPopover()"><[label]></div>',
+    link: function(scope, elt, attrs) {
+      scope.label = attrs.popoverLabel;
+      $(elt).popover({
+        trigger: 'hover',
+        html: true,
+        content: $sce.getTrustedHtml('<pre>' + attrs.popoverText + '</pre>'),
+        placement: attrs.popoverPlacement
+      });
+    },
+    controller: ['$scope', '$element', function($scope, $element) {
+      $scope.isShown = false;
+
+      $element.on('shown.bs.popover', function() {
+        $scope.isShown = true;
+      });
+      $element.on('hidden.bs.popover', function() {
+        $scope.isShown = false;
+      });
+
+      $scope.showPopover = function() {
+        if (!$scope.isShown) {
+          $element.popover('show');
+        }
+      };
+    }]
+  };
+}]);

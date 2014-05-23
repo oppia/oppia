@@ -63,6 +63,10 @@ EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     'editor_page_announcement', 'Html',
     'A persistent announcement to display on top of all editor pages.',
     default_value='')
+MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
+    'moderator_request_forum_url', 'UnicodeString',
+    'A link to the forum for nominating explorations for release.',
+    default_value='https://moderator/request/forum/url')
 
 
 def _require_valid_version(version_from_payload, exploration_version):
@@ -149,9 +153,13 @@ class EditorHandler(base.BaseHandler):
 class ExplorationPage(EditorHandler):
     """Page describing a single exploration."""
 
-    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
+        try:
+            exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
         object_editors_js = OBJECT_EDITORS_JS.value
@@ -171,6 +179,11 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
+            'can_edit': (
+                bool(self.user_id) and
+                self.username not in config_domain.BANNED_USERNAMES.value and
+                rights_manager.Actor(self.user_id).can_edit(exploration_id)
+            ),
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(exploration_id),
             'can_publicize': rights_manager.Actor(
@@ -183,6 +196,7 @@ class ExplorationPage(EditorHandler):
                 self.user_id).can_unpublicize(exploration_id),
             'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
                 exploration_id),
+            'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
@@ -201,7 +215,10 @@ class ExplorationHandler(EditorHandler):
 
     def _get_exploration_data(self, exploration_id):
         """Returns a description of the given exploration."""
-        exploration = exp_services.get_exploration_by_id(exploration_id)
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
 
         states = {}
         for state_name in exploration.states:
@@ -216,6 +233,7 @@ class ExplorationHandler(EditorHandler):
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'category': exploration.category,
+            'objective': exploration.objective,
             'title': exploration.title,
             'states': states,
             'param_changes': exploration.param_change_dicts,
@@ -225,7 +243,6 @@ class ExplorationHandler(EditorHandler):
                 exploration_id).to_dict(),
         }
 
-    @require_editor
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
         self.values.update(self._get_exploration_data(exploration_id))
@@ -427,11 +444,13 @@ class ResolvedFeedbackHandler(EditorHandler):
 class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a YAML file."""
 
-    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
 
-        exploration = exp_services.get_exploration_by_id(exploration_id)
         version = self.request.get('v', default_value=exploration.version)
 
         # If the title of the exploration has changed, we use the new title
@@ -462,11 +481,13 @@ class ExplorationResourcesHandler(EditorHandler):
 class ExplorationSnapshotsHandler(EditorHandler):
     """Returns the exploration snapshot history."""
 
-    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
-        snapshots = exp_services.get_exploration_snapshots_metadata(
-            exploration_id, DEFAULT_NUM_SNAPSHOTS)
+        try:
+            snapshots = exp_services.get_exploration_snapshots_metadata(
+                exploration_id, DEFAULT_NUM_SNAPSHOTS)
+        except:
+            raise self.PageNotFoundException
 
         # Patch `snapshots` to use the editor's display name.
         for snapshot in snapshots:
@@ -510,9 +531,13 @@ class ExplorationRevertHandler(EditorHandler):
 class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
-    @require_editor
     def get(self, exploration_id):
         """Handles GET requests."""
+        try:
+            exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
         self.render_json({
             'num_visits': stats_services.get_exploration_visit_count(
                 exploration_id),
@@ -528,9 +553,19 @@ class ExplorationStatisticsHandler(EditorHandler):
 class StateRulesStatsHandler(EditorHandler):
     """Returns detailed reader answer statistics for a state."""
 
-    @require_editor
-    def get(self, exploration_id, state_name):
+    def get(self, exploration_id, escaped_state_name):
         """Handles GET requests."""
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        state_name = self.unescape_state_name(escaped_state_name)
+        if state_name not in exploration.states:
+            logging.error('Could not find state: %s' % state_name)
+            logging.error('Available states: %s' % exploration.states.keys())
+            raise self.PageNotFoundException
+
         self.render_json({
             'rules_stats': stats_services.get_state_rules_stats(
                 exploration_id, state_name)
@@ -568,7 +603,7 @@ class ImageUploadHandler(EditorHandler):
         if '.' in filename:
             dot_index = filename.rfind('.')
             primary_name = filename[:dot_index]
-            extension = filename[dot_index+1:]
+            extension = filename[dot_index + 1:]
             if (extension not in
                     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
                 raise self.InvalidInputException(

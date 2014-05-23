@@ -26,8 +26,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="submit(feedback)">Submit</button>
-        <button class="btn" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success" ng-click="submit(feedback)">Submit</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
     </script>
 
@@ -46,18 +46,12 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn" ng-click="cancel()">Close</button>
+        <button class="btn btn-default" ng-click="cancel()">Close</button>
       </div>
     </script>
   </div>
 
   <div class="oppia-content" role="main">
-    <a href="/learn" class="btn" ng-if="!iframed">
-      Return to the gallery
-    </a>
-
-    <br><br>
-
     <div class="oppia-exploration-header">
       <a href="" ng-click="resetPage()" class="pull-right oppia-exploration-header-sublink">
         Clear history and restart

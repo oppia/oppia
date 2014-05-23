@@ -5,8 +5,8 @@
 {% endblock subtitle %}
 
 {% block content %}
-  <div ng-controller="Profile">
-    <div class="oppia-content">
+  <div class="container" ng-controller="Profile">
+    <div class="row">
       <div class="oppia-gallery-frame">
         <div>
           <strong>Email address</strong>: {{user_email}}
@@ -21,35 +21,49 @@
 
         <hr>
 
+        <h4>Exploration counts</h4>
+        <div ng-if="explorationStats.owned > 0"><a href="#owned_section">
+          I manage <[explorationStats.owned]>
+          (<[explorationStats.owned_private]> private) explorations.
+        </a></div>
+        <div ng-if="explorationStats.editable > 0"><a href="#editable_section">
+            I collaborate on <[explorationStats.editable]>
+            (<[explorationStats.editable_private]> private) explorations.
+        </a></div>
+        <div ng-if="explorationStats.viewable > 0"><a href="#viewable_section">
+            I playtest <[explorationStats.viewable]>
+            (<[explorationStats.viewable_private]> private) explorations.
+        </a></div>
+
         <div ng-show="!isEmpty(ownedExplorations)">
-          <h5>Explorations I manage</h5>
+          <h5 id="owned_section">Explorations I manage</h5>
           <ul>
             <li ng-repeat="(expId, expData) in ownedExplorations">
               <span ng-if="expData.rights.status == 'private'">
                 (Private)
               </span>
-              <a href="/create/<[expId]>"><[expData.title]></a>
+              <a ng-href="/create/<[expId]>"><[expData.title]></a>
             </li>
           </ul>
         </div>
 
         <div ng-show="!isEmpty(editableExplorations)">
-          <h5>Explorations I collaborate on</h5>
+          <h5 id="editable_section">Explorations I collaborate on</h5>
           <ul>
             <li ng-repeat="(expId, expData) in editableExplorations">
               <span ng-if="expData.rights.status == 'private'">
                 (Private)
               </span>
-              <a href="/create/<[expId]>"><[expData.title]></a>
+              <a ng-href="/create/<[expId]>"><[expData.title]></a>
             </li>
           </ul>
         </div>
 
         <div ng-show="!isEmpty(viewableExplorations)">
-          <h5>Explorations I can playtest</h5>
+          <h5 id="viewable_section">Explorations I can playtest</h5>
           <ul>
             <li ng-repeat="(expId, expData) in viewableExplorations">
-              <a href="/create/<[expId]>"><[expData.title]></a>
+              <a ng-href="/explore/<[expId]>"><[expData.title]></a>
             </li>
           </ul>
         </div>
@@ -60,21 +74,27 @@
 
         <div ng-show="!isEmpty(feedback)">
           <h5>Feedback I've submitted</h5>
-          <dl class="dl-horizontal">
-            <div ng-repeat="f in feedback">
-              <dt><div class="oppia-feedback-status label">
-                <[f.status]>
-              </div></dt>
-              <dd>
+          <table>
+            <tr ng-repeat="f in feedback">
+              <td>
+                <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a>
+              </td>
+              <td style="width: 20px;">
+              </td>
+              <td>
+                <div class="oppia-feedback-status label">
+                  <[f.status]>
+                </div>
+              </td>
+              <td style="width: 20px;">
+              </td>
+              <td>
                 <div class="oppia-feedback-content">
                   <[f.content]>
                 </div>
-                <div class="oppia-feedback-reader-link">
-                  <em>for exploration: <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a></em>
-                </div>
-              </dd>
-            </div>
-          </dl>
+              </td>
+            </tr>
+          </table>
         </div>
       </div>
     </div>

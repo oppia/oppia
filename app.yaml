@@ -6,10 +6,11 @@ threadsafe: false
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
-  OPPIA_VERSION: '1.2.2'
+  OPPIA_VERSION: '1.2.5'
 
 builtins:
 - appstats: on
+- deferred: on
 - remote_api: on
 
 inbound_services:
@@ -47,12 +48,6 @@ handlers:
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
   secure: always
-- url: /img
-  static_dir: third_party/bootstrap/img
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=2592000'
-    Vary: Accept-Encoding
 - url: /third_party/static
   static_dir: third_party/static
   secure: always
@@ -71,6 +66,13 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
+- url: /mapreduce/pipeline/images
+  static_dir: third_party/gae-mapreduce-1.9.0.0/mapreduce/lib/pipeline/ui/images
+  secure: always
+- url: /mapreduce/worker(/.*)?
+  script: mapreduce.main.APP
+  login: admin
+  secure: always
 - url: /.*
   script: main.app
   secure: always

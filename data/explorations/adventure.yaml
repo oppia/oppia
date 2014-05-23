@@ -1,4 +1,9 @@
+author_notes: ''
+blurb: ''
 default_skin: conversation_v1
+init_state_name: Welcome
+language_code: en
+objective: N/A
 param_changes: []
 param_specs:
   Name:
@@ -13,482 +18,483 @@ param_specs:
     obj_type: UnicodeString
   sneezeitem:
     obj_type: UnicodeString
-schema_version: 1
+schema_version: 3
+skill_tags: []
 states:
-- content:
-  - type: text
-    value: "<div>Hello, brave adventurer, and welcome!</div><div><br></div><div>On\
-      \ this adventure, keep two things in mind:</div><div><br></div><div>1) Figuring\
-      \ out what to do is half the game! That said, the possible options are usually\
-      \ displayed in <b>bold</b> within the text of the state. Go back and look for\
-      \ the latest bolded words if you get stuck.</div><div><b><br></b></div><div>2)\
-      \ There is no global text-parsing engine, so each and every input field is very\
-      \ specific to its context - <u>there are no</u> \"inventory\" or \"look\" or\
-      \ \"drink\" or any other universal commands that would be available to you any\
-      \ time an input field is provided in a \"classic\" adventure game.</div><div><br></div><div>Now\
-      \ - what is your name?\_<br></div>"
-  name: Welcome
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: Road
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: You are standing at a fork in the road. The main road goes to the <b>northeast</b>,
-      while a smaller path winds to the <b>northwest</b>.
-  name: Fork
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: northeast
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - You go northeast
-        param_changes: []
-      - definition:
-          inputs:
-            x: northwest
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Clearing
-        feedback:
-        - You go northwest
-        param_changes: []
-      - definition:
-          inputs:
-            x: ne
-          name: StartsWith
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - You go northeast
-        param_changes: []
-      - definition:
-          inputs:
-            x: nw
-          name: StartsWith
-          rule_type: atomic
-          subject: answer
-        dest: Clearing
-        feedback:
-        - You go northwest
-        param_changes: []
-      - definition:
-          inputs:
-            x: back
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Fork
-        feedback:
-        - You cannot go back
-        - The gate is closed
-        - There is no way back. You must carry on!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Fork
-        feedback:
-        - Pardon?
-        - Nothing happens
-        - Maybe you should pick a direction to go in. Northwest or Northeast?
-        - I'm not sure how to {{answer}}
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
-      {{Name}}. You have to pay a toll if you want to cross this bridge."</div><div><br></div><div>There
-      is a path leading back to the <b>southwest</b>.</div>
-  name: Troll
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: southwest
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Fork
-        feedback:
-        - You go southwest
-        param_changes: []
-      - definition:
-          inputs:
-            x: sw
-          name: StartsWith
-          rule_type: atomic
-          subject: answer
-        dest: Fork
-        feedback:
-        - You go southwest
-        param_changes: []
-      - definition:
-          inputs:
-            x: use nothing
-          name: StartsWith
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - You use nothing. Nothing happens.
-        param_changes: []
-      - definition:
-          inputs:
-            x: nothing
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - You do nothing. nothing happens.
-        param_changes: []
-      - definition:
-          inputs:
-            x: '{{Weapon}}'
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - You flail at the troll with your {{Weapon}}. He is not amused.
-        param_changes: []
-      - definition:
-          inputs:
-            x: '{{sneezeitem}}'
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: pre-rainbow
-        feedback:
-        - You flail your {{sneezeitem}} at the troll. Oh no, the troll is allergic!
-          he sneezes really loudly and you are carried away by the gust...
-        param_changes: []
-      - definition:
-          inputs:
-            x: '{{payitem}}'
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: END
-        feedback:
-        - "You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
-          \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
-          \ and toward victory!"
-        param_changes: []
-      - definition:
-          inputs:
-            x: use
-          name: StartsWith
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - You don't have that!
-        param_changes: []
-      - definition:
-          inputs:
-            x: troll
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - You flail at the troll with your bare hands. He is not amused.
-        param_changes: []
-      - definition:
-          inputs:
-            x: toll
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Troll
-        feedback:
-        - Pay toll with what?
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Troll
-        feedback:
-        - Pardon?
-        - I don't know how to {{answer}}
-        - I don't understand
-        - Have you tried using things? (type "use [item]")
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: You are at a clearing. There are lots of pretty <b>flowers</b> here.<div>There
-      is a path leading back to the <b>southeast</b>.</div>
-  name: Clearing
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: pick
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: picking
-        feedback: []
-        param_changes: []
-      - definition:
-          inputs:
-            x: flower
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: picking
-        feedback: []
-        param_changes: []
-      - definition:
-          inputs:
-            x: southeast
-          name: Contains
-          rule_type: atomic
-          subject: answer
-        dest: Fork
-        feedback:
-        - You go southeast
-        param_changes: []
-      - definition:
-          inputs:
-            x: se
-          name: StartsWith
-          rule_type: atomic
-          subject: answer
-        dest: Fork
-        feedback:
-        - You go southeast
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Clearing
-        feedback:
-        - Pardon?
-        - Huh?
-        - Did you mean "pick some flowers"?
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
-- content:
-  - type: text
-    value: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
-      also get a pretty red <b>towel</b>.</div></div><div><br></div>You are standing
-      in a small courtyard. To the north is a gate, with a sign:<div>"This way to
-      adventure!"</div>'
-  name: Road
-  param_changes:
-  - customization_args:
-      parse_with_jinja: true
-      value: '{{answer}}'
-    generator_id: Copier
-    name: Name
-  - customization_args:
-      value: towel
-    generator_id: Copier
-    name: Weapon
-  - customization_args:
-      value: nothing
-    generator_id: Copier
-    name: sneezeitem
-  - customization_args:
-      value: nothing
-    generator_id: Copier
-    name: payitem
-  widget:
-    customization_args:
-      choices:
-        value:
-        - Go north
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: 0
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: Fork
-        feedback: []
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Fork
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: MultipleChoiceInput
-- content:
-  - type: text
-    value: You pick a pretty bouquet of <b>flowers</b>.
-  name: picking
-  param_changes:
-  - customization_args:
-      value: flowers
-    generator_id: Copier
-    name: sneezeitem
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: Clearing
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: Continue
-- content:
-  - type: text
-    value: <span>"Guess how many coins I'm holding!"</span><br>
-  name: Rainbow
-  param_changes: []
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          inputs:
-            x: '{{numcoins}}'
-          name: Equals
-          rule_type: atomic
-          subject: answer
-        dest: get coins
-        feedback:
-        - Correct!
-        param_changes: []
-      - definition:
-          inputs:
-            x: 10.0
-          name: IsGreaterThan
-          rule_type: atomic
-          subject: answer
-        dest: Rainbow
-        feedback:
-        - Actually, I can't hold any more than 10 coins. My hands are too small.
-        param_changes: []
-      - definition:
-          inputs:
-            x: 1.0
-          name: IsLessThan
-          rule_type: atomic
-          subject: answer
-        dest: Rainbow
-        feedback:
-        - I do have some coins!
-        param_changes: []
-      - definition:
-          inputs:
-            x: '{{numcoins}}'
-          name: IsGreaterThan
-          rule_type: atomic
-          subject: answer
-        dest: Rainbow
-        feedback:
-        - No, fewer than that!
-        param_changes: []
-      - definition:
-          inputs:
-            x: '{{numcoins}}'
-          name: IsLessThan
-          rule_type: atomic
-          subject: answer
-        dest: Rainbow
-        feedback:
-        - More than that!
-        param_changes: []
-      - definition:
-          rule_type: default
-        dest: Rainbow
-        feedback:
-        - This should never happen
-        param_changes: []
-    sticky: false
-    widget_id: NumericInput
-- content:
-  - type: text
-    value: He gives you the <b>coins</b> and uses his magic to return you back to
-      the troll.
-  name: get coins
-  param_changes:
-  - customization_args:
-      value: coins
-    generator_id: Copier
-    name: payitem
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: Troll
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: Continue
-- content:
-  - type: text
-    value: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
-      says:<br><div>"Hello, {{Name}}! How are you?"</div></div>
-  name: pre-rainbow
-  param_changes:
-  - customization_args:
-      list_of_values:
-      - '1'
-      - '2'
-      - '3'
-      - '4'
-      - '5'
-      - '6'
-      - '7'
-      - '8'
-      - '9'
-      - '10'
-    generator_id: RandomSelector
-    name: numcoins
-  widget:
-    customization_args: {}
-    handlers:
-    - name: submit
-      rule_specs:
-      - definition:
-          rule_type: default
-        dest: Rainbow
-        feedback: []
-        param_changes: []
-    sticky: false
-    widget_id: TextInput
+  Clearing:
+    content:
+    - type: text
+      value: You are at a clearing. There are lots of pretty <b>flowers</b> here.<div>There
+        is a path leading back to the <b>southeast</b>.</div>
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: pick
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: picking
+          feedback: []
+          param_changes: []
+        - definition:
+            inputs:
+              x: flower
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: picking
+          feedback: []
+          param_changes: []
+        - definition:
+            inputs:
+              x: southeast
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Fork
+          feedback:
+          - You go southeast
+          param_changes: []
+        - definition:
+            inputs:
+              x: se
+            name: StartsWith
+            rule_type: atomic
+            subject: answer
+          dest: Fork
+          feedback:
+          - You go southeast
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Clearing
+          feedback:
+          - Pardon?
+          - Huh?
+          - Did you mean "pick some flowers"?
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  Fork:
+    content:
+    - type: text
+      value: You are standing at a fork in the road. The main road goes to the <b>northeast</b>,
+        while a smaller path winds to the <b>northwest</b>.
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: northeast
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - You go northeast
+          param_changes: []
+        - definition:
+            inputs:
+              x: northwest
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Clearing
+          feedback:
+          - You go northwest
+          param_changes: []
+        - definition:
+            inputs:
+              x: ne
+            name: StartsWith
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - You go northeast
+          param_changes: []
+        - definition:
+            inputs:
+              x: nw
+            name: StartsWith
+            rule_type: atomic
+            subject: answer
+          dest: Clearing
+          feedback:
+          - You go northwest
+          param_changes: []
+        - definition:
+            inputs:
+              x: back
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Fork
+          feedback:
+          - You cannot go back
+          - The gate is closed
+          - There is no way back. You must carry on!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Fork
+          feedback:
+          - Pardon?
+          - Nothing happens
+          - Maybe you should pick a direction to go in. Northwest or Northeast?
+          - I'm not sure how to {{answer}}
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  Rainbow:
+    content:
+    - type: text
+      value: <span>"Guess how many coins I'm holding!"</span><br>
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: '{{numcoins}}'
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: get coins
+          feedback:
+          - Correct!
+          param_changes: []
+        - definition:
+            inputs:
+              x: 10.0
+            name: IsGreaterThan
+            rule_type: atomic
+            subject: answer
+          dest: Rainbow
+          feedback:
+          - Actually, I can't hold any more than 10 coins. My hands are too small.
+          param_changes: []
+        - definition:
+            inputs:
+              x: 1.0
+            name: IsLessThan
+            rule_type: atomic
+            subject: answer
+          dest: Rainbow
+          feedback:
+          - I do have some coins!
+          param_changes: []
+        - definition:
+            inputs:
+              x: '{{numcoins}}'
+            name: IsGreaterThan
+            rule_type: atomic
+            subject: answer
+          dest: Rainbow
+          feedback:
+          - No, fewer than that!
+          param_changes: []
+        - definition:
+            inputs:
+              x: '{{numcoins}}'
+            name: IsLessThan
+            rule_type: atomic
+            subject: answer
+          dest: Rainbow
+          feedback:
+          - More than that!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Rainbow
+          feedback:
+          - This should never happen
+          param_changes: []
+      sticky: false
+      widget_id: NumericInput
+  Road:
+    content:
+    - type: text
+      value: '<div><div>You get: a name tag. It says "Hello, I''m {{answer}}!"</div><div>You
+        also get a pretty red <b>towel</b>.</div></div><div><br></div>You are standing
+        in a small courtyard. To the north is a gate, with a sign:<div>"This way to
+        adventure!"</div>'
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{answer}}'
+      generator_id: Copier
+      name: Name
+    - customization_args:
+        value: towel
+      generator_id: Copier
+      name: Weapon
+    - customization_args:
+        value: nothing
+      generator_id: Copier
+      name: sneezeitem
+    - customization_args:
+        value: nothing
+      generator_id: Copier
+      name: payitem
+    widget:
+      customization_args:
+        choices:
+          value:
+          - Go north
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 0
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Fork
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Fork
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Troll:
+    content:
+    - type: text
+      value: You come to a bridge that is being guarded by a troll. The troll says:<div><br></div><div>"Hello,
+        {{Name}}. You have to pay a toll if you want to cross this bridge."</div><div><br></div><div>There
+        is a path leading back to the <b>southwest</b>.</div>
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: southwest
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Fork
+          feedback:
+          - You go southwest
+          param_changes: []
+        - definition:
+            inputs:
+              x: sw
+            name: StartsWith
+            rule_type: atomic
+            subject: answer
+          dest: Fork
+          feedback:
+          - You go southwest
+          param_changes: []
+        - definition:
+            inputs:
+              x: use nothing
+            name: StartsWith
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - You use nothing. Nothing happens.
+          param_changes: []
+        - definition:
+            inputs:
+              x: nothing
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - You do nothing. nothing happens.
+          param_changes: []
+        - definition:
+            inputs:
+              x: '{{Weapon}}'
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - You flail at the troll with your {{Weapon}}. He is not amused.
+          param_changes: []
+        - definition:
+            inputs:
+              x: '{{sneezeitem}}'
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: pre-rainbow
+          feedback:
+          - You flail your {{sneezeitem}} at the troll. Oh no, the troll is allergic!
+            he sneezes really loudly and you are carried away by the gust...
+          param_changes: []
+        - definition:
+            inputs:
+              x: '{{payitem}}'
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: END
+          feedback:
+          - "You give the coins to the troll. He counts them. \n\"Hmm, {{numcoins}}\
+            \ is all you've got? Oh well, go ahead.\"\n\nYou walk across the bridge\
+            \ and toward victory!"
+          param_changes: []
+        - definition:
+            inputs:
+              x: use
+            name: StartsWith
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - You don't have that!
+          param_changes: []
+        - definition:
+            inputs:
+              x: troll
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - You flail at the troll with your bare hands. He is not amused.
+          param_changes: []
+        - definition:
+            inputs:
+              x: toll
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Troll
+          feedback:
+          - Pay toll with what?
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Troll
+          feedback:
+          - Pardon?
+          - I don't know how to {{answer}}
+          - I don't understand
+          - Have you tried using things? (type "use [item]")
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  Welcome:
+    content:
+    - type: text
+      value: "<div>Hello, brave adventurer, and welcome!</div><div><br></div><div>On\
+        \ this adventure, keep two things in mind:</div><div><br></div><div>1) Figuring\
+        \ out what to do is half the game! That said, the possible options are usually\
+        \ displayed in <b>bold</b> within the text of the state. Go back and look\
+        \ for the latest bolded words if you get stuck.</div><div><b><br></b></div><div>2)\
+        \ There is no global text-parsing engine, so each and every input field is\
+        \ very specific to its context - <u>there are no</u> \"inventory\" or \"look\"\
+        \ or \"drink\" or any other universal commands that would be available to\
+        \ you any time an input field is provided in a \"classic\" adventure game.</div><div><br></div><div>Now\
+        \ - what is your name?\_<br></div>"
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Road
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  get coins:
+    content:
+    - type: text
+      value: He gives you the <b>coins</b> and uses his magic to return you back to
+        the troll.
+    param_changes:
+    - customization_args:
+        value: coins
+      generator_id: Copier
+      name: payitem
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Troll
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
+  picking:
+    content:
+    - type: text
+      value: You pick a pretty bouquet of <b>flowers</b>.
+    param_changes:
+    - customization_args:
+        value: flowers
+      generator_id: Copier
+      name: sneezeitem
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Clearing
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
+  pre-rainbow:
+    content:
+    - type: text
+      value: You find yourself at the end of a rainbow. There's a leprechaun here.<div>He
+        says:<br><div>"Hello, {{Name}}! How are you?"</div></div>
+    param_changes:
+    - customization_args:
+        list_of_values:
+        - '1'
+        - '2'
+        - '3'
+        - '4'
+        - '5'
+        - '6'
+        - '7'
+        - '8'
+        - '9'
+        - '10'
+      generator_id: RandomSelector
+      name: numcoins
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Rainbow
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput

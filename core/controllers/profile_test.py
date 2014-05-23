@@ -14,8 +14,6 @@
 
 __author__ = 'Sean Lip'
 
-import unittest
-
 import feconf
 import test_utils
 
@@ -25,7 +23,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
     def test_redirect_to_prerequisites_page_happens(self):
         self.login('editor@example.com')
 
-        response = self.testapp.get('/create/0')
+        response = self.testapp.get('/contribute')
         self.assertEqual(response.status_int, 302)
         self.assertIn(
             feconf.EDITOR_PREREQUISITES_URL, response.headers['location'])
@@ -33,7 +31,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         response = response.follow()
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'A few notes before you start editing',
+            'Welcome to the Oppia contributor community!',
             'My preferred Oppia username')
 
         self.logout()

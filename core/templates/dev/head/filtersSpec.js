@@ -79,4 +79,17 @@ describe('Testing filters', function() {
     expect(filter(['a', 'b'])).toEqual('a, b');
     expect(filter(['a', 'b', 'c'])).toEqual('a, b, c');
   }));
+
+  it('should correctly normalize whitespace', inject(function($filter) {
+    var filter = $filter('normalizeWhitespace');
+
+    expect(filter('a')).toBe('a');
+    expect(filter('a  ')).toBe('a');
+    expect(filter('  a')).toBe('a');
+    expect(filter('  a  ')).toBe('a');
+
+    expect(filter('a  b ')).toBe('a b');
+    expect(filter('  a  b ')).toBe('a b');
+    expect(filter('  ab c ')).toBe('ab c');
+  }));
 });

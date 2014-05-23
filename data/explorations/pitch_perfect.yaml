@@ -1,8 +1,13 @@
+author_notes: ''
+blurb: ''
 default_skin: conversation_v1
 init_state_name: Pitch Trainer-1
+language_code: en
+objective: practice listening to and transcribing musical pitches
 param_changes: []
 param_specs: {}
-schema_version: 2
+schema_version: 3
+skill_tags: []
 states:
   Choice from Interval-1:
     content:
@@ -424,7 +429,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Pitch-3
+          dest: Melody Trainer-1
           feedback:
           - I think you can handle this now. Your ears are all warmed up.
           param_changes: []
@@ -434,7 +439,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Pitch-3
+          dest: Pitch Trainer-1
           feedback:
           - Sounds good to me. Practice makes perfect!
           param_changes: []
@@ -444,13 +449,13 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Choice from Pitch-3
+          dest: END
           feedback:
           - Thanks for playing. We look forward to seeing you next time!
           param_changes: []
         - definition:
             rule_type: default
-          dest: Choice from Interval-1
+          dest: Interval Trainer-1
           feedback:
           - Let's move on to the Interval Trainer.
           param_changes: []
@@ -569,24 +574,16 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: E4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: B4
-            name: IsLongerSequence
+              k: 2
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Interval Trainer-1
           feedback:
-          - "Oops! There are too many notes on the staff. Let's not get ahead of ourselves\
-            \ just yet. Melodies are just around the corner.\_"
-          - "There are too many notes on the staff. Remember, an interval is made\
-            \ up of only two notes.\_"
+          - Oops! There are too many notes on the staff. Melodies are just around
+            the corner.
+          - There are too many notes on the staff. I know you're excited but we'll
+            be getting to longer sequences soon.
           param_changes: []
         - definition:
             inputs:
@@ -809,25 +806,16 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: A4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: D5
-            name: IsLongerSequence
+              k: 2
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Interval Trainer-2
           feedback:
-          - There are too many notes on the staff. Remember, an interval is made up
-            of only two notes. I know you're excited but we'll get to longer sequences
-            soon.
-          - Oops! There should only be two notes on the staff for this challenge.
-            Why don't you give it another shot?
+          - Oops! There are too many notes on the staff. Remember, an interval is
+            made up of only two notes.
+          - There are too many notes on the staff. I know you're excited but we'll
+            be getting to longer sequences soon.
           param_changes: []
         - definition:
             inputs:
@@ -1052,22 +1040,14 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: A4
-            name: IsLongerSequence
+              k: 2
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Interval Trainer-3
           feedback:
-          - "Oops! There are too many notes on the staff. Remember an interval is\
-            \ made up of only two notes.\_"
+          - Oops! There are too many notes on the staff. Remember, an interval is
+            made up of only two notes.
           - There are too many notes on the staff. I know you're excited but we'll
             be getting to longer sequences soon.
           param_changes: []
@@ -1244,26 +1224,26 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: F4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: B4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
-            name: IsLongerSequence
+              k: 3
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Melody Trainer-1
           feedback:
           - There are too many notes on the staff. Compare your sequence with the
             desired sequence to hear where you've added an extra note.
+          param_changes: []
+        - definition:
+            inputs:
+              a: 1
+              b: 2
+            name: HasLengthInclusivelyBetween
+            rule_type: atomic
+            subject: answer
+          dest: Melody Trainer-1
+          feedback:
+          - There aren't enough notes on the staff yet. Compare your sequence with
+            the desired sequence to hear where you should add a note.
           param_changes: []
         - definition:
             inputs:
@@ -1420,35 +1400,28 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: E5
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: G4
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: C5
-            name: IsLongerSequence
+              k: 5
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Melody Trainer-2
           feedback:
-          - "Oops! There are too many notes on the staff. Listen to the desired sequence\
-            \ and try again.\_"
-          - There are too many notes on the staff. Why don't you give it another shot?
+          - There are too many notes on the staff. Compare your sequence with the
+            desired sequence to hear where you've added an extra note.
+          - Oops! There too many notes on the staff. Why don't you give it another
+            shot?
+          param_changes: []
+        - definition:
+            inputs:
+              a: 1
+              b: 4
+            name: HasLengthInclusivelyBetween
+            rule_type: atomic
+            subject: answer
+          dest: Melody Trainer-2
+          feedback:
+          - There aren't enough notes on the staff yet. Compare your sequence with
+            the desired sequence to hear where you should add a note.
           param_changes: []
         - definition:
             inputs:
@@ -1639,20 +1612,16 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: D5
-            name: IsLongerSequence
+              k: 1
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Pitch Trainer-1
           feedback:
-          - "Oops! There are too many notes on the staff. I can tell you're excited\
-            \ but we'll get there, I promise.\_"
-          - There should only be one note for this challenge. Why don't you give it
-            another shot?
+          - <div>Oops! There are too many notes on the staff. Let's not get ahead
+            of ourselves just yet.</div>
+          - There should only be one note on the staff for this challenge. Why don't
+            you give it another shot?
           param_changes: []
         - definition:
             inputs:
@@ -1882,18 +1851,14 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: F4
-            name: IsLongerSequence
+              k: 1
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Pitch Trainer-2
           feedback:
-          - Oops! There are too many notes on the staff. I can tell your excited but
-            we get there, I promise.
+          - Oops! There are too many notes on the staff. I can tell you're excited,
+            but don't worry, we'll get there.
           - There should only be one note on the staff for this challenge. Why don't
             you give it another shot?
           param_changes: []
@@ -2126,12 +2091,8 @@ states:
           param_changes: []
         - definition:
             inputs:
-              x:
-              - noteDuration:
-                  den: 1
-                  num: 1
-                readableNoteName: A5
-            name: IsLongerSequence
+              k: 1
+            name: IsLongerThan
             rule_type: atomic
             subject: answer
           dest: Pitch Trainer-3

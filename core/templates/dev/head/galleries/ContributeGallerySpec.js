@@ -65,7 +65,12 @@ describe('Gallery controller', function() {
         }
       });
       scope = $rootScope.$new();
-      ctrl = $controller(ContributeGallery, {$scope: scope, warningsData: null, oppiaRequestCreator: null});
+      ctrl = $controller(ContributeGallery, {
+        $scope: scope,
+        warningsData: null,
+        oppiaRequestCreator: null,
+        validatorsService: null
+      });
     }));
 
     it('should show correct categories', function() {

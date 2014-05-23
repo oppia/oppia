@@ -19,10 +19,11 @@ import webtest
 
 from core.domain import config_domain
 from core.platform import models
-(base_models, exp_models, file_models, stats_models, user_models) = (
+(base_models, config_models, exp_models, file_models, job_models, stats_models,
+ user_models) = (
     models.Registry.import_models([
-        models.NAMES.base_model,
-        models.NAMES.exploration, models.NAMES.file, models.NAMES.statistics,
+        models.NAMES.base_model, models.NAMES.config, models.NAMES.exploration,
+        models.NAMES.file, models.NAMES.job, models.NAMES.statistics,
         models.NAMES.user
     ])
 )
@@ -45,6 +46,8 @@ def empty_environ():
     os.environ['USER_EMAIL'] = ''
     os.environ['USER_ID'] = ''
     os.environ['USER_IS_ADMIN'] = '0'
+    os.environ['DEFAULT_VERSION_HOSTNAME'] = '%s:%s' % (
+        os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
 
 class TestTags(object):
@@ -66,13 +69,17 @@ class TestBase(unittest.TestCase):
 
     def _delete_all_models(self):
         versioned_model_classes = frozenset([
+            config_models.ConfigPropertyModel,
             exp_models.ExplorationModel,
             exp_models.ExplorationRightsModel,
             file_models.FileMetadataModel,
             file_models.FileModel,
+            job_models.JobModel,
         ])
 
         unversioned_model_classes = frozenset([
+            config_models.COnfigPropertySnapshotMetadataModel,
+            config_models.COnfigPropertySnapshotContentModel,
             exp_models.ExplorationSnapshotMetadataModel,
             exp_models.ExplorationSnapshotContentModel,
             exp_models.ExplorationRightsSnapshotMetadataModel,
@@ -254,7 +261,11 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
         self.testbed.init_taskqueue_stub()
-        self.taskq = self.testbed.get_stub(testbed.TASKQUEUE_SERVICE_NAME)
+        self.taskqueue_stub = self.testbed.get_stub(
+            testbed.TASKQUEUE_SERVICE_NAME)
+        self.testbed.init_urlfetch_stub()
+        self.testbed.init_files_stub()
+        self.testbed.init_blobstore_stub()
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
@@ -262,6 +273,34 @@ class AppEngineTestBase(TestBase):
     def tearDown(self):  # pylint: disable-msg=g-bad-name
         os.environ['USER_IS_ADMIN'] = '0'
         self.testbed.deactivate()
+
+    def count_jobs_in_taskqueue(self):
+        return len(self.taskqueue_stub.get_filtered_tasks())
+
+    def process_and_flush_pending_tasks(self):
+        from google.appengine.ext import deferred
+
+        tasks = self.taskqueue_stub.get_filtered_tasks()
+        self.taskqueue_stub.FlushQueue('default')
+        while tasks:
+            for task in tasks:
+                if task.url == '/_ah/queue/deferred':
+                    deferred.run(task.payload)
+                else:
+                    # All other tasks are expected to be mapreduce ones.
+                    headers = {
+                        key: str(val) for key, val in task.headers.iteritems()
+                    }
+                    headers['Content-Length'] = str(len(task.payload or ''))
+                    response = self.testapp.post(
+                        url=str(task.url), params=(task.payload or ''),
+                        headers=headers)
+                    if response.status_code != 200:
+                        raise RuntimeError(
+                            'MapReduce task to URL %s failed' % task.url)
+
+            tasks = self.taskqueue_stub.get_filtered_tasks()
+            self.taskqueue_stub.FlushQueue('default')
 
 
 if feconf.PLATFORM == 'gae':

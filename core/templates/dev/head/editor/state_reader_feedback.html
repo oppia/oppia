@@ -1,16 +1,16 @@
 <div ng-controller="StateReaderFeedback">
-  <div class="row-fluid" ng-show="!isEmpty(stateReaderFeedback)" id="feedback">
-    <div class="span2">
+  <div class="row" ng-show="!isEmpty(stateReaderFeedback)" id="feedback">
+    <div class="col-lg-2 col-md-2 col-sm-2">
       <span class="oppia-editor-header">
         reader feedback
       </span>
     </div>
 
-    <div class="span10">
-      <div class="container-fluid">
-        <div class="row-fluid">
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <div class="container">
+        <div class="row">
           <div ng-repeat="(feedbackId, feedbackItem) in stateReaderFeedback">
-            <li class="span10">
+            <li class="col-lg-10 col-md-10 col-sm-10">
               <span ng-if="feedbackItem.deleted">
                 <del><[feedbackItem.content]></del>
               </span>
@@ -19,14 +19,14 @@
               </span>
             </li>
 
-            <div class="span1">
+            <div class="col-lg-1 col-md-1 col-sm-1">
               <div class="pull-right" ng-if="!feedbackItem.deleted">
-                <button ng-click="resolveReaderFeedback(feedbackId, 'fixed')" title="Mark this feedback as fixed">Fixed</button>
-                <button ng-click="resolveReaderFeedback(feedbackId, 'will_not_fix')" title"Mark this feedback as ignored">Ignore</button>
+                <button type="button" class="btn btn-default" ng-click="resolveReaderFeedback(feedbackId, 'fixed')" title="Mark this feedback as fixed">Fixed</button>
+                <button type="button" class="btn btn-default" ng-click="resolveReaderFeedback(feedbackId, 'will_not_fix')" title"Mark this feedback as ignored">Ignore</button>
               </div>
             </div>
 
-            <div class="span1">
+            <div class="col-lg-1 col-md-1 col-sm-1">
             </div>
           </div>
         </div>
