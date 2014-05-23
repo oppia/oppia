@@ -33,7 +33,7 @@ describe('splash page', function() {
   it('should show the correct buttons for a non-logged-in user', function() {
     browser.get('/');
 
-    element.all(by.css('.btn-large')).then(function(items) {
+    element.all(by.css('.btn-lg')).then(function(items) {
       expect(items.length).toBe(3);
       expect(items[0].getText()).toBe('Browse the explorations gallery');
       expect(items[1].getText()).toBe('Learn more');

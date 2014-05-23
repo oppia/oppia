@@ -1,4 +1,4 @@
-<div class="container-fluid">
+<div>
   <br>
   <span ng-show="localValue.length == 0">
     <em>
@@ -11,24 +11,28 @@
     </em>
   </span>
 
-  <div class="row-fluid" ng-repeat="item in localValue track by $index">
-    <div class="span1">
+  <div class="row" ng-repeat="item in localValue track by $index">
+    <div class="col-lg-1 col-md-1 col-sm-1">
       <[$index + 1]>
     </div>
 
-    <div class="span9">
-      <object-editor obj-type="<[initArgs.objType]>" value="item.label" always-editable="<[alwaysEditable]>">
+    <div class="col-lg-9 col-md-9 col-sm-9">
+      <object-editor obj-type="<[initArgs.objType]>" value="item.label" always-editable="<[alwaysEditable]>" is-editable="<[isEditable]>">
       </object-editor>
     </div>
 
-    <div class="span2">
-      <button type="button" class="btn btn-mini pull-right" ng-click="deleteItem($index)" ng-disabled="!!initArgs.disableControls">Delete</button>
+    <div class="col-lg-2 col-md-2 col-sm-2">
+      <button type="button" class="btn btn-default btn-xs pull-right" ng-click="deleteItem($index)" ng-disabled="!!initArgs.disableControls" ng-if="isEditable">
+        Delete
+      </button>
     </div>
   </div>
 
-  <div class="row-fluid">
-    <button type="button" class="btn pull-right" ng-click="addItem()" ng-disabled="!!initArgs.disableControls">
-      <[getAddItemText()]>
-    </button>
+  <div class="row" ng-if="isEditable">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <button type="button" class="btn btn-default pull-right" ng-click="addItem()" ng-disabled="!!initArgs.disableControls">
+        <[getAddItemText()]>
+      </button>
+    </div>
   </div>
 </div>

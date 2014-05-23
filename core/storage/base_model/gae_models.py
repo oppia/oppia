@@ -22,6 +22,7 @@ import utils
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 from google.appengine.ext import ndb
+from google.appengine.ext.ndb import polymodel
 
 
 class BaseModel(ndb.Model):
@@ -414,3 +415,5 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
+
+

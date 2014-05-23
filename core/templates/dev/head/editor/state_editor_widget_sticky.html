@@ -2,17 +2,15 @@
 
 {% block label %}{% endblock %}
 
-{% block info %}{% endblock %}
-
 {% block cls %}{% endblock %}
 
 {% block center %}
-  <div>
-    <label class="checkbox">
-      <input type="checkbox" ng-model="widgetSticky" ng-change="toggleWidgetSticky()">
+  <div class="checkbox">
+    <label>
+      <input type="checkbox" ng-model="widgetSticky" ng-change="toggleWidgetSticky()" ng-disabled="!editabilityService.isEditable()">
       Reuse the previous state's interaction, if possible.
       <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
-      More info...
+        More info...
       </a>
     </label>
   </div>

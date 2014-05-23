@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 import ast
+import copy
 import logging
 import time
 import traceback
@@ -390,11 +391,11 @@ class BaseMapReduceJobManager(BaseJobManager):
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
 
     @classmethod
-    def entity_class_to_map_over(cls):
-        """Return a reference to the datastore class to map over."""
+    def entity_classes_to_map_over(cls):
+        """Return a list of reference to the datastore classes to map over."""
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement '
-            'entity_class()')
+            'entity_classes_to_map_over()')
 
     @staticmethod
     def map(item):
@@ -436,19 +437,22 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @classmethod
     def _real_enqueue(cls, job_id):
-        entity_class_type = cls.entity_class_to_map_over()
-        entity_class_name = '%s.%s' % (entity_class_type.__module__,
-                                       entity_class_type.__name__)
+        entity_class_types = cls.entity_classes_to_map_over()
+        entity_class_names = [
+            '%s.%s' % (
+                entity_class_type.__module__, entity_class_type.__name__)
+            for entity_class_type in entity_class_types]
+
         kwargs = {
             'job_name': job_id,
             'mapper_spec': '%s.%s.map' % (cls.__module__, cls.__name__),
             'reducer_spec': '%s.%s.reduce' % (cls.__module__, cls.__name__),
             'input_reader_spec': (
-                'mapreduce.input_readers.DatastoreInputReader'),
+                'core.jobs.MultipleDatastoreEntitiesInputReader'),
             'output_writer_spec': (
                 'mapreduce.output_writers.BlobstoreRecordsOutputWriter'),
             'mapper_params': {
-                'entity_kind': entity_class_name,
+                'entity_kinds': entity_class_names,
             }
         }
         mr_pipeline = MapReduceJobPipeline(job_id, kwargs)
@@ -503,3 +507,48 @@ def get_data_for_recent_jobs(recency_secs=DEFAULT_RECENCY_SECS):
         'error': model.error,
     } for model in recent_job_models]
     return result
+
+
+class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
+    _ENTITY_KINDS_PARAM = 'entity_kinds'
+    _READER_LIST_PARAM = 'readers'
+
+    def __init__(self, reader_list):
+        self._reader_list = reader_list
+
+    def __iter__(self):
+        for reader in self._reader_list:
+            yield reader
+
+    @classmethod
+    def from_json(cls, input_shard_state):
+        return cls(input_readers.DatastoreInputReader.from_json(
+            input_shard_state[cls._READER_LIST_PARAM]))
+
+    def to_json(self):
+        return {
+            self._READER_LIST_PARAM: self._reader_list.to_json()
+        }
+
+    @classmethod
+    def split_input(cls, mapper_spec):
+        params = mapper_spec.params
+        entity_kinds = params.get(cls._ENTITY_KINDS_PARAM)
+
+        splits = []
+        for entity_kind in entity_kinds:
+            new_mapper_spec = copy.deepcopy(mapper_spec)
+            new_mapper_spec.params['entity_kind'] = entity_kind
+            splits.append(
+                input_readers.DatastoreInputReader.split_input(
+                    new_mapper_spec))
+
+        inputs = []
+        for split in splits:
+            for item in split:
+                inputs.append(MultipleDatastoreEntitiesInputReader(item))
+        return inputs
+
+    @classmethod
+    def validate(cls, mapper_spec):
+        return True  # TODO

@@ -265,6 +265,15 @@ class StartExplorationEventLogEntryModel(ReaderEventLogEntryModel):
         start_event_entity.put()
 
 
+class ExplorationAnnotationModel(base_models.BaseModel):
+    """Model for exploration-level statistics."""
+
+    # Number of students who started the exploration
+    num_visits = ndb.IntegerProperty(indexed=True)
+    # Number of students who have completed the exploration
+    num_completions = ndb.IntegerProperty(indexed=True)
+
+
 def process_submitted_answer(
         exploration_id, exploration_version, state_name, handler_name,
         rule, answer):

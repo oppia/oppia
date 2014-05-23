@@ -301,6 +301,11 @@ class ReaderFeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_state_feedback_from_reader(
             exploration_id, state_name, feedback,
             {'state_history': state_history}, self.user_id)
+        # msl: need to call render_json for ReaderFeedbackHandler integration test
+        # (otherwise get AssertionError: 'text/html' != 'application/javascript' from 
+        # test_utils.py", line 131, in _parse_json_response)
+        self.render_json({})
+
 
 class ReaderLeaveHandler(base.BaseHandler):
     """Tracks a reader leaving an exploration before completion."""

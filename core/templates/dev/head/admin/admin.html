@@ -23,29 +23,37 @@
       <[message]>
     </div>
 
-    <h3>Performance Counters</h3>
-
-    <ul>
-      {% for counter in counters %}
-        <li>
-          {{counter.description}} : {{counter.value}}
-        </li>
+    <h3>Reload a single exploration</h3>
+    <div class="container" style="margin-left: 0;">
+      {% for exploration in demo_explorations %}
+        <div class="row">
+          <span class="col-lg-4 col-md-4 col-sm-4">
+            {{exploration[1]}}
+          </span>
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <button type="button" class="btn btn-default" ng-click="reloadExploration({{exploration[0]}})">
+              Reload
+            </button>
+          </span>
+        </div>
       {% endfor %}
-    </ul>
+    </div>
 
-    <h3>Configuration</h3>
+    <h3>Configuration properties</h3>
 
-    <div class="container-fluid" ng-if="isNonemptyObject(configProperties)">
-      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties" class="row-fluid" style="padding-bottom: 10px;">
-        <span class="span2">
-          <em><[configPropertyData.description]></em>
-        </span>
-        <span class="span4">
-          <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
-        </span>
-        <span class="span2">
-          <button ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
-        </span>
+    <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
+      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
+        <div class="row" style="padding-bottom: 10px;">
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <em><[configPropertyData.description]></em>
+          </span>
+          <span class="col-lg-6 col-md-6 col-sm-6">
+            <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
+          </span>
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
+          </span>
+        </div>
       </div>
 
       <button ng-click="saveConfigProperties()">Save</button>
@@ -71,15 +79,12 @@
       No computed configuration properties are available.
     </div>
 
-    <h3>Actions</h3>
-    <h4>Reload a single exploration</h4>
+    <h3>Performance Counters</h3>
+
     <ul>
-      {% for exploration in demo_explorations %}
+      {% for counter in counters %}
         <li>
-          {{exploration[1]}}
-          <button ng-click="reloadExploration({{exploration[0]}})">
-            Reload
-          </button>
+          {{counter.description}} : {{counter.value}}
         </li>
       {% endfor %}
     </ul>

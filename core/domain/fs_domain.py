@@ -256,7 +256,9 @@ class AbstractFileSystem(object):
 
     def _check_filepath(self, filepath):
         """Raises an error if a filepath is invalid."""
-        base_dir = os.path.join('/', self.impl.exploration_id, 'assets')
+        # Note: uses os.sep as initial separator in order to function on
+        # Windows correctly.
+        base_dir = os.path.join(os.sep, self.impl.exploration_id, 'assets')
         absolute_path = os.path.join(base_dir, filepath)
         normalized_path = os.path.normpath(absolute_path)
 

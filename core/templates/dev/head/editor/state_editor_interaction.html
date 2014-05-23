@@ -1,86 +1,79 @@
 {% extends "editor/state_editor_row.html" %}
 
-{% block info %}{% endblock %}
-
 {% block cls %}oppia-interactive-widget-display{% endblock %}
 
 {% block center %}
   <div>
     <div ng-if="!interactiveWidgetEditorIsShown">
-      <div class="container-fluid">
-        <div class="row-fluid">
-          <div class="span11">
-            <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
-          </div>
-          <div class="span1">
-            <button type="button" class="btn btn-mini pull-right" ng-click="showInteractiveWidgetEditor()" >
-              <i class="icon-pencil" title="Edit Interaction"></i>
-            </button>
-          </div>
+      <div class="row">
+        <div class="col-lg-11 col-md-11 col-sm-11">
+          <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
+        </div>
+        <div class="col-lg-1 col-md-1 col-sm-1">
+          <button type="button" class="btn btn-default btn-xs pull-right" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()">
+            <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
+          </button>
         </div>
       </div>
     </div>
 
     <div ng-if="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
       <span class="pull-right" ng-if="tmpWidget">
-        <button type="button" class="btn" ng-click="selectInteractiveWidget(tmpWidget)">
+        <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)">
           Use this interaction
         </button>
-        <button type="button" class="btn" ng-click="resetInteractiveWidgetEditor()">
+        <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
           Cancel
         </button>
       </span>
 
       <h5>Interaction Editor</h5>
 
-      <div class="container-fluid">
-        <div class="row-fluid">
+      <div class="row">
+        <div class="col-lg-4 col-md-4 col-sm-4">
+          <accordion close-others="true">
+            <accordion-group heading="<[category]>" ng-repeat="(category, widgetList) in interactiveWidgetRepository" is-open="category === 'Basic Input'">
+              <ul>
+                <li ng-repeat="widget in widgetList" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'" style="list-style-type: none;">
+                  <[widget.name]>
+                </li>
+              </ul>
+            </accordion-group>
+          </accordion>
+        </div>
 
-          <div class="span4">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          <div ng-show="tmpWidget">
             <accordion close-others="true">
-              <accordion-group heading="<[category]>" ng-repeat="(category, widgetList) in interactiveWidgetRepository" is-open="category === 'Basic Input'">
-                <ul>
-                  <li ng-repeat="widget in widgetList" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'" style="list-style-type: none;">
-                    <[widget.name]>
-                  </li>
-                </ul>
+              <accordion-group is-open="true">
+                <accordion-heading>
+                  <!-- Due to how ui.bootstrap.accordion is set up, the manipulation of margin and padding is (unfortunately) necessary for the click target to cover the whole heading. -->
+                  <div style="width: 100%; margin: -8px -15px; padding: 8px 15px;" ng-click="generateTmpWidgetPreview()">
+                    Preview
+                  </div>
+                </accordion-heading>
+                <div class="oppia-preview">
+                  <div angular-html-bind="tmpWidget.tag"></div>
+                </div>
               </accordion-group>
-            </accordion>
-          </div>
 
-          <div class="span8">
-            <div ng-show="tmpWidget">
-              <accordion close-others="true">
-                <accordion-group is-open="true">
-                  <accordion-heading>
-                    <!-- Due to how ui.bootstrap.accordion is set up, the manipulation of margin and padding is (unfortunately) necessary for the click target to cover the whole heading. -->
-                    <div style="width: 100%; margin: -8px -15px; padding: 8px 15px;" ng-click="generateTmpWidgetPreview()">
-                      Preview
-                    </div>
-                  </accordion-heading>
-                  <div class="oppia-preview">
-                    <div angular-html-bind="tmpWidget.tag"></div>
+              <div ng-if="!isEmpty(tmpWidget.params)">
+                <accordion-group heading="Edit">
+                  <div ng-repeat="(paramName, paramSpecDict) in tmpWidget.params">
+                    <strong><[tmpWidget.params[paramName].description]></strong>
+                    <value-generator-editor generator-id="paramSpecDict.generator_id"
+                                            init-args="paramSpecDict.init_args"
+                                            customization-args="tmpWidget.customization_args[paramName]"
+                                            obj-type="paramSpecDict.obj_type">
+                    </value-generator-editor>
+                    <br>
                   </div>
                 </accordion-group>
-
-                <div ng-if="!isEmpty(tmpWidget.params)">
-                  <accordion-group heading="Edit">
-                    <div ng-repeat="(paramName, paramSpecDict) in tmpWidget.params">
-                      <strong><[tmpWidget.params[paramName].description]></strong>
-                      <value-generator-editor generator-id="paramSpecDict.generator_id"
-                                              init-args="paramSpecDict.init_args"
-                                              customization-args="tmpWidget.customization_args[paramName]"
-                                              obj-type="paramSpecDict.obj_type">
-                      </value-generator-editor>
-                      <br>
-                    </div>
-                  </accordion-group>
-                </div>
-              </accordion>
-            </div>
+              </div>
+            </accordion>
           </div>
-
         </div>
+
       </div>
     </div>
   </div>

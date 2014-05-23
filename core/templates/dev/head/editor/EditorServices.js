@@ -158,6 +158,24 @@ oppia.factory('editorContextService', ['$log', function($log) {
 }]);
 
 
+// TODO(sll): Should this depend on a versioning service that keeps track of
+// the current active version? Previous versions should not be editable.
+oppia.factory('editabilityService', [function() {
+  var isEditable = false;
+  return {
+    isEditable: function() {
+      return isEditable;
+    },
+    markEditable: function() {
+      isEditable = true;
+    },
+    markNotEditable: function() {
+      isEditable = false;
+    }
+  };
+}]);
+
+
 // A service that maintains a provisional list of changes to be committed to
 // the server.
 oppia.factory('changeListService', [

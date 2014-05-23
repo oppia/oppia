@@ -81,61 +81,8 @@ function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInpu
     $scope.addContentToIframe(document.getElementById(iframeId), content);
   };
 
-  /**
-   * Checks if a new user-entered field is a duplicate of one that already
-   * exists in a given object.
-   * @param {object} object The object to be iterated over.
-   * @param {string} field The variable name corresponding to the field that
-   *     will store the new input.
-   * @param {string} currentKey The value of the key for which a new input is
-   *     being given.
-   * @param {string} newInput The new input whose existence in the object is
-   *     being checked.
-   * @return {bool} true if the input is already in the list under a key that is
-   *     not currentKey; false otherwise.
-   */
-  $scope.isDuplicateInput = function(object, field, currentKey, newInput) {
-    for (var key in object) {
-      if (key != currentKey && object[key][field] == newInput) {
-        return true;
-      }
-    }
-    return false;
-  };
-
-  /**
-   * Checks if a new user-entered field is a duplicate of one that already
-   * exists a given array.
-   * @param {array} array The array to be iterated over.
-   * @param {string} field The variable name corresponding to the field that
-   *     will store the new input.
-   * @param {string} index The index for which a new input is being given.
-   * @param {string} newInput The new input whose existence in the array is
-   *     being checked.
-   * @return {bool} true if the input is already in the list under a key that is
-   *     not index; false otherwise.
-   */
-  $scope.isDuplicateArrayInput = function(array, field, index, newInput) {
-    for (var i = 0; i < array.length; ++i) {
-      if (i != index && array[i][field] == newInput) {
-        warningsData.addWarning(
-            'The name \'' + String(newInput) + '\' is already in use.');
-        return true;
-      }
-    }
-    return false;
-  };
-
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
-  };
-
-  $scope.neatJoin = function(string1, string2) {
-    if('.!?'.indexOf(string1.slice(-1)) !== -1) {
-        return string1 + " " + string2;
-      } else {
-        return string1 + ". " + string2;
-      }
   };
 }
 

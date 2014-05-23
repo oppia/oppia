@@ -1,16 +1,14 @@
 <div>
   <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule()" class="oppia-rule-header-bubble">
-    <button type="button" class="btn btn-mini pull-right" ng-if="!isDefaultRule()" ng-click="deleteRule()" >
-      <i class="icon-remove" title="Remove Rule"></i>
+    <button type="button" class="btn btn-default btn-xs pull-right" ng-if="!isDefaultRule() && isEditable" ng-click="deleteRule()">
+      <span class="glyphicon glyphicon-remove" title="Remove Rule"></span>
     </button>
     <div class="oppia-rule-description-editor" ng-class="getEditableCssClassForRule()" ng-click="openRuleDescriptionEditorIfNotDefault()">
-      <span ng-if="isRuleConfusing()">
-        <i class="icon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></i>
-      </span>
+      <span ng-if="isRuleConfusing()" class="glyphicon glyphicon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></span>
       <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
-      <span ng-if="!isDefaultRule()">
-        <button type="button" class="btn btn-mini oppia-edit-rule-description-button">
-          <i class="icon-pencil" title="Edit Rule"></i>
+      <span ng-if="!isDefaultRule() && isEditable">
+        <button type="button" class="btn btn-default btn-xs oppia-edit-rule-description-button">
+          <span class="glyphicon glyphicon-pencil" title="Edit Rule"></span>
         </button>
       </span>
     </div>
@@ -19,8 +17,8 @@
   <div ng-if="activeEditor === 'ruleDescription'">
     <div ng-if="!ruleDescriptionPickerIsOpen" ng-class="getCssClassForRule()" class="oppia-rule-description-picker-bubble">
       <span class="oppia-rule-description-back-arrow">
-        <button type="button" class="btn btn-mini" ng-click="openRuleDescriptionPicker()">
-          <i class="icon-chevron-left" title="Return to rule type selection"></i>
+        <button type="button" class="btn btn-default btn-xs" ng-click="openRuleDescriptionPicker()">
+          <span class="glyphicon glyphicon-chevron-left" title="Return to rule type selection"></span>
         </button>
       </span>
 
@@ -29,20 +27,20 @@
           Answer
         </span>
         <span ng-repeat="item in ruleDescriptionFragments track by $index">
-          <span ng-if="item.type == 'select'">
+          <span ng-if="item.type == 'select'" style="color: black;">
             <select ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices.value)">
             </select>
           </span>
 
           <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-            <object-editor obj-type="<[item.type]>" always-editable="true" value="rule.definition.inputs[item.varName]"></object-editor>
+            <object-editor obj-type="<[item.type]>" always-editable="true" value="rule.definition.inputs[item.varName]" style="color: black;"></object-editor>
           </span>
           <span ng-if="item.type == 'noneditable'">
             <[item.text]>
           </span>
         </span>
         <span>
-          <button type="button" class="btn oppia-rule-description-close-button" ng-click="closeRuleDescriptionEditor()">
+          <button type="button" class="btn btn-default btn-xs" ng-click="closeRuleDescriptionEditor()">
             Done
           </button>
         </span>
@@ -57,7 +55,7 @@
             Answer <span ng-bind-html="description | bracesToText"></span>
           </td>
           <td>
-            <button type="button" class="btn btn-mini pull-right" ng-click="selectNewRuleType(description, name)">
+            <button type="button" class="btn btn-default btn-xs pull-right" ng-click="selectNewRuleType(description, name)">
               Select
             </button>
           </td>
@@ -67,7 +65,7 @@
   </div>
 
   <div class="oppia-feedback-and-dest" ng-class="{'oppia-lightly-grayed': isTmpRule === 'true'}">
-    
+
     <div class="oppia-feedback-bubble">
       <span ng-if="rule.feedback.length > 0">
         Feedback options (<em>chosen at random</em>):
@@ -90,8 +88,8 @@
             <[rule.dest]>
           </a>
         </span>
-        <button type="button" class="btn btn-mini" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
-          <i class="icon-pencil" title="Edit Rule Destination"></i>
+        <button type="button" class="btn btn-default btn-xs" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'" ng-if="isEditable">
+          <span class="glyphicon glyphicon-pencil" title="Edit Rule Destination"></span>
         </button>
       </div>
       <div class="oppia-align-center" ng-if="activeEditor === 'ruleDest'">
@@ -99,7 +97,7 @@
         <select2-dropdown item="rule.dest" choices="allDests" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9]+$">
         </select2-dropdown>
         <span ng-if="rule.dest == stateName"> ⟳ </span><br />
-        <button type="button" class="btn" ng-click="closeRuleDestEditor()" ng-disabled="!rule.dest">Close</button>
+        <button type="button" class="btn btn-default" ng-click="closeRuleDestEditor()" ng-disabled="!rule.dest">Close</button>
       </div>
     </div>
 
