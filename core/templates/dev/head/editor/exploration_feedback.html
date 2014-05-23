@@ -10,10 +10,9 @@
 
   <div ng-show="threads !== undefined">
     <div ng-show="messages === undefined">
-      <div ng-show="threads !== undefined" class="oppia-align-center">
+      <div class="oppia-align-center">
         Create a new thread:<br>
         state: <input type="text" ng-model="newThreadStateId"><br>
-        User ID: <input type="text" ng-model="newThreadAuthorId"><br>
         Subject: <input type="text" ng-model="newThreadSubject"><br>
         Text: <input type="text" ng-model="newThreadText"><br>
         <button ng-click="createThread()">Send</button>
@@ -33,7 +32,6 @@
       <div ng-click="unselectThread()">&lt; back</div>
       <div ng-show="messages !== undefined" class="oppia-align-center">
         Create a new message:<br>
-        User ID: <input type="text" ng-model="newMessageUserId"><br>
         status: <input type="text" ng-model="newMessageStatus"><br>
         Subject: <input type="text" ng-model="newMessageSubject"><br>
         Text: <input type="text" ng-model="newMessageText"><br>

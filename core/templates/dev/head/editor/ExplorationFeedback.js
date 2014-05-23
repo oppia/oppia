@@ -30,6 +30,11 @@ function ExplorationFeedback($scope, $http,
   };
 
   var getThread = function() {
+    if ($scope.currentThreadId === null) {
+      warningsData.addWarning(
+          'Current thread ID not set. Required to get the thread list.');
+      return;
+    }
     $http.get('/thread/' + $scope.currentThreadId).success(function(data) {
       $scope.messages = data.messages;
     }).error(function(data) {
@@ -42,7 +47,6 @@ function ExplorationFeedback($scope, $http,
         '/threadlist/create/' + expId,
         oppiaRequestCreator.createRequest({
           state_id: $scope.newThreadStateId,
-          original_author_id: $scope.newThreadAuthorId,
           subject: $scope.newThreadSubject,
           text: $scope.newThreadText,
         }),
@@ -56,13 +60,16 @@ function ExplorationFeedback($scope, $http,
   };
 
   $scope.createMessage = function() {
+    if ($scope.currentThreadId === null) {
+      warningsData.addWarning(
+          'Current thread ID not set. Required to create a message');
+      return;
+    }
     $http.post(
         '/thread/create/' + $scope.currentThreadId,
         oppiaRequestCreator.createRequest({
           exploration_id: expId,
           thread_id: $scope.currentThreadId,
-          message_id: $scope.messages.length,
-          author_id: $scope.newMessageUserId,
           updated_status: $scope.newMessageStatus,
           updated_subject: $scope.newMessageSubject,
           text: $scope.newMessageText,
@@ -77,13 +84,12 @@ function ExplorationFeedback($scope, $http,
   };
 
   $scope.selectThread = function(thread) {
-    $scope.currentThreadId = thread.thread_id
+    $scope.currentThreadId = thread.thread_id;
     getThread();
-    console.log(thread.thead_id);
   };
 
   $scope.unselectThread = function() {
-    $scope.currentThreadId = null
+    $scope.currentThreadId = null;
     $scope.messages = undefined;
   };
 

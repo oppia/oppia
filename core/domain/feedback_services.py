@@ -17,7 +17,7 @@
 """Commands for feedback thread and message operations.
 """
 
-__author__ = 'Koji Ashiad'
+__author__ = 'Koji Ashida'
 
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -27,7 +27,7 @@ def get_threadlist(exploration_id):
     result = []
     for t in feedback_models.FeedbackThreadModel.get_threads(exploration_id):
         result.append({
-            'thread_id': t.key.id(),
+            'thread_id': t.id,
             'state_id': t.state_id,
             'original_author_id': t.original_author_id,
             'status': t.status,
@@ -50,7 +50,7 @@ def create_thread(exploration_id, state_id, original_author_id, subject, text):
     thread.subject = subject
     thread.put()
     create_message(
-        exploration_id, thread.key.id(), 0, original_author_id,
+        exploration_id, thread.id, original_author_id,
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
 
 
@@ -68,12 +68,13 @@ def get_thread(thread_id):
 
 
 def create_message(
-        exploration_id, thread_id, message_id, author_id, updated_status,
+        exploration_id, thread_id, author_id, updated_status,
         updated_subject, text):
     """Creates a new message for the thread.
     
     Returns False if the message with the ID already exists.
     """
+    message_id = feedback_models.FeedbackMessageModel.message_count(thread_id)
     msg = feedback_models.FeedbackMessageModel.get(thread_id, message_id)
     if msg:
         raise Exception(
@@ -91,14 +92,14 @@ def create_message(
     msg.put()
 
     if message_id != 0 and (updated_status or updated_subject):
-      thread = feedback_models.FeedbackThreadModel.get(thread_id)
-      updated = False
-      if updated_status and updated_status != thread.status:
-          thread.status = updated_status
-          updated = True
-      if updated_subject and updated_subject != thread.subject:
-          thread.subject = updated_subject
-          updated = True
-      if updated:
-          thread.put()
+        thread = feedback_models.FeedbackThreadModel.get(thread_id)
+        updated = False
+        if updated_status and updated_status != thread.status:
+            thread.status = updated_status
+            updated = True
+        if updated_subject and updated_subject != thread.subject:
+            thread.subject = updated_subject
+            updated = True
+        if updated:
+            thread.put()
     return True

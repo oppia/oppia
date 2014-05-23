@@ -183,3 +183,11 @@ class FeedbackMessageModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.thread_id == thread_id).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def message_count(cls, thread_id):
+        """Returns the number of messages in the thread.
+
+        Does not include the deleted entries.
+        """
+        return cls.get_all().filter(cls.thread_id == thread_id).count()

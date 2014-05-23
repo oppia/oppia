@@ -38,7 +38,7 @@ class ThreadCreateHandler(base.BaseHandler):
         feedback_services.create_thread(
             exploration_id,
             self.payload.get('state_id'),
-            self.payload.get('original_author_id') or self.user_id,
+            self.user_id,
             self.payload.get('subject'),
             self.payload.get('text'))
 
@@ -61,8 +61,7 @@ class MessageCreateHandler(base.BaseHandler):
         feedback_services.create_message(
             self.payload.get('exploration_id'),
             thread_id,
-            self.payload.get('message_id'),
-            self.payload.get('author_id') or self.user_id,
+            self.user_id,
             self.payload.get('updated_status'),
             self.payload.get('updated_subject'),
             self.payload.get('text'))
