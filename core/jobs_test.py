@@ -452,8 +452,8 @@ class SampleMapReduceJobManager(jobs.BaseMapReduceJobManager):
     """Test job that counts the total number of explorations."""
 
     @classmethod
-    def entity_class_to_map_over(cls):
-        return exp_models.ExplorationModel
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
 
     @staticmethod
     def map(item):
@@ -516,3 +516,47 @@ class JobQueriesTests(test_utils.GenericTestBase):
             'is_cancelable': True,
             'error': None
         }, recent_jobs[0])
+
+
+class TwoClassesMapReduceJobManager(jobs.BaseMapReduceJobManager):
+    """A test job handler that counts entities in two datastore classes."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel, exp_models.ExplorationRightsModel]
+
+    @staticmethod
+    def map(item):
+        yield ('sum', 1)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, sum([int(value) for value in values]))
+
+
+class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
+    """Tests MapReduce jobs using two classes end-to-end."""
+
+    def setUp(self):
+        """Create an exploration so that there is something to count."""
+        super(TwoClassesMapReduceJobIntegrationTests, self).setUp()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'exp_id', 'title', 'A category')
+        # Note that this ends up creating an entry in the
+        # ExplorationRightsModel as well.
+        exp_services.save_new_exploration('owner_id', exploration)
+
+    def test_count_entities(self):
+        self.assertEqual(exp_models.ExplorationModel.query().count(), 1)
+        self.assertEqual(exp_models.ExplorationRightsModel.query().count(), 1)
+
+        job_id = TwoClassesMapReduceJobManager.create_new()
+        TwoClassesMapReduceJobManager.enqueue(job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(
+            TwoClassesMapReduceJobManager.get_output(job_id), [['sum', 2]])
+        self.assertEqual(
+            TwoClassesMapReduceJobManager.get_status_code(job_id),
+            jobs.STATUS_CODE_COMPLETED)
