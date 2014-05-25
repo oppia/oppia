@@ -1,3 +1,5 @@
+// @author Jacob Davis (jacobdavis11@gmail.com)
+
 var logicProofShared = (function() {
 
   // Used by parseLineString() to limit the number of possible parsings of a

@@ -49,9 +49,15 @@ describe('Parse then display expressions', function() {
     expect(parseThenDisplay('p\u2227q')).toEqual('p\u2227q');
     expect(parseThenDisplay('(p+q)=r')).toEqual('(p+q)=r');
     expect(parseThenDisplay('p<(\u2200x.(2+2))')).toEqual('p<(\u2200x.(2+2))');
-    expect(parseThenDisplay('((x=2)\u2227(\u2203y.(y=6)))=>valid')).toEqual('((x=2)\u2227(\u2203y.(y=6)))=>valid');
-    expect(parseThenDisplayControl('p\u2228(\u2200m\u2208S.A(m,S))')).toEqual('p\u2228(\u2200m\u2208S.A(m,S))');
-    expect(parseThenDisplayControl('min{a<b|p\u2228(q\u2227r)}')).toEqual('min{a<b | p\u2228(q\u2227r)}');
+    expect(
+      parseThenDisplay('((x=2)\u2227(\u2203y.(y=6)))=>valid')
+    ).toEqual('((x=2)\u2227(\u2203y.(y=6)))=>valid');
+    expect(
+      parseThenDisplayControl('p\u2228(\u2200m\u2208S.A(m,S))')
+    ).toEqual('p\u2228(\u2200m\u2208S.A(m,S))');
+    expect(
+      parseThenDisplayControl('min{a<b|p\u2228(q\u2227r)}')
+    ).toEqual('min{a<b | p\u2228(q\u2227r)}');
   });
 });
 
@@ -62,18 +68,30 @@ describe('Pre-parse lines', function() {
   };
 
   it('should pre-parse examples correctly', function() {
-    expect(preParse('from p and q we have p\u2227q', false)).toEqual(['from', 'p', 'and', 'q', 'we', 'have', 'p\u2227q']);
-    expect(preParse('    from p \u2228 (q\u2227 r ) s we see \u2200 x. r', false)).toEqual(['from', 'p\u2228(q\u2227r)', 's', 'we', 'see', '\u2200x.r']);
-    expect(preParse('from p [ x -> a ] at {{ a | variable }} have q', true)).toEqual(['from', 'p[x->a]', 'at', '{{a|variable}}', 'have', 'q']);
-    expect(preParse('from  ~R =>~S and  ~S =>~R we have ~R <=> ~S', true)).toEqual(['from', '~R=>~S', 'and', '~S=>~R', 'we', 'have', '~R<=>~S']);
+    expect(
+      preParse('from p and q we have p\u2227q', false)
+    ).toEqual(['from', 'p', 'and', 'q', 'we', 'have', 'p\u2227q']);
+    expect(
+      preParse('    from p \u2228 (q\u2227 r ) s we see \u2200 x. r', false)
+    ).toEqual(['from', 'p\u2228(q\u2227r)', 's', 'we', 'see', '\u2200x.r']);
+    expect(
+      preParse('from p [ x -> a ] at {{ a | variable }} have q', true)
+    ).toEqual(['from', 'p[x->a]', 'at', '{{a|variable}}', 'have', 'q']);
+    expect(
+      preParse('from  ~R =>~S and  ~S =>~R we have ~R <=> ~S', true)
+    ).toEqual(['from', '~R=>~S', 'and', '~S=>~R', 'we', 'have', '~R<=>~S']);
   });
 
   it('should reject lines that are entirely whitespace', function() {
-    expect(errorWrapper(preParse, '   ', false)).toThrow('This line is blank.');
+    expect(
+      errorWrapper(preParse, '   ', false)
+    ).toThrow('This line is blank.');
   });
 
   it('should reject unknown symbols', function() {
-    expect(errorWrapper(preParse, 'from p and p{q we see q', false)).toThrow('The symbol { was not recognised.');
+    expect(
+      errorWrapper(preParse, 'from p and p{q we see q', false)
+    ).toThrow('The symbol { was not recognised.');
   })
 })
 
@@ -131,7 +149,10 @@ describe('Parse lines', function() {
         }
       }]]);
 
-    expect(parse('from p[x->a] we know hence a contradiction {{ a | element }}', true)).toEqual([[{
+    expect(
+      parse(
+        'from p[x->a] we know hence a contradiction {{ a | element }}', true)
+    ).toEqual([[{
         format:"phrase",
         content:"from"
       },{
@@ -190,11 +211,17 @@ describe('Parse lines', function() {
   });
 
   it('should reject unknown phrases', function() {
-    expect(errorWrapper(parse, 'from p we havw p\u2227q')).toThrow('The phrase starting \'we\' could not be identified; please make sure you are only using phrases from the given list of vocabulary.')
+    expect(
+      errorWrapper(parse, 'from p we havw p\u2227q')
+    ).toThrow('The phrase starting \'we\' could not be identified; please \
+make sure you are only using phrases from the given list of vocabulary.')
   });
 
   it('should reject consecutive expressions', function() {
-    expect(errorWrapper(parse, 'from A=>B B have B')).toThrow('We could not identify \'B\'; please make sure you are using vocabulary from the given list, and don\'t have two consecutive expressions.')
+    expect(
+      errorWrapper(parse, 'from A=>B B have B')
+    ).toThrow('We could not identify \'B\'; please make sure you are using \
+vocabulary from the given list, and don\'t have two consecutive expressions.')
   });
 });
 
@@ -301,22 +328,47 @@ describe('Assign types to expressions', function() {
   });
 
   it('should reject type mismatches', function() {
-    expect(errorWrapper(assignTypes, 'p<=>2+x', ['variable'])).toThrow('addition yields a element but you are trying to use it to give a boolean.')
-    expect(errorWrapper(assignTypes, 'x\u2227f(x)', ['variable', 'prefix_function', 'constant'])).toThrow('x yields a boolean but you are trying to use it to give a element.')
-    expect(errorWrapper(assignTypesControl, '\'a\'=2', ['prefix_function', 'constant'])).toThrow('2 yields a integer but you are trying to use it to give a string.') 
+    expect(
+      errorWrapper(assignTypes, 'p<=>2+x', ['variable'])
+    ).toThrow(
+      'addition yields a element but you are trying to use it to give a boolean.')
+    expect(
+      errorWrapper(
+        assignTypes, 'x\u2227f(x)', 
+        ['variable', 'prefix_function', 'constant'])
+    ).toThrow('x yields a boolean but you are trying to use it to give a element.')
+    expect(
+      errorWrapper(
+        assignTypesControl, '\'a\'=2', ['prefix_function', 'constant'])
+    ).toThrow('2 yields a integer but you are trying to use it to give a string.')
   });
 
   it('should forbid quantification over pre-existing variables', function() {
-    expect(errorWrapper(assignTypes, 'a\u2227\u2203a.f(2)', ['variable', 'prefix_function', 'constant'])).toThrow('The name \'a\' is already in use and so cannot be quantified over in \u2203a.f(2).')
+    expect(
+      errorWrapper(
+        assignTypes, 'a\u2227\u2203a.f(2)', 
+        ['variable', 'prefix_function', 'constant'])
+    ).toThrow(
+      'The name \'a\' is already in use and so cannot be quantified over in \u2203a.f(2).')
   });
 
   it('should reject kind mismatches', function() {
-    expect(errorWrapper(assignTypes, 'f(f)', ['variable', 'prefix_function', 'constant'])).toThrow('f is supposed to be a prefix_function.')
+    expect(
+      errorWrapper(
+        assignTypes, 'f(f)', ['variable', 'prefix_function', 'constant'])
+    ).toThrow('f is supposed to be a prefix_function.')
   });
 
   it('should reject unknown operators of an un-addable kind', function() {
-    expect(errorWrapper(assignTypes, '\u2200m<n.A(n)', ['variable', 'prefix_function', 'constant'])).toThrow('The operator bounded_for_all could not be identified.')
-    expect(errorWrapper(assignTypes, '\u2203x.A(x)<=>x=2', ['prefix_function', 'constant'])).toThrow('The operator x could not be identified.')
+    expect(
+      errorWrapper(
+        assignTypes, '\u2200m<n.A(n)', 
+        ['variable', 'prefix_function', 'constant'])
+    ).toThrow('The operator bounded_for_all could not be identified.')
+    expect(
+      errorWrapper(
+        assignTypes, '\u2203x.A(x)<=>x=2', ['prefix_function', 'constant'])
+    ).toThrow('The operator x could not be identified.')
   });
 });
 
@@ -324,15 +376,17 @@ describe('Check equality between expression constructs', function() {
   it('should recognise when expressions are equal', function() {
     expect(
       logicProofShared.checkExpressionsAreEqual(
-        logicProofParser.parse('p\u2227r\u2228\u2200x.s', 'expression'), 
-        logicProofParser.parse('(p\u2227r)\u2228(\u2200x.s)', 'expression'))).toBe(true);
+        logicProofParser.parse('p\u2227r\u2228\u2200x.s', 'expression'),
+        logicProofParser.parse('(p\u2227r)\u2228(\u2200x.s)', 'expression'))
+    ).toBe(true);
   });
 
   it('should recognise when expressions are not equal', function() {
     expect(
       logicProofShared.checkExpressionsAreEqual(
         logicProofParser.parse('p\u2227r\u2228\u2200x.s', 'expression'), 
-        logicProofParser.parse('(p\u2227r)\u2228(\u2200y.s)', 'expression'))).toBe(false);
+        logicProofParser.parse('(p\u2227r)\u2228(\u2200y.s)', 'expression'))
+    ).toBe(false);
   });
 
   it('should recognise when an expression is not in a set', function() {
@@ -342,7 +396,8 @@ describe('Check equality between expression constructs', function() {
         [
           logicProofParser.parse('A(x)', 'expression'), 
           logicProofParser.parse('q\u2227p', 'expression')
-        ])).toBe(false);
+        ])
+    ).toBe(false);
   });
 
   it('should recognise when sets of expressions are equal', function() {
@@ -354,7 +409,8 @@ describe('Check equality between expression constructs', function() {
           logicProofParser.parse('p', 'expression'),
           logicProofParser.parse('A(x)\u2228(x=2)', 'expression'),
           logicProofParser.parse('p', 'expression')
-        ])).toBe(true);
+        ])
+    ).toBe(true);
   });
 });
 
@@ -362,7 +418,8 @@ describe('Get operators from expression', function() {
   it('should identify all operators', function() {
     expect(
       logicProofShared.getOperatorsFromExpression(
-        logicProofParser.parse('f(x+2)=y+x\u2227p', 'expression'))).toEqual(['x', 2, 'addition', 'f', 'y', 'equals', 'p', 'and']);
+        logicProofParser.parse('f(x+2)=y+x\u2227p', 'expression'))
+    ).toEqual(['x', 2, 'addition', 'f', 'y', 'equals', 'p', 'and']);
   });
 
   it('should identify all operators of a given kind', function() {
@@ -382,3 +439,4 @@ describe('Check ordering in lex', function() {
     expect(logicProofShared.greaterThanInLex([1,2], [1,2])).toBe(false);
   })
 })
+
