@@ -1,3 +1,5 @@
+// These functions are used to build defaultData.js. In future they should be
+// made available to teachers so that they can edit the settings they build.
 var logicProofTeacher2 = (function() {
 
 /////////////////////  LINE TEMPLATES  ////////////////////////////////////////

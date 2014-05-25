@@ -5,11 +5,16 @@
 <script src="/extensions/widgets/interactive/LogicProof/static/js/defaultData.js"></script>
 <script src="/extensions/widgets/interactive/LogicProof/static/js/generatedParser.js"></script>
 <script src="/extensions/widgets/interactive/LogicProof/static/js/conversion.js"></script>
+    <style>
+      table.logic-proof-symbols {
+        border-collapse: separate;
+        border-spacing: 15px 0px;
+      }
+    </style>
 
-<div ng-cloak>
 <script type="text/ng-template" id="modals/logicProofHelp">
-
   <div class="modal-body">
+
     <p>
       <div class="row-fluid">
         <div class="span6">
@@ -48,20 +53,20 @@
 
           <i>An indent is two spaces at the start of the line</i><br><br>
  
-          <table border="1">
-          	<tr>
+          <table class="logic-proof-symbols">
+            <tr>
               <td><i>Type</i></td>
-              <td>&nbsp; &amp;&nbsp; </td>
-              <td>&nbsp; |&nbsp; </td>
-              <td>&nbsp; @&nbsp; </td>
-              <td>&nbsp; $&nbsp; </td>
+              <td>&amp;</td>
+              <td>|</td>
+              <td>&</td>
+              <td>$</td>
             </tr>
             <tr>
               <td><i>to get</i></td>
-              <td>&nbsp; ∧ &nbsp; </td>
-              <td>&nbsp; ∨ &nbsp; </td>
-              <td>&nbsp; ∀ &nbsp; </td>
-              <td>&nbsp; ∃ &nbsp; </td>
+              <td>∧</td>
+              <td>∨</td>
+              <td>∀</td>
+              <td>∃</td>
             </tr>
           </table>
         </div>
@@ -72,4 +77,3 @@
     <button class="btn" ng-click="close()">Close</button>
   </div>
 </script>
-</div>
