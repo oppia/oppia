@@ -32,9 +32,11 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
       $scope.alwaysEditable = true;
       $scope.localValue = {
         assumptionsString: logicProofShared.displayExpressionArray(
-          $scope.$parent.value.assumptions, logicProofData.BASE_STUDENT_LANGUAGE.operators),
+          $scope.$parent.value.assumptions, 
+          logicProofData.BASE_STUDENT_LANGUAGE.operators),
         targetString: logicProofShared.displayExpression(
-          $scope.$parent.value.results[0], logicProofData.BASE_STUDENT_LANGUAGE.operators),
+          $scope.$parent.value.results[0], 
+          logicProofData.BASE_STUDENT_LANGUAGE.operators),
         errorMessage: '',
         proofString: $scope.$parent.value.default_proof_string
       };
@@ -58,30 +60,23 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
       }
 
       $scope.$watch('localValue.assumptionsString', function(newValue, oldValue) {
-        var comparison = logicProofConversion.compareStrings(newValue, oldValue);
-        if (comparison.first === newValue.length - 1) {
-          $scope.localValue.assumptionsString = logicProofConversion.convertToLogicCharacters(newValue);
-        }
+        logicProofConversion.convertElementToLogicChars(
+          document.getElementById('logicQuestionAssumptions'));
         $scope.buildQuestion();
-      })
+
+      });
 
       $scope.$watch('localValue.targetString', function(newValue, oldValue) {
-        var comparison = logicProofConversion.compareStrings(newValue, oldValue);
-        if (comparison.first === newValue.length - 1) {
-          $scope.localValue.targetString = logicProofConversion.convertToLogicCharacters(newValue);
-        }
-        if (newValue !== '') {
-        }
+        logicProofConversion.convertElementToLogicChars(
+          document.getElementById('logicQuestionTarget'));
         $scope.buildQuestion();
-      })
+      });
 
       $scope.$watch('localValue.proofString', function(newValue, oldValue) {
-        var comparison = logicProofConversion.compareStrings(newValue, oldValue);
-        if (comparison.first === newValue.length - 1) {
-          $scope.localValue.proofString = logicProofConversion.convertToLogicCharacters(newValue);
-        }
+        logicProofConversion.convertElementToLogicChars(
+          document.getElementById('logicQuestionProof'));
         $scope.buildQuestion();
-      })
+      });
 
     }
   };

@@ -24,32 +24,18 @@ var logicProofConversion = (function() {
     return replacedString;
   }
 
-  // Returns first and last characters in the new string that have been
-  // changed, or false if one string is not defined.
-  var compareStrings = function(newString, oldString) {
-    if (newString === undefined || oldString === undefined) {
-      return false;
+  var convertElementToLogicChars = function(element) {
+    // NOTE: this function is first called before the DOM is defined, when
+    // the element will be undefined and we do nothing.
+    if(element) {
+      var cursorPosition = element.selectionEnd;
+      element.value = convertToLogicCharacters(element.value);
+      element.selectionEnd = cursorPosition;
     }
-    for (var i = 0; i < newString.length; i++) {
-      if (newString[i] !== oldString[i]) {
-        var firstChange = i;
-        break;
-      }
-    }
-    for (var i = newString.length - 1; i >= 0; i--) {
-      if (newString[i] !== oldString[i + oldString.length - newString.length]) {
-        var lastChange = Math.max(i, firstChange);
-        break;
-      }
-    }
-    return {
-      first: firstChange,
-      last: lastChange
-    };
   }
 
   return {
     convertToLogicCharacters: convertToLogicCharacters,
-    compareStrings: compareStrings
-  }
-})()
+    convertElementToLogicChars: convertElementToLogicChars
+  };
+}())

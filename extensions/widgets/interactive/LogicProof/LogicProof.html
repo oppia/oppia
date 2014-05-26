@@ -1,13 +1,11 @@
+<link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
+
 <div>
-  {{questionString}}
-  <div class="row-fluid">
-    <div class="span7">
-      <textarea ng-model="proofString" ng-trim="false" rows="10" cols="50"></textarea>
-      <button ng-click="showHelp()">Help</button>
-      <button ng-click="submitProof()">Submit</button>
-    </div>
-    <div class="span5" ng-show="proofError">
-      <pre>{{proofError}}</pre>
-    </div>
+  <[questionString]>
+  <div ui-codemirror="{onLoad: codeEditor}" >
+    <textarea ui-codemirror="editorOptions" ng-trim="false" rows="10"></textarea>
   </div>
+  <button ng-click="showHelp()">Help</button>
+  <button ng-click="submitProof()">Submit</button>
+  <p class="mistake-message"> <[proofError]>  </p>
 </div>

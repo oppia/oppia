@@ -22,6 +22,7 @@
  */
 oppia.directive('oppiaInteractiveLogicProof', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+
     return {
       restrict: 'E',
       scope: {},
@@ -64,40 +65,87 @@ oppia.directive('oppiaInteractiveLogicProof', [
             'Prove ' + $scope.targetString + '.':
             'Assuming ' + $scope.assumptionsString + '; prove ' + $scope.targetString + '.';
 
+
         $scope.questionInstance = logicProofStudent.buildInstance($scope.questionData);
-        $scope.proofString = $scope.localQuestionData.default_proof_string;
         $scope.haveErrorMessage = false;
 
-        $scope.displayMessage = function(message, lineNumber) {
-          var output = '';
-          for (var i = 0; i < lineNumber; i++) {
-            output += ' \n';
-          }
-          output += message;
-          return output;
+        // NOTE: for information on integrating angular and code-mirror see
+        // http://github.com/angular-ui/ui-codemirror
+        $scope.codeEditor = function(editor) {
+          editor.setValue($scope.localQuestionData.default_proof_string)
+          $scope.proofString = editor.getValue();
+          var cursorPosition = editor.doc.getCursor();
+
+          editor.setOption('lineNumbers', true);
+          editor.setOption('indentWithTabs', true);
+          editor.setOption('lineWrapping', true);
+
+          // NOTE: we must use beforeChange rather than change here to avoid an
+          // infinite loop (which code-mirror will not catch).
+          editor.on('beforeChange', function(instance, change) {
+            var convertedText = logicProofConversion.convertToLogicCharacters(
+              change.text.join('\n'));
+            if(convertedText !== change.text.join('\n')) {
+              // We update using the converted text, then cancel its being 
+              // overwritten by the original text.
+              editor.doc.replaceRange(convertedText, change.from, change.to);
+              change.cancel();
+            }
+          });
+
+          editor.on('cursorActivity', function() {
+            if(editor.doc.getCursor().line !== cursorPosition.line) {
+              $scope.refreshMessages(editor);
+              cursorPosition = editor.doc.getCursor();
+            }
+          })
+
+          // NOTE: we use change rather than beforeChange here so that checking
+          // for mistakes is done with respect to the updated text.
+          editor.on('change', function(instance, change) {
+            $scope.proofString = editor.getValue();
+            if(change.text.length>1 || change.removed.length>1) {
+              $scope.refreshMessages(editor);
+            }
+          });
         }
 
-        $scope.$watch('proofString', function(newValue, oldValue) {
-          var comparison = logicProofConversion.compareStrings(newValue, oldValue);
-          if (comparison.first === newValue.length - 1) {
-            $scope.proofString = logicProofConversion.convertToLogicCharacters(newValue);
+        $scope.refreshMessages = function(editor) {
+          if($scope.mistakeMark) {
+            $scope.mistakeMark.clear();
           }
-
-          var haveNewLineBreak = 
-            (newValue.slice(comparison.first, comparison.last + 1).indexOf('\n') !== -1);
-          if (haveNewLineBreak) {
-            try {
-              logicProofStudent.validateProof($scope.proofString, $scope.questionInstance);
-              $scope.proofError = '';
-            } catch (err) {
-              $scope.proofError = $scope.displayMessage(err.message, err.line);
-            }
-          } else {
+          try {
+            logicProofStudent.validateProof($scope.proofString, $scope.questionInstance);
             $scope.proofError = '';
+          } catch(err) {
+            $scope.proofError = $scope.displayMessage(err.message, err.line);
+            $scope.mistakeMark = editor.doc.markText({line:err.line, ch:0}, {line:err.line, ch:100}, {className: 'erroneous-line'});
           }
-        })
+          // NOTE: this line is necessary to force angular to refresh the
+          // displayed proofError.
+          $scope.$apply();
+        }
 
-        // NOTE: proof_num_lines and displayed_question are only computed here
+        $scope.displayMessage = function(message, lineNumber) {
+          return 'line ' + (lineNumber +1) + ': ' + message;
+        }
+
+        $scope.displayProof = function(proofString, errorLineNum) {
+          var proofLines = proofString.split('\n');
+          var numberedLines = [];
+          for (var i = 0; i<proofLines.length; i++) {
+            numberedLines.push((i + 1) + '  ' + proofLines[i]);
+          }
+          return (errorLineNum === undefined) ?
+            [numberedLines.join('\n')]:
+            [
+              numberedLines.slice(0, errorLineNum).join('\n'), 
+              numberedLines[errorLineNum], 
+              numberedLines.slice(errorLineNum + 1, numberedLines.length).join('\n')
+            ];
+        }
+
+        // NOTE: proof_num_lines, displayed_question and displayed_proof are only computed here
         // because response.html needs them and does not have its own
         // javascript.
         $scope.submitProof = function() {
@@ -111,7 +159,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
               proof_num_lines: proof.lines.length,
               correct: true,
               displayed_question: $scope.questionString,
-              displayed_message: ''
+              displayed_message: '',
+              displayed_proof: $scope.displayProof($scope.proofString)
             }, 'submit');
           } catch (err) {
             $scope.$parent.$parent.submitAnswer({
@@ -125,7 +174,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
               error_message: err.message,
               error_line_number: err.line,
               displayed_question: $scope.questionString,
-              displayed_message: $scope.displayMessage(err.message, err.line)
+              displayed_message: $scope.displayMessage(err.message, err.line),
+              displayed_proof: $scope.displayProof($scope.proofString, err.line)
             }, 'submit');
           }
         }
