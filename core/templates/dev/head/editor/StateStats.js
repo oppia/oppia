@@ -31,7 +31,7 @@ function StateStats(
 
   $scope.$on('guiTabSelected', function(evt) {
     $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = explorationData.data.states[$scope.stateName];
+    var stateData = $scope.$parent.states[$scope.stateName];
     $scope.initStateStats(stateData);
   });
 
