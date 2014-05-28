@@ -30,7 +30,7 @@ oppia.directive('htmlEditor', function($compile, warningsData) {
     restrict: 'E',
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: function ($scope, $attrs) {
+    controller: function($scope, $attrs) {
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
       $scope.$watch('$parent.value', function(newValue, oldValue) {
