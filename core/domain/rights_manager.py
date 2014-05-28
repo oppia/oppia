@@ -267,11 +267,7 @@ def is_exploration_cloned(exploration_id):
 
 
 class Actor(object):
-    """Domain object for a user with various rights.
-
-    Due to GAE limitations, this class should only ever be invoked with a
-    user_id that is equal to the user_id of the current request.
-    """
+    """Domain object for a user with various rights."""
 
     def __init__(self, user_id):
         # Note that this may be None.
@@ -294,7 +290,11 @@ class Actor(object):
             exp_rights.community_owned or self.user_id in exp_rights.owner_ids)
 
     def has_explicit_editing_rights(self, exploration_id):
-        """Whether this user is in the owner/editor list of the exploration."""
+        """Whether this user has editing rights for this exploration.
+
+        This is true if the exploration is community-owned, or if the user is
+        in the owner/editor list for the exploration.
+        """
         try:
             exp_rights = get_exploration_rights(exploration_id)
         except Exception:
