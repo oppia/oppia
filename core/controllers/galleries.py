@@ -168,26 +168,15 @@ class ContributeHandler(base.BaseHandler):
         # TODO(sll): Implement paging.
 
         explorations_dict = (
-            exp_services.get_editable_explorations_summary_dict(
+            exp_services.get_viewable_explorations_summary_dict(
                 self.user_id))
-        if (rights_manager.Actor(self.user_id).is_moderator() or
-                self.is_super_admin):
-            explorations_dict.update(
-                exp_services.get_public_explorations_summary_dict())
-            explorations_dict.update(
-                exp_services.get_publicized_explorations_summary_dict())
 
         categories = collections.defaultdict(list)
         for (eid, exploration_data) in explorations_dict.iteritems():
             categories[exploration_data['category']].append({
                 'id': eid,
                 'title': exploration_data['title'],
-                'can_clone': (
-                    rights_manager.Actor(self.user_id).can_clone(eid) or
-                    self.is_super_admin),
-                'can_edit': (
-                    rights_manager.Actor(self.user_id).can_edit(eid) or
-                    self.is_super_admin),
+                'can_edit': rights_manager.Actor(self.user_id).can_edit(eid),
                 'is_private': (
                     exploration_data['rights']['status'] ==
                     rights_manager.EXPLORATION_STATUS_PRIVATE),
@@ -198,6 +187,8 @@ class ContributeHandler(base.BaseHandler):
                     exploration_data['rights']['status'] ==
                     rights_manager.EXPLORATION_STATUS_PUBLICIZED),
                 'is_cloned': bool(exploration_data['rights']['cloned_from']),
+                'is_community_owned': (
+                    exploration_data['rights']['community_owned']),
             })
 
         self.values.update({

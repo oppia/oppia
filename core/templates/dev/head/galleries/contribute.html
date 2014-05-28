@@ -30,13 +30,13 @@
 
       <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-8">
-          <div ng-if="displayedCategories">
+          <div ng-if="categories">
             <div class="row">
               <div class="col-lg-3 col-md-3 col-sm-3">
                 <div class="nav nav-tabs oppia-gallery-nav-tabs oppia-light-border-right">
                   <div class="oppia-gallery-menu">
                     <ul class="nav nav-pills nav-stacked" id="navTabs">
-                      <li ng-repeat="(category, explorations) in displayedCategories"
+                      <li ng-repeat="(category, explorations) in categories"
                           ng-class="{active: $index == 0}">
                         <a data-toggle="tab" href="#<[category|spacesToUnderscores]>">
                           <[category]>
@@ -49,7 +49,7 @@
 
               <div class="col-lg-9 col-md-9 col-sm-9">
                 <div class="tab-content oppia-gallery-tiles-container">
-                  <div ng-repeat="(category, explorations) in displayedCategories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
+                  <div ng-repeat="(category, explorations) in categories" class="tab-pane" ng-class="{active: $index == 0}" id="<[category|spacesToUnderscores]>">
                     <div class="row">
                       <div ng-repeat="exploration in explorations" class="oppia-gallery-tile">
 
@@ -66,30 +66,29 @@
 
                         <div class="oppia-gallery-tile-bottom">
                           <div>
-                            <span ng-if="exploration.can_edit">
-                              <a href="/create/<[exploration.id]>">
+                            <a ng-href="/create/<[exploration.id]>">
+                              <span ng-if="exploration.can_edit">
                                 <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
                                 <span class="oppia-small-font">Edit</span>
-                              </a>
-                            </span>
-                            <span ng-if="exploration.can_edit && exploration.can_clone">
-                            &nbsp;&nbsp;|&nbsp;
-                            </span>
-                            <span ng-if="exploration.can_clone">
-                              <a href="" ng-click="cloneExploration(exploration.id)">
-                                <span class="glyphicon glyphicon-share" title="Copy this exploration"></span>
-                                <span class="oppia-small-font" tooltip="Make a private copy of an exploration." title="Make a private copy of an exploration.">Copy</span>
-                              </a>
-                            </span>
+                              </span>
+                              <span ng-if="!exploration.can_edit">
+                                <span class="oppia-small-font">View</span>
+                              </span>
+                            </a>
 
-                            <span ng-if="exploration.is_cloned" class="label label-info pull-right">
-                              Cloned
-                            </span>
-                            <span ng-if="exploration.is_public" class="label label-info pull-right" style="opacity: 0.5">
-                              Beta
-                            </span>
-                            <span ng-if="exploration.is_private && !exploration.is_cloned" class="label label-info pull-right">
-                              Private
+                            <span class="pull-right">
+                              <span ng-if="exploration.is_cloned" class="label label-info">
+                                Cloned
+                              </span>
+                              <span ng-if="exploration.is_community_owned" class="label label-info">
+                                Community-owned
+                              </span>
+                              <span ng-if="exploration.is_public" class="label label-info" style="opacity: 0.5">
+                                Beta
+                              </span>
+                              <span ng-if="exploration.is_private && !exploration.is_cloned" class="label label-info">
+                                Private
+                              </span>
                             </span>
                           </div>
                         </div>

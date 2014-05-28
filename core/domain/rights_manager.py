@@ -193,6 +193,12 @@ def get_publicized_exploration_rights():
             exp_models.ExplorationRightsModel.get_publicized()]
 
 
+def get_non_private_exploration_rights():
+    """Returns a list of rights domain objects for non-private explorations."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_non_private()]
+
+
 def get_community_owned_exploration_rights():
     """Returns a list of rights objects for community-owned explorations."""
     return [_get_exploration_rights_from_model(model) for model in
@@ -228,6 +234,14 @@ def get_editable_exploration_rights(user_id):
             exp_models.ExplorationRightsModel.get_editable(user_id)]
 
 
+def get_private_at_least_viewable_exploration_rights(user_id):
+    """Returns rights objects for all private explorations that this user can
+    view, edit or own."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_private_at_least_viewable(
+                user_id)]
+
+
 def get_owned_exploration_rights(user_id):
     """Returns rights objects for explorations owned by this user.
 
@@ -253,11 +267,7 @@ def is_exploration_cloned(exploration_id):
 
 
 class Actor(object):
-    """Domain object for a user with various rights.
-
-    Due to GAE limitations, this class should only ever be invoked with a
-    user_id that is equal to the user_id of the current request.
-    """
+    """Domain object for a user with various rights."""
 
     def __init__(self, user_id):
         # Note that this may be None.
@@ -280,7 +290,11 @@ class Actor(object):
             exp_rights.community_owned or self.user_id in exp_rights.owner_ids)
 
     def has_explicit_editing_rights(self, exploration_id):
-        """Whether this user is in the owner/editor list of the exploration."""
+        """Whether this user has editing rights for this exploration.
+
+        This is true if the exploration is community-owned, or if the user is
+        in the owner/editor list for the exploration.
+        """
         try:
             exp_rights = get_exploration_rights(exploration_id)
         except Exception:

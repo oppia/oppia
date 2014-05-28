@@ -123,8 +123,7 @@ def require_editor(handler):
         except:
             raise self.PageNotFoundException
 
-        if not (rights_manager.Actor(self.user_id).can_edit(exploration_id) or
-                self.is_super_admin):
+        if not rights_manager.Actor(self.user_id).can_edit(exploration_id):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to edit this exploration.',
                 self.user_id)

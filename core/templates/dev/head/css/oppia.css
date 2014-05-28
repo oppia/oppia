@@ -750,6 +750,9 @@ textarea {
   color: #444
 }
 
+.label {
+  margin: auto 4px;
+}
 .label-info {
   background-color: #18447E;
 }

@@ -199,11 +199,14 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.get_explicit_viewer_explorations_summary_dict(
                 self.OWNER_ID), {})
 
-    def test_get_editable_explorations_summary_dict(self):
+    def test_get_private_at_least_viewable_summary_dict(self):
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
 
         exp_dict = {
             'title': 'A title',
@@ -211,7 +214,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             'rights': {
                 'owner_names': [self.OWNER_NAME],
                 'editor_names': [self.EDITOR_NAME],
-                'viewer_names': [],
+                'viewer_names': [self.VIEWER_NAME],
                 'community_owned': False,
                 'cloned_from': None,
                 'status': rights_manager.EXPLORATION_STATUS_PRIVATE
@@ -219,15 +222,20 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         }
 
         self.assertEqual(
-            exp_services.get_editable_explorations_summary_dict(self.OWNER_ID),
+            exp_services.get_private_at_least_viewable_summary_dict(
+                self.OWNER_ID),
             {self.EXP_ID: exp_dict})
         self.assertEqual(
-            exp_services.get_editable_explorations_summary_dict(
+            exp_services.get_private_at_least_viewable_summary_dict(
                 self.EDITOR_ID),
             {self.EXP_ID: exp_dict})
         self.assertEqual(
-            exp_services.get_editable_explorations_summary_dict(
-                self.VIEWER_ID), {})
+            exp_services.get_private_at_least_viewable_summary_dict(
+                self.VIEWER_ID),
+            {self.EXP_ID: exp_dict})
+        self.assertEqual(
+            exp_services.get_private_at_least_viewable_summary_dict(
+                'random_user_id'), {})
 
     def test_count_explorations(self):
         """Test count_explorations()."""
