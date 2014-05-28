@@ -2071,7 +2071,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
     "error": []
   },
   {
-    "name": "excluded_middle",
+    "name": "excluded_middle_1",
     "reader_view": [
       {
         "format": "phrase",
@@ -2135,6 +2135,83 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
                   "dummies": []
                 }
               ],
+              "dummies": []
+            }
+          ],
+          "dummies": []
+        },
+        "substitutions": [],
+        "type": "boolean"
+      }
+    ],
+    "variables": [],
+    "error": []
+  },
+  {
+    "name": "excluded_middle_2",
+    "reader_view": [
+      {
+        "format": "phrase",
+        "content": "have"
+      },
+      {
+        "format": "expression",
+        "content": {
+          "expression": {
+            "top_kind_name": "binary_connective",
+            "top_operator_name": "or",
+            "arguments": [
+              {
+                "top_kind_name": "unary_connective",
+                "top_operator_name": "not",
+                "arguments": [
+                  {
+                    "top_kind_name": "variable",
+                    "top_operator_name": "R",
+                    "arguments": [],
+                    "dummies": []
+                  }
+                ],
+                "dummies": []
+              },
+              {
+                "top_kind_name": "variable",
+                "top_operator_name": "R",
+                "arguments": [],
+                "dummies": []
+              }
+            ],
+            "dummies": []
+          },
+          "substitutions": [],
+          "type": "boolean"
+        }
+      }
+    ],
+    "antecedents": [],
+    "results": [
+      {
+        "expression": {
+          "top_kind_name": "binary_connective",
+          "top_operator_name": "or",
+          "arguments": [
+            {
+              "top_kind_name": "unary_connective",
+              "top_operator_name": "not",
+              "arguments": [
+                {
+                  "top_kind_name": "variable",
+                  "top_operator_name": "R",
+                  "arguments": [],
+                  "dummies": []
+                }
+              ],
+              "dummies": []
+            },
+            {
+              "top_kind_name": "variable",
+              "top_operator_name": "R",
+              "arguments": [],
               "dummies": []
             }
           ],
@@ -4072,14 +4149,114 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
         }
       ]
     ]
+  },
+  {
+    name: "not_eliminate_e",
+    reader_view: [{
+      format: 'phrase',
+      content: 'hence'
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'variable',
+          top_operator_name: 'R',
+          arguments: [],
+          dummies: []
+        },
+        substitutions: [],
+        type: 'boolean'
+      }
+    }],
+    antecedents: [],
+    results: [{
+      expression: {
+        top_kind_name: 'variable',
+        top_operator_name: 'R',
+        arguments: [],
+        dummies: []
+      },
+      substitutions: [],
+      type: 'boolean'
+    }],
+    variables: [],
+    error: [[{
+      format: 'string',
+      content: 'If you want to reach a contradiction from '
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'unary_connective',
+          top_operator_name: 'not',
+          arguments: [{
+            top_kind_name: 'variable',
+            top_operator_name: 'R',
+            arguments: [],
+            dummies: []
+          }],
+          dummies: []
+        },
+        substitutions: [],
+        type: 'boolean'
+      }
+    }, {
+      format: 'string',
+      content: ' and so conclude '
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'variable',
+          top_operator_name: 'R',
+          arguments: [],
+          dummies: []
+        },
+        substitutions: [],
+        type: 'boolean'
+      }
+    }, {
+      format: 'string',
+      content: ' then you\'ll need to start from the law of the excluded middle \'We know '
+    }, {
+      format: 'expression',
+      content: {
+        expression: {
+          top_kind_name: 'binary_connective',
+          top_operator_name: 'or',
+          arguments: [{
+            top_kind_name: 'variable',
+            top_operator_name: 'R',
+            arguments: [],
+            dummies: []
+          }, {
+            top_kind_name: 'unary_connective',
+            top_operator_name: 'not',
+            arguments: [{
+              top_kind_name: 'variable',
+              top_operator_name: 'R',
+              arguments: [],
+              dummies: []
+            }],
+            dummies: []
+          }],
+          dummies: []
+        },
+        substitutions: [],
+        type: 'boolean'
+      }
+    }, {
+      format: 'string',
+      content: '\'.'
+    }]]
   }],
   vocabulary: {
   	from: ['from'],
     and: ['and'],
     have: ['we have', 'we know', 'have'],
-    hence: ['hence', 'so', 'thus'],
-    whichever: ['and whichever is true'],
-    arbitrary: ['was arbitrary'],
+    hence: ['hence', 'so', 'thus', 'whence', 'therefore'],
+    whichever: ['and whichever is true', 'and either way', 'and in either case'],
+    arbitrary: ['was arbitrary', 'is arbitrary'],
     take: ['take'],
     satisfying: ['satisfying', 'such that'],
     if: ['if'],
@@ -4385,7 +4562,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "Only indent once after '"
+              "content": "Only indent once after \'"
             },
             {
               "format": "expression",
@@ -4422,7 +4599,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "'."
+              "content": "\'."
             }
           ]
         ]
@@ -4539,7 +4716,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "After '"
+              "content": "After \'"
             },
             {
               "format": "expression",
@@ -4576,7 +4753,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "' the following lines in which you reason using the variable "
+              "content": "\' the following lines in which you reason using the variable "
             },
             {
               "format": "expression",
@@ -4767,7 +4944,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "After "
+              "content": "After \'"
             },
             {
               "format": "expression",
@@ -4804,7 +4981,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": " the following lines in which you reason under the assumption of "
+              "content": "\' the following lines in which you reason under the assumption of "
             },
             {
               "format": "expression",
@@ -5873,7 +6050,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "We only reduce the level of indentation by one here; we are just leaving the scope of '"
+              "content": "We only reduce the level of indentation by one here; we are just leaving the scope of \'"
             },
             {
               "format": "expression",
@@ -5918,7 +6095,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "'."
+              "content": "\'."
             }
           ]
         ]
@@ -6469,7 +6646,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "You are still working withing the scope of '"
+              "content": "You are still working withing the scope of \'"
             },
             {
               "format": "expression",
@@ -6514,7 +6691,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "' and you need to stop doing so (typically be introducing a forall statement) before you can drop the assumption of "
+              "content": "\' and you need to stop doing so (typically be introducing a forall statement) before you can drop the assumption of "
             },
             {
               "format": "expression",
@@ -6958,7 +7135,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "When writing '"
+              "content": "When writing \'"
             },
             {
               "format": "expression",
@@ -6980,7 +7157,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "' we reduce the level of indentation by one, to indicate that we are no longer making the assumption that "
+              "content": "\' we reduce the level of indentation by one, to indicate that we are no longer making the assumption that "
             },
             {
               "format": "expression",
@@ -7600,7 +7777,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": " but are still within the scope of '"
+              "content": " but are still within the scope of \'"
             },
             {
               "format": "expression",
@@ -7653,7 +7830,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "'."
+              "content": "\'."
             }
           ]
         ]
@@ -8167,7 +8344,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": " was only specified within the scope of "
+              "content": " was only specified within the scope of \'"
             },
             {
               "format": "expression",
@@ -8220,7 +8397,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": " in line "
+              "content": "\' in line "
             },
             {
               "format": "expression",
@@ -9160,7 +9337,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": ", which was only proved within the context of '"
+              "content": ", which was only proved within the context of \'"
             },
             {
               "format": "expression",
@@ -9274,7 +9451,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "' and so is no longer available to you."
+              "content": "\' and so is no longer available to you."
             }
           ]
         ]
@@ -12234,7 +12411,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": ", but this was in the context of "
+              "content": ", but this was in the context of \'"
             },
             {
               "format": "expression",
@@ -12399,7 +12576,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": ", which we have since left."
+              "content": "\', which we have since left."
             }
           ]
         ]
@@ -12824,7 +13001,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": ", but this was in the context of "
+              "content": ", but this was in the context of \'"
             },
             {
               "format": "expression",
@@ -12989,7 +13166,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": ", which we have since left."
+              "content": "\', which we have since left."
             }
           ]
         ]
@@ -13258,7 +13435,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
           [
             {
               "format": "string",
-              "content": "The last line of a proof should not be indented; you should have ceased working within the scope of '"
+              "content": "The last line of a proof should not be indented; you should have ceased working within the scope of \'"
             },
             {
               "format": "expression",
@@ -13288,7 +13465,7 @@ LOGIC_PROOF_DEFAULT_QUESTION_DATA = {
             },
             {
               "format": "string",
-              "content": "' by this point, typically by introducing a forall statement."
+              "content": "\' by this point, typically by introducing a forall statement."
             }
           ]
         ]

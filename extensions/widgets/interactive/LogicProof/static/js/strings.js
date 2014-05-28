@@ -152,10 +152,18 @@ DEFAULT_LINE_TEMPLATE_STRINGS = [
     error: []
   },
   {
-    name: 'excluded_middle',
+    name: 'excluded_middle_1',
     reader_view: 'We know R\u2228~R',
     antecedents: '',
     results: 'R\u2228~R',
+    variables: '',
+    error: []
+  },
+  {
+    name: 'excluded_middle_2',
+    reader_view: 'We know ~R\u2228R',
+    antecedents: '',
+    results: '~R\u2228R',
     variables: '',
     error: []
   },
@@ -270,6 +278,14 @@ DEFAULT_LINE_TEMPLATE_STRINGS = [
     results: 'T',
     variables: '',
     error: ['From {{R\u2227S}} you can conclude either {{R}} or {{S}}, but not anything else']
+  },
+  {
+    name: 'not_introduce_e',
+    reader_view: 'Hence R',
+    antecedents: '',
+    results: 'R',
+    variables: '',
+    error: ['If you want to reach a contradiction from {{~R}} and so conclude {{R}} then you\'ll need to start from the law of the excluded middle \'We know {{R\u2228~R}}\'.']
   }
 ]
 
@@ -299,7 +315,7 @@ DEFAULT_LAYOUT_MISTAKE_STRINGS = [
   {
     name: 'missing_indent_assumption',
     occurs: 'template(n-1)=\'assumption\' \u2227 indentation(n)<=indentation(n-1)',
-    message: ['After {{text(n-1)}} the following lines in which you reason under the assumption of {{result(n-1)}} should be indented. Once you have proved some statement p assuming {{result(n-1)}} then you can write an unindented line \'Hence {{result(n-1)}}=>p\'. Alternatively you can simply stop indenting if you no longer wish to use the assumption of  {{result(n-1)}}.']
+    message: ['After \'{{text(n-1)}}\' the following lines in which you reason under the assumption of {{result(n-1)}} should be indented. Once you have proved some statement p assuming {{result(n-1)}} then you can write an unindented line \'Hence {{result(n-1)}}=>p\'. Alternatively you can simply stop indenting if you no longer wish to use the assumption of  {{result(n-1)}}.']
   },
   {
     name: 'missing_deindent_forall_0',
@@ -377,7 +393,7 @@ DEFAULT_VARIABLE_MISTAKE_STRINGS = [
   {
     name: 'inaccessible_variable',
     occurs: '~is_initializer(n) \u2227 template(n)!= \'for_all_introduce\' \u2227 \u2203x\u2208variables(n).~is_accessible(x,n)',
-    message: ['The variable {{variable(n)}} was only specified within the scope of  {{text(scoper2(initializer(variable(n),n)))}} in line {{scoper2(initializer(variable(n),n))}}, and so can only be used there. If you want it as an arbitrary variable again then write \'Given {{variable(n)}}\'.']
+    message: ['The variable {{variable(n)}} was only specified within the scope of \'{{text(scoper2(initializer(variable(n),n)))}}\' in line {{scoper2(initializer(variable(n),n))}}, and so can only be used there. If you want it as an arbitrary variable again then write \'Given {{variable(n)}}\'.']
   },
   {
     name: 'incorrect_variable_forall',
@@ -460,12 +476,12 @@ DEFAULT_LOGIC_MISTAKE_STRINGS = [
   {
     name: 'or_inaccessible_antecedent_left',
     occurs: 'template(n)=\'or_eliminate\' \u2227 ~\u2203j<n.\u2203i<j.(is_implication(element(\'R\',n), element(\'T\',n) ,i,j) \u2227 (~\u2203k<n.(k>i \u2227 indentation(k)<indentation(i))) \u2227 indentation(i)<=indentation(n))',
-    message: ['You proved that if {{element(\'R\',n)}} then {{element(\'T\',n)}}, but this was in the context of {{text(scoper(max{i<n|\u2203j<n.is_implication(element(\'R\',n),element(\'T\',n),i,j)}))}}, which we have since left.']
+    message: ['You proved that if {{element(\'R\',n)}} then {{element(\'T\',n)}}, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.is_implication(element(\'R\',n),element(\'T\',n),i,j)}))}}\', which we have since left.']
   },
   {
     name: 'or_inaccessible_antecedent_right',
     occurs: 'template(n)=\'or_eliminate\' \u2227 ~\u2203j<n.\u2203i<j.(is_implication(element(\'S\',n), element(\'T\',n) ,i,j) \u2227 (~\u2203k<n.(k>i \u2227 indentation(k)<indentation(i))) \u2227 indentation(i)<=indentation(n))',
-    message: ['You proved that if {{element(\'S\',n)}} then {{element(\'T\',n)}}, but this was in the context of {{text(scoper(max{i<n|\u2203j<n.is_implication(element(\'S\',n),element(\'T\',n),i,j)}))}}, which we have since left.']
+    message: ['You proved that if {{element(\'S\',n)}} then {{element(\'T\',n)}}, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.is_implication(element(\'S\',n),element(\'T\',n),i,j)}))}}\', which we have since left.']
   }
 ]
 
