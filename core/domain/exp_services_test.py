@@ -325,28 +325,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 include_deleted_entities=True)]
         )
 
-    def test_clone_exploration(self):
-        """Test cloning an exploration with assets."""
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID)
-        exploration.add_states(['New state'])
-        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
-
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration.id))
-        fs.commit(self.OWNER_ID, 'abc.png', raw_image)
-
-        new_eid = exp_services.clone_exploration(self.OWNER_ID, exploration.id)
-        new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(new_eid))
-        new_exploration = exp_services.get_exploration_by_id(new_eid)
-
-        self.assertEqual(new_exploration.title, 'Copy of A title')
-        self.assertEqual(new_exploration.category, 'A category')
-        self.assertEqual(new_fs.get('abc.png'), raw_image)
-
     def test_create_new_exploration_error_cases(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, '', '')
