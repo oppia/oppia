@@ -193,6 +193,12 @@ def get_publicized_exploration_rights():
             exp_models.ExplorationRightsModel.get_publicized()]
 
 
+def get_non_private_exploration_rights():
+    """Returns a list of rights domain objects for non-private explorations."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_non_private()]
+
+
 def get_community_owned_exploration_rights():
     """Returns a list of rights objects for community-owned explorations."""
     return [_get_exploration_rights_from_model(model) for model in
@@ -226,6 +232,14 @@ def get_editable_exploration_rights(user_id):
     """
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_editable(user_id)]
+
+
+def get_private_at_least_viewable_exploration_rights(user_id):
+    """Returns rights objects for all private explorations that this user can
+    view, edit or own."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_private_at_least_viewable(
+                user_id)]
 
 
 def get_owned_exploration_rights(user_id):

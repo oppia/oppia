@@ -192,6 +192,12 @@ def get_publicized_explorations_summary_dict():
         rights_manager.get_publicized_exploration_rights())
 
 
+def get_non_private_explorations_summary_dict():
+    """Returns a summary of non-private explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_non_private_exploration_rights())
+
+
 def get_community_owned_explorations_summary_dict():
     """Returns a summary of community-owned explorations."""
     return _get_explorations_summary_dict(
@@ -238,11 +244,19 @@ def get_owned_explorations_summary_dict(user_id):
         rights_manager.get_owned_exploration_rights(user_id))
 
 
-def get_editable_explorations_summary_dict(user_id):
-    """Returns a summary of all explorations editable by this user."""
-    result = get_community_owned_explorations_summary_dict()
-    result.update(get_explicit_editor_explorations_summary_dict(user_id))
-    result.update(get_owned_explorations_summary_dict(user_id))
+def get_private_at_least_viewable_summary_dict(user_id):
+    """Returns a summary of private explorations that are at least viewable by
+    this user.
+    """
+    return  _get_explorations_summary_dict(
+        rights_manager.get_private_at_least_viewable_exploration_rights(
+            user_id))
+
+
+def get_viewable_explorations_summary_dict(user_id):
+    """Returns a summary of all explorations viewable by this user."""
+    result = get_private_at_least_viewable_summary_dict(user_id)
+    result.update(get_non_private_explorations_summary_dict())
     return result
 
 
