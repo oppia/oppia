@@ -249,26 +249,6 @@ class UploadExploration(base.BaseHandler):
                 'This server does not allow file uploads.')
 
 
-class CloneExploration(base.BaseHandler):
-    """Clones an existing exploration."""
-
-    PAGE_NAME_FOR_CSRF = 'contribute'
-
-    @base.require_registered_as_editor
-    def post(self):
-        """Handles POST requests."""
-        exploration_id = self.payload.get('exploration_id')
-
-        if not rights_manager.Actor(self.user_id).can_clone(
-                exploration_id):
-            raise Exception('You cannot copy this exploration.')
-
-        self.render_json({
-            EXPLORATION_ID_KEY: exp_services.clone_exploration(
-                self.user_id, exploration_id)
-        })
-
-
 class RecentCommitsHandler(base.BaseHandler):
     """Returns a list of recent commits."""
 
