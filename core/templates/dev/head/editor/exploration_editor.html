@@ -209,7 +209,7 @@
       </div>
 
       <div class="row">
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-5 col-md-5 col-sm-5">
           <div>
             <span class="oppia-page-title">
               <[explorationTitleService.displayed]>
@@ -238,7 +238,7 @@
           </div>
         </div>
 
-        <div class="col-lg-6 col-md-6 col-sm-6">
+        <div class="col-lg-7 col-md-7 col-sm-7">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <span class="pull-right" style="margin-top: 10px;">
@@ -251,7 +251,7 @@
                        tooltip-placement="bottom">
                 </span>
 
-                <span ng-show="!explorationRightsService.isPrivate()" class="oppia-exploration-ctrl">
+                <span class="oppia-exploration-ctrl" ng-if="!explorationRightsService.isPrivate()">
                   <button class="btn btn-default" title="Embed this exploration in another webpage." ng-click="showEmbedExplorationModal()" ng-disabled="isExplorationSaveable()">
                     <span class="glyphicon glyphicon-share"></span>
                   </button>
