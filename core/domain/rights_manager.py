@@ -157,20 +157,19 @@ def _save_exploration_rights(
     model.commit(committer_id, commit_message, commit_cmds)
 
 
-def create_new_exploration_rights(exploration_id, committer_id, cloned_from):
+def create_new_exploration_rights(exploration_id, committer_id):
     exploration_rights = ExplorationRights(
-        exploration_id, [committer_id], [], [], cloned_from=cloned_from)
+        exploration_id, [committer_id], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
-    model = exp_models.ExplorationRightsModel(
+
+    exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
         owner_ids=exploration_rights.owner_ids,
         editor_ids=exploration_rights.editor_ids,
         viewer_ids=exploration_rights.viewer_ids,
         community_owned=exploration_rights.community_owned,
-        cloned_from=exploration_rights.cloned_from,
         status=exploration_rights.status
-    )
-    model.commit(committer_id, 'Created new exploration', commit_cmds)
+    ).commit(committer_id, 'Created new exploration', commit_cmds)
 
 
 def get_exploration_rights(exploration_id):
@@ -331,14 +330,6 @@ class Actor(object):
     def can_view(self, exploration_id):
         """Whether the user can view the editor page for this exploration."""
         return self.can_play(exploration_id)
-
-    def can_clone(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
-        if exp_rights.cloned_from:
-            return False
-        if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
-            return False
-        return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):
         # TODO(sll): Add a check here for whether a user is banned or not,

@@ -24,9 +24,6 @@ function ContributeGallery(
   $scope.contributeGalleryDataUrl = '/contributehandler/data';
   $scope.categoryList = [];
   $scope.categories = {};
-  // The default is to show only explorations that are editable by this user,
-  // and explorations that have moved out of beta.
-  $scope.areAllBetaExplorationsShown = false;
 
   $rootScope.loadingMessage = 'Loading';
 

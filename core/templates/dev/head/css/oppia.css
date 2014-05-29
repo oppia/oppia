@@ -109,6 +109,14 @@ textarea {
 }
 
 /*
+  Adjustments for the jWysiwyg RTE, to allow it to adopt the size
+  of its container.
+*/
+div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
+  width: 100%;
+}
+
+/*
   This is needed for proper display of tabs. See
 
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
