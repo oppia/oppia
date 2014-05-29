@@ -58,7 +58,7 @@ oppia.directive('oppiaInteractiveNumericInput', [
             $scope.errorMessage = $scope.getErrorMessage();
           } else {
             $scope.errorMessage = '';
-            $scope.$parent.$parent.submitAnswer(answer, 'submit');
+            $scope.$parent.$parent.submitAnswer(Number(answer), 'submit');
           }
         };
       }]

@@ -50,6 +50,7 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
             return;
           }
           $scope.errorMessage = '';
+          answer = parseInt(answer, 10);
           $scope.$parent.$parent.submitAnswer(answer, 'submit');
         };
       }]
