@@ -51,6 +51,8 @@ fi
 echo Checking whether karma-jasmine is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/karma-jasmine" ]; then
   echo Installing karma-jasmine
+  # Install karma as well, in case people have an older version.
+  $NPM_INSTALL karma@0.12.16
   $NPM_INSTALL karma-jasmine@0.1.0
 fi
 
@@ -61,7 +63,7 @@ if [ ! -d "$NODE_MODULE_DIR/karma-coverage" ]; then
 fi
 
 echo Checking whether phantomjs is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-phantomjs-launcher" ]; then
+if [ ! -d "$NODE_MODULE_DIR/phantomjs" ]; then
   echo Installing phantomjs
   $NPM_INSTALL phantomjs@1.9
 fi
