@@ -24,7 +24,7 @@ oppia.directive('richTextEditor', [
     return {
       restrict: 'E',
       scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
-      template: '<textarea rows="7" cols="60" ng-disabled="!hasFullyLoaded"></textarea>',
+      template: '<textarea rows="7" ng-disabled="!hasFullyLoaded"></textarea>',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         $scope.disallowOppiaWidgets = ($scope.disallowOppiaWidgets || false);
 
@@ -247,6 +247,7 @@ oppia.directive('richTextEditor', [
                   $scope._saveContent();
                 }
               },
+              iFrameClass: 'wysiwyg-content',
               initialContent: $scope.rteContent,
               initialMinHeight: '150px',
               resizeOptions: true
