@@ -49,7 +49,7 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
             position: ll
           }));
 
-          $scope.$parent.$parent.submitAnswer(ll.lat() + ',' + ll.lng(), 'submit');
+          $scope.$parent.$parent.submitAnswer([ll.lat(), ll.lng()], 'submit');
         };
       }]
     };

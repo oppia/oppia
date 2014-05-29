@@ -834,9 +834,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
         self.widget_handlers['submit'][0]['definition']['inputs']['x'] = 'abc'
-        with self.assertRaisesRegexp(
-                Exception,
-                'abc has the wrong type. It should be a NonnegativeInt.'):
+        with self.assertRaisesRegexp(Exception, 'invalid literal for int()'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(

@@ -20,6 +20,7 @@ import numbers
 
 
 SCHEMA_KEY_ITEMS = 'items'
+SCHEMA_KEY_LENGTH = 'length'
 SCHEMA_KEY_PROPERTIES = 'properties'
 SCHEMA_KEY_TYPE = 'type'
 
@@ -29,23 +30,31 @@ SCHEMA_TYPE_FLOAT = 'float'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
+ALLOWED_SCHEMA_TYPES = [
+    SCHEMA_TYPE_BOOL, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT, SCHEMA_TYPE_INT,
+    SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 
 
 def validate_schema(schema):
     assert isinstance(schema, dict)
     assert SCHEMA_KEY_TYPE in schema
+    assert schema[SCHEMA_KEY_TYPE] in ALLOWED_SCHEMA_TYPES
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         for key in schema:
-            assert key in [SCHEMA_KEY_ITEMS, SCHEMA_KEY_TYPE], schema
+            assert key in [
+                SCHEMA_KEY_ITEMS, SCHEMA_KEY_LENGTH, SCHEMA_KEY_TYPE], schema
+            if key == SCHEMA_KEY_LENGTH:
+                assert isinstance(schema[SCHEMA_KEY_LENGTH], int)
+                assert schema[SCHEMA_KEY_LENGTH] > 0
             validate_schema(schema[SCHEMA_KEY_ITEMS])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         for key in schema:
             assert key in [SCHEMA_KEY_PROPERTIES, SCHEMA_KEY_TYPE], schema
             for prop in schema[SCHEMA_KEY_PROPERTIES]:
+                assert isinstance(prop, basestring)
                 validate_schema(schema[SCHEMA_KEY_PROPERTIES][prop])
     else:
-        for key in schema:
-            assert key in [SCHEMA_KEY_TYPE], schema
+        assert schema.keys() == [SCHEMA_KEY_TYPE], schema
 
 
 def normalize_against_schema(obj, schema):
@@ -62,15 +71,21 @@ def normalize_against_schema(obj, schema):
         }
         return normalized_obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
+        obj = float(obj)
         assert isinstance(obj, numbers.Real), (
             'Expected float, received %s' % obj)
-        return float(obj)
+        return obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_INT:
+        obj = int(obj)
+        assert isinstance(obj, numbers.Integral), (
+            'Expected int, received %s' % obj)
         assert isinstance(obj, int), ('Expected int, received %s' % obj)
         return obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
+        if SCHEMA_KEY_LENGTH in schema:
+            assert len(obj) == schema[SCHEMA_KEY_LENGTH]
         return [normalize_against_schema(item, item_schema) for item in obj]
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_UNICODE:
         assert isinstance(obj, basestring), (
