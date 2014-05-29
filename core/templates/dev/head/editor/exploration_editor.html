@@ -327,35 +327,6 @@
           <tab heading="History" active="historyTabActive" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
             {% include 'editor/exploration_history.html' %}
           </tab>
-        </tabset>
-      </div>
-
-      <div class="row">
-        <tabset>
-          <tab heading="Main" active="mainTabActive" select="selectMainTab()">
-            <div class="row">
-              <div class="col-lg-9 col-md-9 col-sm-9" ng-controller="StateEditor">
-                {% include 'editor/state_editor.html' %}
-              </div>
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                {% include 'editor/exploration_graph.html' %}
-                <hr>
-                {% include 'editor/state_stats.html' %}
-              </div>
-            </div>
-          </tab>
-
-          <tab heading="Statistics" active="statsTabActive" select="selectStatsTab()">
-            {% include 'editor/stats_viewer.html' %}
-          </tab>
-
-          <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
-            {% include 'editor/exploration_settings.html' %}
-          </tab>
-
-          <tab heading="History" active="historyTabActive" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
-            {% include 'editor/exploration_history.html' %}
-          </tab>
 
           {% if SHOW_FEEDBACK_TAB %}
             <tab heading="Feedback" active="feedbackTabActive" select="selectFeedbackTab()">
