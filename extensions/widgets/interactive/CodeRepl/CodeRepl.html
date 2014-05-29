@@ -6,8 +6,8 @@
   </div>
   <br>
   <form ng-submit="runCode(code)">
-    <div ui-codemirror="{onLoad: codeEditor}" style="border: 1px solid black;">
-      <textarea ui-codemirror="codemirrorOptions" ng-model="code" required autofocus></textarea>
+    <div ui-codemirror="{onLoad: initCodeEditor}" style="border: 1px solid black;">
+      <textarea ui-codemirror="codemirrorOptions" required autofocus></textarea>
     </div>
     <button type="submit" class="btn btn-default" ng-disabled="!hasLoaded">Run</button>
   </form>
