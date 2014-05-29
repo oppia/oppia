@@ -176,5 +176,4 @@ function ExplorationSettings(
 ExplorationSettings.$inject = [
   '$scope', '$modal', 'activeInputData', 'explorationData', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
-  'explorationRightsService', 'changeListService', 'warningsData'
-];
+  'explorationRightsService', 'changeListService', 'warningsData'];

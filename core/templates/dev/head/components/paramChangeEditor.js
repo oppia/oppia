@@ -22,7 +22,13 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
   // Directive that implements an editor for specifying parameter changes.
   return {
     restrict: 'E',
-    scope: {paramChanges: '=', paramSpecs: '=', saveParamChanges: '=', addExplorationParamSpec: '='},
+    scope: {
+      paramChanges: '=',
+      paramSpecs: '=',
+      saveParamChanges: '=',
+      addExplorationParamSpec: '=',
+      isEditable: '='
+    },
     templateUrl: 'inline/param_change_editor',
     controller: ['$scope', '$attrs', function($scope, $attrs) {
       $scope._inArray = function(array, value) {

@@ -38,19 +38,28 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         $scope.code = ($scope.placeholder || '');
         $scope.output = '';
 
-        // Options for the ui-codemirror display.
-        $scope.codemirrorOptions = {
-          // TODO(sll): Re-enable this. (It is temporarily disabled because it
-          // leads to occasional errors where a grey box, and nothing else, is
-          // displayed. This may be related to issue
-          //   https://github.com/angular-ui/ui-codemirror/issues/24 .)
-          // lineNumbers: true,
-          indentWithTabs: true,
+        $scope.initCodeEditor = function(editor) {
+          editor.setValue($scope.code);
+
+          // Options for the ui-codemirror display.
+          editor.setOption('lineNumbers', true);
+          editor.setOption('indentWithTabs', true);
+
           // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
           // 'scheme' have CodeMirror-supported syntax highlighting. For other
           // languages, syntax highlighting will not happen.
-          mode: $scope.language
+          editor.setOption('mode', $scope.language);
+
+          // NOTE: this is necessary to avoid the textarea being greyed-out.
+          setTimeout(function() {
+            editor.refresh();
+          }, 200);
+
+          editor.on('change', function(instance, change) {
+            $scope.code = editor.getValue();
+          });
         };
+
 
         // Set up the jsrepl instance with callbacks set.
         var jsrepl = new JSREPL({

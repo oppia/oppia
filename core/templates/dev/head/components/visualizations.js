@@ -62,7 +62,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       centerAtCurrentState: '@',
       onClickFunction: '=',
       onDeleteFunction: '=',
-      onMaximizeFunction: '='
+      onMaximizeFunction: '=',
+      isEditable: '='
     },
     template: '<div></div>',
     replace: true,
@@ -687,7 +688,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             });
         }
 
-        if ($scope.onDeleteFunction) {
+        if ($scope.isEditable && $scope.onDeleteFunction) {
           // Add a 'delete node' handler.
           nodeEnter.append('svg:rect')
             .attr({

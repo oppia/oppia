@@ -31,7 +31,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       isTmpRule: '@',
       saveTmpRule: '=',
       saveRule: '=',
-      deleteRule: '&'
+      deleteRule: '&',
+      isEditable: '='
     },
     templateUrl: 'inline/rule_editor',
     controller: [
@@ -80,6 +81,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.FEEDBACK_LIST_INIT_ARGS = {
           addItemText: 'Add feedback message',
           disableControls: Boolean($scope.isTmpRule === 'true'),
+          isEditable: $scope.isEditable,
           objType: 'Html',
           messageIfEmpty: 'This rule provides no feedback.'
         };

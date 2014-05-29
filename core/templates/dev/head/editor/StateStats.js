@@ -19,7 +19,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateStats($scope, $log, warningsData, explorationData, editorContextService) {
+function StateStats(
+    $scope, $log, warningsData, explorationData, editorContextService) {
+
   $scope.unresolvedAnswersList = [];
 
   $scope.initStateStats = function(data) {
@@ -29,7 +31,7 @@ function StateStats($scope, $log, warningsData, explorationData, editorContextSe
 
   $scope.$on('guiTabSelected', function(evt) {
     $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = explorationData.data.states[$scope.stateName];
+    var stateData = $scope.$parent.states[$scope.stateName];
     $scope.initStateStats(stateData);
   });
 

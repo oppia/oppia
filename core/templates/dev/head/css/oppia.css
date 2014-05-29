@@ -95,6 +95,9 @@ p {
   position: relative;
 }
 
+.label {
+  margin: auto 4px;
+}
 .label-info {
   background-color: #18447E;
 }
@@ -110,6 +113,14 @@ img, video, canvas {
 
 textarea {
   width: 90%;
+}
+
+/*
+  Adjustments for the jWysiwyg RTE, to allow it to adopt the size
+  of its container.
+*/
+div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
+  width: 100%;
 }
 
 /*

@@ -178,6 +178,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ]
     )
 
+    def get_all_viewer_ids(self):
+        return list(set(self.owner_ids + self.editor_ids + self.viewer_ids))
+
+    all_viewer_ids = ndb.ComputedProperty(get_all_viewer_ids, repeated=True)
+
     def save(self, committer_id, commit_message, commit_cmds):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
@@ -201,6 +206,15 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).fetch(QUERY_LIMIT)
 
     @classmethod
+    def get_non_private(cls):
+        """Returns an iterable with non-private exp rights models."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
     def get_community_owned(cls):
         """Returns an iterable with community-owned exp rights models."""
         return ExplorationRightsModel.query().filter(
@@ -217,6 +231,17 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.viewer_ids == user_id
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_private_at_least_viewable(cls, user_id):
+        """Returns an iterable with private exps that are at least viewable."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status == EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ExplorationRightsModel.all_viewer_ids == user_id
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)

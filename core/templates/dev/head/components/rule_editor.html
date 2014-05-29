@@ -1,12 +1,12 @@
 <div>
   <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule()" class="oppia-rule-header-bubble">
-    <button type="button" class="btn btn-default btn-xs pull-right" ng-if="!isDefaultRule()" ng-click="deleteRule()" >
+    <button type="button" class="btn btn-default btn-xs pull-right" ng-if="!isDefaultRule() && isEditable" ng-click="deleteRule()">
       <span class="glyphicon glyphicon-remove" title="Remove Rule"></span>
     </button>
     <div class="oppia-rule-description-editor" ng-class="getEditableCssClassForRule()" ng-click="openRuleDescriptionEditorIfNotDefault()">
       <span ng-if="isRuleConfusing()" class="glyphicon glyphicon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></span>
       <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
-      <span ng-if="!isDefaultRule()">
+      <span ng-if="!isDefaultRule() && isEditable">
         <button type="button" class="btn btn-default btn-xs oppia-edit-rule-description-button">
           <span class="glyphicon glyphicon-pencil" title="Edit Rule"></span>
         </button>
@@ -88,7 +88,7 @@
             <[rule.dest]>
           </a>
         </span>
-        <button type="button" class="btn btn-default btn-xs" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'">
+        <button type="button" class="btn btn-default btn-xs" ng-click="openRuleDestEditor()" ng-disabled="isTmpRule === 'true'" ng-if="isEditable">
           <span class="glyphicon glyphicon-pencil" title="Edit Rule Destination"></span>
         </button>
       </div>

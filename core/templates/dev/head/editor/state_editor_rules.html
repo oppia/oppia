@@ -18,12 +18,12 @@
   <div class="row">
     <div ng-repeat="rule in handler" ng-hide="$last">
       <div class="col-lg-11 col-md-11 col-sm-11 oppia-rule-block">
-        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)">
+        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
         </rule-editor>
       </div>
 
       <div class="col-lg-1 col-md-1 col-sm-1 oppia-rule-swap-arrows">
-        <span class="pull-right">
+        <span class="pull-right" ng-if="editabilityService.isEditable()">
           <button type="button" class="btn btn-default btn-xs oppia-rule-ctrl" ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)">
             <span class="glyphicon glyphicon-arrow-up" title="Move rule up"></span>
           </button>
@@ -44,7 +44,7 @@
 {% endblock %}
 
 {% block line2 %}
-  <div class="row" ng-show="widgetId != 'Continue'">
+  <div class="row" ng-if="widgetId != 'Continue' && editabilityService.isEditable()">
     <div class="col-lg-11 col-md-11 col-sm-11 oppia-rule-block">
       <div ng-if="!tmpRule">
         <button type="button" class="btn btn-default oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
@@ -53,7 +53,7 @@
       </div>
 
       <div ng-if="tmpRule">
-        <rule-editor rule="tmpRule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-tmp-rule="saveTmpRule" delete-rule="cancelTmpRule()">
+        <rule-editor rule="tmpRule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-tmp-rule="saveTmpRule" delete-rule="cancelTmpRule()" is-editable="editabilityService.isEditable()">
         </rule-editor>
       </div>
     </div>
@@ -63,7 +63,7 @@
 {% block line3 %}
   <div class="row">
     <div class="col-lg-11 col-md-11 col-sm-11 oppia-rule-block">
-      <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule">
+      <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
       </rule-editor>
     </div>
     <div class="col-lg-1 col-md-1 col-sm-1">
