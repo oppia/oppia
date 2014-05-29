@@ -80,6 +80,13 @@ oppia.directive('oppiaInteractiveLogicProof', [
           editor.setOption('indentWithTabs', true);
           editor.setOption('lineWrapping', true);
 
+          // NOTE: this is necessary to avoid the textarea being greyed-out. See
+          // http://stackoverflow.com/questions/8349571/codemirror-editor-is-not-loading-content-until-clicked
+          // for discussion.
+          setTimeout(function() {
+            editor.refresh();
+          }, 200);          
+
           // NOTE: we must use beforeChange rather than change here to avoid an
           // infinite loop (which code-mirror will not catch).
           editor.on('beforeChange', function(instance, change) {
