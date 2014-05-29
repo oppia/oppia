@@ -18,9 +18,53 @@
  * @author kashida@google.com (Koji Ashida)
  */
 
-function ExplorationFeedback($scope, $http,
+function ExplorationFeedback($scope, $http, $modal,
     warningsData, oppiaRequestCreator, explorationData) {
   var expId = explorationData.explorationId;
+
+  $scope._getThreadById = function(threadId) {
+    for (var i = 0; i < $scope.threads.length; i++) {
+      if ($scope.threads[i].thread_id == threadId) {
+        return $scope.threads[i];
+      }
+    }
+    return null;
+  };
+
+  $scope._createThread = function(newThreadSubject, newThreadText) {
+    $http.post(
+      '/threadlist/create/' + expId,
+      oppiaRequestCreator.createRequest({
+        state_id: null,
+        subject: newThreadSubject,
+        text: newThreadText,
+      }),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+    success(function() {
+      getThreadList();
+      $scope.deselectThread();
+    }).error(function(data) {
+      warningsData.addWarning(data.error || 'Error creating a thread.');
+    });
+  };
+
+  $scope.setCurrentThread = function(threadId) {
+    if (threadId === null) {
+      $scope.currentThreadId = null;
+      $scope.currentThreadData = null;
+      $scope.currentThreadMessages = null;
+      return;
+    }
+
+    $http.get('/thread/' + threadId).success(function(data) {
+      $scope.currentThreadId = threadId;
+      $scope.currentThreadData = $scope._getThreadById(threadId);
+      $scope.currentThreadMessages = data.messages;
+    }).error(function(data) {
+      warningsData.addWarning(data.error || 'Error getting thread messages.');
+    });
+  };
+
   var getThreadList = function() {
     $http.get('/threadlist/' + expId).success(function(data) {
       $scope.threads = data.threads;
@@ -29,73 +73,74 @@ function ExplorationFeedback($scope, $http,
     });
   };
 
-  var getThread = function() {
-    if ($scope.currentThreadId === null) {
-      warningsData.addWarning(
-          'Current thread ID not set. Required to get the thread list.');
-      return;
-    }
-    $http.get('/thread/' + $scope.currentThreadId).success(function(data) {
-      $scope.messages = data.messages;
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error getting thread messages.');
+  $scope.showCreateThreadModal = function() {
+    warningsData.clear();
+
+    $modal.open({
+      templateUrl: 'modals/editorFeedbackCreateThread',
+      backdrop: 'static',
+      resolve: {},
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.create = function(newThreadSubject, newThreadText) {
+          if (!newThreadSubject) {
+            warningsData.addWarning('Please specify a thread subject.');
+            return;
+          }
+          if (!newThreadText) {
+            warningsData.addWarning('Please specify a message.');
+            return;
+          }
+
+          // Clear the form variables so that they are empty on the next load
+          // of the modal.
+          $scope.newThreadSubject = '';
+          $scope.newThreadText = '';
+
+          $modalInstance.close({
+            newThreadSubject: newThreadSubject,
+            newThreadText: newThreadText
+          });
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    }).result.then(function(result) {
+      $scope._createThread(result.newThreadSubject, result.newThreadText);
     });
   };
 
-  $scope.createThread = function() {
-    $http.post(
-        '/threadlist/create/' + expId,
-        oppiaRequestCreator.createRequest({
-          state_id: $scope.newThreadStateId,
-          subject: $scope.newThreadSubject,
-          text: $scope.newThreadText,
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function() {
-      getThreadList();
-      $scope.unselectThread();
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error creating a thread.');
-    });
-  };
-
-  $scope.createMessage = function() {
-    if ($scope.currentThreadId === null) {
+  $scope.addMessage = function(threadId, newMessageText) {
+    if (threadId === null) {
       warningsData.addWarning(
-          'Current thread ID not set. Required to create a message');
+        'Current thread ID not set. Required to create a message');
       return;
     }
     $http.post(
-        '/thread/create/' + $scope.currentThreadId,
-        oppiaRequestCreator.createRequest({
-          exploration_id: expId,
-          thread_id: $scope.currentThreadId,
-          updated_status: $scope.newMessageStatus,
-          updated_subject: $scope.newMessageSubject,
-          text: $scope.newMessageText,
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+      '/thread/create/' + threadId,
+      oppiaRequestCreator.createRequest({
+        exploration_id: expId,
+        updated_status: null,
+        updated_subject: null,
+        text: newMessageText,
+      }),
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function() {
-      getThreadList();
-      getThread();
+      $scope.setCurrentThread(threadId);
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error creating a thread message.');
     });
   };
 
-  $scope.selectThread = function(thread) {
-    $scope.currentThreadId = thread.thread_id;
-    getThread();
-  };
-
-  $scope.unselectThread = function() {
-    $scope.currentThreadId = null;
-    $scope.messages = undefined;
-  };
-
   // Initial load of the thread list.
   $scope.currentThreadId = null;
+  $scope.currentThreadData = null;
+  $scope.currentThreadMessages = null;
   getThreadList();
 }
-ExplorationFeedback.$inject = ['$scope', '$http',
-    'warningsData', 'oppiaRequestCreator', 'explorationData'];
+
+ExplorationFeedback.$inject = [
+  '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
+  'explorationData'];

@@ -71,7 +71,7 @@ def create_message(
         exploration_id, thread_id, author_id, updated_status,
         updated_subject, text):
     """Creates a new message for the thread.
-    
+
     Returns False if the message with the ID already exists.
     """
     message_id = feedback_models.FeedbackMessageModel.message_count(thread_id)

@@ -95,6 +95,10 @@ p {
   position: relative;
 }
 
+.label-info {
+  background-color: #18447E;
+}
+
 /*
   The following rule ensures that, as the viewport gets
   smaller, any media will scale down according to its
@@ -750,8 +754,9 @@ textarea {
   color: #444
 }
 
-.label-info {
-  background-color: #18447E;
+.oppia-back-arrow {
+  float: left;
+  margin-right: 5px;
 }
 
 .oppia-rule-block {
@@ -790,10 +795,6 @@ textarea {
 
 .oppia-rule-description-picker-bubble {
   text-align: center;
-}
-
-.oppia-rule-description-back-arrow {
-  float: left;
 }
 
 .oppia-rule-bubble-warning {

@@ -18,6 +18,7 @@ __author__ = 'kashida@google.com (Koji Ashida)'
 
 from core.controllers import base
 from core.domain import feedback_services
+from core.domain import user_services
 
 
 class ThreadListHandler(base.BaseHandler):
@@ -49,6 +50,10 @@ class ThreadHandler(base.BaseHandler):
     @base.require_user
     def get(self, thread_id):
         messages = feedback_services.get_thread(thread_id)
+        for message in messages:
+            message['author_username'] = user_services.get_username(
+                message['author_id'])
+            del message['author_id']
         self.values.update({'messages': messages})
         self.render_json(self.values)
 

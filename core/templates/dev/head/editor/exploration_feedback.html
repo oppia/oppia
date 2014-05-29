@@ -1,50 +1,119 @@
 <div ng-controller="ExplorationFeedback">
-  <h4>Feedback Threads</h4>
-
-  <div ng-show="threads === undefined" class="oppia-align-center">
-    Loading
-    <span class="oppia-loading-dot-one">.</span>
-    <span class="oppia-loading-dot-two">.</span>
-    <span class="oppia-loading-dot-three">.</span>
+  <div ng-if="!threads">
+    <h4>Feedback Threads</h4>
+    <div class="oppia-align-center">
+      Loading
+      <span class="oppia-loading-dot-one">.</span>
+      <span class="oppia-loading-dot-two">.</span>
+      <span class="oppia-loading-dot-three">.</span>
+    </div>
   </div>
 
-  <div ng-show="threads !== undefined">
-    <div ng-show="messages === undefined">
-      <div class="oppia-align-center">
-        Create a new thread:<br>
-        state: <input type="text" ng-model="newThreadStateId"><br>
-        Subject: <input type="text" ng-model="newThreadSubject"><br>
-        Text: <input type="text" ng-model="newThreadText"><br>
-        <button ng-click="createThread()">Send</button>
+  <div ng-if="threads">
+    <div ng-if="!currentThreadId">
+      <h4>Feedback Threads</h4>
+      <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          <button class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
+            Start new thread
+          </button>
+        </div>
       </div>
 
-      <div ng-repeat="t in threads" ng-click="selectThread(t)">
-        #<[t.thread_id]>,
-        state=<[t.state_id]>,
-        author=<[t.original_author_id]>,
-        status=<[t.status]>,
-        [<[t.subject]>]
-        <[t.summary]>
+      <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          <table class="table">
+            <tr ng-repeat="t in threads">
+              <td class="col-lg-7 col-md-7 col-sm-7">
+                <h5><[t.subject]></h5>
+                <[t.summary]>
+              </td>
+              <td class="col-lg-3 col-md-3 col-sm-3">
+                <span class="label label-info"><[t.status]></span>
+                <span ng-if="t.state_id" class="label label-info">state: <[t.state_id]></span>
+              </td>
+              <td class="col-lg-2 col-md-2 col-sm-2">
+                <button class="btn btn-default" ng-click="setCurrentThread(t.thread_id)">View</button>
+              </td>
+            </tr>
+          </table>
+        </div>
       </div>
     </div>
 
-    <div ng-show="messages !== undefiend">
-      <div ng-click="unselectThread()">&lt; back</div>
-      <div ng-show="messages !== undefined" class="oppia-align-center">
-        Create a new message:<br>
-        status: <input type="text" ng-model="newMessageStatus"><br>
-        Subject: <input type="text" ng-model="newMessageSubject"><br>
-        Text: <input type="text" ng-model="newMessageText"><br>
-        <button ng-click="createMessage()">Send</button>
+    <div ng-if="currentThreadId">
+      <br>
+      <div class="row">
+        <div class="col-lg-6 col-md-6 col-sm-6">
+          <span class="oppia-back-arrow">
+            <button type="button" class="btn btn-default btn-xs" ng-click="setCurrentThread(null)">
+              <span class="glyphicon glyphicon-chevron-left" title="Return to list of feedback threads">
+              </span>
+            </button>
+          </span>
+          <span style="font-size: larger">Feedback Thread: <[currentThreadData.subject]></span>
+        </div>
+
+        <div class="col-lg-2 col-md-2 col-sm-2">
+          <span class="label label-info"><[currentThreadData.status]></span>
+          <span ng-if="currentThreadData.state_id" class="label label-info">
+            state: <[currentThreadData.state_id]>
+          </span>
+        </div>
       </div>
 
-      <div ng-repeat="m in messages">
-        #<[m.message_id]>,
-        author=<[m.author_id]>,
-        status=<[m.updated_status]>,
-        subject=<[m.updated_subject]>,
-        <[m.text]>
+      <div ng-if="currentThreadMessages">
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <table class="table">
+              <tr ng-repeat="m in currentThreadMessages track by $index">
+                <td>
+                  <div>
+                    <strong>#<[m.message_id]></strong> by <em><[m.author_username]></em>
+                    <span class="pull-right" ng-if="m.message_id !== 0">
+                      <span ng-if="m.updated_status" class="label label-info">
+                        Status changed to '<[m.updated_status]>'
+                      </span>
+                      <span ng-if="m.updated_subject" class="label label-info">
+                        Subject changed to '<[m.updated_subject]>'
+                      </span>
+                    </span>
+                  </div>
+                  <div>
+                    <[m.text]>
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <hr>
+
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <label for="newMessageText">Add new message</label>
+            <textarea class="form-control" ng-model="newMessageText" id="newMessageText" rows="6"></textarea>
+            <button class="btn btn-default" ng-click="addMessage(currentThreadId, newMessageText)">Send</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
+
+  <script type="text/ng-template" id="modals/editorFeedbackCreateThread">
+    <div class="modal-header">
+      <h3>Start New Feedback Thread</h3>
+    </div>
+
+    <div class="modal-body">
+      <p>Thread subject: <input type="text" ng-model="newThreadSubject"></p>
+      <p>Message text <textarea ng-model="newThreadText" rows="6"></textarea></p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)">Create Thread</button>
+      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    </div>
+  </script>
 </div>
