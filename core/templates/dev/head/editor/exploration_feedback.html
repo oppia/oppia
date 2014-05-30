@@ -1,5 +1,5 @@
 <div ng-controller="ExplorationFeedback">
-  <div ng-if="!threads">
+  <div ng-if="threads === null">
     <h4>Feedback Threads</h4>
     <div class="oppia-align-center">
       Loading
@@ -9,7 +9,7 @@
     </div>
   </div>
 
-  <div ng-if="threads">
+  <div ng-if="threads !== null">
     <div ng-if="!currentThreadId">
       <h4>Feedback Threads</h4>
       <div class="row">
@@ -30,7 +30,7 @@
               </td>
               <td class="col-lg-3 col-md-3 col-sm-3">
                 <span class="label label-info"><[t.status]></span>
-                <span ng-if="t.state_id" class="label label-info">state: <[t.state_id]></span>
+                <span ng-if="t.state_name" class="label label-info">state: <[t.state_name]></span>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
                 <button class="btn btn-default" ng-click="setCurrentThread(t.thread_id)">View</button>
@@ -56,8 +56,8 @@
 
         <div class="col-lg-2 col-md-2 col-sm-2">
           <span class="label label-info"><[currentThreadData.status]></span>
-          <span ng-if="currentThreadData.state_id" class="label label-info">
-            state: <[currentThreadData.state_id]>
+          <span ng-if="currentThreadData.state_name" class="label label-info">
+            state: <[currentThreadData.state_name]>
           </span>
         </div>
       </div>
@@ -69,7 +69,7 @@
               <tr ng-repeat="m in currentThreadMessages track by $index">
                 <td>
                   <div>
-                    <strong>#<[m.message_id]></strong> by <em><[m.author_username]></em>
+                    Message <strong>#<[m.message_id]></strong> by <em><[m.author_username]></em>
                     <span class="pull-right" ng-if="m.message_id !== 0">
                       <span ng-if="m.updated_status" class="label label-info">
                         Status changed to '<[m.updated_status]>'

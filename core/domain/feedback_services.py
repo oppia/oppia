@@ -28,7 +28,7 @@ def get_threadlist(exploration_id):
     for t in feedback_models.FeedbackThreadModel.get_threads(exploration_id):
         result.append({
             'thread_id': t.id,
-            'state_id': t.state_id,
+            'state_name': t.state_name,
             'original_author_id': t.original_author_id,
             'status': t.status,
             'subject': t.subject,
@@ -37,14 +37,15 @@ def get_threadlist(exploration_id):
     return result
 
 
-def create_thread(exploration_id, state_id, original_author_id, subject, text):
+def create_thread(
+        exploration_id, state_name, original_author_id, subject, text):
     """Creates a thread and the first message in it."""
     thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
         exploration_id)
     thread = feedback_models.FeedbackThreadModel.create(
         exploration_id, thread_id)
     thread.exploration_id = exploration_id
-    thread.state_id = state_id
+    thread.state_name = state_name
     thread.original_author_id = original_author_id
     thread.status = feedback_models.STATUS_CHOICES_OPEN
     thread.subject = subject

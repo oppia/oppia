@@ -21,6 +21,7 @@
 function ExplorationFeedback($scope, $http, $modal,
     warningsData, oppiaRequestCreator, explorationData) {
   var expId = explorationData.explorationId;
+  var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
 
   $scope._getThreadById = function(threadId) {
     for (var i = 0; i < $scope.threads.length; i++) {
@@ -33,9 +34,9 @@ function ExplorationFeedback($scope, $http, $modal,
 
   $scope._createThread = function(newThreadSubject, newThreadText) {
     $http.post(
-      '/threadlist/create/' + expId,
+      THREAD_LIST_HANDLER_URL,
       oppiaRequestCreator.createRequest({
-        state_id: null,
+        state_name: null,
         subject: newThreadSubject,
         text: newThreadText,
       }),
@@ -56,7 +57,7 @@ function ExplorationFeedback($scope, $http, $modal,
       return;
     }
 
-    $http.get('/thread/' + threadId).success(function(data) {
+    $http.get('/threadhandler/' + threadId).success(function(data) {
       $scope.currentThreadId = threadId;
       $scope.currentThreadData = $scope._getThreadById(threadId);
       $scope.currentThreadMessages = data.messages;
@@ -66,7 +67,7 @@ function ExplorationFeedback($scope, $http, $modal,
   };
 
   var getThreadList = function() {
-    $http.get('/threadlist/' + expId).success(function(data) {
+    $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
       $scope.threads = data.threads;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error getting thread list.');
@@ -119,7 +120,7 @@ function ExplorationFeedback($scope, $http, $modal,
       return;
     }
     $http.post(
-      '/thread/create/' + threadId,
+      '/threadhandler/' + threadId,
       oppiaRequestCreator.createRequest({
         exploration_id: expId,
         updated_status: null,

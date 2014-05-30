@@ -265,6 +265,13 @@ urls = [
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
 
     get_redirect_route(
+        r'%s/<exploration_id>' % feconf.THREADLIST_URL_PREFIX,
+        feedback.ThreadListHandler, 'threadlist_handler'),
+    get_redirect_route(
+        r'%s/<thread_id>' % feconf.THREAD_URL_PREFIX,
+        feedback.ThreadHandler, 'thread_handler'),
+
+    get_redirect_route(
         r'/widgetrepository/data/<widget_type>',
         widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
     get_redirect_route(
@@ -274,22 +281,6 @@ urls = [
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
 ]
-if feconf.SHOW_FEEDBACK_TAB:
-  urls += [
-      get_redirect_route(
-          r'%s/<exploration_id>' % feconf.THREADLIST_URL_PREFIX,
-          feedback.ThreadListHandler, 'threadlist_handler'),
-      get_redirect_route(
-          r'%s/create/<exploration_id>' % feconf.THREADLIST_URL_PREFIX,
-          feedback.ThreadCreateHandler, 'threadcreate_handler'),
-      get_redirect_route(
-          r'%s/<thread_id>' % feconf.THREAD_URL_PREFIX,
-          feedback.ThreadHandler, 'thread_handler'),
-      get_redirect_route(
-          r'%s/create/<thread_id>' % feconf.THREAD_URL_PREFIX,
-          feedback.MessageCreateHandler, 'messagecreate_handler'),
-  ]
-
 
 # 404 error handler.
 error404_handler = [webapp2.Route(r'/.*', Error404Handler)]

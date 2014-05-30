@@ -19,36 +19,41 @@ __author__ = 'kashida@google.com (Koji Ashida)'
 from core.controllers import base
 from core.domain import feedback_services
 from core.domain import user_services
+import feconf
 
 
 class ThreadListHandler(base.BaseHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_user
     def get(self, exploration_id):
+        if not feconf.SHOW_FEEDBACK_TAB:
+            raise Exception('Unlaunched feature.')
+
         threads = feedback_services.get_threadlist(exploration_id)
         self.values.update({'threads': threads})
         self.render_json(self.values)
 
-
-class ThreadCreateHandler(base.BaseHandler):
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @base.require_user
     def post(self, exploration_id):
+        if not feconf.SHOW_FEEDBACK_TAB:
+            raise Exception('Unlaunched feature.')
+
         feedback_services.create_thread(
             exploration_id,
-            self.payload.get('state_id'),
+            self.payload.get('state_name'),
             self.user_id,
-            self.payload.get('subject'),
-            self.payload.get('text'))
+            self.payload['subject'],
+            self.payload['text'])
+        self.render_json(self.values)
 
 
 class ThreadHandler(base.BaseHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    @base.require_user
     def get(self, thread_id):
+        if not feconf.SHOW_FEEDBACK_TAB:
+            raise Exception('Unlaunched feature.')
+
         messages = feedback_services.get_thread(thread_id)
         for message in messages:
             message['author_username'] = user_services.get_username(
@@ -57,12 +62,11 @@ class ThreadHandler(base.BaseHandler):
         self.values.update({'messages': messages})
         self.render_json(self.values)
 
-
-class MessageCreateHandler(base.BaseHandler):
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @base.require_user
     def post(self, thread_id):
+        if not feconf.SHOW_FEEDBACK_TAB:
+            raise Exception('Unlaunched feature.')
+
         feedback_services.create_message(
             self.payload.get('exploration_id'),
             thread_id,
@@ -70,3 +74,4 @@ class MessageCreateHandler(base.BaseHandler):
             self.payload.get('updated_status'),
             self.payload.get('updated_subject'),
             self.payload.get('text'))
+        self.render_json(self.values)

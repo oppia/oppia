@@ -52,7 +52,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     exploration_id = ndb.StringProperty(required=True, indexed=True)
     # ID of state the thread is for. Does not exist if the thread is about the
     # entire exploration.
-    state_id = ndb.StringProperty(indexed=True)
+    state_name = ndb.StringProperty(indexed=True)
     # ID of the user who started the thread.
     original_author_id = ndb.StringProperty(required=True, indexed=True)
     # Latest status of the thread.
@@ -96,8 +96,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         """
         instance_id = cls._generate_id(exploration_id, thread_id)
         if cls.get_by_id(instance_id):
-          raise Exception(
-              'Feedback thread ID conflict on create.')
+            raise Exception('Feedback thread ID conflict on create.')
         return cls(id=instance_id)
 
     @classmethod
@@ -132,7 +131,7 @@ class FeedbackMessageModel(base_models.BaseModel):
     The id/key of instances of this class has the form
         [EXPLORATION_ID].[THREAD_ID].[MESSAGE_ID]
     """
-    # ID corresponding to an entry of FeedbackThreadModel in the form of 
+    # ID corresponding to an entry of FeedbackThreadModel in the form of
     #   [EXPLORATION_ID].[THREAD_ID]
     thread_id = ndb.StringProperty(required=True, indexed=True)
     # 0-based sequential numerical ID. Sorting by this field will create the
@@ -157,13 +156,12 @@ class FeedbackMessageModel(base_models.BaseModel):
     def create(cls, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
 
-        Throws an exception if a message with the given thread ID and message ID
-        combination exists already.
+        Throws an exception if a message with the given thread ID and message
+        ID combination exists already.
         """
         instance_id = cls._generate_id(thread_id, message_id)
         if cls.get_by_id(instance_id):
-          raise Exception(
-              'Feedback message ID conflict on create.')
+            raise Exception('Feedback message ID conflict on create.')
         return cls(id=instance_id)
 
     @classmethod
