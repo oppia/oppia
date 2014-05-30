@@ -20,6 +20,7 @@ import feconf
 
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import cron
 from core.controllers import editor
 from core.controllers import galleries
 from core.controllers import moderator
@@ -148,6 +149,8 @@ urls = [
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
+
+    get_redirect_route(r'/cron/statistics', cron.StatisticsHandler, 'statistics_handler'),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
