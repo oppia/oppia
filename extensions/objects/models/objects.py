@@ -326,7 +326,6 @@ class TabContent(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        schema_utils.validate_schema(cls._schema)
         raw = schema_utils.normalize_against_schema(raw, cls._schema)
         raw['title'] = UnicodeString.normalize(raw['title'])
         raw['content'] = Html.normalize(raw['content'])

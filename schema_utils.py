@@ -12,7 +12,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Utility functions for managing schemas and schema-based validation."""
+"""Utility functions for managing schemas and schema-based validation.
+
+A schema is a way to specify the type of an object. For example, one might
+want to require that an object is an integer, or that it is a dict with two
+keys named 'abc' and 'def', each with values that are unicode strings. This
+file contains utilities for validating schemas and for checking that objects
+follow the definitions given by the schemas.
+
+The objects that can be described by these schemas must be composable from the
+following Python types: bool, dict, float, int, list, unicode.
+"""
 
 __author__ = 'sll@google.com (Sean Lip)'
 
@@ -35,29 +45,68 @@ ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 
 
+def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
+    """Checks that all of the required keys, and possibly some of the optional
+    keys, are in the given dict.
+
+    Raises:
+      AssertionError: if the validation fails.
+    """
+    assert set(required_keys) <= set(dict_to_check.keys()), (
+        'Missing keys: %s' % dict_to_check)
+    assert set(dict_to_check.keys()) <= set(required_keys + optional_keys), (
+        'Extra keys: %s' % dict_to_check)
+
+
 def validate_schema(schema):
+    """Validates a schema.
+
+    This is meant to be a utility function that should be used by tests to
+    ensure that all schema definitions in the codebase are valid.
+
+    Each schema is a dict with at least a key called 'type'. The 'type' can
+    take one of the SCHEMA_TYPE_* values declared above. In addition, there
+    may be additional keys for specific types:
+    - 'list' requires an additional 'items' property, which specifies the type
+      of the elements in the list. It also allows for an optional 'length'
+      property which specifies the length of the list.
+    - 'dict' requires an additional 'properties' property, which specifies the
+      names of the keys in the dict.
+
+    Raises:
+      AssertionError: if the schema is not valid.
+    """
     assert isinstance(schema, dict)
     assert SCHEMA_KEY_TYPE in schema
     assert schema[SCHEMA_KEY_TYPE] in ALLOWED_SCHEMA_TYPES
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
-        for key in schema:
-            assert key in [
-                SCHEMA_KEY_ITEMS, SCHEMA_KEY_LENGTH, SCHEMA_KEY_TYPE], schema
-            if key == SCHEMA_KEY_LENGTH:
-                assert isinstance(schema[SCHEMA_KEY_LENGTH], int)
-                assert schema[SCHEMA_KEY_LENGTH] > 0
-            validate_schema(schema[SCHEMA_KEY_ITEMS])
+        _validate_dict_keys(
+            schema, [SCHEMA_KEY_ITEMS, SCHEMA_KEY_TYPE], [SCHEMA_KEY_LENGTH])
+
+        validate_schema(schema[SCHEMA_KEY_ITEMS])
+        if SCHEMA_KEY_LENGTH in schema:
+            assert isinstance(schema[SCHEMA_KEY_LENGTH], int)
+            assert schema[SCHEMA_KEY_LENGTH] > 0
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
-        for key in schema:
-            assert key in [SCHEMA_KEY_PROPERTIES, SCHEMA_KEY_TYPE], schema
-            for prop in schema[SCHEMA_KEY_PROPERTIES]:
-                assert isinstance(prop, basestring)
-                validate_schema(schema[SCHEMA_KEY_PROPERTIES][prop])
+        _validate_dict_keys(
+            schema, [SCHEMA_KEY_PROPERTIES, SCHEMA_KEY_TYPE], [])
+
+        for prop in schema[SCHEMA_KEY_PROPERTIES]:
+            assert isinstance(prop, basestring)
+            validate_schema(schema[SCHEMA_KEY_PROPERTIES][prop])
     else:
-        assert schema.keys() == [SCHEMA_KEY_TYPE], schema
+        _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], [])
 
 
 def normalize_against_schema(obj, schema):
+    """Validate the given object using the schema, normalizing if necessary.
+
+    Returns:
+        the normalized object.
+
+    Raises:
+        AssertionError: if the object fails to validate against the schema.
+    """
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         return obj
