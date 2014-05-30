@@ -71,7 +71,7 @@ def validate_schema(schema):
       of the elements in the list. It also allows for an optional 'length'
       property which specifies the length of the list.
     - 'dict' requires an additional 'properties' property, which specifies the
-      names of the keys in the dict.
+      names of the keys in the dict, and schema definitions for their values.
 
     Raises:
       AssertionError: if the schema is not valid.
