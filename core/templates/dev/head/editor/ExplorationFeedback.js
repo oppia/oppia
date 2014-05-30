@@ -22,6 +22,7 @@ function ExplorationFeedback($scope, $http, $modal,
     warningsData, oppiaRequestCreator, explorationData) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
+  var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
   $scope._getThreadById = function(threadId) {
     for (var i = 0; i < $scope.threads.length; i++) {
@@ -57,7 +58,7 @@ function ExplorationFeedback($scope, $http, $modal,
       return;
     }
 
-    $http.get('/threadhandler/' + threadId).success(function(data) {
+    $http.get(THREAD_HANDLER_PREFIX + threadId).success(function(data) {
       $scope.currentThreadId = threadId;
       $scope.currentThreadData = $scope._getThreadById(threadId);
       $scope.currentThreadMessages = data.messages;
@@ -120,9 +121,8 @@ function ExplorationFeedback($scope, $http, $modal,
       return;
     }
     $http.post(
-      '/threadhandler/' + threadId,
+      THREAD_HANDLER_PREFIX + threadId,
       oppiaRequestCreator.createRequest({
-        exploration_id: expId,
         updated_status: null,
         updated_subject: null,
         text: newMessageText,

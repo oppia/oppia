@@ -29,8 +29,12 @@ class ThreadListHandler(base.BaseHandler):
         if not feconf.SHOW_FEEDBACK_TAB:
             raise Exception('Unlaunched feature.')
 
-        threads = feedback_services.get_threadlist(exploration_id)
-        self.values.update({'threads': threads})
+        threadlist = feedback_services.get_threadlist(exploration_id)
+        for thread in threadlist:
+            thread['original_author_username'] = user_services.get_username(
+                thread['original_author_id'])
+            del thread['original_author_id']
+        self.values.update({'threads': threadlist})
         self.render_json(self.values)
 
     @base.require_user
@@ -38,19 +42,29 @@ class ThreadListHandler(base.BaseHandler):
         if not feconf.SHOW_FEEDBACK_TAB:
             raise Exception('Unlaunched feature.')
 
+        subject = self.payload.get('subject')
+        if not subject:
+            raise self.InvalidInputException(
+                'A thread subject must be specified.')
+
+        text = self.payload.get('text')
+        if not text:
+            raise self.InvalidInputException(
+                'Text for the first message in the thread must be specified.')
+
         feedback_services.create_thread(
             exploration_id,
             self.payload.get('state_name'),
             self.user_id,
-            self.payload['subject'],
-            self.payload['text'])
+            subject,
+            text)
         self.render_json(self.values)
 
 
 class ThreadHandler(base.BaseHandler):
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def get(self, thread_id):
+    def get(self, exploration_id, thread_id):
         if not feconf.SHOW_FEEDBACK_TAB:
             raise Exception('Unlaunched feature.')
 
@@ -63,15 +77,20 @@ class ThreadHandler(base.BaseHandler):
         self.render_json(self.values)
 
     @base.require_user
-    def post(self, thread_id):
+    def post(self, exploration_id, thread_id):
         if not feconf.SHOW_FEEDBACK_TAB:
             raise Exception('Unlaunched feature.')
 
+        text = self.payload.get('text')
+        if not text:
+            raise self.InvalidInputException(
+                'Text for the message must be specified.')
+
         feedback_services.create_message(
-            self.payload.get('exploration_id'),
+            exploration_id,
             thread_id,
             self.user_id,
             self.payload.get('updated_status'),
             self.payload.get('updated_subject'),
-            self.payload.get('text'))
+            text)
         self.render_json(self.values)

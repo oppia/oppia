@@ -268,7 +268,7 @@ urls = [
         r'%s/<exploration_id>' % feconf.THREADLIST_URL_PREFIX,
         feedback.ThreadListHandler, 'threadlist_handler'),
     get_redirect_route(
-        r'%s/<thread_id>' % feconf.THREAD_URL_PREFIX,
+        r'%s/<exploration_id>/<thread_id>' % feconf.THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'thread_handler'),
 
     get_redirect_route(
