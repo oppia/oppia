@@ -58,7 +58,6 @@ oppia.directive('oppiaInteractiveTarFileReadInput', [
             type: 'POST',
             datatype: 'json',
             success: function(data) {
-              console.log(data);
               var answer = data['base64_file_content'];
               if (!answer) {
                 alert('An error occurred while processing your input.');
