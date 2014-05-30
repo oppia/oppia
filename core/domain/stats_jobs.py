@@ -15,16 +15,20 @@
 """Jobs for statistics views."""
 
 import ast
+import logging
+
+from core import jobs
+from core.platform import models
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 import feconf
 import logging
 import utils
-from core import jobs
-from core.platform import models
-
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
-    """Job that calculates and creates stats models for exploration view."""
+    """Job that calculates and creates stats models for exploration view.
+       Includes: * number of visits to the exploration
+                 * number of completions of the exploration
+    """
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -40,25 +44,23 @@ class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
         yield (item.exploration_id, map_value)
 
     @staticmethod
-    def reduce(key, values):
+    def reduce(key, stringified_values):
         started_session_ids = set()
-        leave_by_session_id = {}
-        for value_str in values:
+        last_maybe_leave_by_session_id = {}
+        for value_str in stringified_values:
             value = ast.literal_eval(value_str)
             if value['event_type'] == feconf.EVENT_TYPE_START:
                 started_session_ids.add(value['session_id'])
-            if value['event_type'] == feconf.EVENT_TYPE_LEAVE:
+            elif value['event_type'] == feconf.EVENT_TYPE_LEAVE:
                 session_id = value['session_id']
-                if session_id in leave_by_session_id:
-                    former_value = leave_by_session_id[session_id]
-                    leave_by_session_id[session_id] = (
-                        former_value 
-                          if former_value['created_on'] > value['created_on']
-                          else value)
-                else:
-                    leave_by_session_id[session_id] = value 
-        complete_events = [e for e in leave_by_session_id.values() 
+                if (session_id not in last_maybe_leave_by_session_id or
+                    value['created_on'] > 
+                    last_maybe_leave_by_session_id[session_id]['created_on']):
+                    last_maybe_leave_by_session_id[session_id] = value
+        complete_events = [e for 
+                           e in last_maybe_leave_by_session_id.values() 
                            if e['state_name'] == feconf.END_DEST]
-        stats_models.ExplorationAnnotationModel(id=key,
+        stats_models.ExplorationAnnotationModel(
+            id=key,
             num_visits=len(started_session_ids),
             num_completions=len(complete_events)).put()
