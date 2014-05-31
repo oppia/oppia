@@ -30,10 +30,6 @@ class ThreadListHandler(base.BaseHandler):
             raise Exception('Unlaunched feature.')
 
         threadlist = feedback_services.get_threadlist(exploration_id)
-        for thread in threadlist:
-            thread['original_author_username'] = user_services.get_username(
-                thread['original_author_id'])
-            del thread['original_author_id']
         self.values.update({'threads': threadlist})
         self.render_json(self.values)
 
@@ -69,10 +65,6 @@ class ThreadHandler(base.BaseHandler):
             raise Exception('Unlaunched feature.')
 
         messages = feedback_services.get_messages(thread_id)
-        for message in messages:
-            message['author_username'] = user_services.get_username(
-                message['author_id'])
-            del message['author_id']
         self.values.update({'messages': messages})
         self.render_json(self.values)
 
@@ -109,3 +101,20 @@ class FeedbackLastUpdatedHandler(base.BaseHandler):
 
         self.values.update({'last_updated': last_updated})
         self.render_json(self.values)
+
+
+class RecentFeedbackMessagesHandler(base.BaseHandler):
+    """Returns a list of recently-posted feedback messages."""
+
+    def get(self):
+        urlsafe_start_cursor = self.request.get('cursor')
+
+        all_feedback_messages, new_urlsafe_start_cursor, more = (
+            feedback_services.get_next_page_of_all_feedback_messages(
+                urlsafe_start_cursor=urlsafe_start_cursor))
+
+        self.render_json({
+            'results': all_feedback_messages,
+            'cursor': new_urlsafe_start_cursor,
+            'more': more,
+        })

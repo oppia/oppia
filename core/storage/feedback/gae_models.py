@@ -152,6 +152,10 @@ class FeedbackMessageModel(base_models.BaseModel):
     def _generate_id(cls, thread_id, message_id):
         return '.'.join([thread_id, str(message_id)])
 
+    @property
+    def exploration_id(self):
+        return self.id.split('.')[0]
+
     @classmethod
     def create(cls, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
@@ -189,3 +193,8 @@ class FeedbackMessageModel(base_models.BaseModel):
         Does not include the deleted entries.
         """
         return cls.get_all().filter(cls.thread_id == thread_id).count()
+
+    @classmethod
+    def get_all_messages(cls, page_size, urlsafe_start_cursor):
+        return cls._fetch_page_sorted_by_last_updated(
+            cls.query(), page_size, urlsafe_start_cursor)

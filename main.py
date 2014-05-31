@@ -187,10 +187,6 @@ urls = [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
 
-    get_redirect_route(
-        r'%s' % feconf.RECENT_COMMITS_DATA_URL,
-        recent_commits.RecentCommitsHandler, 'recent_commits_handler'),
-
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
         r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
@@ -263,6 +259,14 @@ urls = [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
+
+    get_redirect_route(
+        r'%s' % feconf.RECENT_COMMITS_DATA_URL,
+        recent_commits.RecentCommitsHandler, 'recent_commits_handler'),
+    get_redirect_route(
+        r'%s' % feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL,
+        feedback.RecentFeedbackMessagesHandler,
+        'recent_feedback_messages_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.FEEDBACK_LAST_UPDATED_URL_PREFIX,

@@ -14,20 +14,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Commands for feedback thread and message operations.
-"""
+"""Commands for feedback thread and message operations."""
 
 __author__ = 'Koji Ashida'
 
+from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+import feconf
 import utils
 
 
 def get_threadlist(exploration_id):
     return [{
         'last_updated': utils.get_time_in_millisecs(t.last_updated),
-        'original_author_id': t.original_author_id,
+        'original_author_username': user_services.get_username(
+            t.original_author_id),
         'state_name': t.state_name,
         'status': t.status,
         'subject': t.subject,
@@ -54,15 +56,23 @@ def create_thread(
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
 
 
+def _get_message_dict(message_instance):
+    return {
+        'author_username': user_services.get_username(
+            message_instance.author_id),
+        'created_on': utils.get_time_in_millisecs(message_instance.created_on),
+        'exploration_id': message_instance.exploration_id,
+        'message_id': message_instance.message_id,
+        'text': message_instance.text,
+        'updated_status': message_instance.updated_status,
+        'updated_subject': message_instance.updated_subject,
+    }
+
+
 def get_messages(thread_id):
-    return [{
-        'author_id': m.author_id,
-        'created_on': utils.get_time_in_millisecs(m.created_on),
-        'message_id': m.message_id,
-        'text': m.text,
-        'updated_status': m.updated_status,
-        'updated_subject': m.updated_subject,
-    } for m in feedback_models.FeedbackMessageModel.get_messages(thread_id)]
+    return [
+        _get_message_dict(m)
+        for m in feedback_models.FeedbackMessageModel.get_messages(thread_id)]
 
 
 def create_message(
@@ -103,3 +113,20 @@ def create_message(
             updated = True
     thread.put()
     return True
+
+
+def get_next_page_of_all_feedback_messages(
+        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+    """Returns a page of feedback messages in reverse time order.
+
+    The return value is a triple (results, cursor, more) as described in
+    fetch_page() at:
+
+        https://developers.google.com/appengine/docs/python/ndb/queryclass
+    """
+    results, new_urlsafe_start_cursor, more = (
+        feedback_models.FeedbackMessageModel.get_all_messages(
+            page_size, urlsafe_start_cursor))
+
+    result_dicts = [_get_message_dict(m) for m in results]
+    return (result_dicts, new_urlsafe_start_cursor, more)

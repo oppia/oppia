@@ -244,6 +244,7 @@ NEW_EXPLORATION_URL = '/contributehandler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
 PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
+RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 SPLASH_PAGE_URL = '/'
 

@@ -25,8 +25,8 @@ EXPECTED_THREAD_KEYS = [
     'status', 'original_author_username', 'state_name', 'summary',
     'thread_id', 'subject', 'last_updated']
 EXPECTED_MESSAGE_KEYS = [
-    'author_username', 'message_id', 'text', 'updated_status',
-    'updated_subject', 'created_on']
+    'author_username', 'created_on', 'exploration_id', 'message_id',
+    'text', 'updated_status', 'updated_subject']
 
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
@@ -228,6 +228,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             set(EXPECTED_MESSAGE_KEYS))
         self.assertDictContainsSubset({
             'author_username': self.EDITOR_USERNAME,
+            'exploration_id': self.EXP_ID,
             'message_id': 0,
             'updated_status': 'open',
             'updated_subject': u'New Thread ¡unicode!',
@@ -235,6 +236,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         }, response_dict['messages'][0])
         self.assertDictContainsSubset({
             'author_username': self.EDITOR_USERNAME,
+            'exploration_id': self.EXP_ID,
             'message_id': 1,
             'updated_status': None,
             'updated_subject': None,
