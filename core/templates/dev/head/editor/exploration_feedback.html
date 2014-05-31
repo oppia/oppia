@@ -12,13 +12,15 @@
   <div ng-if="threads !== null">
     <div ng-if="!currentThreadId">
       <h4>Feedback Threads</h4>
-      <div class="row">
-        <div class="col-lg-8 col-md-8 col-sm-8">
-          <button class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
-            Start new thread
-          </button>
+      {% if user_email %}
+        <div class="row">
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <button class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
+              Start new thread
+            </button>
+          </div>
         </div>
-      </div>
+      {% endif %}
 
       <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-8">
@@ -58,6 +60,10 @@
           </table>
         </div>
       </div>
+
+      {% if not user_email %}
+        <em>To create a new feedback thread, please log in.</em>
+      {% endif %}
     </div>
 
     <div ng-if="currentThreadId">
@@ -114,13 +120,17 @@
 
         <hr>
 
-        <div class="row">
-          <div class="col-lg-8 col-md-8 col-sm-8">
-            <label for="newMessageText">Add new message</label>
-            <textarea class="form-control" ng-model="newMessageText" id="newMessageText" rows="6"></textarea>
-            <button class="btn btn-default" ng-click="addMessage(currentThreadId, newMessageText)" ng-disabled="messageSendingInProgress">Send</button>
+        {% if user_email %}
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8">
+              <label for="newMessageText">Add new message</label>
+              <textarea class="form-control" ng-model="newMessageText" id="newMessageText" rows="6"></textarea>
+              <button class="btn btn-default" ng-click="addMessage(currentThreadId, newMessageText)" ng-disabled="messageSendingInProgress">Send</button>
+            </div>
           </div>
-        </div>
+        {% else %}
+          <em>To respond to a feedback thread, please log in.</em>
+        {% endif %}
       </div>
     </div>
   </div>

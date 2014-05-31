@@ -328,11 +328,9 @@
             {% include 'editor/exploration_history.html' %}
           </tab>
 
-          {% if SHOW_FEEDBACK_TAB %}
-            <tab heading="<[feedbackTabHeader]>" active="feedbackTabActive" select="selectFeedbackTab()">
-              {% include 'editor/exploration_feedback.html' %}
-            </tab>
-          {% endif %}
+          <tab heading="<[feedbackTabHeader]>" active="feedbackTabActive" select="selectFeedbackTab()">
+            {% include 'editor/exploration_feedback.html' %}
+          </tab>
         </tabset>
       </div>
     </div>

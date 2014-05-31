@@ -32,9 +32,6 @@ EXPECTED_MESSAGE_KEYS = [
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        # TODO(sll): Remove this.
-        feconf.SHOW_FEEDBACK_TAB = True
-
         super(FeedbackThreadPermissionsTests, self).setUp()
 
         # Load exploration 0.
@@ -53,10 +50,11 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-               'state_name': 'Welcome!',
-               'subject': 'New subject',
-               'text': 'Some text'
+            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
+            {
+                'state_name': 'Welcome!',
+                'subject': 'New subject',
+                'text': 'Some text'
             }, self.csrf_token)
         self.logout()
 
@@ -85,7 +83,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         first_thread_id = response_dict['threads'][0]['thread_id']
         thread_url = '%s/%s/%s' % (
             feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID, first_thread_id)
-        response_dict = self.get_json(thread_url)            
+        response_dict = self.get_json(thread_url)
         self.assertEqual(len(response_dict['messages']), 1)
         self.assertDictContainsSubset({
             'updated_status': 'open',
@@ -95,7 +93,8 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
     def test_non_logged_in_users_cannot_create_threads_and_messages(self):
         self.post_json('%s/%s' % (
-            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
+            feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
+            {
                 'state_name': 'Welcome!',
                 'subject': 'New subject',
                 'text': 'Some text'
@@ -113,9 +112,6 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
     def setUp(self):
-        # TODO(sll): Remove this.
-        feconf.SHOW_FEEDBACK_TAB = True
-
         super(FeedbackThreadIntegrationTests, self).setUp()
 
         # Load exploration 0.
@@ -182,10 +178,11 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         response = self.testapp.get('/create/%s' % self.EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
+            {
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
-        }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            }, self.csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(
             response_dict['error'],
             'Text for the first message in the thread must be specified.')
@@ -199,9 +196,9 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         # First, create a thread.
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
-               'state_name': None,
-               'subject': u'New Thread ¡unicode!',
-               'text': u'Message 0 ¡unicode!',
+                'state_name': None,
+                'subject': u'New Thread ¡unicode!',
+                'text': u'Message 0 ¡unicode!',
             }, self.csrf_token)
 
         # Then, get the thread id.
@@ -267,7 +264,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.assertIsNone(response_dict['messages'][0]['author_username'])
 
         self.logout()
-        
+
     def test_message_id_assignment_for_multiple_posts_to_same_thread(self):
         # Create a thread for others to post to.
         self.login(self.EDITOR_EMAIL)

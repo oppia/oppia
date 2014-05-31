@@ -256,6 +256,3 @@ NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LEARN = 'learn'
 NAV_MODE_PLAYTEST = 'playtest'
 NAV_MODE_PROFILE = 'profile'
-
-# Unlaunched feature.
-SHOW_FEEDBACK_TAB = False
