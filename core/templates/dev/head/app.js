@@ -115,6 +115,10 @@ oppia.factory('oppiaDateFormatter', [function() {
     getLocaleString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       return date.toLocaleString();
+    },
+    getLocaleDateString: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
+      return date.toLocaleDateString();
     }
   };
 }]);

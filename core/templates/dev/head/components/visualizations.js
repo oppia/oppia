@@ -168,6 +168,10 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
           };
         }
 
+        console.log(nodes);
+        console.log(links);
+        console.log(initStateName);
+
         // Do a breadth-first search to calculate the depths and offsets.
         var maxDepth = 0;
         var maxOffsetInEachLevel = {0: 0};

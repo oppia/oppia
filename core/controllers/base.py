@@ -195,7 +195,7 @@ class BaseHandler(webapp2.RequestHandler):
                     self.user_id, self.PAGE_NAME_FOR_CSRF, csrf_token)
 
                 if not is_csrf_token_valid:
-                    raise Exception(
+                    raise self.UnauthorizedUserException(
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
@@ -258,6 +258,7 @@ class BaseHandler(webapp2.RequestHandler):
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'FULL_SITE_URL': FULL_SITE_URL.value,
             'ABOUT_PAGES': feconf.ABOUT_PAGES,
+            'SHOW_FEEDBACK_TAB': feconf.SHOW_FEEDBACK_TAB,
         })
 
         if self.user_id:
