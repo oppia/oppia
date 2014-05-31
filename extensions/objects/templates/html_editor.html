@@ -10,8 +10,8 @@
 <div ng-if="active || alwaysEditable">
   <rich-text-editor html-content="localValue.label">
   </rich-text-editor>
-  <button type="button" class="btn btn-default" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
-    Close
+  <button type="button" class="btn btn-default btn-sm pull-right" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
+    Done
   </button>
 </div>
 

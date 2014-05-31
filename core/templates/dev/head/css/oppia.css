@@ -837,7 +837,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   background: #E0E0E0;
   border-bottom-left-radius: 8px;
   display: table-cell;
-  padding: 5px;
+  padding: 5px 10px;
 }
 
 .oppia-dest-bubble {
@@ -846,6 +846,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   display: table-cell;
   padding: 5px;
   vertical-align: middle;
+  width: 160px;
 }
 
 .oppia-logo {
