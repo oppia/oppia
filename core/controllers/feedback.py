@@ -94,3 +94,18 @@ class ThreadHandler(base.BaseHandler):
             self.payload.get('updated_subject'),
             text)
         self.render_json(self.values)
+
+
+class FeedbackLastUpdatedHandler(base.BaseHandler):
+    """Returns the last time a thread for this exploration was updated."""
+
+    def get(self, exploration_id):
+        threadlist = feedback_services.get_threadlist(exploration_id)
+        if threadlist:
+            last_updated = max(
+                [thread['last_updated'] for thread in threadlist])
+        else:
+            last_updated = None
+
+        self.values.update({'last_updated': last_updated})
+        self.render_json(self.values)

@@ -329,7 +329,7 @@
           </tab>
 
           {% if SHOW_FEEDBACK_TAB %}
-            <tab heading="Feedback" active="feedbackTabActive" select="selectFeedbackTab()">
+            <tab heading="<[feedbackTabHeader]>" active="feedbackTabActive" select="selectFeedbackTab()">
               {% include 'editor/exploration_feedback.html' %}
             </tab>
           {% endif %}

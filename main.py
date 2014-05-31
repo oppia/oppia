@@ -265,11 +265,14 @@ urls = [
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
 
     get_redirect_route(
-        r'%s/<exploration_id>' % feconf.THREADLIST_URL_PREFIX,
-        feedback.ThreadListHandler, 'threadlist_handler'),
+        r'%s/<exploration_id>' % feconf.FEEDBACK_LAST_UPDATED_URL_PREFIX,
+        feedback.FeedbackLastUpdatedHandler, 'feedback_last_updated_handler'),
     get_redirect_route(
-        r'%s/<exploration_id>/<thread_id>' % feconf.THREAD_URL_PREFIX,
-        feedback.ThreadHandler, 'thread_handler'),
+        r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
+        feedback.ThreadListHandler, 'feedback_threadlist_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
+        feedback.ThreadHandler, 'feedback_thread_handler'),
 
     get_redirect_route(
         r'/widgetrepository/data/<widget_type>',

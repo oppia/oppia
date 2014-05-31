@@ -38,6 +38,14 @@ function ExplorationFeedback($scope, $http, $modal,
     return null;
   };
 
+  $scope._getThreadList = function() {
+    $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
+      $scope.threads = data.threads;
+    }).error(function(data) {
+      warningsData.addWarning(data.error || 'Error getting thread list.');
+    });
+  };
+
   $scope._createThread = function(newThreadSubject, newThreadText) {
     $http.post(
       THREAD_LIST_HANDLER_URL,
@@ -48,8 +56,9 @@ function ExplorationFeedback($scope, $http, $modal,
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function() {
-      getThreadList();
-      $scope.deselectThread();
+      $scope._getThreadList();
+      $scope.setCurrentThread(null);
+      $scope.$parent.refreshFeedbackTabHeader();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error creating a thread.');
     });
@@ -69,14 +78,6 @@ function ExplorationFeedback($scope, $http, $modal,
       $scope.currentThreadMessages = data.messages;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error getting thread messages.');
-    });
-  };
-
-  var getThreadList = function() {
-    $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
-      $scope.threads = data.threads;
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error getting thread list.');
     });
   };
 
@@ -135,9 +136,10 @@ function ExplorationFeedback($scope, $http, $modal,
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function() {
-      getThreadList();
+      $scope._getThreadList();
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
+      $scope.$parent.refreshFeedbackTabHeader();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error creating a thread message.');
     });
@@ -147,7 +149,7 @@ function ExplorationFeedback($scope, $http, $modal,
   $scope.currentThreadId = null;
   $scope.currentThreadData = null;
   $scope.currentThreadMessages = null;
-  getThreadList();
+  $scope._getThreadList();
 }
 
 ExplorationFeedback.$inject = [
