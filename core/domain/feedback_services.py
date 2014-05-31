@@ -130,3 +130,14 @@ def get_next_page_of_all_feedback_messages(
 
     result_dicts = [_get_message_dict(m) for m in results]
     return (result_dicts, new_urlsafe_start_cursor, more)
+
+
+def get_last_updated_time(exploration_id):
+    """Returns the most recent time a thread for this exploration was updated.
+
+    If this exploration has no threads, returns None.
+    """
+    threadlist = get_threadlist(exploration_id)
+    return max(
+        [thread['last_updated'] for thread in threadlist]
+    ) if threadlist else None

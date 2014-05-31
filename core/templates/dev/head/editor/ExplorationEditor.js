@@ -942,7 +942,7 @@ function ExplorationEditor(
   $scope.feedbackLastUpdatedUrl = (
     '/feedback_last_updated/' + $scope.explorationId);
   $scope.refreshFeedbackTabHeader = function() {
-    $scope.feedbackTabHeader += ' (loading...)';
+    $scope.feedbackTabHeader = 'Feedback (loading...)';
     $http.get($scope.feedbackLastUpdatedUrl).then(function(response) {
       var data = response.data;
       if (data.last_updated) {

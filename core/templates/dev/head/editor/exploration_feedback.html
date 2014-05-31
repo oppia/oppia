@@ -22,8 +22,11 @@
 
       <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-8">
+          <div ng-if="threads.length === 0">
+            <em>No feedback has been given for this exploration yet.</em>
+          </div>
           <table class="table">
-            <tr>
+            <tr ng-if="threads.length > 0">
               <th class="col-lg-5 col-md-5 col-sm-5">
                 Subject
               </th>

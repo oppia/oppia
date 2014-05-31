@@ -29,8 +29,8 @@ class ThreadListHandler(base.BaseHandler):
         if not feconf.SHOW_FEEDBACK_TAB:
             raise Exception('Unlaunched feature.')
 
-        threadlist = feedback_services.get_threadlist(exploration_id)
-        self.values.update({'threads': threadlist})
+        self.values.update({
+            'threads': feedback_services.get_threadlist(exploration_id)})
         self.render_json(self.values)
 
     @base.require_user
@@ -64,8 +64,8 @@ class ThreadHandler(base.BaseHandler):
         if not feconf.SHOW_FEEDBACK_TAB:
             raise Exception('Unlaunched feature.')
 
-        messages = feedback_services.get_messages(thread_id)
-        self.values.update({'messages': messages})
+        self.values.update({
+            'messages': feedback_services.get_messages(thread_id)})
         self.render_json(self.values)
 
     @base.require_user
@@ -92,20 +92,20 @@ class FeedbackLastUpdatedHandler(base.BaseHandler):
     """Returns the last time a thread for this exploration was updated."""
 
     def get(self, exploration_id):
-        threadlist = feedback_services.get_threadlist(exploration_id)
-        if threadlist:
-            last_updated = max(
-                [thread['last_updated'] for thread in threadlist])
-        else:
-            last_updated = None
-
-        self.values.update({'last_updated': last_updated})
+        self.values.update({
+            'last_updated': feedback_services.get_last_updated_time(
+                exploration_id)})
         self.render_json(self.values)
 
 
 class RecentFeedbackMessagesHandler(base.BaseHandler):
-    """Returns a list of recently-posted feedback messages."""
+    """Returns a list of recently-posted feedback messages.
 
+    Note that this currently also includes messages posted in private
+    explorations.
+    """
+
+    @base.require_moderator
     def get(self):
         urlsafe_start_cursor = self.request.get('cursor')
 
