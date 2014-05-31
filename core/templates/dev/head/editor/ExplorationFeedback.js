@@ -24,8 +24,9 @@ function ExplorationFeedback($scope, $http, $modal,
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
-  $scope.getLocaleStringForDate = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getLocaleString(millisSinceEpoch);
+  $scope.getLocaleStringForDateWithoutSeconds = function(millisSinceEpoch) {
+    return oppiaDateFormatter.getLocaleString(
+      millisSinceEpoch).replace(/:\d\d /, ' ');
   };
 
   $scope._getThreadById = function(threadId) {
@@ -124,6 +125,7 @@ function ExplorationFeedback($scope, $http, $modal,
         'Current thread ID not set. Required to create a message');
       return;
     }
+    $scope.messageSendingInProgress = true;
     $http.post(
       THREAD_HANDLER_PREFIX + threadId,
       oppiaRequestCreator.createRequest({
@@ -135,6 +137,7 @@ function ExplorationFeedback($scope, $http, $modal,
     success(function() {
       getThreadList();
       $scope.setCurrentThread(threadId);
+      $scope.messageSendingInProgress = false;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error creating a thread message.');
     });

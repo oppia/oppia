@@ -33,7 +33,7 @@
                 <span ng-if="t.original_author_username">by <[t.original_author_username]></span>
               </td>
               <td class="col-lg-3 col-md-3 col-sm-3">
-                <span><[getLocaleStringForDate(t.last_updated)]></span>
+                <span><[getLocaleStringForDateWithoutSeconds(t.last_updated)]></span>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
                 <button class="btn btn-default btn-xs" ng-click="setCurrentThread(t.thread_id)">View</button>
@@ -86,7 +86,7 @@
                         </span>
                       </span>
 
-                      <span><[getLocaleStringForDate(m.created_on)]></span>
+                      <span><[getLocaleStringForDateWithoutSeconds(m.created_on)]></span>
                     </span>
                   </div>
                   <div style="white-space: pre-wrap;"><[m.text]></div>
@@ -102,7 +102,7 @@
           <div class="col-lg-8 col-md-8 col-sm-8">
             <label for="newMessageText">Add new message</label>
             <textarea class="form-control" ng-model="newMessageText" id="newMessageText" rows="6"></textarea>
-            <button class="btn btn-default" ng-click="addMessage(currentThreadId, newMessageText)">Send</button>
+            <button class="btn btn-default" ng-click="addMessage(currentThreadId, newMessageText)" ng-disabled="messageSendingInProgress">Send</button>
           </div>
         </div>
       </div>
