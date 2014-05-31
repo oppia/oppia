@@ -2,17 +2,25 @@
 
 {% block id %}content{% endblock %}
 
-{% block label %}content{% endblock %}
+{% block label %}content / parameters{% endblock %}
 
 {% block cls %}oppia-state-content{% endblock %}
 
 {% block center %}
+  <param-change-editor param-changes="stateParamChanges"
+      param-specs="paramSpecs" save-param-changes="saveStateParamChanges"
+      add-exploration-param-spec="addExplorationParamSpec"
+      is-editable="editabilityService.isEditable()">
+  </param-change-editor>
+
+  <hr>
+
   <div ng-if="!contentMemento">
     <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()" ng-if="editabilityService.isEditable()">
       <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
     </button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
-      In this section, type what you want the reader to see before interacting with this state.
+      In this section, type what you want the reader to see before entering a response.
     </span>
     <span angular-html-bind="content[0].value"></span>
   </div>
