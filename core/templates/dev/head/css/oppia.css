@@ -95,6 +95,13 @@ p {
   position: relative;
 }
 
+.label {
+  margin: auto 4px;
+}
+.label-info {
+  background-color: #18447E;
+}
+
 /*
   The following rule ensures that, as the viewport gets
   smaller, any media will scale down according to its
@@ -758,11 +765,9 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   color: #444
 }
 
-.label {
-  margin: auto 4px;
-}
-.label-info {
-  background-color: #18447E;
+.oppia-back-arrow {
+  float: left;
+  margin-right: 5px;
 }
 
 .oppia-rule-block {
@@ -801,10 +806,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 
 .oppia-rule-description-picker-bubble {
   text-align: center;
-}
-
-.oppia-rule-description-back-arrow {
-  float: left;
 }
 
 .oppia-rule-bubble-warning {

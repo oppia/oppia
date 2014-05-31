@@ -89,6 +89,36 @@ function Moderator(
   };
 
   $scope.loadMoreCommits();
+
+
+  $scope.recentFeedbackMessagesCursor = null;
+  $scope.reachedEndOfFeedbackMessages = false;
+  $scope.allFeedbackMessages = [];
+  $scope.loadMoreFeedbackMessages = function() {
+    if ($scope.reachedEndOfFeedbackMessages) {
+      return;
+    }
+
+    var recentFeedbackMessagesUrl = '/recent_feedback_messages';
+    if ($scope.recentFeedbackMessagesCursor) {
+      recentFeedbackMessagesUrl += (
+        '?cursor=' + $scope.recentFeedbackMessagesCursor);
+    }
+
+    $http.get(recentFeedbackMessagesUrl).success(function(data) {
+      for (var i = 0; i < data.results.length; i++) {
+        $scope.allFeedbackMessages.push(data.results[i]);
+      }
+      $scope.recentFeedbackMessagesCursor = data.cursor;
+      if (!data.more) {
+        $scope.reachedEndOfFeedbackMessages = true;
+      }
+    }).error(function(data) {
+      warningsData.addWarning(data.error);
+    });
+  };
+
+  $scope.loadMoreFeedbackMessages();
 }
 
 /**
