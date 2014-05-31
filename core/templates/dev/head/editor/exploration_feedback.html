@@ -23,6 +23,19 @@
       <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-8">
           <table class="table">
+            <tr>
+              <th class="col-lg-5 col-md-5 col-sm-5">
+                Subject
+              </th>
+              <th class="col-lg-2 col-md-2 col-sm-2">
+                Original author
+              </th>
+              <th class="col-lg-3 col-md-3 col-sm-3">
+                Last updated
+              </th>
+              <th class="col-lg-2 col-md-2 col-sm-2">
+              </th>
+            </tr>
             <tr ng-repeat="t in threads|orderBy:'-last_updated'">
               <td class="col-lg-5 col-md-5 col-sm-5">
                 <div><[t.subject]></div>
