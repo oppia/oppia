@@ -23,17 +23,20 @@
       <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-8">
           <table class="table">
-            <tr ng-repeat="t in threads">
-              <td class="col-lg-7 col-md-7 col-sm-7">
-                <h5><[t.subject]></h5>
-                <[t.summary]>
-              </td>
-              <td class="col-lg-3 col-md-3 col-sm-3">
-                <span class="label label-info"><[t.status]></span>
-                <span ng-if="t.state_name" class="label label-info">state: <[t.state_name]></span>
+            <tr ng-repeat="t in threads|orderBy:'-last_updated'">
+              <td class="col-lg-5 col-md-5 col-sm-5">
+                <div><[t.subject]></div>
+                <div><[t.summary]></div>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
-                <button class="btn btn-default" ng-click="setCurrentThread(t.thread_id)">View</button>
+                <span ng-if="t.state_name" class="label label-info">state: <[t.state_name]></span>
+                <span ng-if="t.original_author_username">by <[t.original_author_username]></span>
+              </td>
+              <td class="col-lg-3 col-md-3 col-sm-3">
+                <span><[getLocaleStringForDate(t.last_updated)]></span>
+              </td>
+              <td class="col-lg-2 col-md-2 col-sm-2">
+                <button class="btn btn-default btn-xs" ng-click="setCurrentThread(t.thread_id)">View</button>
               </td>
             </tr>
           </table>
@@ -55,7 +58,6 @@
         </div>
 
         <div class="col-lg-2 col-md-2 col-sm-2">
-          <span class="label label-info"><[currentThreadData.status]></span>
           <span ng-if="currentThreadData.state_name" class="label label-info">
             state: <[currentThreadData.state_name]>
           </span>
@@ -66,22 +68,28 @@
         <div class="row">
           <div class="col-lg-8 col-md-8 col-sm-8">
             <table class="table">
-              <tr ng-repeat="m in currentThreadMessages track by $index">
+              <tr ng-repeat="m in currentThreadMessages|orderBy:'message_id'">
                 <td>
                   <div>
-                    Message <strong>#<[m.message_id]></strong> by <em><[m.author_username]></em>
-                    <span class="pull-right" ng-if="m.message_id !== 0">
-                      <span ng-if="m.updated_status" class="label label-info">
-                        Status changed to '<[m.updated_status]>'
+                    <span ng-if="$index !== 0">
+                      #<[m.message_id]>
+                    </span>
+                    by <strong><[m.author_username]></strong>
+
+                    <span class="pull-right">
+                      <span ng-if="m.message_id !== 0">
+                        <span ng-if="m.updated_status" class="label label-info">
+                          Status changed to '<[m.updated_status]>'
+                        </span>
+                        <span ng-if="m.updated_subject" class="label label-info">
+                          Subject changed to '<[m.updated_subject]>'
+                        </span>
                       </span>
-                      <span ng-if="m.updated_subject" class="label label-info">
-                        Subject changed to '<[m.updated_subject]>'
-                      </span>
+
+                      <span><[getLocaleStringForDate(m.created_on)]></span>
                     </span>
                   </div>
-                  <div>
-                    <[m.text]>
-                  </div>
+                  <div style="white-space: pre-wrap;"><[m.text]></div>
                 </td>
               </tr>
             </table>

@@ -21,20 +21,19 @@ __author__ = 'Koji Ashida'
 
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
+import utils
 
 
 def get_threadlist(exploration_id):
-    result = []
-    for t in feedback_models.FeedbackThreadModel.get_threads(exploration_id):
-        result.append({
-            'thread_id': t.id,
-            'state_name': t.state_name,
-            'original_author_id': t.original_author_id,
-            'status': t.status,
-            'subject': t.subject,
-            'summary': t.summary,
-        })
-    return result
+    return [{
+        'last_updated': utils.get_time_in_millisecs(t.last_updated),
+        'original_author_id': t.original_author_id,
+        'state_name': t.state_name,
+        'status': t.status,
+        'subject': t.subject,
+        'summary': t.summary,
+        'thread_id': t.id,
+    } for t in feedback_models.FeedbackThreadModel.get_threads(exploration_id)]
 
 
 def create_thread(
@@ -55,17 +54,15 @@ def create_thread(
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
 
 
-def get_thread(thread_id):
-    result = []
-    for t in feedback_models.FeedbackMessageModel.get_thread(thread_id):
-        result.append({
-            'message_id': t.message_id,
-            'author_id': t.author_id,
-            'updated_status': t.updated_status,
-            'updated_subject': t.updated_subject,
-            'text': t.text,
-        })
-    return result
+def get_messages(thread_id):
+    return [{
+        'author_id': m.author_id,
+        'created_on': utils.get_time_in_millisecs(m.created_on),
+        'message_id': m.message_id,
+        'text': m.text,
+        'updated_status': m.updated_status,
+        'updated_subject': m.updated_subject,
+    } for m in feedback_models.FeedbackMessageModel.get_messages(thread_id)]
 
 
 def create_message(
@@ -92,8 +89,11 @@ def create_message(
     msg.text = text
     msg.put()
 
+    # We do a put() even if the status and subject are not updated, so that the
+    # last_updated time of the thread reflects the last time a message was
+    # added to it.
+    thread = feedback_models.FeedbackThreadModel.get(thread_id)
     if message_id != 0 and (updated_status or updated_subject):
-        thread = feedback_models.FeedbackThreadModel.get(thread_id)
         updated = False
         if updated_status and updated_status != thread.status:
             thread.status = updated_status
@@ -101,6 +101,5 @@ def create_message(
         if updated_subject and updated_subject != thread.subject:
             thread.subject = updated_subject
             updated = True
-        if updated:
-            thread.put()
+    thread.put()
     return True

@@ -174,7 +174,7 @@ class FeedbackMessageModel(base_models.BaseModel):
         return super(FeedbackMessageModel, cls).get(instance_id, strict=False)
 
     @classmethod
-    def get_thread(cls, thread_id):
+    def get_messages(cls, thread_id):
         """Returns an array of messages in the thread.
 
         Does not include the deleted entries.

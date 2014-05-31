@@ -19,10 +19,14 @@
  */
 
 function ExplorationFeedback($scope, $http, $modal,
-    warningsData, oppiaRequestCreator, explorationData) {
+    warningsData, oppiaRequestCreator, explorationData, oppiaDateFormatter) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
+
+  $scope.getLocaleStringForDate = function(millisSinceEpoch) {
+    return oppiaDateFormatter.getLocaleString(millisSinceEpoch);
+  };
 
   $scope._getThreadById = function(threadId) {
     for (var i = 0; i < $scope.threads.length; i++) {
@@ -129,6 +133,7 @@ function ExplorationFeedback($scope, $http, $modal,
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function() {
+      getThreadList();
       $scope.setCurrentThread(threadId);
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error creating a thread message.');
@@ -144,4 +149,4 @@ function ExplorationFeedback($scope, $http, $modal,
 
 ExplorationFeedback.$inject = [
   '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
-  'explorationData'];
+  'explorationData', 'oppiaDateFormatter'];

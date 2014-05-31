@@ -68,7 +68,7 @@ class ThreadHandler(base.BaseHandler):
         if not feconf.SHOW_FEEDBACK_TAB:
             raise Exception('Unlaunched feature.')
 
-        messages = feedback_services.get_thread(thread_id)
+        messages = feedback_services.get_messages(thread_id)
         for message in messages:
             message['author_username'] = user_services.get_username(
                 message['author_id'])
