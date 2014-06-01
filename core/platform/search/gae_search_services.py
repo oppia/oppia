@@ -61,7 +61,6 @@ def add_documents_to_index(documents, index, language=feconf.DEFAULT_LANGUAGE_CO
     return [r.id for r in results]
 
 
-
 def _dict_to_search_document(d):
     if not isinstance(d, dict):
         raise ValueError('document should be a dictionary')
@@ -95,8 +94,8 @@ def _make_fields(key, value):
     if isinstance(value, datetime.datetime) or isinstance(value, datetime.date):
         return [gae_search.DateField(name=key, value=value)]
 
-    raise ValueError('Value for document field %s should be a (unicode) string, numeric type, datetime.date, ' \
-                 'datetime.datetime or list of such types, got %s' % (key, type(value)))
+    raise ValueError('Value for document field %s should be a (unicode) string, numeric type, datetime.date, '
+                     'datetime.datetime or list of such types, got %s' % (key, type(value)))
 
 
 def delete_documents_from_index(doc_ids, index, retries=3):
@@ -122,7 +121,7 @@ def delete_documents_from_index(doc_ids, index, retries=3):
             raise SearchFailureError(e.message, e)
 
 
-def search(query_string, index, cursor=gae_search.Cursor(), limit=20, ids_only=False, retries=3):
+def search(query_string, index, cursor=gae_search.Cursor().web_safe_string, limit=20, ids_only=False, retries=3):
     """Searches for documents in an index
 
     Args:
@@ -139,7 +138,10 @@ def search(query_string, index, cursor=gae_search.Cursor(), limit=20, ids_only=F
       returns a tuple with two elements:
         - a list of dictionaries representing search documents
         - a cursor that you can pass back in to get the next page of results.
+          This wil be a web safe string that you can use in uls. It will be None
+          if there is no next page.
     """
+    cursor = gae_search.Cursor(web_safe_string=cursor)
     options = gae_search.QueryOptions(limit=limit, cursor=cursor, ids_only=ids_only)
     query = gae_search.Query(query_string, options)
     index = gae_search.Index(index)
@@ -150,7 +152,11 @@ def search(query_string, index, cursor=gae_search.Cursor(), limit=20, ids_only=F
         if retries > 0:
             return search(query_string, index, cursor, limit, ids_only, retries-1)
 
-    return [_search_document_to_dict(doc) for doc in results.results], results.cursor
+    result_cursor = None
+    if results.cursor:
+        result_cursor = results.cursor.web_safe_string
+
+    return [_search_document_to_dict(doc) for doc in results.results], result_cursor
 
 
 def _search_document_to_dict(doc):

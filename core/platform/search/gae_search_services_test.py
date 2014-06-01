@@ -68,6 +68,20 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
             retrieved_doc = index.get('id' + str(n))
             self.assertEqual(retrieved_doc.field('name').value, 'doc' + str(n))
 
+    def test_disallow_unsuported_value_types(self):
+        with self.assertRaises(ValueError):
+            doc = {'abc': set("xyz")}
+            gae_search_services.add_documents_to_index(doc, "my_index")
+
+    def test_add_document_with_existing_id_updates_it(self):
+        doc1 = {"id": "doc", "version": 1}
+        doc2 = {"id": "doc", "version": 2}
+        gae_search_services.add_documents_to_index([doc1], "my_index")
+        index = search.Index("my_index")
+        self.assertEqual(index.get("doc").field("version").value, 1)
+        gae_search_services.add_documents_to_index([doc2], "my_index")
+        self.assertEqual(index.get("doc").field("version").value, 2)
+
 
 class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
     """Test deleting documents from search indexes"""
@@ -147,3 +161,12 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn({'id':'doc1'}, result)
         self.assertIn({'id':'doc2'}, result)
         self.assertIn({'id':'doc3'}, result)
+
+    def test_cursor_is_none_if_no_more_results(self):
+        doc1 = search.Document(doc_id='doc1',fields=[search.TextField(name='k', value='abc def ghi')])
+        doc2 = search.Document(doc_id='doc2',fields=[search.TextField(name='k', value='abc jkl mno')])
+        doc3 = search.Document(doc_id='doc3',fields=[search.TextField(name='k', value='abc jkl ghi')])
+        index = search.Index('my_index')
+        index.put([doc1, doc2, doc3])
+        result, cursor = gae_search_services.search('k:abc','my_index')
+        self.assertIsNone(cursor)
