@@ -33,7 +33,7 @@
           </span>
 
           <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-            <object-editor obj-type="<[item.type]>" always-editable="true" value="rule.definition.inputs[item.varName]" style="color: black;"></object-editor>
+            <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="rule.definition.inputs[item.varName]" style="color: black;"></object-editor>
           </span>
           <span ng-if="item.type == 'noneditable'">
             <[item.text]>
