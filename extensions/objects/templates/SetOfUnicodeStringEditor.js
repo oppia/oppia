@@ -34,6 +34,8 @@ oppia.directive('setOfUnicodeStringEditor', function($compile, warningsData) {
         if (newValue) {
           $scope.initArgs = newValue;
           $scope.initArgs.objType = 'UnicodeString';
+          $scope.isEditable = (
+            newValue.isEditable !== undefined ? newValue.isEditable : true);
         }
       }, true);
 
