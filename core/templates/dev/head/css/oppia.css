@@ -595,7 +595,8 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 
 .oppia-placeholder {
-  color: gray;
+  color: #ccc;
+  font-style: italic;
 }
 
 .oppia-state-name-container {
@@ -624,17 +625,13 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 
 .oppia-state-content {
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-top: 1px dashed #ddd;
+  border: 1px dashed #ddd;
   min-height: 20px;
   padding: 5px 10px 15px 10px;
 }
 
 .oppia-interactive-widget-display {
-  border-bottom: 1px dashed #ddd;
-  border-left: 1px solid #ddd;
-  border-right: 1px solid #ddd;
+  border: 1px dashed #ddd;
   margin: 0 0 2px 0;
   padding: 15px 10px 5px 10px;
 }
@@ -648,7 +645,16 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 .oppia-graph-viz-container {
   height: 250px;
   border-radius: 4px;
-  border: 1px solid black;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+}
+
+.oppia-graph-and-stats-separator {
+  margin-top: 25px;
+}
+
+.oppia-param-and-content-separator {
+  border-top: 1px dashed #ddd;
 }
 
 .oppia-add-state-container {

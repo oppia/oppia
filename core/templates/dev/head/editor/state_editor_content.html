@@ -13,14 +13,14 @@
       is-editable="editabilityService.isEditable()">
   </param-change-editor>
 
-  <hr>
+  <hr class="oppia-param-and-content-separator">
 
   <div ng-if="!contentMemento">
     <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()" ng-if="editabilityService.isEditable()">
       <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
     </button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
-      In this section, type what you want the reader to see before entering a response.
+      This state currently has no content.
     </span>
     <span angular-html-bind="content[0].value"></span>
   </div>
