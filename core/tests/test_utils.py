@@ -226,6 +226,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
         self.testbed.init_blobstore_stub()
+        self.testbed.init_search_stub()
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
