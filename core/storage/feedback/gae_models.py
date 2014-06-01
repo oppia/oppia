@@ -192,7 +192,8 @@ class FeedbackMessageModel(base_models.BaseModel):
 
         Includes the deleted entries.
         """
-        return cls.get_all(True).filter(cls.thread_id == thread_id).count()
+        return cls.get_all(include_deleted_entities=True).filter(
+            cls.thread_id == thread_id).count()
 
     @classmethod
     def get_all_messages(cls, page_size, urlsafe_start_cursor):
