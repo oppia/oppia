@@ -255,27 +255,6 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_delete(self.EXP_ID))
 
-    def test_cloned_explorations_cannot_be_published(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
-        exp_services.save_new_exploration(self.user_id_a, exp)
-
-        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
-
-        new_exp_id = exp_services.clone_exploration(
-            self.user_id_b, self.EXP_ID)
-        self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_edit(self.EXP_ID))
-
-        self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_play(new_exp_id))
-        self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_view(new_exp_id))
-        self.assertTrue(
-            rights_manager.Actor(self.user_id_b).can_edit(new_exp_id))
-        self.assertFalse(
-            rights_manager.Actor(self.user_id_b).can_publish(new_exp_id))
-
     def test_cannot_unpublish_exploration_after_edited(self):
         # User A creates an exploration, marks it private.
         # User A publishes the exploration.

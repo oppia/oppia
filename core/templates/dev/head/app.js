@@ -115,6 +115,10 @@ oppia.factory('oppiaDateFormatter', [function() {
     getLocaleString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       return date.toLocaleString();
+    },
+    getLocaleDateString: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
+      return date.toLocaleDateString();
     }
   };
 }]);
@@ -169,7 +173,7 @@ oppia.factory('validatorsService', [
 
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
-oppia.factory('focusService', function($rootScope, $timeout) {
+oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
   return {
     setFocus: function(name) {
       $timeout(function() {
@@ -177,4 +181,4 @@ oppia.factory('focusService', function($rootScope, $timeout) {
       });
     }
   };
-});
+}]);

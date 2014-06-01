@@ -23,7 +23,8 @@ import utils
 
 # Valid model names.
 NAMES = utils.create_enum(
-    'base_model', 'config', 'exploration', 'file', 'job', 'statistics', 'user')
+    'base_model', 'config', 'exploration', 'file', 'job', 'statistics', 'user',
+    'feedback')
 
 
 class _Platform(object):
@@ -59,6 +60,9 @@ class _Gae(_Platform):
             elif name == NAMES.user:
                 from core.storage.user import gae_models as user_model
                 returned_models.append(user_model)
+            elif name == NAMES.feedback:
+                from core.storage.feedback import gae_models as feedback_model
+                returned_models.append(feedback_model)
             else:
                 raise Exception('Invalid model name: %s' % name)
 

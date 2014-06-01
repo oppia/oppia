@@ -95,6 +95,13 @@ p {
   position: relative;
 }
 
+.label {
+  margin: auto 4px;
+}
+.label-info {
+  background-color: #18447E;
+}
+
 /*
   The following rule ensures that, as the viewport gets
   smaller, any media will scale down according to its
@@ -106,6 +113,14 @@ img, video, canvas {
 
 textarea {
   width: 90%;
+}
+
+/*
+  Adjustments for the jWysiwyg RTE, to allow it to adopt the size
+  of its container.
+*/
+div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
+  width: 100%;
 }
 
 /*
@@ -580,7 +595,8 @@ textarea {
 }
 
 .oppia-placeholder {
-  color: gray;
+  color: #aaa;
+  font-style: italic;
 }
 
 .oppia-state-name-container {
@@ -633,7 +649,16 @@ textarea {
 .oppia-graph-viz-container {
   height: 250px;
   border-radius: 4px;
-  border: 1px solid black;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+}
+
+.oppia-graph-and-stats-separator {
+  margin-top: 25px;
+}
+
+.oppia-param-and-content-separator {
+  border-top: 1px dashed #ddd;
 }
 
 .oppia-add-state-container {
@@ -750,8 +775,9 @@ textarea {
   color: #444
 }
 
-.label-info {
-  background-color: #18447E;
+.oppia-back-arrow {
+  float: left;
+  margin-right: 5px;
 }
 
 .oppia-rule-block {
@@ -792,10 +818,6 @@ textarea {
   text-align: center;
 }
 
-.oppia-rule-description-back-arrow {
-  float: left;
-}
-
 .oppia-rule-bubble-warning {
   background: #F9EDBE;
   border-top-left-radius: 8px;
@@ -826,7 +848,7 @@ textarea {
   background: #E0E0E0;
   border-bottom-left-radius: 8px;
   display: table-cell;
-  padding: 5px;
+  padding: 5px 10px;
 }
 
 .oppia-dest-bubble {
@@ -835,6 +857,7 @@ textarea {
   display: table-cell;
   padding: 5px;
   vertical-align: middle;
+  width: 160px;
 }
 
 .oppia-logo {

@@ -342,5 +342,6 @@ def get_current_time_in_millisecs():
 def get_epoch_time():
     return int(time.time())
 
+
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))

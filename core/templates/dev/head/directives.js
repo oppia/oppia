@@ -66,19 +66,7 @@ oppia.directive('selectOnClick', [function() {
 }]);
 
 
-// Makes an element draggable.
-oppia.directive('draggable', function() {
-  return {
-    restrict: 'A',
-    link: function(scope, elm, attrs) {
-      var options = scope.$eval(attrs.draggable);
-      elm.draggable(options);
-    }
-  };
-});
-
-
-oppia.directive('whenScrolledToBottom', function() {
+oppia.directive('whenScrolledToBottom', [function() {
   return function(scope, elm, attr) {
     var raw = elm[0];
 
@@ -88,7 +76,7 @@ oppia.directive('whenScrolledToBottom', function() {
       }
     });
   };
-});
+}]);
 
 
 // A popover that is shown when its label is hovered or clicked upon, and
@@ -127,7 +115,7 @@ oppia.directive('customPopover', ['$sce', function($sce) {
 
 // When set as an attr of an <input> element, moves focus to that element
 // when a 'focusOn' event is broadcast.
-oppia.directive('focusOn', function() {
+oppia.directive('focusOn', [function() {
   return function(scope, elt, attrs) {
     scope.$on('focusOn', function(e, name) {
       if (name === attrs.focusOn) {
@@ -135,4 +123,4 @@ oppia.directive('focusOn', function() {
       }
     });
   };
-});
+}]);

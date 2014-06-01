@@ -199,11 +199,14 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             exp_services.get_explicit_viewer_explorations_summary_dict(
                 self.OWNER_ID), {})
 
-    def test_get_editable_explorations_summary_dict(self):
+    def test_get_private_at_least_viewable_summary_dict(self):
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
             rights_manager.ROLE_EDITOR)
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
 
         exp_dict = {
             'title': 'A title',
@@ -211,7 +214,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             'rights': {
                 'owner_names': [self.OWNER_NAME],
                 'editor_names': [self.EDITOR_NAME],
-                'viewer_names': [],
+                'viewer_names': [self.VIEWER_NAME],
                 'community_owned': False,
                 'cloned_from': None,
                 'status': rights_manager.EXPLORATION_STATUS_PRIVATE
@@ -219,15 +222,20 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         }
 
         self.assertEqual(
-            exp_services.get_editable_explorations_summary_dict(self.OWNER_ID),
+            exp_services.get_private_at_least_viewable_summary_dict(
+                self.OWNER_ID),
             {self.EXP_ID: exp_dict})
         self.assertEqual(
-            exp_services.get_editable_explorations_summary_dict(
+            exp_services.get_private_at_least_viewable_summary_dict(
                 self.EDITOR_ID),
             {self.EXP_ID: exp_dict})
         self.assertEqual(
-            exp_services.get_editable_explorations_summary_dict(
-                self.VIEWER_ID), {})
+            exp_services.get_private_at_least_viewable_summary_dict(
+                self.VIEWER_ID),
+            {self.EXP_ID: exp_dict})
+        self.assertEqual(
+            exp_services.get_private_at_least_viewable_summary_dict(
+                'random_user_id'), {})
 
     def test_count_explorations(self):
         """Test count_explorations()."""
@@ -316,28 +324,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             [exp.id for exp in exp_models.ExplorationModel.get_all(
                 include_deleted_entities=True)]
         )
-
-    def test_clone_exploration(self):
-        """Test cloning an exploration with assets."""
-        exploration = self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID)
-        exploration.add_states(['New state'])
-        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
-
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
-            raw_image = f.read()
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(exploration.id))
-        fs.commit(self.OWNER_ID, 'abc.png', raw_image)
-
-        new_eid = exp_services.clone_exploration(self.OWNER_ID, exploration.id)
-        new_fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(new_eid))
-        new_exploration = exp_services.get_exploration_by_id(new_eid)
-
-        self.assertEqual(new_exploration.title, 'Copy of A title')
-        self.assertEqual(new_exploration.category, 'A category')
-        self.assertEqual(new_fs.get('abc.png'), raw_image)
 
     def test_create_new_exploration_error_cases(self):
         exploration = exp_domain.Exploration.create_default_exploration(
@@ -848,9 +834,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
         self.widget_handlers['submit'][0]['definition']['inputs']['x'] = 'abc'
-        with self.assertRaisesRegexp(
-                Exception,
-                'abc has the wrong type. It should be a NonnegativeInt.'):
+        with self.assertRaisesRegexp(Exception, 'invalid literal for int()'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(

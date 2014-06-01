@@ -157,20 +157,19 @@ def _save_exploration_rights(
     model.commit(committer_id, commit_message, commit_cmds)
 
 
-def create_new_exploration_rights(exploration_id, committer_id, cloned_from):
+def create_new_exploration_rights(exploration_id, committer_id):
     exploration_rights = ExplorationRights(
-        exploration_id, [committer_id], [], [], cloned_from=cloned_from)
+        exploration_id, [committer_id], [], [])
     commit_cmds = [{'cmd': CMD_CREATE_NEW}]
-    model = exp_models.ExplorationRightsModel(
+
+    exp_models.ExplorationRightsModel(
         id=exploration_rights.id,
         owner_ids=exploration_rights.owner_ids,
         editor_ids=exploration_rights.editor_ids,
         viewer_ids=exploration_rights.viewer_ids,
         community_owned=exploration_rights.community_owned,
-        cloned_from=exploration_rights.cloned_from,
         status=exploration_rights.status
-    )
-    model.commit(committer_id, 'Created new exploration', commit_cmds)
+    ).commit(committer_id, 'Created new exploration', commit_cmds)
 
 
 def get_exploration_rights(exploration_id):
@@ -191,6 +190,12 @@ def get_publicized_exploration_rights():
     """Returns a list of rights domain objects for publicized explorations."""
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_publicized()]
+
+
+def get_non_private_exploration_rights():
+    """Returns a list of rights domain objects for non-private explorations."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_non_private()]
 
 
 def get_community_owned_exploration_rights():
@@ -228,6 +233,14 @@ def get_editable_exploration_rights(user_id):
             exp_models.ExplorationRightsModel.get_editable(user_id)]
 
 
+def get_private_at_least_viewable_exploration_rights(user_id):
+    """Returns rights objects for all private explorations that this user can
+    view, edit or own."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_private_at_least_viewable(
+                user_id)]
+
+
 def get_owned_exploration_rights(user_id):
     """Returns rights objects for explorations owned by this user.
 
@@ -253,11 +266,7 @@ def is_exploration_cloned(exploration_id):
 
 
 class Actor(object):
-    """Domain object for a user with various rights.
-
-    Due to GAE limitations, this class should only ever be invoked with a
-    user_id that is equal to the user_id of the current request.
-    """
+    """Domain object for a user with various rights."""
 
     def __init__(self, user_id):
         # Note that this may be None.
@@ -280,7 +289,11 @@ class Actor(object):
             exp_rights.community_owned or self.user_id in exp_rights.owner_ids)
 
     def has_explicit_editing_rights(self, exploration_id):
-        """Whether this user is in the owner/editor list of the exploration."""
+        """Whether this user has editing rights for this exploration.
+
+        This is true if the exploration is community-owned, or if the user is
+        in the owner/editor list for the exploration.
+        """
         try:
             exp_rights = get_exploration_rights(exploration_id)
         except Exception:
@@ -317,14 +330,6 @@ class Actor(object):
     def can_view(self, exploration_id):
         """Whether the user can view the editor page for this exploration."""
         return self.can_play(exploration_id)
-
-    def can_clone(self, exploration_id):
-        exp_rights = get_exploration_rights(exploration_id)
-        if exp_rights.cloned_from:
-            return False
-        if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
-            return False
-        return self.user_id and self.can_view(exploration_id)
 
     def can_edit(self, exploration_id):
         # TODO(sll): Add a check here for whether a user is banned or not,

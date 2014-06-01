@@ -20,13 +20,11 @@
   </div>
 </div>
 
-<hr>
-
 <div class="oppia-state-editor-body">
   <div class="oppia-editor" ng-show="stateName">
-    {% include 'editor/state_editor_param.html' %}
-    <hr>
-    {% include 'editor/state_editor_content.html' %}
+    <div style="margin-bottom: -15px;">
+      {% include 'editor/state_editor_content.html' %}
+    </div>
     <div ng-controller="InteractiveWidgetEditor">
       {% include 'editor/state_editor_interaction.html' %}
       {% include 'editor/state_editor_widget_sticky.html' %}
@@ -34,7 +32,6 @@
       {% include 'editor/state_editor_rules.html' %}
     </div>
     <br>
-    <hr>
     {% include 'editor/state_reader_feedback.html' %}
     <br>
     <hr>

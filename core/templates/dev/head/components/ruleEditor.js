@@ -79,7 +79,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.activeEditor = null;
 
         $scope.FEEDBACK_LIST_INIT_ARGS = {
-          addItemText: 'Add feedback message',
+          addItemText: '+ Add Feedback',
           disableControls: Boolean($scope.isTmpRule === 'true'),
           isEditable: $scope.isEditable,
           objType: 'Html',

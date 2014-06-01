@@ -29,6 +29,8 @@ import test_utils
 
 from google.appengine.ext import ndb
 
+JOB_FAILED_MESSAGE = 'failed (as expected)'
+
 
 class DummyJobManager(jobs.BaseDeferredJobManager):
     @classmethod
@@ -45,7 +47,7 @@ class AnotherDummyJobManager(jobs.BaseDeferredJobManager):
 class DummyFailingJobManager(jobs.BaseDeferredJobManager):
     @classmethod
     def _run(cls):
-        raise Exception('failed')
+        raise Exception(JOB_FAILED_MESSAGE)
 
 
 class JobWithNoRunMethodManager(jobs.BaseDeferredJobManager):
@@ -146,7 +148,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         error = DummyFailingJobManager.get_error(job_id)
         self.assertIsNone(metadata)
         self.assertIsNone(output)
-        self.assertIn('failed', error)
+        self.assertIn(JOB_FAILED_MESSAGE, error)
 
         self.assertFalse(DummyFailingJobManager.is_active(job_id))
         self.assertTrue(DummyFailingJobManager.has_finished(job_id))
