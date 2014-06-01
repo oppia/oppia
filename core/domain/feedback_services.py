@@ -52,7 +52,7 @@ def create_thread(
     thread.subject = subject
     thread.put()
     create_message(
-        exploration_id, thread.id, original_author_id,
+        thread.id, original_author_id,
         feedback_models.STATUS_CHOICES_OPEN, subject, text)
 
 
@@ -75,19 +75,13 @@ def get_messages(thread_id):
         for m in feedback_models.FeedbackMessageModel.get_messages(thread_id)]
 
 
-def create_message(
-        exploration_id, thread_id, author_id, updated_status,
+def create_message(thread_id, author_id, updated_status,
         updated_subject, text):
     """Creates a new message for the thread.
 
     Returns False if the message with the ID already exists.
     """
-    message_id = feedback_models.FeedbackMessageModel.message_count(thread_id)
-    msg = feedback_models.FeedbackMessageModel.get(thread_id, message_id)
-    if msg:
-        raise Exception(
-            'Message creation failed. Message %d thread %s already exits.' % (
-                message_id, thread_id))
+    message_id = feedback_models.FeedbackMessageModel.get_message_count(thread_id)
     msg = feedback_models.FeedbackMessageModel.create(thread_id, message_id)
     msg.thread_id = thread_id
     msg.message_id = message_id

@@ -65,7 +65,6 @@ class ThreadHandler(base.BaseHandler):
                 'Text for the message must be specified.')
 
         feedback_services.create_message(
-            exploration_id,
             thread_id,
             self.user_id,
             self.payload.get('updated_status'),
