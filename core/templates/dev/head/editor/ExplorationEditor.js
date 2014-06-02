@@ -84,6 +84,10 @@ function ExplorationEditor(
     return $scope.isExplorationLockedForEditing() && !$scope.isSaveInProgress;
   };
 
+  $scope.getChangeListLength = function() {
+    return changeListService.getChangeList().length;
+  };
+
   $scope.isExplorationLockedForEditing = function() {
     return changeListService.getChangeList().length > 0;
   };
