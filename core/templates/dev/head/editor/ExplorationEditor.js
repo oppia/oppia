@@ -736,6 +736,25 @@ function ExplorationEditor(
     document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
   };
 
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.publish = $modalInstance.close;
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function() {
+      explorationRightsService.saveChangeToBackend({is_public: true});
+    });
+  };
+
   $scope.showNominateExplorationModal = function() {
     warningsData.clear();
     $modal.open({
