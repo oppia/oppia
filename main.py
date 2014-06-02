@@ -214,7 +214,7 @@ urls = [
          % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
         reader.FeedbackHandler, 'feedback_handler'),
     get_redirect_route(
-        r'/explorehandler/give_feedback/<exploration_id>/<escaped_state_name>',
+        r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
     get_redirect_route(
@@ -238,9 +238,6 @@ urls = [
     get_redirect_route(
         r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
-    get_redirect_route(
-        r'/createhandler/resolved_feedback/<exploration_id>/<escaped_state_name>',
-        editor.ResolvedFeedbackHandler, 'resolved_feedback_handler'),
     get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),

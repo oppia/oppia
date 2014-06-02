@@ -53,8 +53,9 @@ class FeedbackThreadModel(base_models.BaseModel):
     # ID of state the thread is for. Does not exist if the thread is about the
     # entire exploration.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of the user who started the thread.
-    original_author_id = ndb.StringProperty(required=True, indexed=True)
+    # ID of the user who started the thread. This may be None if the feedback
+    # was given anonymously by a learner.
+    original_author_id = ndb.StringProperty(indexed=True)
     # Latest status of the thread.
     status = ndb.StringProperty(
         default=STATUS_CHOICES_OPEN,
@@ -76,7 +77,8 @@ class FeedbackThreadModel(base_models.BaseModel):
         MAX_RETRIES = 10
         RAND_RANGE = 127 * 127
         for i in range(MAX_RETRIES):
-            thread_id = (utils.base64_from_int(utils.get_epoch_time()) +
+            thread_id = (
+                utils.base64_from_int(utils.get_epoch_time()) +
                 utils.base64_from_int(utils.get_random_int(RAND_RANGE)))
             if not cls.get_by_exp_and_thread_id(exploration_id, thread_id):
                 return thread_id
@@ -137,8 +139,9 @@ class FeedbackMessageModel(base_models.BaseModel):
     # 0-based sequential numerical ID. Sorting by this field will create the
     # thread in chronological order.
     message_id = ndb.IntegerProperty(required=True, indexed=True)
-    # ID of the user who posted this message.
-    author_id = ndb.StringProperty(required=True, indexed=True)
+    # ID of the user who posted this message. This may be None if the feedback
+    # was given anonymously by a learner.
+    author_id = ndb.StringProperty(indexed=True)
     # New thread status. Must exist in the first message of a thread. For the
     # rest of the thread, should exist only when the status changes.
     updated_status = ndb.StringProperty(choices=STATUS_CHOICES, indexed=True)
