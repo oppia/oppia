@@ -285,7 +285,7 @@
 
                 {% if can_publish %}
                   <span ng-if="explorationRightsService.isPrivate()">
-                    <button type="button" class="btn oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !getExplorationWarningsList().length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || getExplorationWarningsList().length">
+                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !getExplorationWarningsList().length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || getExplorationWarningsList().length">
                       publish
                     </button>
                     <img class="oppia-help" src="/images/help.png"
@@ -295,8 +295,8 @@
                 {% endif %}
 
                 <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-                  <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()">
-                    Nominate for release
+                  <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}">
+                    nominate for release
                   </button>
                   <img class="oppia-help" src="/images/help.png"
                        tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the Learn Gallery by default."
