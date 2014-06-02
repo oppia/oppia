@@ -12,14 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-/**
- * Directive for the InteractiveMap interactive widget.
- *
- * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
- * followed by the name of the arg.
- */
 oppia.directive('oppiaInteractiveLogicProof', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
 
@@ -143,6 +135,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           for (var i = 0; i<proofLines.length; i++) {
             numberedLines.push((i + 1) + '  ' + proofLines[i]);
           }
+          // We split incorrect proofs into three parts so that response.html
+          // can make the invalid line bold.
           return (errorLineNum === undefined) ?
             [numberedLines.join('\n')]:
             [
