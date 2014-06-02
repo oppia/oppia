@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-'''Tests for the appengine search api wrapper'''
+"""Tests for the appengine search api wrapper"""
 
 __author__ = 'Frederik Creemers'
 
@@ -35,7 +35,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         date_today = datetime.date.today()
         # most ther methods of getting a datetime also give microseconds, which aren't preserved by the search api
         # which makes equality tests fail. In oppia, we probably don't care about microseconds
-        datetime_obj = datetime.datetime.combine(date_today, datetime.datetime.min.time()) + datetime.timedelta(days=2,hours=11,seconds=15)
+        datetime_obj = datetime.datetime.combine(date_today, datetime.datetime.min.time()) + datetime.timedelta(days=2, hours=11, seconds=15)
 
         doc_id = 'abcdefghijklmnop'
         doc = {'id': doc_id,
@@ -70,17 +70,25 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_disallow_unsuported_value_types(self):
         with self.assertRaises(ValueError):
-            doc = {'abc': set("xyz")}
-            gae_search_services.add_documents_to_index(doc, "my_index")
+            doc = {'abc': set('xyz')}
+            gae_search_services.add_documents_to_index(doc, 'my_index')
+
+    def test_add_document_with_rank(self):
+        doc = {'id': 'my_doc', 'field': 'value', 'rank': 42}
+        gae_search_services.add_documents_to_index([doc],'my_index')
+        index = search.Index('my_index')
+        self.assertEqual(index.get('my_doc').rank, 42)
 
     def test_add_document_with_existing_id_updates_it(self):
-        doc1 = {"id": "doc", "version": 1}
-        doc2 = {"id": "doc", "version": 2}
-        gae_search_services.add_documents_to_index([doc1], "my_index")
-        index = search.Index("my_index")
-        self.assertEqual(index.get("doc").field("version").value, 1)
-        gae_search_services.add_documents_to_index([doc2], "my_index")
-        self.assertEqual(index.get("doc").field("version").value, 2)
+        doc1 = {'id': 'doc', 'version': 1, 'rank': 10}
+        doc2 = {'id': 'doc', 'version': 2, 'rank': 20}
+        gae_search_services.add_documents_to_index([doc1], 'my_index'   )
+        index = search.Index('my_index')
+        self.assertEqual(index.get('doc').field('version').value, 1)
+        self.assertEqual(index.get('doc').rank, 10)
+        gae_search_services.add_documents_to_index([doc2], 'my_index')
+        self.assertEqual(index.get('doc').field('version').value, 2)
+        self.assertEqual(index.get('doc').rank, 20)
 
 
 class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
@@ -152,6 +160,7 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn({'id': 'doc3', 'k': 'abc jkl ghi'}, result1 + result2)
 
     def test_ids_only(self):
+        import time
         doc1 = search.Document(doc_id='doc1',fields=[search.TextField(name='k', value='abc def ghi')])
         doc2 = search.Document(doc_id='doc2',fields=[search.TextField(name='k', value='abc jkl mno')])
         doc3 = search.Document(doc_id='doc3',fields=[search.TextField(name='k', value='abc jkl ghi')])
@@ -170,3 +179,46 @@ class SearchQueryTests(test_utils.GenericTestBase):
         index.put([doc1, doc2, doc3])
         result, cursor = gae_search_services.search('k:abc','my_index')
         self.assertIsNone(cursor)
+
+    def test_default_rank_is_descending_date(self):
+        """Time is only saved with 1 second accuracy, so I'm putting a 1 second delay between puts."""
+        import time
+        dict1 = {'id': 'doc1', 'k': 'abc def'}
+        dict2 = {'id': 'doc2', 'k': 'abc ghi'}
+        dict3 = {'id': 'doc3', 'k': 'abc jkl'}
+        gae_search_services.add_documents_to_index([dict1], 'my_index')
+        time.sleep(1)
+        gae_search_services.add_documents_to_index([dict2], 'my_index')
+        time.sleep(1)
+        gae_search_services.add_documents_to_index([dict3], 'my_index')
+        result, cursor = gae_search_services.search('k:abc', index='my_index')
+        self.assertEqual(result, [dict3, dict2, dict1])
+
+    def test_search_with_custom_rank(self):
+        dict1 = {'id': 'doc1', 'k': 'abc def', 'rank': 3}
+        dict2 = {'id': 'doc2', 'k': 'abc ghi', 'rank': 1}
+        dict3 = {'id': 'doc3', 'k': 'abc jkl', 'rank': 2}
+        gae_search_services.add_documents_to_index([dict1, dict2, dict3], 'my_index')
+        del dict1['rank']
+        del dict2['rank']
+        del dict3['rank']
+        result, cursor = gae_search_services.search('k:abc', index='my_index')
+        self.assertEqual(result, [dict1, dict3, dict2])
+
+    def test_search_using_single_sort_expression(self):
+        dict1 = {'id': 'doc1', 'k': 'abc ghi'}
+        dict2 = {'id': 'doc2', 'k': 'abc def'}
+        dict3 = {'id': 'doc3', 'k': 'abc jkl'}
+        gae_search_services.add_documents_to_index([dict1, dict2, dict3], 'my_index')
+        result, cursor = gae_search_services.search('k:abc', index='my_index', sort='+k')
+        self.assertEqual(result, [dict2, dict1, dict3])
+        result, cursor = gae_search_services.search('k:abc', index='my_index', sort='-k')
+        self.assertEqual(result, [dict3, dict1, dict2])
+
+    def test_search_using_multiple_sort_expressions(self):
+        dict1 = {'id': 'doc1', 'k1': 2, 'k2': 'abc ghi'}
+        dict2 = {'id': 'doc2', 'k1': 1, 'k2': 'abc def'}
+        dict3 = {'id': 'doc3', 'k1': 1, 'k2': 'abc jkl'}
+        gae_search_services.add_documents_to_index([dict1, dict2, dict3], 'my_index')
+        result, cursor = gae_search_services.search('k2:abc', index='my_index', sort='+k1 -k2')
+        self.assertEqual(result, [dict3, dict2, dict1])

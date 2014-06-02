@@ -39,6 +39,8 @@ def add_documents_to_index(documents, index, language=feconf.DEFAULT_LANGUAGE_CO
       - documents: a list of documents. Each document should be a dictionary.
         Every key in the document is a field name, and the corresponding value will be the field's value.
         If there is a key named 'id', its value will be used as the document's id.
+        If there is a key named 'rank', its value will be used as the document's rank.
+        By default, search results are returned ordered by descending rank.
       - index: the name f the index to insert the document into.
       - language: the language the document was written in.
       - retries: the number of times to retry inserting the documents.
@@ -69,15 +71,20 @@ def _dict_to_search_document(d):
     if 'id' in d:
         doc_id = d['id']
 
+    #rank = int((datetime.datetime.now() - datetime.datetime(2011, 1, 1)).total_seconds())
+    rank = None
+    if 'rank' in d:
+        rank = d['rank']
+
     fields = []
 
     for key, value in d.iteritems():
-        if key == 'id':
+        if key == 'id' or key == 'rank':
             continue
 
         fields += _make_fields(key, value)
 
-    doc = gae_search.Document(doc_id=doc_id, fields=fields)
+    doc = gae_search.Document(doc_id=doc_id, fields=fields, rank=rank)
     return doc
 
 
@@ -121,7 +128,7 @@ def delete_documents_from_index(doc_ids, index, retries=3):
             raise SearchFailureError(e.message, e)
 
 
-def search(query_string, index, cursor=gae_search.Cursor().web_safe_string, limit=20, ids_only=False, retries=3):
+def search(query_string, index, cursor=gae_search.Cursor().web_safe_string, limit=20, sort='', ids_only=False, retries=3):
     """Searches for documents in an index
 
     Args:
@@ -130,6 +137,7 @@ def search(query_string, index, cursor=gae_search.Cursor().web_safe_string, limi
       - index: the name of the index to search.
       - cursor: a cursor, describing where to start searching. Leave blank to start at the beginning.
                 This function returns a cursor, that you can use to retrieve the next 'page' of search results.
+      - sort: a string r
       - limit: the maximum number of documents to return.
       - ids_only: whether to only return document ids.
       - retries: the number of times to retry inserting the documents.
@@ -142,8 +150,14 @@ def search(query_string, index, cursor=gae_search.Cursor().web_safe_string, limi
           if there is no next page.
     """
     cursor = gae_search.Cursor(web_safe_string=cursor)
-    options = gae_search.QueryOptions(limit=limit, cursor=cursor, ids_only=ids_only)
-    query = gae_search.Query(query_string, options)
+    sort_options = None
+
+    if sort:
+        expr = _string_to_sort_expressions(sort)
+        sort_options = gae_search.SortOptions(expr)
+
+    options = gae_search.QueryOptions(limit=limit, cursor=cursor, ids_only=ids_only, sort_options=sort_options)
+    query = gae_search.Query(query_string, options=options)
     index = gae_search.Index(index)
 
     try:
@@ -151,12 +165,28 @@ def search(query_string, index, cursor=gae_search.Cursor().web_safe_string, limi
     except gae_search.Error as e:
         if retries > 0:
             return search(query_string, index, cursor, limit, ids_only, retries-1)
+        raise SearchFailureError(original_exception=e, message='search failed.')
 
     result_cursor = None
     if results.cursor:
         result_cursor = results.cursor.web_safe_string
 
     return [_search_document_to_dict(doc) for doc in results.results], result_cursor
+
+
+def _string_to_sort_expressions(s):
+    sort_expressions = []
+    s = s.split()
+    for expression in s:
+        if expression.startswith('+'):
+            direction = gae_search.SortExpression.ASCENDING
+        elif expression.startswith('-'):
+            direction = gae_search.SortExpression.DESCENDING
+        else:
+            raise ValueError('Fields in the sort expression should start with "+" or "-" to indicate sort direction.'
+                             'The field %s has no such indicator in expression "%s"' % (field, s))
+        sort_expressions.append(gae_search.SortExpression(expression[1:], direction))
+    return sort_expressions
 
 
 def _search_document_to_dict(doc):
