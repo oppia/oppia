@@ -137,7 +137,9 @@ def search(query_string, index, cursor=gae_search.Cursor().web_safe_string, limi
       - index: the name of the index to search.
       - cursor: a cursor, describing where to start searching. Leave blank to start at the beginning.
                 This function returns a cursor, that you can use to retrieve the next 'page' of search results.
-      - sort: a string r
+      - sort: a string indicating how to sort results. This should be a string of space separated values.
+        Each value should start with a '+' or a '-' character indicating whether to sort in ascending or descending
+        order respectively. This character should be followed by a field name to sort on.
       - limit: the maximum number of documents to return.
       - ids_only: whether to only return document ids.
       - retries: the number of times to retry inserting the documents.
