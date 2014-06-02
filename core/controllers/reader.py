@@ -279,9 +279,10 @@ class ReaderFeedbackHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
-    def post(self, exploration_id, escaped_state_name):
+    def post(self, exploration_id):
         """Handles POST requests."""
-        state_name = self.unescape_state_name(escaped_state_name)
+        state_name = self.payload.get('state_name')
+        subject = self.payload.get('subject', 'Feedback from a learner')
         feedback = self.payload.get('feedback')
         include_author = self.payload.get('include_author')
 
@@ -289,6 +290,6 @@ class ReaderFeedbackHandler(base.BaseHandler):
             exploration_id,
             state_name,
             self.user_id if include_author else None,
-            'Feedback from a reader',
+            subject,
             feedback)
         self.render_json(self.values)

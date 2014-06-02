@@ -53,7 +53,7 @@ class FeedbackThreadModel(base_models.BaseModel):
     # ID of state the thread is for. Does not exist if the thread is about the
     # entire exploration.
     state_name = ndb.StringProperty(indexed=True)
-    # ID of the user who started the thread. This may be empty if the feedback
+    # ID of the user who started the thread. This may be None if the feedback
     # was given anonymously by a learner.
     original_author_id = ndb.StringProperty(indexed=True)
     # Latest status of the thread.

@@ -228,12 +228,13 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         self.login(self.viewer_email)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
-        state_name1 = exploration_dict['state_name']
+        state_name_1 = exploration_dict['state_name']
 
         # Viewer gives 1st feedback
         self.post_json(
-            '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name1),
+            '/explorehandler/give_feedback/%s' % EXP_ID,
             {
+                'state_name': state_name_1,
                 'feedback': 'This is a feedback message.',
             }
         )
@@ -242,18 +243,19 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         exploration_dict = self.post_json(
             '%s/%s/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX,
                           EXP_ID,
-                          state_name1),
+                          state_name_1),
             {
                 'answer': '0', 'handler': 'submit',
                 'state_history': exploration_dict['state_history']
             }
         )
-        state_name2 = exploration_dict['state_name']
+        state_name_2 = exploration_dict['state_name']
 
         # Viewer gives 2nd feedback
         self.post_json(
-            '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name2),
+            '/explorehandler/give_feedback/%s' % EXP_ID,
             {
+                'state_name': state_name_2,
                 'feedback': 'This is a 2nd feedback message.',
             }
         )

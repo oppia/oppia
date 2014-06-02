@@ -214,7 +214,7 @@ urls = [
          % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
         reader.FeedbackHandler, 'feedback_handler'),
     get_redirect_route(
-        r'/explorehandler/give_feedback/<exploration_id>/<escaped_state_name>',
+        r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
     get_redirect_route(

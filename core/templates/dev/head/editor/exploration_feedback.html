@@ -98,6 +98,9 @@
                     <span ng-if="m.author_username">
                       by <strong><[m.author_username]></strong>
                     </span>
+                    <span ng-if="!m.author_username">
+                      (anonymously submitted)
+                    </span>
 
                     <span class="pull-right">
                       <span ng-if="m.message_id !== 0">

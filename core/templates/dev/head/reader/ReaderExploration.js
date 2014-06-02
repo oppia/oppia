@@ -108,11 +108,14 @@ function ReaderExploration(
           '$scope', '$modalInstance', 'isLoggedIn',
           function($scope, $modalInstance, isLoggedIn) {
         $scope.isLoggedIn = isLoggedIn;
-        $scope.anonymizeFeedback = false;
-        $scope.submit = function(feedback, anonymizeFeedback) {
+        $scope.isSubmitterAnonymized = false;
+        $scope.relatedTo = 'state';
+        $scope.submit = function(subject, feedback, relatedTo, isSubmitterAnonymized) {
           $modalInstance.close({
+            subject: subject,
             feedback: feedback,
-            anonymizeFeedback: anonymizeFeedback
+            isStateRelated: relatedTo === 'state',
+            isSubmitterAnonymized: isSubmitterAnonymized
           });
         };
 
@@ -125,7 +128,27 @@ function ReaderExploration(
 
     modalInstance.result.then(function(result) {
       if (result.feedback) {
-        $scope.submitFeedback(result.feedback, result.anonymizeFeedback);
+        var requestMap = {
+          subject: result.subject,
+          feedback: result.feedback,
+          include_author: !result.isSubmitterAnonymized && $scope.isLoggedIn,
+        };
+        if (result.isStateRelated) {
+          requestMap.state_name = $scope.stateName;
+        }
+
+        $http.post(
+            '/explorehandler/give_feedback/' + $scope.explorationId,
+            oppiaRequestCreator.createRequest(requestMap),
+            {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+        ).success(function() {
+          $scope.subject = '';
+          $scope.feedback = '';
+        }).error(function(data) {
+          warningsData.addWarning(
+            data.error || 'There was an error processing your input.');
+        });
+
         $scope.showFeedbackConfirmationModal();
       } else {
         warningsData.addWarning('No feedback was submitted.');
@@ -146,25 +169,6 @@ function ReaderExploration(
           warningsData.clear();
         };
       }]
-    });
-  };
-
-  $scope.submitFeedback = function(feedback, anonymizeFeedback) {
-    var requestMap = {
-      feedback: feedback,
-      include_author: !anonymizeFeedback && $scope.isLoggedIn
-    };
-
-    $http.post(
-        '/explorehandler/give_feedback/' + $scope.explorationId + '/' + encodeURIComponent($scope.stateName),
-        oppiaRequestCreator.createRequest(requestMap),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-    ).success(function() {
-      $scope.feedback = '';
-      $('#feedbackModal').modal('hide');
-    }).error(function(data) {
-      warningsData.addWarning(
-        data.error || 'There was an error processing your input.');
     });
   };
 
