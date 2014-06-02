@@ -29,7 +29,7 @@ def get_threadlist(exploration_id):
     return [{
         'last_updated': utils.get_time_in_millisecs(t.last_updated),
         'original_author_username': user_services.get_username(
-            t.original_author_id),
+            t.original_author_id) if t.original_author_id else None,
         'state_name': t.state_name,
         'status': t.status,
         'subject': t.subject,
@@ -58,8 +58,9 @@ def create_thread(
 
 def _get_message_dict(message_instance):
     return {
-        'author_username': user_services.get_username(
-            message_instance.author_id),
+        'author_username': (
+            user_services.get_username(message_instance.author_id)
+            if message_instance.author_id else None),
         'created_on': utils.get_time_in_millisecs(message_instance.created_on),
         'exploration_id': message_instance.exploration_id,
         'message_id': message_instance.message_id,
@@ -75,13 +76,14 @@ def get_messages(thread_id):
         for m in feedback_models.FeedbackMessageModel.get_messages(thread_id)]
 
 
-def create_message(thread_id, author_id, updated_status,
-        updated_subject, text):
+def create_message(
+        thread_id, author_id, updated_status, updated_subject, text):
     """Creates a new message for the thread.
 
     Returns False if the message with the ID already exists.
     """
-    message_id = feedback_models.FeedbackMessageModel.get_message_count(thread_id)
+    message_id = feedback_models.FeedbackMessageModel.get_message_count(
+        thread_id)
     msg = feedback_models.FeedbackMessageModel.create(thread_id, message_id)
     msg.thread_id = thread_id
     msg.message_id = message_id
@@ -98,13 +100,10 @@ def create_message(thread_id, author_id, updated_status,
     # added to it.
     thread = feedback_models.FeedbackThreadModel.get(thread_id)
     if message_id != 0 and (updated_status or updated_subject):
-        updated = False
         if updated_status and updated_status != thread.status:
             thread.status = updated_status
-            updated = True
         if updated_subject and updated_subject != thread.subject:
             thread.subject = updated_subject
-            updated = True
     thread.put()
     return True
 

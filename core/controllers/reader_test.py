@@ -188,7 +188,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.submit_and_compare(
             0, '', 'to be sure our strategy works in all cases')
         self.submit_and_compare(0, 'try to guess', '')
- 
+
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
         self.init_player(
@@ -209,3 +209,52 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         # is persisted to the backend.
         self.submit_and_compare(
             'a' * 1000500, 'Sorry, nope, we didn\'t get it', '')
+
+
+class FeedbackIntegrationTest(test_utils.GenericTestBase):
+    """Test the handler for giving feedback."""
+
+    def test_give_feedback_handler(self):
+        """Test giving feedback handler."""
+        self.viewer_email = 'viewer@example.com'
+        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+
+        # Load demo exploration
+        EXP_ID = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        # Viewer opens exploration
+        self.login(self.viewer_email)
+        exploration_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+        state_name1 = exploration_dict['state_name']
+
+        # Viewer gives 1st feedback
+        self.post_json(
+            '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name1),
+            {
+                'feedback': 'This is a feedback message.',
+            }
+        )
+
+        # Viewer submits answer '0'
+        exploration_dict = self.post_json(
+            '%s/%s/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX,
+                          EXP_ID,
+                          state_name1),
+            {
+                'answer': '0', 'handler': 'submit',
+                'state_history': exploration_dict['state_history']
+            }
+        )
+        state_name2 = exploration_dict['state_name']
+
+        # Viewer gives 2nd feedback
+        self.post_json(
+            '/explorehandler/give_feedback/%s/%s' % (EXP_ID, state_name2),
+            {
+                'feedback': 'This is a 2nd feedback message.',
+            }
+        )
+        self.logout()

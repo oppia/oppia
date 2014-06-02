@@ -13,20 +13,30 @@
 
       <div class="modal-body">
         <h4>Give feedback to the exploration editors</h4>
-        <!-- TODO(sfederwisch): make this true<i> They will be given the exploration history already.</i><br />-->
         <em>
           <p>
             Note: This form is meant for exploration-specific feedback. This feedback will be sent to the exploration's editors, who will use your feedback to improve the exploration.
+          </p>
+
+          <p>
+            Please note that feedback you give can be viewed by anyone who can view the exploration editor page. If you like, you can give feedback anonymously by checking the box at the bottom.
           </p>
           <p>
             To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
           </p>
         </em>
         <textarea ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
+
+        <div ng-show="isLoggedIn">
+          <label>
+            <input type="checkbox" ng-model="anonymizeFeedback">
+            Give feedback anonymously?
+          </label>
+        </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" ng-click="submit(feedback)">Submit</button>
+        <button class="btn btn-success" ng-click="submit(feedback, anonymizeFeedback)">Submit</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
     </script>
@@ -38,7 +48,7 @@
 
       <div class="modal-body">
         <p>
-          Your feedback has been successfully submitted, and the exploration creator will see it the next time he/she visits the exploration creation dashboard.
+          Your feedback has been successfully submitted, and the exploration editors will see it when they next visit the exploration editing page.
         </p>
         <p>
           Thank you for helping to improve this exploration!

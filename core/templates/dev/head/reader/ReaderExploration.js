@@ -74,12 +74,15 @@ function ReaderExploration(
     $scope.initializePage();
   };
 
+  $scope.isLoggedIn = false;
+
   $scope.initializePage = function() {
     $scope.responseLog = [];
     $scope.inputTemplate = '';
     $http.get($scope.explorationDataUrl)
       .success(function(data) {
         $scope.explorationTitle = data.title;
+        $scope.isLoggedIn = data.is_logged_in;
         $scope.loadPage(data);
         $window.scrollTo(0, 0);
       }).error(function(data) {
@@ -96,10 +99,21 @@ function ReaderExploration(
     var modalInstance = $modal.open({
       templateUrl: 'modals/readerFeedback',
       backdrop: 'static',
-      resolve: {},
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.submit = function(feedback) {
-          $modalInstance.close({feedback: feedback});
+      resolve: {
+        isLoggedIn: function() {
+          return $scope.isLoggedIn;
+        }
+      },
+      controller: [
+          '$scope', '$modalInstance', 'isLoggedIn',
+          function($scope, $modalInstance, isLoggedIn) {
+        $scope.isLoggedIn = isLoggedIn;
+        $scope.anonymizeFeedback = false;
+        $scope.submit = function(feedback, anonymizeFeedback) {
+          $modalInstance.close({
+            feedback: feedback,
+            anonymizeFeedback: anonymizeFeedback
+          });
         };
 
         $scope.cancel = function() {
@@ -111,7 +125,7 @@ function ReaderExploration(
 
     modalInstance.result.then(function(result) {
       if (result.feedback) {
-        $scope.submitFeedback(result.feedback);
+        $scope.submitFeedback(result.feedback, result.anonymizeFeedback);
         $scope.showFeedbackConfirmationModal();
       } else {
         warningsData.addWarning('No feedback was submitted.');
@@ -135,11 +149,10 @@ function ReaderExploration(
     });
   };
 
-  $scope.submitFeedback = function(feedback) {
+  $scope.submitFeedback = function(feedback, anonymizeFeedback) {
     var requestMap = {
       feedback: feedback,
-      state_history: angular.copy($scope.stateHistory),
-      version: GLOBALS.explorationVersion
+      include_author: !anonymizeFeedback && $scope.isLoggedIn
     };
 
     $http.post(
@@ -185,8 +198,8 @@ function ReaderExploration(
     if ($scope.answerIsBeingProcessed) {
       return;
     }
-      
-    $scope.clientTimeSpentInSecs = 
+
+    $scope.clientTimeSpentInSecs =
       (new Date().getTime() - $scope.stateStartTime) / 1000;
 
     var requestMap = {
