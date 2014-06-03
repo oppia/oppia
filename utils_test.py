@@ -136,3 +136,17 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(len(full_hash), 28)
         self.assertEqual(len(abbreviated_hash), 5)
         self.assertEqual(full_hash[:5], abbreviated_hash)
+
+    def test_construct_path(self):
+        p = utils.construct_path('a', 'b', 'c')
+        self.assertEqual(p, 'a/b/c')
+        p = utils.construct_path('a/', '/b', 'c')
+        self.assertEqual(p, 'a/b/c')
+        p = utils.construct_path('a/', 'b', 'c')
+        self.assertEqual(p, 'a/b/c')
+        p = utils.construct_path('a', '/b', 'c')
+        self.assertEqual(p, 'a/b/c')
+        p = utils.construct_path('/a', 'b/'
+        self.assertEqual(p, '/a/b/')
+        self.assertRaises(Exception, utils.construct_path)
+        self.assertRaises(Exception, utils.construct_path, '', 'a')

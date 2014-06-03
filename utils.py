@@ -31,6 +31,8 @@ import urlparse
 import yaml
 import zipfile
 
+
+
 # Sentinel value for schema verification, indicating that a value can take any
 # type.
 ANY_TYPE = 1
@@ -58,7 +60,7 @@ def create_enum(*sequential, **names):
 
 def get_file_contents(filepath, raw_bytes=False):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with open(filepath) as f:
+    with open(filepath, 'rb') as f:
         return f.read() if raw_bytes else f.read().decode('utf-8')
 
 
@@ -344,3 +346,33 @@ def get_epoch_time():
 
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
+
+def construct_path(*components):
+    # Filter out empty strings, and note final empty one
+    isFinalEmptyString = False
+    accum = []
+    for i, c in enumerate(components):
+        if len(c) == 0:
+            if i == len(components) - 1 and len(components) > 1:
+                isFinalEmptyString = True
+        else:
+            accum.append(c)
+    # If 'accum' is empty, handle this by returning empty string
+    if len(accum) == 0:
+        return ''
+    # Accumulate non-empty path components, adding seps where needed.
+    accum2 = [accum[0]]
+    for i in range(0, len(accum)-1):
+        left = accum[i]
+        right = accum[i+1]
+        if right[0] == '/':
+            # in the event an absolute path is encountered, all previous
+            # components are discarded
+            accum2 = [right]
+        elif left[-1] == '/':
+            accum2.append(right)
+        else:
+            accum2.append('/' + right)
+    if isFinalEmptyString and accum2[-1][-1] != '/':
+        accum2.append('/')
+    return ''.join(accum2)
