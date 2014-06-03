@@ -190,7 +190,7 @@ function InteractiveWidgetEditor(
     $scope.tmpWidget = null;
     $scope.widgetIdMemento = null;
     $scope.widgetCustomizationArgsMemento = null;
-    $scope.widgetHandlersMemento = null;
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
   };
 
   $scope.createTmpRule = function() {
