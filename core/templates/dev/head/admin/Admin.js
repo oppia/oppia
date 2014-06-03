@@ -65,6 +65,26 @@ function Admin($scope, $http) {
     });
   };
 
+  $scope.migrateFeedback = function() {
+    var request = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'migrate_feedback'
+      })
+    }, true);
+
+    $http.post(
+      $scope.adminHandlerUrl,
+      request,
+      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
+    success(function(data) {
+      $scope.message = 'Feedback migrated successfully.';
+      window.reload();
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
+
   $scope.refreshComputedProperty = function(computedPropertyId) {
     var request = $.param({
       csrf_token: GLOBALS.csrf_token,

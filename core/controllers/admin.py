@@ -140,7 +140,7 @@ class AdminHandler(base.BaseHandler):
 
     def _migrate_feedback(self):
         old_feedback_items = stats_models.FeedbackItemModel.get_all()
-        for item in old_feedback_items[:10]:
+        for item in old_feedback_items.fetch(10):
             target_id = item.target_id
             content = item.content
             # additional_data = item.additional_data
@@ -171,12 +171,12 @@ class AdminHandler(base.BaseHandler):
             thread.state_name = state_name
             thread.original_author_id = submitter_id
             thread.status = STATUS_MAPPING[status]
-            thread.subject = 'Feedback from a reader',
+            thread.subject = 'Feedback from a reader'
             thread.put()
 
             message_id = 0
             msg = feedback_models.FeedbackMessageModel.create(
-                thread_id, message_id)
+                thread.id, message_id)
             msg.thread_id = thread_id
             msg.message_id = message_id
             msg.author_id = submitter_id
@@ -185,8 +185,7 @@ class AdminHandler(base.BaseHandler):
             msg.text = content
             msg.put()
 
-            thread = feedback_models.FeedbackThreadModel.get(thread_id)
-            thread.put()
+            item.delete()
 
     @require_super_admin
     def get(self):
