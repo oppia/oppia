@@ -143,8 +143,6 @@ class AdminHandler(base.BaseHandler):
         for item in old_feedback_items.fetch(10):
             target_id = item.target_id
             content = item.content
-            # additional_data = item.additional_data
-            submitter_id = item.submitter_id
             status = item.status
 
             if not target_id.startswith('state:'):
@@ -169,7 +167,7 @@ class AdminHandler(base.BaseHandler):
                 exploration_id, thread_id)
             thread.exploration_id = exploration_id
             thread.state_name = state_name
-            thread.original_author_id = submitter_id
+            thread.original_author_id = None
             thread.status = STATUS_MAPPING[status]
             thread.subject = 'Feedback from a reader'
             thread.put()
@@ -179,7 +177,7 @@ class AdminHandler(base.BaseHandler):
                 thread.id, message_id)
             msg.thread_id = thread.id
             msg.message_id = message_id
-            msg.author_id = submitter_id
+            msg.author_id = None
             msg.updated_status = thread.status
             msg.updated_subject = thread.subject
             msg.text = content
