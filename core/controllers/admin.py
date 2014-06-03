@@ -177,7 +177,7 @@ class AdminHandler(base.BaseHandler):
             message_id = 0
             msg = feedback_models.FeedbackMessageModel.create(
                 thread.id, message_id)
-            msg.thread_id = thread_id
+            msg.thread_id = thread.id
             msg.message_id = message_id
             msg.author_id = submitter_id
             msg.updated_status = thread.status
