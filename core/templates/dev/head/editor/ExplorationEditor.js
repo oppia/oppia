@@ -389,6 +389,7 @@ function ExplorationEditor(
         } else {
           resetActiveTags();
           $scope.mainTabActive = true;
+          $scope.$broadcast('refreshStateEditor');
         }
       };
 
