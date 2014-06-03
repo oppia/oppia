@@ -11,7 +11,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-from contextlib import contextmanager
+
+import contextlib
 import os
 import re
 import unittest
@@ -194,18 +195,18 @@ class TestBase(unittest.TestCase):
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
 
-    @contextmanager
+    @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
         """Swap an object's attribute value within the context of a
         'with' statement. The object can be anything that supports
         getattr and setattr, such as class instances, modules, ...
 
-        example usage:
+        Example usage:
 
         import math
         with self.swap(math, "sqrt", lambda x: 42):
-            print math.sqrt(16.0) #prints 42
-        print math.sqrt(16.0) #prints 4 as expected.
+            print math.sqrt(16.0) # prints 42
+        print math.sqrt(16.0) # prints 4 as expected.
         """
         original = getattr(obj, attr)
         setattr(obj, attr, newvalue)
