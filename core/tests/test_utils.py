@@ -11,13 +11,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
+from contextlib import contextmanager
 import os
 import re
 import unittest
 import webtest
 
-from contextlib import contextmanager
 from core.domain import config_domain
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -197,11 +196,23 @@ class TestBase(unittest.TestCase):
 
     @contextmanager
     def swap(self, obj, attr, newvalue):
-        """Swap an object's attribute value within the context of a 'with' statement."""
+        """Swap an object's attribute value within the context of a
+        'with' statement. The object can be anything that supports
+        getattr and setattr, such as class instances, modules, ...
+
+        example usage:
+
+        import math
+        with self.swap(math, "sqrt", lambda x: 42):
+            print math.sqrt(16.0) #prints 42
+        print math.sqrt(16.0) #prints 4 as expected.
+        """
         original = getattr(obj, attr)
         setattr(obj, attr, newvalue)
-        yield
-        setattr(obj, attr, original)
+        try:
+            yield
+        finally:
+            setattr(obj, attr, original)
 
 
 class AppEngineTestBase(TestBase):
