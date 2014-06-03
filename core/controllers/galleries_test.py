@@ -450,17 +450,29 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.set_moderators([self.EMAIL_MODERATOR])
         self.set_admins([self.EMAIL_ADMIN])
 
-    def attempt_to_edit(self, exploration_id, expect_errors=False, version=1):
+    def attempt_to_view(self, exploration_id, expect_errors=False, version=1):
         if expect_errors:
-            expected_status_int = 401
+            expected_status_int = 404
         else:
             expected_status_int = 200
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id),
             expect_errors=expect_errors)
+        self.assertEqual(response.status_int, expected_status_int)
+
+    def attempt_to_edit(self, exploration_id, expect_errors=False, version=1):
+        # This should only be called if attempt_to_view() passes, otherwise
+        # it isn't possible to get a CSRF token.
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id))
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
+
+        if expect_errors:
+            expected_status_int = 401
+        else:
+            expected_status_int = 200
 
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exploration_id),
@@ -475,8 +487,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                 }]
             },
             csrf_token=csrf_token, expect_errors=expect_errors,
-            expected_status_int=expected_status_int
-        )
+            expected_status_int=expected_status_int)
 
     def attempt_to_delete(self, exploration_id, expect_errors=False):
         if expect_errors:
@@ -494,7 +505,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         """Test user rights for explorations in the Contribute gallery."""
 
         # user@example.com, a regular user, can see exploration B, can see and
-        #     edit exploration C, and cannot delete any of the explorations.
+        # edit exploration C, and cannot delete any of the explorations.
         EMAIL_USER = 'user@example.com'
         self.register_editor(EMAIL_USER)
 
@@ -525,12 +536,15 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_community_owned': True,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id, expect_errors=True, version=2)
-        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
+        self.attempt_to_view(self.exp_a_id, expect_errors=True, version=2)
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
         self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id, expect_errors=True)
 
         self.logout()
@@ -565,12 +579,16 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_community_owned': True,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
+        self.attempt_to_view(self.exp_a_id, version=2)
         self.attempt_to_edit(self.exp_a_id, expect_errors=True)
-        self.attempt_to_edit(self.exp_b_id, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, version=2)
         self.attempt_to_delete(self.exp_b_id)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id)
 
         self.logout()
@@ -605,12 +623,16 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_community_owned': True,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
+        self.attempt_to_view(self.exp_a_id, version=2)
         self.attempt_to_edit(self.exp_a_id, expect_errors=True)
-        self.attempt_to_edit(self.exp_b_id, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, version=2)
         self.attempt_to_delete(self.exp_b_id)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id)
 
         self.logout()
@@ -649,12 +671,15 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_community_owned': True,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id, expect_errors=True)
-        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
+        self.attempt_to_view(self.exp_a_id, expect_errors=True, version=2)
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True)
         self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id, expect_errors=True)
 
         self.logout()

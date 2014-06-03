@@ -46,17 +46,25 @@ function ContributeGallery(
       templateUrl: 'modals/galleryCreateNew',
       backdrop: 'static',
       resolve: {
-        categoryList: function() {
-          return categoryList;
+        categoriesForDropdown: function() {
+          var result = [];
+          var sortedCategories = $scope.categoryList.sort();
+          for (var i = 0; i < sortedCategories.length; i++) {
+            result.push({
+              id: sortedCategories[i],
+              text: sortedCategories[i]
+            });
+          }
+          return result;
         },
         isUploadModal: function() {
           return isUploadModal;
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'categoryList', 'isUploadModal',
-        function($scope, $modalInstance, categoryList, isUploadModal) {
-          $scope.categoryList = categoryList;
+        '$scope', '$modalInstance', 'categoriesForDropdown', 'isUploadModal',
+        function($scope, $modalInstance, categoriesForDropdown, isUploadModal) {
+          $scope.categoriesForDropdown = categoriesForDropdown;
           $scope.newExplorationTitle = '';
           $scope.newExplorationCategory = '';
           $scope.isUploadModal = isUploadModal;

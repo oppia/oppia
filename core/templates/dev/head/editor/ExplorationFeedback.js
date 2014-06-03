@@ -19,7 +19,8 @@
  */
 
 function ExplorationFeedback($scope, $http, $modal,
-    warningsData, oppiaRequestCreator, explorationData, oppiaDateFormatter) {
+    warningsData, oppiaRequestCreator, explorationData, oppiaDateFormatter,
+    editabilityService) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
@@ -69,6 +70,7 @@ function ExplorationFeedback($scope, $http, $modal,
       $scope.currentThreadId = null;
       $scope.currentThreadData = null;
       $scope.currentThreadMessages = null;
+      $scope.updatedStatus = null;
       return;
     }
 
@@ -76,6 +78,7 @@ function ExplorationFeedback($scope, $http, $modal,
       $scope.currentThreadId = threadId;
       $scope.currentThreadData = $scope._getThreadById(threadId);
       $scope.currentThreadMessages = data.messages;
+      $scope.updatedStatus = $scope.currentThreadData.status;
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error getting thread messages.');
     });
@@ -120,7 +123,15 @@ function ExplorationFeedback($scope, $http, $modal,
     });
   };
 
-  $scope.addMessage = function(threadId, newMessageText) {
+  $scope.getLabelClass = function(status) {
+    if (status === 'open') {
+      return 'label label-info';
+    } else {
+      return 'label label-default';
+    }
+  };
+
+  $scope.addMessage = function(threadId, newMessageText, updatedStatus) {
     if (threadId === null) {
       warningsData.addWarning(
         'Current thread ID not set. Required to create a message');
@@ -130,28 +141,41 @@ function ExplorationFeedback($scope, $http, $modal,
     $http.post(
       THREAD_HANDLER_PREFIX + threadId,
       oppiaRequestCreator.createRequest({
-        updated_status: null,
+        updated_status: (
+          updatedStatus !== $scope.currentThreadData.status ?
+          updatedStatus : null),
         updated_subject: null,
         text: newMessageText,
       }),
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function() {
-      $scope._getThreadList();
+      $scope.currentThreadData.status = updatedStatus;
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
       $scope.$parent.refreshFeedbackTabHeader();
     }).error(function(data) {
       warningsData.addWarning(data.error || 'Error creating a thread message.');
+      $scope.messageSendingInProgress = false;
     });
   };
+
+  $scope.STATUS_CHOICES = [
+    {id: 'open', text: 'Open'},
+    {id: 'fixed', text: 'Fixed'},
+    {id: 'ignored', text: 'Ignored'},
+    {id: 'duplicate', text: 'Duplicate'},
+    {id: 'compliment', text: 'Compliment'},
+    {id: 'not_actionable', text: 'Not Actionable'}
+  ];
 
   // Initial load of the thread list.
   $scope.currentThreadId = null;
   $scope.currentThreadData = null;
   $scope.currentThreadMessages = null;
+  $scope.updatedStatus = null;
   $scope._getThreadList();
 }
 
 ExplorationFeedback.$inject = [
   '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
-  'explorationData', 'oppiaDateFormatter'];
+  'explorationData', 'oppiaDateFormatter', 'editabilityService'];

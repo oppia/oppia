@@ -66,8 +66,6 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       // The 0-based index of the parameter change item that is currently active for
       // editing, or -1 if no item is active.
       $scope.activeItem = -1;
-      // Choices for the select2 dropdown that displays parameter name options.
-      $scope.paramNameChoices = [];
       // TODO(sll): Move these lists (of value generators without init_args)
       // somewhere more global.
       $scope.ALLOWED_KEYS = {
@@ -97,27 +95,34 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
         }
       };
 
-      // Reset the parameter change editor.
       $scope.resetEditor = function() {
         $scope.activeItem = -1;
         $scope.tmpParamChange = angular.copy(DEFAULT_TMP_PARAM_CHANGE);
         // This should only be non-null when an editing view is active.
         $scope.paramChangesMemento = null;
-
-        // Initialize dropdown options for the parameter name selector.
-        var namedata = [];
-        if ($scope.paramSpecs) {
-          for (var paramName in $scope.paramSpecs) {
-            namedata.push(paramName);
-          }
-        }
-        angular.extend($scope.paramNameChoices, namedata);
       };
 
       $scope.resetEditor();
 
+      // Choices for the select2 dropdown that displays parameter name options.
+      $scope.paramNameChoices = [];
+      $scope.resetParamNameChoices = function() {
+        // Initialize dropdown options for the parameter name selector.
+        $scope.paramNameChoices = [];
+        if ($scope.paramSpecs) {
+          var paramNames = Object.keys($scope.paramSpecs).sort();
+          for (var i = 0; i < paramNames.length; i++) {
+            $scope.paramNameChoices.push({
+              id: paramNames[i],
+              text: paramNames[i]
+            });
+          }
+        }
+      }
+
       // Called when an 'add param change' action is triggered.
       $scope.startAddParamChange = function() {
+        $scope.resetParamNameChoices();
         $scope.paramChangesMemento = angular.copy($scope.paramChanges);
         $scope.activeItem = $scope.paramChanges.length;
         $scope.paramChanges.push(angular.copy(DEFAULT_TMP_PARAM_CHANGE));
@@ -142,8 +147,9 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
         return newCustomizationArgs;
       };
 
-      // Called when an 'edit param change' action is triggered.
       $scope.startEditParamChange = function(index) {
+        $scope.resetParamNameChoices();
+
         $scope.paramChangesMemento = angular.copy($scope.paramChanges);
 
         var param = $scope.paramChanges[index];

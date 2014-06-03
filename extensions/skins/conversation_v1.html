@@ -8,25 +8,53 @@
 
     <script type="text/ng-template" id="modals/readerFeedback">
       <div class="modal-header">
-        <h3>Give Feedback</h3>
+        <h3>Give Feedback to the Exploration Editors</h3>
       </div>
 
       <div class="modal-body">
-        <h4>Give feedback to the exploration editors</h4>
-        <!-- TODO(sfederwisch): make this true<i> They will be given the exploration history already.</i><br />-->
         <em>
           <p>
-            Note: This form is meant for exploration-specific feedback. This feedback will be sent to the exploration's editors, who will use your feedback to improve the exploration.
+            This form will start a new feedback thread on the exploration editor page, so that the exploration can be improved. If you like, you can give feedback anonymously by checking the box at the bottom.
           </p>
           <p>
-            To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
+            Note: This form is meant for exploration-specific feedback. To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
           </p>
         </em>
-        <textarea ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
+
+        <form role="form">
+          <div class="form-group">
+            <label for="subject">Subject</label>
+            <input type="text" class="form-control" id="subject" ng-model="subject">
+          </div>
+          <label for="feedback">Feedback</label>
+          <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
+              This feedback relates to the current question.
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
+              This feedback relates to the exploration as a whole.
+            </label>
+          </div>
+        </form>
+
+        <div ng-show="isLoggedIn">
+          <hr>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="isSubmitterAnonymized">
+              Give feedback anonymously
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" ng-click="submit(feedback)">Submit</button>
+        <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)">Submit</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
     </script>
@@ -38,7 +66,7 @@
 
       <div class="modal-body">
         <p>
-          Your feedback has been successfully submitted, and the exploration creator will see it the next time he/she visits the exploration creation dashboard.
+          Your feedback has been successfully submitted, and the exploration editors will see it when they next visit the exploration editing page.
         </p>
         <p>
           Thank you for helping to improve this exploration!

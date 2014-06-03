@@ -159,6 +159,9 @@ class ExplorationPage(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+            raise self.PageNotFoundException
+
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
         object_editors_js = OBJECT_EDITORS_JS.value
@@ -244,6 +247,9 @@ class ExplorationHandler(EditorHandler):
 
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+            raise self.PageNotFoundException
+
         self.values.update(self._get_exploration_data(exploration_id))
         self.render_json(self.values)
 

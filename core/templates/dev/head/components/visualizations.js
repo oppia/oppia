@@ -326,11 +326,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       }
 
       function isStateFlagged(name, highlightStates, stateStats) {
-          var isHighlightState = (highlightStates && name in highlightStates);
-          var hasFeedback = (
-            stateStats && stateStats[name] &&
-            Object.keys(stateStats[name].readerFeedback).length > 0);
-          return (isHighlightState || hasFeedback);
+          return (highlightStates && name in highlightStates);
       }
 
       $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {

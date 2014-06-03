@@ -33,30 +33,9 @@ oppia.directive('select2Dropdown', [function() {
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
       $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
 
-      $scope.makeUnique = function(arr) {
-        var hashMap = {};
-        var result = [];
-        for (var i = 0; i < arr.length; i++) {
-          if (!hashMap.hasOwnProperty(arr[i])) {
-            result.push(arr[i]);
-            hashMap[arr[i]] = 1;
-          }
-        }
-        return result;
-      };
-
-      $scope.uniqueChoices = $scope.makeUnique($scope.choices);
-      $scope.select2Choices = [];
-      for (var i = 0; i < $scope.uniqueChoices.length; i++) {
-        $scope.select2Choices.push({
-          id: $scope.uniqueChoices[i],
-          text: $scope.uniqueChoices[i]
-        });
-      }
-
       var select2Node = $element[0].firstChild;
       $(select2Node).select2({
-        data: $scope.select2Choices,
+        data: $scope.choices,
         placeholder: $scope.placeholder,
         allowClear: false,
         width: $scope.width || '250px',
