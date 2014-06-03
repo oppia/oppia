@@ -64,16 +64,19 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           return ($scope.rule.description === 'Default');
         };
 
-        $scope.allDests = [];
+        $scope.destChoices = [];
         $scope.$watch('states', function(newValue) {
-          // Returns a list of all states, as well as 'END'.
-          $scope.allDests = [];
-          for (var state in $scope.states) {
-            $scope.allDests.push(state);
+          // Returns a list of objects, each with an ID and name. These
+          // represent all states in alphabetical order, followed by 'END'.
+          $scope.destChoices = [];
+          var stateNames = Object.keys($scope.states).sort();
+          stateNames.push(END_DEST);
+          for (var i = 0; i < stateNames.length; i++) {
+            $scope.destChoices.push({
+              id: stateNames[i],
+              text: stateNames[i]
+            });
           }
-
-          $scope.allDests.push(END_DEST);
-          return $scope.allDests;
         }, true);
 
         $scope.activeEditor = null;
