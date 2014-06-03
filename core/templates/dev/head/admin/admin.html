@@ -142,7 +142,7 @@
         Number of new feedback messages: {{new_feedback_messages_count}}
       </li>
     </ul>
-    <button ng-click="migrateFeedback()">Perform migration</button>
+    <button class="btn btn-default" ng-click="migrateFeedback()" ng-disabled="migrationInProcess">Perform migration</button>
 
     {% include 'footer_js_libs.html' %}
     {% include 'rte_js_libs.html' %}

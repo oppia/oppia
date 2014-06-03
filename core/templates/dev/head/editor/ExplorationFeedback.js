@@ -159,11 +159,12 @@ function ExplorationFeedback($scope, $http, $modal,
     });
   };
 
+  // We do not permit 'Duplicate' as a valid status for now, since it should
+  // require the id of the duplicated thread to be specified.
   $scope.STATUS_CHOICES = [
     {id: 'open', text: 'Open'},
     {id: 'fixed', text: 'Fixed'},
     {id: 'ignored', text: 'Ignored'},
-    {id: 'duplicate', text: 'Duplicate'},
     {id: 'compliment', text: 'Compliment'},
     {id: 'not_actionable', text: 'Not Actionable'}
   ];

@@ -65,7 +65,10 @@ function Admin($scope, $http) {
     });
   };
 
+  $scope.migrationInProcess = false;
   $scope.migrateFeedback = function() {
+    $scope.migrationInProcess = true;
+
     var request = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
@@ -79,9 +82,11 @@ function Admin($scope, $http) {
       {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
     success(function(data) {
       $scope.message = 'Feedback migrated successfully.';
+      $scope.migrationInProcess = false;
       window.reload();
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.migrationInProcess = false;
     });
   };
 
