@@ -17,6 +17,7 @@ import re
 import unittest
 import webtest
 
+from contextlib import contextmanager
 from core.domain import config_domain
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -193,6 +194,14 @@ class TestBase(unittest.TestCase):
 
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
+
+    @contextmanager
+    def swap(self, obj, attr, newvalue):
+        """Swap an object's attribute value within the context of a 'with' statement."""
+        original = getattr(obj, attr)
+        setattr(obj, attr, newvalue)
+        yield
+        setattr(obj, attr, original)
 
 
 class AppEngineTestBase(TestBase):
