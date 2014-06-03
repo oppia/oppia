@@ -389,7 +389,6 @@ function ExplorationEditor(
         } else {
           resetActiveTags();
           $scope.mainTabActive = true;
-          $scope.$broadcast('guiTabSelected');
         }
       };
 
@@ -674,6 +673,12 @@ function ExplorationEditor(
       $rootScope.loadingMessage = '';
 
       $scope.refreshExplorationStatistics();
+
+      var stateName = editorContextService.getActiveStateName();
+      var stateData = $scope.states[stateName];
+      if (stateData && stateData && !$.isEmptyObject(stateData)) {
+        $scope.$broadcast('refreshStateEditor');
+      }
 
       $scope.refreshFeedbackTabHeader();
 

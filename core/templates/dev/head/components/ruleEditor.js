@@ -196,6 +196,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.selectNewRuleType = function(description, name) {
           $scope.rule.description = description;
           $scope.rule.definition.name = name;
+          $scope.rule.definition.inputs = {};
 
           // Finds the parameters and sets them in $scope.rule.definition.inputs.
           var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;

@@ -24,6 +24,7 @@ function InteractiveWidgetEditor(
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
+  $scope.widgetHandlers = {};
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.
