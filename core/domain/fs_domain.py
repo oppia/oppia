@@ -191,7 +191,7 @@ class ExplorationFileSystem(object):
         # The trailing slash is necessary to prevent non-identical directory
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
-        prefix = '%s' % os.path.join(
+        prefix = '%s' % utils.construct_path(
             '/', self._exploration_id, 'assets', dir_name)
         if not prefix.endswith('/'):
             prefix += '/'
@@ -256,11 +256,11 @@ class AbstractFileSystem(object):
 
     def _check_filepath(self, filepath):
         """Raises an error if a filepath is invalid."""
-        # Note: uses os.sep as initial separator in order to function on
-        # Windows correctly.
-        base_dir = os.path.join(os.sep, self.impl.exploration_id, 'assets')
-        absolute_path = os.path.join(base_dir, filepath)
-        normalized_path = os.path.normpath(absolute_path)
+        base_dir = utils.construct_path('/', self.impl.exploration_id, 'assets')
+        absolute_path = utils.construct_path(base_dir, filepath)
+        # TODO mpm
+        #normalized_path = os.path.normpath(absolute_path)
+        normalized_path = absolute_path
 
         # This check prevents directory traversal.
         if not normalized_path.startswith(base_dir):
