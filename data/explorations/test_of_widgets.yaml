@@ -1,0 +1,290 @@
+author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: Numeric input
+language_code: en
+objective: check all the widgets work
+param_changes: []
+param_specs: {}
+schema_version: 3
+skill_tags: []
+states:
+  Code REPL:
+    content:
+    - type: text
+      value: Write a program the prints 12.<br>
+    param_changes: []
+    widget:
+      customization_args:
+        language:
+          value: python
+        placeholder:
+          value: '[Type your code here.]'
+        postCode:
+          value: ''
+        preCode:
+          value: ''
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: '12'
+            name: OutputEquals
+            rule_type: atomic
+            subject: answer
+          dest: END
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Code REPL
+          feedback:
+          - Done.
+          param_changes: []
+      sticky: false
+      widget_id: CodeRepl
+  Continue:
+    content:
+    - type: text
+      value: Click continue.<br>
+    param_changes: []
+    widget:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Multiple choice input
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
+  File upload:
+    content:
+    - type: text
+      value: Upload a file containing "aaaaa".<br>
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: aaaaa
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: Continue
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: File upload
+          feedback:
+          - Wrong.
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  Interactive map:
+    content:
+    - type: text
+      value: Click on the USA.<br>
+    param_changes: []
+    widget:
+      customization_args:
+        latitude:
+          value: 0
+        longitude:
+          value: 0
+        zoom:
+          value: 0
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              d: 30.0
+              p:
+              - 40.0
+              - -105.0
+            name: Within
+            rule_type: atomic
+            subject: answer
+          dest: Code REPL
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Interactive map
+          feedback:
+          - Done.
+          param_changes: []
+      sticky: false
+      widget_id: InteractiveMap
+  Multiple choice input:
+    content:
+    - type: text
+      value: Choose option B.<br>
+    param_changes: []
+    widget:
+      customization_args:
+        choices:
+          value:
+          - Option A<br>
+          - Option B<br>
+          - Option C<br>
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 1
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Set input
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Multiple choice input
+          feedback:
+          - Done.
+          param_changes: []
+      sticky: false
+      widget_id: MultipleChoiceInput
+  Music notes input:
+    content:
+    - type: text
+      value: Enter two E4 notes (bottom line).<br>
+    param_changes: []
+    widget:
+      customization_args:
+        sequenceToGuess:
+          value:
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+          - noteDuration:
+              den: 1
+              num: 1
+            readableNoteName: E4
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x:
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: E4
+              - noteDuration:
+                  den: 1
+                  num: 1
+                readableNoteName: E4
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Interactive map
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Music notes input
+          feedback:
+          - Done.
+          param_changes: []
+      sticky: false
+      widget_id: MusicNotesInput
+  Numeric input:
+    content:
+    - type: text
+      value: Enter a number larger than 6.<br>
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: 6.0
+            name: IsGreaterThan
+            rule_type: atomic
+            subject: answer
+          dest: File upload
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Numeric input
+          feedback:
+          - Wrong.
+          param_changes: []
+      sticky: false
+      widget_id: NumericInput
+  Set input:
+    content:
+    - type: text
+      value: Enter the set {abc, xyz}<br>
+    param_changes: []
+    widget:
+      customization_args:
+        element_type:
+          value: UnicodeString
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x:
+              - abc
+              - xyz
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Text input
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Set input
+          feedback:
+          - Done.
+          param_changes: []
+      sticky: false
+      widget_id: SetInput
+  Text input:
+    content:
+    - type: text
+      value: Enter the string rrrrr<br>
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: rrrrr
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Music notes input
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Text input
+          feedback:
+          - Done.
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
