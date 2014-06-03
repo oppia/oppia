@@ -144,6 +144,7 @@ class AdminHandler(base.BaseHandler):
             target_id = item.target_id
             content = item.content
             status = item.status
+            created_on = item.created_on
 
             if not target_id.startswith('state:'):
                 raise Exception('Invalid target id: %s' % target_id)
@@ -169,7 +170,8 @@ class AdminHandler(base.BaseHandler):
             thread.state_name = state_name
             thread.original_author_id = None
             thread.status = STATUS_MAPPING[status]
-            thread.subject = 'Feedback from a reader'
+            thread.subject = 'Feedback from a learner'
+            thread.created_on = created_on
             thread.put()
 
             message_id = 0
@@ -181,6 +183,7 @@ class AdminHandler(base.BaseHandler):
             msg.updated_status = thread.status
             msg.updated_subject = thread.subject
             msg.text = content
+            msg.created_on = created_on
             msg.put()
 
             item.delete()
