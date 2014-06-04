@@ -84,6 +84,10 @@ function ExplorationEditor(
     return $scope.isExplorationLockedForEditing() && !$scope.isSaveInProgress;
   };
 
+  $scope.getChangeListLength = function() {
+    return changeListService.getChangeList().length;
+  };
+
   $scope.isExplorationLockedForEditing = function() {
     return changeListService.getChangeList().length > 0;
   };
@@ -385,7 +389,7 @@ function ExplorationEditor(
         } else {
           resetActiveTags();
           $scope.mainTabActive = true;
-          $scope.$broadcast('guiTabSelected');
+          $scope.$broadcast('refreshStateEditor');
         }
       };
 
@@ -671,6 +675,12 @@ function ExplorationEditor(
 
       $scope.refreshExplorationStatistics();
 
+      var stateName = editorContextService.getActiveStateName();
+      var stateData = $scope.states[stateName];
+      if (stateData && stateData && !$.isEmptyObject(stateData)) {
+        $scope.$broadcast('refreshStateEditor');
+      }
+
       $scope.refreshFeedbackTabHeader();
 
       if (successCallback) {
@@ -734,6 +744,25 @@ function ExplorationEditor(
    */
   $scope.downloadExplorationWithVersion = function(versionNumber) {
     document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
+  };
+
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.publish = $modalInstance.close;
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function() {
+      explorationRightsService.saveChangeToBackend({is_public: true});
+    });
   };
 
   $scope.showNominateExplorationModal = function() {

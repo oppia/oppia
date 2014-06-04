@@ -60,14 +60,15 @@ class ThreadHandler(base.BaseHandler):
     @base.require_user
     def post(self, exploration_id, thread_id):
         text = self.payload.get('text')
-        if not text:
+        updated_status = self.payload.get('updated_status')
+        if not text and not updated_status:
             raise self.InvalidInputException(
                 'Text for the message must be specified.')
 
         feedback_services.create_message(
             thread_id,
             self.user_id,
-            self.payload.get('updated_status'),
+            updated_status,
             self.payload.get('updated_subject'),
             text)
         self.render_json(self.values)

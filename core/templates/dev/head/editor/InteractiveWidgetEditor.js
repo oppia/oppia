@@ -24,6 +24,7 @@ function InteractiveWidgetEditor(
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
+  $scope.widgetHandlers = {};
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.
@@ -190,7 +191,7 @@ function InteractiveWidgetEditor(
     $scope.tmpWidget = null;
     $scope.widgetIdMemento = null;
     $scope.widgetCustomizationArgsMemento = null;
-    $scope.widgetHandlersMemento = null;
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
   };
 
   $scope.createTmpRule = function() {

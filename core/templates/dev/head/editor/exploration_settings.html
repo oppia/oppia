@@ -149,21 +149,6 @@
             <div class="col-lg-6 col-md-6 col-sm-6">
               <h4>Controls</h4>
 
-              {% if can_publish %}
-                <p ng-show="explorationRightsService.isPrivate()">
-                  <button type="button" class="btn btn-success" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
-                    Publish Exploration
-                  </button>
-                  <img class="oppia-help" src="/images/help.png"
-                       tooltip="Publishing your exploration allows others to view and learn from it."
-                       tooltip-placement="bottom">
-                  <span ng-if="isExplorationLockedForEditing()">
-                    <br>
-                    Please save your changes first.
-                  </span>
-                </p>
-              {% endif %}
-
               {% if can_release_ownership %}
                 <p ng-hide="explorationRightsService.isCommunityOwned()">
                   <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
@@ -268,43 +253,6 @@
       </div>
     </div>
   </div>
-
-  <script type="text/ng-template" id="modals/publishExploration">
-    <div class="modal-header">
-      <h3>Publish Exploration</h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        Congratulations, you are about to publish an exploration!
-      </p>
-      <p>
-        <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/site_guidelines#/publish-and-release-criteria" target="_blank">why?</a>):
-        <ul>
-          <li>It should help its intended audience learn something new.</li>
-          <li>It should convey more than a single isolated factoid.</li>
-          <li>It should provide useful feedback and guidance to help the learner (and not just 'Correct'/'Incorrect').</li>
-          <li>It should not substantially duplicate existing explorations.</li>
-        </ul>
-      </p>
-      <p>
-        You can read more about these criteria on the <a href="/site_guidelines#/publish-and-release-criteria" target="_blank">exploration publishing criteria</a> page.
-      </p>
-
-      <p>
-        If your exploration meets all these criteria, please feel free to publish
-        it so that others can playtest and improve it! Good explorations can subsequently be
-        moved to the Learn gallery. (You can find more information
-        <a href="/site_guidelines#/how-to-use" target="_blank">here</a>
-        about how this works.)
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-success" ng-click="publish()">Publish</button>
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    </div>
-  </script>
 
   <script type="text/ng-template" id="modals/transferExplorationOwnership">
     <div class="modal-header">

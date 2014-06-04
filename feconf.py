@@ -220,7 +220,8 @@ DEMO_EXPLORATIONS = [
     # please note that Oppia lacks many of the features of a full interactive
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
-    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music')
+    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
+    ('test_of_widgets.yaml', 'Test of widgets', 'Test')
 ]
 
 # TODO(sll): Add all other URLs here.

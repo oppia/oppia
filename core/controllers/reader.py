@@ -18,6 +18,7 @@ __author__ = 'Sean Lip'
 
 from core.controllers import base
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import skins_services
 from core.domain import stats_services
@@ -121,6 +122,7 @@ class ExplorationHandler(base.BaseHandler):
             init_state.widget.customization_args, reader_params)
 
         self.values.update({
+            'is_logged_in': bool(self.user_id),
             'init_html': init_state.content[0].to_html(reader_params),
             'interactive_html': interactive_html,
             'params': reader_params,
@@ -197,7 +199,8 @@ class FeedbackHandler(base.BaseHandler):
         # Current session id.
         session_id = self.payload.get('session_id')
         # Time spent in state.
-        client_time_spent_in_secs = self.payload.get('client_time_spent_in_secs')
+        client_time_spent_in_secs = self.payload.get(
+            'client_time_spent_in_secs')
 
         values = {}
         exploration = exp_services.get_exploration_by_id(
@@ -276,19 +279,17 @@ class ReaderFeedbackHandler(base.BaseHandler):
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
-    def post(self, exploration_id, escaped_state_name):
+    def post(self, exploration_id):
         """Handles POST requests."""
-        state_name = self.unescape_state_name(escaped_state_name)
-
+        state_name = self.payload.get('state_name')
+        subject = self.payload.get('subject', 'Feedback from a learner')
         feedback = self.payload.get('feedback')
-        state_history = self.payload.get('state_history')
-        version = self.payload.get('version')
-        # TODO(sll): Add the reader's history log here.
-        stats_services.EventHandler.record_state_feedback_from_reader(
-            exploration_id, state_name, feedback,
-            {'state_history': state_history}, self.user_id)
+        include_author = self.payload.get('include_author')
 
-        # msl: need to call render_json for ReaderFeedbackHandler integration test
-        # (otherwise get AssertionError: 'text/html' != 'application/javascript' from
-        # test_utils.py", line 131, in _parse_json_response)
-        self.render_json({})
+        feedback_services.create_thread(
+            exploration_id,
+            state_name,
+            self.user_id if include_author else None,
+            subject,
+            feedback)
+        self.render_json(self.values)

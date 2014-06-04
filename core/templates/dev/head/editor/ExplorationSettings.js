@@ -94,25 +94,6 @@ function ExplorationSettings(
   /********************************************
   * Methods relating to control buttons.
   ********************************************/
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
   $scope.showTransferExplorationOwnershipModal = function() {
     warningsData.clear();
     $modal.open({

@@ -22,7 +22,7 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
     warningsData, activeInputData, oppiaRequestCreator, editorContextService,
     changeListService, validatorsService, focusService) {
 
-  $scope.$on('guiTabSelected', function(evt) {
+  $scope.$on('refreshStateEditor', function(evt) {
     $scope.initStateEditor();
   });
 
