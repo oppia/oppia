@@ -27,7 +27,9 @@ class Image(widget_domain.BaseWidget):
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
         'name': 'filepath',
-        'description': 'The name of the image file.',
+        'description': (
+            'The name of the image file. (Allowed extensions: gif, jpeg, jpg, '
+            'png.)'),
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {

@@ -608,7 +608,7 @@ class ImageUploadHandler(EditorHandler):
         if '.' in filename:
             dot_index = filename.rfind('.')
             primary_name = filename[:dot_index]
-            extension = filename[dot_index + 1:]
+            extension = filename[dot_index + 1:].lower()
             if (extension not in
                     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
                 raise self.InvalidInputException(
