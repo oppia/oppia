@@ -230,8 +230,9 @@ class DiskBackedFileSystem(object):
 
     def get(self, filepath, version=None):
         """Returns a bytestring with the file content, but no metadata."""
+        # TODO(mpm) this mode should probably not be hard-coded
         content = utils.get_file_contents(
-            os.path.join(self._root, filepath), raw_bytes=True)
+            os.path.join(self._root, filepath), raw_bytes=True, mode='rb')
         return FileStreamWithMetadata(content, None, None)
 
     def commit(self, user_id, filepath, raw_bytes):
@@ -258,9 +259,7 @@ class AbstractFileSystem(object):
         """Raises an error if a filepath is invalid."""
         base_dir = utils.construct_path('/', self.impl.exploration_id, 'assets')
         absolute_path = utils.construct_path(base_dir, filepath)
-        # TODO mpm
-        #normalized_path = os.path.normpath(absolute_path)
-        normalized_path = absolute_path
+        normalized_path = utils.vfs_normpath(absolute_path)
 
         # This check prevents directory traversal.
         if not normalized_path.startswith(base_dir):

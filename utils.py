@@ -58,9 +58,9 @@ def create_enum(*sequential, **names):
     return type('Enum', (), enums)
 
 
-def get_file_contents(filepath, raw_bytes=False):
+def get_file_contents(filepath, raw_bytes=False, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with open(filepath, 'rb') as f:
+    with open(filepath, mode) as f:
         return f.read() if raw_bytes else f.read().decode('utf-8')
 
 
@@ -376,3 +376,10 @@ def construct_path(*components):
     if isFinalEmptyString and accum2[-1][-1] != '/':
         accum2.append('/')
     return ''.join(accum2)
+
+def vfs_normpath(filepath):
+    """An implementation of os.path.normpath for the virtual file system."""
+    normalized_path = os.path.normpath(filepath)
+    # On Windows, os.path.normpath will change forward slashes to back slashes.
+    # For vfs filepaths, we need to change them back.
+    return re.sub(r'\\', '/', normalized_path)
