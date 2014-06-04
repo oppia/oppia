@@ -19,9 +19,13 @@
  */
 
 function ExplorationSettings(
-    $scope, $modal, activeInputData, explorationData, explorationTitleService,
-    explorationCategoryService, explorationObjectiveService,
-    explorationRightsService, changeListService, warningsData) {
+    $scope, $http, $window, $modal, activeInputData, explorationData,
+    explorationTitleService, explorationCategoryService,
+    explorationObjectiveService, explorationRightsService, changeListService,
+    warningsData) {
+
+  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
+
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
     $scope.explorationCategoryService = explorationCategoryService;
@@ -155,6 +159,7 @@ function ExplorationSettings(
  * Injects dependencies in a way that is preserved by minification.
  */
 ExplorationSettings.$inject = [
-  '$scope', '$modal', 'activeInputData', 'explorationData', 'explorationTitleService',
-  'explorationCategoryService', 'explorationObjectiveService',
-  'explorationRightsService', 'changeListService', 'warningsData'];
+  '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
+  'explorationTitleService', 'explorationCategoryService',
+  'explorationObjectiveService', 'explorationRightsService',
+  'changeListService', 'warningsData'];

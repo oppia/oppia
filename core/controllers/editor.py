@@ -194,6 +194,8 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
+            'can_delete': rights_manager.Actor(
+                self.user_id).can_delete(exploration_id),
             'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(exploration_id),

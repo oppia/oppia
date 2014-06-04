@@ -161,13 +161,15 @@
                 </p>
               {% endif %}
 
-              <p>
-                <button type="button" ng-if="explorationRightsService.isPrivate()"
-                        class="btn btn-danger" ng-click="deleteExploration('')"
-                        title="Delete this exploration">
-                  Delete Exploration
-                </button>
-              </p>
+              {% if can_delete %}
+                <p>
+                  <button type="button" ng-if="explorationRightsService.isPrivate()"
+                          class="btn btn-danger" ng-click="deleteExploration('')"
+                          title="Delete this exploration">
+                    Delete Exploration
+                  </button>
+                </p>
+              {% endif %}
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">

@@ -52,8 +52,6 @@ function ExplorationEditor(
     editorContextService.setActiveStateName(newStateName);
   };
 
-  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
-
   /**************************************************
   * Methods affecting the saving of explorations.
   **************************************************/
