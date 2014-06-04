@@ -12,14 +12,11 @@
       </div>
 
       <div class="modal-body">
-        <em>
-          <p>
-            This form will start a new feedback thread on the exploration editor page, so that the exploration can be improved. If you like, you can give feedback anonymously by checking the box at the bottom.
-          </p>
-          <p>
-            Note: This form is meant for exploration-specific feedback. To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
-          </p>
-        </em>
+        <p>
+          <em>
+            This form is meant for exploration-specific feedback. To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
+          </em>
+        </p>
 
         <form role="form">
           <div class="form-group">
@@ -54,7 +51,7 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)">Submit</button>
+        <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
       </div>
     </script>

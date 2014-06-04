@@ -169,6 +169,15 @@ function ExplorationFeedback($scope, $http, $modal,
     {id: 'not_actionable', text: 'Not Actionable'}
   ];
 
+  $scope.getHumanReadableStatus = function(status) {
+    for (var i = 0; i < $scope.STATUS_CHOICES.length; i++) {
+      if ($scope.STATUS_CHOICES[i].id === status) {
+        return $scope.STATUS_CHOICES[i].text;
+      }
+    }
+    return '';
+  };
+
   // Initial load of the thread list.
   $scope.currentThreadId = null;
   $scope.currentThreadData = null;

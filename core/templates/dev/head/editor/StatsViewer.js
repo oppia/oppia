@@ -67,6 +67,10 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
               return numberOfTimes + suffix;
             };
 
+            $scope.getHumanReadableRuleName = function(ruleName) {
+              return ruleName.substring('submit.'.length);
+            };
+
             $scope.isEmpty = function(obj) {
               for (var property in obj) {
                 if (obj.hasOwnProperty(property)) {
@@ -86,7 +90,7 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
             };
 
             $scope.gotoStateEditor = function(locationHash) {
-              $modalInstance.close({locationHash: locationHash});
+              $modalInstance.close({});
             };
 
             $scope.cancel = function() {
@@ -98,7 +102,6 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
       });
 
       modalInstance.result.then(function(result) {
-        $location.hash(result.locationHash);
         $scope.$parent.showStateEditor(stateName);
       });
     });
