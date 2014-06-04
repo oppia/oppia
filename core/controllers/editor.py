@@ -162,6 +162,19 @@ class ExplorationPage(EditorHandler):
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
+        can_edit = (
+            bool(self.user_id) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(exploration_id))
+
+        if (can_edit and not
+                user_services.has_user_registered_as_editor(self.user_id)):
+            redirect_url = utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL, 'return_url',
+                self.request.uri)
+            self.redirect(redirect_url)
+            return
+
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
         object_editors_js = OBJECT_EDITORS_JS.value
@@ -181,11 +194,7 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
-            'can_edit': (
-                bool(self.user_id) and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(exploration_id)
-            ),
+            'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(exploration_id),
             'can_publicize': rights_manager.Actor(
