@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Reader View
+  Exploration Player View
 {% endblock subtitle %}
 
 {% block header_js %}
@@ -22,14 +22,15 @@
     </div>
     <br>
   {% endif %}
-  {{ content }}
+  {{ skin_html }}
   <br><br><br>
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
-    {{ include_js_file('reader/ReaderExploration.js') }}
+    {{ include_js_file('player/PlayerServices.js') }}
+    {{ skin_js }}
   </script>
 
   {{ widget_js_directives }}

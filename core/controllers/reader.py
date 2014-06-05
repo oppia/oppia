@@ -75,7 +75,9 @@ class ExplorationPage(base.BaseHandler):
                 interactive_widget_ids))
 
         self.values.update({
-            'content': skins_services.get_skin_html(exploration.default_skin),
+            'skin_html': skins_services.get_skin_html(
+                exploration.default_skin),
+            'skin_js': skins_services.get_skin_js(exploration.default_skin),
             'exploration_version': version,
             'iframed': is_iframed,
             'is_private': rights_manager.is_exploration_private(
@@ -88,9 +90,9 @@ class ExplorationPage(base.BaseHandler):
 
         if is_iframed:
             self.render_template(
-                'reader/reader_exploration.html', iframe_restriction=None)
+                'player/exploration_player.html', iframe_restriction=None)
         else:
-            self.render_template('reader/reader_exploration.html')
+            self.render_template('player/exploration_player.html')
 
 
 class ExplorationHandler(base.BaseHandler):
