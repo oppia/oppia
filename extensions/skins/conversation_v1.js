@@ -19,7 +19,7 @@
  */
 
 function ConversationSkin(
-    $scope, $timeout, $window, $log, warningsData, messengerService,
+    $scope, $timeout, $window, warningsData, messengerService,
     oppiaPlayerService) {
 
   var urlParams = $scope.getUrlParams();
@@ -199,6 +199,6 @@ function ConversationSkin(
  * Injects dependencies in a way that is preserved by minification.
  */
 ConversationSkin.$inject = [
-  '$scope', '$timeout', '$window', '$log', 'warningsData', 'messengerService',
+  '$scope', '$timeout', '$window', 'warningsData', 'messengerService',
   'oppiaPlayerService'
 ];
