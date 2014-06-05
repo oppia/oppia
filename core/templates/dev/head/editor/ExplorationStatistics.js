@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the stats viewer in the exploration editor.
+ * @fileoverview Controllers for the exploration statistics tab in the exploration editor.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-function StatsViewer($scope, $http, $location, $modal, warningsData, activeInputData) {
+function ExplorationStatistics($scope, $http, $location, $modal, warningsData, activeInputData) {
 
   $scope.onClickStateInStatsGraph = function(stateName) {
     if (stateName !== END_DEST) {
@@ -111,6 +111,6 @@ function StatsViewer($scope, $http, $location, $modal, warningsData, activeInput
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-StatsViewer.$inject = [
+ExplorationStatistics.$inject = [
   '$scope', '$http', '$location', '$modal', 'warningsData', 'activeInputData'
 ];

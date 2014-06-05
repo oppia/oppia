@@ -372,7 +372,7 @@
           </tab>
 
           <tab heading="Statistics" active="statsTabActive" select="selectStatsTab()">
-            {% include 'editor/stats_viewer.html' %}
+            {% include 'editor/exploration_statistics.html' %}
           </tab>
 
           <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
@@ -411,7 +411,7 @@
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}
     {{ object_editors_js }}
-    {{ include_js_file('editor/StatsViewer.js') }}
+    {{ include_js_file('editor/ExplorationStatistics.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
