@@ -84,7 +84,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           editor.on('beforeChange', function(instance, change) {
             var convertedText = logicProofConversion.convertToLogicCharacters(
               change.text.join('\n'));
-            if(convertedText !== change.text.join('\n')) {
+            if (convertedText !== change.text.join('\n')) {
               // We update using the converted text, then cancel its being 
               // overwritten by the original text.
               editor.doc.replaceRange(convertedText, change.from, change.to);
@@ -93,7 +93,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           });
 
           editor.on('cursorActivity', function() {
-            if(editor.doc.getCursor().line !== cursorPosition.line) {
+            if (editor.doc.getCursor().line !== cursorPosition.line) {
               $scope.refreshMessages(editor);
               cursorPosition = editor.doc.getCursor();
             }
@@ -103,7 +103,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // for mistakes is done with respect to the updated text.
           editor.on('change', function(instance, change) {
             $scope.proofString = editor.getValue();
-            if(change.text.length>1 || change.removed.length>1) {
+            // We update the message only if the user has added or removed a
+            // line break, so that it remains while the work on a single line.
+            if (change.text.length > 1 || change.removed.length > 1) {
               $scope.refreshMessages(editor);
             }
           });
@@ -118,7 +120,10 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $scope.proofError = '';
           } catch(err) {
             $scope.proofError = $scope.displayMessage(err.message, err.line);
-            $scope.mistakeMark = editor.doc.markText({line:err.line, ch:0}, {line:err.line, ch:100}, {className: 'erroneous-line'});
+            $scope.mistakeMark = editor.doc.markText(
+              {line: err.line, ch:0}, 
+              {line: err.line, ch:100}, 
+              {className: 'erroneous-line'});
           }
           // NOTE: this line is necessary to force angular to refresh the
           // displayed proofError.
@@ -126,19 +131,19 @@ oppia.directive('oppiaInteractiveLogicProof', [
         }
 
         $scope.displayMessage = function(message, lineNumber) {
-          return 'line ' + (lineNumber +1) + ': ' + message;
+          return 'line ' + (lineNumber + 1) + ': ' + message;
         }
 
         $scope.displayProof = function(proofString, errorLineNum) {
           var proofLines = proofString.split('\n');
           var numberedLines = [];
-          for (var i = 0; i<proofLines.length; i++) {
+          for (var i = 0; i < proofLines.length; i++) {
             numberedLines.push((i + 1) + '  ' + proofLines[i]);
           }
           // We split incorrect proofs into three parts so that response.html
           // can make the invalid line bold.
           return (errorLineNum === undefined) ?
-            [numberedLines.join('\n')]:
+            [numberedLines.join('\n')] :
             [
               numberedLines.slice(0, errorLineNum).join('\n'), 
               numberedLines[errorLineNum], 

@@ -38,8 +38,9 @@ var logicProofConversion = (function() {
   var convertToLogicCharacters = function(oldString) {
     var replacedString = oldString;
     for (var i = 0; i < REPLACEMENT_PAIRS.length; i++) {
-      replacedString = replacedString.replace(
-        REPLACEMENT_PAIRS[i].old, REPLACEMENT_PAIRS[i].new);
+      // We don't use .replace() as it only affects the first instance
+      replacedString = replacedString.split(
+        REPLACEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i].new);
     }
     return replacedString;
   }
@@ -47,7 +48,7 @@ var logicProofConversion = (function() {
   var convertElementToLogicChars = function(element) {
     // NOTE: this function is first called before the DOM is defined, when
     // the element will be undefined and we do nothing.
-    if(element) {
+    if (element) {
       var cursorPosition = element.selectionEnd;
       element.value = convertToLogicCharacters(element.value);
       element.selectionEnd = cursorPosition;
@@ -58,4 +59,4 @@ var logicProofConversion = (function() {
     convertToLogicCharacters: convertToLogicCharacters,
     convertElementToLogicChars: convertElementToLogicChars
   };
-}())
+}());

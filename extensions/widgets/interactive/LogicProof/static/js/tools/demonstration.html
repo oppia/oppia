@@ -4,11 +4,12 @@
     <script src="../generatedParser.js"></script>
     <script src="../shared.js"></script>
     <script src="../teacher.js"></script>
-    <script src="../tools/teacher2.js"></script>
+    <script src="teacher2.js"></script>
     <script src="../student.js"></script>
     <script src="../data.js"></script>
     <script src="../defaultData.js"></script>
     <script src="demonstration.js"></script>
+    <script src="../strings.js"></script>
 
     <script>
 
@@ -36,8 +37,8 @@
 
 
 
-    <!-- line <input type="text" ng-model="line"> mistake <input type="text" ng-model=mistakeName>
-    <button ng-click="localCheck()">Check</button> {{localCheck}} -->
+    line <input type="text" ng-model="line"> mistake <input type="text" ng-model=mistakeName>
+    <button ng-click="doLocalCheck()">Check</button> {{localCheck}}
 
     <hr>
     <p></p>
@@ -125,5 +126,8 @@
         <td> <font color="red"> {{controlFunctionErrors[i]}} </font> </td> 
       </tr>
     <table>
+
+    <p></p>
+    <button ng-click="requestJavascript()">Request Javascript</button>
   </body>
 </html>

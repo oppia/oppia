@@ -500,7 +500,7 @@ describe('Match expression to expression template', function() {
     expect(errorWrapper(matchThenDisplay, 'A(x)\u2227t', 'p\u2227q', {
       q: logicProofParser.parse('s', 'expression')
     })).toThrow(
-      'This line could not be identified as valid - please check the list of acceptable lines.');
+      'This line could not be identified as valid - please check the list of possible lines.');
   });
 });
 
@@ -602,14 +602,14 @@ describe('Match line to template', function() {
         matchLineToTemplate, 'from p and q we have q\u2227p', 
         sampleWidget.line_templates[0])
     ).toThrow('This line could not be identified as valid - please check the\
- list of acceptable lines.');
+ list of possible lines.');
 
     expect(
       errorWrapper(
         matchLineToTemplate, 'z was arbitrary from \u2200x.x=2', 
         sampleWidget.line_templates[1])
     ).toThrow('This line could not be identified as valid - please check the\
- list of acceptable lines.');
+ list of possible lines.');
   });
 });
 
@@ -630,7 +630,7 @@ describe('Line to have known layout as student types', function() {
   it('should reject unknown layouts', function() {
     expect(
       errorWrapper(requireIdentifiable, 'from p we have p\u2228q')).toThrow(
-      'This line could not be identified as valid - please check the list of acceptable lines.');
+      'This line could not be identified as valid - please check the list of possible lines.');
   });
 });
 
@@ -699,7 +699,7 @@ describe('Build, validate and display line', function() {
 
   it('should reject lines that do not match a template', function() {
     expect(errorWrapper(buildThenDisplay, 'Hence A=>x=3')).toThrow(
-      'This line could not be identified as valid - please check the list of acceptable lines.');
+      'This line could not be identified as valid - please check the list of possible lines.');
   });
 
   it('should reject lines that match an incorrect template', function() {

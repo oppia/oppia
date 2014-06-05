@@ -23,6 +23,13 @@ The code is contained in the following files:
   - conversion.js. Used to convert symbols into unicode logic symbols as users
  type.
 
+In order to update defaultData.js:
+1. Make the desired changes in tools/strings.js.
+2. Open tools/demonstration.html and check everything has succeeded.
+3. Click "Request javascript" at the bottom of the page.
+4. Paste the result into defaultData.js.
+5. Run karma tests.
+
  More information about the program flow, together with specifications for all the 
  objects used, can be found at [LINK].
 

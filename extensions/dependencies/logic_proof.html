@@ -7,9 +7,8 @@
 <script src="/extensions/widgets/interactive/LogicProof/static/js/conversion.js"></script>
 
 <style>
-  table.logic-proof-symbols {
-    border-collapse: separate;
-    border-spacing: 15px 0px;
+  td {
+    padding:5px;
   }
   .mistake-message {
     color:red;
@@ -21,12 +20,15 @@
 
 
 <script type="text/ng-template" id="modals/logicProofHelp">
+  <div class="modal-header">
+    Possible line layouts
+  </div>
   <div class="modal-body">
 
     <p>
       <div class="row">
         <div class="col-xs-6">
-          <u>Acceptable line types</u><br>
+          <p><i>Just use the lines you have seen so far</i></p>
           From R∧S we have R<br>
           From R∧S we have S<br>
           From R and S we have R∧S<br><br>
@@ -61,7 +63,7 @@
 
           <i>An indent is two spaces at the start of the line</i><br><br>
  
-          <table class="logic-proof-symbols">
+          <table class="table-bordered">
             <tr>
               <td><i>Type</i></td>
               <td>&amp;</td>

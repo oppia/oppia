@@ -734,7 +734,7 @@ var logicProofData = (function() {
     'unmatched_line': {
       templates: [[{
         isFixed: true,
-        content: 'This line could not be identified as valid - please check the list of acceptable lines.'
+        content: 'This line could not be identified as valid - please check the list of possible lines.'
       }]],
       parameters: {},
       category: 'parsing'

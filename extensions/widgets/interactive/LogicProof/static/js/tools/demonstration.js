@@ -16,9 +16,14 @@ function TestCtrl($scope) {
     return output;
   }
 
-  $scope.questionData = LOGIC_PROOF_DEFAULT_QUESTION_DATA;  
+  $scope.questionData = {
+    language: logicProofData.BASE_STUDENT_LANGUAGE,
+    vocabulary: DEFAULT_VOCABULARY,
+    mistake_table: [[], [], [], []],
+    general_messages: logicProofData.BASE_GENERAL_MESSAGES
+  }
   $scope.proofString = 'from P\u2227Q we have P\nfrom P\u2227Q we have Q\nfrom Q and P we have Q\u2227P';
-  
+ 
   $scope.displayMessage = function(message, line) {
     $scope.proofError = '';
     for (var i = 0; i < line; i++) {
@@ -63,19 +68,20 @@ function TestCtrl($scope) {
   }
 
   // LOCAL CHECK (for testing only)
-  $scope.localCheck = function() {
-    $scope.buildProof();
+  $scope.doLocalCheck = function() {
+    questionInstance = logicProofStudent.buildInstance($scope.questionData);
+    proof = logicProofStudent.buildProof($scope.proofString, questionInstance);
     $scope.localCheck = 'mistake not found'
     var parameters = {
-      proof: $scope.proof,
-      assumptions: $scope.questionData.assumptions,
-      target: $scope.questionData.results[0]
+      proof: proof,
+      assumptions: questionInstance.assumptions,
+      target: questionInstance.results[0]
     };
-    for ( var i = 0; i < $scope.questionData.mistake_table.length; i++) {
-      for (var j = 0; j < $scope.questionData.mistake_table[i].entries.length; j++) {
-        var mistake = $scope.questionData.mistake_table[i].entries[j];
+    for ( var i = 0; i < questionInstance.mistake_table.length; i++) {
+      for (var j = 0; j < questionInstance.mistake_table[i].entries.length; j++) {
+        var mistake = questionInstance.mistake_table[i].entries[j];
         if (mistake.name === $scope.mistakeName) {
-          $scope.localCheck = logicProofStudent.evaluate(mistake.occurs, {n: parseInt($scope.line)}, $scope.questionData.control_model, parameters, {});
+          $scope.localCheck = logicProofStudent.evaluate(mistake.occurs, {n: parseInt($scope.line)}, questionInstance.control_model, parameters, {}, true);
         }
       }
     }
@@ -107,7 +113,7 @@ function TestCtrl($scope) {
   $scope.submitQuestion();
 
   // LINE TEMPLATES
-  $scope.lineTemplateStrings = logicProofTeacher2.displayLineTemplateTable($scope.questionData.line_templates, $scope.questionData.vocabulary);
+  $scope.lineTemplateStrings = DEFAULT_LINE_TEMPLATE_STRINGS;
   $scope.lineTemplateIndexer = $scope.buildIndexer($scope.lineTemplateStrings.length);
   $scope.submitLineTemplates = function() {
     $scope.checkError = '';
@@ -127,7 +133,19 @@ function TestCtrl($scope) {
   $scope.submitLineTemplates();
 
   // MISTAKE TABLE
-  $scope.mistakeStrings = logicProofTeacher2.displayMistakeTable($scope.questionData.mistake_table);
+  $scope.mistakeStrings = [{
+    name: 'layout',
+    entries: DEFAULT_LAYOUT_MISTAKE_STRINGS
+  }, {
+    name: 'variables',
+    entries: DEFAULT_VARIABLE_MISTAKE_STRINGS
+  }, {
+    name: 'logic',
+    entries: DEFAULT_LOGIC_MISTAKE_STRINGS
+  }, {
+    name: 'target',
+    entries: DEFAULT_TARGET_MISTAKE_STRINGS
+  }];
   $scope.mistakeIndexer = $scope.buildIndexer($scope.mistakeStrings.length);
   $scope.mistakeSectionIndexer = [];
   $scope.mistakeSuccess = [];
@@ -144,8 +162,8 @@ function TestCtrl($scope) {
     $scope.buildSuccess = false;
     try {
       $scope.questionData.mistake_table[sectionNumber] = logicProofTeacher2.buildMistakeSection(
-        $scope.mistakeStrings[sectionNumber].name, 
-        $scope.mistakeStrings[sectionNumber].entries, 
+        $scope.mistakeStrings[sectionNumber].name,
+        $scope.mistakeStrings[sectionNumber].entries,
         $scope.questionData.control_functions);
       $scope.mistakeSuccess[sectionNumber] = true;
       $scope.mistakeErrors[sectionNumber] = $scope.buildErrors($scope.mistakeStrings[sectionNumber].entries.length);
@@ -155,12 +173,9 @@ function TestCtrl($scope) {
       $scope.mistakeErrors[sectionNumber] = err;
     }
   }
-  for (var i = 0; i < $scope.mistakeStrings.length; i++) {
-    $scope.submitMistakes(i);
-  }
 
   // CONTROL FUNCTIONS
-  $scope.controlFunctionStrings = logicProofTeacher2.displayControlFunctionTable($scope.questionData.control_functions);
+  $scope.controlFunctionStrings = DEFAULT_CONTROL_FUNCTION_STRINGS;
   $scope.controlFunctionIndexer = $scope.buildIndexer($scope.controlFunctionStrings.length);
   $scope.submitControlFunctions = function() {
     $scope.checkError = '';
@@ -178,6 +193,56 @@ function TestCtrl($scope) {
     }
   };
   $scope.submitControlFunctions();
-} 
+  // Mistake sections depend on control functions so we build them after.
+  for (var i = 0; i < $scope.mistakeStrings.length; i++) {
+    $scope.submitMistakes(i);
+  }
 
+  $scope.REPLACEMENT_PAIRS = [{
+    old: '\u2227',
+    new: '\\u2227'
+  }, {
+    old: '\u2228',
+    new: '\\u2228'
+  }, {
+    old: '\u2200',
+    new: '\\u2200'
+  }, {
+    old: '\u2203',
+    new: '\\u2203'
+  }, {
+    old: '\u2208',
+    new: '\\u2208'
+  }];
 
+  $scope.replaceUnicode = function(input) {
+    var output = input;
+    for (var i = 0; i < $scope.REPLACEMENT_PAIRS.length; i++) {
+      // We use this as .replace() only replaces one instance.
+      output = output.split($scope.REPLACEMENT_PAIRS[i].old).join(
+        $scope.REPLACEMENT_PAIRS[i].new);
+    }
+    return output;
+  }
+
+  // JAVASCRIPT CONSTRUCTION
+  $scope.requestJavascript = function() {
+    if ($scope.questionSuccess && $scope.lineTemplateSuccess &&
+        $scope.mistakeSuccess[0] && $scope.mistakeSuccess[1] &&
+        $scope.mistakeSuccess[2] && $scope.mistakeSuccess[3] &&
+        $scope.controlFunctionSuccess) {
+      var docStart = 'LOGIC_PROOF_DEFAULT_QUESTION_DATA = {\
+  assumptions: [],\
+  results: [],\
+  language: logicProofData.BASE_STUDENT_LANGUAGE,\
+  general_messages: logicProofData.BASE_GENERAL_MESSAGES,';
+      document.write(docStart + $scope.replaceUnicode(
+        JSON.stringify({
+          line_templates: $scope.questionData.line_templates,
+          vocabulary: $scope.questionData.vocabulary,
+          mistake_table: $scope.questionData.mistake_table,
+          control_functions: $scope.questionData.control_functions
+        })).substring(1 ));
+    }
+  }
+}

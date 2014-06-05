@@ -386,7 +386,7 @@ var logicProofStudent = (function() {
           // The name of the element is provided as a string such as \'R\', so
           // we must strip the quotes.
           var element = arguments[0].substr(1, arguments[0].length - 2);
-          var line = evaluationParameters.proof.lines[arguments[0] - 1];
+          var line = evaluationParameters.proof.lines[arguments[1] - 1];
           if (line === undefined) {
             throw new Error('evaluation failed');
           }
@@ -863,7 +863,7 @@ var logicProofStudent = (function() {
 
  /**
   * This is a top-level function that checks all lines of a proof match some
-  * line template, but nothing else. It is run as the student types.
+  * line template (or are blank), but nothing else. It is run as the student types.
   * @param proofString: the proof as written by the student
   * @param questionInstance: the object representing the problem, which was
   *        constructed from the QuestionData by buildInstance().
@@ -878,14 +878,16 @@ var logicProofStudent = (function() {
     }
     var lineStrings = proofString.split('\n');
     for (var i = 0; i < lineStrings.length; i++) {
-      try {
-        requireIdentifiableLine(lineStrings[i], 
-          questionInstance.line_templates, questionInstance.language, 
-          questionInstance.vocabulary, questionInstance.general_messages);
-      } catch (err) {
-        throw {
-          message: err.message,
-          line: i
+      if (lineStrings[i].split(' ').join('').length !== 0) {
+        try {
+          requireIdentifiableLine(lineStrings[i], 
+            questionInstance.line_templates, questionInstance.language, 
+            questionInstance.vocabulary, questionInstance.general_messages);
+        } catch (err) {
+          throw {
+            message: err.message,
+            line: i
+          }
         }
       }
     }
