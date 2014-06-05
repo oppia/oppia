@@ -136,11 +136,14 @@ class ExplorationFileSystem(object):
         data.commit(user_id, CHANGE_LIST_SAVE)
         metadata.commit(user_id, CHANGE_LIST_SAVE)
 
-    def get(self, filepath, version=None):
+    def get(self, filepath, version=None, mode=None):
         """Gets a file as an unencoded stream of raw bytes.
 
         If `version` is not supplied, the latest version is retrieved. If the
         file does not exist, None is returned.
+
+        Argument 'mode' is here so signature will match other file systems,
+        but is ignored.
         """
         metadata = self._get_file_metadata(filepath, version)
         if metadata:
@@ -228,11 +231,10 @@ class DiskBackedFileSystem(object):
         """Checks if a file exists."""
         return os.path.isfile(os.path.join(self._root, filepath))
 
-    def get(self, filepath, version=None):
+    def get(self, filepath, version=None, mode='r'):
         """Returns a bytestring with the file content, but no metadata."""
-        # TODO(mpm) this mode should probably not be hard-coded
         content = utils.get_file_contents(
-            os.path.join(self._root, filepath), raw_bytes=True, mode='rb')
+            os.path.join(self._root, filepath), raw_bytes=True, mode=mode)
         return FileStreamWithMetadata(content, None, None)
 
     def commit(self, user_id, filepath, raw_bytes):
@@ -270,14 +272,14 @@ class AbstractFileSystem(object):
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
-    def open(self, filepath, version=None):
+    def open(self, filepath, version=None, mode='r'):
         """Returns a stream with the file content. Similar to open(...)."""
         self._check_filepath(filepath)
-        return self._impl.get(filepath, version=version)
+        return self._impl.get(filepath, version=version, mode=mode)
 
-    def get(self, filepath, version=None):
+    def get(self, filepath, version=None, mode='r'):
         """Returns a bytestring with the file content, but no metadata."""
-        file_stream = self.open(filepath, version=version)
+        file_stream = self.open(filepath, version=version, mode=mode)
         if file_stream is None:
             raise IOError(
                 'File %s (version %s) not found.'

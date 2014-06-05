@@ -87,11 +87,11 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
             ['hello.c', 'Makefile']).set_fs(canonical_fs)
 
         file_name = 'incorrect-contents.tar.gz'
-        encoded_content = base64.b64encode(fs.get(file_name))
+        encoded_content = base64.b64encode(fs.get(file_name, mode='rb'))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
-        encoded_content = base64.b64encode(fs.get(file_name))
+        encoded_content = base64.b64encode(fs.get(file_name, mode='rb'))
         self.assertFalse(rule.eval(encoded_content))
 
     def test_missing_expected_file_rule(self):

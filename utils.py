@@ -265,7 +265,7 @@ def convert_png_to_data_url(filepath):
     This method is currently used only in tests for the non-interactive
     widgets.
     """
-    file_contents = get_file_contents(filepath, raw_bytes=True)
+    file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return 'data:image/png;base64,%s' % urllib.quote(
         file_contents.encode('base64'))
 
@@ -348,6 +348,38 @@ def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
 def construct_path(*components):
+    # Filter out empty components.
+    non_empty_components = [c for c in components if len(c) > 0]
+    if len(non_empty_components) == 0:
+        return ''
+    out = [non_empty_components[0]]
+    for i in range(1, len(non_empty_components)):
+        left = out[-1]
+        right = non_empty_components[i]
+        if left.endswith('/'):
+            if right.startswith('/'):
+                out.append(right[1:])
+            else:
+                out.append(right)
+        else:
+            if right.startswith('/'):
+                out.append(right)
+            else:
+                out.append('/' + right)
+    return ''.join(out)
+
+'''
+def construct_path(*components):
+    """Put forward slashes between components."""
+    # Filter out empty components.
+    non_empty_components = [c for c in components if len(c) > 0]
+    if len(non_empty_components) == 0:
+        return ''
+    return '/'.join(non_empty_components)
+'''
+
+'''
+def construct_path(*components):
     # Filter out empty strings, and note final empty one
     isFinalEmptyString = False
     accum = []
@@ -376,6 +408,7 @@ def construct_path(*components):
     if isFinalEmptyString and accum2[-1][-1] != '/':
         accum2.append('/')
     return ''.join(accum2)
+'''
 
 def vfs_normpath(filepath):
     """An implementation of os.path.normpath for the virtual file system."""
