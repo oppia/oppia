@@ -30,6 +30,7 @@ import copy
 
 from core.domain import html_cleaner
 import feconf
+import schema_utils
 import utils
 
 
@@ -106,87 +107,70 @@ class Boolean(BaseObject):
     edit_html_filename = 'boolean_editor'
     edit_js_filename = 'BooleanEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        try:
-            if raw is None or raw == '':
-                raw = False
-
-            assert raw in [True, False]
-            return raw
-        except Exception:
-            raise TypeError('Cannot convert to boolean: %s' % raw)
-
-
-class Number(BaseObject):
-    """Generic number class."""
-
-    description = 'A number.'
+    _schema = {
+        'type': 'bool'
+    }
 
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            result = float(raw)
-            assert isinstance(result, numbers.Number)
-            return result
-        except Exception:
-            raise TypeError('Cannot convert to number: %s' % raw)
+        if raw is None or raw == '':
+            raw = False
+
+        return schema_utils.normalize_against_schema(raw, cls._schema)
 
 
-class Real(Number):
+class Real(BaseObject):
     """Real number class."""
 
     description = 'A real number.'
     edit_html_filename = 'real_editor'
     edit_js_filename = 'RealEditor'
 
+    _schema = {
+        'type': 'float'
+    }
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            result = float(raw)
-            assert isinstance(result, numbers.Real)
-            return result
-        except Exception:
-            raise TypeError('Cannot convert to real number: %s' % raw)
+        return schema_utils.normalize_against_schema(raw, cls._schema)
 
 
-class Int(Real):
+class Int(BaseObject):
     """Integer class."""
 
     description = 'An integer.'
     edit_html_filename = 'int_editor'
     edit_js_filename = 'IntEditor'
 
+    _schema = {
+        'type': 'int'
+    }
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            result = int(super(Int, cls).normalize(raw))
-            assert isinstance(result, numbers.Integral)
-            return result
-        except Exception:
-            raise TypeError('Cannot convert to int: %s' % raw)
+        return schema_utils.normalize_against_schema(raw, cls._schema)
 
 
-class NonnegativeInt(Int):
+class NonnegativeInt(BaseObject):
     """Nonnegative integer class."""
 
     description = 'A non-negative integer.'
     edit_html_filename = 'nonnegative_int_editor'
     edit_js_filename = 'NonnegativeIntEditor'
 
+    _schema = {
+        'type': 'int'
+    }
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            result = super(NonnegativeInt, cls).normalize(raw)
-            assert result >= 0
-            return result
-        except Exception:
-            raise TypeError('Cannot convert to nonnegative int: %s' % raw)
+        result = schema_utils.normalize_against_schema(raw, cls._schema)
+        assert result >= 0
+        return result
 
 
 class CodeEvaluation(BaseObject):
@@ -194,19 +178,28 @@ class CodeEvaluation(BaseObject):
 
     description = 'Code and its evaluation results.'
 
+    _schema = {
+        'type': 'dict',
+        'properties': {
+            'code': {
+                'type': 'unicode'
+            },
+            'output': {
+                'type': 'unicode'
+            },
+            'evaluation': {
+                'type': 'unicode'
+            },
+            'error': {
+                'type': 'unicode'
+            }
+        }
+    }
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert isinstance(raw, dict)
-            assert 'code' in raw and isinstance(raw['code'], basestring)
-            assert 'output' in raw and isinstance(raw['output'], basestring)
-            assert ('evaluation' in raw
-                    and isinstance(raw['evaluation'], basestring))
-            assert 'error' in raw and isinstance(raw['error'], basestring)
-            return raw
-        except Exception:
-            raise TypeError('Cannot convert to code evaluation: %s' % raw)
+        return schema_utils.normalize_against_schema(raw, cls._schema)
 
 
 class CoordTwoDim(BaseObject):
@@ -216,26 +209,18 @@ class CoordTwoDim(BaseObject):
     edit_html_filename = 'coord_two_dim_editor'
     edit_js_filename = 'CoordTwoDimEditor'
 
+    _schema = {
+        'type': 'list',
+        'length': 2,
+        'items': {
+            'type': 'float'
+        }
+    }
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            if isinstance(raw, list):
-                assert len(raw) == 2
-                r0, r1 = raw
-            else:
-                if '(' in raw:
-                    reals = raw.lstrip('(').rstrip(')').split(',')
-                else:
-                    reals = raw.lstrip('[').rstrip(']').split(',')
-                r0 = float(reals[0])
-                r1 = float(reals[1])
-
-            assert isinstance(r0, numbers.Real)
-            assert isinstance(r1, numbers.Real)
-            return [r0, r1]
-        except Exception:
-            raise TypeError('Cannot convert to 2D coordinate: %s' % raw)
+        return schema_utils.normalize_against_schema(raw, cls._schema)
 
 
 class List(BaseObject):
@@ -248,11 +233,8 @@ class List(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert isinstance(raw, list)
-            return raw
-        except Exception:
-            raise TypeError('Cannot convert to list: %s' % raw)
+        assert isinstance(raw, list)
+        return raw
 
 
 class SetOfUnicodeString(List):
@@ -262,15 +244,18 @@ class SetOfUnicodeString(List):
     edit_html_filename = 'list_editor'
     edit_js_filename = 'SetOfUnicodeStringEditor'
 
+    _schema = {
+        'type': 'list',
+        'items': {
+            'type': 'unicode'
+        }
+    }
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert isinstance(raw, (list, set, tuple))
-            assert all([isinstance(item, basestring) for item in raw])
-            return sorted(list(set([unicode(item) for item in raw])))
-        except Exception:
-            raise TypeError('Cannot convert to set of strings: %s' % raw)
+        raw = schema_utils.normalize_against_schema(raw, cls._schema)
+        return sorted(list(set([unicode(item) for item in raw])))
 
 
 class UnicodeString(BaseObject):
@@ -283,12 +268,9 @@ class UnicodeString(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert raw is not None
-            assert isinstance(raw, basestring) or isinstance(raw, numbers.Real)
-            return unicode(raw)
-        except Exception:
-            raise TypeError('Cannot convert to Unicode: %s' % raw)
+        assert raw is not None
+        assert isinstance(raw, basestring) or isinstance(raw, numbers.Real)
+        return unicode(raw)
 
 
 class NormalizedString(UnicodeString):
@@ -301,11 +283,8 @@ class NormalizedString(UnicodeString):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            result = super(NormalizedString, cls).normalize(raw)
-            return ' '.join(result.split())
-        except Exception:
-            raise TypeError('Cannot convert to NormalizedString: %s' % raw)
+        result = super(NormalizedString, cls).normalize(raw)
+        return ' '.join(result.split())
 
 
 class Html(BaseObject):
@@ -318,12 +297,8 @@ class Html(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert isinstance(raw, basestring)
-            return html_cleaner.clean(unicode(raw))
-        except Exception as e:
-            raise TypeError('Cannot convert to HTML string: %s. Error: %s' %
-                            (raw, e))
+        assert isinstance(raw, basestring)
+        return html_cleaner.clean(unicode(raw))
 
 
 class TabContent(BaseObject):
@@ -337,20 +312,26 @@ class TabContent(BaseObject):
     edit_html_filename = 'tab_content_editor'
     edit_js_filename = 'TabContentEditor'
 
+    _schema = {
+        'type': 'dict',
+        'properties': {
+            'title': {
+                'type': 'unicode'
+            },
+            'content': {
+                'type': 'unicode'
+            }
+        }
+    }
+
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert isinstance(raw, dict)
-            assert 'title' in raw
-            assert 'content' in raw
-            raw['title'] = UnicodeString.normalize(raw['title'])
-            raw['content'] = Html.normalize(raw['content'])
-            assert len(raw['title'])
-            return raw
-        except Exception as e:
-            raise TypeError('Cannot convert to tab content: %s. Error: %s' %
-                            (raw, e))
+        raw = schema_utils.normalize_against_schema(raw, cls._schema)
+        raw['title'] = UnicodeString.normalize(raw['title'])
+        raw['content'] = Html.normalize(raw['content'])
+        assert len(raw['title'])
+        return raw
 
 
 class ListOfTabContent(BaseObject):
@@ -367,12 +348,8 @@ class ListOfTabContent(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert isinstance(raw, list)
-            return [TabContent.normalize(item) for item in raw]
-        except Exception as e:
-            raise TypeError('Cannot convert to list of tab content: %s. '
-                            'Error: %s' % (raw, e))
+        assert isinstance(raw, list)
+        return [TabContent.normalize(item) for item in raw]
 
 
 class SanitizedUrl(BaseObject):
@@ -385,66 +362,57 @@ class SanitizedUrl(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert isinstance(raw, basestring)
-            raw = unicode(raw)
-            if raw:
-                url_components = urlparse.urlsplit(raw)
-                quoted_url_components = (
-                    urllib.quote(component) for component in url_components)
-                raw = urlparse.urlunsplit(quoted_url_components)
+        assert isinstance(raw, basestring)
+        raw = unicode(raw)
+        if raw:
+            url_components = urlparse.urlsplit(raw)
+            quoted_url_components = (
+                urllib.quote(component) for component in url_components)
+            raw = urlparse.urlunsplit(quoted_url_components)
 
-                acceptable = html_cleaner.filter_a('href', raw)
-                if not acceptable:
-                    logging.error(
-                        'Invalid URL: Sanitized URL should start with '
-                        '\'http://\' or \'https://\'; received %s' % raw)
-                    return u''
+            acceptable = html_cleaner.filter_a('href', raw)
+            if not acceptable:
+                logging.error(
+                    'Invalid URL: Sanitized URL should start with '
+                    '\'http://\' or \'https://\'; received %s' % raw)
+                return u''
 
-            return raw
-        except Exception as e:
-            raise TypeError('Cannot convert to sanitized URL: %s. Error: %s' %
-                            (raw, e))
+        return raw
 
 
 class MusicPhrase(BaseObject):
     """List of Objects that represent a musical phrase."""
 
     description = ('A musical phrase that contains zero or more notes, rests, '
-                    'and time signature.')
+                   'and time signature.')
     edit_html_filename = 'music_phrase_editor'
     edit_js_filename = 'MusicPhraseEditor'
 
     @classmethod
     def normalize(cls, raw):
-
-        try:
-            valid_notes = [
-                'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5',
-                'E5', 'F5', 'G5', 'A5'
-            ]
-            valid_properties = [
-                'readableNoteName', 'readableRestName', 'noteDuration',
-                'restDuration', 'noteStart', 'restStart'
-            ]
-            assert isinstance(raw, list)
-            for item in raw:
-                if type(item) == dict:
-                    for prop in item:
-                        prop = str(prop)
-                        assert prop in valid_properties
-                        if prop == 'readableNoteName' or prop == 'readableRestName':
-                            assert str(item.get(prop)) in valid_notes
-                        elif prop == 'noteDuration' or prop == 'restDuration':
-                            for d in item[prop]:
-                                assert int(item[prop][d]) > 0
-                        elif prop == 'noteStart' or prop == 'restStart':
-                            for s in prop:
-                                assert int(item[prop][s]) > 0
-            return raw
-        except Exception as e:
-            raise TypeError('Cannot convert to Music Phrase: %s. '
-                            'Error: %s' % (raw, e))
+        valid_notes = [
+            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5',
+            'E5', 'F5', 'G5', 'A5'
+        ]
+        valid_properties = [
+            'readableNoteName', 'readableRestName', 'noteDuration',
+            'restDuration', 'noteStart', 'restStart'
+        ]
+        assert isinstance(raw, list)
+        for item in raw:
+            if type(item) == dict:
+                for prop in item:
+                    prop = str(prop)
+                    assert prop in valid_properties
+                    if prop in ['readableNoteName', 'readableRestName']:
+                        assert str(item.get(prop)) in valid_notes
+                    elif prop in ['noteDuration', 'restDuration']:
+                        for d in item[prop]:
+                            assert int(item[prop][d]) > 0
+                    elif prop == 'noteStart' or prop == 'restStart':
+                        for s in prop:
+                            assert int(item[prop][s]) > 0
+        return raw
 
 
 class TarFileString(BaseObject):
@@ -455,14 +423,11 @@ class TarFileString(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert raw is not None
-            assert isinstance(raw, basestring)
-            raw = base64.b64decode(raw)
-            tfile = tarfile.open(fileobj=StringIO(raw), mode='r:gz')
-            return tfile
-        except Exception:
-            raise TypeError('Not a valid tar file.')
+        assert raw is not None
+        assert isinstance(raw, basestring)
+        raw = base64.b64decode(raw)
+        tfile = tarfile.open(fileobj=StringIO(raw), mode='r:gz')
+        return tfile
 
 
 class Filepath(UnicodeString):
@@ -475,11 +440,8 @@ class Filepath(UnicodeString):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
-        try:
-            assert raw is not None
-            assert isinstance(raw, basestring)
-        except Exception:
-            raise TypeError('Cannot convert to filepath: %s' % raw)
+        assert raw is not None
+        assert isinstance(raw, basestring)
 
         # The path will be prefixed with "[exploration_id]/assets".
         raw = super(Filepath, cls).normalize(raw)

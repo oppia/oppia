@@ -29,7 +29,7 @@ function StateStats(
     $scope.generateUnresolvedAnswersList();
   };
 
-  $scope.$on('guiTabSelected', function(evt) {
+  $scope.$on('refreshStateEditor', function(evt) {
     $scope.stateName = editorContextService.getActiveStateName();
     var stateData = $scope.$parent.states[$scope.stateName];
     $scope.initStateStats(stateData);

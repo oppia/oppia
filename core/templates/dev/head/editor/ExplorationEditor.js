@@ -22,11 +22,12 @@
 var END_DEST = 'END';
 
 function ExplorationEditor(
-    $scope, $http, $location, $anchorScroll, $modal, $window, $filter, $rootScope,
+    $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
-    explorationRightsService, validatorsService, editabilityService) {
+    explorationRightsService, validatorsService, editabilityService,
+    oppiaDateFormatter) {
 
   $scope.editabilityService = editabilityService;
 
@@ -50,8 +51,6 @@ function ExplorationEditor(
     $scope.saveActiveState();
     editorContextService.setActiveStateName(newStateName);
   };
-
-  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
 
   /**************************************************
   * Methods affecting the saving of explorations.
@@ -81,6 +80,10 @@ function ExplorationEditor(
 
   $scope.isExplorationSaveable = function() {
     return $scope.isExplorationLockedForEditing() && !$scope.isSaveInProgress;
+  };
+
+  $scope.getChangeListLength = function() {
+    return changeListService.getChangeList().length;
   };
 
   $scope.isExplorationLockedForEditing = function() {
@@ -279,10 +282,13 @@ function ExplorationEditor(
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
-  $scope.mainTabActive = false;
-  $scope.statsTabActive = false;
-  $scope.settingsTabActive = false;
-  $scope.historyTabActive = false;
+  var resetActiveTags = function() {
+    $scope.mainTabActive = false;
+    $scope.statsTabActive = false;
+    $scope.settingsTabActive = false;
+    $scope.historyTabActive = false;
+    $scope.feedbackTabActive = false;
+  };
 
   $scope.location = $location;
 
@@ -290,6 +296,7 @@ function ExplorationEditor(
   var STATS_VIEWER_URL = '/stats';
   var SETTINGS_URL = '/settings';
   var HISTORY_URL = '/history';
+  var FEEDBACK_URL = '/feedback';
 
   $scope.selectMainTab = function() {
     $scope.showStateEditor(editorContextService.getActiveStateName());
@@ -305,6 +312,10 @@ function ExplorationEditor(
 
   $scope.selectHistoryTab = function() {
     $location.path(HISTORY_URL);
+  };
+
+  $scope.selectFeedbackTab = function() {
+    $location.path(FEEDBACK_URL);
   };
 
   $scope.showStateEditor = function(stateName) {
@@ -337,27 +348,25 @@ function ExplorationEditor(
 
     if (path === STATS_VIEWER_URL) {
       $scope.saveActiveState();
+      resetActiveTags();
       $scope.statsTabActive = true;
-      $scope.mainTabActive = false;
-      $scope.settingsTabActive = false;
-      $scope.historyTabActive = false;
     } else if (path === SETTINGS_URL) {
       $scope.saveActiveState();
-      $scope.statsTabActive = false;
-      $scope.mainTabActive = false;
+      resetActiveTags();
       $scope.settingsTabActive = true;
-      $scope.historyTabActive = false;
     } else if (path === HISTORY_URL) {
       $scope.saveActiveState();
-      $scope.statsTabActive = false;
-      $scope.mainTabActive = false;
-      $scope.settingsTabActive = false;
+      resetActiveTags();
       $scope.historyTabActive = true;
 
       if ($scope.explorationSnapshots === null) {
         // TODO(sll): Do this on-hover rather than on-click.
         $scope.refreshVersionHistory();
       }
+    } else if (path === FEEDBACK_URL) {
+      $scope.saveActiveState();
+      resetActiveTags();
+      $scope.feedbackTabActive = true;
     } else {
       if (path.indexOf('/gui/') != -1) {
         $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
@@ -376,19 +385,9 @@ function ExplorationEditor(
           warningsData.addWarning('State ' + stateName + ' does not exist.');
           return;
         } else {
-          $scope.settingsTabActive = false;
-          $scope.historyTabActive = false;
-          $scope.statsTabActive = false;
+          resetActiveTags();
           $scope.mainTabActive = true;
-          $scope.$broadcast('guiTabSelected');
-          // Scroll to the relevant element (if applicable).
-          // TODO(sfederwisch): Change the trigger so that there is exactly one
-          // scroll action that occurs when the page finishes loading.
-          setTimeout(function () {
-            if ($location.hash()) {
-              $anchorScroll();
-            }
-          }, 1000);
+          $scope.$broadcast('refreshStateEditor');
         }
       };
 
@@ -674,6 +673,14 @@ function ExplorationEditor(
 
       $scope.refreshExplorationStatistics();
 
+      var stateName = editorContextService.getActiveStateName();
+      var stateData = $scope.states[stateName];
+      if (stateData && stateData && !$.isEmptyObject(stateData)) {
+        $scope.$broadcast('refreshStateEditor');
+      }
+
+      $scope.refreshFeedbackTabHeader();
+
       if (successCallback) {
         successCallback();
       }
@@ -735,6 +742,25 @@ function ExplorationEditor(
    */
   $scope.downloadExplorationWithVersion = function(versionNumber) {
     document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
+  };
+
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.publish = $modalInstance.close;
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function() {
+      explorationRightsService.saveChangeToBackend({is_public: true});
+    });
   };
 
   $scope.showNominateExplorationModal = function() {
@@ -938,16 +964,34 @@ function ExplorationEditor(
       });
     }
   };
+
+  $scope.feedbackTabHeader = 'Feedback';
+  $scope.feedbackLastUpdatedUrl = (
+    '/feedback_last_updated/' + $scope.explorationId);
+  $scope.refreshFeedbackTabHeader = function() {
+    $scope.feedbackTabHeader = 'Feedback (loading...)';
+    $http.get($scope.feedbackLastUpdatedUrl).then(function(response) {
+      var data = response.data;
+      if (data.last_updated) {
+        $scope.feedbackTabHeader = (
+          'Feedback (updated ' +
+          oppiaDateFormatter.getLocaleDateString(data.last_updated) +
+          ')');
+      } else {
+        $scope.feedbackTabHeader = 'Feedback';
+      }
+    });
+  };
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
 ExplorationEditor.$inject = [
-  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
+  '$scope', '$http', '$location', '$modal', '$window',
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
   'activeInputData', 'oppiaRequestCreator', 'editorContextService',
   'changeListService', 'explorationTitleService', 'explorationCategoryService',
   'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
-  'editabilityService'
+  'editabilityService', 'oppiaDateFormatter'
 ];

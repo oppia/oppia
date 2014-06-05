@@ -21,6 +21,7 @@ import feconf
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import editor
+from core.controllers import feedback
 from core.controllers import galleries
 from core.controllers import moderator
 from core.controllers import pages
@@ -186,10 +187,6 @@ urls = [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
 
-    get_redirect_route(
-        r'%s' % feconf.RECENT_COMMITS_DATA_URL,
-        recent_commits.RecentCommitsHandler, 'recent_commits_handler'),
-
     get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
         r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
@@ -217,7 +214,7 @@ urls = [
          % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
         reader.FeedbackHandler, 'feedback_handler'),
     get_redirect_route(
-        r'/explorehandler/give_feedback/<exploration_id>/<escaped_state_name>',
+        r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
 
     get_redirect_route(
@@ -242,9 +239,6 @@ urls = [
         r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
-        r'/createhandler/resolved_feedback/<exploration_id>/<escaped_state_name>',
-        editor.ResolvedFeedbackHandler, 'resolved_feedback_handler'),
-    get_redirect_route(
         r'/createhandler/resource_list/<exploration_id>',
         editor.ExplorationResourcesHandler, 'exploration_resources_handler'),
     get_redirect_route(
@@ -262,6 +256,24 @@ urls = [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
+
+    get_redirect_route(
+        r'%s' % feconf.RECENT_COMMITS_DATA_URL,
+        recent_commits.RecentCommitsHandler, 'recent_commits_handler'),
+    get_redirect_route(
+        r'%s' % feconf.RECENT_FEEDBACK_MESSAGES_DATA_URL,
+        feedback.RecentFeedbackMessagesHandler,
+        'recent_feedback_messages_handler'),
+
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_LAST_UPDATED_URL_PREFIX,
+        feedback.FeedbackLastUpdatedHandler, 'feedback_last_updated_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>' % feconf.FEEDBACK_THREADLIST_URL_PREFIX,
+        feedback.ThreadListHandler, 'feedback_threadlist_handler'),
+    get_redirect_route(
+        r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
+        feedback.ThreadHandler, 'feedback_thread_handler'),
 
     get_redirect_route(
         r'/widgetrepository/data/<widget_type>',

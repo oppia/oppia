@@ -1,21 +1,9 @@
 <div>
-  <div ng-if="paramChanges.length === 0">
-    <div class="row">
-      <div class="col-lg-11 col-md-11 col-sm-11">
-        <em>No parameter changes have been defined.</em>
-      </div>
-      <div class="col-lg-1 col-md-1 col-sm-1"></div>
-    </div>
-  </div>
-
   <div ng-repeat="param in paramChanges">
     <div class="row">
-      <div class="col-lg-1 col-md-1 col-sm-1">
-        <[$index + 1]>.
-      </div>
-      <div class="col-lg-7 col-md-7 col-sm-7">
+      <div class="col-lg-9 col-md-9 col-sm-9">
         <span ng-if="activeItem !== $index">
-          Change <b><[param.name]></b> <[HUMAN_READABLE_ARGS_RENDERERS[param.generator_id](param.customization_args)]>
+          <[$index + 1]>. Change parameter <span class="label label-info"><[param.name]></span> <[HUMAN_READABLE_ARGS_RENDERERS[param.generator_id](param.customization_args)]>
         </span>
 
         <div ng-if="activeItem === $index">
@@ -68,20 +56,19 @@
           </button>
         </span>
       </div>
-
-      <div class="col-lg-1 col-md-1 col-sm-1"></div>
     </div>
   </div>
 
   <div class="row" ng-if="isEditable">
-    <div class="col-lg-8 col-md-8 col-sm-8"></div>
-
-    <div class="col-lg-3 col-md-3 col-sm-3">
-      <button type="button" class="btn btn-default pull-right" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()">
-        Add new
-      </a>
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <div class="pull-right">
+        <button type="button" class="btn btn-default btn-xs" ng-disabled="activeItem !== -1" ng-click="startAddParamChange()">
+          Add parameter change
+        </button>
+        <a href="https://code.google.com/p/oppia/wiki/Parameters" target="_blank">
+          <span class="glyphicon glyphicon-question-sign"></span>
+        </a>
+      </div>
     </div>
-
-    <div class="col-lg-1 col-md-1 col-sm-1"></div>
   </div>
 </div>

@@ -159,6 +159,22 @@ class ExplorationPage(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+            raise self.PageNotFoundException
+
+        can_edit = (
+            bool(self.user_id) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(exploration_id))
+
+        if (can_edit and not
+                user_services.has_user_registered_as_editor(self.user_id)):
+            redirect_url = utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL, 'return_url',
+                self.request.uri)
+            self.redirect(redirect_url)
+            return
+
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
         object_editors_js = OBJECT_EDITORS_JS.value
@@ -178,11 +194,9 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
-            'can_edit': (
-                bool(self.user_id) and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(exploration_id)
-            ),
+            'can_delete': rights_manager.Actor(
+                self.user_id).can_delete(exploration_id),
+            'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(exploration_id),
             'can_publicize': rights_manager.Actor(
@@ -244,6 +258,9 @@ class ExplorationHandler(EditorHandler):
 
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
+        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
+            raise self.PageNotFoundException
+
         self.values.update(self._get_exploration_data(exploration_id))
         self.render_json(self.values)
 
@@ -420,26 +437,6 @@ class ResolvedAnswersHandler(EditorHandler):
         self.render_json({})
 
 
-class ResolvedFeedbackHandler(EditorHandler):
-    """Allows readers' feedback for a state to be resolved."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
-
-    @require_editor
-    def put(self, exploration_id, state_name):
-        """Marks readers' feedback as resolved."""
-        feedback_id = self.payload.get('feedback_id')
-        new_status = self.payload.get('new_status')
-
-        if not feedback_id:
-            raise self.InvalidInputException(
-                'Invalid feedback resolution request: no feedback_id given')
-
-        stats_services.EventHandler.resolve_feedback(feedback_id, new_status)
-
-        self.render_json({})
-
-
 class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a YAML file."""
 
@@ -602,7 +599,7 @@ class ImageUploadHandler(EditorHandler):
         if '.' in filename:
             dot_index = filename.rfind('.')
             primary_name = filename[:dot_index]
-            extension = filename[dot_index + 1:]
+            extension = filename[dot_index + 1:].lower()
             if (extension not in
                     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
                 raise self.InvalidInputException(

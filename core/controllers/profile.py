@@ -20,7 +20,6 @@ from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import user_services
-from core.domain import stats_services
 import feconf
 import utils
 
@@ -62,13 +61,10 @@ class ProfileHandler(base.BaseHandler):
         owned_exps = exp_services.get_owned_explorations_summary_dict(
             self.user_id)
 
-        user_stats = stats_services.get_user_stats(self.user_id)
-
         self.values.update({
             'viewable': viewable_exps,
             'editable': editable_exps,
             'owned': owned_exps,
-            'feedback': user_stats['feedback']
         })
         self.render_json(self.values)
 

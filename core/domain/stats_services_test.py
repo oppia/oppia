@@ -29,12 +29,13 @@ import test_utils
 # versions of the rules, while the new ones take in the whole rule.
 # This will require moving off of DEFAULT_RULESPEC_STR in those cases.
 
+
 class EventHandlerUnitTests(test_utils.GenericTestBase):
     """Test the event handler methods."""
 
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
-        'sid', 'NormalizedString');
+        'sid', 'NormalizedString')
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_record_state_hit(self):
@@ -69,7 +70,8 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
     def test_record_answer_submitted(self):
         stats_services.EventHandler.record_state_hit('eid', 'sname', True)
         stats_services.EventHandler.record_answer_submitted(
-            'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC, 'answer')
+            'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
+            'answer')
 
         counter = stats_domain.StateCounter.get('eid', 'sname')
         self.assertEquals(counter.first_entry_count, 1)
@@ -85,7 +87,8 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
 
         stats_services.EventHandler.record_state_hit('eid', 'sname', False)
         stats_services.EventHandler.record_answer_submitted(
-            'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC, 'answer')
+            'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
+            'answer')
 
         counter = stats_domain.StateCounter.get('eid', 'sname')
         self.assertEquals(counter.first_entry_count, 1)
@@ -177,54 +180,12 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEquals(answer_log.answers, {})
 
 
-class StatsServicesUnitTests(test_utils.GenericTestBase):
-    """Test the statistics services."""
-
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
-    SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
-
-    def test_get_user_stats(self):
-        exp0 = exp_domain.Exploration.create_default_exploration(
-            'eid0', 'title0', 'category')
-        exp_services.save_new_exploration('uid0', exp0)
-        exp1 = exp_domain.Exploration.create_default_exploration(
-            'eid1', 'title1', 'category')
-        exp_services.save_new_exploration('uid0', exp1)
-
-        f0 = stats_domain.FeedbackItem.create_feedback_for_state(
-            'eid0', 'welcome', 'my feedback', None, 'uid0')
-        f1 = stats_domain.FeedbackItem.create_feedback_for_exploration(
-            'eid1', 'another feedback', None, 'uid0')
-
-        # This should return the both the feedback.
-        self.assertEquals(stats_services.get_user_stats('uid0'), {'feedback': {
-            f0.id: {
-                'content': 'my feedback',
-                'exp_id': 'eid0',
-                'exp_title': 'title0',
-                'state_name': 'welcome',
-                'status': 'new',
-                'target_id': 'state:eid0.welcome',
-            },
-            f1.id: {
-                'content': 'another feedback',
-                'exp_id': 'eid1',
-                'exp_title': 'title1',
-                'state_name': None,
-                'status': 'new',
-                'target_id': 'exploration:eid1',
-            },
-        }})
-        # uid1 does not have any feedbacks.
-        self.assertEquals(stats_services.get_user_stats('uid1'),
-            {'feedback':{}})
-
-
 class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
     """Test the get_top_improvable_states() function."""
 
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR 
-    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec('sid', 'NormalizedString');
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
+        'sid', 'NormalizedString')
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_get_top_improvable_states(self):
@@ -285,7 +246,8 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
             'inputs': {},
             'subject': 'answer'
         }, exp.init_state_name, [], [], 'NormalizedString')
-        default_rule_spec = exp_domain.RuleSpec.get_default_rule_spec(feconf.END_DEST, 'NormalizedString') 
+        default_rule_spec = exp_domain.RuleSpec.get_default_rule_spec(
+            feconf.END_DEST, 'NormalizedString')
         exp.init_state.widget.handlers[0].rule_specs = [
             not_default_rule_spec, default_rule_spec
         ]
@@ -411,8 +373,9 @@ class TopImprovableStatesUnitTests(test_utils.GenericTestBase):
 class UnresolvedAnswersTests(test_utils.GenericTestBase):
     """Test the unresolved answers methods."""
 
-    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR 
-    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec('sid', 'NormalizedString');
+    DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
+    DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
+        'sid', 'NormalizedString')
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
     def test_get_unresolved_answers(self):

@@ -22,7 +22,6 @@ import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 
@@ -339,21 +338,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     # on this property is faster than an inequality query on
     # post_commit_status.
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
-
-    @classmethod
-    def _fetch_page_sorted_by_last_updated(
-            cls, query, page_size, urlsafe_start_cursor):
-        if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
-        else:
-            start_cursor = None
-
-        result = query.order(-cls.last_updated).fetch_page(
-            page_size, start_cursor=start_cursor)
-        return (
-            result[0],
-            (result[1].urlsafe() if result[1] else None),
-            result[2])
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):

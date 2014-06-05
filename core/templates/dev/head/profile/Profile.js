@@ -50,8 +50,6 @@ function Profile($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
     $scope.editableExplorations = data.editable;
     $scope.viewableExplorations = data.viewable;
 
-    $scope.feedback = data.feedback;
-
     $rootScope.loadingMessage = '';
   }).error(function(data) {
     warningsData.addWarning(data.error || 'Error communicating with server.');

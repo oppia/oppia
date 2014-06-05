@@ -223,7 +223,8 @@ DEMO_EXPLORATIONS = [
     # please note that Oppia lacks many of the features of a full interactive
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
-    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music')
+    ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
+    ('test_of_widgets.yaml', 'Test of widgets', 'Test')
 ]
 
 # TODO(sll): Add all other URLs here.
@@ -238,12 +239,16 @@ EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
 EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
+FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
+FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
+FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
 PLAYTEST_QUEUE_URL = '/playtest'
 PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
+RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 SPLASH_PAGE_URL = '/'
 

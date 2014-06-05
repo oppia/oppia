@@ -136,7 +136,7 @@
                       Category
                     </label>
                     <div class="col-lg-10 col-md-10 col-sm-10">
-                      <select2-dropdown item="newExplorationCategory" choices="categoryList" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px">
+                      <select2-dropdown item="newExplorationCategory" choices="categoriesForDropdown" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px">
                       </select2-dropdown>
                     </div>
                   </div>
@@ -154,7 +154,7 @@
             </div>
             <div class="modal-footer">
               <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory)" ng-disabled="!newExplorationTitle || !newExplorationCategory">Save</button>
-              <button class="btn btn-default" ng-click="cancel()">Close</button>
+              <button class="btn btn-default" ng-click="cancel()">Cancel</button>
             </div>
           </script>
         </div>
