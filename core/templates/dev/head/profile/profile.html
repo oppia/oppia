@@ -71,31 +71,6 @@
         <div ng-show="isEmpty(ownedExplorations) && isEmpty(editableExplorations) && isEmpty(viewableExplorations)">
           <em>No explorations here yet!</em>
         </div>
-
-        <div ng-show="!isEmpty(feedback)">
-          <h5>Feedback I've submitted</h5>
-          <table>
-            <tr ng-repeat="f in feedback">
-              <td>
-                <a ng-href="/explore/<[f.exp_id]>"><[f.exp_title]></a>
-              </td>
-              <td style="width: 20px;">
-              </td>
-              <td>
-                <div class="oppia-feedback-status label">
-                  <[f.status]>
-                </div>
-              </td>
-              <td style="width: 20px;">
-              </td>
-              <td>
-                <div class="oppia-feedback-content">
-                  <[f.content]>
-                </div>
-              </td>
-            </tr>
-          </table>
-        </div>
       </div>
     </div>
   </div>

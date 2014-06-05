@@ -138,53 +138,6 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
         return entities
 
 
-class FeedbackItemModel(base_models.BaseModel):
-    """A piece of feedback for a particular resource."""
-    # The id for the target of the feedback (e.g. an exploration, a state, the
-    # app as a whole, etc.)
-    target_id = ndb.StringProperty()
-    # The text of the feedback message.
-    content = ndb.TextProperty(indexed=False)
-    # Additional data supplied with the feedback message, such as the reader's
-    # state/answer history.
-    additional_data = ndb.JsonProperty(indexed=False)
-    # The id of the user who submitted this feedback. If None, it means that
-    # the feedback was submitted anonymously.
-    submitter_id = ndb.StringProperty()
-    # The status of the feedback.
-    status = ndb.StringProperty(
-        default='new',
-        choices=[
-            'new', 'accepted', 'fixed', 'verified', 'will_not_fix',
-            'needs_clarification'
-        ]
-    )
-
-    @classmethod
-    def get_or_create(cls, target_id, content, additional_data, submitter_id):
-        """Creates a new feedback entry."""
-        entity_id = cls.get_new_id('%s:%s' % (target_id, content))
-        feedback_entity = cls(
-            id=entity_id, target_id=target_id, content=content,
-            additional_data=additional_data, submitter_id=submitter_id)
-        feedback_entity.put()
-
-        return feedback_entity
-
-    @classmethod
-    def get_feedback_items_for_user(cls, user_id):
-        """Gets all feedback submitted by a given user."""
-        return cls.get_all().filter(
-            cls.submitter_id == user_id).fetch(QUERY_LIMIT)
-
-    @classmethod
-    def get_new_feedback_items_for_target(cls, target_id):
-        """Gets all 'new' feedback items corresponding to a given target_id."""
-        return cls.get_all().filter(
-            cls.target_id == target_id
-        ).filter(cls.status == 'new').fetch(QUERY_LIMIT)
-
-
 def process_submitted_answer(
         exploration_id, exploration_version, state_name, handler_name,
         rule, answer):

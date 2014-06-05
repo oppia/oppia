@@ -31,10 +31,6 @@ from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
-# This is temporary.
-(feedback_models, stats_models,) = models.Registry.import_models([
-    models.NAMES.feedback, models.NAMES.statistics])
-# End of temporary code.
 import feconf
 
 import jinja2
@@ -119,17 +115,6 @@ class AdminPage(base.BaseHandler):
             'job_data': job_data,
         })
 
-        # This is temporary.
-        self.values.update({
-            'old_feedback_items_count': (
-                stats_models.FeedbackItemModel.get_all().count()),
-            'new_feedback_threads_count': (
-                feedback_models.FeedbackThreadModel.get_all().count()),
-            'new_feedback_messages_count': (
-                feedback_models.FeedbackMessageModel.get_all().count()),
-        })
-        # End of temporary code.
-
         self.render_template('admin/admin.html')
 
 
@@ -137,56 +122,6 @@ class AdminHandler(base.BaseHandler):
     """Handler for the admin page."""
 
     PAGE_NAME_FOR_CSRF = 'admin'
-
-    def _migrate_feedback(self):
-        old_feedback_items = stats_models.FeedbackItemModel.get_all()
-        for item in old_feedback_items.fetch(10):
-            target_id = item.target_id
-            content = item.content
-            status = item.status
-            created_on = item.created_on
-
-            if not target_id.startswith('state:'):
-                raise Exception('Invalid target id: %s' % target_id)
-            target_id = item.target_id[len('state:'):]
-            exploration_id = target_id[:target_id.find('.')]
-            state_name = target_id[target_id.find('.') + 1:]
-
-            # Create a feedback thread for (exp_id, state_id) with content.
-            # This thread is created by submitter_id. The status is set as:
-            # new --> open, will_not_fix --> ignored, fixed --> fixed.
-            STATUS_MAPPING = {
-                'new': feedback_models.STATUS_CHOICES_OPEN,
-                'will_not_fix': feedback_models.STATUS_CHOICES_IGNORED,
-                'fixed': feedback_models.STATUS_CHOICES_FIXED,
-            }
-
-            thread_id = (
-                feedback_models.FeedbackThreadModel.generate_new_thread_id(
-                    exploration_id))
-            thread = feedback_models.FeedbackThreadModel.create(
-                exploration_id, thread_id)
-            thread.exploration_id = exploration_id
-            thread.state_name = state_name
-            thread.original_author_id = None
-            thread.status = STATUS_MAPPING[status]
-            thread.subject = 'Feedback from a learner'
-            thread.created_on = created_on
-            thread.put()
-
-            message_id = 0
-            msg = feedback_models.FeedbackMessageModel.create(
-                thread.id, message_id)
-            msg.thread_id = thread.id
-            msg.message_id = message_id
-            msg.author_id = None
-            msg.updated_status = thread.status
-            msg.updated_subject = thread.subject
-            msg.text = content
-            msg.created_on = created_on
-            msg.put()
-
-            item.delete()
 
     @require_super_admin
     def get(self):
@@ -240,8 +175,6 @@ class AdminHandler(base.BaseHandler):
                     if klass.__name__ == self.payload.get('job_type'):
                         klass.cancel(job_id, self.user_id)
                         break
-            elif self.payload.get('action') == 'migrate_feedback':
-                self._migrate_feedback()
 
             self.render_json({})
         except Exception as e:
