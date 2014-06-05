@@ -347,68 +347,18 @@ def get_epoch_time():
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
-def construct_path(*components):
-    # Filter out empty components.
-    non_empty_components = [c for c in components if len(c) > 0]
-    if len(non_empty_components) == 0:
-        return ''
-    out = [non_empty_components[0]]
-    for i in range(1, len(non_empty_components)):
-        left = out[-1]
-        right = non_empty_components[i]
-        if left.endswith('/'):
-            if right.startswith('/'):
-                out.append(right[1:])
-            else:
-                out.append(right)
+def construct_path(a, *p):
+    """Mimicks behavior of os.path.join on Posix machines."""
+    path = a
+    for b in p:
+        if b.startswith('/'):
+            path = b
+        elif path == '' or path.endswith('/'):
+            path += b
         else:
-            if right.startswith('/'):
-                out.append(right)
-            else:
-                out.append('/' + right)
-    return ''.join(out)
+            path += '/' + b
+    return path
 
-'''
-def construct_path(*components):
-    """Put forward slashes between components."""
-    # Filter out empty components.
-    non_empty_components = [c for c in components if len(c) > 0]
-    if len(non_empty_components) == 0:
-        return ''
-    return '/'.join(non_empty_components)
-'''
-
-'''
-def construct_path(*components):
-    # Filter out empty strings, and note final empty one
-    isFinalEmptyString = False
-    accum = []
-    for i, c in enumerate(components):
-        if len(c) == 0:
-            if i == len(components) - 1 and len(components) > 1:
-                isFinalEmptyString = True
-        else:
-            accum.append(c)
-    # If 'accum' is empty, handle this by returning empty string
-    if len(accum) == 0:
-        return ''
-    # Accumulate non-empty path components, adding seps where needed.
-    accum2 = [accum[0]]
-    for i in range(0, len(accum)-1):
-        left = accum[i]
-        right = accum[i+1]
-        if right[0] == '/':
-            # in the event an absolute path is encountered, all previous
-            # components are discarded
-            accum2 = [right]
-        elif left[-1] == '/':
-            accum2.append(right)
-        else:
-            accum2.append('/' + right)
-    if isFinalEmptyString and accum2[-1][-1] != '/':
-        accum2.append('/')
-    return ''.join(accum2)
-'''
 
 def vfs_normpath(filepath):
     """An implementation of os.path.normpath for the virtual file system."""
