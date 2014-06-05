@@ -227,15 +227,22 @@ function InteractiveWidgetEditor(
     $scope.tmpRule = null;
   };
 
-  $scope.swapRules = function(handlerName, index1, index2) {
-    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
-
-    var tmpSwapRule = $scope.widgetHandlers[handlerName][index1];
-    $scope.widgetHandlers[handlerName][index1] =
-        $scope.widgetHandlers[handlerName][index2];
-    $scope.widgetHandlers[handlerName][index2] = tmpSwapRule;
-
-    $scope.saveWidgetHandlers($scope.widgetHandlers, $scope.widgetHandlersMemento);
+  $scope.RULE_LIST_SORTABLE_OPTIONS = {
+    axis: 'y',
+    cursor: 'move',
+    handle: '.oppia-rule-header-bubble',
+    items: '.oppia-rule-block',
+    tolerance: 'pointer',
+    start: function(e, ui) {
+      $scope.$apply();
+      $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+      ui.placeholder.height(ui.item.height());
+    },
+    stop: function(e, ui) {
+      $scope.$apply();
+      $scope.saveWidgetHandlers(
+        $scope.widgetHandlers, $scope.widgetHandlersMemento);
+    }
   };
 
   $scope.deleteRule = function(handlerName, index) {

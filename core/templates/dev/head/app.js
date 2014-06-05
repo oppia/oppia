@@ -18,8 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-var oppia = angular.module(
-  'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map']);
+var oppia = angular.module('oppia', [
+  'ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map',
+  'ui.sortable']);
 
 // Sets the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.

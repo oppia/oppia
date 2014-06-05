@@ -13,6 +13,7 @@ module.exports = function(config) {
       'third_party/static/ui-codemirror-0.1.0/src/ui-codemirror.js',
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
+      'third_party/static/ui-sortable-0.12.6/src/sortable.js',
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/**/*.html',
       'extensions/widgets/interactive/**/*.js',
