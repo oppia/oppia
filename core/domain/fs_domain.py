@@ -261,7 +261,7 @@ class AbstractFileSystem(object):
         """Raises an error if a filepath is invalid."""
         base_dir = utils.construct_path('/', self.impl.exploration_id, 'assets')
         absolute_path = utils.construct_path(base_dir, filepath)
-        normalized_path = utils.vfs_normpath(absolute_path)
+        normalized_path = utils.normpath(absolute_path)
 
         # This check prevents directory traversal.
         if not normalized_path.startswith(base_dir):

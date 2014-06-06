@@ -149,3 +149,14 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, '/b/c')
         p = utils.construct_path('/a', 'b/')
         self.assertEqual(p, '/a/b/')
+
+    def test_normpath(self):
+        p = utils.normpath('/foo/../bar')
+        self.assertEqual(p, '/bar')
+        p = utils.normpath('foo//bar')
+        self.assertEqual(p, 'foo/bar')
+        p = utils.normpath('foo/bar/..')
+        self.assertEqual(p, 'foo')
+        p = utils.normpath('/foo//bar//baz//')
+        self.assertEqual(p, '/foo/bar/baz')
+        
