@@ -32,7 +32,6 @@ from core.domain import user_services
 from core.domain import value_generators_domain
 from core.domain import widget_registry
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
@@ -538,7 +537,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
-        exploration_annotations = stats_models.ExplorationAnnotationModel.get(
+        exploration_annotations = stats_services.get_exploration_annotation(
             exploration_id)
         self.render_json({
             'num_visits': exploration_annotations.num_visits,

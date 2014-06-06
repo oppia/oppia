@@ -181,6 +181,16 @@ def get_state_rules_stats(exploration_id, state_name):
 
     return results
 
+def get_exploration_annotation(exp_id):
+    try: 
+        exp_annotations = stats_models.ExplorationAnnotationModel.get(
+            exp_id)
+    except:
+        exp_annotations = stats_models.ExplorationAnnotationModel(
+            id=exp_id, num_visits=0, num_completions=0)
+    return exp_annotations
+
+
 def get_user_stats(user_id):
     """Returns a dict with user statistics for a given user.
 
