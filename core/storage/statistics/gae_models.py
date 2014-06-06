@@ -285,7 +285,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         start_event_entity.put()
 
 
-class ExplorationAnnotationModel(base_models.BaseModel):
+class ExplorationAnnotationsModel(base_models.BaseModel):
     """Model for exploration-level statistics."""
 
     # Caching was causing issues with stale data being shown after MapReduce

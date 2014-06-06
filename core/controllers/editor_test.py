@@ -335,7 +335,7 @@ class StatsIntegrationTest(BaseEditorControllerTest):
 
         # Trigger a stats update
         job_id = (
-           stats_jobs.StatisticsPageJobManager.create_new())
+            stats_jobs.StatisticsPageJobManager.create_new())
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 

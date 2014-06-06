@@ -181,12 +181,11 @@ def get_state_rules_stats(exploration_id, state_name):
 
     return results
 
-def get_exploration_annotation(exp_id):
-    try: 
-        exp_annotations = stats_models.ExplorationAnnotationModel.get(
-            exp_id)
-    except:
-        exp_annotations = stats_models.ExplorationAnnotationModel(
+def get_exploration_annotations(exp_id):
+    exp_annotations = stats_models.ExplorationAnnotationsModel.get(
+        exp_id, strict=False)
+    if not exp_annotations:
+        exp_annotations = stats_models.ExplorationAnnotationsModel(
             id=exp_id, num_visits=0, num_completions=0)
     return exp_annotations
 

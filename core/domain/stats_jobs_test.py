@@ -48,7 +48,7 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_jobs.StatisticsPageJobManager.get_status_code(job_id), 
             jobs.STATUS_CODE_COMPLETED)
-        output_model = stats_models.ExplorationAnnotationModel.get(exp_id)
+        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
         self.assertEqual(output_model.num_visits, 2)
         self.assertEqual(output_model.num_completions, 0)
 
@@ -74,7 +74,7 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
-        output_model = stats_models.ExplorationAnnotationModel.get(exp_id)
+        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
         self.assertEqual(output_model.num_visits, 2)
         self.assertEqual(output_model.num_completions, 2)
 
@@ -114,7 +114,7 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
-        output_model = stats_models.ExplorationAnnotationModel.get(exp_id)
+        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
         self.assertEqual(output_model.num_visits, 2)
         self.assertEqual(output_model.num_completions, 1)
 

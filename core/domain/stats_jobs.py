@@ -60,7 +60,7 @@ class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
         complete_events = [e for 
                            e in last_maybe_leave_by_session_id.values() 
                            if e['state_name'] == feconf.END_DEST]
-        stats_models.ExplorationAnnotationModel(
+        stats_models.ExplorationAnnotationsModel(
             id=key,
             num_visits=len(started_session_ids),
             num_completions=len(complete_events)).put()

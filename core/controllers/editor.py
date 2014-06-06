@@ -537,7 +537,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
-        exploration_annotations = stats_services.get_exploration_annotation(
+        exploration_annotations = stats_services.get_exploration_annotations(
             exploration_id)
         self.render_json({
             'num_visits': exploration_annotations.num_visits,
