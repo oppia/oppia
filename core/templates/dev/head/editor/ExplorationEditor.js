@@ -113,9 +113,8 @@ function ExplorationEditor(
       oppiaRequestCreator.createRequest({
         change_list: changeListService.getChangeList(),
         version: explorationData.data.version
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .success(function(data) {
+      })
+    ).success(function(data) {
       if (data.error) {
         warningsData.addWarning(data.error);
         return;
@@ -555,9 +554,8 @@ function ExplorationEditor(
         oppiaRequestCreator.createRequest({
           current_version: explorationData.data.version,
           revert_to_version: version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-      .success(function(response) {
+        })
+      ).success(function(response) {
         location.reload();
       }).error(function(data) {
         $log.error(data);
@@ -812,9 +810,8 @@ function ExplorationEditor(
       $scope.newStateTemplateUrl,
       oppiaRequestCreator.createRequest({
         state_name: newStateName
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .success(function(data) {
+      })
+    ).success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
       changeListService.addState(newStateName);

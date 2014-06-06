@@ -30,6 +30,8 @@ oppia.config(['$interpolateProvider', '$httpProvider', function($interpolateProv
 
   $httpProvider.defaults.headers.post = {
     'Content-Type': 'application/x-www-form-urlencoded'};
+  $httpProvider.defaults.headers.put = {
+    'Content-Type': 'application/x-www-form-urlencoded'};
 }]);
 
 oppia.config(['$provide', function($provide) {

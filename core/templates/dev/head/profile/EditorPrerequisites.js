@@ -65,8 +65,7 @@ function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaReque
       oppiaRequestCreator.createRequest({
         agreed_to_terms: agreedToTerms,
         username: username
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      })
     ).success(function(data) {
       window.location = window.decodeURIComponent($scope.getUrlParams().return_url);
     }).error(function(data) {

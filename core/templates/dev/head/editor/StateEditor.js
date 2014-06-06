@@ -18,9 +18,10 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData,
-    warningsData, activeInputData, oppiaRequestCreator, editorContextService,
-    changeListService, validatorsService, focusService) {
+function StateEditor(
+    $scope, $filter, explorationData, warningsData,
+    editorContextService, changeListService, validatorsService,
+    focusService) {
 
   $scope.$on('refreshStateEditor', function(evt) {
     $scope.initStateEditor();
@@ -146,7 +147,7 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
   };
 }
 
-StateEditor.$inject = ['$scope', '$http', '$filter', '$log', '$sce', '$modal',
-  'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator',
+StateEditor.$inject = [
+  '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
   'focusService'];
