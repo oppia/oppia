@@ -356,13 +356,10 @@ def construct_path(*components):
     for i in range(1, len(non_empty_components)):
         left = out[-1]
         right = non_empty_components[i]
-        if left.endswith('/'):
-            if right.startswith('/'):
-                out.append(right[1:])
-            else:
-                out.append(right)
+        if right.startswith('/'):
+            out = [right]
         else:
-            if right.startswith('/'):
+            if left.endswith('/'):
                 out.append(right)
             else:
                 out.append('/' + right)
