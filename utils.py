@@ -347,69 +347,44 @@ def get_epoch_time():
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
-def construct_path(*components):
-    # Filter out empty components.
-    non_empty_components = [c for c in components if len(c) > 0]
-    if len(non_empty_components) == 0:
-        return ''
-    out = [non_empty_components[0]]
-    for i in range(1, len(non_empty_components)):
-        left = out[-1]
-        right = non_empty_components[i]
-        if right.startswith('/'):
-            out = [right]
+def construct_path(a, *p):
+    """Mimicks behavior of os.path.join on Posix machines."""
+    path = a
+    for b in p:
+        if b.startswith('/'):
+            path = b
+        elif path == '' or path.endswith('/'):
+            path += b
         else:
-            if left.endswith('/'):
-                out.append(right)
-            else:
-                out.append('/' + right)
-    return ''.join(out)
+            path += '/' + b
+    return path
 
-'''
-def construct_path(*components):
-    """Put forward slashes between components."""
-    # Filter out empty components.
-    non_empty_components = [c for c in components if len(c) > 0]
-    if len(non_empty_components) == 0:
-        return ''
-    return '/'.join(non_empty_components)
-'''
 
-'''
-def construct_path(*components):
-    # Filter out empty strings, and note final empty one
-    isFinalEmptyString = False
-    accum = []
-    for i, c in enumerate(components):
-        if len(c) == 0:
-            if i == len(components) - 1 and len(components) > 1:
-                isFinalEmptyString = True
-        else:
-            accum.append(c)
-    # If 'accum' is empty, handle this by returning empty string
-    if len(accum) == 0:
-        return ''
-    # Accumulate non-empty path components, adding seps where needed.
-    accum2 = [accum[0]]
-    for i in range(0, len(accum)-1):
-        left = accum[i]
-        right = accum[i+1]
-        if right[0] == '/':
-            # in the event an absolute path is encountered, all previous
-            # components are discarded
-            accum2 = [right]
-        elif left[-1] == '/':
-            accum2.append(right)
-        else:
-            accum2.append('/' + right)
-    if isFinalEmptyString and accum2[-1][-1] != '/':
-        accum2.append('/')
-    return ''.join(accum2)
-'''
+def normpath(path):
+    """Normalize path from posixpath.py, eliminating double slashes, etc."""
+    # Preserve unicode (if path is unicode)
+    slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
+    if path == '':
+        return dot
+    initial_slashes = path.startswith('/')
+    # POSIX allows one or two initial slashes, but treats three or more
+    # as single slash.
+    if (initial_slashes and
+        path.startswith('//') and not path.startswith('///')):
+        initial_slashes = 2
+    comps = path.split('/')
+    new_comps = []
+    for comp in comps:
+        if comp in ('', '.'):
+            continue
+        if (comp != '..' or (not initial_slashes and not new_comps) or
+             (new_comps and new_comps[-1] == '..')):
+            new_comps.append(comp)
+        elif new_comps:
+            new_comps.pop()
+    comps = new_comps
+    path = slash.join(comps)
+    if initial_slashes:
+        path = slash*initial_slashes + path
+    return path or dot
 
-def vfs_normpath(filepath):
-    """An implementation of os.path.normpath for the virtual file system."""
-    normalized_path = os.path.normpath(filepath)
-    # On Windows, os.path.normpath will change forward slashes to back slashes.
-    # For vfs filepaths, we need to change them back.
-    return re.sub(r'\\', '/', normalized_path)
