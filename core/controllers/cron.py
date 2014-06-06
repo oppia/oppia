@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,14 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Job registries."""
+"""Controllers for the cron jobs."""
 
-__author__ = 'Sean Lip'
+from core.controllers import base
+from core import jobs_registry
 
-from core import jobs
-from core.domain import stats_jobs
-
-# Add a list of job manager classes (i.e., subclasses of jobs.BaseJobManager)
-# here. 'Create new' buttons for these jobs will be displayed on the admin
-# dashboard.
-JOB_MANAGER_CLASSES = [stats_jobs.StatisticsPageJobManager]
+class StatisticsHandler(base.BaseHandler):
+    """Handler for statistics cron job."""
+    def get(self):
+        """Handles get requests."""
+        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+             if klass.__name__ == 'StatisticsPageJobManager':
+                 klass.enqueue(klass.create_new())
+                 break

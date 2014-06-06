@@ -216,6 +216,9 @@ urls = [
     get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
+    get_redirect_route(
+        r'/explorehandler/leave/<exploration_id>/<escaped_state_name>',
+        reader.ReaderLeaveHandler, 'reader_leave_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

@@ -1,0 +1,4 @@
+cron:
+- description: periodic statistics calculations
+  url: /cron/statistics
+  schedule: every 6 hours
