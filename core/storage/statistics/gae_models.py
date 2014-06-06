@@ -288,6 +288,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 class ExplorationAnnotationModel(base_models.BaseModel):
     """Model for exploration-level statistics."""
 
+    # Caching was causing issues with stale data being shown after MapReduce
+    # jobs were run. Benefits of caching were considered to be minimal, so 
+    # all caching has been turned off for statistics models.
     _use_cache = False
     _use_memcache = False
 
