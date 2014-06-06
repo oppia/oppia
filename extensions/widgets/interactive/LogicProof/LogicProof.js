@@ -104,7 +104,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           editor.on('change', function(instance, change) {
             $scope.proofString = editor.getValue();
             // We update the message only if the user has added or removed a
-            // line break, so that it remains while the work on a single line.
+            // line break, so that it remains while they work on a single line.
             if (change.text.length > 1 || change.removed.length > 1) {
               $scope.refreshMessages(editor);
             }
@@ -121,8 +121,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           } catch(err) {
             $scope.proofError = $scope.displayMessage(err.message, err.line);
             $scope.mistakeMark = editor.doc.markText(
-              {line: err.line, ch:0}, 
-              {line: err.line, ch:100}, 
+              {line: err.line, ch: 0}, 
+              {line: err.line, ch: 100}, 
               {className: 'erroneous-line'});
           }
           // NOTE: this line is necessary to force angular to refresh the

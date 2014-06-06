@@ -41,7 +41,8 @@ function TestCtrl($scope) {
   $scope.editProof = function() {
     $scope.checkSuccess = false;
     if ($scope.proofString.slice(-1) === '\n') {
-      questionInstance = logicProofStudent.buildInstance($scope.questionData);
+      var questionInstance = logicProofStudent.buildInstance(
+        $scope.questionData);
       try {
         logicProofStudent.validateProof($scope.proofString, questionInstance);
       }
@@ -54,9 +55,11 @@ function TestCtrl($scope) {
   }
 
   $scope.submitProof = function() {
-    questionInstance = logicProofStudent.buildInstance($scope.questionData);
+    var questionInstance = logicProofStudent.buildInstance(
+      $scope.questionData);
     try {
-      proof = logicProofStudent.buildProof($scope.proofString, questionInstance);
+      var proof = logicProofStudent.buildProof(
+        $scope.proofString, questionInstance);
       logicProofStudent.checkProof(proof, questionInstance);
       $scope.proofError = '';
       $scope.checkSuccess = true;
@@ -71,17 +74,19 @@ function TestCtrl($scope) {
   $scope.doLocalCheck = function() {
     questionInstance = logicProofStudent.buildInstance($scope.questionData);
     proof = logicProofStudent.buildProof($scope.proofString, questionInstance);
-    $scope.localCheck = 'mistake not found'
+    $scope.localCheck = 'mistake not found';
     var parameters = {
       proof: proof,
       assumptions: questionInstance.assumptions,
       target: questionInstance.results[0]
     };
-    for ( var i = 0; i < questionInstance.mistake_table.length; i++) {
+    for (var i = 0; i < questionInstance.mistake_table.length; i++) {
       for (var j = 0; j < questionInstance.mistake_table[i].entries.length; j++) {
         var mistake = questionInstance.mistake_table[i].entries[j];
         if (mistake.name === $scope.mistakeName) {
-          $scope.localCheck = logicProofStudent.evaluate(mistake.occurs, {n: parseInt($scope.line)}, questionInstance.control_model, parameters, {}, true);
+          $scope.localCheck = logicProofStudent.evaluate(
+            mistake.occurs, {n: parseInt($scope.line)}, 
+            questionInstance.control_model, parameters, {});
         }
       }
     }
@@ -215,6 +220,9 @@ function TestCtrl($scope) {
     new: '\\u2208'
   }];
 
+  // JSON.stringify will display '\u2227' from strings.js as '∧'. We do not
+  // want to write unicode in generatedDefaultData.js so we convert to '\\u2227'
+  // which JSON.stringify will display as '\u2227'.
   $scope.replaceUnicode = function(input) {
     var output = input;
     for (var i = 0; i < $scope.REPLACEMENT_PAIRS.length; i++) {
@@ -231,18 +239,18 @@ function TestCtrl($scope) {
         $scope.mistakeSuccess[0] && $scope.mistakeSuccess[1] &&
         $scope.mistakeSuccess[2] && $scope.mistakeSuccess[3] &&
         $scope.controlFunctionSuccess) {
-      var docStart = 'LOGIC_PROOF_DEFAULT_QUESTION_DATA = {\
-  assumptions: [],\
-  results: [],\
-  language: logicProofData.BASE_STUDENT_LANGUAGE,\
-  general_messages: logicProofData.BASE_GENERAL_MESSAGES,';
+      var docStart = 'LOGIC_PROOF_DEFAULT_QUESTION_DATA = {' +
+        'assumptions: [],' +
+        'results: [],' +
+        'language: logicProofData.BASE_STUDENT_LANGUAGE,' +
+        'general_messages: logicProofData.BASE_GENERAL_MESSAGES,';
       document.write(docStart + $scope.replaceUnicode(
         JSON.stringify({
           line_templates: $scope.questionData.line_templates,
           vocabulary: $scope.questionData.vocabulary,
           mistake_table: $scope.questionData.mistake_table,
           control_functions: $scope.questionData.control_functions
-        })).substring(1 ));
+        })).substring(1));
     }
   }
 }

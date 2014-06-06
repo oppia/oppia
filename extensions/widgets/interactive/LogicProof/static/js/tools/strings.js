@@ -11,7 +11,7 @@ DEFAULT_VOCABULARY = {
   given: ['given'],
   contradiction: ['contradiction'],
   at: ['at']
-}
+};
 
 DEFAULT_LINE_TEMPLATE_STRINGS = [{
   name: 'and_eliminate_left',
@@ -125,8 +125,7 @@ DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'R=>S',
   variables: '',
   error: []
-},
-{
+}, {
   name: 'not_eliminate',
   reader_view: 'From R and ~R we have contradiction',
   antecedents: 'R, ~R',
@@ -280,7 +279,7 @@ DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'R',
   variables: '',
   error: ['If you want to reach a contradiction from {{~R}} and so conclude {{R}} then you\'ll need to start from the law of the excluded middle \'We know {{R\u2228~R}}\'.']
-}]
+}];
 
 
 
@@ -356,7 +355,7 @@ DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
   name: 'illegal_first_line',
   occurs: 'n=1 \u2227 (template(n)=\'for_all_introduce\' \u2228 template(n)=\'implies_introduce\' \u2228 template(n)=\'not_introduce\')',
   message: ['You can\'t have this as the first line of your proof']
-}]
+}];
 
 DEFAULT_VARIABLE_MISTAKE_STRINGS = [{
   name: 'unspecified_variable',
@@ -378,7 +377,7 @@ DEFAULT_VARIABLE_MISTAKE_STRINGS = [{
   name: 'variable_clash',
   occurs: 'template(n)=\'exists_eliminate\' \u2227 is_accessible(variable(n),n)',
   message: ['You just know that there is some {{variable(n)}} such that {{result(n)}}; you can\'t assume that it is the {{variable(n)}} we were previously discussing. Try using an entirely new variable in place of {{variable(n)}}.']
-}]
+}];
 
 DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   name: 'missing_antecedent',
@@ -456,7 +455,7 @@ DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   name: 'or_false_inaccessible_antecedent_right',
   occurs: 'template(n)=\'or_eliminate_false\' \u2227 ~is_available_implies_false(element(\'S\',n),n)',
   message: ['You proved that if {{element(\'S\',n)}} then contradiction follows, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implies_false(element(\'S\',n),i,j)}))}}\', which we have since left.']
-}]
+}];
 
 DEFAULT_TARGET_MISTAKE_STRINGS = [{
   name: 'last_line_indented_assumption',
@@ -470,7 +469,7 @@ DEFAULT_TARGET_MISTAKE_STRINGS = [{
   name: 'last_line_not_target',
   occurs: 'n=num_lines() \u2227 ~target()\u2208results(n)',
   message: ['We are trying to prove {{target()}} so it should be given by the final line of the proof.']
-}]
+}];
 
 
 
@@ -558,4 +557,4 @@ DEFAULT_CONTROL_FUNCTION_STRINGS = [{
   LHS: 'is_available_implies_false(A,n)',
   RHS: '\u2203j<n.\u2203i<j.(yields_implies_false(A,i,j) \u2227 (~\u2203k<n.(k>i \u2227 indentation(k)<indentation(i))) \u2227 indentation(i)<=indentation(n))',
   description: 'Whether there is a proof of contradiction under the assumption of A available at line n'
-}]
+}];
