@@ -35,4 +35,4 @@ def get_skin_html(skin_name):
 def get_skin_js(skin_name):
     """Returns the JS content for a given skin."""
     return jinja2.Markup(utils.get_file_contents(
-        '%s/%s' % (feconf.SKINS_TEMPLATES_DIR, '%s.js' % skin_name)))
+        '%s/%s.js' % (feconf.SKINS_TEMPLATES_DIR, skin_name)))

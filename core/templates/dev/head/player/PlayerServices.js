@@ -24,7 +24,7 @@ oppia.factory('timerService', ['$log', function($log) {
 
   return {
     _getCurrentTime: function() {
-      return new Date().getTime();
+      return Date.now();
     },
     resetTimer: function() {
       startTime = this._getCurrentTime();
@@ -79,6 +79,52 @@ oppia.factory('oppiaPlayerService', [
     stateHistory = newStateHistory;
   };
 
+  var _feedbackModalCtrl = ['$scope', '$modalInstance', 'isLoggedIn', function(
+      $scope, $modalInstance, isLoggedIn) {
+    $scope.isLoggedIn = isLoggedIn;
+    $scope.isSubmitterAnonymized = false;
+    $scope.relatedTo = 'state';
+    $scope.subject = '';
+    $scope.feedback = '';
+
+    $scope.submit = function(subject, feedback, relatedTo, isSubmitterAnonymized) {
+      $modalInstance.close({
+        subject: subject,
+        feedback: feedback,
+        isStateRelated: relatedTo === 'state',
+        isSubmitterAnonymized: isSubmitterAnonymized
+      });
+    };
+
+    $scope.cancel = function() {
+      $modalInstance.dismiss('cancel');
+    };
+  }];
+
+  var _feedbackModalCallback = function(result) {
+    if (result.feedback) {
+      $http.post(
+        '/explorehandler/give_feedback/' + explorationId,
+        oppiaRequestCreator.createRequest({
+          subject: result.subject,
+          feedback: result.feedback,
+          include_author: !result.isSubmitterAnonymized && isLoggedIn,
+          state_name: result.isStateRelated ? stateName : null
+        })
+      );
+
+      $modal.open({
+        templateUrl: 'modals/playerFeedbackConfirmation',
+        backdrop: 'static',
+        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+          };
+        }]
+      });
+    }
+  };
+
   return {
     loadInitialState: function(successCallback, errorCallback) {
       $http.get(explorationDataUrl).success(function(data) {
@@ -125,58 +171,15 @@ oppia.factory('oppiaPlayerService', [
     },
     showFeedbackModal: function() {
       $modal.open({
-        templateUrl: 'modals/readerFeedback',
+        templateUrl: 'modals/playerFeedback',
         backdrop: 'static',
         resolve: {
           isLoggedIn: function() {
             return isLoggedIn;
           }
         },
-        controller: [
-            '$scope', '$modalInstance', 'isLoggedIn',
-            function($scope, $modalInstance, isLoggedIn) {
-          $scope.isLoggedIn = isLoggedIn;
-          $scope.isSubmitterAnonymized = false;
-          $scope.relatedTo = 'state';
-          $scope.subject = '';
-          $scope.feedback = '';
-
-          $scope.submit = function(subject, feedback, relatedTo, isSubmitterAnonymized) {
-            $modalInstance.close({
-              subject: subject,
-              feedback: feedback,
-              isStateRelated: relatedTo === 'state',
-              isSubmitterAnonymized: isSubmitterAnonymized
-            });
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-          };
-        }]
-      }).result.then(function(result) {
-        if (result.feedback) {
-          $http.post(
-            '/explorehandler/give_feedback/' + explorationId,
-            oppiaRequestCreator.createRequest({
-              subject: result.subject,
-              feedback: result.feedback,
-              include_author: !result.isSubmitterAnonymized && isLoggedIn,
-              state_name: result.isStateRelated ? stateName : null
-            })
-          );
-
-          $modal.open({
-            templateUrl: 'modals/readerFeedbackConfirmation',
-            backdrop: 'static',
-            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-              };
-            }]
-          });
-        }
-      });
+        controller: _feedbackModalCtrl
+      }).result.then(_feedbackModalCallback);
     }
   };
 }]);

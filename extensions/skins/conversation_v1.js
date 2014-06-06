@@ -23,7 +23,7 @@ function ConversationSkin(
     oppiaPlayerService) {
 
   var urlParams = $scope.getUrlParams();
-  $scope.iframed = (urlParams.hasOwnProperty('iframed') && urlParams['iframed']);
+  $scope.iframed = !!urlParams.iframed;
 
   $scope.showPage = !$scope.iframed;
 
@@ -32,8 +32,8 @@ function ConversationSkin(
   $window.addEventListener('beforeunload', function(e) {
     if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
       var confirmationMessage = (
-          'If you navigate away from this page, your progress on the ' +
-          'exploration will be lost.');
+        'If you navigate away from this page, your progress on the ' +
+        'exploration will be lost.');
       (e || $window.event).returnValue = confirmationMessage;
       return confirmationMessage;
     }
@@ -45,8 +45,9 @@ function ConversationSkin(
 
   $scope.resetPage = function() {
     if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
-      var confirmationMessage = 'Are you sure you want to restart this ' +
-                                'exploration? Your progress will be lost.';
+      var confirmationMessage = (
+        'Are you sure you want to restart this exploration? Your progress ' +
+        'will be lost.');
       if (!$window.confirm(confirmationMessage)) {
         return;
       };
@@ -150,8 +151,9 @@ function ConversationSkin(
       var lastEntryEls = document.getElementsByClassName('oppia-last-log-entry');
       $scope.adjustPageHeight(true, function() {
         if (lastEntryEls.length > 0) {
+          // TODO(sll): Try and drop this in favor of an Angular-based solution.
           $('html, body, iframe').animate(
-              {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
+            {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
         }
       });
 
