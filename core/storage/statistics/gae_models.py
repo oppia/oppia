@@ -288,6 +288,9 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 class ExplorationAnnotationModel(base_models.BaseModel):
     """Model for exploration-level statistics."""
 
+    _use_cache = False
+    _use_memcache = False
+
     # Number of students who started the exploration
     num_visits = ndb.IntegerProperty(indexed=True)
     # Number of students who have completed the exploration
