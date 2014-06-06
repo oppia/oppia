@@ -21,12 +21,13 @@ __author__ = 'Stephanie Federwisch'
 from datetime import datetime
 
 from core import jobs
-from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 from core.domain import stats_jobs
 from core.domain import stats_services
+from core.platform import models
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 import feconf
 import test_utils
+
 
 class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
     """Tests for exploration annotations."""
@@ -36,9 +37,9 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         version = 1
         state = 'sid'
         stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_PLAYTEST)
+            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
         stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_PLAYTEST)
+            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         job_id = (
            stats_jobs.StatisticsPageJobManager.create_new())
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)
@@ -57,15 +58,15 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         version = 1
         state = 'sid'
         stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_PLAYTEST)
+            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
         stats_services.EventHandler.maybe_leave_exploration(
             exp_id, version, feconf.END_DEST, 'session1', 27, {},
-            feconf.PLAY_TYPE_PLAYTEST)
+            feconf.PLAY_TYPE_NORMAL)
         stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_PLAYTEST)
+            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         stats_services.EventHandler.maybe_leave_exploration(
             exp_id, version, feconf.END_DEST, 'session2', 27, {},
-            feconf.PLAY_TYPE_PLAYTEST)
+            feconf.PLAY_TYPE_NORMAL)
         job_id = stats_jobs.StatisticsPageJobManager.create_new()
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
@@ -87,7 +88,7 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             session_id=session,
             client_time_spent_in_secs=27.0,
             params={},
-            play_type=feconf.PLAY_TYPE_PLAYTEST)
+            play_type=feconf.PLAY_TYPE_NORMAL)
         leave.put()
         leave.created_on = datetime.fromtimestamp(created_on)
         leave.put()
@@ -98,12 +99,12 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         version = 1
         state = 'sid'
         stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_PLAYTEST)
+            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
         self.create_leave_event(exp_id, version, state, 'session1', 0)
         self.create_leave_event(exp_id, version, state, 'session1', 1)
         self.create_leave_event(exp_id, version, feconf.END_DEST, 'session1', 2)
         stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_PLAYTEST)
+            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         self.create_leave_event(exp_id, version, state, 'session2', 3)
         self.create_leave_event(exp_id, version, state, 'session2', 4)
         job_id = stats_jobs.StatisticsPageJobManager.create_new()

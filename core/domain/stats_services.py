@@ -64,30 +64,6 @@ class EventHandler(object):
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
     @classmethod
-    def record_state_feedback_from_reader(
-            cls, exploration_id, state_name, feedback, history, submitter_id):
-        """Records user feedback for a particular state."""
-        stats_domain.FeedbackItem.create_feedback_for_state(
-            exploration_id, state_name, feedback,
-            additional_data={'history': history}, submitter_id=submitter_id)
-
-    @classmethod
-    def record_exploration_feedback_from_reader(
-            cls, exploration_id, feedback, history):
-        """Records user feedback for a particular exploration."""
-        stats_domain.FeedbackItem.create_feedback_for_exploration(
-            exploration_id, feedback, additional_data={'history': history})
-
-    @classmethod
-    def resolve_feedback(cls, feedback_item_id, new_status):
-        """Resolves a feedback item."""
-        if new_status not in [STATUS_FIXED, STATUS_WILL_NOT_FIX]:
-            raise Exception('Unexpected status: %s' % new_status)
-        feedback_item = get_feedback_item_by_id(feedback_item_id)
-        feedback_item.change_status(new_status)
-        _save_feedback_item(feedback_item)
-
-    @classmethod
     def start_exploration(cls, exp_id, exp_version, state_name, session_id,
                           params, play_type):
         stats_models.StartExplorationEventLogEntryModel.create(

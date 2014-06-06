@@ -265,4 +265,4 @@ EVENT_TYPE_COMPLETE = 'complete'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
-PLAY_TYPE_GALLERY = 'gallery'
+PLAY_TYPE_NORMAL = 'normal'

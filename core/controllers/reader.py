@@ -141,7 +141,7 @@ class ExplorationHandler(base.BaseHandler):
             exploration_id, exploration.init_state_name, True)
         stats_services.EventHandler.start_exploration(
             exploration_id, version, exploration.init_state_name,
-            session_id, reader_params, feconf.PLAY_TYPE_GALLERY)
+            session_id, reader_params, feconf.PLAY_TYPE_NORMAL)
 
 
 class FeedbackHandler(base.BaseHandler):
@@ -233,7 +233,7 @@ class FeedbackHandler(base.BaseHandler):
             stats_services.EventHandler.maybe_leave_exploration(
                 exploration_id, version, feconf.END_DEST, 
                 session_id, client_time_spent_in_secs, old_params,
-                feconf.PLAY_TYPE_GALLERY)
+                feconf.PLAY_TYPE_NORMAL)
 
         state_history.append(new_state_name)
 
@@ -323,4 +323,4 @@ class ReaderLeaveHandler(base.BaseHandler):
             self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
-            feconf.PLAY_TYPE_GALLERY)
+            feconf.PLAY_TYPE_NORMAL)

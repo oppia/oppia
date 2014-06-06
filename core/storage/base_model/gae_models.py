@@ -23,7 +23,6 @@ import utils
 
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
-from google.appengine.ext.ndb import polymodel
 
 
 class BaseModel(ndb.Model):

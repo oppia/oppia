@@ -165,7 +165,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (preview, from gallery)
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_GALLERY])
+                                            feconf.PLAY_TYPE_NORMAL])
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -212,7 +212,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     # Which type of play-through this is (preview, from gallery)
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
-                                            feconf.PLAY_TYPE_GALLERY])
+                                            feconf.PLAY_TYPE_NORMAL])
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
