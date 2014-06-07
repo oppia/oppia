@@ -142,8 +142,8 @@ class ExplorationFileSystem(object):
         If `version` is not supplied, the latest version is retrieved. If the
         file does not exist, None is returned.
 
-        Argument 'mode' is here so signature will match other file systems,
-        but is ignored.
+        The 'mode' argument is unused. It is included so that this method
+        signature matches that of other files systems. 
         """
         metadata = self._get_file_metadata(filepath, version)
         if metadata:
@@ -194,7 +194,7 @@ class ExplorationFileSystem(object):
         # The trailing slash is necessary to prevent non-identical directory
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
-        prefix = '%s' % utils.construct_path(
+        prefix = '%s' % utils.vfs_construct_path(
             '/', self._exploration_id, 'assets', dir_name)
         if not prefix.endswith('/'):
             prefix += '/'
@@ -259,9 +259,10 @@ class AbstractFileSystem(object):
 
     def _check_filepath(self, filepath):
         """Raises an error if a filepath is invalid."""
-        base_dir = utils.construct_path('/', self.impl.exploration_id, 'assets')
-        absolute_path = utils.construct_path(base_dir, filepath)
-        normalized_path = utils.normpath(absolute_path)
+        base_dir = utils.vfs_construct_path(
+            '/', self.impl.exploration_id, 'assets')
+        absolute_path = utils.vfs_construct_path(base_dir, filepath)
+        normalized_path = utils.vfs_normpath(absolute_path)
 
         # This check prevents directory traversal.
         if not normalized_path.startswith(base_dir):

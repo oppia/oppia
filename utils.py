@@ -347,8 +347,8 @@ def get_epoch_time():
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 
-def construct_path(a, *p):
-    """Mimicks behavior of os.path.join on Posix machines."""
+def vfs_construct_path(a, *p):
+    """Mimics behavior of os.path.join on Posix machines."""
     path = a
     for b in p:
         if b.startswith('/'):
@@ -360,7 +360,7 @@ def construct_path(a, *p):
     return path
 
 
-def normpath(path):
+def vfs_normpath(path):
     """Normalize path from posixpath.py, eliminating double slashes, etc."""
     # Preserve unicode (if path is unicode)
     slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
