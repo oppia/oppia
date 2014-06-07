@@ -1,4 +1,4 @@
-<div ng-controller="StatsViewer" ng-cloak>
+<div ng-controller="ExplorationStatistics" ng-cloak>
 
   <div ng-if="stats.numVisits > 0">
     <h4>Exploration Completion Rate</h4>
@@ -48,36 +48,18 @@
         <strong>Times hit</strong>: <[stateStats.totalEntryCount]>
       </p>
 
-      <div ng-if="!isEmpty(stateStats.readerFeedback)">
-        <h5>
-          Feedback
-          <img class="oppia-help" src="/images/help.png" tooltip="This feedback comes directly from learners who clicked the feedback button when they were at this state." tooltip-placement="right">
-        </h5>
-        <ul>
-          <li ng-repeat="(feedbackId, feedbackItem) in stateStats.readerFeedback">
-            <[feedbackItem.content]>
-            <a href="#" onclick="return false;" ng-click="gotoStateEditor('feedback')">
-              Address this feedback
-            </a>
-          </li>
-        </ul>
-      </div>
-
       <div ng-if="stateStats.totalEntryCount">
         <h5>Answers</h5>
         <div ng-show="doesAnswerExist()">
           <ul>
             <li ng-repeat="(rule, ruleData) in rulesStats" ng-show="ruleData.answers.length > 0">
-              <[rule]>
+              <[getHumanReadableRuleName(rule)]>
               <ul>
                 <li ng-repeat="answerData in ruleData.answers track by $index">
-                  <span class="label pull-right">
+                  <span class="label label-info pull-right">
                     <[getNumTimesString(answerData[1])]>
                   </span>
                   <pre><[answerData[0]]></pre>
-                  <a href="#" onclick="return false;" ng-click="gotoStateEditor('rules')">
-                    Add a rule for this answer
-                  </a>
                 </li>
               </ul>
             </li>
@@ -86,9 +68,6 @@
 
         <div ng-if="!doesAnswerExist()">
           <em>No one has given any answers.</em>
-          <a href="#" onclick="return false;" ng-click="gotoStateEditor('content')">
-            Edit content
-          </a>
         </div>
       </div>
 

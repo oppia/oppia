@@ -24,6 +24,7 @@ function InteractiveWidgetEditor(
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
+  $scope.widgetHandlers = {};
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.
@@ -32,9 +33,8 @@ function InteractiveWidgetEditor(
 
   $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
     $http.post(
-        '/widgets/interactive/' + widgetId,
-        oppiaRequestCreator.createRequest({customization_args: customizationArgs}),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      '/widgets/interactive/' + widgetId,
+      oppiaRequestCreator.createRequest({customization_args: customizationArgs})
     ).success(function(data) {
       $scope.widgetHandlerSpecs = data.widget.handlers;
 
@@ -171,11 +171,10 @@ function InteractiveWidgetEditor(
   $scope.generateTmpWidgetPreview = function() {
     $scope.tmpWidget.tag = 'Loading...';
     $http.post(
-        '/widgets/interactive/' + $scope.tmpWidget.widget_id,
-        oppiaRequestCreator.createRequest({
-          customization_args: $scope.tmpWidget.customization_args
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      '/widgets/interactive/' + $scope.tmpWidget.widget_id,
+      oppiaRequestCreator.createRequest({
+        customization_args: $scope.tmpWidget.customization_args
+      })
     ).success(function(data) {
       $scope.tmpWidget.tag = data.widget.tag;
     });
@@ -190,7 +189,7 @@ function InteractiveWidgetEditor(
     $scope.tmpWidget = null;
     $scope.widgetIdMemento = null;
     $scope.widgetCustomizationArgsMemento = null;
-    $scope.widgetHandlersMemento = null;
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
   };
 
   $scope.createTmpRule = function() {

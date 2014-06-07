@@ -61,11 +61,11 @@ import sys
 import unittest
 
 root_dir = os.path.realpath(os.path.join(os.getcwd()))
-sys.path.append(root_dir)
+sys.path.insert(0, root_dir)
 
 import feconf
 
-EXPECTED_TEST_COUNT = 286
+EXPECTED_TEST_COUNT = 305
 
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
@@ -158,12 +158,12 @@ def main():
 
     sys.path.insert(0, GAE_DIR)
     sys.path.insert(0, CURR_DIR)
-    sys.path.append(WEBTEST_DIR)
-    sys.path.append(WEBOB_DIR)
-    sys.path.append(BLEACH_DIR)
-    sys.path.append(HTML5LIB_DIR)
-    sys.path.append(GAE_MAPREDUCE_DIR)
-    sys.path.append(GAE_CLOUD_STORAGE_DIR)
+    sys.path.insert(0, WEBTEST_DIR)
+    sys.path.insert(0, WEBOB_DIR)
+    sys.path.insert(0, BLEACH_DIR)
+    sys.path.insert(0, HTML5LIB_DIR)
+    sys.path.insert(0, GAE_MAPREDUCE_DIR)
+    sys.path.insert(0, GAE_CLOUD_STORAGE_DIR)
 
     import dev_appserver
     dev_appserver.fix_sys_path()

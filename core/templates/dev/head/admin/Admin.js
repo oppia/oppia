@@ -45,7 +45,7 @@ function Admin($scope, $http) {
       return;
     }
 
-    var request = $.param({
+    var requestParams = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
         action: 'revert_config_property',
@@ -53,11 +53,7 @@ function Admin($scope, $http) {
       })
     }, true);
 
-    $http.post(
-      $scope.adminHandlerUrl,
-      request,
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function(data) {
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
       $scope.message = 'Config property reverted successfully.';
       $scope.reloadConfigProperties();
     }).error(function(errorResponse) {
@@ -65,8 +61,29 @@ function Admin($scope, $http) {
     });
   };
 
+  $scope.migrationInProcess = false;
+  $scope.migrateFeedback = function() {
+    $scope.migrationInProcess = true;
+
+    var requestParams = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'migrate_feedback'
+      })
+    }, true);
+
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+      $scope.message = 'Feedback migrated successfully.';
+      $scope.migrationInProcess = false;
+      window.reload();
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+      $scope.migrationInProcess = false;
+    });
+  };
+
   $scope.refreshComputedProperty = function(computedPropertyId) {
-    var request = $.param({
+    var requestParams = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
         action: 'refresh_computed_property',
@@ -74,11 +91,7 @@ function Admin($scope, $http) {
       })
     }, true);
 
-    $http.post(
-      $scope.adminHandlerUrl,
-      request,
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function(data) {
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
       $scope.message = 'Computed property reloaded successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -101,7 +114,7 @@ function Admin($scope, $http) {
       newConfigPropertyValues[property] = $scope.configProperties[property].value;
     }
 
-    var request = $.param({
+    var requestParams = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
         action: 'save_config_properties',
@@ -109,11 +122,7 @@ function Admin($scope, $http) {
       })
     }, true);
 
-    $http.post(
-      $scope.adminHandlerUrl,
-      request,
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function(data) {
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
       $scope.message = 'Data saved successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -130,7 +139,7 @@ function Admin($scope, $http) {
     }
 
     $scope.message = 'Processing...';
-    var request = $.param({
+    var requestParams = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
         action: 'reload_exploration',
@@ -138,20 +147,16 @@ function Admin($scope, $http) {
       })
     }, true);
 
-    $http.post(
-      $scope.adminHandlerUrl,
-      request,
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function(data) {
-        $scope.message = 'Data reloaded successfully.';
-      }).error(function(errorResponse) {
-        $scope.message = 'Server error: ' + errorResponse.error;
-      });
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+      $scope.message = 'Data reloaded successfully.';
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
   };
 
   $scope.startNewJob = function(jobType) {
     $scope.message = 'Starting new job...';
-    var request = $.param({
+    var requestParams = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
         action: 'start_new_job',
@@ -159,21 +164,17 @@ function Admin($scope, $http) {
       })
     }, true);
 
-    $http.post(
-      $scope.adminHandlerUrl,
-      request,
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function(data) {
-        $scope.message = 'Data reloaded successfully.';
-        window.location.reload();
-      }).error(function(errorResponse) {
-        $scope.message = 'Server error: ' + errorResponse.error;
-      });
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+      $scope.message = 'Data reloaded successfully.';
+      window.location.reload();
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
   };
 
   $scope.cancelJob = function(jobId, jobType) {
     $scope.message = 'Cancelling job...';
-    var request = $.param({
+    var requestParams = $.param({
       csrf_token: GLOBALS.csrf_token,
       payload: JSON.stringify({
         action: 'cancel_job',
@@ -182,16 +183,12 @@ function Admin($scope, $http) {
       })
     }, true);
 
-    $http.post(
-      $scope.adminHandlerUrl,
-      request,
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function(data) {
-        $scope.message = 'Data reloaded successfully.';
-        window.location.reload();
-      }).error(function(errorResponse) {
-        $scope.message = 'Server error: ' + errorResponse.error;
-      });
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+      $scope.message = 'Data reloaded successfully.';
+      window.location.reload();
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
   };
 }
 

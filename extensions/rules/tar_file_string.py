@@ -58,7 +58,10 @@ class HasAppleDoubleFile(base.TarFileStringRule):
 
 
 class HasUnexpectedFile(base.TarFileStringRule):
-    description = 'contains a file not present in {{expected_files|List}}.'
+    description = (
+        'contains a top-level file whose name is not present in '
+        '{{expected_files|SetOfUnicodeString}}.'
+    )
     is_generic = True
 
     def _evaluate(self, subject):
@@ -70,7 +73,8 @@ class HasUnexpectedFile(base.TarFileStringRule):
 
 
 class MissingExpectedFile(base.TarFileStringRule):
-    description = 'omits one or more files in {{expected_files|List}}.'
+    description = (
+        'omits one or more files in {{expected_files|SetOfUnicodeString}}.')
     is_generic = True
 
     def _evaluate(self, subject):
@@ -85,7 +89,8 @@ class MissingExpectedFile(base.TarFileStringRule):
 
 
 class HasUnexpectedContent(base.TarFileStringRule):
-    description = 'contains file not present in {{file_list|List}}.'
+    description = (
+        'contains file not present in {{file_list|SetOfUnicodeString}}.')
     is_generic = True
 
     def _evaluate(self, subject):

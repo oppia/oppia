@@ -71,7 +71,7 @@ def require_user(handler):
 
 
 def require_moderator(handler):
-    """Decorator that checks whether a moderator is associated to the current session."""
+    """Decorator that checks if the current user is a moderator."""
     def test_is_moderator(self, **kwargs):
         """Check that the user is a moderator."""
         if not self.user_id:
@@ -195,7 +195,7 @@ class BaseHandler(webapp2.RequestHandler):
                     self.user_id, self.PAGE_NAME_FOR_CSRF, csrf_token)
 
                 if not is_csrf_token_valid:
-                    raise Exception(
+                    raise self.UnauthorizedUserException(
                         'Your session has expired, and unfortunately your '
                         'changes cannot be saved. Please refresh the page.')
             except Exception as e:
@@ -262,7 +262,7 @@ class BaseHandler(webapp2.RequestHandler):
 
         if self.user_id:
             redirect_url = self.request.uri
-            if '/contribute' in redirect_url or '/create' in redirect_url:
+            if '/contribute' in redirect_url:
                 redirect_url = ''
 
             values['logout_url'] = (

@@ -41,8 +41,6 @@ import utils
 
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
-# This takes an additional 'source_id' parameter.
-CMD_CLONE = 'clone'
 
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
@@ -192,6 +190,12 @@ def get_publicized_explorations_summary_dict():
         rights_manager.get_publicized_exploration_rights())
 
 
+def get_non_private_explorations_summary_dict():
+    """Returns a summary of non-private explorations."""
+    return _get_explorations_summary_dict(
+        rights_manager.get_non_private_exploration_rights())
+
+
 def get_community_owned_explorations_summary_dict():
     """Returns a summary of community-owned explorations."""
     return _get_explorations_summary_dict(
@@ -238,11 +242,19 @@ def get_owned_explorations_summary_dict(user_id):
         rights_manager.get_owned_exploration_rights(user_id))
 
 
-def get_editable_explorations_summary_dict(user_id):
-    """Returns a summary of all explorations editable by this user."""
-    result = get_community_owned_explorations_summary_dict()
-    result.update(get_explicit_editor_explorations_summary_dict(user_id))
-    result.update(get_owned_explorations_summary_dict(user_id))
+def get_private_at_least_viewable_summary_dict(user_id):
+    """Returns a summary of private explorations that are at least viewable by
+    this user.
+    """
+    return  _get_explorations_summary_dict(
+        rights_manager.get_private_at_least_viewable_exploration_rights(
+            user_id))
+
+
+def get_viewable_explorations_summary_dict(user_id):
+    """Returns a summary of all explorations viewable by this user."""
+    result = get_private_at_least_viewable_summary_dict(user_id)
+    result.update(get_non_private_explorations_summary_dict())
     return result
 
 
@@ -530,7 +542,7 @@ def _save_exploration(
 
 
 def _create_exploration(
-        committer_id, exploration, commit_message, commit_cmds, cloned_from):
+        committer_id, exploration, commit_message, commit_cmds):
     """Ensures that rights for a new exploration are saved first.
 
     This is because _save_exploration() depends on the rights object being
@@ -539,8 +551,7 @@ def _create_exploration(
     # This line is needed because otherwise a rights object will be created,
     # but the creation of an exploration object will fail.
     exploration.validate()
-    rights_manager.create_new_exploration_rights(
-        exploration.id, committer_id, cloned_from)
+    rights_manager.create_new_exploration_rights(exploration.id, committer_id)
     model = exp_models.ExplorationModel(
         id=exploration.id,
         category=exploration.category,
@@ -569,7 +580,7 @@ def save_new_exploration(committer_id, exploration):
         'cmd': CMD_CREATE_NEW,
         'title': exploration.title,
         'category': exploration.category,
-    }], None)
+    }])
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -718,40 +729,6 @@ def revert_exploration(
 
 
 # Creation and deletion methods.
-def clone_exploration(committer_id, old_exploration_id):
-    """Clones an exploration and returns the new exploration's id.
-
-    The caller is responsible for checking that the committer is allowed to
-    clone the given exploration.
-    """
-    old_exploration = get_exploration_by_id(old_exploration_id, strict=True)
-
-    new_exploration_id = get_new_exploration_id()
-    new_exploration = exp_domain.Exploration.from_yaml(
-        new_exploration_id, 'Copy of %s' % old_exploration.title,
-        old_exploration.category, old_exploration.to_yaml())
-
-    commit_message = 'Cloned from exploration with id %s.' % old_exploration_id
-
-    _create_exploration(committer_id, new_exploration, commit_message, [{
-        'cmd': CMD_CLONE,
-        'source_id': old_exploration_id
-    }], old_exploration_id)
-
-    # Duplicate the assets of the old exploration.
-    old_fs = fs_domain.AbstractFileSystem(
-        fs_domain.ExplorationFileSystem(old_exploration_id))
-    new_fs = fs_domain.AbstractFileSystem(
-        fs_domain.ExplorationFileSystem(new_exploration.id))
-
-    dir_list = old_fs.listdir('')
-    for filepath in dir_list:
-        file_content = old_fs.get(filepath)
-        new_fs.commit(feconf.ADMIN_COMMITTER_ID, filepath, file_content)
-
-    return new_exploration_id
-
-
 def get_demo_exploration_components(demo_path):
     """Gets the content of `demo_path` in the sample explorations folder.
 
@@ -791,7 +768,7 @@ def save_new_exploration_from_yaml_and_assets(
         'cmd': CMD_CREATE_NEW,
         'title': exploration.title,
         'category': exploration.category,
-    }], None)
+    }])
 
     for (asset_filename, asset_content) in assets_list:
         fs = fs_domain.AbstractFileSystem(

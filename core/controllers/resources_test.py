@@ -40,7 +40,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self._initialize()
 
-        self.login(self.EDITOR_EMAIL, is_super_admin=True)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -67,7 +67,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self._initialize()
 
-        self.login(self.EDITOR_EMAIL, is_super_admin=True)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -90,7 +90,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
 
         self._initialize()
 
-        self.login(self.EDITOR_EMAIL, is_super_admin=True)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -122,7 +122,7 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         # TODO(sll): Add more tests here.
         self._initialize()
 
-        self.login(self.EDITOR_EMAIL, is_super_admin=True)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 

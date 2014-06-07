@@ -1,15 +1,17 @@
 <div ng-if="!active && !alwaysEditable">
   <div>
     <span angular-html-bind="localValue.label"></span>
-    (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+    <span ng-if="isEditable">
+      (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+    </span>
   </div>
 </div>
 
 <div ng-if="active || alwaysEditable">
   <rich-text-editor html-content="localValue.label">
   </rich-text-editor>
-  <button type="button" class="btn btn-default" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
-    Close
+  <button type="button" class="btn btn-default btn-sm pull-right" ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
+    Done
   </button>
 </div>
 
@@ -31,7 +33,7 @@
   </div>
 
   <div class="modal-footer">
-    <input type="submit" class="btn btn-default" value="Cancel"  ng-click="cancel()"/>
+    <input type="submit" class="btn btn-default" value="Cancel" ng-click="cancel()"/>
     <input type="submit" class="btn btn-success" value="Done" ng-click="save(widgetCustomizationArgs)"/>
   </div>
 </script>

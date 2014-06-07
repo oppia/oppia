@@ -22,11 +22,14 @@
 var END_DEST = 'END';
 
 function ExplorationEditor(
-    $scope, $http, $location, $anchorScroll, $modal, $window, $filter, $rootScope,
+    $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
-    explorationRightsService, validatorsService) {
+    explorationRightsService, validatorsService, editabilityService,
+    oppiaDateFormatter) {
+
+  $scope.editabilityService = editabilityService;
 
   $scope.getActiveStateName = function() {
     return editorContextService.getActiveStateName();
@@ -48,8 +51,6 @@ function ExplorationEditor(
     $scope.saveActiveState();
     editorContextService.setActiveStateName(newStateName);
   };
-
-  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
 
   /**************************************************
   * Methods affecting the saving of explorations.
@@ -81,6 +82,10 @@ function ExplorationEditor(
     return $scope.isExplorationLockedForEditing() && !$scope.isSaveInProgress;
   };
 
+  $scope.getChangeListLength = function() {
+    return changeListService.getChangeList().length;
+  };
+
   $scope.isExplorationLockedForEditing = function() {
     return changeListService.getChangeList().length > 0;
   };
@@ -108,9 +113,8 @@ function ExplorationEditor(
       oppiaRequestCreator.createRequest({
         change_list: changeListService.getChangeList(),
         version: explorationData.data.version
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .success(function(data) {
+      })
+    ).success(function(data) {
       if (data.error) {
         warningsData.addWarning(data.error);
         return;
@@ -277,10 +281,13 @@ function ExplorationEditor(
   /********************************************
   * Methods affecting the URL location hash.
   ********************************************/
-  $scope.mainTabActive = false;
-  $scope.statsTabActive = false;
-  $scope.settingsTabActive = false;
-  $scope.historyTabActive = false;
+  var resetActiveTags = function() {
+    $scope.mainTabActive = false;
+    $scope.statsTabActive = false;
+    $scope.settingsTabActive = false;
+    $scope.historyTabActive = false;
+    $scope.feedbackTabActive = false;
+  };
 
   $scope.location = $location;
 
@@ -288,6 +295,7 @@ function ExplorationEditor(
   var STATS_VIEWER_URL = '/stats';
   var SETTINGS_URL = '/settings';
   var HISTORY_URL = '/history';
+  var FEEDBACK_URL = '/feedback';
 
   $scope.selectMainTab = function() {
     $scope.showStateEditor(editorContextService.getActiveStateName());
@@ -303,6 +311,10 @@ function ExplorationEditor(
 
   $scope.selectHistoryTab = function() {
     $location.path(HISTORY_URL);
+  };
+
+  $scope.selectFeedbackTab = function() {
+    $location.path(FEEDBACK_URL);
   };
 
   $scope.showStateEditor = function(stateName) {
@@ -335,27 +347,25 @@ function ExplorationEditor(
 
     if (path === STATS_VIEWER_URL) {
       $scope.saveActiveState();
+      resetActiveTags();
       $scope.statsTabActive = true;
-      $scope.mainTabActive = false;
-      $scope.settingsTabActive = false;
-      $scope.historyTabActive = false;
     } else if (path === SETTINGS_URL) {
       $scope.saveActiveState();
-      $scope.statsTabActive = false;
-      $scope.mainTabActive = false;
+      resetActiveTags();
       $scope.settingsTabActive = true;
-      $scope.historyTabActive = false;
     } else if (path === HISTORY_URL) {
       $scope.saveActiveState();
-      $scope.statsTabActive = false;
-      $scope.mainTabActive = false;
-      $scope.settingsTabActive = false;
+      resetActiveTags();
       $scope.historyTabActive = true;
 
       if ($scope.explorationSnapshots === null) {
         // TODO(sll): Do this on-hover rather than on-click.
         $scope.refreshVersionHistory();
       }
+    } else if (path === FEEDBACK_URL) {
+      $scope.saveActiveState();
+      resetActiveTags();
+      $scope.feedbackTabActive = true;
     } else {
       if (path.indexOf('/gui/') != -1) {
         $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
@@ -374,19 +384,9 @@ function ExplorationEditor(
           warningsData.addWarning('State ' + stateName + ' does not exist.');
           return;
         } else {
-          $scope.settingsTabActive = false;
-          $scope.historyTabActive = false;
-          $scope.statsTabActive = false;
+          resetActiveTags();
           $scope.mainTabActive = true;
-          $scope.$broadcast('guiTabSelected');
-          // Scroll to the relevant element (if applicable).
-          // TODO(sfederwisch): Change the trigger so that there is exactly one
-          // scroll action that occurs when the page finishes loading.
-          setTimeout(function () {
-            if ($location.hash()) {
-              $anchorScroll();
-            }
-          }, 1000);
+          $scope.$broadcast('refreshStateEditor');
         }
       };
 
@@ -496,6 +496,34 @@ function ExplorationEditor(
     });
   };
 
+  $scope.showEmbedExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/embedExploration',
+      backdrop: 'static',
+      resolve: {
+        explorationId: function() {
+          return $scope.explorationId;
+        },
+        explorationVersion: function() {
+          return $scope.currentVersion;
+        }
+      },
+      controller: ['$scope', '$modalInstance', 'explorationId', 'explorationVersion',
+        function($scope, $modalInstance, explorationId, explorationVersion) {
+          $scope.explorationId = explorationId;
+          $scope.serverName = window.location.protocol + '//' + window.location.host;
+          $scope.explorationVersion = explorationVersion;
+
+          $scope.close = function() {
+            $modalInstance.dismiss('close');
+            warningsData.clear();
+          };
+        }
+      ]
+    });
+  };
+
   $scope.showRevertExplorationModal = function(version) {
     warningsData.clear();
     $modal.open({
@@ -526,9 +554,8 @@ function ExplorationEditor(
         oppiaRequestCreator.createRequest({
           current_version: explorationData.data.version,
           revert_to_version: version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-      .success(function(response) {
+        })
+      ).success(function(response) {
         location.reload();
       }).error(function(data) {
         $log.error(data);
@@ -625,6 +652,10 @@ function ExplorationEditor(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
         data.rights.status, data.rights.cloned_from, data.rights.community_owned);
 
+      if (GLOBALS.can_edit) {
+        editabilityService.markEditable();
+      }
+
       $scope.refreshGraph();
 
       if ($scope.doFullRefresh) {
@@ -639,6 +670,14 @@ function ExplorationEditor(
       $rootScope.loadingMessage = '';
 
       $scope.refreshExplorationStatistics();
+
+      var stateName = editorContextService.getActiveStateName();
+      var stateData = $scope.states[stateName];
+      if (stateData && stateData && !$.isEmptyObject(stateData)) {
+        $scope.$broadcast('refreshStateEditor');
+      }
+
+      $scope.refreshFeedbackTabHeader();
 
       if (successCallback) {
         successCallback();
@@ -703,6 +742,25 @@ function ExplorationEditor(
     document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
   };
 
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          $scope.publish = $modalInstance.close;
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function() {
+      explorationRightsService.saveChangeToBackend({is_public: true});
+    });
+  };
+
   $scope.showNominateExplorationModal = function() {
     warningsData.clear();
     $modal.open({
@@ -752,9 +810,8 @@ function ExplorationEditor(
       $scope.newStateTemplateUrl,
       oppiaRequestCreator.createRequest({
         state_name: newStateName
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .success(function(data) {
+      })
+    ).success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
       changeListService.addState(newStateName);
@@ -904,15 +961,34 @@ function ExplorationEditor(
       });
     }
   };
+
+  $scope.feedbackTabHeader = 'Feedback';
+  $scope.feedbackLastUpdatedUrl = (
+    '/feedback_last_updated/' + $scope.explorationId);
+  $scope.refreshFeedbackTabHeader = function() {
+    $scope.feedbackTabHeader = 'Feedback (loading...)';
+    $http.get($scope.feedbackLastUpdatedUrl).then(function(response) {
+      var data = response.data;
+      if (data.last_updated) {
+        $scope.feedbackTabHeader = (
+          'Feedback (updated ' +
+          oppiaDateFormatter.getLocaleDateString(data.last_updated) +
+          ')');
+      } else {
+        $scope.feedbackTabHeader = 'Feedback';
+      }
+    });
+  };
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
 ExplorationEditor.$inject = [
-  '$scope', '$http', '$location', '$anchorScroll', '$modal', '$window',
+  '$scope', '$http', '$location', '$modal', '$window',
   '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
   'activeInputData', 'oppiaRequestCreator', 'editorContextService',
   'changeListService', 'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationRightsService', 'validatorsService'
+  'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
+  'editabilityService', 'oppiaDateFormatter'
 ];

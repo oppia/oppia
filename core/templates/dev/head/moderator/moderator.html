@@ -26,33 +26,61 @@
     </div>
 
     <div class="oppia-content">
-      <h3>Recent Commits (all non-private explorations)</h3>
-      <div when-scrolled-to-bottom="loadMoreCommits()" ng-show="allCommits.length">
-        <table class="oppia-padded-table">
-          <tr>
-            <th>Timestamp</th>
-            <th>Exploration</th>
-            <th>Category</th>
-            <th>Username</th>
-            <th>Commit message</th>
-            <th>Community-owned?</th>
-          </tr>
-          <tr ng-repeat="commit in allCommits track by $index">
-            <td><[getHumanReadableDate(commit.last_updated)]></td>
-            <td>
-              <a ng-href="<[getExplorationCreateUrl(commit.exploration_id)]>">
-                <[explorationData[commit.exploration_id].title]>
-              </a>
-            </td>
-            <td>
-              <[explorationData[commit.exploration_id].category]>
-            </td>
-            <td><[commit.username]></td>
-            <td><[commit.commit_message]></td>
-            <td><[commit.post_commit_community_owned]></td>
-          </tr>
-        </table>
-      </div>
+      <tabset>
+        <tab heading="Recent Commits" active>
+          <h3>Recent Commits (all non-private explorations)</h3>
+          <div when-scrolled-to-bottom="loadMoreCommits()" ng-show="allCommits.length">
+            <table class="oppia-padded-table">
+              <tr>
+                <th>Timestamp</th>
+                <th>Exploration</th>
+                <th>Category</th>
+                <th>Username</th>
+                <th>Commit message</th>
+                <th>Community-owned?</th>
+              </tr>
+              <tr ng-repeat="commit in allCommits track by $index">
+                <td><[getHumanReadableDate(commit.last_updated)]></td>
+                <td>
+                  <a ng-href="<[getExplorationCreateUrl(commit.exploration_id)]>">
+                    <[explorationData[commit.exploration_id].title]>
+                  </a>
+                </td>
+                <td>
+                  <[explorationData[commit.exploration_id].category]>
+                </td>
+                <td><[commit.username]></td>
+                <td><[commit.commit_message]></td>
+                <td><[commit.post_commit_community_owned]></td>
+              </tr>
+            </table>
+          </div>
+        </tab>
+
+        <tab heading="Recent Feedback Messages">
+          <h3>Recent Feedback Messages</h3>
+          (Note that some of these links may be to private explorations, and thus result in authorization errors.)
+          <br><br>
+          <div when-scrolled-to-bottom="loadMoreFeedbackMessages()" ng-show="allFeedbackMessages.length">
+            <table class="oppia-padded-table">
+              <tr>
+                <th>Timestamp</th>
+                <th>Exploration ID</th>
+                <th>Username</th>
+              </tr>
+              <tr ng-repeat="message in allFeedbackMessages track by $index">
+                <td><[getHumanReadableDate(message.created_on)]></td>
+                <td>
+                  <a ng-href="<[getExplorationCreateUrl(message.exploration_id)]>">
+                    <[message.exploration_id]>
+                  </a>
+                </td>
+                <td><[message.author_username]></td>
+              </tr>
+            </table>
+          </div>
+        </tab>
+      </tabset>
     </div>
   </div>
 {% endblock %}

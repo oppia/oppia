@@ -19,9 +19,13 @@
  */
 
 function ExplorationSettings(
-    $scope, $modal, activeInputData, explorationData, explorationTitleService,
-    explorationCategoryService, explorationObjectiveService,
-    explorationRightsService, changeListService, warningsData) {
+    $scope, $http, $window, $modal, activeInputData, explorationData,
+    explorationTitleService, explorationCategoryService,
+    explorationObjectiveService, explorationRightsService, changeListService,
+    warningsData) {
+
+  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
+
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
     $scope.explorationCategoryService = explorationCategoryService;
@@ -94,25 +98,6 @@ function ExplorationSettings(
   /********************************************
   * Methods relating to control buttons.
   ********************************************/
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
   $scope.showTransferExplorationOwnershipModal = function() {
     warningsData.clear();
     $modal.open({
@@ -174,7 +159,7 @@ function ExplorationSettings(
  * Injects dependencies in a way that is preserved by minification.
  */
 ExplorationSettings.$inject = [
-  '$scope', '$modal', 'activeInputData', 'explorationData', 'explorationTitleService',
-  'explorationCategoryService', 'explorationObjectiveService',
-  'explorationRightsService', 'changeListService', 'warningsData'
-];
+  '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
+  'explorationTitleService', 'explorationCategoryService',
+  'explorationObjectiveService', 'explorationRightsService',
+  'changeListService', 'warningsData'];

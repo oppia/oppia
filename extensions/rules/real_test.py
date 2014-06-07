@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for classification of Numbers."""
+"""Tests for classification of real numbers."""
 
 __author__ = 'Sean Lip'
 

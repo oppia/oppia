@@ -48,7 +48,8 @@
             <em><[configPropertyData.description]></em>
           </span>
           <span class="col-lg-6 col-md-6 col-sm-6">
-            <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value"></object-editor>
+            <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value" is-editable="true">
+            </object-editor>
           </span>
           <span class="col-lg-2 col-md-2 col-sm-2">
             <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
@@ -92,7 +93,7 @@
     <h3>Jobs</h3>
     <em>Note: This table may be stale; refresh to see the latest state.</em>
     <h4>Existing jobs</h4>
-    <table>
+    <table class="table">
       <tr>
         <th>Job ID</th>
         <th>Status</th>

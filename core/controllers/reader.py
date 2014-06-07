@@ -18,41 +18,42 @@ __author__ = 'Sean Lip'
 
 from core.controllers import base
 from core.domain import exp_services
+from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import widget_registry
-import base64
 import feconf
 import jinja_utils
-import os
 import utils
 
 import jinja2
 
 
-def require_viewer(handler):
-    """Decorator that checks if the user can view the given exploration."""
-    def test_can_view(self, exploration_id, **kwargs):
+def require_playable(handler):
+    """Decorator that checks if the user can play the given exploration."""
+    def test_can_play(self, exploration_id, **kwargs):
         """Checks if the user for the current session is logged in."""
-        if rights_manager.Actor(self.user_id).can_view(exploration_id):
+        if rights_manager.Actor(self.user_id).can_play(exploration_id):
             return handler(self, exploration_id, **kwargs)
         else:
             raise self.PageNotFoundException
 
-    return test_can_view
+    return test_can_play
 
 
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
 
-    @require_viewer
+    @require_playable
     def get(self, exploration_id):
         """Handles GET requests."""
         version = self.request.get('v')
         if not version:
             # The default value for a missing parameter seems to be ''.
             version = None
+        else:
+            version = int(version)
 
         try:
             exploration = exp_services.get_exploration_by_id(
@@ -76,7 +77,9 @@ class ExplorationPage(base.BaseHandler):
                 interactive_widget_ids))
 
         self.values.update({
-            'content': skins_services.get_skin_html(exploration.default_skin),
+            'skin_html': skins_services.get_skin_html(
+                exploration.default_skin),
+            'skin_js': skins_services.get_skin_js(exploration.default_skin),
             'exploration_version': version,
             'iframed': is_iframed,
             'is_private': rights_manager.is_exploration_private(
@@ -89,9 +92,9 @@ class ExplorationPage(base.BaseHandler):
 
         if is_iframed:
             self.render_template(
-                'reader/reader_exploration.html', iframe_restriction=None)
+                'player/exploration_player.html', iframe_restriction=None)
         else:
-            self.render_template('reader/reader_exploration.html')
+            self.render_template('player/exploration_player.html')
 
 
 class ExplorationHandler(base.BaseHandler):
@@ -102,8 +105,7 @@ class ExplorationHandler(base.BaseHandler):
         # TODO(sll): Maybe this should send a complete state machine to the
         # frontend, and all interaction would happen client-side?
         version = self.request.get('v')
-        if not version:
-            version = None
+        version = int(version) if version else None
 
         try:
             exploration = exp_services.get_exploration_by_id(
@@ -121,20 +123,25 @@ class ExplorationHandler(base.BaseHandler):
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_interactive_widget_tag(
             init_state.widget.customization_args, reader_params)
+        session_id = utils.generate_random_string(24)
 
         self.values.update({
+            'is_logged_in': bool(self.user_id),
             'init_html': init_state.content[0].to_html(reader_params),
             'interactive_html': interactive_html,
             'params': reader_params,
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
             'title': exploration.title,
-            'session_id': utils.generate_random_string(24),
+            'session_id': session_id,
         })
         self.render_json(self.values)
 
         stats_services.EventHandler.record_state_hit(
             exploration_id, exploration.init_state_name, True)
+        stats_services.EventHandler.start_exploration(
+            exploration_id, version, exploration.init_state_name,
+            session_id, reader_params, feconf.PLAY_TYPE_NORMAL)
 
 
 class FeedbackHandler(base.BaseHandler):
@@ -181,8 +188,7 @@ class FeedbackHandler(base.BaseHandler):
 
         return (new_params, question_html, interactive_html)
 
-
-    @require_viewer
+    @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles feedback interactions with readers."""
         old_state_name = self.unescape_state_name(escaped_state_name)
@@ -200,7 +206,8 @@ class FeedbackHandler(base.BaseHandler):
         # Current session id.
         session_id = self.payload.get('session_id')
         # Time spent in state.
-        client_time_spent_in_secs = self.payload.get('client_time_spent_in_secs')
+        client_time_spent_in_secs = self.payload.get(
+            'client_time_spent_in_secs')
 
         values = {}
         exploration = exp_services.get_exploration_by_id(
@@ -222,6 +229,12 @@ class FeedbackHandler(base.BaseHandler):
         stats_services.EventHandler.record_state_hit(
             exploration_id, new_state_name,
             (new_state_name not in state_history))
+        if new_state_name == feconf.END_DEST:
+            stats_services.EventHandler.maybe_leave_exploration(
+                exploration_id, version, feconf.END_DEST, 
+                session_id, client_time_spent_in_secs, old_params,
+                feconf.PLAY_TYPE_NORMAL)
+
         state_history.append(new_state_name)
 
         # If the new state widget is the same as the old state widget, and the
@@ -278,15 +291,36 @@ class ReaderFeedbackHandler(base.BaseHandler):
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
-    @require_viewer
+    @require_playable
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        state_name = self.payload.get('state_name')
+        subject = self.payload.get('subject', 'Feedback from a learner')
+        feedback = self.payload.get('feedback')
+        include_author = self.payload.get('include_author')
+
+        feedback_services.create_thread(
+            exploration_id,
+            state_name,
+            self.user_id if include_author else None,
+            subject,
+            feedback)
+        self.render_json(self.values)
+
+
+class ReaderLeaveHandler(base.BaseHandler):
+    """Tracks a reader leaving an exploration before completion."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles POST requests."""
-        state_name = self.unescape_state_name(escaped_state_name)
-
-        feedback = self.payload.get('feedback')
-        state_history = self.payload.get('state_history')
-        version = self.payload.get('version')
-        # TODO(sll): Add the reader's history log here.
-        stats_services.EventHandler.record_state_feedback_from_reader(
-            exploration_id, state_name, feedback,
-            {'state_history': state_history}, self.user_id)
+        stats_services.EventHandler.maybe_leave_exploration(
+            exploration_id,
+            self.payload.get('version'),
+            self.unescape_state_name(escaped_state_name),
+            self.payload.get('session_id'),
+            self.payload.get('client_time_spent_in_secs'),
+            self.payload.get('params'),
+            feconf.PLAY_TYPE_NORMAL)

@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import os
 import re
 import unittest
@@ -19,14 +20,6 @@ import webtest
 
 from core.domain import config_domain
 from core.platform import models
-(base_models, config_models, exp_models, file_models, job_models, stats_models,
- user_models) = (
-    models.Registry.import_models([
-        models.NAMES.base_model, models.NAMES.config, models.NAMES.exploration,
-        models.NAMES.file, models.NAMES.job, models.NAMES.statistics,
-        models.NAMES.user
-    ])
-)
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import main
@@ -67,47 +60,24 @@ class TestBase(unittest.TestCase):
 
     DEFAULT_USERNAME = 'defaultusername'
 
-    def _delete_all_models(self):
-        versioned_model_classes = frozenset([
-            config_models.ConfigPropertyModel,
-            exp_models.ExplorationModel,
-            exp_models.ExplorationRightsModel,
-            file_models.FileMetadataModel,
-            file_models.FileModel,
-            job_models.JobModel,
-        ])
-
-        unversioned_model_classes = frozenset([
-            config_models.COnfigPropertySnapshotMetadataModel,
-            config_models.COnfigPropertySnapshotContentModel,
-            exp_models.ExplorationSnapshotMetadataModel,
-            exp_models.ExplorationSnapshotContentModel,
-            exp_models.ExplorationRightsSnapshotMetadataModel,
-            exp_models.ExplorationRightsSnapshotContentModel,
-            file_models.FileMetadataSnapshotMetadataModel,
-            file_models.FileMetadataSnapshotContentModel,
-            file_models.FileSnapshotMetadataModel,
-            file_models.FileSnapshotContentModel,
-            stats_models.StateCounterModel,
-            stats_models.StateRuleAnswerLogModel,
-            stats_models.FeedbackItemModel,
-            user_models.UserSettingsModel,
-        ])
-
-        for clazz in versioned_model_classes:
-            for entity in clazz.get_all(include_deleted_entities=True):
-                entity.delete(
-                    feconf.ADMIN_COMMITTER_ID, '', force_deletion=True)
-
-        for clazz in unversioned_model_classes:
-            for entity in clazz.get_all(include_deleted_entities=True):
-                entity.delete()
-
     def setUp(self):
-        self.testapp = webtest.TestApp(main.app)
+        raise NotImplementedError
 
-    def tearDown(self):  # pylint: disable-msg=g-bad-name
-        self._delete_all_models()
+    def tearDown(self):
+        raise NotImplementedError
+
+    def _delete_all_models(self):
+        raise NotImplementedError
+
+    def login(self, email, is_super_admin=False):
+        os.environ['USER_EMAIL'] = email
+        os.environ['USER_ID'] = self.get_user_id_from_email(email)
+        os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
+
+    def logout(self):
+        os.environ['USER_EMAIL'] = ''
+        os.environ['USER_ID'] = ''
+        os.environ['USER_IS_ADMIN'] = '0'
 
     def shortDescription(self):
         """Additional information logged during unit test invocation."""
@@ -225,23 +195,35 @@ class TestBase(unittest.TestCase):
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
 
+    @contextlib.contextmanager
+    def swap(self, obj, attr, newvalue):
+        """Swap an object's attribute value within the context of a
+        'with' statement. The object can be anything that supports
+        getattr and setattr, such as class instances, modules, ...
+
+        Example usage:
+
+        import math
+        with self.swap(math, "sqrt", lambda x: 42):
+            print math.sqrt(16.0) # prints 42
+        print math.sqrt(16.0) # prints 4 as expected.
+        """
+        original = getattr(obj, attr)
+        setattr(obj, attr, newvalue)
+        try:
+            yield
+        finally:
+            setattr(obj, attr, original)
+
 
 class AppEngineTestBase(TestBase):
     """Base class for tests requiring App Engine services."""
 
-    def login(self, email, is_super_admin=False):
-        os.environ['USER_EMAIL'] = email
-        os.environ['USER_ID'] = self.get_user_id_from_email(email)
-        os.environ['USER_IS_ADMIN'] = '1' if is_super_admin else '0'
+    def _delete_all_models(self):
+        from google.appengine.ext import ndb
+        ndb.delete_multi(ndb.Query().iter(keys_only=True))
 
-    def logout(self):
-        # TODO(sll): Move this to the tearDown() method of the generic test
-        # base?
-        os.environ['USER_EMAIL'] = ''
-        os.environ['USER_ID'] = ''
-        del os.environ['USER_IS_ADMIN']
-
-    def setUp(self):  # pylint: disable-msg=g-bad-name
+    def setUp(self):
         empty_environ()
 
         from google.appengine.datastore import datastore_stub_util
@@ -251,8 +233,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.activate()
 
         # Configure datastore policy to emulate instantaneously and globally
-        # consistent HRD; we also patch dev_appserver in main.py to run under
-        # the same policy.
+        # consistent HRD.
         policy = datastore_stub_util.PseudoRandomHRConsistencyPolicy(
             probability=1)
 
@@ -270,8 +251,9 @@ class AppEngineTestBase(TestBase):
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
-    def tearDown(self):  # pylint: disable-msg=g-bad-name
-        os.environ['USER_IS_ADMIN'] = '0'
+    def tearDown(self):
+        self.logout()
+        self._delete_all_models()
         self.testbed.deactivate()
 
     def count_jobs_in_taskqueue(self):

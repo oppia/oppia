@@ -22,12 +22,31 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
+from core.domain import stats_jobs
+from core.domain import stats_services
 from core.domain import rights_manager
 import feconf
 import test_utils
 
 
-class EditorTest(test_utils.GenericTestBase):
+class BaseEditorControllerTest(test_utils.GenericTestBase):
+
+    CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
+    CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
+
+    def assert_can_edit(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        editable."""
+
+        self.assertIn(self.CAN_EDIT_STR, response_body)
+
+    def assert_cannot_edit(self, response_body):
+        """Returns True if the response body indicates that the exploration is
+        not editable."""
+        self.assertIn(self.CANNOT_EDIT_STR, response_body)
+
+
+class EditorTest(BaseEditorControllerTest):
 
     TAGS = [test_utils.TestTags.SLOW_TEST]
 
@@ -36,17 +55,19 @@ class EditorTest(test_utils.GenericTestBase):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        # Check that non-editors cannot access the editor page.
+        # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
-        self.assertEqual(response.status_int, 302)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
 
         # Register and login as an editor.
         self.register_editor('editor@example.com')
         self.login('editor@example.com')
 
-        # Check that it is now possible to access the editor page.
+        # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
         self.assertIn('History', response.body)
         # Test that the value generator JS is included.
@@ -268,7 +289,7 @@ class EditorTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class StatsIntegrationTest(test_utils.GenericTestBase):
+class StatsIntegrationTest(BaseEditorControllerTest):
     """Test statistics recording using the default exploration."""
 
     def test_state_stats_for_default_exploration(self):
@@ -312,6 +333,14 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         # Now switch back to the editor perspective.
         self.login('editor@example.com')
 
+        # Trigger a stats update
+        job_id = (
+            stats_jobs.StatisticsPageJobManager.create_new())
+        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        self.process_and_flush_pending_tasks()
+
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
         self.assertEqual(editor_exploration_dict['num_visits'], 1)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
@@ -321,7 +350,7 @@ class StatsIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
+class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration download."""
 
     def test_exploration_download_handler_for_default_exploration(self):
@@ -377,7 +406,7 @@ class ExplorationDownloadIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
+class ExplorationDeletionRightsTest(BaseEditorControllerTest):
 
     def setUp(self):
         """Creates dummy users."""
@@ -467,19 +496,26 @@ class ExplorationDeletionRightsTest(test_utils.GenericTestBase):
         self.logout()
 
 
-class VersioningIntegrationTest(test_utils.GenericTestBase):
-    """Test retrieval of old exploration versions."""
+class VersioningIntegrationTest(BaseEditorControllerTest):
+    """Test retrieval of and reverting to old exploration versions."""
 
-    def test_versioning_for_default_exploration(self):
-        EXP_ID = '0'
+    def setUp(self):
+        """Create exploration with two versions"""
+        super(VersioningIntegrationTest, self).setUp()
 
-        exp_services.delete_demo(EXP_ID)
-        exp_services.load_demo(EXP_ID)
+        self.EXP_ID = '0'
+
+        exp_services.delete_demo(self.EXP_ID)
+        exp_services.load_demo(self.EXP_ID)
+
+        EDITOR_EMAIL = 'editor@example.com'
+        self.register_editor(EDITOR_EMAIL)
+        self.login(EDITOR_EMAIL)
 
         # In version 2, change the objective and the initial state content.
-        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(
-            'editor@example.com', EXP_ID, [{
+           EDITOR_EMAIL, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective',
@@ -490,32 +526,76 @@ class VersioningIntegrationTest(test_utils.GenericTestBase):
                 'new_value': [{'type': 'text', 'value': 'ABC'}],
             }], 'Change objective and init state content')
 
+    def test_reverting_to_old_exploration(self):
+        """Test reverting to old exploration versions."""
+        # Open editor page
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.EXP_ID))
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # May not revert to any version that's not 1
+        for rev_version in (-1, 0, 2, 3, 4, '1', ()):
+            response_dict = self.post_json(
+                '/createhandler/revert/%s' % self.EXP_ID, {
+                    'current_version': 2,
+                    'revert_to_version': rev_version
+                }, csrf_token, expect_errors=True, expected_status_int=400)
+
+            # Check error message
+            if not isinstance(rev_version, int):
+                self.assertIn('Expected an integer', response_dict['error'])
+            else:
+                self.assertIn('Cannot revert to version',
+                              response_dict['error'])
+
+            # Check that exploration is really not reverted to old version
+            reader_dict = self.get_json(
+                '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
+            self.assertIn('ABC', reader_dict['init_html'])
+            self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+
+        # Revert to version 1
+        rev_version = 1
+        response_dict = self.post_json(
+            '/createhandler/revert/%s' % self.EXP_ID, {
+                'current_version': 2,
+                'revert_to_version': rev_version
+            }, csrf_token)
+
+        # Check that exploration is really reverted to version 1
+        reader_dict = self.get_json(
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
+        self.assertNotIn('ABC', reader_dict['init_html'])
+        self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+
+    def test_versioning_for_default_exploration(self):
+        """Test retrieval of old exploration versions."""
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
-            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
         self.assertIn('ABC', reader_dict['init_html'])
         self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
 
         # v1 contains 'Hi, welcome to Oppia!'.
         reader_dict = self.get_json(
-            '%s/%s?v=1' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s?v=1' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
         self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
         self.assertNotIn('ABC', reader_dict['init_html'])
 
         # v2 contains 'ABC'.
         reader_dict = self.get_json(
-            '%s/%s?v=2' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
+            '%s/%s?v=2' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
         self.assertIn('ABC', reader_dict['init_html'])
         self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
 
         # v3 does not exist.
         response = self.testapp.get(
-            '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID),
+            '%s/%s?v=3' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 404)
 
 
-class ExplorationEditRightsTest(test_utils.GenericTestBase):
+class ExplorationEditRightsTest(BaseEditorControllerTest):
     """Test the handling of edit rights for explorations."""
 
     def test_user_banning(self):
@@ -535,6 +615,7 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
 
         # Ban joe.
         config_services.set_property(
@@ -544,7 +625,8 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         response = self.testapp.get('/contribute', expect_errors=True)
         self.assertEqual(response.status_int, 401)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
 
         # Joe logs out.
         self.logout()
@@ -553,10 +635,11 @@ class ExplorationEditRightsTest(test_utils.GenericTestBase):
         self.login('sandra@example.com')
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
         self.logout()
 
 
-class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
+class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     """Test the handler for managing exploration editing rights."""
 
     def test_exploration_rights_handler(self):
@@ -617,16 +700,18 @@ class ExplorationRightsIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-        # Check that viewer cannot access editor page
+        # Check that viewer can access editor page but cannot edit.
         self.login(self.viewer_email)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
         self.logout()
 
-        # Check that collaborator can access editor page
+        # Check that collaborator can access editor page and can edit.
         self.login(self.collaborator_email)
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
         csrf_token = self.get_csrf_token_from_response(response)
 
         # Check that collaborator can add a new state called 'State 4'

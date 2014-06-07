@@ -23,34 +23,6 @@ describe('Gallery controller', function() {
   describe('ContributeGallery', function() {
     var scope, ctrl, $httpBackend;
 
-    var geographyExploration = {
-      can_clone: false,
-      can_edit: false,
-      data: {
-        category: 'Geography',
-        editors: [],
-        id: '5',
-        is_private: false,
-        is_public: true,
-        is_publicized: false,
-        title: 'Landmarks'
-      }
-    };
-
-    var myExploration = {
-      can_clone: true,
-      can_edit: true,
-      data: {
-        category: 'Personal',
-        editors: [],
-        id: '6',
-        is_private: false,
-        is_public: true,
-        is_publicized: false,
-        title: 'My Exploration'
-      }
-    };
-
     beforeEach(function() {
       module('ui.bootstrap');
     });
@@ -60,8 +32,35 @@ describe('Gallery controller', function() {
       $httpBackend.expectGET('/contributehandler/data').respond({
         allow_yaml_file_upload: false,
         categories: {
-          Geography: [geographyExploration],
-          Personal: [myExploration]
+          Geography: [{
+            can_edit: false,
+            id: '5',
+            is_cloned: false,
+            is_community_owned: false,
+            is_private: false,
+            is_public: true,
+            is_publicized: false,
+            title: 'Landmarks'
+          }, {
+            can_edit: false,
+            id: '3',
+            is_cloned: false,
+            is_community_owned: false,
+            is_private: false,
+            is_public: true,
+            is_publicized: false,
+            title: 'Geography 2'
+          }],
+          Personal: [{
+            can_edit: true,
+            id: '6',
+            is_cloned: false,
+            is_community_owned: false,
+            is_private: false,
+            is_public: true,
+            is_publicized: false,
+            title: 'My Exploration'
+          }]
         }
       });
       scope = $rootScope.$new();
@@ -75,7 +74,6 @@ describe('Gallery controller', function() {
 
     it('should show correct categories', function() {
       $httpBackend.flush();
-      expect(scope.categories.Geography[0].data.title).toBe('Landmarks');
       expect(scope.categoryList).toEqual(['Geography', 'Personal']);
     });
   });

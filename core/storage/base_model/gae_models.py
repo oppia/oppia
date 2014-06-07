@@ -16,11 +16,12 @@
 
 __author__ = 'Sean Lip'
 
+from core.platform import models
+transaction_services = models.Registry.import_transaction_services()
 import feconf
 import utils
 
-from core.platform import models
-transaction_services = models.Registry.import_transaction_services()
+from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 
@@ -139,6 +140,21 @@ class BaseModel(ndb.Model):
                 return new_id
 
         raise Exception('New id generator is producing too many collisions.')
+
+    @classmethod
+    def _fetch_page_sorted_by_last_updated(
+            cls, query, page_size, urlsafe_start_cursor):
+        if urlsafe_start_cursor:
+            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
+        else:
+            start_cursor = None
+
+        result = query.order(-cls.last_updated).fetch_page(
+            page_size, start_cursor=start_cursor)
+        return (
+            result[0],
+            (result[1].urlsafe() if result[1] else None),
+            result[2])
 
 
 class VersionedModel(BaseModel):
@@ -414,3 +430,5 @@ class BaseSnapshotContentModel(BaseModel):
 
     # The snapshot content, as a JSON blob.
     content = ndb.JsonProperty(indexed=False)
+
+

@@ -18,11 +18,12 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData,
-  warningsData, activeInputData, oppiaRequestCreator, editorContextService,
-  changeListService, validatorsService) {
+function StateEditor(
+    $scope, $filter, explorationData, warningsData,
+    editorContextService, changeListService, validatorsService,
+    focusService) {
 
-  $scope.$on('guiTabSelected', function(evt) {
+  $scope.$on('refreshStateEditor', function(evt) {
     $scope.initStateEditor();
   });
 
@@ -50,6 +51,7 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
     $scope.stateNameEditorIsShown = true;
     $scope.tmpStateName = $scope.stateName;
     $scope.stateNameMemento = $scope.stateName;
+    focusService.setFocus('stateNameEditorOpened');
   };
 
   $scope._getNormalizedStateName = function(newStateName) {
@@ -145,6 +147,7 @@ function StateEditor($scope, $http, $filter, $log, $sce, $modal, explorationData
   };
 }
 
-StateEditor.$inject = ['$scope', '$http', '$filter', '$log', '$sce', '$modal',
-    'explorationData', 'warningsData', 'activeInputData', 'oppiaRequestCreator',
-    'editorContextService', 'changeListService', 'validatorsService'];
+StateEditor.$inject = [
+  '$scope', '$filter', 'explorationData', 'warningsData',
+  'editorContextService', 'changeListService', 'validatorsService',
+  'focusService'];

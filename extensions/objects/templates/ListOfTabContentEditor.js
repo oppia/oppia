@@ -34,6 +34,8 @@ oppia.directive('listOfTabContentEditor', function($compile, warningsData) {
         if (newValue) {
           $scope.initArgs = newValue;
           $scope.initArgs.objType = 'TabContent';
+          $scope.isEditable = (
+            newValue.isEditable !== undefined ? newValue.isEditable : true);
         }
       }, true);
 

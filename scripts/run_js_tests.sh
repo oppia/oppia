@@ -42,18 +42,52 @@ source $(dirname $0)/setup_gae.sh || exit 1
 # TODO(sll): Make this work with fewer third-party dependencies.
 bash scripts/install_third_party.sh
 
-echo Checking whether Karma is installed in $TOOLS_DIR
-if [ ! -h "$NODE_MODULE_DIR/.bin/karma" ]; then
-  echo Installing Karma
-  $NPM_INSTALL karma@0.8.7
+echo Checking whether karma is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
+  echo Installing karma
+  $NPM_INSTALL karma@0.12.16
 fi
 
-echo Checking whether PhantomJS is installed in $TOOLS_DIR
-if [ ! -h "$NODE_MODULE_DIR/.bin/phantomjs" ]; then
-  echo Installing PhantomJS
+echo Checking whether karma-jasmine is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/karma-jasmine" ]; then
+  echo Installing karma-jasmine
+  # Install karma as well, in case people have an older version.
+  $NPM_INSTALL karma@0.12.16
+  $NPM_INSTALL karma-jasmine@0.1.0
+fi
+
+echo Checking whether karma-coverage is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/karma-coverage" ]; then
+  echo Installing karma-coverage
+  $NPM_INSTALL karma-coverage@0.2.4
+fi
+
+echo Checking whether phantomjs is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/phantomjs" ]; then
+  echo Installing phantomjs
   $NPM_INSTALL phantomjs@1.9
 fi
 
-$NODE_MODULE_DIR/.bin/karma start core/tests/karma.conf.js
+echo Checking whether karma-phantomjs-launcher is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/karma-phantomjs-launcher" ]; then
+  echo Installing karma-phantomjs-launcher
+  $NPM_INSTALL karma-phantomjs-launcher@0.1.4
+fi
+
+echo Checking whether karma-ng-html2js-preprocessor is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/karma-ng-html2js-preprocessor" ]; then
+  echo Installing karma-ng-html2js-preprocessor
+  $NPM_INSTALL karma-ng-html2js-preprocessor@0.1.0
+fi
+
+echo ""
+echo "  View interactive frontend test coverage reports by navigating to"
+echo ""
+echo "    ../karma_coverage_reports"
+echo ""
+echo "  on your filesystem."
+echo ""
+
+$NODE_MODULE_DIR/karma/bin/karma start core/tests/karma.conf.js
 
 echo Done!

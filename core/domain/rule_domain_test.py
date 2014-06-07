@@ -29,8 +29,8 @@ import test_utils
 
 
 class FakeRule(rule_domain.Rule):
-    subject_type = objects.Number
-    description = 'is between {{x|Number}} and {{y|UnicodeString}}'
+    subject_type = objects.Real
+    description = 'is between {{x|Real}} and {{y|UnicodeString}}'
 
     def _evaluate(self, subject):
         return subject == self.x
@@ -58,9 +58,9 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
             FakeRule()
         with self.assertRaises(ValueError):
             FakeRule(1, 'too_many_args', 3)
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             FakeRule('not_a_number', 'a')
-        with self.assertRaises(TypeError):
+        with self.assertRaises(ValueError):
             FakeRule('wrong_order', 1)
 
         fake_rule = FakeRule(2, 'a')
@@ -68,7 +68,7 @@ class RuleDomainUnitTests(test_utils.GenericTestBase):
         self.assertTrue(fake_rule.y, 'a')
         self.assertEqual(
             fake_rule._PARAMS,
-            [('x', objects.Number), ('y', objects.UnicodeString)]
+            [('x', objects.Real), ('y', objects.UnicodeString)]
         )
 
     def test_rule_is_generic(self):

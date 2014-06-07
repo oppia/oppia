@@ -21,11 +21,17 @@
 var oppia = angular.module(
   'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map']);
 
-// Sets the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
+// Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
-oppia.config(['$interpolateProvider', function($interpolateProvider) {
+// Set default headers for POST requests.
+oppia.config(['$interpolateProvider', '$httpProvider', function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
+
+  $httpProvider.defaults.headers.post = {
+    'Content-Type': 'application/x-www-form-urlencoded'};
+  $httpProvider.defaults.headers.put = {
+    'Content-Type': 'application/x-www-form-urlencoded'};
 }]);
 
 oppia.config(['$provide', function($provide) {
@@ -115,6 +121,10 @@ oppia.factory('oppiaDateFormatter', [function() {
     getLocaleString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       return date.toLocaleString();
+    },
+    getLocaleDateString: function(millisSinceEpoch) {
+      var date = new Date(millisSinceEpoch);
+      return date.toLocaleDateString();
     }
   };
 }]);
@@ -165,4 +175,16 @@ oppia.factory('validatorsService', [
       return true;
     }
   }
+}]);
+
+// Service for setting focus. This broadcasts a 'focusOn' event which sets
+// focus to the element in the page with the corresponding focusOn attribute.
+oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+  return {
+    setFocus: function(name) {
+      $timeout(function() {
+        $rootScope.$broadcast('focusOn', name);
+      });
+    }
+  };
 }]);

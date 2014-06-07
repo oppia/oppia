@@ -24,7 +24,7 @@ var OBJECT_EDITOR_TEMPLATES_URL = '/object_editor_template/';
 
 oppia.directive('objectEditor', ['$compile', '$log', function($compile, $log) {
   return {
-    scope: {objType: '@', value: '=', initArgs: '=', alwaysEditable: '@'},
+    scope: {objType: '@', value: '=', initArgs: '=', alwaysEditable: '@', isEditable: '@'},
     link: function(scope, element, attrs) {
       // Converts a camel-cased string to a lower-case hyphen-separated string.
       var directiveName = scope.objType.replace(

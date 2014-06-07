@@ -18,7 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+import inspect
+
 from extensions.objects.models import objects
+import schema_utils
 import test_utils
 
 
@@ -42,14 +45,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             )
 
         for item in invalid_items:
-            try:
-                normalized_item = cls.normalize(item)
-                error_msg = ('Expected %s to be invalid, but it was '
-                             'successfully normalized to %s as a %s'
-                             % (item, normalized_item, cls.__name__))
-                raise Exception(error_msg)
-            except TypeError:
-                pass
+            with self.assertRaises(Exception):
+                cls.normalize(item)
 
     def test_null_validation(self):
         """Tests objects of type Null."""
@@ -65,14 +62,6 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
         self.check_normalization(objects.Boolean, mappings, invalid_values)
 
-    def test_number_validation(self):
-        """Tests objects of type Number."""
-        mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
-                    ('-1', -1), (3.00, 3), (3.05, 3.05), ('3.05', 3.05), ]
-        invalid_values = ['a', '', {'a': 3}, [3], None]
-
-        self.check_normalization(objects.Number, mappings, invalid_values)
-
     def test_real_validation(self):
         """Tests objects of type Real."""
         mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
@@ -83,8 +72,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_int_validation(self):
         """Tests objects of type Int."""
-        mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0), (-1, -1),
-                    ('-1', -1), (3.00, 3), (3.05, 3), ]
+        mappings = [(20, 20), ('20', 20), ('02', 2), ('0', 0),
+                    ('-1', -1), (-1, -1), (3.00, 3), (3.05, 3), ]
         invalid_values = ['a', '', {'a': 3}, [3], None]
 
         self.check_normalization(objects.Int, mappings, invalid_values)
@@ -117,17 +106,14 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
 
     def test_coord_two_dim_validation(self):
         """Tests objects of type CoordTwoDim."""
-        mappings = [('-1, 2.2', [-1, 2.2]), ([0, 1], [0, 1]),
-                    (' -1 , 3.5', [-1, 3.5]), ]
-        invalid_values = ['123', 'a', [0, 1, 2], None]
-
+        mappings = [([3.5, 1.3], [3.5, 1.3]), ([0, 1], [0, 1])]
+        invalid_values = ['123', 'a', [0, 1, 2], None, '-1, 2.2', ' -1 , 3.5']
         self.check_normalization(objects.CoordTwoDim, mappings, invalid_values)
 
     def test_list_validation(self):
         """Tests objects of type List."""
         mappings = [([3, 'a'], [3, 'a']), ([], []), ([1, 2, 1], [1, 2, 1]), ]
         invalid_values = ['123', {'a': 1}, 3.0, None]
-
         self.check_normalization(objects.List, mappings, invalid_values)
 
     def test_music_phrase(self):
@@ -212,3 +198,16 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = [u'http://¡Hola!.com']
 
         self.check_normalization(objects.SanitizedUrl, mappings, invalid_vals)
+
+
+class SchemaValidityTests(test_utils.GenericTestBase):
+
+    def test_schemas_used_to_define_objects_are_valid(self):
+        count = 0
+        for unused_name, member in inspect.getmembers(objects):
+            if inspect.isclass(member):
+                if hasattr(member, '_schema'):
+                    schema_utils.validate_schema(member._schema)
+                    count += 1
+
+        self.assertEquals(count, 8)

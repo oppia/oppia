@@ -58,6 +58,12 @@ input.ng-dirty.ng-invalid {
   border: 1px solid red;
 }
 
+/* Change the color of odd-numbered lines in a table. */
+.table-striped > tbody > tr:nth-child(odd) > td,
+.table-striped > tbody > tr:nth-child(odd) > th {
+   background-color: #f0f0f0;
+ }
+
 .oppia-editor h3 {
   font-size: 18px;
   margin: 0;
@@ -89,6 +95,13 @@ p {
   position: relative;
 }
 
+.label {
+  margin: auto 4px;
+}
+.label-info {
+  background-color: #18447E;
+}
+
 /*
   The following rule ensures that, as the viewport gets
   smaller, any media will scale down according to its
@@ -100,6 +113,14 @@ img, video, canvas {
 
 textarea {
   width: 90%;
+}
+
+/*
+  Adjustments for the jWysiwyg RTE, to allow it to adopt the size
+  of its container.
+*/
+div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
+  width: 100%;
 }
 
 /*
@@ -124,7 +145,8 @@ textarea {
   font-weight: bold;
 }
 
-.navbar .navbar-brand:hover {
+.navbar .navbar-brand:hover,
+.navbar .navbar-brand:focus {
   color: white;
   text-shadow: 0 1px 2px #000;
 }
@@ -133,12 +155,14 @@ textarea {
   font-size: .6em;
 }
 
-.navbar-default .navbar-nav > li > a:hover {
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
   background: rgb(10, 48, 106);
   color: white;
 }
 
-.navbar-nav > li.active > a, .navbar-nav > li.active > a:hover {
+.navbar-nav > li.active > a, .navbar-nav > li.active > a:hover,
+.navbar-nav > li.active > a, .navbar-nav > li.active > a:focus {
   color: white;
   background: rgb(2, 38, 86);
 }
@@ -162,15 +186,19 @@ textarea {
 }
 
 .navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus,
 .navbar-default .navbar-nav .open > a:hover,
-.navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
+.navbar-default .navbar-nav .open > a:focus,
+.navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
+.navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
   background: rgb(10, 48, 106);
 }
 
 .navbar-default .navbar-nav > .open > a,
 .navbar-default .navbar-nav > .open > a:focus,
 .navbar-default .navbar-nav > .active > a,
-.navbar-default .navbar-nav > .active > a:hover {
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
   background: rgb(10, 48, 106);
   color: white;
 }
@@ -206,7 +234,7 @@ textarea {
   display: none;
 }
 
-.oppia-save-exploration-button {
+.oppia-main-control-button {
   font-size: 110%;
   font-variant: small-caps;
   font-weight: bold;
@@ -574,7 +602,8 @@ textarea {
 }
 
 .oppia-placeholder {
-  color: gray;
+  color: #aaa;
+  font-style: italic;
 }
 
 .oppia-state-name-container {
@@ -627,7 +656,16 @@ textarea {
 .oppia-graph-viz-container {
   height: 250px;
   border-radius: 4px;
-  border: 1px solid black;
+  border: 1px solid #ccc;
+  margin-top: 5px;
+}
+
+.oppia-graph-and-stats-separator {
+  margin-top: 25px;
+}
+
+.oppia-param-and-content-separator {
+  border-top: 1px dashed #ddd;
 }
 
 .oppia-add-state-container {
@@ -744,8 +782,9 @@ textarea {
   color: #444
 }
 
-.label-info {
-  background-color: #18447E;
+.oppia-back-arrow {
+  float: left;
+  margin-right: 5px;
 }
 
 .oppia-rule-block {
@@ -786,10 +825,6 @@ textarea {
   text-align: center;
 }
 
-.oppia-rule-description-back-arrow {
-  float: left;
-}
-
 .oppia-rule-bubble-warning {
   background: #F9EDBE;
   border-top-left-radius: 8px;
@@ -820,7 +855,7 @@ textarea {
   background: #E0E0E0;
   border-bottom-left-radius: 8px;
   display: table-cell;
-  padding: 5px;
+  padding: 5px 10px;
 }
 
 .oppia-dest-bubble {
@@ -829,6 +864,7 @@ textarea {
   display: table-cell;
   padding: 5px;
   vertical-align: middle;
+  width: 160px;
 }
 
 .oppia-logo {

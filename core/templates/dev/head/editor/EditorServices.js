@@ -40,7 +40,6 @@ oppia.factory('explorationData', [
     var explorationUrl = '/create/' + explorationId;
     var explorationDataUrl = '/createhandler/data/' + explorationId;
     var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + explorationId;
-    var resolvedFeedbackUrlPrefix = '/createhandler/resolved_feedback/' + explorationId;
 
     // TODO(sll): Find a fix for multiple users editing the same exploration
     // concurrently.
@@ -86,8 +85,7 @@ oppia.factory('explorationData', [
             change_list: explorationChangeList,
             commit_message: commitMessage,
             version: explorationData.data.version,
-          }),
-          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+          })
         ).success(function(data) {
           warningsData.clear();
           $log.info('Changes to this exploration were saved successfully.');
@@ -108,23 +106,7 @@ oppia.factory('explorationData', [
           resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
           oppiaRequestCreator.createRequest({
             resolved_answers: resolvedAnswersList
-          }),
-          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
-        ).error(function(data) {
-          warningsData.addWarning(data.error || 'Error communicating with server.');
-        });
-
-        warningsData.clear();
-      },
-
-      resolveReaderFeedback: function(stateName, feedbackId, newStatus) {
-        $http.put(
-          resolvedFeedbackUrlPrefix + '/' + encodeURIComponent(stateName),
-          oppiaRequestCreator.createRequest({
-            feedback_id: feedbackId,
-            new_status: newStatus
-          }),
-          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+          })
         ).error(function(data) {
           warningsData.addWarning(data.error || 'Error communicating with server.');
         });
@@ -153,6 +135,24 @@ oppia.factory('editorContextService', ['$log', function($log) {
         return;
       }
       activeStateName = newActiveStateName;
+    }
+  };
+}]);
+
+
+// TODO(sll): Should this depend on a versioning service that keeps track of
+// the current active version? Previous versions should not be editable.
+oppia.factory('editabilityService', [function() {
+  var isEditable = false;
+  return {
+    isEditable: function() {
+      return isEditable;
+    },
+    markEditable: function() {
+      isEditable = true;
+    },
+    markNotEditable: function() {
+      isEditable = false;
     }
   };
 }]);
@@ -459,18 +459,17 @@ oppia.factory('explorationRightsService', [
       var explorationRightsUrl = '/createhandler/rights/' + explorationData.explorationId;
       $http.put(
         explorationRightsUrl,
-        oppiaRequestCreator.createRequest(requestParameters),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-          success(function(data) {
-            warningsData.clear();
-            that.init(
-              data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
-              data.rights.status, data.rights.cloned_from, data.rights.community_owned);
-          }).
-          error(function(data) {
-            warningsData.addWarning(
-              data.error || 'Error communicating with server.');
-          });
+        oppiaRequestCreator.createRequest(requestParameters)
+      ).success(function(data) {
+        warningsData.clear();
+        that.init(
+          data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
+          data.rights.status, data.rights.cloned_from, data.rights.community_owned);
+      }).
+      error(function(data) {
+        warningsData.addWarning(
+          data.error || 'Error communicating with server.');
+      });
     }
   };
 }]);

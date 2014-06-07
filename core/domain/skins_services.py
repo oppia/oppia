@@ -14,12 +14,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides services for HTML skins."""
+"""Provides services for HTML skins for the reader view."""
 
 __author__ = 'Sean Lip'
 
 import feconf
 import jinja_utils
+import utils
 
 import jinja2
 
@@ -29,3 +30,9 @@ def get_skin_html(skin_name):
     return jinja2.Markup(
         jinja_utils.get_jinja_env(feconf.SKINS_TEMPLATES_DIR).get_template(
             '%s.html' % skin_name).render())
+
+
+def get_skin_js(skin_name):
+    """Returns the JS content for a given skin."""
+    return jinja2.Markup(utils.get_file_contents(
+        '%s/%s.js' % (feconf.SKINS_TEMPLATES_DIR, skin_name)))

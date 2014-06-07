@@ -6,28 +6,70 @@
         <h4>General</h4>
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <div role="form" class="form-horizontal">
-              <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
-                <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
-                <div class="col-lg-10 col-md-10 col-sm-10">
-                  <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" id="explorationTitle" ng-blur="saveExplorationTitle()">
+            <div ng-if="editabilityService.isEditable()">
+              <div role="form" class="form-horizontal">
+                <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
+                  <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
+                  <div class="col-lg-10 col-md-10 col-sm-10">
+                    <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
+                  </div>
+                </div>
+                <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
+                  <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
+                  <div class="col-lg-10 col-md-10 col-sm-10">
+                    <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+                  </div>
+                </div>
+                <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
+                  <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Objective</label>
+                  <div class="col-lg-4 col-md-4 col-sm-4">
+                    <span class="help-block">
+                      This exploration helps learners to ...
+                    </span>
+                  </div>
+                  <div class="col-lg-6 col-md-6 col-sm-6">
+                    <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="learn how to multiply two numbers">
+                  </div>
                 </div>
               </div>
-              <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
-                <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
-                <div class="col-lg-10 col-md-10 col-sm-10">
-                  <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+            </div>
+
+            <div ng-if="!editabilityService.isEditable()">
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationTitle">
+                    Title
+                  </label>
                 </div>
-              </div>
-              <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
-                <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Objective</label>
-                <div class="col-lg-4 col-md-4 col-sm-4">
-                  <span class="help-block">
-                    This exploration helps learners to ...
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  <span id="explorationTitle" type="text">
+                    <[explorationTitleService.displayed]>
                   </span>
                 </div>
-                <div class="col-lg-6 col-md-6 col-sm-6">
-                  <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="learn how to multiply two numbers">
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationCategory">
+                    Category
+                  </label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  <span id="explorationCategory" type="text">
+                    <[explorationCategoryService.displayed]>
+                  </span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationObjective">
+                    Objective
+                  </label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  This exploration helps learners to
+                  <span id="explorationObjective" type="text"><[explorationObjectiveService.displayed]></span>.
                 </div>
               </div>
             </div>
@@ -100,89 +142,78 @@
           </div>
         </div>
 
-        <hr>
+        <div ng-if="editabilityService.isEditable()">
+          <hr>
 
-        <div class="row">
-          <div class="col-lg-6 col-md-6 col-sm-6">
-            <h4>Controls</h4>
+          <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-6">
+              <h4>Controls</h4>
 
-            {% if can_publish %}
-              <p ng-show="explorationRightsService.isPrivate()">
-                <button type="button" class="btn btn-success" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Publish Exploration
-                </button>
-                <img class="oppia-help" src="/images/help.png"
-                     tooltip="Publishing your exploration allows others to view and learn from it."
-                     tooltip-placement="bottom">
-                <span ng-if="isExplorationLockedForEditing()">
-                  <br>
-                  Please save your changes first.
-                </span>
-              </p>
-            {% endif %}
+              {% if can_release_ownership %}
+                <p ng-hide="explorationRightsService.isCommunityOwned()">
+                  <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
+                    Transfer ownership to the community
+                  </button>
+                  <span ng-if="isExplorationLockedForEditing()">
+                    <br>
+                    Please save your changes first.
+                  </span>
+                </p>
+              {% endif %}
 
-            {% if can_release_ownership %}
-              <p ng-hide="explorationRightsService.isCommunityOwned()">
-                <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">
-                  Transfer ownership to the community
-                </button>
-                <span ng-if="isExplorationLockedForEditing()">
-                  <br>
-                  Please save your changes first.
-                </span>
-              </p>
-            {% endif %}
+              {% if can_delete %}
+                <p>
+                  <button type="button" ng-if="explorationRightsService.isPrivate()"
+                          class="btn btn-danger" ng-click="deleteExploration('')"
+                          title="Delete this exploration">
+                    Delete Exploration
+                  </button>
+                </p>
+              {% endif %}
+            </div>
 
-            <p>
-              <button type="button" ng-if="explorationRightsService.isPrivate()"
-                      class="btn btn-danger" ng-click="deleteExploration('')"
-                      title="Delete this exploration">
-                Delete Exploration
-              </button>
-            </p>
-          </div>
+            <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
+              <h4>Admin Controls</h4>
 
-          <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
-            <h4>Admin Controls</h4>
+              {% if can_publicize %}
+                <p ng-show="explorationRightsService.isPublic()">
+                  <button type="button" class="btn btn-default" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                    Move out of beta
+                    <span ng-if="currentUserIsAdmin">(as admin)</span>
+                    <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+                  </button>
+                </p>
+              {% endif %}
 
-            {% if can_publicize %}
-              <p ng-show="explorationRightsService.isPublic()">
-                <button type="button" class="btn btn-default" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Move out of beta
+              {% if can_unpublicize %}
+                <p ng-show="explorationRightsService.isPublicized()">
+                  <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                    Move back into beta
+                    <span ng-if="currentUserIsAdmin">(as admin)</span>
+                    <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+                  </button>
+                </p>
+              {% endif %}
+
+              {% if can_unpublish %}
+                <p ng-show="explorationRightsService.isPublic()">
+                  <button type="button" class="btn btn-default" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
+                    Unpublish
+                    <span ng-if="currentUserIsAdmin">(as admin)</span>
+                    <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
+                  </button>
+                </p>
+              {% endif %}
+
+              <p ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
+                <button type="button" class="btn btn-danger"
+                        ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
+                  Delete Exploration
                   <span ng-if="currentUserIsAdmin">(as admin)</span>
                   <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
                 </button>
               </p>
-            {% endif %}
-
-            {% if can_unpublicize %}
-              <p ng-show="explorationRightsService.isPublicized()">
-                <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Move back into beta
-                  <span ng-if="currentUserIsAdmin">(as admin)</span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-                </button>
-              </p>
-            {% endif %}
-
-            {% if can_unpublish %}
-              <p ng-show="explorationRightsService.isPublic()">
-                <button type="button" class="btn btn-default" ng-click="unpublishExploration()" ng-disabled="isExplorationLockedForEditing()">
-                  Unpublish
-                  <span ng-if="currentUserIsAdmin">(as admin)</span>
-                  <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-                </button>
-              </p>
-            {% endif %}
-
-            <p ng-if="explorationRightsService.isPublic() && (currentUserIsAdmin || currentUserIsModerator)">
-              <button type="button" class="btn btn-danger"
-                      ng-click="currentUserIsAdmin ? deleteExploration('admin') : deleteExploration('moderator')">
-                Delete Exploration
-                <span ng-if="currentUserIsAdmin">(as admin)</span>
-                <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
-              </button>
-            </p>
+            </div>
           </div>
         </div>
 
@@ -216,47 +247,14 @@
             <param-change-editor param-changes="explorationParamChanges"
                                  param-specs="paramSpecs"
                                  save-param-changes="saveExplorationParamChanges"
-                                 add-exploration-param-spec="addExplorationParamSpec">
+                                 add-exploration-param-spec="addExplorationParamSpec"
+                                 is-editable="editabilityService.isEditable()">
             </param-change-editor>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <script type="text/ng-template" id="modals/publishExploration">
-    <div class="modal-header">
-      <h3>Publish Exploration</h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/site_guidelines#/publish-and-release-criteria" target="_blank">why?</a>):
-        <ul>
-          <li>It should help its intended audience learn something new.</li>
-          <li>It should convey more than a single isolated factoid.</li>
-          <li>It should provide useful feedback and guidance to help the learner (and not just 'Correct'/'Incorrect').</li>
-          <li>It should not substantially duplicate existing explorations.</li>
-        </ul>
-      </p>
-      <p>
-        You can read more about these criteria on the <a href="/site_guidelines#/publish-and-release-criteria" target="_blank">exploration publishing criteria</a> page.
-      </p>
-
-      <p>
-        If your exploration meets all these criteria, please feel free to publish
-        it so that others can playtest and improve it! Good explorations can subsequently be
-        moved to the Learn gallery. (You can find more information
-        <a href="/site_guidelines#/how-to-use" target="_blank">here</a>
-        about how this works.)
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-success" ng-click="publish()">Publish</button>
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    </div>
-  </script>
 
   <script type="text/ng-template" id="modals/transferExplorationOwnership">
     <div class="modal-header">

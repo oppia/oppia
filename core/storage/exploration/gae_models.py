@@ -22,7 +22,6 @@ import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
 
-from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
 
@@ -178,6 +177,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ]
     )
 
+    def get_all_viewer_ids(self):
+        return list(set(self.owner_ids + self.editor_ids + self.viewer_ids))
+
+    all_viewer_ids = ndb.ComputedProperty(get_all_viewer_ids, repeated=True)
+
     def save(self, committer_id, commit_message, commit_cmds):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
@@ -201,6 +205,15 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).fetch(QUERY_LIMIT)
 
     @classmethod
+    def get_non_private(cls):
+        """Returns an iterable with non-private exp rights models."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
     def get_community_owned(cls):
         """Returns an iterable with community-owned exp rights models."""
         return ExplorationRightsModel.query().filter(
@@ -217,6 +230,17 @@ class ExplorationRightsModel(base_models.VersionedModel):
         """
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.viewer_ids == user_id
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_private_at_least_viewable(cls, user_id):
+        """Returns an iterable with private exps that are at least viewable."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status == EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ExplorationRightsModel.all_viewer_ids == user_id
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)
@@ -314,21 +338,6 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     # on this property is faster than an inequality query on
     # post_commit_status.
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
-
-    @classmethod
-    def _fetch_page_sorted_by_last_updated(
-            cls, query, page_size, urlsafe_start_cursor):
-        if urlsafe_start_cursor:
-            start_cursor = datastore_query.Cursor(urlsafe=urlsafe_start_cursor)
-        else:
-            start_cursor = None
-
-        result = query.order(-cls.last_updated).fetch_page(
-            page_size, start_cursor=start_cursor)
-        return (
-            result[0],
-            (result[1].urlsafe() if result[1] else None),
-            result[2])
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):

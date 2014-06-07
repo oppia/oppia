@@ -62,7 +62,8 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       centerAtCurrentState: '@',
       onClickFunction: '=',
       onDeleteFunction: '=',
-      onMaximizeFunction: '='
+      onMaximizeFunction: '=',
+      isEditable: '='
     },
     template: '<div></div>',
     replace: true,
@@ -166,10 +167,6 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             reachable: false
           };
         }
-
-        console.log(nodes);
-        console.log(links);
-        console.log(initStateName);
 
         // Do a breadth-first search to calculate the depths and offsets.
         var maxDepth = 0;
@@ -325,11 +322,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
       }
 
       function isStateFlagged(name, highlightStates, stateStats) {
-          var isHighlightState = (highlightStates && name in highlightStates);
-          var hasFeedback = (
-            stateStats && stateStats[name] &&
-            Object.keys(stateStats[name].readerFeedback).length > 0);
-          return (isHighlightState || hasFeedback);
+          return (highlightStates && name in highlightStates);
       }
 
       $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {
@@ -392,7 +385,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
         if ($scope.allowPanning) {
           vis = vis.append('g')
             .call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
-              vis.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
+              vis.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
             }))
             .append('g');
 
@@ -687,7 +680,7 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             });
         }
 
-        if ($scope.onDeleteFunction) {
+        if ($scope.isEditable && $scope.onDeleteFunction) {
           // Add a 'delete node' handler.
           nodeEnter.append('svg:rect')
             .attr({
@@ -730,8 +723,14 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
             .attr('y', 0)
             .attr('width', 20)
             .attr('height', 25)
-            .html('<button class="btn btn-default btn-xs"><span title="Expand Map"><strong style="font-size: larger;">+</strong></span></button>')
-            .on('click', $scope.onMaximizeFunction);
+            .append('xhtml:button')
+              .on('click', $scope.onMaximizeFunction)
+              .attr('class', 'btn btn-default btn-xs')
+              .append('xhtml:span')
+                .attr('title', 'Expand Map')
+                .append('xhtml:strong')
+                  .attr('style', 'font-size: larger;')
+                  .text('+');
         }
       }
     }]

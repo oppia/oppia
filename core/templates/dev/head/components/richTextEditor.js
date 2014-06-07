@@ -24,7 +24,7 @@ oppia.directive('richTextEditor', [
     return {
       restrict: 'E',
       scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
-      template: '<textarea rows="7" cols="60" ng-disabled="!hasFullyLoaded"></textarea>',
+      template: '<textarea rows="7" ng-disabled="!hasFullyLoaded"></textarea>',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         $scope.disallowOppiaWidgets = ($scope.disallowOppiaWidgets || false);
 
@@ -127,11 +127,10 @@ oppia.directive('richTextEditor', [
 
         $scope.getRteCustomizationModal = function(widgetDefinition, customizationArgs) {
           return $http.post(
-              '/widgets/noninteractive/' + widgetDefinition.backendName,
-              oppiaRequestCreator.createRequest({
-                customization_args: customizationArgs
-              }),
-              {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+            '/widgets/noninteractive/' + widgetDefinition.backendName,
+            oppiaRequestCreator.createRequest({
+              customization_args: customizationArgs
+            })
           ).then(function(response) {
             var modalInstance = $modal.open({
               templateUrl: 'modals/customizeWidget',
@@ -247,6 +246,7 @@ oppia.directive('richTextEditor', [
                   $scope._saveContent();
                 }
               },
+              iFrameClass: 'wysiwyg-content',
               initialContent: $scope.rteContent,
               initialMinHeight: '150px',
               resizeOptions: true

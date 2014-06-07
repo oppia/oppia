@@ -21,7 +21,6 @@ import feconf
 import test_utils
 
 CAN_EDIT_STR = 'can_edit'
-CAN_CLONE_STR = 'can_clone'
 
 
 class LearnGalleryTest(test_utils.GenericTestBase):
@@ -35,7 +34,7 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             # Test that no edit/copy links are shown (at least in the HTML
             # template; a full test should check what happens after the JS is
             # loaded and data is fetched from the backend).
-            no=[CAN_EDIT_STR, CAN_CLONE_STR, 'Create New Exploration']
+            no=[CAN_EDIT_STR, 'Create New Exploration']
         )
 
         # Test that the correct navbar tab is active.
@@ -104,8 +103,7 @@ class PlaytestQueueTest(test_utils.GenericTestBase):
             # Test that no edit/copy links are shown (at least in the HTML
             # template; a full test should check what happens after the JS is
             # loaded and data is fetched from the backend).
-            no=[CAN_EDIT_STR, CAN_CLONE_STR, 'Create New Exploration',
-                'Categories']
+            no=[CAN_EDIT_STR, 'Create New Exploration', 'Categories']
         )
 
         # Test that the correct navbar tab is active.
@@ -249,9 +247,7 @@ class ContributeGalleryTest(test_utils.GenericTestBase):
         self.login('editor@example.com')
         response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Categories', 'Create New Exploration', CAN_EDIT_STR,
-            CAN_CLONE_STR)
+        response.mustcontain('Create New Exploration', CAN_EDIT_STR)
         # Test that the correct navbar tab is active.
         self.assertRegexpMatches(
             response.body,
@@ -454,18 +450,29 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.set_moderators([self.EMAIL_MODERATOR])
         self.set_admins([self.EMAIL_ADMIN])
 
-    def attempt_to_edit(self, exploration_id, expect_errors=False, version=1):
+    def attempt_to_view(self, exploration_id, expect_errors=False, version=1):
         if expect_errors:
-            expected_status_int = 401
+            expected_status_int = 404
         else:
             expected_status_int = 200
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id),
-            expect_errors=expect_errors
-        )
-        csrf_token = self.get_csrf_token_from_response(response)
+            expect_errors=expect_errors)
         self.assertEqual(response.status_int, expected_status_int)
+
+    def attempt_to_edit(self, exploration_id, expect_errors=False, version=1):
+        # This should only be called if attempt_to_view() passes, otherwise
+        # it isn't possible to get a CSRF token.
+        response = self.testapp.get(
+            '%s/%s' % (feconf.EDITOR_URL_PREFIX, exploration_id))
+        self.assertEqual(response.status_int, 200)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        if expect_errors:
+            expected_status_int = 401
+        else:
+            expected_status_int = 200
 
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, exploration_id),
@@ -480,8 +487,7 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
                 }]
             },
             csrf_token=csrf_token, expect_errors=expect_errors,
-            expected_status_int=expected_status_int
-        )
+            expected_status_int=expected_status_int)
 
     def attempt_to_delete(self, exploration_id, expect_errors=False):
         if expect_errors:
@@ -498,8 +504,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
     def test_user_rights(self):
         """Test user rights for explorations in the Contribute gallery."""
 
-        # user@example.com, a regular user, can see and edit only exploration
-        #     C, and cannot delete any of the explorations.
+        # user@example.com, a regular user, can see exploration B, can see and
+        # edit exploration C, and cannot delete any of the explorations.
         EMAIL_USER = 'user@example.com'
         self.register_editor(EMAIL_USER)
 
@@ -509,26 +515,36 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.assertDictContainsSubset({
             'is_admin': False,
             'is_super_admin': False,
-            'categories': {
-                'Test Explorations': [{
-                    'can_edit': True,
-                    'title': 'C',
-                    'can_clone': True,
-                    'id': self.exp_c_id,
-                    'is_private': False,
-                    'is_cloned': False,
-                    'is_public': True,
-                    'is_publicized': False,
-                }]
-            }
         }, response_dict)
+        self.assertEqual(sorted([{
+            'can_edit': False,
+            'title': 'B',
+            'id': self.exp_b_id,
+            'is_private': False,
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
+            'is_community_owned': False,
+        }, {
+            'can_edit': True,
+            'title': 'C',
+            'id': self.exp_c_id,
+            'is_private': False,
+            'is_cloned': False,
+            'is_public': True,
+            'is_publicized': False,
+            'is_community_owned': True,
+        }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id, expect_errors=True, version=2)
-        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
+        self.attempt_to_view(self.exp_a_id, expect_errors=True, version=2)
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True, version=2)
         self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id, expect_errors=True)
 
         self.logout()
@@ -546,29 +562,33 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.assertEqual(sorted([{
             'can_edit': True,
             'title': 'B',
-            'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
             'is_cloned': False,
             'is_public': True,
             'is_publicized': False,
+            'is_community_owned': False,
         }, {
             'can_edit': True,
             'title': 'C',
-            'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
             'is_cloned': False,
             'is_public': True,
             'is_publicized': False,
+            'is_community_owned': True,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
+        self.attempt_to_view(self.exp_a_id, version=2)
         self.attempt_to_edit(self.exp_a_id, expect_errors=True)
-        self.attempt_to_edit(self.exp_b_id, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, version=2)
         self.attempt_to_delete(self.exp_b_id)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id)
 
         self.logout()
@@ -586,29 +606,33 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
         self.assertEqual(sorted([{
             'can_edit': True,
             'title': 'B',
-            'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
             'is_cloned': False,
             'is_public': True,
             'is_publicized': False,
+            'is_community_owned': False,
         }, {
             'can_edit': True,
             'title': 'C',
-            'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
             'is_cloned': False,
             'is_public': True,
             'is_publicized': False,
+            'is_community_owned': True,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
+        self.attempt_to_view(self.exp_a_id, version=2)
         self.attempt_to_edit(self.exp_a_id, expect_errors=True)
-        self.attempt_to_edit(self.exp_b_id, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, version=2)
         self.attempt_to_delete(self.exp_b_id)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id)
 
         self.logout()
@@ -616,8 +640,8 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
     def test_superadmin_rights(self):
         """Test super-admin rights in the Contribute gallery."""
 
-        # superadmin@example.com, a super admin, can edit all explorations,
-        # but cannot delete any of them.
+        # superadmin@example.com, a super admin, has no special rights and is
+        # equivalent to a user.
         EMAIL_SUPERADMIN = 'superadmin@example.com'
         self.register_editor(EMAIL_SUPERADMIN)
 
@@ -628,31 +652,34 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
             'is_super_admin': True,
         }, response_dict)
         self.assertEqual(sorted([{
-            'can_edit': True,
+            'can_edit': False,
             'title': 'B',
-            'can_clone': True,
             'id': self.exp_b_id,
             'is_private': False,
             'is_cloned': False,
             'is_public': True,
             'is_publicized': False,
+            'is_community_owned': False,
         }, {
             'can_edit': True,
             'title': 'C',
-            'can_clone': True,
             'id': self.exp_c_id,
             'is_private': False,
             'is_cloned': False,
             'is_public': True,
             'is_publicized': False,
+            'is_community_owned': True,
         }]), sorted(response_dict['categories']['Test Explorations']))
 
-        self.attempt_to_edit(self.exp_a_id)
-        self.attempt_to_edit(self.exp_b_id, version=2)
-        self.attempt_to_edit(self.exp_c_id, version=2)
-
+        self.attempt_to_view(self.exp_a_id, expect_errors=True, version=2)
         self.attempt_to_delete(self.exp_a_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_b_id, version=2)
+        self.attempt_to_edit(self.exp_b_id, expect_errors=True)
         self.attempt_to_delete(self.exp_b_id, expect_errors=True)
+
+        self.attempt_to_view(self.exp_c_id, version=2)
+        self.attempt_to_edit(self.exp_c_id, version=2)
         self.attempt_to_delete(self.exp_c_id, expect_errors=True)
 
         self.logout()
