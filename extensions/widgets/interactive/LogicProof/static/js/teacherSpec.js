@@ -37,7 +37,7 @@ describe('Build questions', function() {
       logicProofTeacher.buildQuestion(
         'R(albert)\u2227R(betty)', 'p', logicProofData.BASE_VOCABULARY
       ).results).toEqual([{
-        top_kind_name: "variable", 
+        top_kind_name: "variable",
         top_operator_name: "p",
         arguments: [],
         dummies: []
@@ -53,7 +53,7 @@ describe('Build questions', function() {
 
   it('should forbid the use of reserved words', function() {
     expect(function() {
-      logicProofTeacher.buildQuestion('we\u2227you', 'p=q', 
+      logicProofTeacher.buildQuestion('we\u2227you', 'p=q',
         logicProofData.BASE_VOCABULARY);
     }).toThrow(
       'The name \'we\' is reserved for vocabulary and so cannot be used here.'

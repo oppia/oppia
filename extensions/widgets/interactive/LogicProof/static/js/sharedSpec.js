@@ -27,7 +27,7 @@ var errorWrapper = function(dubiousFunction, input, parameter) {
       }
     } catch(err) {
       throw logicProofShared.renderError(
-        err, logicProofData.BASE_GENERAL_MESSAGES, 
+        err, logicProofData.BASE_GENERAL_MESSAGES,
         logicProofData.BASE_STUDENT_LANGUAGE);
     }
   }
@@ -110,7 +110,7 @@ describe('Parse lines', function() {
       },{
         format: 'expression',
         content: {
-          top_kind_name: 'variable', 
+          top_kind_name: 'variable',
           top_operator_name: 'p',
           arguments:[],
           dummies:[]
@@ -241,14 +241,14 @@ describe('Instantiate types', function() {
 describe('Assign types to expressions', function() {
   var assignTypes = function(expressionString, newKindsPermitted) {
     return logicProofShared.assignTypesToExpression(
-      logicProofParser.parse(expressionString, 'expression'), ['boolean'], 
+      logicProofParser.parse(expressionString, 'expression'), ['boolean'],
       logicProofData.BASE_STUDENT_LANGUAGE, newKindsPermitted
     )[0].typedExpression
   }
 
   var assignTypesControl = function(expressionString, newKindsPermitted) {
     return logicProofShared.assignTypesToExpression(
-      logicProofParser.parse(expressionString, 'expression'), ['boolean'], 
+      logicProofParser.parse(expressionString, 'expression'), ['boolean'],
       logicProofData.BASE_CONTROL_LANGUAGE, newKindsPermitted
     )[0].typedExpression
   }
@@ -334,7 +334,7 @@ describe('Assign types to expressions', function() {
       'addition yields a element but you are trying to use it to give a boolean.')
     expect(
       errorWrapper(
-        assignTypes, 'x\u2227f(x)', 
+        assignTypes, 'x\u2227f(x)',
         ['variable', 'prefix_function', 'constant'])
     ).toThrow('x yields a boolean but you are trying to use it to give a element.')
     expect(
@@ -346,7 +346,7 @@ describe('Assign types to expressions', function() {
   it('should forbid quantification over pre-existing variables', function() {
     expect(
       errorWrapper(
-        assignTypes, 'a\u2227\u2203a.f(2)', 
+        assignTypes, 'a\u2227\u2203a.f(2)',
         ['variable', 'prefix_function', 'constant'])
     ).toThrow(
       'The name \'a\' is already in use and so cannot be quantified over in \u2203a.f(2).')
@@ -362,7 +362,7 @@ describe('Assign types to expressions', function() {
   it('should reject unknown operators of an un-addable kind', function() {
     expect(
       errorWrapper(
-        assignTypes, '\u2200m<n.A(n)', 
+        assignTypes, '\u2200m<n.A(n)',
         ['variable', 'prefix_function', 'constant'])
     ).toThrow('The operator bounded_for_all could not be identified.')
     expect(
@@ -384,7 +384,7 @@ describe('Check equality between expression constructs', function() {
   it('should recognise when expressions are not equal', function() {
     expect(
       logicProofShared.checkExpressionsAreEqual(
-        logicProofParser.parse('p\u2227r\u2228\u2200x.s', 'expression'), 
+        logicProofParser.parse('p\u2227r\u2228\u2200x.s', 'expression'),
         logicProofParser.parse('(p\u2227r)\u2228(\u2200y.s)', 'expression'))
     ).toBe(false);
   });
@@ -392,9 +392,9 @@ describe('Check equality between expression constructs', function() {
   it('should recognise when an expression is not in a set', function() {
     expect(
       logicProofShared.checkExpressionIsInSet(
-        logicProofParser.parse('p\u2227q', 'expression'), 
+        logicProofParser.parse('p\u2227q', 'expression'),
         [
-          logicProofParser.parse('A(x)', 'expression'), 
+          logicProofParser.parse('A(x)', 'expression'),
           logicProofParser.parse('q\u2227p', 'expression')
         ])
     ).toBe(false);
@@ -425,7 +425,7 @@ describe('Get operators from expression', function() {
   it('should identify all operators of a given kind', function() {
     expect(
       logicProofShared.getOperatorsFromExpression(
-        logicProofParser.parse('x+2=y+x', 'expression'), 
+        logicProofParser.parse('x+2=y+x', 'expression'),
         ['variable'])).toEqual(['x', 'y']);
   });
 });
@@ -438,5 +438,4 @@ describe('Check ordering in lex', function() {
   it('should identify when one array does not exceed another', function() {
     expect(logicProofShared.greaterThanInLex([1,2], [1,2])).toBe(false);
   })
-})
-
+});

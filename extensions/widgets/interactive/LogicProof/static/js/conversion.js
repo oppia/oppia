@@ -33,7 +33,7 @@ var logicProofConversion = (function() {
   }, {
     old: '$',
     new: '\u2203'
-  }]
+  }];
 
   var convertToLogicCharacters = function(oldString) {
     var replacedString = oldString;
@@ -43,7 +43,7 @@ var logicProofConversion = (function() {
         REPLACEMENT_PAIRS[i].old).join(REPLACEMENT_PAIRS[i].new);
     }
     return replacedString;
-  }
+  };
 
   var convertElementToLogicChars = function(element) {
     // NOTE: this function is first called before the DOM is defined, when
@@ -53,7 +53,7 @@ var logicProofConversion = (function() {
       element.value = convertToLogicCharacters(element.value);
       element.selectionEnd = cursorPosition;
     }
-  }
+  };
 
   return {
     convertToLogicCharacters: convertToLogicCharacters,

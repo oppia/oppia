@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview These functions are used to build defaultData.js. In future 
-    they should be made available to exploration editors to change the data 
+ * @fileoverview These functions are used to build defaultData.js. In future
+    they should be made available to exploration editors to change the data
     used in an instance of the LogicProof widget.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
@@ -23,9 +23,9 @@ var logicProofTeacher2 = (function() {
 
 /////////////////////  LINE TEMPLATES  ////////////////////////////////////////
 
-  // Ensures that lineTemplate has all its operators of a matchable kind 
-  // occuring in a non-substituted instance so that matching a line against 
-  // the template will be possible, and that all other operators occur in the 
+  // Ensures that lineTemplate has all its operators of a matchable kind
+  // occuring in a non-substituted instance so that matching a line against
+  // the template will be possible, and that all other operators occur in the
   // given list. Also checks line_template is well-typed.
   var requireValidLineTemplate = function(lineTemplate, language, vocabulary) {
     // Collect expressionTemplates to check.
@@ -59,8 +59,8 @@ var logicProofTeacher2 = (function() {
     // 'visible' expressions are those occurring in the reader_view line with no
     // substitutions performed on them, and which are thus available to help
     // determine what the variables and atoms have been instantiated as when
-    // matching against a student's line. The others are all 'invisible'. We 
-    // require that any element occurring invisibly also occurs visibly, so 
+    // matching against a student's line. The others are all 'invisible'. We
+    // require that any element occurring invisibly also occurs visibly, so
     // that it will be possible to determine its instantiation just from what
     // the student types.
     var checkees = [];
@@ -90,7 +90,7 @@ var logicProofTeacher2 = (function() {
           types.push('element');
           invisible.push(LHS);
           if (i < numAccessible) {
-            // FUTURE (Jacob): change back to visible (for single 
+            // FUTURE (Jacob): change back to visible (for single
             // substitutions) after writing seekSubstitute.
             invisible.push(RHS);
           } else {
@@ -119,7 +119,7 @@ var logicProofTeacher2 = (function() {
     var hiddenOperators = logicProofShared.getOperatorsFromExpressionArray(
       invisible);
     for (var i = 0; i < hiddenOperators.length; i++) {
-      if (!language.operators.hasOwnProperty(hiddenOperators[i]) && 
+      if (!language.operators.hasOwnProperty(hiddenOperators[i]) &&
           visibleOperators.indexOf(hiddenOperators[i]) === -1) {
         throw new logicProofShared.UserError(
           'hidden_operator', {operator: hiddenOperators[i]});
@@ -134,7 +134,7 @@ var logicProofTeacher2 = (function() {
   * @param readerViewString: A string from the teacher that describes what lines
   *        of this form should look like when the student writes them.
   * @param antecedentsString: A string from the teacher describing the
-  *        antecedents a line of this form should have. These can then be 
+  *        antecedents a line of this form should have. These can then be
   *        referred to in the MistakeTable to check, for example, that every
   *        antecedent needed was proved on an earlier line.
   * @param resultsString: Similar
@@ -153,8 +153,8 @@ var logicProofTeacher2 = (function() {
   *         antecendents or variables) that it will not be possible to deduce
   *         from what the student is required to write.
   */
-  var buildLineTemplate = function(nameString, readerViewString, 
-      antecedentsString, resultsString, variablesString, errorStrings, 
+  var buildLineTemplate = function(nameString, readerViewString,
+      antecedentsString, resultsString, variablesString, errorStrings,
       language, vocabulary) {
     var possibleReaderViews = logicProofShared.parseLineString(
       readerViewString, language.operators, vocabulary, true);
@@ -185,7 +185,7 @@ var logicProofTeacher2 = (function() {
     var errors = []
     for (var i = 0; i < errorStrings.length; i++) {
       errors.push(parseMessage(errorStrings[i], 'line'));
-    } 
+    }
     var lineTemplate = {
       name: nameString,
       reader_view: readerView,
@@ -233,7 +233,7 @@ var logicProofTeacher2 = (function() {
     }
   };
 
-  // Just gives the 'reader_view' part of the template, not the other 
+  // Just gives the 'reader_view' part of the template, not the other
   // parameters like antecedents
   var displayLineTemplateReaderView = function(readerView, operators, vocabulary) {
     var displayedFragments = [];
@@ -307,8 +307,8 @@ var logicProofTeacher2 = (function() {
       try {
         table.push(
           buildLineTemplate(
-            stringTable[i].name, stringTable[i].reader_view, 
-            stringTable[i].antecedents, stringTable[i].results, 
+            stringTable[i].name, stringTable[i].reader_view,
+            stringTable[i].antecedents, stringTable[i].results,
             stringTable[i].variables, stringTable[i].error,
             logicProofData.BASE_STUDENT_LANGUAGE, vocabulary))
         failures.push('');
@@ -316,7 +316,7 @@ var logicProofTeacher2 = (function() {
         failed = true;
         failures.push(
           logicProofShared.renderError(
-            err, logicProofTeacher.TEACHER_ERROR_MESSAGES, 
+            err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
             logicProofData.BASE_STUDENT_LANGUAGE));
       }
     }
@@ -332,7 +332,7 @@ var logicProofTeacher2 = (function() {
     for (var i = 0; i < table.length; i++) {
       output.push(
         displayLineTemplate(
-          table[i], logicProofData.BASE_STUDENT_LANGUAGE.operators, vocabulary)); 
+          table[i], logicProofData.BASE_STUDENT_LANGUAGE.operators, vocabulary));
     }
     return output;
   }
@@ -340,7 +340,7 @@ var logicProofTeacher2 = (function() {
 
  ////////////////////////  MISTAKE TABLE  /////////////////////////////////////
 
- /** 
+ /**
   * @param mistakeEntry: a MistakeEntry object (but with Expressions in place
   *        of TypedExpressions) which we are to check and assign types to.
   * @param language: a Language object giving the control language
@@ -378,8 +378,8 @@ var logicProofTeacher2 = (function() {
         if (mistakeEntry.message[i][j].format === 'expression') {
           var expression = mistakeEntry.message[i][j].content;
           var typeCheck = logicProofShared.assignTypesToExpression(
-            expression, 
-            ['integer', 'string', 'formula', 'set_of_formulas', 'boolean'], 
+            expression,
+            ['integer', 'string', 'formula', 'set_of_formulas', 'boolean'],
             newLanguage, ['constant']);
           if (typeCheck.length > 1) {
             throw new logicProofShared.UserError('ambiguous_typing', {});
@@ -392,14 +392,14 @@ var logicProofTeacher2 = (function() {
   };
 
  /**
-  * @param nameString: A string provided by the teacher giving the name of the 
-  *        entry; this is not used for anything but is convenient for the 
+  * @param nameString: A string provided by the teacher giving the name of the
+  *        entry; this is not used for anything but is convenient for the
   *        teacher when writing the table.
   * @param occursString: A string from the teacher that represents an
   *        expression in the control language determining whether the mistake
   *        has been made by the student.
   * @param messageString: An array of string written by the teacher, each of
-  *        which represents a possible message to give the student if they 
+  *        which represents a possible message to give the student if they
   *        make the mistake in question.
   * @param controlLanguage: A Language object giving the control language (that
   *        which is used to write formulas describing when mistakes occur).
@@ -433,8 +433,8 @@ var logicProofTeacher2 = (function() {
       if (message[i].format === 'string') {
         output += message[i].content;
       } else {
-        output += '{{' + 
-          logicProofShared.displayExpression(message[i].content, operators) + 
+        output += '{{' +
+          logicProofShared.displayExpression(message[i].content, operators) +
           '}}';
       }
     }
@@ -463,7 +463,7 @@ var logicProofTeacher2 = (function() {
   *          message: an array of message strings
   *        }
   * @param errorDictionary: used to render errors if they occur
-  * @return a MistakeSection 
+  * @return a MistakeSection
   * @raises an array of error messages, one per entry.
   */
   var buildMistakeSection = function(name, entryStrings, controlFunctions) {
@@ -482,7 +482,7 @@ var logicProofTeacher2 = (function() {
       try {
         entries.push(
           buildMistakeEntry(
-            entryStrings[i].name, entryStrings[i].occurs, 
+            entryStrings[i].name, entryStrings[i].occurs,
             entryStrings[i].message, controlLanguage));
         failures.push('');
       } catch (err) {
@@ -532,11 +532,11 @@ var logicProofTeacher2 = (function() {
   *        definition of a formula - e.g. f(n,m).
   * @param formulaRHS: an Expression representing the right-hand-side of such a
   *        definition - e.g. n + g(m).
-  * @param language: a Language object representing the control language (the 
+  * @param language: a Language object representing the control language (the
   *        one used to describe when a student has made a mistake) including
   *        all of the previously-defined control functions.
   * @return a dictionary {
-  *            typing: a length-1 array of the TypingRule that the function 
+  *            typing: a length-1 array of the TypingRule that the function
   *              being defined has been deduced to have.
   *            typedDefinition: a TypedExpression that is the given formulaRHS
   *              but now with types added.
@@ -617,7 +617,7 @@ var logicProofTeacher2 = (function() {
     for (var i = 0; i < formulaLHS.arguments.length; i++) {
       argumentTypes.push({
         type: logicProofShared.seekTypeInExpression(
-          typeCheck[0].typedExpression, 
+          typeCheck[0].typedExpression,
           formulaLHS.arguments[i].top_operator_name),
         arbitrarily_many: false
       })
@@ -643,14 +643,14 @@ var logicProofTeacher2 = (function() {
   *        to describe mistakes.
   * @return a dictionary {
   *            name: the name of the function, deduced from the LHSstring
-  *            variables: the free variables in the function definition, 
+  *            variables: the free variables in the function definition,
   *              deduced from the LHSstring.
   *            typing: a length-1 array of the TypingRule for the new function
-  *            definition: a TypedExpression deduced from the RHSstring, but 
+  *            definition: a TypedExpression deduced from the RHSstring, but
   *              with types added
   *            description: the descriptionString
   *          }
-  * @raises If the input cannot be parsed, or is incorrect as in 
+  * @raises If the input cannot be parsed, or is incorrect as in
   *         validateAndTypeControlFunction().
   */
   var buildControlFunction = function(LHSstring, RHSstring, descriptionString, controlLanguage) {
@@ -708,11 +708,11 @@ var logicProofTeacher2 = (function() {
   * adding them to to the list of operators and model; if one fails validation
   * we abort.
   * @paran controlFunctionStrings: an array of dictionaries of the form {
-  *          LHS: string representing the function LHS, 
+  *          LHS: string representing the function LHS,
   *          RHS: string representing the function RHS,
   *          description: string describing the function
   *        }
-  * @return an array of dictionaries of the kind buildControlFunction returns 
+  * @return an array of dictionaries of the kind buildControlFunction returns
   * @raises the first Error found in the table, with an additonal key 'line'
   *         that gives the number of the line in the table where this error
   *         occurred.
@@ -737,7 +737,7 @@ var logicProofTeacher2 = (function() {
           controlFunctionStrings[i].description, controlLanguage);
       } catch (err) {
         throw {
-          message: logicProofShared.renderError(err, logicProofTeacher.TEACHER_ERROR_MESSAGES, 
+          message: logicProofShared.renderError(err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
             logicProofData.BASE_CONTROL_LANGUAGE),
           line: i
         };
@@ -790,7 +790,7 @@ var logicProofTeacher2 = (function() {
             logicProofParser.parse(
               fragmentString.replace(/ /g, ''),  'expressionTemplate2'):
             logicProofParser.parse(
-              fragmentString.slice(2, fragmentString.length - 2).replace(/ /g, ''), 
+              fragmentString.slice(2, fragmentString.length - 2).replace(/ /g, ''),
               'expression')
         }
       } catch (err) {
@@ -836,15 +836,15 @@ var logicProofTeacher2 = (function() {
         for (var j = 0; j < vocabulary[key][i].split(' ').length; j++) {
           if (vocabularyWords.indexOf(vocabulary[key][i].split(' ')[j]) === -1) {
             vocabularyWords.push(vocabulary[key][i].split(' ')[j]);
-          } 
+          }
         }
       }
     }
     var operatorsToCheck = logicProofShared.getOperatorsFromExpressionArray(
       expressionArray);
     for (var i = 0; i < operatorsToCheck.length; i++) {
-      if (vocabularyWords.indexOf(operatorsToCheck[i]) !== -1 && 
-          operatorsToCheck[i].length > 1 && 
+      if (vocabularyWords.indexOf(operatorsToCheck[i]) !== -1 &&
+          operatorsToCheck[i].length > 1 &&
           !knownOperators.hasOwnProperty(operatorsToCheck[i])) {
         throw new logicProofShared.UserError(
           'forbidden_word', {word: operatorsToCheck[i]});

@@ -37,7 +37,7 @@ var errorWrapper = function(dubiousFunction, input1, input2, input3, input4, inp
       }
     } catch(err) {
       throw new Error(logicProofShared.renderError(
-        err, logicProofData.BASE_GENERAL_MESSAGES, 
+        err, logicProofData.BASE_GENERAL_MESSAGES,
         logicProofData.BASE_STUDENT_LANGUAGE));
     }
   }
@@ -62,7 +62,7 @@ describe('Full sustem', function() {
     expect(completeCheck('p', 'p', 'we know p')).toEqual(undefined);
 
     expect(
-      completeCheck('~R, ~S', '~(R∨S)', 
+      completeCheck('~R, ~S', '~(R∨S)',
         'if R∨S\n' +
         '  if R\n' +
         '    from R and ~R have contradiction\n' +
@@ -72,7 +72,7 @@ describe('Full sustem', function() {
         'hence ~(R∨S)')).toEqual(undefined);
 
     expect(
-      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))∧(∀x.B(x))', 
+      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))∧(∀x.B(x))',
         'given c\n' +
         '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)\n' +
         '  from A(c)∧B(c) we have A(c)\n' +
@@ -87,7 +87,7 @@ describe('Full sustem', function() {
   });
 
   it('should reject proofs with any error', function() {
-    
+
     expect(function() {
       completeCheck('p', 'p', 'we knew p')
     }).toThrow('The phrase starting \'we\' could not be identified; please ' +
@@ -99,7 +99,7 @@ describe('Full sustem', function() {
       'This line uses q, so you need to have an earlier line proving that q is true.');
 
     expect(function() {
-      completeCheck('~R, ~S', '~(R∨S)', 
+      completeCheck('~R, ~S', '~(R∨S)',
         'if R∨S\n' +
         '  if R\n' +
         '    from R and ~R have contradiction\n' +
@@ -112,7 +112,7 @@ describe('Full sustem', function() {
       'but this was in the context of \'  if A\', which we have since left.');
 
     expect(function() {
-      completeCheck('∀x.(A(x)∧B(x)), p', '(∀x.A(x))', 
+      completeCheck('∀x.(A(x)∧B(x)), p', '(∀x.A(x))',
         'given c\n' +
         '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)\n' +
         '  from A(c)∧B(c) we have A(c)\n' +
@@ -122,7 +122,7 @@ describe('Full sustem', function() {
       'final line of the proof.');
 
     expect(function() {
-      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))', 
+      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))',
         'given c\n' +
         '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)\n' +
         '  from A(c)∧B(c) we have A(c)\n' +

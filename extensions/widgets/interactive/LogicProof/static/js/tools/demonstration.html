@@ -25,7 +25,7 @@
     <table>
       <tr>
         <td> <textarea ng-model="proofString" ng-trim="false" ng-change="editProof()" rows="10" cols="50"></textarea> </td>
-        <td valign="top"> 
+        <td valign="top">
           <font color="red"><pre>{{proofError}}</pre></font>
         </td>
       </tr>
@@ -48,7 +48,7 @@
     <font color="green" ng-show="questionSuccess">Success</font>
     <font color="red" ng-hide="questionSuccess">Failure</font>
     <p>
-      Assumptions: <input type="text" ng-model="assumptionsString" size="30"> Target: <input type="text" ng-model="targetString" size="30"> 
+      Assumptions: <input type="text" ng-model="assumptionsString" size="30"> Target: <input type="text" ng-model="targetString" size="30">
       <font color="red"> {{questionError}} </font>
     </p>
 
@@ -93,7 +93,7 @@
           <td> <input type="text" ng-model="mistakeStrings[i].entries[j].name"></td>
           <td> <input type="text" ng-model="mistakeStrings[i].entries[j].occurs" size="50"></td>
           <td> <input type="text" ng-model="mistakeStrings[i].entries[j].message[0]" size="60"></td>
-          <td> <font color="red"> {{mistakeErrors[i][j]}} </font> </td> 
+          <td> <font color="red"> {{mistakeErrors[i][j]}} </font> </td>
         </tr>
       </table>
       <p></p>
@@ -123,7 +123,7 @@
         <td>=</td>
         <td> <input type="text" ng-model="controlFunctionStrings[i].RHS" size="50"></td>
         <td> <input type="text" ng-model="controlFunctionStrings[i].description" size="60"></td>
-        <td> <font color="red"> {{controlFunctionErrors[i]}} </font> </td> 
+        <td> <font color="red"> {{controlFunctionErrors[i]}} </font> </td>
       </tr>
     <table>
 

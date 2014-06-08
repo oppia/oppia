@@ -4,7 +4,7 @@ var logicProofParser = (function(){
    *
    * http://pegjs.majda.cz/
    */
-  
+
   function quote(s) {
     /*
      * ECMA-262, 5th ed., 7.8.4: All characters may appear literally in a
@@ -27,7 +27,7 @@ var logicProofParser = (function(){
       .replace(/[\x00-\x07\x0B\x0E-\x1F\x80-\uFFFF]/g, escape)
       + '"';
   }
-  
+
   var result = {
     /*
      * Parses the input with a generated parser. If the parsing is successfull,
@@ -107,7 +107,7 @@ var logicProofParser = (function(){
         "variable": parse_variable,
         "name": parse_name
       };
-      
+
       if (startRule !== undefined) {
         if (parseFunctions[startRule] === undefined) {
           throw new Error("Invalid rule name: " + quote(startRule) + ".");
@@ -115,29 +115,29 @@ var logicProofParser = (function(){
       } else {
         startRule = "expression";
       }
-      
+
       var pos = 0;
       var reportFailures = 0;
       var rightmostFailuresPos = 0;
       var rightmostFailuresExpected = [];
       var cache = {};
-      
+
       function padLeft(input, padding, length) {
         var result = input;
-        
+
         var padLength = length - input.length;
         for (var i = 0; i < padLength; i++) {
           result = padding + result;
         }
-        
+
         return result;
       }
-      
+
       function escape(ch) {
         var charCode = ch.charCodeAt(0);
         var escapeChar;
         var length;
-        
+
         if (charCode <= 0xFF) {
           escapeChar = 'x';
           length = 2;
@@ -145,23 +145,23 @@ var logicProofParser = (function(){
           escapeChar = 'u';
           length = 4;
         }
-        
+
         return '\\' + escapeChar + padLeft(charCode.toString(16).toUpperCase(), '0', length);
       }
-      
+
       function matchFailed(failure) {
         if (pos < rightmostFailuresPos) {
           return;
         }
-        
+
         if (pos > rightmostFailuresPos) {
           rightmostFailuresPos = pos;
           rightmostFailuresExpected = [];
         }
-        
+
         rightmostFailuresExpected.push(failure);
       }
-      
+
       function parse_expressionTemplate() {
         var cacheKey = "expressionTemplate@" + pos;
         var cachedResult = cache[cacheKey];
@@ -169,9 +169,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_variableTemplate();
         if (result0 === null) {
           result0 = parse_elementTemplate();
@@ -179,14 +179,14 @@ var logicProofParser = (function(){
             result0 = parse_booleanTemplate();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_booleanTemplate() {
         var cacheKey = "booleanTemplate@" + pos;
         var cachedResult = cache[cacheKey];
@@ -194,10 +194,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_expression();
@@ -230,14 +230,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_substitution() {
         var cacheKey = "substitution@" + pos;
         var cachedResult = cache[cacheKey];
@@ -245,10 +245,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3, result4;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 91) {
@@ -316,14 +316,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_elementTemplate() {
         var cacheKey = "elementTemplate@" + pos;
         var cachedResult = cache[cacheKey];
@@ -331,10 +331,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.substr(pos, 2) === "{{") {
@@ -384,14 +384,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_variableTemplate() {
         var cacheKey = "variableTemplate@" + pos;
         var cachedResult = cache[cacheKey];
@@ -399,10 +399,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.substr(pos, 2) === "{{") {
@@ -453,14 +453,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_listOfBooleanTemplates() {
         var cacheKey = "listOfBooleanTemplates@" + pos;
         var cachedResult = cache[cacheKey];
@@ -468,10 +468,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_booleanTemplate();
@@ -505,14 +505,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_commaThenBooleanTemplate() {
         var cacheKey = "commaThenBooleanTemplate@" + pos;
         var cachedResult = cache[cacheKey];
@@ -520,10 +520,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 44) {
@@ -553,14 +553,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_expressionTemplate2() {
         var cacheKey = "expressionTemplate2@" + pos;
         var cachedResult = cache[cacheKey];
@@ -568,9 +568,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_elementTemplate();
         if (result0 === null) {
           result0 = parse_variableTemplate();
@@ -578,14 +578,14 @@ var logicProofParser = (function(){
             result0 = parse_booleanTemplate2();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_booleanTemplate2() {
         var cacheKey = "booleanTemplate2@" + pos;
         var cachedResult = cache[cacheKey];
@@ -593,10 +593,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.substr(pos, 2) === "{{") {
@@ -657,14 +657,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_formulaLHS() {
         var cacheKey = "formulaLHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -672,10 +672,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_name();
@@ -732,14 +732,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_listOfVariables() {
         var cacheKey = "listOfVariables@" + pos;
         var cachedResult = cache[cacheKey];
@@ -747,10 +747,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_variable();
@@ -784,14 +784,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_commaThenVariable() {
         var cacheKey = "commaThenVariable@" + pos;
         var cachedResult = cache[cacheKey];
@@ -799,10 +799,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 44) {
@@ -832,14 +832,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_expression() {
         var cacheKey = "expression@" + pos;
         var cachedResult = cache[cacheKey];
@@ -847,10 +847,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         result0 = parse_iffFormula();
         if (result0 !== null) {
@@ -859,14 +859,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_listOfExpressions() {
         var cacheKey = "listOfExpressions@" + pos;
         var cachedResult = cache[cacheKey];
@@ -874,10 +874,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_expression();
@@ -911,14 +911,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_commaThenExpression() {
         var cacheKey = "commaThenExpression@" + pos;
         var cachedResult = cache[cacheKey];
@@ -926,10 +926,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 44) {
@@ -959,14 +959,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_iffSymbol() {
         var cacheKey = "iffSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -974,9 +974,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.substr(pos, 3) === "<=>") {
           result0 = "<=>";
           pos += 3;
@@ -986,14 +986,14 @@ var logicProofParser = (function(){
             matchFailed("\"<=>\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_impliesSymbol() {
         var cacheKey = "impliesSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1001,9 +1001,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.substr(pos, 2) === "=>") {
           result0 = "=>";
           pos += 2;
@@ -1013,14 +1013,14 @@ var logicProofParser = (function(){
             matchFailed("\"=>\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_forAllSymbol() {
         var cacheKey = "forAllSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1028,9 +1028,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 8704) {
           result0 = "\u2200";
           pos++;
@@ -1040,14 +1040,14 @@ var logicProofParser = (function(){
             matchFailed("\"\\u2200\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_existsSymbol() {
         var cacheKey = "existsSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1055,9 +1055,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 8707) {
           result0 = "\u2203";
           pos++;
@@ -1067,14 +1067,14 @@ var logicProofParser = (function(){
             matchFailed("\"\\u2203\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_andSymbol() {
         var cacheKey = "andSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1082,9 +1082,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 8743) {
           result0 = "\u2227";
           pos++;
@@ -1094,14 +1094,14 @@ var logicProofParser = (function(){
             matchFailed("\"\\u2227\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_orSymbol() {
         var cacheKey = "orSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1109,9 +1109,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 8744) {
           result0 = "\u2228";
           pos++;
@@ -1121,14 +1121,14 @@ var logicProofParser = (function(){
             matchFailed("\"\\u2228\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_notSymbol() {
         var cacheKey = "notSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1136,9 +1136,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 126) {
           result0 = "~";
           pos++;
@@ -1148,14 +1148,14 @@ var logicProofParser = (function(){
             matchFailed("\"~\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_equalsSymbol() {
         var cacheKey = "equalsSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1163,10 +1163,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         if (input.charCodeAt(pos) === 61) {
           result0 = "=";
@@ -1183,14 +1183,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_lessThanOrEqualsSymbol() {
         var cacheKey = "lessThanOrEqualsSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1198,10 +1198,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         if (input.substr(pos, 2) === "<=") {
           result0 = "<=";
@@ -1218,14 +1218,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_greaterThanOrEqualsSymbol() {
         var cacheKey = "greaterThanOrEqualsSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1233,10 +1233,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         if (input.substr(pos, 2) === ">=") {
           result0 = ">=";
@@ -1253,14 +1253,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_lessThanSymbol() {
         var cacheKey = "lessThanSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1268,10 +1268,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         if (input.charCodeAt(pos) === 60) {
           result0 = "<";
@@ -1288,14 +1288,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_greaterThanSymbol() {
         var cacheKey = "greaterThanSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1303,10 +1303,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         if (input.charCodeAt(pos) === 62) {
           result0 = ">";
@@ -1323,14 +1323,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_notEqualsSymbol() {
         var cacheKey = "notEqualsSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1338,10 +1338,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         if (input.substr(pos, 2) === "!=") {
           result0 = "!=";
@@ -1358,14 +1358,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_membershipSymbol() {
         var cacheKey = "membershipSymbol@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1373,10 +1373,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         if (input.charCodeAt(pos) === 8712) {
           result0 = "\u2208";
@@ -1393,14 +1393,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_addition() {
         var cacheKey = "addition@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1408,9 +1408,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 43) {
           result0 = "+";
           pos++;
@@ -1420,14 +1420,14 @@ var logicProofParser = (function(){
             matchFailed("\"+\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_subtraction() {
         var cacheKey = "subtraction@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1435,9 +1435,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 45) {
           result0 = "-";
           pos++;
@@ -1447,14 +1447,14 @@ var logicProofParser = (function(){
             matchFailed("\"-\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_multiplication() {
         var cacheKey = "multiplication@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1462,9 +1462,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 42) {
           result0 = "*";
           pos++;
@@ -1474,14 +1474,14 @@ var logicProofParser = (function(){
             matchFailed("\"*\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_division() {
         var cacheKey = "division@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1489,9 +1489,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 47) {
           result0 = "/";
           pos++;
@@ -1501,14 +1501,14 @@ var logicProofParser = (function(){
             matchFailed("\"/\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_exponentiation() {
         var cacheKey = "exponentiation@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1516,9 +1516,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         if (input.charCodeAt(pos) === 94) {
           result0 = "^";
           pos++;
@@ -1528,14 +1528,14 @@ var logicProofParser = (function(){
             matchFailed("\"^\"");
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_iffFormula() {
         var cacheKey = "iffFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1543,10 +1543,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_impliesFormula();
@@ -1584,14 +1584,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_impliesFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_impliesFormula() {
         var cacheKey = "impliesFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1599,10 +1599,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_quantifierFormula();
@@ -1640,14 +1640,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_quantifierFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_quantifierFormula() {
         var cacheKey = "quantifierFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1655,21 +1655,21 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_orFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_forAllFormula() {
         var cacheKey = "forAllFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1677,10 +1677,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_forAllSymbol();
@@ -1733,14 +1733,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_existsFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_existsFormula() {
         var cacheKey = "existsFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1748,10 +1748,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_existsSymbol();
@@ -1804,14 +1804,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_boundedForAllFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_boundedForAllFormula() {
         var cacheKey = "boundedForAllFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1819,10 +1819,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3, result4, result5;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_forAllSymbol();
@@ -1892,14 +1892,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_boundedExistsFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_boundedExistsFormula() {
         var cacheKey = "boundedExistsFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1907,10 +1907,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3, result4, result5;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_existsSymbol();
@@ -1977,14 +1977,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_orFormula() {
         var cacheKey = "orFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -1992,10 +1992,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_andFormula();
@@ -2033,14 +2033,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_andFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_andFormula() {
         var cacheKey = "andFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2048,10 +2048,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_unaryFormula();
@@ -2089,14 +2089,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_unaryFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_andRHS() {
         var cacheKey = "andRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2104,21 +2104,21 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_andFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_unaryFormula() {
         var cacheKey = "unaryFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2126,21 +2126,21 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_notFormula();
         if (result0 === null) {
           result0 = parse_infixRelationFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_notFormula() {
         var cacheKey = "notFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2148,10 +2148,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_notSymbol();
@@ -2174,20 +2174,20 @@ var logicProofParser = (function(){
                 top_operator_name: 'not',
                 arguments: [right],
                 dummies: []
-              }               
+              }
             })(pos0, result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_notRHS() {
         var cacheKey = "notRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2195,21 +2195,21 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_unaryFormula();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_infixRelationFormula() {
         var cacheKey = "infixRelationFormula@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2217,10 +2217,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_additionArgument();
@@ -2258,14 +2258,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_additionArgument();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_infixRelationName() {
         var cacheKey = "infixRelationName@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2273,9 +2273,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_equalsSymbol();
         if (result0 === null) {
           result0 = parse_lessThanOrEqualsSymbol();
@@ -2295,14 +2295,14 @@ var logicProofParser = (function(){
             }
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_boundableInfixRelationName() {
         var cacheKey = "boundableInfixRelationName@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2310,9 +2310,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_lessThanOrEqualsSymbol();
         if (result0 === null) {
           result0 = parse_lessThanSymbol();
@@ -2320,14 +2320,14 @@ var logicProofParser = (function(){
             result0 = parse_membershipSymbol();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_infixRelationRHS() {
         var cacheKey = "infixRelationRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2335,9 +2335,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_notFormula();
@@ -2345,14 +2345,14 @@ var logicProofParser = (function(){
             result0 = parse_infixRelationFormula();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_additionArgument() {
         var cacheKey = "additionArgument@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2360,10 +2360,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_subtractionArgument();
@@ -2401,14 +2401,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_subtractionArgument();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_additionRHS() {
         var cacheKey = "additionRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2416,9 +2416,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_notFormula();
@@ -2426,14 +2426,14 @@ var logicProofParser = (function(){
             result0 = parse_additionArgument();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_subtractionArgument() {
         var cacheKey = "subtractionArgument@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2441,10 +2441,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_multiplicationArgument();
@@ -2482,14 +2482,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_multiplicationArgument();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_subtractionRHS() {
         var cacheKey = "subtractionRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2497,9 +2497,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_notFormula();
@@ -2507,14 +2507,14 @@ var logicProofParser = (function(){
             result0 = parse_subtractionArgument();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_multiplicationArgument() {
         var cacheKey = "multiplicationArgument@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2522,10 +2522,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_divisionArgument();
@@ -2563,14 +2563,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_divisionArgument();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_multiplicationRHS() {
         var cacheKey = "multiplicationRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2578,9 +2578,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_notFormula();
@@ -2588,14 +2588,14 @@ var logicProofParser = (function(){
             result0 = parse_multiplicationArgument();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_divisionArgument() {
         var cacheKey = "divisionArgument@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2603,10 +2603,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_exponentiationArgument();
@@ -2644,14 +2644,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_exponentiationArgument();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_divisionRHS() {
         var cacheKey = "divisionRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2659,9 +2659,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_notFormula();
@@ -2669,14 +2669,14 @@ var logicProofParser = (function(){
             result0 = parse_divisionArgument();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_exponentiationArgument() {
         var cacheKey = "exponentiationArgument@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2684,10 +2684,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_reducedArgument();
@@ -2725,14 +2725,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_reducedArgument();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_exponentiationRHS() {
         var cacheKey = "exponentiationRHS@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2740,9 +2740,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_forAllFormula();
         if (result0 === null) {
           result0 = parse_notFormula();
@@ -2750,14 +2750,14 @@ var logicProofParser = (function(){
             result0 = parse_exponentiationArgument();
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_reducedArgument() {
         var cacheKey = "reducedArgument@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2765,9 +2765,9 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
-        
+
         result0 = parse_bracketExpression();
         if (result0 === null) {
           result0 = parse_prefixFunction();
@@ -2778,14 +2778,14 @@ var logicProofParser = (function(){
             }
           }
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_bracketExpression() {
         var cacheKey = "bracketExpression@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2793,10 +2793,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 40) {
@@ -2840,14 +2840,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_prefixFunction() {
         var cacheKey = "prefixFunction@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2855,10 +2855,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_name();
@@ -2918,14 +2918,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_rangedFunction();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_rangedFunction() {
         var cacheKey = "rangedFunction@" + pos;
         var cachedResult = cache[cacheKey];
@@ -2933,10 +2933,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2, result3, result4, result5, result6, result7;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         result0 = parse_name();
@@ -3030,14 +3030,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_constant() {
         var cacheKey = "constant@" + pos;
         var cachedResult = cache[cacheKey];
@@ -3045,10 +3045,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1;
         var pos0;
-        
+
         pos0 = pos;
         if (/^[0-9]/.test(input.charAt(pos))) {
           result1 = input.charAt(pos);
@@ -3077,7 +3077,7 @@ var logicProofParser = (function(){
           result0 = null;
         }
         if (result0 !== null) {
-          result0 = (function(offset, digits) { 
+          result0 = (function(offset, digits) {
               return {
                 top_kind_name: 'constant',
                 top_operator_name: parseInt(digits.join(""), 10),
@@ -3093,14 +3093,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           result0 = parse_string();
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_string() {
         var cacheKey = "string@" + pos;
         var cachedResult = cache[cacheKey];
@@ -3108,10 +3108,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (input.charCodeAt(pos) === 39) {
@@ -3184,14 +3184,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_variable() {
         var cacheKey = "variable@" + pos;
         var cachedResult = cache[cacheKey];
@@ -3199,10 +3199,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0;
         var pos0;
-        
+
         pos0 = pos;
         result0 = parse_name();
         if (result0 !== null) {
@@ -3218,14 +3218,14 @@ var logicProofParser = (function(){
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
+
       function parse_name() {
         var cacheKey = "name@" + pos;
         var cachedResult = cache[cacheKey];
@@ -3233,10 +3233,10 @@ var logicProofParser = (function(){
           pos = cachedResult.nextPos;
           return cachedResult.result;
         }
-        
+
         var result0, result1, result2;
         var pos0, pos1;
-        
+
         pos0 = pos;
         pos1 = pos;
         if (/^[A-Za-z]/.test(input.charAt(pos))) {
@@ -3282,25 +3282,25 @@ var logicProofParser = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, first, middle) { 
+          result0 = (function(offset, first, middle) {
               return first + middle.join('');
             })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
         }
-        
+
         cache[cacheKey] = {
           nextPos: pos,
           result:  result0
         };
         return result0;
       }
-      
-      
+
+
       function cleanupExpected(expected) {
         expected.sort();
-        
+
         var lastExpected = null;
         var cleanExpected = [];
         for (var i = 0; i < expected.length; i++) {
@@ -3311,7 +3311,7 @@ var logicProofParser = (function(){
         }
         return cleanExpected;
       }
-      
+
       function computeErrorPosition() {
         /*
          * The first idea was to use |String.split| to break the input up to the
@@ -3319,11 +3319,11 @@ var logicProofParser = (function(){
          * there. However IE's |split| implementation is so broken that it was
          * enough to prevent it.
          */
-        
+
         var line = 1;
         var column = 1;
         var seenCR = false;
-        
+
         for (var i = 0; i < Math.max(pos, rightmostFailuresPos); i++) {
           var ch = input.charAt(i);
           if (ch === "\n") {
@@ -3339,13 +3339,13 @@ var logicProofParser = (function(){
             seenCR = false;
           }
         }
-        
+
         return { line: line, column: column };
       }
-      
-      
+
+
       var result = parseFunctions[startRule]();
-      
+
       /*
        * The parser is now in one of the following three states:
        *
@@ -3374,7 +3374,7 @@ var logicProofParser = (function(){
         var offset = Math.max(pos, rightmostFailuresPos);
         var found = offset < input.length ? input.charAt(offset) : null;
         var errorPosition = computeErrorPosition();
-        
+
         throw new this.SyntaxError(
           cleanupExpected(rightmostFailuresExpected),
           found,
@@ -3383,20 +3383,20 @@ var logicProofParser = (function(){
           errorPosition.column
         );
       }
-      
+
       return result;
     },
-    
+
     /* Returns the parser source code. */
     toSource: function() { return this._source; }
   };
-  
+
   /* Thrown when a parser encounters a syntax error. */
-  
+
   result.SyntaxError = function(expected, found, offset, line, column) {
     function buildMessage(expected, found) {
       var expectedHumanized, foundHumanized;
-      
+
       switch (expected.length) {
         case 0:
           expectedHumanized = "end of input";
@@ -3409,12 +3409,12 @@ var logicProofParser = (function(){
             + " or "
             + expected[expected.length - 1];
       }
-      
+
       foundHumanized = found ? quote(found) : "end of input";
-      
+
       return "Expected " + expectedHumanized + " but " + foundHumanized + " found.";
     }
-    
+
     this.name = "SyntaxError";
     this.expected = expected;
     this.found = found;
@@ -3423,8 +3423,8 @@ var logicProofParser = (function(){
     this.line = line;
     this.column = column;
   };
-  
+
   result.SyntaxError.prototype = Error.prototype;
-  
+
   return result;
 })();

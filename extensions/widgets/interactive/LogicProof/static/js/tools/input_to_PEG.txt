@@ -33,7 +33,7 @@ elementTemplate = '{{' element:element '|element}}'
         type: 'element',
       };
     }
- 
+
 variableTemplate = '{{' variable:variable '|variable}}'
     {
       return {
@@ -66,7 +66,7 @@ expressionTemplate2 =
      elementTemplate
    / variableTemplate
    / booleanTemplate2
- 
+
 booleanTemplate2 = '{{' expression:expression subs:substitution* '}}'
     {
       return {
@@ -194,7 +194,7 @@ quantifierFormula =
     forAllFormula
   / orFormula
 
-forAllFormula = 
+forAllFormula =
     forAllSymbol left:variable '.'? right:quantifierFormula
     {
       return {
@@ -206,7 +206,7 @@ forAllFormula =
     }
   / existsFormula
 
-existsFormula = 
+existsFormula =
     existsSymbol left:variable '.'? right:quantifierFormula
     {
       return {
@@ -218,7 +218,7 @@ existsFormula =
     }
   / boundedForAllFormula
 
-boundedForAllFormula = 
+boundedForAllFormula =
     forAllSymbol k:variable relation:boundableInfixRelationName n:element '.'? A:quantifierFormula
     {
       return {
@@ -235,7 +235,7 @@ boundedForAllFormula =
     }
   / boundedExistsFormula
 
-boundedExistsFormula = 
+boundedExistsFormula =
     existsSymbol k:variable relation:boundableInfixRelationName n:element '.'? A:quantifierFormula
     {
       return {
@@ -276,11 +276,11 @@ andFormula =
     }
   / unaryFormula
 
-andRHS = 
+andRHS =
     forAllFormula
   / andFormula
 
-unaryFormula = 
+unaryFormula =
     notFormula
   / infixRelationFormula
 
@@ -293,7 +293,7 @@ notFormula =
         top_operator_name: 'not',
         arguments: [right],
         dummies: []
-      }               
+      }
     }
 
 notRHS =
@@ -301,7 +301,7 @@ notRHS =
   / unaryFormula
 
 
-infixRelationFormula = 
+infixRelationFormula =
     left:additionArgument name:infixRelationName right:infixRelationRHS
     {
        return {
@@ -313,7 +313,7 @@ infixRelationFormula =
     }
   / additionArgument
 
-infixRelationName = 
+infixRelationName =
     equalsSymbol
   / lessThanOrEqualsSymbol
   / greaterThanOrEqualsSymbol
@@ -322,19 +322,19 @@ infixRelationName =
   / notEqualsSymbol
   / membershipSymbol
 
-boundableInfixRelationName = 
+boundableInfixRelationName =
     lessThanOrEqualsSymbol
   / lessThanSymbol
   / membershipSymbol
 
-infixRelationRHS = 
+infixRelationRHS =
     forAllFormula
   / notFormula
   / infixRelationFormula
 
 element = additionArgument
 
-additionArgument = 
+additionArgument =
     left:subtractionArgument addition right:additionRHS
     {
       return {
@@ -346,12 +346,12 @@ additionArgument =
     }
   / subtractionArgument
 
-additionRHS = 
+additionRHS =
     forAllFormula
   / notFormula
   / additionArgument
 
-subtractionArgument = 
+subtractionArgument =
     left:multiplicationArgument subtraction right:subtractionRHS
     {
       return {
@@ -363,12 +363,12 @@ subtractionArgument =
     }
   / multiplicationArgument
 
-subtractionRHS = 
+subtractionRHS =
     forAllFormula
   / notFormula
   / subtractionArgument
 
-multiplicationArgument = 
+multiplicationArgument =
     left:divisionArgument multiplication right:multiplicationRHS
     {
       return {
@@ -380,12 +380,12 @@ multiplicationArgument =
     }
   / divisionArgument
 
-multiplicationRHS = 
+multiplicationRHS =
     forAllFormula
   / notFormula
   / multiplicationArgument
 
-divisionArgument = 
+divisionArgument =
     left:exponentiationArgument division right:divisionRHS
     {
       return {
@@ -402,7 +402,7 @@ divisionRHS =
   / notFormula
   / divisionArgument
 
-exponentiationArgument = 
+exponentiationArgument =
     left:reducedArgument exponentiation right:exponentiationRHS
     {
       return {
@@ -414,21 +414,21 @@ exponentiationArgument =
     }
   / reducedArgument
 
-exponentiationRHS = 
+exponentiationRHS =
     forAllFormula
   / notFormula
   / exponentiationArgument
 
 
 
-reducedArgument = 
+reducedArgument =
     bracketExpression
   / prefixFunction
   / constant
   / variable
 
-bracketExpression = 
-    '(' e: expression ')' 
+bracketExpression =
+    '(' e: expression ')'
     {return e;}
 
 prefixFunction =
@@ -443,9 +443,9 @@ prefixFunction =
     }
   / rangedFunction
 
-  // NOTE: we use n:element instead of n:expression because otherwise the 
+  // NOTE: we use n:element instead of n:expression because otherwise the
   // parser inexplicably fails (probably due to 'or' in some way).
-  rangedFunction = 
+  rangedFunction =
     name:name '{' k:variable relation:boundableInfixRelationName n:element '|' A:expression '}'
     {
       return {
@@ -462,8 +462,8 @@ prefixFunction =
     }
 
 constant =
-    digits:[0-9]+ 
-    { 
+    digits:[0-9]+
+    {
       return {
         top_kind_name: 'constant',
         top_operator_name: parseInt(digits.join(""), 10),
@@ -498,8 +498,6 @@ variable =
 
 name =
     first:[A-Za-z] middle:[A-Za-z0-9_]*
-    { 
+    {
       return first + middle.join('');
     }
-
-    

@@ -33,7 +33,7 @@ DEFAULT_LINE_TEMPLATE_STRINGS = [{
   antecedents: 'R, S',
   results: 'R\u2227S',
   variables: '',
-  error: []  
+  error: []
 }, {
   name: 'and_introduce',
   reader_view: 'From S and R we have R\u2227S',

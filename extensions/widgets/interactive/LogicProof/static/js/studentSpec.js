@@ -37,7 +37,7 @@ var errorWrapper = function(dubiousFunction, input1, input2, input3, input4, inp
       }
     } catch(err) {
       throw new Error(logicProofShared.renderError(
-        err, logicProofData.BASE_GENERAL_MESSAGES, 
+        err, logicProofData.BASE_GENERAL_MESSAGES,
         logicProofData.BASE_STUDENT_LANGUAGE));
     }
   }
@@ -150,7 +150,7 @@ var displayExpressionDictionary = function(expressionDictionary, operators) {
       dummies:[],
       output:'integer'
     }]
-  } 
+  }
   sampleControlModel.evaluation_rules['scoper'] = {
     format:'definition',
     evaluateExpression: function(expression, inputs, model, parameters, cache) {
@@ -409,7 +409,7 @@ var displayExpressionDictionary = function(expressionDictionary, operators) {
             'template(n)=\'for_all_introduce\'\u2227entry(1,variables(n))\
 !=entry(1,variables(scoper(n-1)))',
             'expression'),
-          ['boolean'], sampleControlLanguage, 
+          ['boolean'], sampleControlLanguage,
           ['constant', 'variable']
         )[0].typedExpression,
         message:[[{
@@ -465,7 +465,7 @@ var displayExpressionDictionary = function(expressionDictionary, operators) {
           format:'expression',
           content: logicProofShared.assignTypesToExpression(
             logicProofParser.parse(
-              'entry(1,results(scoper(n)))', 'expression'), ['formula'], 
+              'entry(1,results(scoper(n)))', 'expression'), ['formula'],
             sampleControlLanguage, ['constant', 'variable']
           )[0].typedExpression
         }, {
@@ -483,7 +483,7 @@ describe('Match expression to expression template', function() {
   var matchThenDisplay = function(expressionString, templateString, oldMatchings) {
     return displayExpressionDictionary(
         logicProofStudent.matchExpression(
-          logicProofParser.parse(expressionString, 'expression'), 
+          logicProofParser.parse(expressionString, 'expression'),
           logicProofParser.parse(templateString, 'expression'), oldMatchings),
         logicProofData.BASE_STUDENT_LANGUAGE.operators
       );
@@ -571,7 +571,7 @@ describe('Match line to template', function() {
   var matchLineToTemplate = function(lineString, template) {
     return logicProofStudent.matchLineToTemplate(
       logicProofShared.parseLineString(
-        lineString, logicProofData.BASE_STUDENT_LANGUAGE.operators, 
+        lineString, logicProofData.BASE_STUDENT_LANGUAGE.operators,
         logicProofData.BASE_VOCABULARY
       )[0], template.reader_view, logicProofData.BASE_VOCABULARY);
   }
@@ -579,7 +579,7 @@ describe('Match line to template', function() {
   it('should match examples correctly', function() {
     expect(
       matchLineToTemplate(
-        'from A(x,y) and A(y,z) we have A(x,y)\u2227A(y,z)', 
+        'from A(x,y) and A(y,z) we have A(x,y)\u2227A(y,z)',
         sampleWidget.line_templates[0])
     ).toEqual({
       R: logicProofParser.parse('A(x,y)', 'expression'),
@@ -599,14 +599,14 @@ describe('Match line to template', function() {
   it('should reject examples that do not match', function() {
     expect(
       errorWrapper(
-        matchLineToTemplate, 'from p and q we have q\u2227p', 
+        matchLineToTemplate, 'from p and q we have q\u2227p',
         sampleWidget.line_templates[0])
     ).toThrow('This line could not be identified as valid - please check the\
  list of possible lines.');
 
     expect(
       errorWrapper(
-        matchLineToTemplate, 'z was arbitrary from \u2200x.x=2', 
+        matchLineToTemplate, 'z was arbitrary from \u2200x.x=2',
         sampleWidget.line_templates[1])
     ).toThrow('This line could not be identified as valid - please check the\
  list of possible lines.');
@@ -617,7 +617,7 @@ describe('Line to have known layout as student types', function() {
   var requireIdentifiable = function(lineString) {
     return logicProofStudent.requireIdentifiableLine(
       lineString, sampleWidget.line_templates,
-      logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY, 
+      logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY,
       logicProofData.BASE_GENERAL_MESSAGES
     );
   }
@@ -634,7 +634,7 @@ describe('Line to have known layout as student types', function() {
   });
 });
 
-describe('Require all lines to have known layouts as student types', 
+describe('Require all lines to have known layouts as student types',
   function() {
     it('should accept known layouts', function() {
       expect(
@@ -657,7 +657,7 @@ describe('Build, validate and display line', function() {
   var buildThenDisplay = function(lineString) {
     return displayLine(
       logicProofStudent.buildLine(
-        lineString, sampleWidget.line_templates, 
+        lineString, sampleWidget.line_templates,
         logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY
       ), logicProofData.BASE_STUDENT_LANGUAGE.operators
     );
@@ -760,9 +760,9 @@ describe('Evaluate a logical expression', function() {
   var testEvaluate = function(expressionString, type, inputs, parameters) {
     return logicProofStudent.evaluate(
       logicProofShared.assignTypesToExpression(
-        logicProofParser.parse(expressionString, 'expression'), [type], 
+        logicProofParser.parse(expressionString, 'expression'), [type],
         logicProofData.BASE_CONTROL_LANGUAGE
-      )[0].typedExpression, inputs, logicProofStudent.BASE_CONTROL_MODEL, 
+      )[0].typedExpression, inputs, logicProofStudent.BASE_CONTROL_MODEL,
       parameters, {});
   }
 
@@ -770,26 +770,26 @@ describe('Evaluate a logical expression', function() {
     expect(testEvaluate('2+2', 'integer', {}, {})).toEqual(4);
 
     expect(testEvaluate('y\u2208z', 'boolean', {
-      x: "a", 
-      y: logicProofParser.parse('p\u2227q', 'expression'), 
+      x: "a",
+      y: logicProofParser.parse('p\u2227q', 'expression'),
       z: [
-           logicProofParser.parse('\u2203x.p', 'expression'), 
+           logicProofParser.parse('\u2203x.p', 'expression'),
            logicProofParser.parse('p\u2227q', 'expression')
          ]
     }, {})).toEqual(true);
 
     expect(testEvaluate('x=\'a\'', 'boolean', {
-      x: '\'a\'', 
-      y: logicProofParser.parse('p\u2227q', 'expression'), 
+      x: '\'a\'',
+      y: logicProofParser.parse('p\u2227q', 'expression'),
       z: [
-           logicProofParser.parse('\u2203x.p', 'expression'), 
+           logicProofParser.parse('\u2203x.p', 'expression'),
            logicProofParser.parse('p\u2227q', 'expression')
          ]
     }, {})).toEqual(true);
 
     expect(
       testEvaluate(
-        'max{n<10|~\u2203x<10.\u2203y<10.(x>1\u2227y>1\u2227x*y=n)}', 
+        'max{n<10|~\u2203x<10.\u2203y<10.(x>1\u2227y>1\u2227x*y=n)}',
         'integer', {}, {})
     ).toEqual(7);
 
@@ -831,12 +831,12 @@ describe('Render mistake messages', function() {
       }, logicProofData.BASE_STUDENT_LANGUAGE.operators)
   }
 
-  it('should render example messages with respect to given proofs', 
+  it('should render example messages with respect to given proofs',
     function() {
 
     expect(
       render(
-        sampleWidget.mistake_table[0].entries[0] ,2, 
+        sampleWidget.mistake_table[0].entries[0] ,2,
         'a was arbitrary hence \u2200x.p\n  from p and q we have \
 p\u2227q\n  b was arbitrary hence \u2200x.q')[0]
     ).toEqual('We originally took a as our arbitrary variable so this, \
@@ -844,7 +844,7 @@ rather than b, needs to be the one that we quantify out over.');
 
     expect(
       render(
-        sampleWidget.mistake_table[1].entries[0], 1, 
+        sampleWidget.mistake_table[1].entries[0], 1,
         'a was arbitrary hence \u2200x.p\n  from p and q we have p\u2227q')[0]
     ).toEqual('The last line of a proof should not be indented; you need to \
 prove that the given formulas holds just from the original assumptions, not the\
@@ -852,7 +852,7 @@ prove that the given formulas holds just from the original assumptions, not the\
 
     expect(
       render(
-        sampleWidget.mistake_table[1].entries[0], 0, 
+        sampleWidget.mistake_table[1].entries[0], 0,
         'a was arbitrary hence \u2200x.p\n  from p and q we have p\u2227q')
     ).toEqual([]);
   });

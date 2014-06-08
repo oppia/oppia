@@ -22,15 +22,15 @@ var logicProofStudent = (function() {
 
   // These evaluation rules must all return an object of their specified output
   // type (boolean, integer, string, formula or set_of_formulas) or throw an
-  // error with message 'evaluation failed'. They will be used by evaluate() 
+  // error with message 'evaluation failed'. They will be used by evaluate()
   // when computing the value of an expression that contains these operators.
 
   // Evaluation strictness: if an error occurs at any point in a computation
-  // then the entire computation will return an error; so for example 
-  // true||error evaluates as error rather than true. The exceptions to this 
+  // then the entire computation will return an error; so for example
+  // true||error evaluates as error rather than true. The exceptions to this
   // are bounded quantification and ranged functions; for these we will
   // evaluate until we reach an answer and then return without computing any
-  // later values. So for example min{x<n|A(x)} where ~A(1)=false, A(2)=true 
+  // later values. So for example min{x<n|A(x)} where ~A(1)=false, A(2)=true
   // and A(3)=error will return true rather than error. The default control
   // functions rely heavily on this functionality and will need to be rewritten
   // if it is changed.
@@ -164,7 +164,7 @@ var logicProofStudent = (function() {
             newInputs[key] = inputs[key];
           }
           var bounder = evaluate(
-            expression.arguments[0].arguments[1], inputs, model, 
+            expression.arguments[0].arguments[1], inputs, model,
             evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
             var rangeEnd = (expression.arguments[0].top_operator_name === 'less_than') ?
@@ -174,7 +174,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = i;
               if (
                   !evaluate(
-                    expression.arguments[1], newInputs, model, 
+                    expression.arguments[1], newInputs, model,
                     evaluationParameters, cache)) {
                 return false;
               }
@@ -186,7 +186,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = bounder[i];
               if (
                 !evaluate(
-                  expression.arguments[1], newInputs, model, 
+                  expression.arguments[1], newInputs, model,
                   evaluationParameters, cache)) {
                 return false;
               }
@@ -213,7 +213,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = i;
               if (
                 evaluate(
-                  expression.arguments[1], newInputs, model, 
+                  expression.arguments[1], newInputs, model,
                   evaluationParameters, cache)) {
                 return true;
               }
@@ -225,7 +225,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = bounder[i];
               if (
                 evaluate(
-                  expression.arguments[1], newInputs, model, 
+                  expression.arguments[1], newInputs, model,
                   evaluationParameters, cache)) {
                 return true;
               }
@@ -234,7 +234,7 @@ var logicProofStudent = (function() {
           }
         }
       },
-      // min{k<n|A(k)} will range over [1,..,n-1], throwing an error if no 
+      // min{k<n|A(k)} will range over [1,..,n-1], throwing an error if no
       // match is found.
       // min{p∈antecedents(n)|A(p)} will range over antecedents(n), throwing
       // an error if no match is found.
@@ -246,7 +246,7 @@ var logicProofStudent = (function() {
             newInputs[key] = inputs[key];
           }
           var bounder = evaluate(
-            expression.arguments[0].arguments[1], inputs, model, 
+            expression.arguments[0].arguments[1], inputs, model,
             evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
             var rangeEnd = (expression.arguments[0].top_operator_name === 'less_than') ?
@@ -256,7 +256,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = i;
               if (
                 evaluate(
-                  expression.arguments[1], newInputs, model, 
+                  expression.arguments[1], newInputs, model,
                   evaluationParameters, cache)) {
                 return i;
               }
@@ -267,7 +267,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = bounder[i];
               if (
                 evaluate(
-                  expression.arguments[1], newInputs, model, 
+                  expression.arguments[1], newInputs, model,
                   evaluationParameters, cache)) {
                 return bounder[i];
               }
@@ -284,7 +284,7 @@ var logicProofStudent = (function() {
             newInputs[key] = inputs[key];
           }
           var bounder = evaluate(
-            expression.arguments[0].arguments[1], inputs, model, 
+            expression.arguments[0].arguments[1], inputs, model,
             evaluationParameters, cache);
           if (expression.arguments[0].arguments[0].type === 'integer') {
             var rangeEnd = (expression.arguments[0].top_operator_name === 'less_than') ?
@@ -294,7 +294,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = i;
               if (
                 evaluate(
-                  expression.arguments[1], newInputs, model, 
+                  expression.arguments[1], newInputs, model,
                   evaluationParameters, cache)) {
                 return i;
               }
@@ -305,7 +305,7 @@ var logicProofStudent = (function() {
               newInputs[expression.dummies[0].top_operator_name] = bounder[i];
               if (
                 evaluate(
-                  expression.arguments[1], newInputs, model, 
+                  expression.arguments[1], newInputs, model,
                   evaluationParameters, cache)) {
                 return bounder[i];
               }
@@ -466,7 +466,7 @@ var logicProofStudent = (function() {
  /**
   * This function is run when the state is loaded, it is top-level.
   * @param questionData: The information from the teacher specifying the
-  *        question - this will be one of the keys of 
+  *        question - this will be one of the keys of
   *        widget_customization_args.
   * @result A QuestionInstance object that will be used to build and check
   *         proofs from the student.
@@ -483,7 +483,7 @@ var logicProofStudent = (function() {
         var argumentValues = {};
         for (var i = 0; i < variables.length; i++) {
           argumentValues[variables[i].top_operator_name] = evaluate(
-            expression.arguments[i], inputs, model, evaluationParameters, 
+            expression.arguments[i], inputs, model, evaluationParameters,
             cache);
         }
         return evaluate(
@@ -494,7 +494,7 @@ var logicProofStudent = (function() {
       evaluationRules[questionData.control_functions[i].name] = {
         format: 'definition',
         evaluateExpression: makeEvaluateExpression(
-          questionData.control_functions[i].definition, 
+          questionData.control_functions[i].definition,
           questionData.control_functions[i].variables)
       };
       controlOperators[questionData.control_functions[i].name] = {
@@ -576,7 +576,7 @@ var logicProofStudent = (function() {
       return matchExpressionArray(subExpressions, subTemplates, matchings);
     }
   };
-  
+
   // companion of matchExpression
   var matchExpressionArray = function(array, templateArray, matchings) {
     for (var i = 0; i < array.length; i++) {
@@ -599,7 +599,7 @@ var logicProofStudent = (function() {
       for (var i = 0; i < expression.dummies.length; i++) {
         if (expression.dummies[i].top_operator_name === key) {
           isDummy = true;
-        } 
+        }
       }
       if (!isDummy) {
         newSubstitutions[key] = substitutions[key];
@@ -677,7 +677,7 @@ var logicProofStudent = (function() {
         newExpression, newSubstitutions[i]);
     }
     return newExpression;
-    // e.g. result is A(2)    
+    // e.g. result is A(2)
   };
 
   var computeExpressionsFromTemplateArray = function(templateArray, matchings) {
@@ -696,9 +696,9 @@ var logicProofStudent = (function() {
   *        the line the student actually wrote to the LineTemplate provided by
   *        the techer of which it is an instance.
   * @param operators: from the student Language and used for display purposes.
-  * @raises This function throws a logicProofShared.UserError (with the 'pre-rendered' code) that 
-  *         contains an array of strings describing the error, one of which will be 
-  *         chosen later to show to the student. If the messages list is empty 
+  * @raises This function throws a logicProofShared.UserError (with the 'pre-rendered' code) that
+  *         contains an array of strings describing the error, one of which will be
+  *         chosen later to show to the student. If the messages list is empty
   *         (signifying that the line in question is a correct one) we do nothing.
   */
   var throwLineMessages = function(messages, templateName, matchings, operators) {
@@ -725,7 +725,7 @@ var logicProofStudent = (function() {
   * Checks whether protoLine is an instance of template, in terms of both
   * expressions and phrases.
   * @param protoLine: a ProtoLine, that is an array of phrases and expressions
-  * @param template: the value corresponding to the reader_view key of a 
+  * @param template: the value corresponding to the reader_view key of a
   *        LineTemplate, so an array of phrases and ExpressionTemplates.
   * @return a dictionary of the form {string: Expression} that specifies what
   *          each variable / atom in the template corresponds to in the
@@ -747,7 +747,7 @@ var logicProofStudent = (function() {
         throw new logicProofShared.UserError('unmatched_line', {});
       }
       if (protoLine[i].format === 'expression') {
-        // Only unsubstituted expression templates are useful in establishing 
+        // Only unsubstituted expression templates are useful in establishing
         // the matchings. e.g. if we are told simple the expression
         // corresponding to p[x->a] it will not be possible to discern p, x or
         // a, because there are many possible subsitutions that could have
@@ -781,12 +781,12 @@ var logicProofStudent = (function() {
 
  /**
   * This is used by buildLine. It checks that the types of the line are
-  * correct and at the top agree with those the template requires, and 
+  * correct and at the top agree with those the template requires, and
   * likewise for the kinds of the line (if the template has an opinion).
   * @param matchings: a dictionary of {string: Expression} that allows the line
   *        the student wrote to be deduced from the reader_view key of the
   *        LineTemplate in question.
-  * @param templateReaderView: the value of the reader_view key of a 
+  * @param templateReaderView: the value of the reader_view key of a
   *        LineTemplate, so an array of phrases and ExpressionTemplates.
   * @param language: a Language object giving the student language
   * @raises A typing error if the types are invalid.
@@ -799,11 +799,11 @@ var logicProofStudent = (function() {
         var expression = computeExpressionFromTemplate(
           templateReaderView[i].content, matchings);
         if (
-          templateReaderView[i].content.hasOwnProperty('kind') && 
+          templateReaderView[i].content.hasOwnProperty('kind') &&
           templateReaderView[i].content.kind !== expression.top_kind_name) {
           throw new logicProofShared.UserError(
             'wrong_kind_in_line', {
-              expression: expression, 
+              expression: expression,
               expected_kind: templateReaderView[i].content.kind
             });
         }
@@ -828,7 +828,7 @@ var logicProofStudent = (function() {
   *           message: a string describing the problem
   *         }
   */
-  var requireIdentifiableLine = function(lineString, lineTemplates, language, 
+  var requireIdentifiableLine = function(lineString, lineTemplates, language,
       vocabulary, generalMessages) {
     try {
       var protoLines = logicProofShared.parseLineString(
@@ -880,8 +880,8 @@ var logicProofStudent = (function() {
     for (var i = 0; i < lineStrings.length; i++) {
       if (lineStrings[i].split(' ').join('').length !== 0) {
         try {
-          requireIdentifiableLine(lineStrings[i], 
-            questionInstance.line_templates, questionInstance.language, 
+          requireIdentifiableLine(lineStrings[i],
+            questionInstance.line_templates, questionInstance.language,
             questionInstance.vocabulary, questionInstance.general_messages);
         } catch (err) {
           throw {
@@ -896,18 +896,18 @@ var logicProofStudent = (function() {
  /**
   * @param lineString: a line of text written by the student
   * @param lineTemplates: an array of LineTemplates written by the teacher,
-  *        that describe the sorts of lines a student might write; we try to 
+  *        that describe the sorts of lines a student might write; we try to
   *        find one of which the given line is an instance.
   * @param language: the student language (a Language object)
-  * @param vocabulary: the phrases available for the student to use. It is a 
+  * @param vocabulary: the phrases available for the student to use. It is a
   *        dictionary with entries like satisfying: ['satisfying', 'such that']
-  *        which indicates that the student can convey the concept of 
+  *        which indicates that the student can convey the concept of
   *        'satisfying' by writing either 'satisfying' or 'such that'.
   * @return a Line object that is an abstract representation of the student's
-  *          lineString, constructed from this string and one of the 
+  *          lineString, constructed from this string and one of the
   *          lineTemplates.
   * @raises an error representing the closest we got to understanding the line,
-  *         generally 'unmatched line', a complaint about typing, or a 
+  *         generally 'unmatched line', a complaint about typing, or a
   *         LineMessage from the teacher if this is identified as an instance
   *         of an invalid deduction.
   */
@@ -922,7 +922,7 @@ var logicProofStudent = (function() {
     }
     var indentation = n / 2;
     var protoLines = logicProofShared.parseLineString(
-      lineString.slice(n, lineString.length), language.operators, vocabulary, 
+      lineString.slice(n, lineString.length), language.operators, vocabulary,
       false);
 
     // At this stage we wish to return the 'best' matching with the following
@@ -934,7 +934,7 @@ var logicProofStudent = (function() {
 
     // Returns true iff error1 is a better attempt than error2
     var _isBetterAttempt = function(error1, error2) {
-      return error2 === undefined || 
+      return error2 === undefined ||
         (error1.code === 'pre-rendered' && !error2.code === 'pre-rendered') ||
         (error1.code !== 'unmatched_line' && error2.code === 'unmatched_line');
     }
@@ -947,7 +947,7 @@ var logicProofStudent = (function() {
           requireValidMatching(
             matchings, lineTemplates[j].reader_view, language);
           throwLineMessages(
-            lineTemplates[j].error, lineTemplates[j].name, matchings, 
+            lineTemplates[j].error, lineTemplates[j].name, matchings,
             language.operators);
 
           var antecedents = [];
@@ -1002,7 +1002,7 @@ var logicProofStudent = (function() {
       try {
         builtLines.push(
           buildLine(
-            lineStrings[i], questionInstance.line_templates, 
+            lineStrings[i], questionInstance.line_templates,
             questionInstance.language, questionInstance.vocabulary));
       } catch (err) {
         throw {
@@ -1010,8 +1010,8 @@ var logicProofStudent = (function() {
             err, questionInstance.general_messages, questionInstance.language),
           line: i,
           code: err.code,
-          category: (err.name === 'PreRenderedUserError') ? 
-            'line': 
+          category: (err.name === 'PreRenderedUserError') ?
+            'line':
             questionInstance.general_messages[err.code].category
         };
       }
@@ -1026,15 +1026,15 @@ var logicProofStudent = (function() {
  /**
   * This function is a core component of the program - it takes an expression
   * and returns its value (with respect to given inputs, model and parameters).
-  * @param expression: the TypedExpression (in the control language) to be 
+  * @param expression: the TypedExpression (in the control language) to be
   *        evaluated, e.g. n+2
   * @param inputs: a dictionary with keys the free variables in the expression,
   *        giving for each the value they should be taken to have, e.g. {n:3}
-  * @param model: a Model object that specifies how to evaluate functions - 
+  * @param model: a Model object that specifies how to evaluate functions -
   *        e.g. that '+' should be interpreted as the usual addition.
   * @param evaluationRuleParameters: these are sent to all of the EvaluationRules occurring
   *        in the model, for them to make use of if they wish. e.g. here they
-  *        would include the student's proof, and the function 'num_lines' 
+  *        would include the student's proof, and the function 'num_lines'
   *        would evaluate by examining this proof.
   * @param cache: expressions, at particular inputs, that were already
   *        evaluated.
@@ -1063,8 +1063,8 @@ var logicProofStudent = (function() {
       } else if (evaluationRule.format === 'definition') {
         // evaluate arguments (spec requires that the expression has no dummies)
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' + 
-            expression.top_operator_name + 
+          throw new Error('evaluate() received ' +
+            expression.top_operator_name +
             ' to be evaluated via a definition but it has dummies');
         }
         var answer =  evaluationRule.evaluateExpression(
@@ -1073,8 +1073,8 @@ var logicProofStudent = (function() {
       } else if (evaluationRule.format === 'bottom_up') {
         // evaluate arguments (spec requires that there are no dummies)
         if (expression.dummies.length > 0) {
-          throw new Error('evaluate() received ' + 
-            expression.top_operator_name + 
+          throw new Error('evaluate() received ' +
+            expression.top_operator_name +
             ' to be evaluated bottom-up but it has dummies');
         }
         var arguments = [];
@@ -1091,7 +1091,7 @@ var logicProofStudent = (function() {
         var answer =  evaluationRule.evaluateExpression(
           arguments, types, evaluationRuleParameters);
       } else {
-        throw Error('Unknown evaluation rule format (' + 
+        throw Error('Unknown evaluation rule format (' +
           evaluationRule.format + ') sent to evaluate().')
       }
     }
@@ -1154,7 +1154,7 @@ var logicProofStudent = (function() {
   *        buildInstance().
   * @raises if a mistake from the mistake_table has been
   *          made in the proof, {
-  *            message: a human-readable description of the first mistake 
+  *            message: a human-readable description of the first mistake
   *              identified,
   *            line: the line (zero-indexed) the error occurred in,
   *            code: the name of the mistake that was made
@@ -1167,12 +1167,12 @@ var logicProofStudent = (function() {
       proof: proof,
       assumptions: questionInstance.assumptions,
       // questionInstance.results is an array of expressions, to allow for
-      // future questions in which the student has to prove more than one 
+      // future questions in which the student has to prove more than one
       // thing, but for now we only permit one target per question.
       target: questionInstance.results[0]
     }
     // We check for all mistakes in the first mistake section (layout) first so
-    // that formulas in subsequent sections can assume the layout is correct, 
+    // that formulas in subsequent sections can assume the layout is correct,
     // and so on with the subsequent sections.
     for (var i = 0; i < questionInstance.mistake_table.length; i++) {
       for (var lineNumber = 0; lineNumber < proof.lines.length; lineNumber++) {
@@ -1185,7 +1185,7 @@ var logicProofStudent = (function() {
           var check = false;
           try {
             check = evaluate(
-              mistake.occurs, {n: lineNumber + 1}, 
+              mistake.occurs, {n: lineNumber + 1},
               questionInstance.control_model, parameters, evaluationCache);
           } catch(err) {
             if (err.message !== 'evaluation failed') {
@@ -1194,20 +1194,20 @@ var logicProofStudent = (function() {
           }
           if (check) {
             var mistakeMessages = renderMistakeMessages(
-                mistake, lineNumber, questionInstance.control_model, 
+                mistake, lineNumber, questionInstance.control_model,
                 parameters, questionInstance.language.operators);
-            // If the teacher has made a mistake and none of the messages they have 
-            // provided can be evaluated then we try to return to the student as 
+            // If the teacher has made a mistake and none of the messages they have
+            // provided can be evaluated then we try to return to the student as
             // helpful a message as possible.
             var error = (mistakeMessages.length > 0) ?
               new logicProofShared.PreRenderedUserError(
                 mistakeMessages, mistake.name):
               new logicProofShared.UserError('unspecified_mistake', {
-                section: questionInstance.mistake_table[i].name, 
+                section: questionInstance.mistake_table[i].name,
                 entry: mistake.name});
             throw {
               message: logicProofShared.renderError(
-                error, questionInstance.general_messages, 
+                error, questionInstance.general_messages,
                 questionInstance.language),
               line: lineNumber,
               code: mistake.name,
@@ -1236,4 +1236,4 @@ var logicProofStudent = (function() {
     renderMistakeMessages: renderMistakeMessages,
     checkProof: checkProof
   }
-})()
+})();

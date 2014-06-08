@@ -35,21 +35,21 @@ var errorWrapper2 = function(dubiousFunction, input1, input2, input3, input4, in
       }
     } catch(err) {
       throw new Error(logicProofShared.renderError(
-        err, logicProofTeacher.TEACHER_ERROR_MESSAGES, 
+        err, logicProofTeacher.TEACHER_ERROR_MESSAGES,
         logicProofData.BASE_STUDENT_LANGUAGE));
     }
   }
 };
 
 describe('Build line templates', function() {
-  var buildThenDisplay = function(nameString, readerViewString, 
+  var buildThenDisplay = function(nameString, readerViewString,
     antecedentsString, resultsString, variablesString, errorStrings) {
     return logicProofTeacher2.displayLineTemplate(
       logicProofTeacher2.buildLineTemplate(
-        nameString, readerViewString, antecedentsString, resultsString, 
-        variablesString, errorStrings, logicProofData.BASE_STUDENT_LANGUAGE, 
+        nameString, readerViewString, antecedentsString, resultsString,
+        variablesString, errorStrings, logicProofData.BASE_STUDENT_LANGUAGE,
         logicProofData.BASE_VOCABULARY
-      ), logicProofData.BASE_STUDENT_LANGUAGE.operators, 
+      ), logicProofData.BASE_STUDENT_LANGUAGE.operators,
       logicProofData.BASE_VOCABULARY
     );
   }
@@ -70,16 +70,16 @@ describe('Build line templates', function() {
     expect(
       buildThenDisplay(
         'and_introduce', 'from p we have p\u2227q', 'p', 'p\u2227q', '', [
-          'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?', 
+          'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
           'To prove {{p\u2227q}} you need to have shown {{q}} as well'
         ])).toEqual({
         name: 'and_introduce',
-        reader_view: 'from p we have p\u2227q', 
+        reader_view: 'from p we have p\u2227q',
         antecedents: 'p',
-        results: 'p\u2227q', 
+        results: 'p\u2227q',
         variables: '',
         error: [
-          'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?', 
+          'Should this be "from {{p}} and {{q}} we have {{p\u2227q}}"?',
           'To prove {{p\u2227q}} you need to have shown {{q}} as well'
         ]
       });
@@ -108,7 +108,7 @@ describe('Build line templates', function() {
     // FUTURE: render this test passable
     expect(
       errorWrapper2(
-        buildThenDisplay, 'exists_introduce', 
+        buildThenDisplay, 'exists_introduce',
         'from p[x->a] we have \u2203x.p', 'p[x->a]', '\u2203x.p', 'a', [])
     ).toThrow(
       'It will not be possible to uniquely identify a from a line of this form.');
@@ -127,7 +127,7 @@ describe('Build line template table', function() {
   var buildThenDisplay = function(inputStrings) {
     return logicProofTeacher2.displayLineTemplateTable(
       logicProofTeacher2.buildLineTemplateTable(
-        inputStrings, logicProofData.BASE_VOCABULARY), 
+        inputStrings, logicProofData.BASE_VOCABULARY),
       logicProofData.BASE_VOCABULARY);
   }
 
@@ -145,7 +145,7 @@ describe('Build line template table', function() {
       antecedents: 'r, p, q',
       results: '',
       variables: 'x',
-      error: ['How unwise {{x|variable}}.']        
+      error: ['How unwise {{x|variable}}.']
     }])).toEqual([{
       name: "a",
       reader_view: "p hence q",
@@ -179,7 +179,7 @@ describe('Build line template table', function() {
             antecedents: 'r, p, q',
             results: '',
             variables: 'x',
-            error: ['How unwise {{x|variable}}.']        
+            error: ['How unwise {{x|variable}}.']
           }]);
       } catch(err) {return err}
     })()[1]).toEqual(
@@ -191,7 +191,7 @@ describe('Build mistake entry', function() {
   var buildThenDisplay = function(nameString, occursString, messageStrings) {
     return logicProofTeacher2.displayMistakeEntry(
       logicProofTeacher2.buildMistakeEntry(
-        nameString, occursString, messageStrings, 
+        nameString, occursString, messageStrings,
         logicProofData.BASE_CONTROL_LANGUAGE
       ), logicProofData.BASE_CONTROL_LANGUAGE.operators
     );
@@ -268,7 +268,7 @@ describe('Build mistake entry', function() {
         ])
     ).toEqual({
           name: 'name',
-          occurs: '(n=1)\u2227(indentation(n)>0)', 
+          occurs: '(n=1)\u2227(indentation(n)>0)',
           message: [
             'The first line of a proof should not be indented',
             'Don\'t indent the first line of your proof'
@@ -278,7 +278,7 @@ describe('Build mistake entry', function() {
   it('should reject mis-typed combinations of expressions', function() {
     expect(
       errorWrapper2(
-        buildThenDisplay, 'name', 'template(n) = \'given\'', 
+        buildThenDisplay, 'name', 'template(n) = \'given\'',
         ['examine {{antecedents(n-1)+1}}'])
     ).toThrow(
       'antecedents yields a set_of_formulas but you are trying to use it to give a integer.'
@@ -308,7 +308,7 @@ describe('Build mistake section', function() {
           name: 'mistake_1',
           occurs: 'entry(1,antecedents(n))\u2208assumptions()',
           message: ['wrong']
-        }, { 
+        }, {
           name: 'mistake_2',
           occurs: 'num_lines()>3',
           message: ['Try to assess {{indentation(22)}}']
@@ -336,7 +336,7 @@ describe('Build control function', function() {
   var buildThenDisplay = function(LHSstring, RHSstring, descriptionString) {
     return logicProofTeacher2.displayControlFunction(
       logicProofTeacher2.buildControlFunction(
-        LHSstring, RHSstring, descriptionString, 
+        LHSstring, RHSstring, descriptionString,
         logicProofData.BASE_CONTROL_LANGUAGE),
       logicProofData.BASE_CONTROL_LANGUAGE.operators);
   }
@@ -392,7 +392,7 @@ describe('Build control function', function() {
     });
 
     expect(
-      buildThenDisplay('is_scope_creator(n)', 
+      buildThenDisplay('is_scope_creator(n)',
         'template(n)=\'given\' \u2228 template(n)=\'assumption\'', '')
     ).toEqual({
       LHS: 'is_scope_creator(n)',
@@ -404,7 +404,7 @@ describe('Build control function', function() {
   it('should reject undefined functions', function() {
     expect(
       errorWrapper2(
-        buildThenDisplay, 'bad_function(x,y)', 'missing_function(x-y, x+y)', 
+        buildThenDisplay, 'bad_function(x,y)', 'missing_function(x-y, x+y)',
         '')
     ).toThrow('The operator missing_function could not be identified.');
   });
@@ -441,11 +441,11 @@ describe('Build control function table', function() {
         logicProofTeacher2.buildControlFunctionTable(
           [
             {
-              LHS: 'is_scope_creator(n)', 
+              LHS: 'is_scope_creator(n)',
               RHS: 'template(n)=\'given\' \u2228 template(n)=\'assumption\'',
               description: 'a',
             }, {
-              LHS: 'is_in_scope(m,n)', 
+              LHS: 'is_in_scope(m,n)',
               RHS: '(~is_scope_creator(m)\u2227indentation(n)>=indentation(m)\
 \u2227~\u2203k<=n.(k>=m\u2227indentation(k)<indentation(m)))\u2228\
 (indentation(n)>indentation(m)\u2227~\u2203\
@@ -482,12 +482,12 @@ k<=n.(k>=m\u2227indentation(k)<=indentation(m)))',
 });
 
 describe('Parse messages describing student mistakes', function() {
-  it('should parse then display control-language messages correctly', 
+  it('should parse then display control-language messages correctly',
     function() {
-      
+
     expect(logicProofTeacher2.displayControlMessage(
         logicProofTeacher2.parseMessage(
-          'stuff {{p\u2227q}} thingies', 'control'), 
+          'stuff {{p\u2227q}} thingies', 'control'),
         logicProofData.BASE_CONTROL_LANGUAGE.operators)
     ).toEqual('stuff {{p\u2227q}} thingies');
   });
@@ -511,7 +511,7 @@ describe('Parse messages describing student mistakes', function() {
   it('should forbid unparseable expression templates', function() {
     expect(
       errorWrapper2(
-        logicProofTeacher2.parseMessage, 
+        logicProofTeacher2.parseMessage,
         'By lack of arbitraryness this fails for {{p[[x->a]}}.', 'line')
     ).toThrow('It was not possible to parse {{p[[x->a]}}.');
   });
@@ -519,7 +519,7 @@ describe('Parse messages describing student mistakes', function() {
   it('should forbid unmatched {{', function() {
     expect(
       errorWrapper2(
-        logicProofTeacher2.parseMessage, 
+        logicProofTeacher2.parseMessage,
         'of {{result(scoper(n))}}.{{d)', 'control')
     ).toThrow('This has an unmatched {{.');
   });

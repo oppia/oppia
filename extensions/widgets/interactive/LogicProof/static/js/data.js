@@ -13,7 +13,7 @@ var logicProofData = (function() {
     given: ['given'],
     contradiction: ['contradiction'],
     at: ['at']
-  }
+  };
 
   var SINGLE_BOOLEAN = {
     type: 'boolean',
@@ -25,7 +25,7 @@ var logicProofData = (function() {
   }
 
   // NOTE: by default and & or must be binary
-  // NOTE: we are not yet using the display keys from the kinds (we are using symbol keys from the list of operators) 
+  // NOTE: we are not yet using the display keys from the kinds (we are using symbol keys from the list of operators)
   var BASE_STUDENT_LANGUAGE = {
     types: {
       boolean: {quantifiable: false},
@@ -546,29 +546,29 @@ var logicProofData = (function() {
           dummies: [SINGLE_INTEGER],
           output: 'boolean'
         }, {
-          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN], 
+          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN],
           dummies: [SINGLE_INTEGER],
-          output: 'boolean'          
+          output: 'boolean'
         }],
         symbols: ['\u2200', '.']
       },
       bounded_exists: {
         kind: 'bounded_quantifier',
         typing: [{
-          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN], 
+          arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN],
           dummies: [SINGLE_INTEGER],
           output: 'boolean'
         }, {
           arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN], // first argument is the bounding
           dummies: [SINGLE_FORMULA],
-          output: 'boolean'          
+          output: 'boolean'
         }],
         symbols: ['\u2203', '.']
       },
       // has form min{n<m|A(n)}, A(n) is the argument and n the dummy, or
       // alteratively min{p∈antecedents(n)|B(p)} which will return the first
       // element of set_of_formulas antecedents(n) satisfying B.
-      min: { 
+      min: {
         kind: 'ranged_function',
         typing: [{
           arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN],
@@ -581,7 +581,7 @@ var logicProofData = (function() {
         }],
         symbols: ['min', '{', '|', '}']
       },
-      max: { 
+      max: {
         kind: 'ranged_function',
         typing: [{
           arguments: [SINGLE_BOOLEAN, SINGLE_BOOLEAN],
@@ -750,7 +750,7 @@ var logicProofData = (function() {
         isFixed: true,
         content: ' should be a '
       }, {
-        isFixed: false, 
+        isFixed: false,
         content: 'expected_kind'
       }, {
         isFixed: true,

@@ -26,7 +26,7 @@ var logicProofTeacher = (function() {
   * widget is used.
   * @param assumptionsString: typed by the teacher to describe the assumptions
   *        the student is allowed to make.
-  * @param targetString: typed by the teacher to describe what the student is 
+  * @param targetString: typed by the teacher to describe what the student is
   *        supposed to prove.
   * @param language: A Language object in which expressions are written.
   * @param vocabulary: A vocabulary object, the words from which the teacher is
@@ -34,7 +34,7 @@ var logicProofTeacher = (function() {
   * @result {
   *           operators: the operators occurring in the question including both
   *             ordinary ones (like ∧) and specific ones (like f).
-  *           assumptions: an array of Expressions, which will form the 
+  *           assumptions: an array of Expressions, which will form the
   *             'assumptions' key in the widget.
   *           results: an array of length one built from the targetString which
   *             will form the 'results' key in the widget.
@@ -82,7 +82,7 @@ var logicProofTeacher = (function() {
 
     try {
       var typing = logicProofShared.assignTypesToExpressionArray(
-        expressions, topTypes, logicProofData.BASE_STUDENT_LANGUAGE, 
+        expressions, topTypes, logicProofData.BASE_STUDENT_LANGUAGE,
         ['variable', 'constant', 'prefix_function']
       );
       if (typing.length > 1) {
@@ -127,8 +127,8 @@ var logicProofTeacher = (function() {
     var operatorNamesToCheck = logicProofShared.getOperatorsFromExpressionArray(
       expressionArray);
     for (var i = 0; i < operatorNamesToCheck.length; i++) {
-      if (_isMember(operatorNamesToCheck[i], vocabularyWords) && 
-          operatorNamesToCheck[i].length > 1 && 
+      if (_isMember(operatorNamesToCheck[i], vocabularyWords) &&
+          operatorNamesToCheck[i].length > 1 &&
           !knownOperators.hasOwnProperty(operatorNamesToCheck[i])) {
         throw new logicProofShared.UserError(
           'forbidden_word', {word: operatorNamesToCheck[i]});
