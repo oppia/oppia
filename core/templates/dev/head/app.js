@@ -188,3 +188,21 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
     }
   };
 }]);
+
+// Service for creating HTML strings programmatically.
+oppia.factory('htmlService', [function() {
+  return {
+    // Constructs an HTML string from an element name, a list of 2-element lists
+    // representing attribute names and values, and an optional innerText string.
+    build: function(eltName, attrPairs, innerText) {
+      var jQueryElt = $(document.createElement(eltName));
+      for (var i = 0; i < attrPairs.length; i++) {
+        jQueryElt = jQueryElt.attr(attrPairs[i][0], attrPairs[i][1]);
+      }
+      if (innerText) {
+        jQueryElt = jQueryElt.text(innerText);
+      }
+      return jQueryElt[0].outerHTML;
+    }
+  };
+}]);

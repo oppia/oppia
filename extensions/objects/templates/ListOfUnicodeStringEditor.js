@@ -17,7 +17,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('listEditor', function($compile, warningsData) {
+oppia.directive('listOfUnicodeStringEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
       scope.getTemplateUrl = function() {
