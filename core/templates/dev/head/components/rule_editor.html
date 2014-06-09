@@ -3,6 +3,9 @@
     <button type="button" class="btn btn-default btn-xs pull-right" ng-if="!isDefaultRule() && isEditable" ng-click="deleteRule()">
       <span class="glyphicon glyphicon-remove" title="Remove Rule"></span>
     </button>
+    <span class="pull-left">
+      <span class="glyphicon glyphicon-resize-vertical" style="font-size: 20px;"></span>
+    </span>
     <div class="oppia-rule-description-editor" ng-class="getEditableCssClassForRule()" ng-click="openRuleDescriptionEditorIfNotDefault()">
       <span ng-if="isRuleConfusing()" class="glyphicon glyphicon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></span>
       <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
