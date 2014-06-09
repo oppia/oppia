@@ -446,10 +446,10 @@ describe('Build control function table', function() {
               description: 'a',
             }, {
               LHS: 'is_in_scope(m,n)',
-              RHS: '(~is_scope_creator(m)\u2227indentation(n)>=indentation(m)\
-\u2227~\u2203k<=n.(k>=m\u2227indentation(k)<indentation(m)))\u2228\
-(indentation(n)>indentation(m)\u2227~\u2203\
-k<=n.(k>=m\u2227indentation(k)<=indentation(m)))',
+              RHS: '(~is_scope_creator(m)\u2227indentation(n)>=indentation(m)' +
+                '\u2227~\u2203k<=n.(k>=m\u2227indentation(k)<indentation(m)))\u2228' +
+                '(indentation(n)>indentation(m)\u2227~\u2203' +
+                'k<=n.(k>=m\u2227indentation(k)<=indentation(m)))',
               description: 'b'
             }
           ]
@@ -460,10 +460,10 @@ k<=n.(k>=m\u2227indentation(k)<=indentation(m)))',
       description: 'a'
     }, {
       LHS: 'is_in_scope(m,n)',
-      RHS: '((~is_scope_creator(m))\u2227((indentation(n)>=indentation(m))\
-\u2227(~\u2203k<=n.(k>=m)\u2227(indentation(k)<indentation(m)))))\u2228\
-((indentation(n)>indentation(m))\u2227(~\u2203k<=n.(k>=m)\u2227\
-(indentation(k)<=indentation(m))))',
+      RHS: '((~is_scope_creator(m))\u2227((indentation(n)>=indentation(m))' +
+        '\u2227(~\u2203k<=n.(k>=m)\u2227(indentation(k)<indentation(m)))))\u2228' +
+        '((indentation(n)>indentation(m))\u2227(~\u2203k<=n.(k>=m)\u2227' +
+        '(indentation(k)<=indentation(m))))',
       description: 'b'
     }]);
   });

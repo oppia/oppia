@@ -109,7 +109,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
               $scope.refreshMessages(editor);
             }
           });
-        }
+        };
 
         $scope.refreshMessages = function(editor) {
           if($scope.mistakeMark) {
@@ -128,11 +128,11 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // NOTE: this line is necessary to force angular to refresh the
           // displayed proofError.
           $scope.$apply();
-        }
+        };
 
         $scope.displayMessage = function(message, lineNumber) {
           return 'line ' + (lineNumber + 1) + ': ' + message;
-        }
+        };
 
         $scope.displayProof = function(proofString, errorLineNum) {
           var proofLines = proofString.split('\n');
@@ -149,7 +149,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
               numberedLines[errorLineNum], 
               numberedLines.slice(errorLineNum + 1, numberedLines.length).join('\n')
             ];
-        }
+        };
 
         // NOTE: proof_num_lines, displayed_question and displayed_proof are only computed here
         // because response.html needs them and does not have its own
@@ -184,7 +184,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
               displayed_proof: $scope.displayProof($scope.proofString, err.line)
             }, 'submit');
           }
-        }
+        };
         $scope.showHelp = function() {
           $modal.open({
             templateUrl: 'modals/logicProofHelp',

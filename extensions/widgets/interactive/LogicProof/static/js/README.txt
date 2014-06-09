@@ -31,7 +31,8 @@ In order to update generatedDefaultData.js:
 5. Run karma tests.
 
  More information about the program flow, together with specifications for all the 
- objects used, can be found at [LINK].
+ objects used, can be found at 
+ https://docs.google.com/document/d/1go1RdOS2IW1A9f9_dyTKuWPVzWZS5lb43TZCn5KY3Tc/edit?usp=sharing
 
  Useful unicode codes:
   - ∧ (and) \u2227

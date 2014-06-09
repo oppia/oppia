@@ -18,11 +18,11 @@ var logicProofData = (function() {
   var SINGLE_BOOLEAN = {
     type: 'boolean',
     arbitrarily_many: false
-  }
+  };
   var SINGLE_ELEMENT = {
     type: 'element',
     arbitrarily_many: false
-  }
+  };
 
   // NOTE: by default and & or must be binary
   // NOTE: we are not yet using the display keys from the kinds (we are using symbol keys from the list of operators)
@@ -292,24 +292,24 @@ var logicProofData = (function() {
         symbols: ['^']
       }
     }
-  }
+  };
 
   var SINGLE_INTEGER = {
     type: 'integer',
     arbitrarily_many: false
-  }
+  };
   var SINGLE_STRING = {
     type: 'string',
     arbitrarily_many: false
-  }
+  };
   var SINGLE_FORMULA = {
     type: 'formula',
     arbitrarily_many: false
-  }
+  };
   var SINGLE_SET_OF_FORMULAS = {
     type: 'set_of_formulas',
     arbitrarily_many: false
-  }
+  };
 
   var BASE_CONTROL_LANGUAGE = {
     types: {
@@ -720,7 +720,7 @@ var logicProofData = (function() {
         }]
       }
     }
-  }
+  };
 
   var BASE_GENERAL_MESSAGES = {
     'odd_number_spaces': {
@@ -1077,12 +1077,12 @@ var logicProofData = (function() {
       parameters: {}
     },
     category: 'typing'
-  }
+  };
 
   return {
     BASE_VOCABULARY: BASE_VOCABULARY,
     BASE_STUDENT_LANGUAGE: BASE_STUDENT_LANGUAGE,
     BASE_CONTROL_LANGUAGE: BASE_CONTROL_LANGUAGE,
     BASE_GENERAL_MESSAGES: BASE_GENERAL_MESSAGES
-  }
-})()
+  };
+})();

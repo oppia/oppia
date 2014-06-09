@@ -43,7 +43,7 @@ var errorWrapper = function(dubiousFunction, input1, input2, input3, input4, inp
   }
 };
 
-describe('Full sustem', function() {
+describe('Full system', function() {
   var completeCheck = function(assumptionsString, targetString, proofString) {
     var questionInstance = logicProofStudent.buildInstance(
       LOGIC_PROOF_DEFAULT_QUESTION_DATA);
@@ -59,30 +59,30 @@ describe('Full sustem', function() {
 
   it('should accept fully correct proofs', function() {
 
-    expect(completeCheck('p', 'p', 'we know p')).toEqual(undefined);
+    expect(completeCheck('p', 'p', 'we know p')).toBeUndefined();
 
     expect(
-      completeCheck('~R, ~S', '~(R∨S)',
-        'if R∨S\n' +
-        '  if R\n' +
-        '    from R and ~R have contradiction\n' +
-        '  if S\n' +
-        '    from S and ~S have contradiction\n' +
-        '  we know R∨S and whichever is true we have contradiction\n' +
-        'hence ~(R∨S)')).toEqual(undefined);
+      completeCheck('~R, ~S', '~(R∨S)', [
+        'if R∨S',
+        '  if R',
+        '    from R and ~R have contradiction',
+        '  if S',
+        '    from S and ~S have contradiction',
+        '  we know R∨S and whichever is true we have contradiction',
+        'hence ~(R∨S)'].join('\n'))).toBeUndefined();
 
     expect(
-      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))∧(∀x.B(x))',
-        'given c\n' +
-        '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)\n' +
-        '  from A(c)∧B(c) we have A(c)\n' +
-        'c was arbitrary so ∀x.A(x)\n' +
-        'given d\n' +
-        '  from ∀x.(A(x)∧B(x)) at d we have A(d)∧B(d)\n' +
-        '  from A(d)∧B(d) we have B(d)\n' +
-        'd was arbitrary so ∀x.B(x)\n' +
-        'from ∀x.A(x) and ∀x.B(x) have (∀x.A(x))∧(∀x.B(x))')
-      ).toEqual(undefined);
+      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))∧(∀x.B(x))', [
+        'given c',
+        '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)',
+        '  from A(c)∧B(c) we have A(c)',
+        'c was arbitrary so ∀x.A(x)',
+        'given d',
+        '  from ∀x.(A(x)∧B(x)) at d we have A(d)∧B(d)',
+        '  from A(d)∧B(d) we have B(d)',
+        'd was arbitrary so ∀x.B(x)',
+        'from ∀x.A(x) and ∀x.B(x) have (∀x.A(x))∧(∀x.B(x))'].join('\n'))
+      ).toBeUndefined();
 
   });
 
@@ -99,37 +99,37 @@ describe('Full sustem', function() {
       'This line uses q, so you need to have an earlier line proving that q is true.');
 
     expect(function() {
-      completeCheck('~R, ~S', '~(R∨S)',
-        'if R∨S\n' +
-        '  if R\n' +
-        '    from R and ~R have contradiction\n' +
-        '  if A\n' +
-        '    if S\n' +
-        '      from S and ~S have contradiction\n' +
-        '  we know R∨S and whichever is true we have contradiction\n' +
-        'hence ~(R∨S)')
+      completeCheck('~R, ~S', '~(R∨S)', [
+        'if R∨S',
+        '  if R',
+        '    from R and ~R have contradiction',
+        '  if A',
+        '    if S',
+        '      from S and ~S have contradiction',
+        '  we know R∨S and whichever is true we have contradiction',
+        'hence ~(R∨S)'].join('\n'))
     }).toThrow('You proved that if S then contradiction follows, ' +
       'but this was in the context of \'  if A\', which we have since left.');
 
     expect(function() {
-      completeCheck('∀x.(A(x)∧B(x)), p', '(∀x.A(x))',
-        'given c\n' +
-        '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)\n' +
-        '  from A(c)∧B(c) we have A(c)\n' +
-        'c was arbitrary so ∀x.A(x)\n' +
-        'from ∀x.A(x) and p have (∀x.A(x))∧p')
+      completeCheck('∀x.(A(x)∧B(x)), p', '(∀x.A(x))', [
+        'given c',
+        '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)',
+        '  from A(c)∧B(c) we have A(c)',
+        'c was arbitrary so ∀x.A(x)',
+        'from ∀x.A(x) and p have (∀x.A(x))∧p'].join('\n'))
     }).toThrow('We are trying to prove ∀x.A(x) so it should be given by the ' +
       'final line of the proof.');
 
     expect(function() {
-      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))',
-        'given c\n' +
-        '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)\n' +
-        '  from A(c)∧B(c) we have A(c)\n' +
-        'd was arbitrary so ∀x.A(x)')
+      completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))', [
+        'given c',
+        '  from ∀x.(A(x)∧B(x)) at c we have A(c)∧B(c)',
+        '  from A(c)∧B(c) we have A(c)',
+        'd was arbitrary so ∀x.A(x)'].join('\n'))
     }).toThrow('You haven\'t said where d comes from; if you want it to be arbitrary ' +
       'then add a preceding line saying \'Given d\'; alternatively you might ' +
-      'want to take a particular d witnessing some existential formula.')
+      'want to take a particular d witnessing some existential formula.');
 
   });
 });

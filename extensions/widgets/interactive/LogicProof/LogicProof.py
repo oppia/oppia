@@ -47,23 +47,6 @@ class LogicProof(widget_domain.BaseWidget):
         'name': 'question',
         'description': 'Question to ask.',
         'generator': generators.Copier,
-        'init_args': {
-            'value': {
-                'assumptions': [{
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p',
-                    'arguments': [],
-                    'dummies': []
-                }],
-                'results': [{
-                    'top_kind_name': 'variable',
-                    'top_operator_name': 'p',
-                    'arguments': [],
-                    'dummies': []
-                }],
-                'default_proof_string': ''
-            }
-        },
         'customization_args': {
             'value': {
                 'assumptions': [{

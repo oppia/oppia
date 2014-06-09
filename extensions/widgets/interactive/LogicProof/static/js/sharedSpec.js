@@ -213,15 +213,16 @@ describe('Parse lines', function() {
   it('should reject unknown phrases', function() {
     expect(
       errorWrapper(parse, 'from p we havw p\u2227q')
-    ).toThrow('The phrase starting \'we\' could not be identified; please \
-make sure you are only using phrases from the given list of vocabulary.')
+    ).toThrow('The phrase starting \'we\' could not be identified; please ' +
+      'make sure you are only using phrases from the given list of vocabulary.')
   });
 
   it('should reject consecutive expressions', function() {
     expect(
       errorWrapper(parse, 'from A=>B B have B')
-    ).toThrow('We could not identify \'B\'; please make sure you are using \
-vocabulary from the given list, and don\'t have two consecutive expressions.')
+    ).toThrow('We could not identify \'B\'; please make sure you are using ' +
+      'vocabulary from the given list, and don\'t have two consecutive ' + 
+      'expressions.')
   });
 });
 
@@ -433,9 +434,9 @@ describe('Get operators from expression', function() {
 describe('Check ordering in lex', function() {
   it('should identify when one array exceeds another' , function() {
     expect(logicProofShared.greaterThanInLex([1,2,4,4], [1,2,3,5])).toBe(true);
-  })
+  });
 
   it('should identify when one array does not exceed another', function() {
     expect(logicProofShared.greaterThanInLex([1,2], [1,2])).toBe(false);
-  })
+  });
 });

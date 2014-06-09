@@ -29,12 +29,17 @@ var logicProofShared = (function() {
 
   ////////////////// ERROR-HANDLING  //////////////////////////////////////////
 
+  // UserErrors have codes that refer to entries in the errorDictionary (which 
+  // is either logicProofData.BASE_GENERAL_MESSAGES or 
+  // logicProofTeacher.TEACHER_ERROR_MESSAGES), from which a human-readable 
+  // message can be constructed.
   function UserError(code, parameters) {
     this.name = 'UserError';
     this.code = code;
     this.parameters = parameters || {};
   }
 
+  // These errors already have messages which are user-readable.
   function PreRenderedUserError(messages, code) {
     this.name = 'PreRenderedUserError';
     this.messages = messages;

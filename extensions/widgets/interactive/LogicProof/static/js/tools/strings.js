@@ -1,4 +1,4 @@
-DEFAULT_VOCABULARY = {
+var DEFAULT_VOCABULARY = {
   from: ['from'],
   and: ['and'],
   have: ['we have', 'we know', 'have'],
@@ -13,7 +13,7 @@ DEFAULT_VOCABULARY = {
   at: ['at']
 };
 
-DEFAULT_LINE_TEMPLATE_STRINGS = [{
+var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   name: 'and_eliminate_left',
   reader_view: 'From R\u2227S we have R',
   antecedents: 'R\u2227S',
@@ -283,7 +283,7 @@ DEFAULT_LINE_TEMPLATE_STRINGS = [{
 
 
 
-DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
+var DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
   name: 'first_line_indented',
   occurs: 'n=1 \u2227 indentation(n)>0',
   message: ['The first line of a proof should not be indented.']
@@ -357,7 +357,7 @@ DEFAULT_LAYOUT_MISTAKE_STRINGS = [{
   message: ['You can\'t have this as the first line of your proof']
 }];
 
-DEFAULT_VARIABLE_MISTAKE_STRINGS = [{
+var DEFAULT_VARIABLE_MISTAKE_STRINGS = [{
   name: 'unspecified_variable',
   occurs: '~is_initializer(n) \u2227 \u2203x\u2208variables(n).~is_initialized(x,n)',
   message: ['You haven\'t said where {{variable(n)}} comes from; if you want it to be arbitrary then add a preceding line saying \'Given {{variable(n)}}\'; alternatively you might want to take a particular {{variable(n)}} witnessing some existential formula.']
@@ -379,7 +379,7 @@ DEFAULT_VARIABLE_MISTAKE_STRINGS = [{
   message: ['You just know that there is some {{variable(n)}} such that {{result(n)}}; you can\'t assume that it is the {{variable(n)}} we were previously discussing. Try using an entirely new variable in place of {{variable(n)}}.']
 }];
 
-DEFAULT_LOGIC_MISTAKE_STRINGS = [{
+var DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   name: 'missing_antecedent',
   occurs: '\u2203A\u2208antecedents(n).~is_proven(A,n)',
   message: ['This line uses {{min{A\u2208antecedents(n)|~is_proven(A,n)}}}, so you need to have an earlier line proving that {{min{A\u2208antecedents(n)|~is_proven(A,n)}}} is true.']
@@ -457,7 +457,7 @@ DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   message: ['You proved that if {{element(\'S\',n)}} then contradiction follows, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implies_false(element(\'S\',n),i,j)}))}}\', which we have since left.']
 }];
 
-DEFAULT_TARGET_MISTAKE_STRINGS = [{
+var DEFAULT_TARGET_MISTAKE_STRINGS = [{
   name: 'last_line_indented_assumption',
   occurs: 'n=num_lines()\u2227indentation(n)>0 \u2227 template(scoper(n))!=\'given\'',
   message: ['The last line of a proof should not be indented; you need to prove that the given formulas holds just from the original assumptions, not the additional assumption of {{result(scoper(n))}}.']
@@ -473,7 +473,7 @@ DEFAULT_TARGET_MISTAKE_STRINGS = [{
 
 
 
-DEFAULT_CONTROL_FUNCTION_STRINGS = [{
+var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
   LHS: 'variable(n)',
   RHS: 'entry(1, variables(n))',
   description: 'The free variable occurring in line n (if any)'
