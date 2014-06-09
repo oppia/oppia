@@ -18,24 +18,31 @@
  * @author sll@google.com (Sean Lip)
  */
 
-// A simple timer service.
-oppia.factory('timerService', ['$log', function($log) {
-  var startTime = null;
-
-  return {
+// A simple service that provides stopwatch instances. Each stopwatch can be
+// independently reset and queried for the current time.
+oppia.factory('stopwatchProviderService', ['$log', function($log) {
+  var Stopwatch = function() {};
+  Stopwatch.prototype = {
+    _startTime: null,
     _getCurrentTime: function() {
       return Date.now();
     },
-    resetTimer: function() {
-      startTime = this._getCurrentTime();
+    resetStopwatch: function() {
+      this._startTime = this._getCurrentTime();
     },
     getTimeInSecs: function() {
-      if (startTime === null) {
+      if (this._startTime === null) {
         $log.error(
           'Tried to retrieve the elapsed time, but no start time was set.');
         return null;
       }
-      return (this._getCurrentTime() - startTime) / 1000;
+      return (this._getCurrentTime() - this._startTime) / 1000;
+    }
+  };
+
+  return {
+    getInstance: function() {
+      return new Stopwatch();
     }
   };
 }]);
@@ -44,9 +51,9 @@ oppia.factory('timerService', ['$log', function($log) {
 // individual skins.
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', 'oppiaRequestCreator',
-    'messengerService', 'timerService', function(
+    'messengerService', 'stopwatchProviderService', function(
       $http, $rootScope, $modal, oppiaRequestCreator, messengerService,
-      timerService) {
+      stopwatchProviderService) {
 
   var explorationId = null;
   // The pathname should be: .../explore/{exploration_id}
@@ -127,12 +134,14 @@ oppia.factory('oppiaPlayerService', [
     }
   };
 
+  var stopwatch = stopwatchProviderService.getInstance();
+
   return {
     loadInitialState: function(successCallback, errorCallback) {
       $http.get(explorationDataUrl).success(function(data) {
         isLoggedIn = data.is_logged_in;
         sessionId = data.sessionId;
-        timerService.resetTimer();
+        stopwatch.resetStopwatch();
         _updateStatus(data.params, data.state_name, data.state_history);
         successCallback(data);
       }).error(errorCallback);
@@ -152,7 +161,7 @@ oppia.factory('oppiaPlayerService', [
           state_history: stateHistory,
           version: version,
           session_id: sessionId,
-          client_time_spent_in_secs: timerService.getTimeInSecs()
+          client_time_spent_in_secs: stopwatch.getTimeInSecs()
         })
       ).success(function(data) {
         answerIsBeingProcessed = false;
@@ -163,7 +172,7 @@ oppia.factory('oppiaPlayerService', [
         });
 
         _updateStatus(data.params, data.state_name, data.state_history);
-        timerService.resetTimer();
+        stopwatch.resetStopwatch();
         successCallback(data);
       })
       .error(function(data) {
