@@ -79,11 +79,13 @@ oppia.factory('oppiaPlayerService', [
     stateHistory = newStateHistory;
   };
 
-  var _feedbackModalCtrl = ['$scope', '$modalInstance', 'isLoggedIn', function(
-      $scope, $modalInstance, isLoggedIn) {
+  var _feedbackModalCtrl = ['$scope', '$modalInstance', 'isLoggedIn', 'currentStateName', function(
+      $scope, $modalInstance, isLoggedIn, currentStateName) {
     $scope.isLoggedIn = isLoggedIn;
+    $scope.currentStateName = currentStateName;
+
     $scope.isSubmitterAnonymized = false;
-    $scope.relatedTo = 'state';
+    $scope.relatedTo = $scope.currentStateName === 'END' ? 'exploration' : 'state';
     $scope.subject = '';
     $scope.feedback = '';
 
@@ -174,6 +176,9 @@ oppia.factory('oppiaPlayerService', [
         templateUrl: 'modals/playerFeedback',
         backdrop: 'static',
         resolve: {
+          currentStateName: function() {
+            return stateName;
+          },
           isLoggedIn: function() {
             return isLoggedIn;
           }
