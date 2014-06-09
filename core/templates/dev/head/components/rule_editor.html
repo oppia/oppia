@@ -3,7 +3,7 @@
     <button type="button" class="btn btn-default btn-xs pull-right" ng-if="!isDefaultRule() && isEditable" ng-click="deleteRule()">
       <span class="glyphicon glyphicon-remove" title="Remove Rule"></span>
     </button>
-    <span class="pull-left">
+    <span ng-if="!isDefaultRule() && isEditable" class="pull-left">
       <span class="glyphicon glyphicon-resize-vertical" style="font-size: 20px;"></span>
     </span>
     <div class="oppia-rule-description-editor" ng-class="getEditableCssClassForRule()" ng-click="openRuleDescriptionEditorIfNotDefault()">
