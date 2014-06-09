@@ -368,24 +368,74 @@ oppia.directive('stateGraphViz', ['$filter', function($filter) {
 
         var vis = outerVis.append('g');
 
+        // The translation applied when the graph is first loaded.
+        var originalTranslationAmounts = [0, 0];
+
+        var _ensureBetween = function(value, bound1, bound2) {
+          var minValue = Math.min(bound1, bound2);
+          var maxValue = Math.max(bound1, bound2);
+          return Math.min(Math.max(value, minValue), maxValue);
+        };
+
+        // The input object is a 2-element array representing the x- and
+        // y-amounts to transform by, respectively. This function returns
+        // a 2-element array defined similarly, but ensures that the translation
+        // amounts are such that the graph remains within the bounds of the
+        // viewport.
+        var normalizeTranslationAmounts = function(translationAmounts) {
+          var INFINITY = 1e30;
+          var BORDER_PADDING = 5;
+
+          var leftEdge = INFINITY;
+          var topEdge = INFINITY;
+          var bottomEdge = -INFINITY;
+          var rightEdge = -INFINITY;
+
+          for (var nodeName in nodeData) {
+            leftEdge = Math.min(nodeData[nodeName].x0 - BORDER_PADDING, leftEdge);
+            topEdge = Math.min(nodeData[nodeName].y0 - BORDER_PADDING, topEdge);
+            rightEdge = Math.max(
+              nodeData[nodeName].x0 + BORDER_PADDING + nodeData[nodeName].width,
+              rightEdge);
+            bottomEdge = Math.max(
+              nodeData[nodeName].y0 + BORDER_PADDING + nodeData[nodeName].height,
+              bottomEdge);
+          }
+
+          return [
+            _ensureBetween(
+              translationAmounts[0],
+              dimensions.w - rightEdge - originalTranslationAmounts[0],
+              - leftEdge - originalTranslationAmounts[0]),
+            _ensureBetween(
+              translationAmounts[1],
+              dimensions.h - bottomEdge - originalTranslationAmounts[1],
+              - topEdge - originalTranslationAmounts[1])
+          ];
+        };
+
         if ($scope.centerAtCurrentState) {
           // Center the graph at the node representing the current state.
-          var deltaX = -(
-            nodeData[$scope.currentStateName].x0 +
-            nodeData[$scope.currentStateName].width / 2 -
-            dimensions.w / 2);
-          var deltaY = -(
-            nodeData[$scope.currentStateName].y0 +
-            nodeData[$scope.currentStateName].height / 2 -
-            dimensions.h / 2);
+          var translationAmounts = [
+            dimensions.w / 2 - nodeData[$scope.currentStateName].x0 -
+            nodeData[$scope.currentStateName].width / 2,
+            dimensions.h / 2 - nodeData[$scope.currentStateName].y0 -
+            nodeData[$scope.currentStateName].height / 2];
+
+          originalTranslationAmounts = normalizeTranslationAmounts(
+            translationAmounts);
+
           vis = vis.append('g').attr(
-            'transform', 'translate(' + deltaX + ',' + deltaY + ')');
+            'transform', 'translate(' + originalTranslationAmounts + ')');
         }
 
         if ($scope.allowPanning) {
           vis = vis.append('g')
             .call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
-              vis.attr('transform', 'translate(' + d3.event.translate + ')scale(' + d3.event.scale + ')');
+              vis.attr(
+                'transform',
+                'translate(' + normalizeTranslationAmounts(
+                  angular.copy(d3.event.translate)) + ')');
             }))
             .append('g');
 
