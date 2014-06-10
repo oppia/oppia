@@ -191,7 +191,15 @@ function ExplorationEditor(
               'category': 'Category',
               'objective': 'Objective',
               'param_specs': 'Parameter specifications',
-              'param_changes': 'Initial parameter changes'
+              'param_changes': 'Initial parameter changes',
+              'default_skin_id': 'Default skin'
+            };
+
+            var EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS = {
+              'title': true,
+              'category': true,
+              'objective': true,
+              'default_skin_id': true
             };
 
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
@@ -224,7 +232,7 @@ function ExplorationEditor(
             };
 
             $scope.formatExplorationPropertyChange = function(propertyName, changeInfo) {
-              if (['title', 'category', 'objective'].indexOf(propertyName) !== -1) {
+              if (EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS[propertyName]) {
                 return $scope._getLongFormPropertyChange(
                   $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                   changeInfo);
@@ -641,6 +649,8 @@ function ExplorationEditor(
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
       $scope.states = angular.copy(data.states);
+      $scope.defaultSkinId = data.default_skin_id;
+      $scope.allSkinIds = data.all_skin_ids;
 
       $scope.paramSpecs = data.param_specs || {};
 

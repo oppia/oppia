@@ -148,7 +148,8 @@ function ConversationSkin(
         isMostRecentQuestion: isQuestion
       });
 
-      var lastEntryEls = document.getElementsByClassName('oppia-last-log-entry');
+      var lastEntryEls = document.getElementsByClassName(
+        'conversation-skin-last-log-entry');
       $scope.adjustPageHeight(true, function() {
         if (lastEntryEls.length > 0) {
           // TODO(sll): Try and drop this in favor of an Angular-based solution.

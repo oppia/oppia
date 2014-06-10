@@ -258,7 +258,7 @@ NAV_MODE_LEARN = 'learn'
 NAV_MODE_PLAYTEST = 'playtest'
 NAV_MODE_PROFILE = 'profile'
 
-# Event types 
+# Event types
 EVENT_TYPE_LEAVE = 'leave'
 EVENT_TYPE_START = 'start'
 EVENT_TYPE_COMPLETE = 'complete'
@@ -266,3 +266,6 @@ EVENT_TYPE_COMPLETE = 'complete'
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
+
+# Unlaunched feature.
+SHOW_SKIN_CHOOSER = False
