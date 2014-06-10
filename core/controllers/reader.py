@@ -77,7 +77,7 @@ class ExplorationPage(base.BaseHandler):
                 interactive_widget_ids))
 
         self.values.update({
-            'skin_html': skins_services.get_skin_html(
+            'skin_html': skins_services.Registry.get_skin_html(
                 exploration.default_skin),
             'exploration_version': version,
             'iframed': is_iframed,
