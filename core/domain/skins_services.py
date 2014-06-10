@@ -48,14 +48,14 @@ class Registry(object):
 
     @classmethod
     def get_all_skin_ids(cls):
-        """Get a list of all skin classes."""
+        """Get a list of all skin ids."""
         if not cls._skins_dict:
             cls._refresh_registry()
         return cls._skins_dict.keys()
 
     @classmethod
     def get_all_skin_classes(cls):
-        """Get a list of all skin classes."""
+        """Get a dict mapping skin ids to skin classes."""
         if not cls._skins_dict:
             cls._refresh_registry()
         return copy.deepcopy(cls._skins_dict)

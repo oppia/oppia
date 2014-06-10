@@ -195,6 +195,13 @@ function ExplorationEditor(
               'default_skin_id': 'Default skin'
             };
 
+            var EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS = {
+              'title': true,
+              'category': true,
+              'objective': true,
+              'default_skin_id': true
+            };
+
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
               'name': 'State name',
               'param_changes': 'Parameter changes',
@@ -225,7 +232,7 @@ function ExplorationEditor(
             };
 
             $scope.formatExplorationPropertyChange = function(propertyName, changeInfo) {
-              if (['title', 'category', 'objective', 'default_skin_id'].indexOf(propertyName) !== -1) {
+              if (EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS[propertyName]) {
                 return $scope._getLongFormPropertyChange(
                   $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                   changeInfo);
