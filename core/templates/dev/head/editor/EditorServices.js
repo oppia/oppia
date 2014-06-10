@@ -197,15 +197,19 @@ oppia.factory('changeListService', [
     'param_changes': 'stateParamChanges'
   };
 
-  var _addChange = function(changeDict) {
-    if ($rootScope.loadingMessage) {
-      return;
-    }
-    explorationChangeList.push(changeDict);
-    undoneChangeStack = [];
-  };
-
   return {
+    _postChangeHook: null,
+    _addChange: function(changeDict) {
+      if ($rootScope.loadingMessage) {
+        return;
+      }
+      explorationChangeList.push(changeDict);
+      undoneChangeStack = [];
+
+      if (this._postChangeHook) {
+        this._postChangeHook();
+      }
+    },
     /**
      * Saves a change dict that represents adding a new state.
      *
@@ -215,7 +219,7 @@ oppia.factory('changeListService', [
      * @param {string} stateName The name of the newly-added state
      */
     addState: function(stateName) {
-      _addChange({
+      this._addChange({
         cmd: CMD_ADD_STATE,
         state_name: stateName
       });
@@ -230,7 +234,7 @@ oppia.factory('changeListService', [
      * @param {string} oldStateName The previous name of the state
      */
     renameState: function(newStateName, oldStateName) {
-      _addChange({
+      this._addChange({
         cmd: CMD_RENAME_STATE,
         old_state_name: oldStateName,
         new_state_name: newStateName
@@ -245,7 +249,7 @@ oppia.factory('changeListService', [
      * @param {string} stateName The name of the deleted state.
      */
     deleteState: function(stateName) {
-      _addChange({
+      this._addChange({
         cmd: CMD_DELETE_STATE,
         state_name: stateName
       });
@@ -267,7 +271,7 @@ oppia.factory('changeListService', [
         warningsData.addWarning('Invalid exploration property: ' + backendName);
         return;
       }
-      _addChange({
+      this._addChange({
         cmd: CMD_EDIT_EXPLORATION_PROPERTY,
         property_name: backendName,
         new_value: angular.copy(newValue),
@@ -290,7 +294,7 @@ oppia.factory('changeListService', [
         warningsData.addWarning('Invalid state property: ' + backendName);
         return;
       }
-      _addChange({
+      this._addChange({
         cmd: CMD_EDIT_STATE_PROPERTY,
         state_name: stateName,
         property_name: backendName,
@@ -301,6 +305,9 @@ oppia.factory('changeListService', [
     discardAllChanges: function() {
       explorationChangeList = [];
       undoneChangeStack = [];
+      if (this._postChangeHook) {
+        this._postChangeHook();
+      }
     },
     getChangeList: function() {
       return angular.copy(explorationChangeList);
@@ -312,6 +319,13 @@ oppia.factory('changeListService', [
       }
       var lastChange = explorationChangeList.pop();
       undoneChangeStack.push(lastChange);
+      if (this._postChangeHook) {
+        this._postChangeHook();
+      }
+    },
+    setPostChangeHook: function(postChangeHookFunction) {
+      // Sets a function to be called after any edit to the changelist.
+      this._postChangeHook = postChangeHookFunction;
     }
   };
 }]);
