@@ -155,20 +155,12 @@ oppia.directive('oppiaInteractiveLogicProof', [
         // because response.html needs them and does not have its own
         // javascript.
         $scope.submitProof = function() {
+          var success = true;
           try {
             var proof = logicProofStudent.buildProof($scope.proofString, $scope.questionInstance);
             logicProofStudent.checkProof(proof, $scope.questionInstance);
-            $scope.$parent.$parent.submitAnswer({
-              assumptions_string: $scope.assumptionsString,
-              target_string: $scope.targetString,
-              proof_string: $scope.proofString,
-              proof_num_lines: proof.lines.length,
-              correct: true,
-              displayed_question: $scope.questionString,
-              displayed_message: '',
-              displayed_proof: $scope.displayProof($scope.proofString)
-            }, 'submit');
           } catch (err) {
+            var success = false;
             $scope.$parent.$parent.submitAnswer({
               assumptions_string: $scope.assumptionsString,
               target_string: $scope.targetString,
@@ -182,6 +174,18 @@ oppia.directive('oppiaInteractiveLogicProof', [
               displayed_question: $scope.questionString,
               displayed_message: $scope.displayMessage(err.message, err.line),
               displayed_proof: $scope.displayProof($scope.proofString, err.line)
+            }, 'submit');
+          }
+          if (success) {
+            $scope.$parent.$parent.submitAnswer({
+              assumptions_string: $scope.assumptionsString,
+              target_string: $scope.targetString,
+              proof_string: $scope.proofString,
+              proof_num_lines: proof.lines.length,
+              correct: true,
+              displayed_question: $scope.questionString,
+              displayed_message: '',
+              displayed_proof: $scope.displayProof($scope.proofString)
             }, 'submit');
           }
         };

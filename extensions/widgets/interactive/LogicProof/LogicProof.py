@@ -47,6 +47,7 @@ class LogicProof(widget_domain.BaseWidget):
         'name': 'question',
         'description': 'Question to ask.',
         'generator': generators.Copier,
+        'init_args': {},
         'customization_args': {
             'value': {
                 'assumptions': [{

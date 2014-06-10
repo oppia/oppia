@@ -40,3 +40,12 @@ In order to update generatedDefaultData.js:
   - ∀ (for all) \u2200
   - ∃ (exists) \u2203
   - ∈ (membership) \u2208
+
+This widget adds the following objects to the global javascript namespace, 
+which should not be overwritten:
+ - logicProofParser
+ - logicProofShared
+ - logicProofStudent
+ - logicProofData
+ - logicProofConversion
+ - LOGIC_PROOF_DEFAULT_QUESTION_DATA

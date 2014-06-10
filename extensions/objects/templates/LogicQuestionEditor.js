@@ -60,22 +60,32 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
       }
 
       $scope.$watch('localValue.assumptionsString', function(newValue, oldValue) {
-        logicProofConversion.convertElementToLogicChars(
-          document.getElementById('logicQuestionAssumptions'));
-        $scope.buildQuestion();
-
+        var element = document.getElementById('logicQuestionAssumptions');
+        logicProofConversion.convertElementToLogicChars(element);
+        // We need to forcibly refresh the angular values ($scope.$apply() does
+        // not suffice).
+        if (element) {
+          $scope.localValue.assumptionsString = element.value;
+          $scope.buildQuestion();
+        }
       });
 
       $scope.$watch('localValue.targetString', function(newValue, oldValue) {
-        logicProofConversion.convertElementToLogicChars(
-          document.getElementById('logicQuestionTarget'));
-        $scope.buildQuestion();
+        var element = document.getElementById('logicQuestionTarget');
+        logicProofConversion.convertElementToLogicChars(element);
+        if (element) {
+          $scope.localValue.targetString = element.value;
+          $scope.buildQuestion();
+        }
       });
 
       $scope.$watch('localValue.proofString', function(newValue, oldValue) {
-        logicProofConversion.convertElementToLogicChars(
-          document.getElementById('logicQuestionProof'));
-        $scope.buildQuestion();
+        var element = document.getElementById('logicQuestionProof')
+        logicProofConversion.convertElementToLogicChars(element);
+        if (element) {
+          $scope.localValue.proofString = element.value;
+          $scope.buildQuestion();
+        }
       });
 
     }

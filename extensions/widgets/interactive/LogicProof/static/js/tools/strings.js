@@ -243,35 +243,41 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   antecedents: 'R',
   results: 'R\u2227S',
   variables: '',
-  error: ['Should this be From {{R}} and {{S}} we have {{R\u2227S}}?' ,'To prove {{R\u2227S}} you need to have shown {{S}} as well.']
+  error: [
+    'Should this be \'From {{R}} and {{S}} we have {{R\u2227S}}\'?' ,
+    'To prove {{R\u2227S}} you need to have shown {{S}} as well.'
+  ]
 }, {
   name: 'and_introduce_e2',
   reader_view: 'From S we have R\u2227S',
   antecedents: 'R',
   results: 'R\u2227S',
   variables: '',
-  error: ['Should this be From {{R}} and {{S}} we have {{R\u2227S}}?' ,'{{R\u2227S}} means that {{R}} and {{S}} are both true, so you also need to have shown {{S}}']
+  error: [
+    'Should this be \'From {{R}} and {{S}} we have {{R\u2227S}}\'?',
+    '{{R\u2227S}} means that {{R}} and {{S}} are both true, so you also need to have shown {{S}}.'
+  ]
 }, {
   name: 'and_introduce_e3',
-  reader_view: 'From T we have R\u2227S',
-  antecedents: 'T',
+  reader_view: 'From R and T we have R\u2227S',
+  antecedents: 'R, T',
   results: 'R\u2227S',
   variables: '',
-  error: ['To prove {{R\u2227S}} you need to show both {{R}} and {{S}} on earlier lines, then write From {{R}} and {{S}} we have {{R\u2227S}}.']
+  error: ['You have shown {{R\u2227T}}, not {{R\u2227S}}.']  
 }, {
   name: 'and_introduce_e4',
-  reader_view: 'From T and U we have R\u2227S',
-  antecedents: 'T, U',
+  reader_view: 'From T and S we have R\u2227S',
+  antecedents: 'T, S',
   results: 'R\u2227S',
   variables: '',
-  error: ['The conclusion you are allowed to make here is \'From {{T}} and {{U}} we have {{T\u2227U}}\'.']
+  error: ['You have shown {{T\u2227S}}, not {{R\u2227S}}.']
 }, {
   name: 'and_eliminate_e',
   reader_view: 'From R\u2227S we have T',
   antecedents: 'R\u2227S',
   results: 'T',
   variables: '',
-  error: ['From {{R\u2227S}} you can conclude either {{R}} or {{S}}, but not anything else']
+  error: ['From {{R\u2227S}} you can conclude either {{R}} or {{S}}.']
 }, {
   name: 'not_introduce_e',
   reader_view: 'Hence R',
