@@ -72,6 +72,14 @@ function ExplorationSettings(
     }
   });
 
+  $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
+    if (oldValue !== undefined && !$scope.isDiscardInProgress
+        && !angular.equals(newValue, oldValue)) {
+      changeListService.editExplorationProperty(
+        'default_skin_id', newValue, oldValue);
+    }
+  });
+
   /********************************************
   * Methods for rights management.
   ********************************************/

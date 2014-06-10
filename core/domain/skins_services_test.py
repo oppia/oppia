@@ -27,7 +27,7 @@ class DefaultSkinsUnitTests(test_utils.GenericTestBase):
 
     def test_get_all_skin_ids(self):
         self.assertEqual(
-            sorted(skins_services.Registry.get_all_skin_classes().keys()),
+            sorted(skins_services.Registry.get_all_skin_ids()),
             ['conversation_v1', 'snapshots_v1'])
 
     def test_default_skins_are_present(self):

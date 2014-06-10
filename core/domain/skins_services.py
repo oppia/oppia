@@ -47,6 +47,13 @@ class Registry(object):
             cls._skins_dict[clazz.skin_id] = clazz
 
     @classmethod
+    def get_all_skin_ids(cls):
+        """Get a list of all skin classes."""
+        if not cls._skins_dict:
+            cls._refresh_registry()
+        return cls._skins_dict.keys()
+
+    @classmethod
     def get_all_skin_classes(cls):
         """Get a list of all skin classes."""
         if not cls._skins_dict:

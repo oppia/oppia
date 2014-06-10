@@ -36,6 +36,7 @@ class BaseSkin(object):
     """
     # These values should be overridden in subclasses.
     skin_id = None
+    skin_name = None
     description = ''
     # This path is relative to /extensions/skins/{{SKIN_ID}}. It defaults to
     # player.html.
@@ -54,6 +55,7 @@ class BaseSkin(object):
 
 class ConversationV1(BaseSkin):
     skin_id = 'conversation_v1'
+    skin_name = 'Conversation'
     description = 'A vertically-scrolling conversation.'
 
     options = [{
@@ -66,6 +68,7 @@ class ConversationV1(BaseSkin):
 
 class SnapshotsV1(BaseSkin):
     skin_id = 'snapshots_v1'
+    skin_name = 'Snapshots'
     description = 'A sequence of snapshots.'
 
     options = [{

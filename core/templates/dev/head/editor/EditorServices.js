@@ -184,7 +184,8 @@ oppia.factory('changeListService', [
     'category': 'explorationCategory',
     'objective': 'explorationObjective',
     'param_specs': 'paramSpecs',
-    'param_changes': 'explorationParamChanges'
+    'param_changes': 'explorationParamChanges',
+    'default_skin_id': 'defaultSkinId'
   };
 
   var STATE_BACKEND_NAMES_TO_FRONTEND_NAMES = {
