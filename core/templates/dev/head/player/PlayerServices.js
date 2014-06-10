@@ -21,9 +21,11 @@
 // A simple service that provides stopwatch instances. Each stopwatch can be
 // independently reset and queried for the current time.
 oppia.factory('stopwatchProviderService', ['$log', function($log) {
-  var Stopwatch = function() {};
+  var Stopwatch = function() {
+    this._startTime = null;
+  };
+
   Stopwatch.prototype = {
-    _startTime: null,
     _getCurrentTime: function() {
       return Date.now();
     },
