@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for the Oppia reader view."""
+"""Controllers for the Oppia learner view."""
 
 __author__ = 'Sean Lip'
 
@@ -79,7 +79,6 @@ class ExplorationPage(base.BaseHandler):
         self.values.update({
             'skin_html': skins_services.get_skin_html(
                 exploration.default_skin),
-            'skin_js': skins_services.get_skin_js(exploration.default_skin),
             'exploration_version': version,
             'iframed': is_iframed,
             'is_private': rights_manager.is_exploration_private(
@@ -231,7 +230,7 @@ class FeedbackHandler(base.BaseHandler):
             (new_state_name not in state_history))
         if new_state_name == feconf.END_DEST:
             stats_services.EventHandler.maybe_leave_exploration(
-                exploration_id, version, feconf.END_DEST, 
+                exploration_id, version, feconf.END_DEST,
                 session_id, client_time_spent_in_secs, old_params,
                 feconf.PLAY_TYPE_NORMAL)
 
