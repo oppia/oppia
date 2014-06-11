@@ -419,46 +419,104 @@ function ExplorationEditor(
     $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
   };
 
-  $scope.getExplorationWarningsList = function() {
-    var warningsList = [];
-    if (!$scope.isEndStateReachable()) {
-      warningsList.push('The END state is unreachable.');
+  // Given an initial node name, a list of node names, and a list of edges
+  // (each of which is an object with keys 'source' and 'target', and values
+  // equal to the respective node names), returns a list of names of all nodes
+  // which are unreachable from the initial node.
+  $scope._getUnreachableNodeNames = function(initNodeName, nodes, edges) {
+    var queue = [initNodeName];
+    var seen = {};
+    seen[initNodeName] = true;
+    while (queue.length > 0) {
+      var currNodeName = queue.shift();
+      edges.forEach(function(edge) {
+        if (edge.source === currNodeName && !seen.hasOwnProperty(edge.target)) {
+          seen[edge.target] = true;
+          queue.push(edge.target);
+        }
+      });
     }
-    if (!explorationObjectiveService.displayed) {
-      warningsList.push('An objective should be specified.');
-    }
-    return warningsList;
+
+    return nodes.filter(function(node) {
+      return !seen.hasOwnProperty(node);
+    });
   };
 
-  $scope.isEndStateReachable = function() {
-    if (!$scope.graphData) {
-      return true;
-    }
+  // Given an array of objects with two keys 'source' and 'target', returns
+  // an array with the same objects but with the values of 'source' and 'target'
+  // switched. (The objects represent edges in a graph, and this operation
+  // amounts to reversing all the edges.)
+  $scope._getReversedLinks = function(links) {
+    return links.map(function(link) {
+      return {
+        source: link.target,
+        target: link.source
+      };
+    });
+  };
 
-    var queue = [$scope.graphData.initStateName];
-    var seen = [$scope.graphData.initStateName];
-    var reachedEnd = false;
-    while (queue.length > 0) {
-      var currNodeName = queue[0];
-      queue.shift();
+  // Returns a list of states which have rules that have no feedback and that
+  // point back to the same state.
+  $scope._getStatesWithInsufficientFeedback = function() {
+    var problematicStates = [];
+    for (var stateName in $scope.states) {
+      var handlers = $scope.states[stateName].widget.handlers;
+      var isProblematic = handlers.some(function(handler) {
+        return handler.rule_specs.some(function(ruleSpec) {
+          return (
+            ruleSpec.dest === stateName &&
+            !ruleSpec.feedback.some(function(feedbackItem) {
+              return feedbackItem.length > 0;
+            })
+          );
+        });
+      });
 
-      if (currNodeName === $scope.graphData.finalStateName) {
-        reachedEnd = true;
-        break;
+      if (isProblematic) {
+        problematicStates.push(stateName);
       }
+    }
+    return problematicStates;
+  };
 
-      for (var i = 0; i < $scope.graphData.links.length; i++) {
-        if ($scope.graphData.links[i].source === currNodeName &&
-            seen.indexOf($scope.graphData.links[i].target) === -1) {
-          queue.push($scope.graphData.links[i].target);
-          seen.push($scope.graphData.links[i].target);
+  $scope.updateWarningsList = function() {
+    $scope.refreshGraph();
+    $scope.warningsList = [];
+
+    if ($scope.graphData) {
+      var unreachableStateNames = $scope._getUnreachableNodeNames(
+        $scope.graphData.initStateName, $scope.graphData.nodes,
+        $scope.graphData.links);
+      if (unreachableStateNames.length) {
+        $scope.warningsList.push(
+          'The following state(s) are unreachable: ' +
+          unreachableStateNames.join(', ') + '.');
+      } else {
+        // Only perform this check if all states are reachable.
+        var deadEndStates = $scope._getUnreachableNodeNames(
+          $scope.graphData.finalStateName, $scope.graphData.nodes,
+          $scope._getReversedLinks($scope.graphData.links));
+        if (deadEndStates.length) {
+          $scope.warningsList.push(
+            'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
         }
       }
     }
 
-    return reachedEnd;
+    var statesWithInsufficientFeedback = $scope._getStatesWithInsufficientFeedback();
+    if (statesWithInsufficientFeedback.length) {
+      $scope.warningsList.push(
+        'The following states need more feedback: ' +
+        statesWithInsufficientFeedback.join(', ') + '.');
+    }
+
+    if (!explorationObjectiveService.displayed) {
+      $scope.warningsList.push('An objective should be specified.');
+    }
   };
 
+  $scope.warningsList = [];
+  changeListService.setPostChangeHook($scope.updateWarningsList);
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
@@ -676,6 +734,8 @@ function ExplorationEditor(
         $scope.showStateEditor(editorContextService.getActiveStateName());
         $scope.doFullRefresh = false;
       }
+
+      $scope.updateWarningsList();
 
       $rootScope.loadingMessage = '';
 
