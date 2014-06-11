@@ -37,34 +37,36 @@
         </em>
       </p>
 
-      <form role="form">
+      <div role="form">
         <div class="form-group">
           <label for="subject">Subject</label>
           <input type="text" class="form-control" id="subject" ng-model="subject">
         </div>
         <label for="feedback">Feedback</label>
         <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
-        <div class="radio">
-          <label>
-            <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
-            This feedback relates to the current question.
-          </label>
+        <!-- Note that, for this to use the correct $scope.relatedTo, it must be an ng-show and not an ng-if. -->
+        <div ng-show="currentStateName !== 'END'">
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
+              This feedback relates to the current question.
+            </label>
+          </div>
+          <div class="radio">
+            <label>
+              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
+              This feedback relates to the exploration as a whole.
+            </label>
+          </div>
         </div>
-        <div class="radio">
-          <label>
-            <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
-            This feedback relates to the exploration as a whole.
-          </label>
-        </div>
-      </form>
-
-      <div ng-show="isLoggedIn">
-        <hr>
-        <div class="checkbox">
-          <label>
-            <input type="checkbox" ng-model="isSubmitterAnonymized">
-            Give feedback anonymously
-          </label>
+        <div ng-show="isLoggedIn">
+          <hr>
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" ng-model="isSubmitterAnonymized">
+              Give feedback anonymously
+            </label>
+          </div>
         </div>
       </div>
     </div>
@@ -99,7 +101,6 @@
   {{ super() }}
   <script>
     {{ include_js_file('player/PlayerServices.js') }}
-    {{ skin_js }}
   </script>
 
   {{ widget_js_directives }}

@@ -1,40 +1,41 @@
+<link rel="stylesheet" type="text/css"
+      href="/extensions/skins/conversation_v1/static/conversation.css">
+
 <div ng-controller="ConversationSkin" ng-style="getStyle()">
-  <div ng-if="!iframed" class="oppia-hide-if-small-screenwidth">
-    <div class="oppia-feedback-button" ng-click="showFeedbackModal()">
-      <center>
-        <br><br><br>Feedback
-      </center>
-    </div>
+  <div ng-if="!iframed" class="conversation-skin-feedback-button" ng-click="showFeedbackModal()">
+    <center>
+      <br><br><br>Feedback
+    </center>
   </div>
 
   <div class="oppia-content" role="main">
-    <div class="oppia-exploration-header">
-      <a href="" ng-click="resetPage()" class="pull-right oppia-exploration-header-sublink">
+    <div class="conversation-skin-exploration-header">
+      <a href="" ng-click="resetPage()" class="pull-right conversation-skin-exploration-header-sublink">
         Clear history and restart
       </a>
       <h3 role="heading"><[title]></h3>
     </div>
 
-    <div class="oppia-iframe-container oppia-exploration">
+    <div class="conversation-skin-iframe-container">
       <div ng-repeat="response in responseLog track by $index"
-           ng-class="{'oppia-last-log-entry': $last}"
+           ng-class="{'conversation-skin-last-log-entry': $last}"
            aria-live="<[$last ? 'polite' : 'off']>"
            aria-atomic="true">
 
-        <div class="oppia-conversation-log"
+        <div class="conversation-skin-conversation-log"
              angular-html-bind="response.previousReaderAnswer">
         </div>
-        <div class="oppia-conversation-log"
+        <div class="conversation-skin-conversation-log"
              angular-html-bind="response.feedback">
         </div>
 
         <div ng-if="response.question">
           <div ng-if="!response.isMostRecentQuestion"
-               class="oppia-conversation-log"
+               class="conversation-skin-conversation-log"
                angular-html-bind="response.question">
           </div>
           <div ng-if="response.isMostRecentQuestion"
-               class="oppia-response oppia-log-title"
+               class="conversation-skin-response"
                angular-html-bind="response.question">
           </div>
         </div>
@@ -42,7 +43,7 @@
 
       <br>
 
-      <div ng-show="finished" class="oppia-response-finished">
+      <div ng-show="finished" class="conversation-skin-response-finished">
         Congratulations, you've finished this exploration!
         Would you like to <a ng-click="resetPage()" href="">play again?</a>
       </div>
@@ -65,3 +66,5 @@
     </div>
   </div>
 </div>
+
+<script src="/extensions/skins/conversation_v1/static/Conversation.js"></script>
