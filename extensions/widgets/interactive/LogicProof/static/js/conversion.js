@@ -45,18 +45,7 @@ var logicProofConversion = (function() {
     return replacedString;
   };
 
-  var convertElementToLogicChars = function(element) {
-    // NOTE: this function is first called before the DOM is defined, when
-    // the element will be undefined and we do nothing.
-    if (element) {
-      var cursorPosition = element.selectionEnd;
-      element.value = convertToLogicCharacters(element.value);
-      element.selectionEnd = cursorPosition;
-    }
-  };
-
   return {
-    convertToLogicCharacters: convertToLogicCharacters,
-    convertElementToLogicChars: convertElementToLogicChars
+    convertToLogicCharacters: convertToLogicCharacters
   };
 }());

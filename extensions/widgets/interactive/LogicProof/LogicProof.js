@@ -155,40 +155,36 @@ oppia.directive('oppiaInteractiveLogicProof', [
         // because response.html needs them and does not have its own
         // javascript.
         $scope.submitProof = function() {
-          var success = true;
+          var submission = {
+            assumptions_string: $scope.assumptionsString,
+            target_string: $scope.targetString,
+            proof_string: $scope.proofString,
+            proof_num_lines: $scope.proofString.split('\n').length,
+            displayed_question: $scope.questionString
+          };
           try {
-            var proof = logicProofStudent.buildProof($scope.proofString, $scope.questionInstance);
+            var proof = logicProofStudent.buildProof(
+              $scope.proofString, $scope.questionInstance);
             logicProofStudent.checkProof(proof, $scope.questionInstance);
+            submission.correct = true;
           } catch (err) {
-            var success = false;
-            $scope.$parent.$parent.submitAnswer({
-              assumptions_string: $scope.assumptionsString,
-              target_string: $scope.targetString,
-              proof_string: $scope.proofString,
-              proof_num_lines: $scope.proofString.split('\n').length,
-              correct: false,
-              error_category: err.category,
-              error_code: err.code,
-              error_message: err.message,
-              error_line_number: err.line,
-              displayed_question: $scope.questionString,
-              displayed_message: $scope.displayMessage(err.message, err.line),
-              displayed_proof: $scope.displayProof($scope.proofString, err.line)
-            }, 'submit');
+            submission.correct = false;
+            submission.error_category = err.category;
+            submission.error_code = err.code;
+            submission.error_message = err.message;
+            submission.error_line_number = err.line;
+            submission.displayed_message = 
+              $scope.displayMessage(err.message, err.line);
+            submission.displayed_proof = 
+              $scope.displayProof($scope.proofString, err.line);
           }
-          if (success) {
-            $scope.$parent.$parent.submitAnswer({
-              assumptions_string: $scope.assumptionsString,
-              target_string: $scope.targetString,
-              proof_string: $scope.proofString,
-              proof_num_lines: proof.lines.length,
-              correct: true,
-              displayed_question: $scope.questionString,
-              displayed_message: '',
-              displayed_proof: $scope.displayProof($scope.proofString)
-            }, 'submit');
+          if (submission.correct) {
+            submission.displayed_message = '';
+            submission.displayed_proof = $scope.displayProof($scope.proofString);
           }
+          $scope.$parent.$parent.submitAnswer(submission, 'submit');
         };
+
         $scope.showHelp = function() {
           $modal.open({
             templateUrl: 'modals/logicProofHelp',

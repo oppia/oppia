@@ -40,7 +40,34 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
         errorMessage: '',
         proofString: $scope.$parent.value.default_proof_string
       };
-      
+
+      // NOTE: we use ng-change rather than $watch because the latter runs in
+      // response to any change to the watched value, and we only want to 
+      // respond to changes made by the user.
+      $scope.changeAssumptions = function() {
+        $scope.convertThenBuild('logicQuestionAssumptions', 'assumptionsString');
+      };
+      $scope.changeTarget = function() {
+        $scope.convertThenBuild('logicQuestionTarget', 'targetString');
+      };
+      $scope.changeProof = function() {
+        $scope.convertThenBuild('logicQuestionProof', 'proofString');
+      };
+
+      $scope.convertThenBuild = function(elementID, nameOfString) {
+        var element = document.getElementById(elementID);
+        var cursorPosition = element.selectionEnd;
+        $scope.localValue[nameOfString] = 
+          logicProofConversion.convertToLogicCharacters(
+            $scope.localValue[nameOfString]);
+        $scope.buildQuestion();
+        // NOTE: angular will reset the position of the cursor after this 
+        // function runs, so we need to delay our re-resetting.
+        setTimeout(function() {
+          element.selectionEnd = cursorPosition;
+        }, 2);  
+      };
+
       $scope.buildQuestion = function() {
         try {
           builtQuestion = angular.copy(
@@ -57,37 +84,7 @@ oppia.directive('logicQuestionEditor', function($compile, warningsData) {
         } catch (err) {
           $scope.localValue.errorMessage = err.message;
         }
-      }
-
-      $scope.$watch('localValue.assumptionsString', function(newValue, oldValue) {
-        var element = document.getElementById('logicQuestionAssumptions');
-        logicProofConversion.convertElementToLogicChars(element);
-        // We need to forcibly refresh the angular values ($scope.$apply() does
-        // not suffice).
-        if (element) {
-          $scope.localValue.assumptionsString = element.value;
-          $scope.buildQuestion();
-        }
-      });
-
-      $scope.$watch('localValue.targetString', function(newValue, oldValue) {
-        var element = document.getElementById('logicQuestionTarget');
-        logicProofConversion.convertElementToLogicChars(element);
-        if (element) {
-          $scope.localValue.targetString = element.value;
-          $scope.buildQuestion();
-        }
-      });
-
-      $scope.$watch('localValue.proofString', function(newValue, oldValue) {
-        var element = document.getElementById('logicQuestionProof')
-        logicProofConversion.convertElementToLogicChars(element);
-        if (element) {
-          $scope.localValue.proofString = element.value;
-          $scope.buildQuestion();
-        }
-      });
-
+      };
     }
   };
 });
