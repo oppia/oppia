@@ -19,7 +19,7 @@
  */
 
 // Global utility methods.
-function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
+function Base($scope, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
@@ -90,5 +90,5 @@ function Base($scope, $http, $rootScope, $window, $log, warningsData, activeInpu
  * Injects dependencies in a way that is preserved by minification.
  */
 Base.$inject = [
-  '$scope', '$http', '$rootScope', '$window', '$log', 'warningsData',
+  '$scope', '$rootScope', '$window', '$log', 'warningsData',
   'activeInputData', 'messengerService'];

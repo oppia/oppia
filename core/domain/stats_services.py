@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
 import feconf
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -61,6 +62,20 @@ class EventHandler(object):
         stats_models.resolve_answers(
             exploration_id, state_name, handler_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)
+
+    @classmethod
+    def start_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          params, play_type):
+        stats_models.StartExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, params,
+            play_type)
+
+    @classmethod
+    def maybe_leave_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          time_spent, params, play_type):
+        stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type)
 
 
 def get_unresolved_answers_for_default_rule(exploration_id, state_name):
@@ -116,6 +131,14 @@ def get_state_rules_stats(exploration_id, state_name):
         }
 
     return results
+
+def get_exploration_annotations(exp_id):
+    exp_annotations = stats_models.ExplorationAnnotationsModel.get(
+        exp_id, strict=False)
+    if not exp_annotations:
+        exp_annotations = stats_models.ExplorationAnnotationsModel(
+            id=exp_id, num_visits=0, num_completions=0)
+    return exp_annotations
 
 
 def get_state_stats_for_exploration(exploration_id):

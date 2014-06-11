@@ -1,79 +1,10 @@
-<div ng-controller="ReaderExploration" ng-style="getStyle()">
+<div ng-controller="ConversationSkin" ng-style="getStyle()">
   <div ng-if="!iframed" class="oppia-hide-if-small-screenwidth">
     <div class="oppia-feedback-button" ng-click="showFeedbackModal()">
       <center>
         <br><br><br>Feedback
       </center>
     </div>
-
-    <script type="text/ng-template" id="modals/readerFeedback">
-      <div class="modal-header">
-        <h3>Give Feedback to the Exploration Editors</h3>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          <em>
-            This form is meant for exploration-specific feedback. To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
-          </em>
-        </p>
-
-        <form role="form">
-          <div class="form-group">
-            <label for="subject">Subject</label>
-            <input type="text" class="form-control" id="subject" ng-model="subject">
-          </div>
-          <label for="feedback">Feedback</label>
-          <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
-              This feedback relates to the current question.
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
-              This feedback relates to the exploration as a whole.
-            </label>
-          </div>
-        </form>
-
-        <div ng-show="isLoggedIn">
-          <hr>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" ng-model="isSubmitterAnonymized">
-              Give feedback anonymously
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      </div>
-    </script>
-
-    <script type="text/ng-template" id="modals/readerFeedbackConfirmation">
-      <div class="modal-header">
-        <h3>Thank you for giving feedback</h3>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          Your feedback has been successfully submitted, and the exploration editors will see it when they next visit the exploration editing page.
-        </p>
-        <p>
-          Thank you for helping to improve this exploration!
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="cancel()">Close</button>
-      </div>
-    </script>
   </div>
 
   <div class="oppia-content" role="main">

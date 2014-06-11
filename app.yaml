@@ -73,6 +73,9 @@ handlers:
   script: mapreduce.main.APP
   login: admin
   secure: always
+- url: /cron/.*
+  login: admin
+  script: main_cron.app
 - url: /.*
   script: main.app
   secure: always

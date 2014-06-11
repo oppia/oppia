@@ -44,7 +44,8 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,
@@ -125,7 +126,8 @@ class ImageHandlerTest(test_utils.GenericTestBase):
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
-        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png'),
+                  mode='rb') as f:
             raw_image = f.read()
         response_dict = self.post_json(
             '%s/0' % self.IMAGE_UPLOAD_URL_PREFIX,

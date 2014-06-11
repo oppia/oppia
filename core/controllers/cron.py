@@ -1,5 +1,3 @@
-# coding: utf-8
-#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,25 +12,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Provides services for HTML skins for the reader view."""
+"""Controllers for the cron jobs."""
 
-__author__ = 'Sean Lip'
+from core.controllers import base
+from core import jobs_registry
 
-import feconf
-import jinja_utils
-import utils
-
-import jinja2
-
-
-def get_skin_html(skin_name):
-    """Returns the HTML for a given skin."""
-    return jinja2.Markup(
-        jinja_utils.get_jinja_env(feconf.SKINS_TEMPLATES_DIR).get_template(
-            '%s.html' % skin_name).render())
-
-
-def get_skin_js(skin_name):
-    """Returns the JS content for a given skin."""
-    return jinja2.Markup(utils.get_file_contents(
-        '%s/%s.js' % (feconf.SKINS_TEMPLATES_DIR, skin_name)))
+class StatisticsHandler(base.BaseHandler):
+    """Handler for statistics cron job."""
+    def get(self):
+        """Handles get requests."""
+        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+             if klass.__name__ == 'StatisticsPageJobManager':
+                 klass.enqueue(klass.create_new())
+                 break

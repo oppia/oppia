@@ -400,3 +400,14 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         self.assertEquals(
             stats_services.get_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
+
+
+class EventLogEntryTests(test_utils.GenericTestBase):
+    """Test for the event log creation."""
+
+    def test_create_events(self):
+        """Basic test that makes sure there are no exceptions thrown."""
+        stats_services.EventHandler.start_exploration('eid', 2, 'state', 'session',
+            {}, feconf.PLAY_TYPE_NORMAL)
+        stats_services.EventHandler.maybe_leave_exploration('eid', 2, 'state', 'session',
+            27.2, {}, feconf.PLAY_TYPE_NORMAL)

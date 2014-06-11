@@ -24,6 +24,8 @@ import core.storage.base_model.gae_models as base_models
 
 from google.appengine.ext import ndb
 
+import utils
+
 QUERY_LIMIT = 1000
 
 
@@ -54,7 +56,7 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):
-        return os.path.join('/', exploration_id, filepath)
+        return utils.vfs_construct_path('/', exploration_id, filepath)
 
     @classmethod
     def create(cls, exploration_id, filepath):
@@ -111,7 +113,7 @@ class FileModel(base_models.VersionedModel):
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):
-        return os.path.join('/', exploration_id, filepath)
+        return utils.vfs_construct_path('/', exploration_id, filepath)
 
     @classmethod
     def create(cls, exploration_id, filepath):

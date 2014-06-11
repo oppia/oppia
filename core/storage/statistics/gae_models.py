@@ -18,6 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
+import feconf
 import logging
 
 from core.platform import models
@@ -136,6 +138,120 @@ class StateRuleAnswerLogModel(base_models.BaseModel):
 
         ndb.put_multi(entities_to_put)
         return entities
+
+
+class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a reader attempting to leave the
+    exploration without completing.
+
+    Due to complexity on browser end, this event may be logged when user clicks
+    close and then cancel. Thus, the real event is the last event of this type
+    logged for the session id."""
+
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    # Current parameter values, map of parameter name to value
+    params = ndb.JsonProperty(indexed=False)
+    # Which type of play-through this is (preview, from gallery)
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_NORMAL])
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+                              utils.get_time_in_millisecs(timestamp),
+                              exp_id,
+                              session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               client_time_spent_in_secs, params, play_type):
+        """Creates a new leave exploration event."""
+        entity_id = cls.get_new_event_entity_id(exp_id,
+                                                session_id)
+        leave_event_entity = cls(event_type=feconf.EVENT_TYPE_LEAVE,
+                                 exploration_id=exp_id,
+                                 exploration_version=exp_version,
+                                 state_name=state_name,
+                                 session_id=session_id,
+                                 client_time_spent_in_secs=client_time_spent_in_secs,
+                                 params=params,
+                                 play_type=play_type)
+        leave_event_entity.put()
+
+
+class StartExplorationEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student starting the exploration."""
+
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Time since start of this state before this event occurred (in sec).
+    client_time_spent_in_secs = ndb.FloatProperty(indexed=True)
+    # Current parameter values, map of parameter name to value
+    params = ndb.JsonProperty(indexed=False)
+    # Which type of play-through this is (preview, from gallery)
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_NORMAL])
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+                              utils.get_time_in_millisecs(timestamp),
+                              exp_id,
+                              session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id,
+               params, play_type):
+        """Creates a new start exploration event."""
+        entity_id = cls.get_new_event_entity_id(exp_id,
+                                                session_id)
+        start_event_entity = cls(event_type=feconf.EVENT_TYPE_START,
+                                 exploration_id=exp_id,
+                                 exploration_version=exp_version,
+                                 state_name=state_name,
+                                 session_id=session_id,
+                                 client_time_spent_in_secs=0.0,
+                                 params=params,
+                                 play_type=play_type)
+        start_event_entity.put()
+
+
+class ExplorationAnnotationsModel(base_models.BaseModel):
+    """Model for exploration-level statistics."""
+
+    # Caching was causing issues with stale data being shown after MapReduce
+    # jobs were run. Benefits of caching were considered to be minimal, so 
+    # all caching has been turned off for statistics models.
+    _use_cache = False
+    _use_memcache = False
+
+    # Number of students who started the exploration
+    num_visits = ndb.IntegerProperty(indexed=True)
+    # Number of students who have completed the exploration
+    num_completions = ndb.IntegerProperty(indexed=True)
 
 
 def process_submitted_answer(
