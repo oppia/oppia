@@ -417,27 +417,21 @@ function ExplorationEditor(
   // which are unreachable from the initial node.
   $scope._getUnreachableNodeNames = function(initNodeName, nodes, edges) {
     var queue = [initNodeName];
-    var seen = [initNodeName];
+    var seen = {};
+    seen[initNodeName] = true;
     while (queue.length > 0) {
-      var currNodeName = queue[0];
-      queue.shift();
-
-      for (var i = 0; i < edges.length; i++) {
-        if (edges[i].source === currNodeName && seen.indexOf(edges[i].target) === -1) {
-          seen.push(edges[i].target);
-          queue.push(edges[i].target);
+      var currNodeName = queue.shift();
+      edges.forEach(function(edge) {
+        if (edge.source === currNodeName && !seen.hasOwnProperty(edge.target)) {
+          seen[edge.target] = true;
+          queue.push(edge.target);
         }
-      }
+      });
     }
 
-    var unreachableNodeNames = [];
-    for (var i = 0; i < nodes.length; i++) {
-      if (seen.indexOf(nodes[i]) === -1) {
-        unreachableNodeNames.push(nodes[i]);
-      }
-    }
-
-    return unreachableNodeNames;
+    return nodes.filter(function(node) {
+      return !seen.hasOwnProperty(node);
+    });
   };
 
   // Given an array of objects with two keys 'source' and 'target', returns
@@ -445,14 +439,12 @@ function ExplorationEditor(
   // switched. (The objects represent edges in a graph, and this operation
   // amounts to reversing all the edges.)
   $scope._getReversedLinks = function(links) {
-    var reversedLinks = [];
-    for (var i = 0; i < links.length; i++) {
-      reversedLinks.push({
-        source: links[i].target,
-        target: links[i].source,
-      });
-    }
-    return reversedLinks;
+    return links.map(function(link) {
+      return {
+        source: link.target,
+        target: link.source
+      };
+    });
   };
 
   // Returns a list of states which have rules that have no feedback and that
@@ -460,26 +452,17 @@ function ExplorationEditor(
   $scope._getStatesWithInsufficientFeedback = function() {
     var problematicStates = [];
     for (var stateName in $scope.states) {
-      var isProblematic = false;
       var handlers = $scope.states[stateName].widget.handlers;
-      for (var i = 0; i < handlers.length; i++) {
-        var ruleSpecs = handlers[i].rule_specs;
-        for (var j = 0; j < ruleSpecs.length; j++) {
-          if (ruleSpecs[j].dest === stateName) {
-            var hasFeedback = false;
-            for (var k = 0; k < ruleSpecs[j].feedback.length; k++) {
-              if (ruleSpecs[j].feedback[k].length) {
-                hasFeedback = true;
-                break;
-              }
-            }
-            if (!hasFeedback) {
-              isProblematic = true;
-              break;
-            }
-          }
-        }
-      }
+      var isProblematic = handlers.some(function(handler) {
+        return handler.rule_specs.some(function(ruleSpec) {
+          return (
+            ruleSpec.dest === stateName &&
+            !ruleSpec.feedback.some(function(feedbackItem) {
+              return feedbackItem.length > 0;
+            })
+          );
+        });
+      });
 
       if (isProblematic) {
         problematicStates.push(stateName);
