@@ -56,6 +56,7 @@
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('filters.js') }}
     {{ include_js_file('components/schemaBasedEditors.js') }}
     {{ include_js_file('tests/SchemaEditorTests.js') }}
   </script>

@@ -20,6 +20,8 @@
 
 oppia.factory('schemaDefaultValueService', [function() {
   return {
+    // TODO(sll): Rewrite this to take into account post_normalizers, so that
+    // we always start with a valid value.
     getDefaultValue: function(schema) {
       if (schema.type === 'bool') {
         return false;
@@ -36,43 +38,111 @@ oppia.factory('schemaDefaultValueService', [function() {
   };
 }]);
 
-oppia.directive('validateAsFloat', function() {
+
+oppia.filter('requireIsFloat', [function() {
+  return function(input) {
+    var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+    if (!FLOAT_REGEXP.test(input)) {
+      return undefined;
+    }
+
+    return (typeof input === 'number') ? input : parseFloat(
+      input.replace(',', '.'));
+  };
+}]);
+
+
+// The names of these filters must correspond to the names of the backend post-
+// normalizers (with underscores converted to camelcase).
+// WARNING: These filters do not validate the arguments supplied with the
+// post-normalizer definitions in the schema; these are assumed to be correct.
+oppia.filter('requireAtLeast', [function() {
+  return function(input, args) {
+    return (input >= args.minValue) ? input : undefined;
+  };
+}]);
+
+
+oppia.filter('requireAtMost', [function() {
+  return function(input, args) {
+    return (input <= args.maxValue) ? input : undefined;
+  };
+}]);
+
+
+oppia.filter('requireIsOneOf', [function() {
+  return function(input, args) {
+    return args.choices.indexOf(input) !== -1 ? input : undefined;
+  };
+}]);
+
+
+oppia.filter('requireNonempty', [function() {
+  return function(input) {
+    return input ? input : undefined;
+  };
+}]);
+
+
+oppia.directive('validateWithPostNormalizers', ['$filter', function($filter) {
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs, ctrl) {
+      // Add normalizers in reverse order.
+      if (scope.postNormalizers()) {
+        scope.postNormalizers().forEach(function(normalizerSpec) {
+          var frontendName = $filter('underscoresToCamelCase')(normalizerSpec.id);
+
+          // Note that there may not be a corresponding frontend filter for
+          // each backend normalizer.
+          try {
+            $filter(frontendName);
+          } catch(err) {
+            return;
+          }
+
+          var filterArgs = {};
+          for (key in normalizerSpec) {
+            if (key !== 'id') {
+              filterArgs[$filter('underscoresToCamelCase')(key)] = angular.copy(
+                normalizerSpec[key]);
+            }
+          }
+
+          var customValidator = function(viewValue) {
+            var filteredValue = $filter(frontendName)(viewValue, filterArgs);
+            ctrl.$setValidity(frontendName, filteredValue !== undefined);
+            return filteredValue;
+          }
+
+          ctrl.$parsers.unshift(customValidator);
+          ctrl.$formatters.unshift(customValidator);
+        });
+      }
+    }
+  };
+}]);
+
+// This should come after validate-with-post-normalizers, if that is defined as
+// an attribute on the HTML tag.
+oppia.directive('addFloatValidation', ['$filter', function($filter) {
   var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
   return {
     require: 'ngModel',
     restrict: 'A',
     link: function(scope, elm, attrs, ctrl) {
-      function validate(viewValue) {
-        if (FLOAT_REGEXP.test(viewValue)) {
-          ctrl.$setValidity('float', true);
-          var normalizedValue = (
-            (typeof viewValue === 'number') ? viewValue :
-            parseFloat(viewValue.replace(',', '.'))
-          );
+      var floatValidator = function(viewValue) {
+        var filteredValue = $filter('requireIsFloat')(viewValue);
+        ctrl.$setValidity('requireIsFloat', filteredValue !== undefined);
+        return filteredValue;
+      };
 
-          if (scope.postNormalizers()) {
-            for (var i = 0; i < scope.postNormalizers().length; i++) {
-              if (scope.postNormalizers()[i].id === 'require_at_least') {
-                if (normalizedValue < scope.postNormalizers()[i].min_value) {
-                  ctrl.$setValidity('float', false);
-                  return undefined;
-                }
-              }
-            }
-          }
-
-          return normalizedValue;
-        } else {
-          ctrl.$setValidity('float', false);
-          return undefined;
-        }
-      }
-
-      ctrl.$parsers.unshift(validate);
-      ctrl.$formatters.unshift(validate);
+      ctrl.$parsers.unshift(floatValidator);
+      ctrl.$formatters.unshift(floatValidator);
     }
   };
-});
+}]);
 
 // Prevents timeouts due to recursion in nested directives. See:
 //
@@ -155,7 +225,7 @@ oppia.directive('schemaBuilder', [function() {
   };
 }]);
 
-oppia.directive('boolEditor', [function() {
+oppia.directive('schemaBasedBoolEditor', [function() {
   return {
     scope: {
       localValue: '=',
@@ -167,7 +237,7 @@ oppia.directive('boolEditor', [function() {
   };
 }]);
 
-oppia.directive('floatEditor', [function() {
+oppia.directive('schemaBasedFloatEditor', [function() {
   return {
     scope: {
       localValue: '=',
@@ -180,7 +250,7 @@ oppia.directive('floatEditor', [function() {
   };
 }]);
 
-oppia.directive('intEditor', [function() {
+oppia.directive('schemaBasedIntEditor', [function() {
   return {
     scope: {
       localValue: '=',
@@ -192,12 +262,13 @@ oppia.directive('intEditor', [function() {
   };
 }]);
 
-oppia.directive('unicodeEditor', [function() {
+oppia.directive('schemaBasedUnicodeEditor', [function() {
   return {
     scope: {
       localValue: '=',
       // Read-only property. Whether the item is editable.
-      isEditable: '&'
+      isEditable: '&',
+      postNormalizers: '&'
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E'
@@ -207,9 +278,7 @@ oppia.directive('unicodeEditor', [function() {
 // TODO(sll): The 'Cancel' button should revert the text in the HTML box to its
 // original state.
 // TODO(sll): The noninteractive widgets in the RTE do not work.
-// TODO(sll): This duplicates an existing object editor directive; remove
-// the other one.
-oppia.directive('htmlEditor', [function() {
+oppia.directive('schemaBasedHtmlEditor', [function() {
   return {
     scope: {
       localValue: '=',
@@ -221,9 +290,7 @@ oppia.directive('htmlEditor', [function() {
   };
 }]);
 
-// TODO(sll): This duplicates an existing object editor directive; remove
-// the other one.
-oppia.directive('listEditor', [
+oppia.directive('schemaBasedListEditor', [
     'schemaDefaultValueService', 'recursionHelper',
     function(schemaDefaultValueService, recursionHelper) {
   return {
@@ -250,9 +317,7 @@ oppia.directive('listEditor', [
   };
 }]);
 
-// TODO(sll): This duplicates an existing object editor directive; remove
-// the other one.
-oppia.directive('dictEditor', ['recursionHelper', function(recursionHelper) {
+oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionHelper) {
   return {
     scope: {
       localValue: '=',

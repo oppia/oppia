@@ -27,6 +27,16 @@ function SchemaEditorTests($scope) {
   };
 
   $scope.testForms = [{
+    name: 'Restricted unicode form; the value must be either a or b.',
+    schema: {
+      type: 'unicode',
+      post_normalizers: [{
+        id: 'require_is_one_of',
+        choices: ['a', 'b']
+      }]
+    },
+    value: 'a'
+  }, {
     name: 'Boolean form',
     schema: {
       type: 'bool'
@@ -39,17 +49,20 @@ function SchemaEditorTests($scope) {
     },
     value: 3
   }, {
-    name: 'Float form  (value must be at least 3)',
+    name: 'Float form (value must be between 3 and 6)',
     schema: {
       type: 'float',
       post_normalizers: [{
         id: 'require_at_least',
         min_value: 3.0
+      }, {
+        id: 'require_at_most',
+        max_value: 6.0
       }]
     },
     value: 3.14
   }, {
-    name: 'Dict with a bool and a unicode string',
+    name: 'Dict with a bool and a unicode string. The string must be either \'abc\' or \'def\'.',
     schema: {
       type: 'dict',
       properties: {
@@ -57,13 +70,17 @@ function SchemaEditorTests($scope) {
           type: 'bool'
         },
         a_unicode_string: {
-          type: 'unicode'
+          type: 'unicode',
+          post_normalizers: [{
+            id: 'require_is_one_of',
+            choices: ['abc', 'def']
+          }]
         }
       }
     },
     value: {
       a_boolean: false,
-      a_unicode_string: 'sample_value'
+      a_unicode_string: 'abc'
     }
   }, {
     name: 'List of unicode strings',

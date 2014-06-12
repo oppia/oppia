@@ -12,26 +12,26 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/master">
-  <bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()">
-  </bool-editor>
+  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()">
+  </schema-based-bool-editor>
 
-  <int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()">
-  </int-editor>
+  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()">
+  </schema-based-int-editor>
 
-  <float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
-  </float-editor>
+  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
+  </schema-based-float-editor>
 
-  <unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" is-editable="isEditable()">
-  </unicode-editor>
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
+  </schema-based-unicode-editor>
 
-  <html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" is-editable="isEditable()">
-  </html-editor>
+  <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" is-editable="isEditable()">
+  </schema-based-html-editor>
 
-  <list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" is-editable="isEditable()" item-schema="schema().items">
-  </list-editor>
+  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" is-editable="isEditable()" item-schema="schema().items">
+  </schema-based-list-editor>
 
-  <dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" is-editable="isEditable()" property-schemas="schema().properties">
-  </dict-editor>
+  <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" is-editable="isEditable()" property-schemas="schema().properties">
+  </schema-based-dict-editor>
 </script>
 
 
@@ -48,13 +48,13 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
-  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control" validate-as-float post-normalizers="postNormalizers()">
+  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation>
   <span ng-if="!isEditable()"><[localValue]></span>
 </script>
 
 
 <script type="text/ng-template" id="schemaBasedEditor/unicode">
-  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control">
+  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
   <span ng-if="!isEditable()"><[localValue]></span>
 </script>
 
