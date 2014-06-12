@@ -13,6 +13,12 @@
   <bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()">
   </bool-editor>
 
+  <int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()">
+  </int-editor>
+
+  <float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" is-editable="isEditable()">
+  </float-editor>
+
   <unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" is-editable="isEditable()">
   </unicode-editor>
 
@@ -29,6 +35,18 @@
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">
   <input ng-if="isEditable()" type="checkbox" ng-model="$parent.localValue">
+  <span ng-if="!isEditable()"><[localValue]></span>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/int">
+  <input ng-if="isEditable()" type="number" ng-model="$parent.localValue" class="form-control">
+  <span ng-if="!isEditable()"><[localValue]></span>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/float">
+  <input type="text" ng-if="isEditable()" ng-model="$parent.localValue" class="form-control">
   <span ng-if="!isEditable()"><[localValue]></span>
 </script>
 

@@ -129,6 +129,30 @@ oppia.directive('boolEditor', [function() {
   };
 }]);
 
+oppia.directive('floatEditor', [function() {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. Whether the item is editable.
+      isEditable: '&'
+    },
+    templateUrl: 'schemaBasedEditor/float',
+    restrict: 'E'
+  };
+}]);
+
+oppia.directive('intEditor', [function() {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. Whether the item is editable.
+      isEditable: '&'
+    },
+    templateUrl: 'schemaBasedEditor/int',
+    restrict: 'E'
+  };
+}]);
+
 oppia.directive('unicodeEditor', [function() {
   return {
     scope: {

@@ -33,7 +33,19 @@ function SchemaEditorTests($scope) {
     },
     value: true
   }, {
-    name: 'dictForm',
+    name: 'Integer form',
+    schema: {
+      type: 'int'
+    },
+    value: 3
+  }, {
+    name: 'Float form',
+    schema: {
+      type: 'float'
+    },
+    value: 3.14
+  }, {
+    name: 'Dict with a bool and a unicode string',
     schema: {
       type: 'dict',
       properties: {
@@ -50,7 +62,7 @@ function SchemaEditorTests($scope) {
       a_unicode_string: 'sample_value'
     }
   }, {
-    name: 'listForm',
+    name: 'List of unicode strings',
     schema: {
       type: 'list',
       items: {
@@ -59,7 +71,7 @@ function SchemaEditorTests($scope) {
     },
     value: ['abc', 'def', 'ghi']
   }, {
-    name: 'nestedListForm',
+    name: 'Nested lists',
     schema: {
       type: 'list',
       items: {
@@ -71,7 +83,7 @@ function SchemaEditorTests($scope) {
     },
     value: [['abc'], ['def', 'ghi']]
   }, {
-    name: 'htmlForm',
+    name: 'HTML form',
     schema: {
       type: 'html'
     },
