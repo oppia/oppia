@@ -18,7 +18,10 @@
 
 __author__ = 'Sean Lip'
 
+import base64
 import os
+import StringIO
+import tarfile
 
 import feconf
 import schema_utils
@@ -390,12 +393,15 @@ class TarFileString(BaseObject):
 
     _schema = {
         'type': 'unicode',
-        'post_normalizers': [{
-            'id': 'require_nonempty'
-        }, {
-            'id': 'read_as_tar_file_contents'
-        }]
     }
+
+    @classmethod
+    def normalize(cls, raw):
+        """Reads `raw` as a unicode string representing a tar file and returns
+        the base64-encoded contents."""
+        raw = schema_utils.normalize_against_schema(raw, cls._schema)
+        raw = base64.b64decode(raw)
+        return tarfile.open(fileobj=StringIO.StringIO(raw), mode='r:gz')
 
 
 class Filepath(BaseObject):

@@ -190,14 +190,15 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
-            ('javascript:alert(5);', ''),
-            ('ftp://gopher.com', ''),
-            ('test', ''),
-            ('google.com', ''),
             ('https://www.google!.com', 'https://www.google%21.com'),
         ]
 
-        invalid_vals = [u'http://¡Hola!.com']
+        invalid_vals = [
+            u'http://¡Hola!.com',
+            'javascript:alert(5);',
+            'ftp://gopher.com',
+            'test',
+            'google.com']
 
         self.check_normalization(objects.SanitizedUrl, mappings, invalid_vals)
 

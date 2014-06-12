@@ -26,11 +26,8 @@ following Python types: bool, dict, float, int, list, unicode.
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import base64
 import logging
 import numbers
-import StringIO
-import tarfile
 import urllib
 import urlparse
 
@@ -195,6 +192,20 @@ def normalize_against_schema(obj, schema):
 
 
 class Normalizers(object):
+    """Various normalizers.
+
+    A normalizer is a function that takes an object, attempts to normalize
+    it to a canonical representation, and/or performs validity checks on the
+    object pre- and post-normalization. If the normalization succeeds, the
+    function returns the transformed object; if it fails, it raises an
+    exception.
+
+    Some normalizers require additional arguments. It is the responsibility of
+    callers of normalizer functions to ensure that the arguments they supply to
+    the normalizer are valid. What exactly this entails is provided in the
+    docstring for each normalizer.
+    """
+
     @classmethod
     def get(cls, normalizer_id):
         if not hasattr(cls, normalizer_id):
@@ -260,13 +271,10 @@ class Normalizers(object):
         raw = urlparse.urlunsplit(quoted_url_components)
 
         acceptable = html_cleaner.filter_a('href', obj)
-        if not acceptable:
-            logging.error(
-                'Invalid URL: Sanitized URL should start with '
-                '\'http://\' or \'https://\'; received %s' % raw)
-            return u''
-        else:
-            return raw
+        assert acceptable, (
+            'Invalid URL: Sanitized URL should start with '
+            '\'http://\' or \'https://\'; received %s' % raw)
+        return raw
 
     @staticmethod
     def require_at_least(obj, min_value):
@@ -318,17 +326,3 @@ class Normalizers(object):
         """
         assert obj in choices
         return obj
-
-    @staticmethod
-    def read_as_tar_file_contents(obj):
-        """Reads `obj` as a unicode string representing a tar file and returns
-        the base64-encoded contents.
-
-        Args:
-          obj: a unicode string representing the contents of a tar file.
-
-        Returns:
-          obj, represented as the base64 contents of a tar file.
-        """
-        obj = base64.b64decode(obj)
-        return tarfile.open(fileobj=StringIO.StringIO(obj), mode='r:gz')

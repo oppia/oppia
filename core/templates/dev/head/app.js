@@ -24,7 +24,8 @@ var oppia = angular.module(
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
 // Set default headers for POST requests.
-oppia.config(['$interpolateProvider', '$httpProvider', function($interpolateProvider, $httpProvider) {
+oppia.config(['$interpolateProvider', '$httpProvider',
+    function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 
@@ -185,24 +186,6 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
       $timeout(function() {
         $rootScope.$broadcast('focusOn', name);
       });
-    }
-  };
-}]);
-
-// Service for creating HTML strings programmatically.
-oppia.factory('htmlService', [function() {
-  return {
-    // Constructs an HTML string from an element name, a list of 2-element lists
-    // representing attribute names and values, and an optional innerText string.
-    build: function(eltName, attrPairs, innerText) {
-      var jQueryElt = $(document.createElement(eltName));
-      for (var i = 0; i < attrPairs.length; i++) {
-        jQueryElt = jQueryElt.attr(attrPairs[i][0], attrPairs[i][1]);
-      }
-      if (innerText) {
-        jQueryElt = jQueryElt.text(innerText);
-      }
-      return jQueryElt[0].outerHTML;
     }
   };
 }]);

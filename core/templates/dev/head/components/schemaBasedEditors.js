@@ -18,49 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.factory('schemaParsingService', ['htmlService', function(htmlService) {
+oppia.factory('schemaDefaultValueService', [function() {
   return {
-    buildFromSchema: function(schema, propertyToBindTo, schemaAttrName) {
-      if (schema.type === 'bool') {
-        return htmlService.build('bool-editor', [
-          ['local-value', propertyToBindTo],
-          ['is-editable', 'isEditable()']
-        ], '');
-      } else if (schema.type === 'unicode') {
-        return htmlService.build('unicode-editor', [
-          ['local-value', propertyToBindTo],
-          ['is-editable', 'isEditable()']
-        ], '');
-      } else if (schema.type === 'list') {
-        return htmlService.build('list-editor', [
-          ['local-value', propertyToBindTo],
-          ['is-editable', 'isEditable()'],
-          ['item-schema', schemaAttrName + '.items']
-        ], '');
-      } else if (schema.type === 'dict') {
-        var innerFormHtml = '<form role="form">';
-        for (var key in schema.properties) {
-          innerFormHtml += '  <div class="form-group">';
-          // TODO(sll): Add a 'for' attribute here.
-          innerFormHtml += htmlService.build('label', [], key);
-          innerFormHtml += ' ';
-          innerFormHtml += this.buildFromSchema(
-            schema.properties[key], propertyToBindTo + '.' + key,
-            schemaAttrName + '.properties.' + key);
-          innerFormHtml += htmlService.build('br', [], '');
-          innerFormHtml += '  </div>';
-        }
-        innerFormHtml += '</form>';
-        return innerFormHtml;
-      } else if (schema.type === 'html') {
-        return htmlService.build('new-html-editor', [
-          ['local-value', propertyToBindTo],
-          ['is-editable', 'isEditable()']
-        ], '');
-      } else {
-        console.error('Invalid schema type: ' + schema.type);
-      }
-    },
     getDefaultValue: function(schema) {
       if (schema.type === 'bool') {
         return false;
@@ -77,174 +36,59 @@ oppia.factory('schemaParsingService', ['htmlService', function(htmlService) {
   };
 }]);
 
-// TODO(sll): Rename this (and instances of 'new-html-editor') to just HtmlEditor.
-// TODO(sll): The 'Cancel' button should revert the text in the HTML box to its
-// original state.
-// TODO(sll): The noninteractive widgets in the RTE do not work.
-oppia.directive('newHtmlEditor', ['$compile', 'htmlService', function($compile, htmlService) {
+// Prevents timeouts due to recursion in nested directives. See:
+//
+//   http://stackoverflow.com/questions/14430655/recursion-in-angular-directives
+oppia.factory('recursionHelper', ['$compile', function($compile){
   return {
-    scope: {
-      localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&'
-    },
-    link: function(scope, element, attrs) {
-      var elementHtml = '';
-      if (scope.isEditable()) {
-        elementHtml = htmlService.build(
-          'rich-text-editor', [['html-content', 'localValue']], '');
-      } else {
-        elementHtml = htmlService.build(
-          'span', [['angular-html-bind', 'localValue']], '');
-      }
-      element.html(elementHtml);
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    controller: function($scope, $attrs) {
-      return;
-    }
-  };
-}]);
-
-oppia.directive('boolEditor', ['$compile', 'htmlService', function($compile, htmlService) {
-  return {
-    scope: {
-      localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&'
-    },
-    link: function(scope, element, attrs) {
-      var elementHtml = '';
-      if (scope.isEditable()) {
-        elementHtml = htmlService.build(
-          'input', [['type', 'checkbox'], ['ng-model', 'localValue']], '');
-      } else {
-        elementHtml = htmlService.build('span', [], '<[localValue]>');
-      }
-      element.html(elementHtml);
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    controller: function($scope, $attrs) {
-      return;
-    }
-  };
-}]);
-
-oppia.directive('unicodeEditor', ['$compile', 'htmlService', function($compile, htmlService) {
-  return {
-    scope: {
-      localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&'
-    },
-    link: function(scope, element, attrs) {
-      var elementHtml = '';
-      if (scope.isEditable()) {
-        elementHtml = htmlService.build('input', [
-          ['type', 'text'],
-          ['ng-model', 'localValue'],
-          ['class', 'form-control']
-        ], '');
-      } else {
-        elementHtml = htmlService.build('span', [], '<[localValue]>');
-      }
-      element.html(elementHtml);
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    controller: function($scope, $attrs) {
-      return;
-    }
-  };
-}]);
-
-// TODO(sll): This duplicates an existing object editor directive; remove
-// the other one.
-oppia.directive('listEditor', [
-    '$compile', 'htmlService', 'schemaParsingService',
-    function($compile, htmlService, schemaParsingService) {
-  return {
-    scope: {
-      localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&',
-      // Read-only property. The schema definition for each item in the list.
-      itemSchema: '&'
-    },
-    link: function(scope, element, attrs) {
-      var elementHtml = (
-        '<table class="table">' +
-        '  <tr ng-repeat="item in localValue track by $index">' +
-        '    <td>' +
-        schemaParsingService.buildFromSchema(
-          scope.itemSchema(), 'localValue[$index]', 'itemSchema()') +
-        '    </td>' + (
-          scope.isEditable() ?
-        '    <td>' +
-        '      <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)">' +
-        '        <span class="glyphicon glyphicon-remove" title="Delete item">' +
-        '        </span>' +
-        '      </button>' +
-        '    </td>' : '') +
-        '  </tr>' +
-        '</table>');
-
-      if (scope.isEditable()) {
-        elementHtml += (
-          '<button class="btn btn-default" type="button" ng-click="addElement()">' +
-          '  Add element' +
-          '</button>');
+    /**
+     * Manually compiles the element, fixing the recursion loop.
+     * @param element
+     * @param [link] A post-link function, or an object with function(s)
+     *     registered via pre and post properties.
+     * @returns An object containing the linking functions.
+     */
+    compile: function(element, link){
+      // Normalize the link parameter
+      if (angular.isFunction(link)) {
+        link = {post: link};
       }
 
-      element.html(elementHtml);
-      $compile(element.contents())(scope);
-    },
-    restrict: 'E',
-    controller: function($scope, $attrs) {
-      $scope.addElement = function() {
-        $scope.localValue.push(
-          schemaParsingService.getDefaultValue($scope.itemSchema()));
-      };
+      // Break the recursion loop by removing the contents,
+      var contents = element.contents().remove();
+      var compiledContents;
+      return {
+        pre: (link && link.pre) ? link.pre : null,
+        post: function(scope, element){
+          // Compile the contents.
+          if (!compiledContents) {
+              compiledContents = $compile(contents);
+          }
+          // Re-add the compiled contents to the element.
+          compiledContents(scope, function(clone) {
+              element.append(clone);
+          });
 
-      $scope.deleteElement = function(index) {
-        $scope.localValue.splice(index, 1);
+          // Call the post-linking function, if any.
+          if (link && link.post) {
+            link.post.apply(null, arguments);
+          }
+        }
       };
     }
   };
 }]);
 
-oppia.directive('schemaBasedEditor', [
-    '$compile', 'htmlService', 'schemaParsingService',
-    function($compile, htmlService, schemaParsingService) {
+oppia.directive('schemaBasedEditor', ['recursionHelper', function(recursionHelper) {
   return {
     scope: {
       definition: '=',
       isEditable: '&',
       savedValue: '='
     },
-    link: function(scope, element, attrs) {
-      var formHtml = schemaParsingService.buildFromSchema(
-        scope.definition, 'localValue', 'definition');
-      if (scope.isEditable()) {
-        formHtml += (
-          '<div>' +
-            htmlService.build('button', [
-              ['ng-click', 'submitValue(localValue)'],
-              ['class', 'btn btn-success']
-            ], 'Submit') +
-            htmlService.build('button', [
-              ['ng-click', 'cancelEdit()'],
-              ['class', 'btn btn-default']
-            ], 'Cancel') +
-          '</div>');
-      }
-
-      element.html(formHtml);
-      $compile(element.contents())(scope);
-    },
+    templateUrl: 'schemaBasedEditor/entryPoint',
     restrict: 'E',
+    compile: recursionHelper.compile,
     controller: function($scope, $attrs) {
       $scope.$watch('savedValue', function(newValue, oldValue) {
         $scope.localValue = angular.copy($scope.savedValue);
@@ -258,5 +102,105 @@ oppia.directive('schemaBasedEditor', [
         $scope.localValue = angular.copy($scope.savedValue);
       };
     }
+  };
+}]);
+
+oppia.directive('schemaBuilder', [function() {
+  return {
+    scope: {
+      schema: '&',
+      isEditable: '&',
+      localValue: '='
+    },
+    templateUrl: 'schemaBasedEditor/master',
+    restrict: 'E'
+  };
+}]);
+
+oppia.directive('boolEditor', [function() {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. Whether the item is editable.
+      isEditable: '&'
+    },
+    templateUrl: 'schemaBasedEditor/bool',
+    restrict: 'E'
+  };
+}]);
+
+oppia.directive('unicodeEditor', [function() {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. Whether the item is editable.
+      isEditable: '&'
+    },
+    templateUrl: 'schemaBasedEditor/unicode',
+    restrict: 'E'
+  };
+}]);
+
+// TODO(sll): The 'Cancel' button should revert the text in the HTML box to its
+// original state.
+// TODO(sll): The noninteractive widgets in the RTE do not work.
+// TODO(sll): This duplicates an existing object editor directive; remove
+// the other one.
+oppia.directive('htmlEditor', [function() {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. Whether the item is editable.
+      isEditable: '&'
+    },
+    templateUrl: 'schemaBasedEditor/html',
+    restrict: 'E'
+  };
+}]);
+
+// TODO(sll): This duplicates an existing object editor directive; remove
+// the other one.
+oppia.directive('listEditor', [
+    'schemaDefaultValueService', 'recursionHelper',
+    function(schemaDefaultValueService, recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. Whether the item is editable.
+      isEditable: '&',
+      // Read-only property. The schema definition for each item in the list.
+      itemSchema: '&'
+    },
+    templateUrl: 'schemaBasedEditor/list',
+    restrict: 'E',
+    compile: recursionHelper.compile,
+    controller: function($scope, $attrs, $sce) {
+      $scope.addElement = function() {
+        $scope.localValue.push(
+          schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+      };
+
+      $scope.deleteElement = function(index) {
+        $scope.localValue.splice(index, 1);
+      };
+    }
+  };
+}]);
+
+// TODO(sll): This duplicates an existing object editor directive; remove
+// the other one.
+oppia.directive('dictEditor', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. Whether the item is editable.
+      isEditable: '&',
+      // Read-only property. An object whose keys and values are the dict
+      // properties and the corresponding schemas.
+      propertySchemas: '&'
+    },
+    templateUrl: 'schemaBasedEditor/dict',
+    restrict: 'E',
+    compile: recursionHelper.compile
   };
 }]);
