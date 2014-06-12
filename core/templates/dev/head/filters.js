@@ -26,7 +26,7 @@ oppia.filter('spacesToUnderscores', [function() {
 
 oppia.filter('underscoresToCamelCase', [function() {
   return function(input) {
-    return input.replace(/_(.)/g, function(match, group1) {
+    return input.replace(/_+(.)/g, function(match, group1) {
       return group1.toUpperCase();
     });
   };
@@ -114,16 +114,6 @@ oppia.filter('parameterizeRuleDescription', [function() {
       finalRule = finalRule.replace(pattern, replacementText);
     }
     return 'Answer ' + finalRule;
-  };
-}]);
-
-// Filter that converts a list into a comma-separated string.
-oppia.filter('commaSeparatedList', [function() {
-  return function(input) {
-    if (!angular.isArray(input)) {
-      return 'ERROR';
-    }
-    return input.join(', ');
   };
 }]);
 
