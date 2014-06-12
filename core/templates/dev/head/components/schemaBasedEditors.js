@@ -36,6 +36,44 @@ oppia.factory('schemaDefaultValueService', [function() {
   };
 }]);
 
+oppia.directive('validateAsFloat', function() {
+  var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs, ctrl) {
+      function validate(viewValue) {
+        if (FLOAT_REGEXP.test(viewValue)) {
+          ctrl.$setValidity('float', true);
+          var normalizedValue = (
+            (typeof viewValue === 'number') ? viewValue :
+            parseFloat(viewValue.replace(',', '.'))
+          );
+
+          if (scope.postNormalizers()) {
+            for (var i = 0; i < scope.postNormalizers().length; i++) {
+              if (scope.postNormalizers()[i].id === 'require_at_least') {
+                if (normalizedValue < scope.postNormalizers()[i].min_value) {
+                  ctrl.$setValidity('float', false);
+                  return undefined;
+                }
+              }
+            }
+          }
+
+          return normalizedValue;
+        } else {
+          ctrl.$setValidity('float', false);
+          return undefined;
+        }
+      }
+
+      ctrl.$parsers.unshift(validate);
+      ctrl.$formatters.unshift(validate);
+    }
+  };
+});
+
 // Prevents timeouts due to recursion in nested directives. See:
 //
 //   http://stackoverflow.com/questions/14430655/recursion-in-angular-directives
@@ -89,7 +127,7 @@ oppia.directive('schemaBasedEditor', ['recursionHelper', function(recursionHelpe
     templateUrl: 'schemaBasedEditor/entryPoint',
     restrict: 'E',
     compile: recursionHelper.compile,
-    controller: function($scope, $attrs) {
+    controller: ['$scope', function($scope) {
       $scope.$watch('savedValue', function(newValue, oldValue) {
         $scope.localValue = angular.copy($scope.savedValue);
       });
@@ -101,7 +139,7 @@ oppia.directive('schemaBasedEditor', ['recursionHelper', function(recursionHelpe
       $scope.cancelEdit = function() {
         $scope.localValue = angular.copy($scope.savedValue);
       };
-    }
+    }]
   };
 }]);
 
@@ -134,7 +172,8 @@ oppia.directive('floatEditor', [function() {
     scope: {
       localValue: '=',
       // Read-only property. Whether the item is editable.
-      isEditable: '&'
+      isEditable: '&',
+      postNormalizers: '&'
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E'
@@ -198,7 +237,7 @@ oppia.directive('listEditor', [
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',
     compile: recursionHelper.compile,
-    controller: function($scope, $attrs, $sce) {
+    controller: ['$scope', function($scope) {
       $scope.addElement = function() {
         $scope.localValue.push(
           schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
@@ -207,7 +246,7 @@ oppia.directive('listEditor', [
       $scope.deleteElement = function(index) {
         $scope.localValue.splice(index, 1);
       };
-    }
+    }]
   };
 }]);
 

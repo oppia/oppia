@@ -39,9 +39,13 @@ function SchemaEditorTests($scope) {
     },
     value: 3
   }, {
-    name: 'Float form',
+    name: 'Float form  (value must be at least 3)',
     schema: {
-      type: 'float'
+      type: 'float',
+      post_normalizers: [{
+        id: 'require_at_least',
+        min_value: 3.0
+      }]
     },
     value: 3.14
   }, {
