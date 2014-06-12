@@ -87,7 +87,7 @@
         <schema-builder schema="itemSchema()" is-editable="isEditable()" local-value="localValue[$index]">
         </schema-builder>
       </td>
-      <td>
+      <td ng-if="isEditable()">
         <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>

@@ -13,7 +13,10 @@
         <th>Editable version</th>
       </tr>
       <tr>
-        <td>Unicode form (copy 1)</td>
+        <td>
+          <h5>Unicode form (copy 1)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        </td>
         <td>
           <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
           </schema-based-editor>
@@ -24,7 +27,9 @@
         </td>
       </tr>
       <tr>
-        <td>Unicode form (copy 2)</td>
+        <td>
+          <h5>Unicode form (copy 2)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
         <td>
           <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
           </schema-based-editor>
@@ -36,7 +41,10 @@
       </tr>
 
       <tr ng-repeat="form in testForms">
-        <td><[form.name]></td>
+        <td>
+          <h5><[form.name]></h5>
+          <em>Saved value:</em> <[form.value]>
+        </td>
         <td>
           <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="false">
           </schema-based-editor>
