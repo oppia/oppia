@@ -62,7 +62,7 @@ function SchemaEditorTests($scope) {
     },
     value: 3.14
   }, {
-    name: 'Dict with a bool and a unicode string. The string must be either \'abc\' or \'def\'.',
+    name: 'Dict with a bool, a unicode string and a list of ints. The string must be either \'abc\' or \'def\'.',
     schema: {
       type: 'dict',
       properties: {
@@ -75,12 +75,19 @@ function SchemaEditorTests($scope) {
             id: 'require_is_one_of',
             choices: ['abc', 'def']
           }]
+        },
+        a_list: {
+          type: 'list',
+          items: {
+            type: 'int'
+          }
         }
       }
     },
     value: {
       a_boolean: false,
-      a_unicode_string: 'abc'
+      a_unicode_string: 'abc',
+      a_list: [2, 3]
     }
   }, {
     name: 'List of unicode strings',
