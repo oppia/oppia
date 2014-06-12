@@ -77,13 +77,13 @@ oppia.factory('oppiaPlayerService', [
   var sessionId = null;
   var isLoggedIn = false;
 
-  var currentParams = {};
+  $rootScope.currentParams = {};
   var stateHistory = [];
   var stateName = null;
   var answerIsBeingProcessed = false;
 
   var _updateStatus = function(newParams, newStateName, newStateHistory) {
-    currentParams = newParams;
+    $rootScope.currentParams = newParams;
     stateName = newStateName;
     stateHistory = newStateHistory;
   };
@@ -159,7 +159,7 @@ oppia.factory('oppiaPlayerService', [
         oppiaRequestCreator.createRequest({
           answer: answer,
           handler: handler,
-          params: currentParams,
+          params: $rootScope.currentParams,
           state_history: stateHistory,
           version: version,
           session_id: sessionId,
