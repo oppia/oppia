@@ -19,16 +19,11 @@
 __author__ = 'Sean Lip'
 
 import base64
-import logging
-import numbers
-import os
-from StringIO import StringIO
-import tarfile
-import urllib
-import urlparse
 import copy
+import os
+import StringIO
+import tarfile
 
-from core.domain import html_cleaner
 import feconf
 import schema_utils
 import utils
@@ -62,7 +57,7 @@ class BaseObject(object):
         Raises:
           TypeError: if the Python object cannot be normalized.
         """
-        raise NotImplementedError('Not implemented.')
+        return schema_utils.normalize_against_schema(raw, cls._schema)
 
     @classmethod
     def has_editor_js_template(cls):
@@ -131,11 +126,6 @@ class Real(BaseObject):
         'type': 'float'
     }
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        return schema_utils.normalize_against_schema(raw, cls._schema)
-
 
 class Int(BaseObject):
     """Integer class."""
@@ -148,11 +138,6 @@ class Int(BaseObject):
         'type': 'int'
     }
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        return schema_utils.normalize_against_schema(raw, cls._schema)
-
 
 class NonnegativeInt(BaseObject):
     """Nonnegative integer class."""
@@ -162,15 +147,12 @@ class NonnegativeInt(BaseObject):
     edit_js_filename = 'NonnegativeIntEditor'
 
     _schema = {
-        'type': 'int'
+        'type': 'int',
+        'post_normalizers': [{
+            'id': 'require_at_least',
+            'min_value': 0
+        }]
     }
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        result = schema_utils.normalize_against_schema(raw, cls._schema)
-        assert result >= 0
-        return result
 
 
 class CodeEvaluation(BaseObject):
@@ -196,11 +178,6 @@ class CodeEvaluation(BaseObject):
         }
     }
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        return schema_utils.normalize_against_schema(raw, cls._schema)
-
 
 class CoordTwoDim(BaseObject):
     """2D coordinate class."""
@@ -217,27 +194,23 @@ class CoordTwoDim(BaseObject):
         }
     }
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        return schema_utils.normalize_against_schema(raw, cls._schema)
 
-
-class List(BaseObject):
+class ListOfUnicodeString(BaseObject):
     """List class."""
 
     description = 'A list.'
     edit_html_filename = 'list_editor'
-    edit_js_filename = 'ListEditor'
+    edit_js_filename = 'ListOfUnicodeStringEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        assert isinstance(raw, list)
-        return raw
+    _schema = {
+        'type': 'list',
+        'items': {
+            'type': 'unicode'
+        }
+    }
 
 
-class SetOfUnicodeString(List):
+class SetOfUnicodeString(BaseObject):
     """Class for sets of UnicodeStrings."""
 
     description = 'A set (a list with unique elements) of unicode strings.'
@@ -248,14 +221,11 @@ class SetOfUnicodeString(List):
         'type': 'list',
         'items': {
             'type': 'unicode'
-        }
+        },
+        'post_normalizers': [{
+            'id': 'uniquify'
+        }]
     }
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        raw = schema_utils.normalize_against_schema(raw, cls._schema)
-        return sorted(list(set([unicode(item) for item in raw])))
 
 
 class UnicodeString(BaseObject):
@@ -265,26 +235,24 @@ class UnicodeString(BaseObject):
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'UnicodeStringEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        assert raw is not None
-        assert isinstance(raw, basestring) or isinstance(raw, numbers.Real)
-        return unicode(raw)
+    _schema = {
+        'type': 'unicode',
+    }
 
 
-class NormalizedString(UnicodeString):
+class NormalizedString(BaseObject):
     """Unicode string with spaces collapsed."""
 
     description = 'A unicode string with adjacent whitespace collapsed.'
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'NormalizedStringEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        result = super(NormalizedString, cls).normalize(raw)
-        return ' '.join(result.split())
+    _schema = {
+        'type': 'unicode',
+        'post_normalizers': [{
+            'id': 'normalize_spaces'
+        }]
+    }
 
 
 class Html(BaseObject):
@@ -294,11 +262,9 @@ class Html(BaseObject):
     edit_html_filename = 'html_editor'
     edit_js_filename = 'HtmlEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        assert isinstance(raw, basestring)
-        return html_cleaner.clean(unicode(raw))
+    _schema = {
+        'type': 'html',
+    }
 
 
 class TabContent(BaseObject):
@@ -316,22 +282,16 @@ class TabContent(BaseObject):
         'type': 'dict',
         'properties': {
             'title': {
-                'type': 'unicode'
+                'type': 'unicode',
+                'post_normalizers': [{
+                    'id': 'require_nonempty'
+                }]
             },
             'content': {
-                'type': 'unicode'
+                'type': 'html',
             }
         }
     }
-
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        raw = schema_utils.normalize_against_schema(raw, cls._schema)
-        raw['title'] = UnicodeString.normalize(raw['title'])
-        raw['content'] = Html.normalize(raw['content'])
-        assert len(raw['title'])
-        return raw
 
 
 class ListOfTabContent(BaseObject):
@@ -345,11 +305,23 @@ class ListOfTabContent(BaseObject):
     edit_html_filename = 'list_editor'
     edit_js_filename = 'ListOfTabContentEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        assert isinstance(raw, list)
-        return [TabContent.normalize(item) for item in raw]
+    _schema = {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': {
+                'title': {
+                    'type': 'unicode',
+                    'post_normalizers': [{
+                        'id': 'require_nonempty'
+                    }]
+                },
+                'content': {
+                    'type': 'html'
+                }
+            }
+        }
+    }
 
 
 class SanitizedUrl(BaseObject):
@@ -359,25 +331,12 @@ class SanitizedUrl(BaseObject):
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'SanitizedUrlEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        assert isinstance(raw, basestring)
-        raw = unicode(raw)
-        if raw:
-            url_components = urlparse.urlsplit(raw)
-            quoted_url_components = (
-                urllib.quote(component) for component in url_components)
-            raw = urlparse.urlunsplit(quoted_url_components)
-
-            acceptable = html_cleaner.filter_a('href', raw)
-            if not acceptable:
-                logging.error(
-                    'Invalid URL: Sanitized URL should start with '
-                    '\'http://\' or \'https://\'; received %s' % raw)
-                return u''
-
-        return raw
+    _schema = {
+        'type': 'unicode',
+        'post_normalizers': [{
+            'id': 'sanitize_url'
+        }]
+    }
 
 
 class MusicPhrase(BaseObject):
@@ -388,31 +347,44 @@ class MusicPhrase(BaseObject):
     edit_html_filename = 'music_phrase_editor'
     edit_js_filename = 'MusicPhraseEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        valid_notes = [
-            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5',
-            'E5', 'F5', 'G5', 'A5'
-        ]
-        valid_properties = [
-            'readableNoteName', 'readableRestName', 'noteDuration',
-            'restDuration', 'noteStart', 'restStart'
-        ]
-        assert isinstance(raw, list)
-        for item in raw:
-            if type(item) == dict:
-                for prop in item:
-                    prop = str(prop)
-                    assert prop in valid_properties
-                    if prop in ['readableNoteName', 'readableRestName']:
-                        assert str(item.get(prop)) in valid_notes
-                    elif prop in ['noteDuration', 'restDuration']:
-                        for d in item[prop]:
-                            assert int(item[prop][d]) > 0
-                    elif prop == 'noteStart' or prop == 'restStart':
-                        for s in prop:
-                            assert int(item[prop][s]) > 0
-        return raw
+    _schema = {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': {
+                'readableNoteName': {
+                    'type': 'unicode',
+                    'post_normalizers': [{
+                        'id': 'require_is_one_of',
+                        'choices': [
+                            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
+                            'D5', 'E5', 'F5', 'G5', 'A5'
+                        ]
+                    }]
+                },
+                'noteDuration': {
+                    'type': 'dict',
+                    'properties': {
+                        'num': {
+                            'type': 'int',
+                            'post_normalizers': [{
+                                'id': 'require_at_least',
+                                'min_value': 1
+                            }]
+                        },
+                        'den': {
+                            'type': 'int',
+                            'post_normalizers': [{
+                                'id': 'require_at_least',
+                                'min_value': 1
+                            }]
+                        }
+                    }
+                },
+            }
+
+        }
+    }
 
 
 class TarFileString(BaseObject):
@@ -420,31 +392,32 @@ class TarFileString(BaseObject):
 
     description = 'A string with base64-encoded content of a tar file'
 
+    _schema = {
+        'type': 'unicode',
+    }
+
     @classmethod
     def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        assert raw is not None
-        assert isinstance(raw, basestring)
+        """Reads `raw` as a unicode string representing a tar file and returns
+        the base64-encoded contents."""
+        raw = schema_utils.normalize_against_schema(raw, cls._schema)
         raw = base64.b64decode(raw)
-        tfile = tarfile.open(fileobj=StringIO(raw), mode='r:gz')
-        return tfile
+        return tarfile.open(fileobj=StringIO.StringIO(raw), mode='r:gz')
 
 
-class Filepath(UnicodeString):
-    """A string representing a filepath."""
+class Filepath(BaseObject):
+    """A string representing a filepath.
+
+    The path will be prefixed with '[exploration_id]/assets'.
+    """
 
     description = 'A string that represents a filepath'
     edit_html_filename = 'filepath_editor'
     edit_js_filename = 'FilepathEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        """Validates and normalizes a raw Python object."""
-        assert raw is not None
-        assert isinstance(raw, basestring)
-
-        # The path will be prefixed with "[exploration_id]/assets".
-        raw = super(Filepath, cls).normalize(raw)
+    _schema = {
+        'type': 'unicode',
+    }
 
 
 class CheckedProof(BaseObject):
@@ -498,7 +471,7 @@ class LogicQuestion(BaseObject):
             assert isinstance(raw, dict)
             _validateExpressionArray(raw['assumptions'])
             _validateExpressionArray(raw['results'])
-            assert isinstance (raw['default_proof_string'], basestring)
+            assert isinstance(raw['default_proof_string'], basestring)
 
             return copy.deepcopy(raw)
         except Exception:
@@ -516,7 +489,7 @@ class LogicErrorCategory(BaseObject):
     def normalize(cls, raw):
         try:
             assert raw in ['parsing', 'typing', 'line', 'layout', 'variables',
-                        'logic', 'target', 'mistake']
+                           'logic', 'target', 'mistake']
         except Exception:
             raise TypeError('Cannot convert to an error category.')
         return raw

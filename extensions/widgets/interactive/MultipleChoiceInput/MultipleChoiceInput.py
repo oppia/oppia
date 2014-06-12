@@ -34,7 +34,7 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
         'customization_args': {
             'value': ['Default choice']
         },
-        'obj_type': 'List'
+        'obj_type': 'ListOfUnicodeString'
     }]
 
     # Actions that the reader can perform on this widget which trigger a

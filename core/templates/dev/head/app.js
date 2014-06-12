@@ -24,7 +24,8 @@ var oppia = angular.module(
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
 // Set default headers for POST requests.
-oppia.config(['$interpolateProvider', '$httpProvider', function($interpolateProvider, $httpProvider) {
+oppia.config(['$interpolateProvider', '$httpProvider',
+    function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 
