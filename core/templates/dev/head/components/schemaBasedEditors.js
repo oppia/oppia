@@ -291,7 +291,7 @@ oppia.directive('schemaBasedBoolEditor', [function() {
               type: 'parameter',
               data: paramName
             }
-          })
+          });
         });
       }
 
@@ -326,10 +326,53 @@ oppia.directive('schemaBasedIntEditor', [function() {
     scope: {
       localValue: '=',
       // Read-only property. Whether the item is editable.
-      isEditable: '&'
+      isEditable: '&',
+      allowParameters: '&'
     },
     templateUrl: 'schemaBasedEditor/int',
-    restrict: 'E'
+    restrict: 'E',
+    controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      $scope.editAsParameter = false;
+
+      if ($scope.allowParameters()) {
+        var paramNames = parameterSpecsService.getAllParamsOfType('int');
+        if (paramNames.length) {
+          $scope.paramNameOptions = paramNames.map(function(paramName) {
+            return {
+              name: paramName,
+              value: {
+                type: 'parameter',
+                data: paramName
+              }
+            };
+          });
+
+          $scope.$watch('localValue', function(newValue, oldValue) {
+            $scope.editAsParameter = (newValue.type === 'parameter');
+            // Because JS objects are passed by reference, the current value needs
+            // to be set manually to an object in the list of options.
+            if ($scope.localValue.type === 'parameter') {
+              $scope.paramNameOptions.forEach(function(option) {
+                if (angular.equals(option.value, newValue)) {
+                  $scope.localValue = option.value;
+                }
+              });
+            }
+          });
+
+          $scope.toggleEditMode = function() {
+            $scope.editAsParameter = !$scope.editAsParameter;
+            $scope.localValue = $scope.editAsParameter ? {
+              type: 'parameter',
+              data: paramNames[0]
+            } : {
+              type: 'raw',
+              data: 0
+            };
+          };
+        }
+      }
+    }]
   };
 }]);
 

@@ -30,17 +30,7 @@ function SchemaEditorTests($scope, parameterSpecsService) {
     value: 'aab'
   };
 
-  $scope.testForms = [{
-    name: 'Restricted unicode form; the value must be either a or b.',
-    schema: {
-      type: 'unicode',
-      post_normalizers: [{
-        id: 'require_is_one_of',
-        choices: ['a', 'b']
-      }]
-    },
-    value: 'a'
-  }, {
+  $scope.booleanForms = [{
     name: 'Boolean form',
     schema: {
       type: 'bool'
@@ -59,13 +49,31 @@ function SchemaEditorTests($scope, parameterSpecsService) {
       type: 'parameter',
       data: 'paramBool1'
     }
-  }, {
-    name: 'Integer form',
+  }];
+
+  $scope.intForms = [{
+    name: 'Integer form (no parameters)',
     schema: {
       type: 'int'
     },
-    value: 3
+    value: {
+      type: 'raw',
+      data: 3
+    }
   }, {
+    // TODO(sll): Add test for bad initialization.
+    name: 'Integer form with parameters',
+    schema: {
+      type: 'int',
+      allow_parameters: true
+    },
+    value: {
+      type: 'parameter',
+      data: 'paramInt1'
+    }
+  }];
+
+  $scope.floatForms = [{
     name: 'Float form (value must be between 3 and 6)',
     schema: {
       type: 'float',
@@ -78,7 +86,29 @@ function SchemaEditorTests($scope, parameterSpecsService) {
       }]
     },
     value: 3.14
-  }, {
+  }];
+
+  $scope.unicodeForms = [{
+    name: 'Restricted unicode form; the value must be either a or b.',
+    schema: {
+      type: 'unicode',
+      post_normalizers: [{
+        id: 'require_is_one_of',
+        choices: ['a', 'b']
+      }]
+    },
+    value: 'a'
+  }];
+
+  $scope.htmlForms = [{
+    name: 'HTML form',
+    schema: {
+      type: 'html'
+    },
+    value: 'Some <b>HTML</b>' 
+  }];
+
+  $scope.compositeForms = [{
     name: 'Dict with a bool, a unicode string and a list of ints. The string must be either \'abc\' or \'def\'.',
     schema: {
       type: 'dict',
@@ -107,7 +137,13 @@ function SchemaEditorTests($scope, parameterSpecsService) {
         data: false
       },
       a_unicode_string: 'abc',
-      a_list: [2, 3]
+      a_list: [{
+        type: 'raw',
+        data: 2
+      }, {
+        type: 'raw',
+        data: 3
+      }]
     }
   }, {
     name: 'List of unicode strings',
@@ -130,12 +166,26 @@ function SchemaEditorTests($scope, parameterSpecsService) {
       }
     },
     value: [['abc'], ['def', 'ghi']]
+  }];
+
+  $scope.formsets = [{
+    name: 'Boolean editors',
+    forms: $scope.booleanForms
   }, {
-    name: 'HTML form',
-    schema: {
-      type: 'html'
-    },
-    value: 'Some <b>HTML</b>'
+    name: 'Integer editors',
+    forms: $scope.intForms
+  }, {
+    name: 'Float editors',
+    forms: $scope.floatForms
+  }, {
+    name: 'Unicode editors',
+    forms: $scope.unicodeForms
+  }, {
+    name: 'HTML editors',
+    forms: $scope.htmlForms
+  }, {
+    name: 'Composite editors',
+    forms: $scope.compositeForms
   }];
 }
 
