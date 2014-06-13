@@ -27,12 +27,12 @@ oppia.directive('oppiaNoninteractiveParameter', [
       templateUrl: 'noninteractiveWidget/Parameter',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var paramName = oppiaHtmlEscaper.escapedJsonToObj(
-            $attrs.paramnameWithValue);
-        $scope.paramValue = $rootScope.currentParams ?
-            // Currently in player. Use the parameter value.
-            $rootScope.currentParams[paramName] :
-            // This is for rendering in the state editor.
-            '[' + paramName + ']';
+            $attrs.paramNameWithValue);
+        $scope.paramName = paramName;
+        if ($rootScope.currentParams) {
+          $scope.paramValue = $rootScope.currentParams[paramName];
+        }
+        $scope.navMode = GLOBALS.NAV_MODE;
       }]
     };
   }

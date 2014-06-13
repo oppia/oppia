@@ -26,7 +26,7 @@ class Parameter(widget_domain.BaseWidget):
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
-        'name': 'paramName',
+        'name': 'param_name',
         'description': 'The name of the parameter to display.',
         'generator': generators.Copier,
         'init_args': { 'disallow_parse_with_jinja': True },
