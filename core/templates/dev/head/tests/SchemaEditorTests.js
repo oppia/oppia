@@ -20,8 +20,10 @@
 
 function SchemaEditorTests($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramBool1', 'bool');
-  parameterSpecsService.addParamSpec('paramInt1', 'int');
   parameterSpecsService.addParamSpec('paramBool2', 'bool');
+  parameterSpecsService.addParamSpec('paramInt1', 'int');
+  parameterSpecsService.addParamSpec('paramFloat1', 'float');
+  parameterSpecsService.addParamSpec('paramFloat2', 'float');
 
   $scope.unicodeForm = {
     schema: {
@@ -74,18 +76,38 @@ function SchemaEditorTests($scope, parameterSpecsService) {
   }];
 
   $scope.floatForms = [{
-    name: 'Float form (value must be between 3 and 6)',
+    name: 'Float form (value must be between -3 and 6)',
     schema: {
       type: 'float',
       post_normalizers: [{
         id: 'require_at_least',
-        min_value: 3.0
+        min_value: -3.0
       }, {
         id: 'require_at_most',
         max_value: 6.0
       }]
     },
-    value: 3.14
+    value: {
+      type: 'raw',
+      data: 3.14
+    }
+  }, {
+    name: 'Float form with parameters (value must be between -3 and 6)',
+    schema: {
+      type: 'float',
+      allow_parameters: true,
+      post_normalizers: [{
+        id: 'require_at_least',
+        min_value: -3.0
+      }, {
+        id: 'require_at_most',
+        max_value: 6.0
+      }]
+    },
+    value: {
+      type: 'raw',
+      data: 3.14
+    }
   }];
 
   $scope.unicodeForms = [{
