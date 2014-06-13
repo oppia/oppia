@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Tests for the Schema Editor
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="container" ng-controller="SchemaEditorTests">
+    <table class="table">
+      <tr>
+        <th>Form name</th>
+        <th>Read-only version</th>
+        <th>Editable version</th>
+      </tr>
+      <tr>
+        <td>
+          <h5>Unicode form (copy 1)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        </td>
+        <td>
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
+          </schema-based-editor>
+        </td>
+        <td>
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
+          </schema-based-editor>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <h5>Unicode form (copy 2)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        <td>
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
+          </schema-based-editor>
+        </td>
+        <td>
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
+          </schema-based-editor>
+        </td>
+      </tr>
+
+      <tr ng-repeat="form in testForms">
+        <td>
+          <h5><[form.name]></h5>
+          <em>Saved value:</em> <[form.value]>
+        </td>
+        <td>
+          <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="false">
+          </schema-based-editor>
+        </td>
+        <td>
+          <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="true">
+          </schema-based-editor>
+        </td>
+      </tr>
+    </div>
+  </div>
+
+  {% include 'components/schema_based_editor_templates.html' %}
+
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('filters.js') }}
+    {{ include_js_file('components/schemaBasedEditors.js') }}
+    {{ include_js_file('tests/SchemaEditorTests.js') }}
+  </script>
+{% endblock footer_js %}

@@ -1,0 +1,101 @@
+<script type="text/ng-template" id="schemaBasedEditor/entryPoint">
+  <ng-form name="schemaForm">
+    <schema-builder local-value="localValue" schema="definition" is-editable="isEditable()">
+    </schema-builder>
+  </ng-form>
+
+  <div ng-if="isEditable()">
+    <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
+    <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/master">
+  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()">
+  </schema-based-bool-editor>
+
+  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()">
+  </schema-based-int-editor>
+
+  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
+  </schema-based-float-editor>
+
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
+  </schema-based-unicode-editor>
+
+  <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" is-editable="isEditable()">
+  </schema-based-html-editor>
+
+  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" is-editable="isEditable()" item-schema="schema().items">
+  </schema-based-list-editor>
+
+  <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" is-editable="isEditable()" property-schemas="schema().properties">
+  </schema-based-dict-editor>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/bool">
+  <input ng-if="isEditable()" type="checkbox" ng-model="$parent.localValue">
+  <span ng-if="!isEditable()"><[localValue]></span>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/int">
+  <input ng-if="isEditable()" type="number" ng-model="$parent.localValue" class="form-control">
+  <span ng-if="!isEditable()"><[localValue]></span>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/float">
+  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation>
+  <span ng-if="!isEditable()"><[localValue]></span>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/unicode">
+  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
+  <span ng-if="!isEditable()"><[localValue]></span>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/html">
+  <rich-text-editor ng-if="isEditable()" html-content="$parent.localValue"></rich-text-editor>
+  <span ng-if="!isEditable()" angular-html-bind="localValue"></span>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/dict">
+  <form role="form">
+    <div ng-repeat="(key, schema) in propertySchemas()">
+      <div class="form-group">
+        <!-- TODO(sll): Add a 'for' attribute here. -->
+        <label><[key]></label>
+        <schema-builder schema="schema" is-editable="isEditable()" local-value="localValue[key]">
+        </schema-builder>
+      </div>
+    </div>
+  </form>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/list">
+  <table class="table">
+    <tr ng-repeat="item in localValue track by $index">
+      <td>
+        <schema-builder schema="itemSchema()" is-editable="isEditable()" local-value="localValue[$index]">
+        </schema-builder>
+      </td>
+      <td ng-if="isEditable()">
+        <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)">
+          <span class="glyphicon glyphicon-remove" title="Delete item">
+          </span>
+        </button>
+      </td>
+    </tr>
+  </table>
+
+  <button ng-if="isEditable()" type="button" class="btn btn-default" ng-click="addElement()">
+    Add element
+  </button>
+</script>
