@@ -18,7 +18,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function SchemaEditorTests($scope) {
+function SchemaEditorTests($scope, parameterSpecsService) {
+  parameterSpecsService.addParamSpec('paramBool1', 'bool');
+  parameterSpecsService.addParamSpec('paramInt1', 'int');
+  parameterSpecsService.addParamSpec('paramBool2', 'bool');
+
   $scope.unicodeForm = {
     schema: {
       type: 'unicode'
@@ -41,7 +45,20 @@ function SchemaEditorTests($scope) {
     schema: {
       type: 'bool'
     },
-    value: true
+    value: {
+      type: 'raw',
+      data: true
+    }
+  }, {
+    name: 'Boolean form with parameters',
+    schema: {
+      type: 'bool',
+      allow_parameters: true
+    },
+    value: {
+      type: 'parameter',
+      data: 'paramBool1'
+    }
   }, {
     name: 'Integer form',
     schema: {
@@ -85,7 +102,10 @@ function SchemaEditorTests($scope) {
       }
     },
     value: {
-      a_boolean: false,
+      a_boolean: {
+        type: 'raw',
+        data: false
+      },
       a_unicode_string: 'abc',
       a_list: [2, 3]
     }
@@ -122,4 +142,4 @@ function SchemaEditorTests($scope) {
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-SchemaEditorTests.$inject = ['$scope'];
+SchemaEditorTests.$inject = ['$scope', 'parameterSpecsService'];

@@ -12,7 +12,7 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/master">
-  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()">
+  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()" allow-parameters="schema().allow_parameters">
   </schema-based-bool-editor>
 
   <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()">
@@ -36,8 +36,16 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">
-  <input ng-if="isEditable()" type="checkbox" ng-model="$parent.localValue">
-  <span ng-if="!isEditable()"><[localValue]></span>
+  <select class="form-control" ng-if="isEditable()" ng-model="$parent.localValue" ng-options="option.value as option.name for option in boolEditorOptions"></select>
+
+  <span ng-if="!isEditable()">
+    <span ng-show="localValue.type === 'raw'">
+      <[localValue.data]>
+    </span>
+    <span class="label label-info" ng-show="localValue.type === 'parameter'">
+      <[localValue.data]>
+    </span>
+  </span>
 </script>
 
 

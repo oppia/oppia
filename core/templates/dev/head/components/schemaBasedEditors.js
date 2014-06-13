@@ -18,6 +18,38 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// Service for retrieving parameter specifications.
+oppia.factory('parameterSpecsService', ['$log', function($log) {
+  var paramSpecs = {};
+
+  return {
+    addParamSpec: function(paramName, paramType) {
+      if (['bool', 'unicode', 'float', 'int', 'unicode'].indexOf(paramType) === -1) {
+        $log.error('Invalid parameter type: ' + paramType);
+        return;
+      }
+      paramSpecs[paramName] = {type: paramType};
+    },
+    getParamType: function(paramName) {
+      if (!paramSpecs.hasOwnProperty(paramName)) {
+        $log.error('No parameter with name ' + paramName + ' found.');
+        return null;
+      }
+      return paramSpecs[paramName].type;
+    },
+    getAllParamsOfType: function(paramType) {
+      var names = [];
+      for (var paramName in paramSpecs) {
+        if (paramSpecs[paramName].type === paramType) {
+          names.push(paramName);
+        }
+      }
+      return names.sort();
+    }
+  };
+}]);
+
+
 oppia.factory('schemaDefaultValueService', [function() {
   return {
     // TODO(sll): Rewrite this to take into account post_normalizers, so that
@@ -230,10 +262,49 @@ oppia.directive('schemaBasedBoolEditor', [function() {
     scope: {
       localValue: '=',
       // Read-only property. Whether the item is editable.
-      isEditable: '&'
+      isEditable: '&',
+      allowParameters: '&'
     },
     templateUrl: 'schemaBasedEditor/bool',
-    restrict: 'E'
+    restrict: 'E',
+    controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      $scope.boolEditorOptions = [{
+        name: 'True',
+        value: {
+          type: 'raw',
+          data: true
+        }
+      }, {
+        name: 'False',
+        value: {
+          type: 'raw',
+          data: false
+        }
+      }];
+
+      if ($scope.allowParameters()) {
+        var paramNames = parameterSpecsService.getAllParamsOfType('bool');
+        paramNames.forEach(function(paramName) {
+          $scope.boolEditorOptions.push({
+            name: '[Parameter] ' + paramName,
+            value: {
+              type: 'parameter',
+              data: paramName
+            }
+          })
+        });
+      }
+
+      $scope.$watch('localValue', function(newValue, oldValue) {
+        // Because JS objects are passed by reference, the current value needs
+        // to be set manually to an object in the list of options.
+        $scope.boolEditorOptions.forEach(function(option) {
+          if (angular.equals(option.value, newValue)) {
+            $scope.localValue = option.value;
+          }
+        });
+      });
+    }]
   };
 }]);
 
