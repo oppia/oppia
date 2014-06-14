@@ -27,10 +27,25 @@ body {
   line-height: 20px;
   margin: 0 auto;
   padding: 0;
-  width: 100%;
+  width: 98%;
   color: #222;
 }
 
 h1, h2 {
   color: #000;
+}
+
+oppia-parameter {
+  background-color: #18447E;
+  border-radius: .25em;
+  color: #fff;
+  display: inline;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  margin: auto 4px;
+  padding: .2em .6em .3em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
 }

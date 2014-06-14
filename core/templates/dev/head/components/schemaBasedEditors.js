@@ -49,6 +49,345 @@ oppia.factory('parameterSpecsService', ['$log', function($log) {
   };
 }]);
 
+oppia.filter('convertHtmlToUnicode', [function() {
+  return function(html) {
+    return angular.element('<div>' + html + '</div>').text();
+  };
+}]);
+
+// <oppia-parameter>name</oppia-parameter> tags are converted to {{name}}.
+// '{' characters are converted to '\{'.
+oppia.filter('convertHtmlWithParamsToUnicode', ['$filter', function($filter) {
+  return function(html) {
+    var decodeAndEscapeOpeningBraces = function(str) {
+      return ($filter('convertHtmlToUnicode')(str)).split('{').join('\\{');
+    };
+
+    var PARAM_OPENING_TAG = '<oppia-parameter>';
+    var PARAM_CLOSING_TAG = '</oppia-parameter>';
+
+    var returnValue = '';
+    while (html.indexOf(PARAM_OPENING_TAG) !== -1) {
+      var i = html.indexOf(PARAM_OPENING_TAG);
+      returnValue += decodeAndEscapeOpeningBraces(html.substring(0, i));
+      html = html.substring(i);
+
+      var j = html.indexOf(PARAM_CLOSING_TAG);
+      returnValue += '{{' + html.substring(PARAM_OPENING_TAG.length, j) + '}}';
+      html = html.substring(j + PARAM_CLOSING_TAG.length);
+    }
+    returnValue += decodeAndEscapeOpeningBraces(html);
+    return returnValue;
+  };
+}]);
+
+oppia.filter('convertUnicodeToHtml', [function() {
+  return function(text) {
+    return angular.element('<div></div>').text(text).html();
+  };
+}]);
+
+oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
+  // '\{' characters are converted to '{'.
+  // {{name}} is converted to <oppia-parameter> tags.
+  return function(text) {
+    var unescapeOpeningBracesAndEncode = function(str) {
+      return ($filter('convertUnicodeToHtml')(str)).split('\\{\\').join('{');
+    };
+
+    var PARAM_OPENING_TAG = '{{';
+    var PARAM_CLOSING_TAG = '}}';
+
+    text = text.split('\\{').join('\\{\\');
+
+    var returnValue = '';
+    while (text.indexOf(PARAM_OPENING_TAG) !== -1) {
+      var i = text.indexOf(PARAM_OPENING_TAG);
+      returnValue += unescapeOpeningBracesAndEncode(text.substring(0, i));
+      text = text.substring(i);
+
+      var j = text.indexOf(PARAM_CLOSING_TAG);
+      returnValue += '<oppia-parameter>' + text.substring(PARAM_OPENING_TAG.length, j) + '</oppia-parameter>';
+      text = text.substring(j + PARAM_CLOSING_TAG.length);
+    }
+    returnValue += unescapeOpeningBracesAndEncode(text);
+    return returnValue;
+  };
+}]);
+
+
+oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
+    return {
+      restrict: 'E',
+      scope: {outerValue: '='},
+      template: (
+        '<div class="row">' +
+        '  <div class="col-lg-11 col-md-11 col-sm-11">' +
+        '    <textarea ng-disabled="!hasFullyLoaded"></textarea>' +
+        '  </div>' +
+        '  <div class="col-lg-1 col-md-1 col-sm-1">' +
+        '    <button ng-click="addParameter()">P</button>' +
+        '  </div>' +
+        '</div>'),
+      controller: ['$scope', '$element', '$attrs', '$filter', '$timeout', function($scope, $element, $attrs, $filter, $timeout) {
+        var rteNode = $element[0].children[0].children[0].children[0];
+
+        // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
+        // is initialized.
+        $scope.editorDoc = null;
+        $scope.hasFullyLoaded = false;
+
+        $scope._createRteElement = function(paramName) {
+          var el = $('<oppia-parameter/>').text(paramName);
+
+          var domNode = el.get(0);
+          // This dblclick handler is stripped in the initial HTML --> RTE conversion,
+          // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
+          domNode.ondblclick = function() {
+            el.addClass('insertionPoint');
+            $scope.getParamModal(paramName);
+          };
+
+          return domNode;
+        };
+
+        // Convert a unicode string into its RTE representation, and add spaces
+        // at the beginning and end of each oppia-parameter element.
+        $scope._convertUnicodeToRte = function(str) {
+          var html = $filter('convertUnicodeWithParamsToHtml')(str);
+
+          var elt = $('<div>' + html + '</div>');
+          elt.find('oppia-parameter').replaceWith(function() {
+            return [
+              document.createTextNode('\200'),
+              $scope._createRteElement(this.textContent),
+              document.createTextNode('\200')];
+          });
+          return elt.html();
+        };
+
+        // Convert an RTE representation into a unicode string by removing all
+        // insertion points and replacing <oppia-parameter> tags with {{...}}.
+        $scope._convertRteToUnicode = function(rte) {
+          var elt = $('<div>' + rte + '</div>');
+          elt.find('oppia-parameter').replaceWith(function() {
+            var jQueryElt = $('<oppia-parameter/>').text(this.textContent);
+            return jQueryElt.get(0);
+          });
+          elt.find('span').replaceWith(function() {
+            return '';
+          });
+          return $filter('convertHtmlWithParamsToUnicode')(elt.html());
+        };
+
+        $scope._saveContent = function() {
+          var content = $(rteNode).wysiwyg('getContent');
+          if (content !== null && content !== undefined) {
+            $scope.outerValue = $scope._convertRteToUnicode(content);
+            // The following $timeout removes the '$apply in progress' errors.
+            $timeout(function() {
+              $scope.$apply();
+            });
+          }
+        };
+
+        $scope.getParamModal = function(currentParamName) {
+          return $modal.open({
+            templateUrl: 'modals/editParamName',
+            backdrop: 'static',
+            resolve: {
+              currentParamName: function() {
+                return currentParamName;
+              }
+            },
+            controller: [
+              '$scope', '$modalInstance', 'currentParamName', 'parameterSpecsService',
+              function($scope, $modalInstance, currentParamName, parameterSpecsService) {
+                $scope.currentParamName = currentParamName;
+
+                var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
+                $scope.paramOptions = allowedParamNames.map(function(paramName) {
+                  return {
+                    name: paramName,
+                    value: paramName
+                  };
+                });
+
+                $scope.cancel = function() {
+                  $modalInstance.dismiss('cancel');
+                };
+
+                $scope.save = function(paramName) {
+                  $modalInstance.close(paramName);
+                };
+              }
+            ]
+          }).result.then(function(paramName) {
+            var el = $scope._createRteElement(paramName);
+            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
+            $(insertionPoint).replaceWith([
+              document.createTextNode('\200'),
+              el,
+              document.createTextNode('\200')
+            ]);
+            $(rteNode).wysiwyg('save');
+
+            var doc = $(rteNode).wysiwyg('document').get(0);
+            doc.getSelection().modify('move', 'forward', 'documentboundary');
+          }, function() {
+            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
+            if (insertionPoint.localName === 'span') {
+              insertionPoint.parentNode.removeChild(insertionPoint);
+            } else {
+              insertionPoint.className = insertionPoint.className.replace(
+                /\binsertionPoint\b/, '');
+            }
+            var doc = $(rteNode).wysiwyg('document').get(0);
+            doc.getSelection().removeAllRanges();
+          });
+        };
+
+        $scope.getCharacterPrecedingCaret = function(doc) {
+          var precedingChar = '', sel, range;
+          if (doc.getSelection) {
+            sel = doc.getSelection();
+            if (sel.rangeCount > 0) {
+              range = sel.getRangeAt(0).cloneRange();
+              range.collapse(true);
+              range.setStart(doc, 0);
+              precedingChar = range.toString().slice(-1);
+            }
+          }
+          return precedingChar;
+        }
+
+        $scope.getCharacterFollowingCaret = function(doc) {
+          var followingChar = '', sel, range;
+          if (doc.getSelection) {
+            sel = doc.getSelection();
+            if (sel.rangeCount > 0) {
+              range = sel.getRangeAt(0).cloneRange();
+              range.collapse(false);
+              range.setEnd(doc, doc.childNodes.length);
+              followingChar = range.toString().slice(0);
+            }
+          }
+          return followingChar;
+        }
+
+        $scope.init = function() {
+          $scope.rteContent = $scope._convertUnicodeToRte($scope.outerValue);
+          // Disable jquery.ui.dialog (just in case).
+          $.fn.dialog = null;
+
+          $(rteNode).wysiwyg({
+            autoGrow: true,
+            autoSave: true,
+            controls: {},
+            css: '/css/rte.css',
+            debug: true,
+            events: {
+              // Prevent use of keyboard shortcuts for bold, italics, etc.
+              // TODO(sll): Allow copy/paste. Prevent enter keys, tab keys?
+              keydown: function(e) {
+                var vKey = 86, cKey = 67;
+                if (e.ctrlKey) {
+                  if (e.keyCode !== vKey && e.keyCode !== cKey) {
+                    e.preventDefault();
+                  }
+                }
+                var doc = $(rteNode).wysiwyg('document').get(0);
+                if (e.keyCode === 8 && $scope.getCharacterPrecedingCaret(doc).charCodeAt(0) === 128) {
+                  // Do not allow spaces after oppia-parameter tags (ASCII code 128) to be deleted.
+                  e.preventDefault();
+                } else if (e.keyCode === 46 &&$scope.getCharacterFollowingCaret(doc).charCodeAt(0) === 128) {
+                  // Do not allow spaces before oppia-parameter tags to be deleted.
+                  e.preventDefault();
+                }
+              },
+              keypress: function(e) {
+                if (e.ctrlKey) {
+                  e.preventDefault();
+                } else {
+                  e.preventDefault();
+                  $scope.ensureCurrentSelectionIsValid();
+                  var doc = $(rteNode).wysiwyg('document').get(0);
+                  doc.execCommand(
+                    'insertHTML', false, String.fromCharCode(e.keyCode));
+                }
+              },
+              keyup: function(e) {
+                $scope.ensureCurrentSelectionIsValid();
+              },
+              mousedown: function(e) {
+                if (e.target.localName === 'oppia-parameter') {
+                  e.preventDefault();
+                }
+              },
+              mouseup: function(e) {
+                // Selection events must not be within an oppia-parameter
+                // element.
+                $scope.ensureCurrentSelectionIsValid();
+              },
+              save: function(e) {
+                $scope._saveContent();
+              }
+            },
+            iFrameClass: 'wysiwyg-content',
+            initialContent: $scope.rteContent,
+            maxHeight: 40,
+            maxLength: 100,
+            rmUnusedControls: true
+          });
+
+          $scope.ensureCurrentSelectionIsValid = function() {
+            var doc = $(rteNode).wysiwyg('document').get(0);
+
+            // TODO(sll): Move the cursor to the beginning or end of the selected element.
+            var elts = Array.prototype.slice.call(
+              $scope.editorDoc.querySelectorAll('oppia-parameter'));
+            var bad = false;
+            elts.forEach(function(elt) {
+              // This tests for partial containment.
+              if (doc.getSelection().containsNode(elt, true) && !doc.getSelection().containsNode(elt, false)) {
+                bad = true;
+              }
+            });
+
+            if (bad) {
+              // TODO(sll): Too drastic?
+              doc.getSelection().modify('move', 'forward', 'documentboundary');
+            }
+          };
+
+          $scope.addParameter = function() {
+            var doc = $(rteNode).wysiwyg('document').get(0);
+            $scope.ensureCurrentSelectionIsValid();
+            $(rteNode).wysiwyg(
+              'insertHtml', '<span class="insertionPoint"></span>');
+            $scope.getParamModal();
+          };
+
+          $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
+
+          // Add dblclick handlers to the various nodes.
+          var elts = Array.prototype.slice.call(
+            $scope.editorDoc.querySelectorAll('oppia-parameter'));
+          elts.forEach(function(elt) {
+            elt.ondblclick = function() {
+              $(elt).addClass('insertionPoint');
+              $scope.getParamModal($(elt).text());
+            };
+          });
+
+          $scope.hasFullyLoaded = true;
+        };
+
+        $scope.init();
+      }]
+    };
+  }
+]);
 
 oppia.factory('schemaDefaultValueService', [function() {
   return {

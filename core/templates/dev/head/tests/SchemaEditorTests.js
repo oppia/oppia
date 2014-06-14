@@ -24,6 +24,11 @@ function SchemaEditorTests($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramInt1', 'int');
   parameterSpecsService.addParamSpec('paramFloat1', 'float');
   parameterSpecsService.addParamSpec('paramFloat2', 'float');
+  parameterSpecsService.addParamSpec('paramUnicode1', 'unicode');
+  parameterSpecsService.addParamSpec('paramUnicode2', 'unicode');
+  parameterSpecsService.addParamSpec('paramUnicode3', 'unicode');
+
+  $scope.testText = 'abc{{paramUnicode1}}';
 
   $scope.unicodeForm = {
     schema: {
@@ -127,7 +132,7 @@ function SchemaEditorTests($scope, parameterSpecsService) {
     schema: {
       type: 'html'
     },
-    value: 'Some <b>HTML</b>' 
+    value: 'Some <b>HTML</b>'
   }];
 
   $scope.compositeForms = [{
