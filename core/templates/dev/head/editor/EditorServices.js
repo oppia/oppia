@@ -85,8 +85,7 @@ oppia.factory('explorationData', [
             change_list: explorationChangeList,
             commit_message: commitMessage,
             version: explorationData.data.version,
-          }),
-          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+          })
         ).success(function(data) {
           warningsData.clear();
           $log.info('Changes to this exploration were saved successfully.');
@@ -107,8 +106,7 @@ oppia.factory('explorationData', [
           resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
           oppiaRequestCreator.createRequest({
             resolved_answers: resolvedAnswersList
-          }),
-          {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+          })
         ).error(function(data) {
           warningsData.addWarning(data.error || 'Error communicating with server.');
         });
@@ -186,7 +184,8 @@ oppia.factory('changeListService', [
     'category': 'explorationCategory',
     'objective': 'explorationObjective',
     'param_specs': 'paramSpecs',
-    'param_changes': 'explorationParamChanges'
+    'param_changes': 'explorationParamChanges',
+    'default_skin_id': 'defaultSkinId'
   };
 
   var STATE_BACKEND_NAMES_TO_FRONTEND_NAMES = {
@@ -199,15 +198,19 @@ oppia.factory('changeListService', [
     'param_changes': 'stateParamChanges'
   };
 
-  var _addChange = function(changeDict) {
-    if ($rootScope.loadingMessage) {
-      return;
-    }
-    explorationChangeList.push(changeDict);
-    undoneChangeStack = [];
-  };
-
   return {
+    _postChangeHook: null,
+    _addChange: function(changeDict) {
+      if ($rootScope.loadingMessage) {
+        return;
+      }
+      explorationChangeList.push(changeDict);
+      undoneChangeStack = [];
+
+      if (this._postChangeHook) {
+        this._postChangeHook();
+      }
+    },
     /**
      * Saves a change dict that represents adding a new state.
      *
@@ -217,7 +220,7 @@ oppia.factory('changeListService', [
      * @param {string} stateName The name of the newly-added state
      */
     addState: function(stateName) {
-      _addChange({
+      this._addChange({
         cmd: CMD_ADD_STATE,
         state_name: stateName
       });
@@ -232,7 +235,7 @@ oppia.factory('changeListService', [
      * @param {string} oldStateName The previous name of the state
      */
     renameState: function(newStateName, oldStateName) {
-      _addChange({
+      this._addChange({
         cmd: CMD_RENAME_STATE,
         old_state_name: oldStateName,
         new_state_name: newStateName
@@ -247,7 +250,7 @@ oppia.factory('changeListService', [
      * @param {string} stateName The name of the deleted state.
      */
     deleteState: function(stateName) {
-      _addChange({
+      this._addChange({
         cmd: CMD_DELETE_STATE,
         state_name: stateName
       });
@@ -269,7 +272,7 @@ oppia.factory('changeListService', [
         warningsData.addWarning('Invalid exploration property: ' + backendName);
         return;
       }
-      _addChange({
+      this._addChange({
         cmd: CMD_EDIT_EXPLORATION_PROPERTY,
         property_name: backendName,
         new_value: angular.copy(newValue),
@@ -292,7 +295,7 @@ oppia.factory('changeListService', [
         warningsData.addWarning('Invalid state property: ' + backendName);
         return;
       }
-      _addChange({
+      this._addChange({
         cmd: CMD_EDIT_STATE_PROPERTY,
         state_name: stateName,
         property_name: backendName,
@@ -303,6 +306,9 @@ oppia.factory('changeListService', [
     discardAllChanges: function() {
       explorationChangeList = [];
       undoneChangeStack = [];
+      if (this._postChangeHook) {
+        this._postChangeHook();
+      }
     },
     getChangeList: function() {
       return angular.copy(explorationChangeList);
@@ -314,6 +320,13 @@ oppia.factory('changeListService', [
       }
       var lastChange = explorationChangeList.pop();
       undoneChangeStack.push(lastChange);
+      if (this._postChangeHook) {
+        this._postChangeHook();
+      }
+    },
+    setPostChangeHook: function(postChangeHookFunction) {
+      // Sets a function to be called after any edit to the changelist.
+      this._postChangeHook = postChangeHookFunction;
     }
   };
 }]);
@@ -461,18 +474,17 @@ oppia.factory('explorationRightsService', [
       var explorationRightsUrl = '/createhandler/rights/' + explorationData.explorationId;
       $http.put(
         explorationRightsUrl,
-        oppiaRequestCreator.createRequest(requestParameters),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-          success(function(data) {
-            warningsData.clear();
-            that.init(
-              data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
-              data.rights.status, data.rights.cloned_from, data.rights.community_owned);
-          }).
-          error(function(data) {
-            warningsData.addWarning(
-              data.error || 'Error communicating with server.');
-          });
+        oppiaRequestCreator.createRequest(requestParameters)
+      ).success(function(data) {
+        warningsData.clear();
+        that.init(
+          data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
+          data.rights.status, data.rights.cloned_from, data.rights.community_owned);
+      }).
+      error(function(data) {
+        warningsData.addWarning(
+          data.error || 'Error communicating with server.');
+      });
     }
   };
 }]);

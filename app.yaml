@@ -6,7 +6,7 @@ threadsafe: false
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
-  OPPIA_VERSION: '1.2.5'
+  OPPIA_VERSION: '1.2.6'
 
 builtins:
 - appstats: on
@@ -66,6 +66,12 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'no-cache'
+- url: /extensions/skins/(.*)/static/(.*)
+  static_files: extensions/skins/\1/static/\2
+  upload: extensions/skins/(.*)/static/(.*)
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
   static_dir: third_party/gae-mapreduce-1.9.0.0/mapreduce/lib/pipeline/ui/images
   secure: always
@@ -73,6 +79,9 @@ handlers:
   script: mapreduce.main.APP
   login: admin
   secure: always
+- url: /cron/.*
+  login: admin
+  script: main_cron.app
 - url: /.*
   script: main.app
   secure: always

@@ -27,6 +27,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import obj_services
+from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -162,6 +163,19 @@ class ExplorationPage(EditorHandler):
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
+        can_edit = (
+            bool(self.user_id) and
+            self.username not in config_domain.BANNED_USERNAMES.value and
+            rights_manager.Actor(self.user_id).can_edit(exploration_id))
+
+        if (can_edit and not
+                user_services.has_user_registered_as_editor(self.user_id)):
+            redirect_url = utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL, 'return_url',
+                self.request.uri)
+            self.redirect(redirect_url)
+            return
+
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?
         object_editors_js = OBJECT_EDITORS_JS.value
@@ -181,11 +195,9 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
-            'can_edit': (
-                bool(self.user_id) and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                rights_manager.Actor(self.user_id).can_edit(exploration_id)
-            ),
+            'can_delete': rights_manager.Actor(
+                self.user_id).can_delete(exploration_id),
+            'can_edit': can_edit,
             'can_modify_roles': rights_manager.Actor(
                 self.user_id).can_modify_roles(exploration_id),
             'can_publicize': rights_manager.Actor(
@@ -205,6 +217,7 @@ class ExplorationPage(EditorHandler):
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
             'widget_dependencies': jinja2.utils.Markup(
                 widget_dependencies),
+            'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 
         self.render_template('editor/exploration_editor.html')
@@ -231,7 +244,7 @@ class ExplorationHandler(EditorHandler):
                     exploration_id, state_name))
             states[state_name] = state_frontend_dict
 
-        return {
+        editor_dict = {
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'category': exploration.category,
@@ -244,6 +257,13 @@ class ExplorationHandler(EditorHandler):
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
         }
+
+        if feconf.SHOW_SKIN_CHOOSER:
+            editor_dict['all_skin_ids'] = (
+                skins_services.Registry.get_all_skin_ids())
+            editor_dict['default_skin_id'] = exploration.default_skin
+
+        return editor_dict
 
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
@@ -426,26 +446,6 @@ class ResolvedAnswersHandler(EditorHandler):
         self.render_json({})
 
 
-class ResolvedFeedbackHandler(EditorHandler):
-    """Allows readers' feedback for a state to be resolved."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
-
-    @require_editor
-    def put(self, exploration_id, state_name):
-        """Marks readers' feedback as resolved."""
-        feedback_id = self.payload.get('feedback_id')
-        new_status = self.payload.get('new_status')
-
-        if not feedback_id:
-            raise self.InvalidInputException(
-                'Invalid feedback resolution request: no feedback_id given')
-
-        stats_services.EventHandler.resolve_feedback(feedback_id, new_status)
-
-        self.render_json({})
-
-
 class ExplorationDownloadHandler(EditorHandler):
     """Downloads an exploration as a YAML file."""
 
@@ -542,12 +542,11 @@ class ExplorationStatisticsHandler(EditorHandler):
             exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
-
+        exploration_annotations = stats_services.get_exploration_annotations(
+            exploration_id)
         self.render_json({
-            'num_visits': stats_services.get_exploration_visit_count(
-                exploration_id),
-            'num_completions': stats_services.get_exploration_completed_count(
-                exploration_id),
+            'num_visits': exploration_annotations.num_visits,
+            'num_completions': exploration_annotations.num_completions,
             'state_stats': stats_services.get_state_stats_for_exploration(
                 exploration_id),
             'imp': stats_services.get_top_improvable_states(
@@ -608,7 +607,7 @@ class ImageUploadHandler(EditorHandler):
         if '.' in filename:
             dot_index = filename.rfind('.')
             primary_name = filename[:dot_index]
-            extension = filename[dot_index + 1:]
+            extension = filename[dot_index + 1:].lower()
             if (extension not in
                     feconf.ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS[file_format]):
                 raise self.InvalidInputException(

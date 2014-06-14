@@ -161,13 +161,15 @@
                 </p>
               {% endif %}
 
-              <p>
-                <button type="button" ng-if="explorationRightsService.isPrivate()"
-                        class="btn btn-danger" ng-click="deleteExploration('')"
-                        title="Delete this exploration">
-                  Delete Exploration
-                </button>
-              </p>
+              {% if can_delete %}
+                <p>
+                  <button type="button" ng-if="explorationRightsService.isPrivate()"
+                          class="btn btn-danger" ng-click="deleteExploration('')"
+                          title="Delete this exploration">
+                    Delete Exploration
+                  </button>
+                </p>
+              {% endif %}
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
@@ -250,6 +252,25 @@
             </param-change-editor>
           </div>
         </div>
+
+        {% if SHOW_SKIN_CHOOSER %}
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h4>Skin chooser</h4>
+            </div>
+          </div>
+
+          <div class="form-horizontal">
+            <div class="form-group">
+              <label for="defaultSkinId" class="col-lg-2 col-md-2 col-sm-2">Default skin</label>
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <select class="form-control" ng-model="$parent.defaultSkinId" ng-options="skinId as skinId for skinId in allSkinIds">
+                </select>
+              </div>
+            </div>
+          </div>
+        {% endif %}
+
       </div>
     </div>
   </div>

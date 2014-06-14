@@ -285,7 +285,7 @@
 
                 {% if can_publish %}
                   <span ng-if="explorationRightsService.isPrivate()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !getExplorationWarningsList().length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || getExplorationWarningsList().length">
+                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length">
                       publish
                     </button>
                     <img class="oppia-help" src="/images/help.png"
@@ -330,7 +330,7 @@
             <div class="col-lg-6 col-md-6 col-sm-6">
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6">
-              <div ng-show="getExplorationWarningsList().length" ng-click="toggleExplorationWarningVisibility()">
+              <div ng-show="warningsList.length" ng-click="toggleExplorationWarningVisibility()">
                 <div class="alert alert-warning pull-right" style="padding: 2px 5px; margin-bottom: 2px; cursor: pointer; position: absolute; opacity: 1; z-index: 5;">
                   <div>
                     <span ng-if="!areExplorationWarningsVisible" style="color: black;">
@@ -340,11 +340,11 @@
                       <span class="glyphicon glyphicon-minus-sign"></span>
                     </span>
                     <span class="glyphicon glyphicon-warning-sign"></span>
-                    This exploration has <strong><[getExplorationWarningsList().length]></strong> warning(s).
+                    This exploration has <strong><[warningsList.length]></strong> warning(s).
                   </div>
                   <div collapse="!areExplorationWarningsVisible">
                     <ul>
-                      <li ng-repeat="warningText in getExplorationWarningsList() track by $index">
+                      <li ng-repeat="warningText in warningsList track by $index">
                         <[warningText]>
                       </li>
                     </ul>
@@ -372,7 +372,7 @@
           </tab>
 
           <tab heading="Statistics" active="statsTabActive" select="selectStatsTab()">
-            {% include 'editor/stats_viewer.html' %}
+            {% include 'editor/exploration_statistics.html' %}
           </tab>
 
           <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
@@ -411,7 +411,7 @@
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}
     {{ object_editors_js }}
-    {{ include_js_file('editor/StatsViewer.js') }}
+    {{ include_js_file('editor/ExplorationStatistics.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/StateEditor.js') }}

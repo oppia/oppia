@@ -111,10 +111,11 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(objects.CoordTwoDim, mappings, invalid_values)
 
     def test_list_validation(self):
-        """Tests objects of type List."""
-        mappings = [([3, 'a'], [3, 'a']), ([], []), ([1, 2, 1], [1, 2, 1]), ]
-        invalid_values = ['123', {'a': 1}, 3.0, None]
-        self.check_normalization(objects.List, mappings, invalid_values)
+        """Tests objects of type ListOfUnicodeString."""
+        mappings = [(['b', 'a'], ['b', 'a']), ([], [])]
+        invalid_values = ['123', {'a': 1}, 3.0, None, [3, 'a'], [1, 2, 1]]
+        self.check_normalization(
+            objects.ListOfUnicodeString, mappings, invalid_values)
 
     def test_music_phrase(self):
         """Tests objects of type MusicPhrase."""
@@ -134,7 +135,8 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             [{'readableNoteName': 'C5', 'noteDuration': {'num': 3, 'den': 2}},
              {'readableNoteName': 'C4', 'noteDuration': {'num': 3, 'den': 2}}]
         )]
-        invalid_values = ['G4', {'n': 1}, 2.0, None]
+        invalid_values = [
+            'G4', {'n': 1}, 2.0, None, {'readableNoteName': 'C5'}]
 
         self.check_normalization(objects.MusicPhrase, mappings, invalid_values)
 
@@ -153,9 +155,9 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_unicode_string_validation(self):
         """Tests objects of type UnicodeString."""
         mappings = [
-            ('Abc   def', u'Abc   def'), (u'¡Hola!', u'¡Hola!'), (3.0, '3.0'),
+            ('Abc   def', u'Abc   def'), (u'¡Hola!', u'¡Hola!'),
         ]
-        invalid_vals = [{'a': 1}, [1, 2, 1], None]
+        invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
 
         self.check_normalization(objects.UnicodeString, mappings, invalid_vals)
 
@@ -177,9 +179,9 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_normalized_string_validation(self):
         """Tests objects of type NormalizedString."""
         mappings = [
-            ('Abc   def', u'Abc def'), (u'¡hola!', u'¡hola!'), (3.0, '3.0'),
+            ('Abc   def', u'Abc def'), (u'¡hola!', u'¡hola!')
         ]
-        invalid_values = [{'a': 1}, [1, 2, 1], None]
+        invalid_values = [3.0, {'a': 1}, [1, 2, 1], None]
 
         self.check_normalization(
             objects.NormalizedString, mappings, invalid_values)
@@ -188,16 +190,90 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         mappings = [
             ('http://www.google.com', 'http://www.google.com'),
             ('https://www.google.com', 'https://www.google.com'),
-            ('javascript:alert(5);', ''),
-            ('ftp://gopher.com', ''),
-            ('test', ''),
-            ('google.com', ''),
             ('https://www.google!.com', 'https://www.google%21.com'),
         ]
 
-        invalid_vals = [u'http://¡Hola!.com']
+        invalid_vals = [
+            u'http://¡Hola!.com',
+            'javascript:alert(5);',
+            'ftp://gopher.com',
+            'test',
+            'google.com']
 
         self.check_normalization(objects.SanitizedUrl, mappings, invalid_vals)
+
+    def test_checked_proof_validation(self):
+        """Tests objects of type CheckedProof"""
+        valid_example_1 = {
+            'assumptions_string': 'p',
+            'target_string': 'q',
+            'proof_string': 'from p we have q',
+            'correct': True
+        }
+        valid_example_2 = {
+            'assumptions_string': 'p',
+            'target_string': 'q',
+            'proof_string': 'from p we have q',
+            'correct': False,
+            'error_category': 'layout',
+            'error_code': 'bad_layout',
+            'error_message': 'layout is bad',
+            'error_line_number': 2
+        }
+        mappings = [
+            (valid_example_1, valid_example_1), 
+            (valid_example_2, valid_example_2)]
+
+        invalid_values = [
+            {}, None, {'assumptions_string': 'p'}, {
+                'assumptions_string': 'p',
+                'target_string': 'q',
+                'proof_string': 'from p we have q',
+                'correct': False
+            }]
+
+        self.check_normalization(
+            objects.CheckedProof, mappings, invalid_values)
+
+    def test_logic_question_validation(self):
+        """Tests objects of type LogicQuestion"""
+        p_expression = {
+            'top_kind_name': 'variable',
+            'top_operator_name': 'p',
+            'arguments': [],
+            'dummies': []
+        }
+
+        valid_example = {
+            'assumptions': [p_expression],
+            'results': [p_expression],
+            'default_proof_string': 'a proof'
+        }
+        mappings = [(valid_example, valid_example)]
+
+        invalid_values = [
+            {}, None, {'assumptions': p_expression}, {
+                'assumptions': p_expression,
+                'results': {
+                    'top_kind_name': 'variable',
+                    'top_operator_name': 'p'
+                }
+            }]
+
+        self.check_normalization(
+            objects.LogicQuestion, mappings, invalid_values)
+
+    def test_logic_error_category_validation(self):
+        """Tests objects of type LogicErrorCategory"""
+
+        mappings = [
+            ('parsing', 'parsing'), ('typing', 'typing'), 
+            ('mistake', 'mistake')]
+
+        invalid_values = [None, 2, 'string', 'item']
+
+        self.check_normalization(
+            objects.LogicErrorCategory, mappings, invalid_values)
 
 
 class SchemaValidityTests(test_utils.GenericTestBase):
@@ -210,4 +286,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils.validate_schema(member._schema)
                     count += 1
 
-        self.assertEquals(count, 8)
+        self.assertEquals(count, 17)

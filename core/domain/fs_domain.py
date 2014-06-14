@@ -136,11 +136,14 @@ class ExplorationFileSystem(object):
         data.commit(user_id, CHANGE_LIST_SAVE)
         metadata.commit(user_id, CHANGE_LIST_SAVE)
 
-    def get(self, filepath, version=None):
+    def get(self, filepath, version=None, mode=None):
         """Gets a file as an unencoded stream of raw bytes.
 
         If `version` is not supplied, the latest version is retrieved. If the
         file does not exist, None is returned.
+
+        The 'mode' argument is unused. It is included so that this method
+        signature matches that of other files systems. 
         """
         metadata = self._get_file_metadata(filepath, version)
         if metadata:
@@ -191,7 +194,7 @@ class ExplorationFileSystem(object):
         # The trailing slash is necessary to prevent non-identical directory
         # names with the same prefix from matching, e.g. /abcd/123.png should
         # not match a query for files under /abc/.
-        prefix = '%s' % os.path.join(
+        prefix = '%s' % utils.vfs_construct_path(
             '/', self._exploration_id, 'assets', dir_name)
         if not prefix.endswith('/'):
             prefix += '/'
@@ -228,10 +231,10 @@ class DiskBackedFileSystem(object):
         """Checks if a file exists."""
         return os.path.isfile(os.path.join(self._root, filepath))
 
-    def get(self, filepath, version=None):
+    def get(self, filepath, version=None, mode='r'):
         """Returns a bytestring with the file content, but no metadata."""
         content = utils.get_file_contents(
-            os.path.join(self._root, filepath), raw_bytes=True)
+            os.path.join(self._root, filepath), raw_bytes=True, mode=mode)
         return FileStreamWithMetadata(content, None, None)
 
     def commit(self, user_id, filepath, raw_bytes):
@@ -256,11 +259,10 @@ class AbstractFileSystem(object):
 
     def _check_filepath(self, filepath):
         """Raises an error if a filepath is invalid."""
-        # Note: uses os.sep as initial separator in order to function on
-        # Windows correctly.
-        base_dir = os.path.join(os.sep, self.impl.exploration_id, 'assets')
-        absolute_path = os.path.join(base_dir, filepath)
-        normalized_path = os.path.normpath(absolute_path)
+        base_dir = utils.vfs_construct_path(
+            '/', self.impl.exploration_id, 'assets')
+        absolute_path = utils.vfs_construct_path(base_dir, filepath)
+        normalized_path = utils.vfs_normpath(absolute_path)
 
         # This check prevents directory traversal.
         if not normalized_path.startswith(base_dir):
@@ -271,14 +273,14 @@ class AbstractFileSystem(object):
         self._check_filepath(filepath)
         return self._impl.isfile(filepath)
 
-    def open(self, filepath, version=None):
+    def open(self, filepath, version=None, mode='r'):
         """Returns a stream with the file content. Similar to open(...)."""
         self._check_filepath(filepath)
-        return self._impl.get(filepath, version=version)
+        return self._impl.get(filepath, version=version, mode=mode)
 
-    def get(self, filepath, version=None):
+    def get(self, filepath, version=None, mode='r'):
         """Returns a bytestring with the file content, but no metadata."""
-        file_stream = self.open(filepath, version=version)
+        file_stream = self.open(filepath, version=version, mode=mode)
         if file_stream is None:
             raise IOError(
                 'File %s (version %s) not found.'

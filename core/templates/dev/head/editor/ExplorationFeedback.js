@@ -54,9 +54,8 @@ function ExplorationFeedback($scope, $http, $modal,
         state_name: null,
         subject: newThreadSubject,
         text: newThreadText,
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function() {
+      })
+    ).success(function() {
       $scope._getThreadList();
       $scope.setCurrentThread(null);
       $scope.$parent.refreshFeedbackTabHeader();
@@ -146,9 +145,8 @@ function ExplorationFeedback($scope, $http, $modal,
           updatedStatus : null),
         updated_subject: null,
         text: newMessageText,
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function() {
+      })
+    ).success(function() {
       $scope.currentThreadData.status = updatedStatus;
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
@@ -159,14 +157,24 @@ function ExplorationFeedback($scope, $http, $modal,
     });
   };
 
+  // We do not permit 'Duplicate' as a valid status for now, since it should
+  // require the id of the duplicated thread to be specified.
   $scope.STATUS_CHOICES = [
     {id: 'open', text: 'Open'},
     {id: 'fixed', text: 'Fixed'},
     {id: 'ignored', text: 'Ignored'},
-    {id: 'duplicate', text: 'Duplicate'},
     {id: 'compliment', text: 'Compliment'},
     {id: 'not_actionable', text: 'Not Actionable'}
   ];
+
+  $scope.getHumanReadableStatus = function(status) {
+    for (var i = 0; i < $scope.STATUS_CHOICES.length; i++) {
+      if ($scope.STATUS_CHOICES[i].id === status) {
+        return $scope.STATUS_CHOICES[i].text;
+      }
+    }
+    return '';
+  };
 
   // Initial load of the thread list.
   $scope.currentThreadId = null;

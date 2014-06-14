@@ -127,11 +127,10 @@ oppia.directive('richTextEditor', [
 
         $scope.getRteCustomizationModal = function(widgetDefinition, customizationArgs) {
           return $http.post(
-              '/widgets/noninteractive/' + widgetDefinition.backendName,
-              oppiaRequestCreator.createRequest({
-                customization_args: customizationArgs
-              }),
-              {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+            '/widgets/noninteractive/' + widgetDefinition.backendName,
+            oppiaRequestCreator.createRequest({
+              customization_args: customizationArgs
+            })
           ).then(function(response) {
             var modalInstance = $modal.open({
               templateUrl: 'modals/customizeWidget',

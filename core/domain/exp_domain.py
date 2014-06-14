@@ -32,6 +32,7 @@ from core.domain import fs_domain
 from core.domain import html_cleaner
 from core.domain import param_domain
 from core.domain import rule_domain
+from core.domain import skins_services
 from core.domain import widget_registry
 import feconf
 import jinja_utils
@@ -53,7 +54,8 @@ class ExplorationChange(object):
 
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'skill_tags',
-        'blurb', 'author_notes', 'param_specs', 'param_changes')
+        'blurb', 'author_notes', 'param_specs', 'param_changes',
+        'default_skin_id')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -775,7 +777,9 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected default_skin to be a string, received %s (%s).'
                 % self.default_skin, type(self.default_skin))
-        # TODO(sll): Check that the skin name corresponds to a valid skin.
+        if not self.default_skin in skins_services.Registry.get_all_skin_ids():
+            raise utils.ValidationError(
+                'Unrecognized skin id: %s' % self.default_skin)
 
         if not isinstance(self.states, dict):
             raise utils.ValidationError(
@@ -1041,6 +1045,9 @@ class Exploration(object):
             param_domain.ParamChange.from_dict(param_change)
             for param_change in param_changes_list
         ]
+
+    def update_default_skin_id(self, default_skin_id):
+        self.default_skin = default_skin_id
 
     # Methods relating to parameters.
     def get_obj_type_for_param(self, param_name):

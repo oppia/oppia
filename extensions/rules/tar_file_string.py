@@ -59,7 +59,8 @@ class HasAppleDoubleFile(base.TarFileStringRule):
 
 class HasUnexpectedFile(base.TarFileStringRule):
     description = (
-        'contains a file not present in {{expected_files|SetOfUnicodeString}}.'
+        'contains a top-level file whose name is not present in '
+        '{{expected_files|SetOfUnicodeString}}.'
     )
     is_generic = True
 

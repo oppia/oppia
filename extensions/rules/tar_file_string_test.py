@@ -38,12 +38,12 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         file_name = 'wrong-wrapper-name.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertFalse(rule.eval(encoded_content))
 
     def test_wrapper_presence_rule(self):
@@ -51,12 +51,12 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         file_name = 'no-wrapper-dir.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertFalse(rule.eval(encoded_content))
 
     def test_unexpected_file_rule(self):
@@ -67,12 +67,12 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         file_name = 'unexpected-file.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertFalse(rule.eval(encoded_content))
 
     def test_unexpected_content_rule(self):
@@ -87,11 +87,11 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
             ['hello.c', 'Makefile']).set_fs(canonical_fs)
 
         file_name = 'incorrect-contents.tar.gz'
-        encoded_content = base64.b64encode(fs.get(file_name))
+        encoded_content = base64.b64encode(fs.get(file_name, mode='rb'))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
-        encoded_content = base64.b64encode(fs.get(file_name))
+        encoded_content = base64.b64encode(fs.get(file_name, mode='rb'))
         self.assertFalse(rule.eval(encoded_content))
 
     def test_missing_expected_file_rule(self):
@@ -102,12 +102,12 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         file_name = 'missing-expected-file.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertFalse(rule.eval(encoded_content))
 
     def test_apple_double_file_rule(self):
@@ -115,10 +115,10 @@ class TarFileStringRuleUnitTests(unittest.TestCase):
 
         file_name = 'apple-double.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertTrue(rule.eval(encoded_content))
 
         file_name = 'good.tar.gz'
         encoded_content = base64.b64encode(utils.get_file_contents(
-            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True))
+            os.path.join(TEST_DATA_DIR, file_name), raw_bytes=True, mode='rb'))
         self.assertFalse(rule.eval(encoded_content))

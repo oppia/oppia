@@ -1,0 +1,70 @@
+<link rel="stylesheet" type="text/css"
+      href="/extensions/skins/conversation_v1/static/conversation.css">
+
+<div ng-controller="ConversationSkin" ng-style="getStyle()">
+  <div ng-if="!iframed" class="conversation-skin-feedback-button" ng-click="showFeedbackModal()">
+    <center>
+      <br><br><br>Feedback
+    </center>
+  </div>
+
+  <div class="oppia-content" role="main">
+    <div class="conversation-skin-exploration-header">
+      <a href="" ng-click="resetPage()" class="pull-right conversation-skin-exploration-header-sublink">
+        Clear history and restart
+      </a>
+      <h3 role="heading"><[title]></h3>
+    </div>
+
+    <div class="conversation-skin-iframe-container">
+      <div ng-repeat="response in responseLog track by $index"
+           ng-class="{'conversation-skin-last-log-entry': $last}"
+           aria-live="<[$last ? 'polite' : 'off']>"
+           aria-atomic="true">
+
+        <div class="conversation-skin-conversation-log"
+             angular-html-bind="response.previousReaderAnswer">
+        </div>
+        <div class="conversation-skin-conversation-log"
+             angular-html-bind="response.feedback">
+        </div>
+
+        <div ng-if="response.question">
+          <div ng-if="!response.isMostRecentQuestion"
+               class="conversation-skin-conversation-log"
+               angular-html-bind="response.question">
+          </div>
+          <div ng-if="response.isMostRecentQuestion"
+               class="conversation-skin-response"
+               angular-html-bind="response.question">
+          </div>
+        </div>
+      </div>
+
+      <br>
+
+      <div ng-show="finished" class="conversation-skin-response-finished">
+        Congratulations, you've finished this exploration!
+        Would you like to <a ng-click="resetPage()" href="">play again?</a>
+      </div>
+
+      <div ng-hide="finished">
+        <!-- This iframe must always be contained within a div in
+        which it is the only element. For more information, please
+        see the ReaderExploration.js file. -->
+        <div ng-hide="answerIsBeingProcessed">
+          <div angular-html-bind="inputTemplate"></div>
+        </div>
+        <div ng-show="answerIsBeingProcessed">
+          <center style="font-size: 8em;">
+            <span class="oppia-loading-dot-one">.</span>
+            <span class="oppia-loading-dot-two">.</span>
+            <span class="oppia-loading-dot-three">.</span>
+          </center>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="/extensions/skins/conversation_v1/static/Conversation.js"></script>

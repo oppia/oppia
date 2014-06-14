@@ -93,7 +93,7 @@
     <h3>Jobs</h3>
     <em>Note: This table may be stale; refresh to see the latest state.</em>
     <h4>Existing jobs</h4>
-    <table>
+    <table class="table">
       <tr>
         <th>Job ID</th>
         <th>Status</th>
@@ -129,20 +129,6 @@
         </li>
       {% endfor %}
     </ul>
-
-    <h4>Feedback migration</h4>
-    <ul>
-      <li>
-        Number of items left to migrate: {{old_feedback_items_count}}
-      </li>
-      <li>
-        Number of new feedback threads: {{new_feedback_threads_count}}
-      </li>
-      <li>
-        Number of new feedback messages: {{new_feedback_messages_count}}
-      </li>
-    </ul>
-    <button ng-click="migrateFeedback()">Perform migration</button>
 
     {% include 'footer_js_libs.html' %}
     {% include 'rte_js_libs.html' %}

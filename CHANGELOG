@@ -3,6 +3,61 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.6 (4 Jun 2014)
+-------------------
+UI changes:
+* Upgrade to Bootstrap 3.
+
+Editor features:
+* Allow exploration editor pages for non-private explorations to be viewed in read-only mode.
+* Add 'feedback thread' functionality to the exploration editor page.
+* Add instructions for embedding explorations in other pages.
+* Deprecate exploration cloning functionality.
+* Display an expandable warning bar for things like 'an objective needs to be specified for this exploration'.
+* Fix a saving bug: when a rule with a variable is selected, and then changed to a rule without one, the extraneous variable from the original rule is kept, causing a backend save error.
+* Fix a bug that prevented changes to rules from being saved after a new interactive widget was selected.
+* Fix a bug in the state minimap where the '+' button was not showing up in Safari.
+* Add a help link to the parameter changes section.
+* Move the 'answers received' section to the right-hand column, below the graph minimap.
+* Make the jwysiwyg rich-text editor responsive.
+* Move the parameter changes section into the state content section.
+* Make the rule destination bubbles fixed-width.
+* Clarify the labels indicating the publication status of an exploration.
+* Remove non-working links in the statistics tab that link back to the state editor.
+* Make the statistics tab rule descriptions slightly more human-readable.
+* Move some settings-related controls to the exploration settings tab.
+* Only show the 'delete exploration' button to exploration owners,
+
+Widget improvements:
+* Numeric input widget: allow decimal numbers that start with a decimal point.
+* Code REPL widget: restore line numbers.
+* Interactive map widget: fix response HTML bug where a zoomed-in map of (0, 0) was being shown; add a custom stats_response file to display the coordinates rounded to 6 decimal places.
+* Video widget: allow exploration authors to set start and end times.
+* Image widget: convert file extensions to lower case before checking their validity.
+* Image widget: add clarification about which filetypes are permitted.
+
+Windows issues:
+* Fix issue 219: image uploads did not work in Windows.
+* We now open zip files in binary mode on Windows.
+* Fix a failure in the startup script due to Windows directory names not being case-sensitive.
+
+Demo explorations:
+* Fix a small bug in the Pitch Perfect exploration.
+* Add a demo exploration that tests all the interactive widgets.
+
+Tests:
+* Update karma and associated libraries.
+* Add a code coverage reporter for frontend tests.
+* Add backend integration tests for reverting to previous versions of an exploration.
+* Fix an issue with the test runner not deleting all datastore models correctly between tests.
+* Fix an issue with the test runner not getting the correct versions of third-party libraries.
+
+Infrastructure:
+* Add a focus management service to the frontend.
+* Add a new input reader for reading multiple datastore input fields during MapReduce jobs.
+* Add a backend module for schema-based object validation.
+
+
 v1.2.5 (16 May 2014)
 --------------------
 UI changes:

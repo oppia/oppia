@@ -120,15 +120,14 @@ function ContributeGallery(
       $rootScope.loadingMessage = 'Creating exploration';
       $http.post(
         '/contributehandler/create_new',
-        oppiaRequestCreator.createRequest({title: title, category: category}),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-          success(function(data) {
-            window.location = '/create/' + data.explorationId;
-          }).error(function(data) {
-            warningsData.addWarning(data.error ? data.error :
-              'Error: Could not add new exploration.');
-            $rootScope.loadingMessage = '';
-          });
+        oppiaRequestCreator.createRequest({title: title, category: category})
+      ).success(function(data) {
+        window.location = '/create/' + data.explorationId;
+      }).error(function(data) {
+        warningsData.addWarning(data.error ? data.error :
+          'Error: Could not add new exploration.');
+        $rootScope.loadingMessage = '';
+      });
     });
   };
 

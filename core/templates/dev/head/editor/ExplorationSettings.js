@@ -19,9 +19,13 @@
  */
 
 function ExplorationSettings(
-    $scope, $modal, activeInputData, explorationData, explorationTitleService,
-    explorationCategoryService, explorationObjectiveService,
-    explorationRightsService, changeListService, warningsData) {
+    $scope, $http, $window, $modal, activeInputData, explorationData,
+    explorationTitleService, explorationCategoryService,
+    explorationObjectiveService, explorationRightsService, changeListService,
+    warningsData) {
+
+  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
+
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
     $scope.explorationCategoryService = explorationCategoryService;
@@ -65,6 +69,14 @@ function ExplorationSettings(
     if (oldValue !== undefined && !$scope.isDiscardInProgress
         && !angular.equals(newValue, oldValue)) {
       changeListService.editExplorationProperty('param_specs', newValue, oldValue);
+    }
+  });
+
+  $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
+    if (oldValue !== undefined && !$scope.isDiscardInProgress
+        && !angular.equals(newValue, oldValue)) {
+      changeListService.editExplorationProperty(
+        'default_skin_id', newValue, oldValue);
     }
   });
 
@@ -155,6 +167,7 @@ function ExplorationSettings(
  * Injects dependencies in a way that is preserved by minification.
  */
 ExplorationSettings.$inject = [
-  '$scope', '$modal', 'activeInputData', 'explorationData', 'explorationTitleService',
-  'explorationCategoryService', 'explorationObjectiveService',
-  'explorationRightsService', 'changeListService', 'warningsData'];
+  '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
+  'explorationTitleService', 'explorationCategoryService',
+  'explorationObjectiveService', 'explorationRightsService',
+  'changeListService', 'warningsData'];

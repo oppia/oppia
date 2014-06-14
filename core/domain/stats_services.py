@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
 import feconf
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -63,28 +64,18 @@ class EventHandler(object):
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
     @classmethod
-    def record_state_feedback_from_reader(
-            cls, exploration_id, state_name, feedback, history, submitter_id):
-        """Records user feedback for a particular state."""
-        stats_domain.FeedbackItem.create_feedback_for_state(
-            exploration_id, state_name, feedback,
-            additional_data={'history': history}, submitter_id=submitter_id)
+    def start_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          params, play_type):
+        stats_models.StartExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, params,
+            play_type)
 
     @classmethod
-    def record_exploration_feedback_from_reader(
-            cls, exploration_id, feedback, history):
-        """Records user feedback for a particular exploration."""
-        stats_domain.FeedbackItem.create_feedback_for_exploration(
-            exploration_id, feedback, additional_data={'history': history})
-
-    @classmethod
-    def resolve_feedback(cls, feedback_item_id, new_status):
-        """Resolves a feedback item."""
-        if new_status not in [STATUS_FIXED, STATUS_WILL_NOT_FIX]:
-            raise Exception('Unexpected status: %s' % new_status)
-        feedback_item = get_feedback_item_by_id(feedback_item_id)
-        feedback_item.change_status(new_status)
-        _save_feedback_item(feedback_item)
+    def maybe_leave_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          time_spent, params, play_type):
+        stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type)
 
 
 def get_unresolved_answers_for_default_rule(exploration_id, state_name):
@@ -92,31 +83,6 @@ def get_unresolved_answers_for_default_rule(exploration_id, state_name):
         exploration_id, state_name, SUBMIT_HANDLER_NAME,
         exp_domain.DEFAULT_RULESPEC_STR
     ).answers
-
-
-def get_feedback_item_by_id(feedback_item_id, strict=True):
-    """Returns a domain object representing a feedback item."""
-    feedback_item_model = stats_models.FeedbackItemModel.get(
-        feedback_item_id, strict=strict)
-    if feedback_item_model:
-        feedback_item = stats_domain.FeedbackItem(feedback_item_model)
-        return feedback_item
-    else:
-        return None
-
-
-def _save_feedback_item(feedback_item):
-    """Commits a feedback item to persistent storage."""
-    feedback_item_model = stats_models.FeedbackItemModel.get(
-        feedback_item.id)
-
-    feedback_item_model.target_id = feedback_item.target_id
-    feedback_item_model.content = feedback_item.content
-    feedback_item_model.additional_data = feedback_item.additional_data
-    feedback_item_model.submitter_id = feedback_item.submitter_id
-    feedback_item_model.status = feedback_item.status
-
-    feedback_item_model.put()
 
 
 def get_exploration_visit_count(exploration_id):
@@ -166,34 +132,13 @@ def get_state_rules_stats(exploration_id, state_name):
 
     return results
 
-
-def get_user_stats(user_id):
-    """Returns a dict with user statistics for a given user.
-
-    The dict includes only one item "feedback" which itself is a dict with the
-    feedback item ID as the keys and the values being yet another dict of:
-    target_id, content, and status -- coming from FeedbackItemModel.
-    exp_id -- exploration ID for which the feedback was made.
-    exp_title -- title of the exploration.
-    state_name -- name of the state for which the feedback was made.
-    """
-    feedback = stats_domain.FeedbackItem.get_feedback_items_for_user(user_id)
-    exp_ids_with_feedback = set([
-        stats_domain.FeedbackItem.get_exploration_id_from_target_id(
-            feedback[k]['target_id']) for k in feedback
-        ])
-    exp_titles = exp_services.get_exploration_titles(exp_ids_with_feedback)
-    for feedback_id, feedback_dict in feedback.iteritems():
-        target_id = feedback_dict['target_id']
-        exp_id = stats_domain.FeedbackItem.get_exploration_id_from_target_id(
-            target_id)
-        state_name = stats_domain.FeedbackItem.get_state_name_from_target_id(
-            target_id)
-        feedback_dict['exp_id'] = exp_id
-        feedback_dict['exp_title'] = exp_titles[exp_id]
-        feedback_dict['state_name'] = state_name
-
-    return {'feedback': feedback}
+def get_exploration_annotations(exp_id):
+    exp_annotations = stats_models.ExplorationAnnotationsModel.get(
+        exp_id, strict=False)
+    if not exp_annotations:
+        exp_annotations = stats_models.ExplorationAnnotationsModel(
+            id=exp_id, num_visits=0, num_completions=0)
+    return exp_annotations
 
 
 def get_state_stats_for_exploration(exploration_id):

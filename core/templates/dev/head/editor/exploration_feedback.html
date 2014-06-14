@@ -11,16 +11,17 @@
 
   <div ng-if="threads !== null">
     <div ng-if="!currentThreadId">
-      <h4>Feedback Threads</h4>
-      {% if user_email %}
-        <div class="row">
-          <div class="col-lg-8 col-md-8 col-sm-8">
+      <br>
+      <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          {% if user_email %}
             <button class="btn btn-success pull-right" ng-click="showCreateThreadModal()">
               Start new thread
             </button>
-          </div>
+          {% endif %}
+          <h4>Feedback Threads</h4>
         </div>
-      {% endif %}
+      </div>
 
       <div class="row">
         <div class="col-lg-8 col-md-8 col-sm-8">
@@ -46,14 +47,14 @@
             </tr>
             <tr ng-repeat="t in threads|orderBy:'-last_updated'">
               <td class="col-lg-1 col-md-1 col-sm-1">
-                <span ng-class="getLabelClass(t.status)"><[t.status]></span>
+                <span ng-class="getLabelClass(t.status)"><[getHumanReadableStatus(t.status)]></span>
               </td>
               <td class="col-lg-4 col-md-4 col-sm-4">
                 <div><[t.subject]></div>
                 <div><[t.summary]></div>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
-                <span ng-if="t.original_author_username">by <[t.original_author_username]></span>
+                <span ng-if="t.original_author_username"><[t.original_author_username]></span>
               </td>
               <td class="col-lg-3 col-md-3 col-sm-3">
                 <span><[getLocaleStringForDateWithoutSeconds(t.last_updated)]></span>
@@ -91,7 +92,7 @@
               state: <[currentThreadData.state_name]>
             </span>
             <span ng-class="getLabelClass(currentThreadData.status)">
-              <[currentThreadData.status]>
+              <[getHumanReadableStatus(currentThreadData.status)]>
             </span>
           </div>
         </div>
@@ -119,7 +120,7 @@
                     <div class="col-lg-4 col-md-4 col-sm-4">
                       <span ng-if="m.message_id !== 0">
                         <span ng-if="m.updated_status">
-                          <em>Status changed to '<[m.updated_status]>'</em>
+                          <em>Status changed to '<[getHumanReadableStatus(m.updated_status)]>'</em>
                         </span>
                         <span ng-if="m.updated_subject">
                           <em>Subject changed to '<[m.updated_subject]>'</em>

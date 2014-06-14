@@ -16,7 +16,9 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import rights_manager
 import feconf
 import test_utils
 
@@ -122,6 +124,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.EDITOR_USERNAME = 'editor'
         self.EDITOR_EMAIL = 'editor@example.com'
         self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
     def test_create_thread(self):
         self.login(self.EDITOR_EMAIL)
@@ -243,23 +246,30 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         self.logout()
 
     def test_no_username_shown_for_nonregistered_users(self):
+        NEW_EXP_ID = 'new_eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            NEW_EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.EDITOR_ID, exploration)
+        rights_manager.publish_exploration(self.EDITOR_ID, NEW_EXP_ID)
+
         self.login('test@example.com')
-        response = self.testapp.get('/create/%s' % self.EXP_ID)
+        response = self.testapp.get('/create/%s' % NEW_EXP_ID)
         self.csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, NEW_EXP_ID),
+            {
                 'state_name': None,
                 'subject': 'Test thread',
                 'text': 'Test thread text',
             }, self.csrf_token)
 
         response_dict = self.get_json(
-            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID))
+            '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, NEW_EXP_ID))
         threadlist = response_dict['threads']
         self.assertIsNone(threadlist[0]['original_author_username'])
 
         response_dict = self.get_json('%s/%s/%s' % (
-            feconf.FEEDBACK_THREAD_URL_PREFIX, self.EXP_ID,
+            feconf.FEEDBACK_THREAD_URL_PREFIX, NEW_EXP_ID,
             threadlist[0]['thread_id']))
         self.assertIsNone(response_dict['messages'][0]['author_username'])
 

@@ -31,6 +31,8 @@ import urlparse
 import yaml
 import zipfile
 
+
+
 # Sentinel value for schema verification, indicating that a value can take any
 # type.
 ANY_TYPE = 1
@@ -56,9 +58,9 @@ def create_enum(*sequential, **names):
     return type('Enum', (), enums)
 
 
-def get_file_contents(filepath, raw_bytes=False):
+def get_file_contents(filepath, raw_bytes=False, mode='r'):
     """Gets the contents of a file, given a relative filepath from oppia/."""
-    with open(filepath) as f:
+    with open(filepath, mode) as f:
         return f.read() if raw_bytes else f.read().decode('utf-8')
 
 
@@ -263,7 +265,7 @@ def convert_png_to_data_url(filepath):
     This method is currently used only in tests for the non-interactive
     widgets.
     """
-    file_contents = get_file_contents(filepath, raw_bytes=True)
+    file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return 'data:image/png;base64,%s' % urllib.quote(
         file_contents.encode('base64'))
 
@@ -345,3 +347,45 @@ def get_epoch_time():
 
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
+
+def vfs_construct_path(a, *p):
+    """Mimics behavior of os.path.join on Posix machines."""
+    path = a
+    for b in p:
+        if b.startswith('/'):
+            path = b
+        elif path == '' or path.endswith('/'):
+            path += b
+        else:
+            path += '/' + b
+    return path
+
+
+def vfs_normpath(path):
+    """Normalize path from posixpath.py, eliminating double slashes, etc."""
+    # Preserve unicode (if path is unicode)
+    slash, dot = (u'/', u'.') if isinstance(path, unicode) else ('/', '.')
+    if path == '':
+        return dot
+    initial_slashes = path.startswith('/')
+    # POSIX allows one or two initial slashes, but treats three or more
+    # as single slash.
+    if (initial_slashes and
+        path.startswith('//') and not path.startswith('///')):
+        initial_slashes = 2
+    comps = path.split('/')
+    new_comps = []
+    for comp in comps:
+        if comp in ('', '.'):
+            continue
+        if (comp != '..' or (not initial_slashes and not new_comps) or
+             (new_comps and new_comps[-1] == '..')):
+            new_comps.append(comp)
+        elif new_comps:
+            new_comps.pop()
+    comps = new_comps
+    path = slash.join(comps)
+    if initial_slashes:
+        path = slash*initial_slashes + path
+    return path or dot
+

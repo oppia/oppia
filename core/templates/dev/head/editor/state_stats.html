@@ -1,6 +1,6 @@
 <div ng-controller="StateStats">
   <h4 ng-if="unresolvedAnswersList.length">
-    <strong>Common responses</strong>
+    <strong>Unhandled responses</strong>
   </h4>
   <table style="width: 100%;" class="table table-striped">
     <tr ng-repeat="item in unresolvedAnswersList | orderBy:'-count' | limitTo:10">
