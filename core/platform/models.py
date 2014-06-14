@@ -88,6 +88,11 @@ class _Gae(_Platform):
         from core.platform.taskqueue import gae_taskqueue_services
         return gae_taskqueue_services
 
+    @classmethod
+    def import_search_services(cls):
+        from core.platform.search import gae_search_services
+        return gae_search_services
+
     NAME = 'gae'
 
 
@@ -119,3 +124,7 @@ class Registry(object):
     @classmethod
     def import_taskqueue_services(cls):
         return cls._get().import_taskqueue_services()
+
+    @classmethod
+    def import_search_services(cls):
+        return cls._get().import_search_services()

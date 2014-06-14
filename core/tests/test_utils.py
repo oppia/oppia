@@ -290,3 +290,29 @@ if feconf.PLATFORM == 'gae':
     GenericTestBase = AppEngineTestBase
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
+
+
+class CallCounter(object):
+    """A wrapper to keep track of how often a function or method gets called."""
+    def __init__(self, f):
+        self._f = f
+        self.times_called = 0
+
+    def __call__(self, *args, **kwargs):
+        self.times_called += 1
+        return self._f(*args, **kwargs)
+
+
+def succeed_after_n_tries(func, n, exception):
+    global count
+    count = 0
+
+    def failing_function(*args, **kwargs):
+        global count
+        if count < n:
+            count += 1
+            raise exception
+
+        return func(*args, **kwargs)
+
+    return failing_function
