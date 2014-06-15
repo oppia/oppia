@@ -250,6 +250,7 @@ PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
+USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 SPLASH_PAGE_URL = '/'
 
 NAV_MODE_ABOUT = 'about'
