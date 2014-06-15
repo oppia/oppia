@@ -81,9 +81,9 @@ oppia.filter('convertHtmlWithParamsToUnicode', ['$filter', function($filter) {
   };
 }]);
 
-oppia.filter('convertUnicodeToHtml', [function() {
+oppia.filter('convertUnicodeToHtml', ['oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
   return function(text) {
-    return angular.element('<div></div>').text(text).html();
+    return oppiaHtmlEscaper.unescapedStrToEscapedStr(text);
   };
 }]);
 
@@ -126,10 +126,12 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
         '    <textarea ng-disabled="!hasFullyLoaded"></textarea>' +
         '  </div>' +
         '  <div class="col-lg-1 col-md-1 col-sm-1">' +
-        '    <button ng-click="addParameter()">P</button>' +
+        '    <button ng-click="addParameter()" ng-disabled="!doUnicodeParamsExist()">P</button>' +
         '  </div>' +
         '</div>'),
-      controller: ['$scope', '$element', '$attrs', '$filter', '$timeout', function($scope, $element, $attrs, $filter, $timeout) {
+      controller: [
+          '$scope', '$element', '$attrs', '$filter', '$timeout', 'parameterSpecsService',
+          function($scope, $element, $attrs, $filter, $timeout, parameterSpecsService) {
         var rteNode = $element[0].children[0].children[0].children[0];
 
         // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
@@ -137,8 +139,25 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
         $scope.editorDoc = null;
         $scope.hasFullyLoaded = false;
 
+        // This is a bit silly. It appears that in contenteditables (in Chrome, anyway)
+        // the cursor will stubbornly remain within the oppia-parameter element (even
+        // though it should be outside it). However the behavior is correct
+        // for images -- so we use images to delimit it. It's still hard to do
+        // selection before the element if it's the first thing in the doc,
+        // after the element if it's the last thing in the doc, or between two
+        // consecutive elements. See this bug for a demonstration:
+        //
+        //     https://code.google.com/p/chromium/issues/detail?id=242110
+        var INVISIBLE_IMAGE_TAG = (
+          '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="></img>');
+
         $scope._createRteElement = function(paramName) {
-          var el = $('<oppia-parameter/>').text(paramName);
+          var el = $(
+            '<oppia-parameter contenteditable="false">' +
+            INVISIBLE_IMAGE_TAG +
+            paramName +
+            INVISIBLE_IMAGE_TAG +
+            '</oppia-parameter>');
 
           var domNode = el.get(0);
           // This dblclick handler is stripped in the initial HTML --> RTE conversion,
@@ -159,9 +178,8 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
           var elt = $('<div>' + html + '</div>');
           elt.find('oppia-parameter').replaceWith(function() {
             return [
-              document.createTextNode('\200'),
-              $scope._createRteElement(this.textContent),
-              document.createTextNode('\200')];
+              $scope._createRteElement(this.textContent)
+            ];
           });
           return elt.html();
         };
@@ -225,15 +243,8 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
           }).result.then(function(paramName) {
             var el = $scope._createRteElement(paramName);
             var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            $(insertionPoint).replaceWith([
-              document.createTextNode('\200'),
-              el,
-              document.createTextNode('\200')
-            ]);
+            $(insertionPoint).replaceWith(el);
             $(rteNode).wysiwyg('save');
-
-            var doc = $(rteNode).wysiwyg('document').get(0);
-            doc.getSelection().modify('move', 'forward', 'documentboundary');
           }, function() {
             var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
             if (insertionPoint.localName === 'span') {
@@ -242,38 +253,8 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
               insertionPoint.className = insertionPoint.className.replace(
                 /\binsertionPoint\b/, '');
             }
-            var doc = $(rteNode).wysiwyg('document').get(0);
-            doc.getSelection().removeAllRanges();
           });
         };
-
-        $scope.getCharacterPrecedingCaret = function(doc) {
-          var precedingChar = '', sel, range;
-          if (doc.getSelection) {
-            sel = doc.getSelection();
-            if (sel.rangeCount > 0) {
-              range = sel.getRangeAt(0).cloneRange();
-              range.collapse(true);
-              range.setStart(doc, 0);
-              precedingChar = range.toString().slice(-1);
-            }
-          }
-          return precedingChar;
-        }
-
-        $scope.getCharacterFollowingCaret = function(doc) {
-          var followingChar = '', sel, range;
-          if (doc.getSelection) {
-            sel = doc.getSelection();
-            if (sel.rangeCount > 0) {
-              range = sel.getRangeAt(0).cloneRange();
-              range.collapse(false);
-              range.setEnd(doc, doc.childNodes.length);
-              followingChar = range.toString().slice(0);
-            }
-          }
-          return followingChar;
-        }
 
         $scope.init = function() {
           $scope.rteContent = $scope._convertUnicodeToRte($scope.outerValue);
@@ -288,46 +269,18 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
             debug: true,
             events: {
               // Prevent use of keyboard shortcuts for bold, italics, etc.
-              // TODO(sll): Allow copy/paste. Prevent enter keys, tab keys?
               keydown: function(e) {
-                var vKey = 86, cKey = 67;
+                var vKey = 86, cKey = 67, zKey = 90;
                 if (e.ctrlKey) {
-                  if (e.keyCode !== vKey && e.keyCode !== cKey) {
+                  if (e.keyCode !== vKey && e.keyCode !== cKey && e.keyCode !== zKey) {
                     e.preventDefault();
                   }
                 }
-                var doc = $(rteNode).wysiwyg('document').get(0);
-                if (e.keyCode === 8 && $scope.getCharacterPrecedingCaret(doc).charCodeAt(0) === 128) {
-                  // Do not allow spaces after oppia-parameter tags (ASCII code 128) to be deleted.
-                  e.preventDefault();
-                } else if (e.keyCode === 46 &&$scope.getCharacterFollowingCaret(doc).charCodeAt(0) === 128) {
-                  // Do not allow spaces before oppia-parameter tags to be deleted.
+                // Disable the enter key. Contenteditable does not seem to support
+                // deletion of newlines. Also disable the tab key.
+                if (e.keyCode === 13 || e.keyCode === 9) {
                   e.preventDefault();
                 }
-              },
-              keypress: function(e) {
-                if (e.ctrlKey) {
-                  e.preventDefault();
-                } else {
-                  e.preventDefault();
-                  $scope.ensureCurrentSelectionIsValid();
-                  var doc = $(rteNode).wysiwyg('document').get(0);
-                  doc.execCommand(
-                    'insertHTML', false, String.fromCharCode(e.keyCode));
-                }
-              },
-              keyup: function(e) {
-                $scope.ensureCurrentSelectionIsValid();
-              },
-              mousedown: function(e) {
-                if (e.target.localName === 'oppia-parameter') {
-                  e.preventDefault();
-                }
-              },
-              mouseup: function(e) {
-                // Selection events must not be within an oppia-parameter
-                // element.
-                $scope.ensureCurrentSelectionIsValid();
               },
               save: function(e) {
                 $scope._saveContent();
@@ -335,37 +288,22 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
             },
             iFrameClass: 'wysiwyg-content',
             initialContent: $scope.rteContent,
-            maxHeight: 40,
-            maxLength: 100,
+            maxHeight: 30,
             rmUnusedControls: true
           });
 
-          $scope.ensureCurrentSelectionIsValid = function() {
+          $scope.addParameter = function() {
             var doc = $(rteNode).wysiwyg('document').get(0);
-
-            // TODO(sll): Move the cursor to the beginning or end of the selected element.
-            var elts = Array.prototype.slice.call(
-              $scope.editorDoc.querySelectorAll('oppia-parameter'));
-            var bad = false;
-            elts.forEach(function(elt) {
-              // This tests for partial containment.
-              if (doc.getSelection().containsNode(elt, true) && !doc.getSelection().containsNode(elt, false)) {
-                bad = true;
-              }
-            });
-
-            if (bad) {
-              // TODO(sll): Too drastic?
-              doc.getSelection().modify('move', 'forward', 'documentboundary');
+            $(rteNode).wysiwyg(
+              'insertHtml', '<span class="insertionPoint"></span>');
+            var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
+            if (allowedParamNames.length) {
+              $scope.getParamModal(allowedParamNames[0]);
             }
           };
 
-          $scope.addParameter = function() {
-            var doc = $(rteNode).wysiwyg('document').get(0);
-            $scope.ensureCurrentSelectionIsValid();
-            $(rteNode).wysiwyg(
-              'insertHtml', '<span class="insertionPoint"></span>');
-            $scope.getParamModal();
+          $scope.doUnicodeParamsExist = function() {
+            return parameterSpecsService.getAllParamsOfType('unicode').length > 0;
           };
 
           $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
