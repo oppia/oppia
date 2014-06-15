@@ -20,6 +20,7 @@ __author__ = 'Frederik Creemers'
 
 import numbers
 import datetime
+import logging
 
 import feconf
 
@@ -33,7 +34,9 @@ class SearchFailureError(Exception):
        Other platform implementations should have a similar way of revealing
        platform specific errors."""
     def __init__(self, original_exception=None):
-        super(SearchFailureError, self).__init__(original_exception.message)
+        super(SearchFailureError, self).__init__("%s: %s" %
+                                                 (type(original_exception),
+                                                  original_exception.message))
         self.original_exception = original_exception
 
 
@@ -68,34 +71,25 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES, _multi
 
     index = gae_search.Index(index)
     gae_docs = [_dict_to_search_document(d) for d in documents]
-    retry = False
 
     try:
+        logging.debug("adding the following docs to index %s: %s", index.name,
+                      documents)
         results = index.put(gae_docs, deadline=5)
-        # todo(frederikcreemers) I'm assuming that every exception that's not in
-        # my control is a search.TransientError. Awaiting answer here:
-        # http://stackoverflow.com/questions/24074521/in-which-cases-does-app-engine-search-raise-a-transienterror
-    except gae_search.TransientError as e:
-        retry = True
-        error = e
     except gae_search.PutError as e:
-        for res in e.results:
-            if res.code == gae_search.OperationResult.TRANSIENT_ERROR:
-                retry = True
-                error = e
-                break
-
-        if not retry:  # The error isn't transient, so fail immediately.
-            raise SearchFailureError(e)
-
-    if retry:
+        logging.exception("PutError raised.")
         if retries > 1:
-            return add_documents_to_index(documents, index.name, retries - 1)
-        else:
-            raise SearchFailureError(error)
+            for res in e.results:
+                if res.code == gae_search.OperationResult.TRANSIENT_ERROR:
+                    logging.debug("%d tries left, retrying." % (retries - 1))
+                    return add_documents_to_index(documents, index.name, retries - 1)
 
-    return [r.id for r in results]
+        # At this pint, either we don't have any tries left, or none of the
+        # results has a transient error code.
+        raise SearchFailureError(e)
 
+    ids = [r.id for r in results]
+    return ids
 
 def _dict_to_search_document(d):
     if not isinstance(d, dict):
@@ -164,31 +158,20 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
                              (type(doc_ids[i]), i))
 
     index = gae_search.Index(index)
-    retry = False
     try:
+        logging.debug("Attempting to delete documents from index %s, ids: %s" %
+                      (index.name, ", ".join(doc_ids)))
         index.delete(doc_ids, deadline=5)
-    except gae_search.TransientError as e:
-        retry = True
-        error = e
     except gae_search.DeleteError as e:
-        for res in e.results:
-            if res.code == gae_search.OperationResult.TRANSIENT_ERROR:
-                retry = True
-                error = e
-                break
-
-        if not retry:  # The error isn't transient, so fail immediately.
-            raise SearchFailureError(e)
-
-    if retry:
+        logging.exception("Something went wrong during deletion.")
         if retries > 1:
-            delete_documents_from_index(doc_ids, index.name, retries - 1)
-        else:
-            raise SearchFailureError(error)
+            for res in e.results:
+                if res.code == gae_search.OperationResult.TRANSIENT_ERROR:
+                    logging.debug("%d tries left, retrying." % (retries - 1))
+                    delete_documents_from_index(doc_ids, index.name, retries - 1)
+                    return
 
-
-
-
+        raise SearchFailureError(e)
 
 
 def search(query_string, index, cursor=None, limit=20, sort='', ids_only=False,
@@ -238,9 +221,12 @@ def search(query_string, index, cursor=None, limit=20, sort='', ids_only=False,
     index = gae_search.Index(index)
 
     try:
+        logging.debug("attempting a search with query %s" % query)
         results = index.search(query)
     except gae_search.TransientError as e:
+        logging.exception("something went wrng while searching.")
         if retries > 1:
+            logging.debug("%d attempts left, retrying..." % (retries - 1))
             return search(query_string, index.name,
                           cursor=cursor._web_safe_string,
                           limit=limit, sort=sort, ids_only=ids_only,

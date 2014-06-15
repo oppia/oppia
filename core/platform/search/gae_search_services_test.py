@@ -101,9 +101,21 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
             gae_search_services.add_documents_to_index(
                 {'id': 'one', 'key': 'value'}, search.Index('test'))
 
+    def _get_put_error(self, num_res, transient=None):
+        """returns a PutError. with num_res results.
+           If transient is given, it should be an index in the
+           results array. The result at that index will have a transient
+           error code."""
+        non_trans_code = search.OperationResult.INVALID_REQUEST
+        trans_code = search.OperationResult.TRANSIENT_ERROR
+        r = [search.PutResult(code=non_trans_code) for i in range(num_res)]
+        if transient is not None:
+            r[transient] = search.PutResult(code=trans_code)
+        return search.PutError('lol', r)
+
     def test_use_default_num_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = search.TransientError('oops')
+        exception = self._get_put_error(1, 0)
         wrapped = test_utils.succeed_after_n_tries(search.Index.put,
                                         gae_search_services.DEFAULT_NUM_RETRIES,
                                         exception)
@@ -122,7 +134,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_use_custom_number_of_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = search.TransientError('oops')
+        exception = self._get_put_error(1, 0)
         wrapped = test_utils.succeed_after_n_tries(search.Index.put, 42, exception)
 
         counter = test_utils.CallCounter(gae_search_services.add_documents_to_index)
@@ -136,7 +148,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_arguments_are_preserved_in_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = search.TransientError('oops')
+        exception = self._get_put_error(1,0)
         wrapped = test_utils.succeed_after_n_tries(search.Index.put, 3, exception)
 
         counter = test_utils.CallCounter(gae_search_services.add_documents_to_index)
@@ -148,18 +160,6 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         self.assertEqual(counter.times_called, 4)
         result = search.Index('my_index').get('doc')
         self.assertEqual(result.field('prop').value, 'val')
-
-    def _get_put_error(self, num_res, transient=False):
-        """returns a PutError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
-        non_trans_code = search.OperationResult.INVALID_REQUEST
-        trans_code = search.OperationResult.TRANSIENT_ERROR
-        r = [search.PutResult(code=non_trans_code) for i in range(num_res)]
-        if transient:
-            r[transient] = search.PutResult(code=trans_code)
-        return search.PutError('lol', r)
 
     def test_put_error_with_transient_result(self):
         docs = [{'id': 'doc1', 'prop': 'val1'},
@@ -228,8 +228,20 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             gae_search_services.delete_documents_from_index(['doc_id'],
                                                             search.Index('ind'))
 
+    def _get_delete_error(self, num_res, transient=None):
+        """returns a DeleteError. with num_res results.
+           If transient is given, it should be an index in the
+           results array. The result at that index will have a transient
+           error code."""
+        non_trans_code = search.OperationResult.INVALID_REQUEST
+        trans_code = search.OperationResult.TRANSIENT_ERROR
+        r = [search.DeleteResult(code=non_trans_code) for i in range(num_res)]
+        if transient is not None:
+            r[transient] = search.PutResult(code=trans_code)
+        return search.DeleteError('lol', results=r)
+
     def test_use_default_num_retries(self):
-        exception = search.TransientError('oops')
+        exception = self._get_delete_error(1,0)
         wrapped = test_utils.succeed_after_n_tries(search.Index.delete,
                                         gae_search_services.DEFAULT_NUM_RETRIES,
                                         exception)
@@ -248,7 +260,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                          gae_search_services.DEFAULT_NUM_RETRIES)
 
     def test_use_custom_number_of_retries(self):
-        exception = search.TransientError('oops')
+        exception = self._get_delete_error(1, 0)
         wrapped = test_utils.succeed_after_n_tries(search.Index.delete, 42, exception)
 
         counter = test_utils.CallCounter(gae_search_services.delete_documents_from_index)
@@ -266,7 +278,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         index.put([search.Document(doc_id='doc', fields=[
             search.TextField(name='prop',value='val')
         ])])
-        exception = search.TransientError('oops')
+        exception = self._get_delete_error(1, 0)
         wrapped = test_utils.succeed_after_n_tries(search.Index.delete, 3, exception)
 
         counter = test_utils.CallCounter(gae_search_services.delete_documents_from_index)
@@ -280,20 +292,8 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         result = search.Index('my_index').get('doc')
         self.assertIsNone(result)
 
-    def _get_delete_error(self, num_res, transient=False):
-        """returns a DeleteError. with num_res results.
-           If transient is given, it should be an index in the
-           results array. The result at that index will have a transient
-           error code."""
-        non_trans_code = search.OperationResult.INVALID_REQUEST
-        trans_code = search.OperationResult.TRANSIENT_ERROR
-        r = [search.DeleteResult(code=non_trans_code) for i in range(num_res)]
-        if transient:
-            r[transient] = search.PutResult(code=trans_code)
-        return search.DeleteError('lol', r)
-
     def test_delete_error_with_transient_result(self):
-        error = self._get_delete_error(3, 1)
+        error = self._get_delete_error(3, transient=1)
         wrapped = test_utils.succeed_after_n_tries(search.Index.delete, 4, error)
         counter = test_utils.CallCounter(gae_search_services.delete_documents_from_index)
         index = search.Index('my_index')
@@ -306,10 +306,10 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
              self.swap(gae_search_services, 'delete_documents_from_index',
                        counter):
             gae_search_services.delete_documents_from_index(['d0','d1', 'd2'],
-                                                            'my_index', 5)
+                                                            'my_index', retries=5)
 
         self.assertEqual(counter.times_called, 5)
-        for i in xrange(1, 4):
+        for i in xrange(3):
             result = search.Index('my_index').get('doc' + str(i))
             self.assertIsNone(result)
 
@@ -482,16 +482,16 @@ class SearchQueryTests(test_utils.GenericTestBase):
 
     def test_use_custom_number_of_retries(self):
         exception = search.TransientError('oops')
-        wrapped = test_utils.succeed_after_n_tries(search.Index.search, 42, exception)
+        wrapped = test_utils.succeed_after_n_tries(search.Index.search, 3, exception)
 
         counter = test_utils.CallCounter(gae_search_services.search)
 
         with self.swap(search.Index, 'search', wrapped),\
              self.swap(gae_search_services, 'search', counter),\
              self.assertRaises(gae_search_services.SearchFailureError) as cm:
-            gae_search_services.search('query', 'my_index', retries=42)
+            gae_search_services.search('query', 'my_index', retries=3)
 
-        self.assertEqual(counter.times_called, 42)
+        self.assertEqual(counter.times_called, 3)
 
     def test_arguments_are_preserved_in_retries(self):
         for i in xrange(3):
