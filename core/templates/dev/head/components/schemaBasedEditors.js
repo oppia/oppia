@@ -163,8 +163,7 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
           // This dblclick handler is stripped in the initial HTML --> RTE conversion,
           // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
           domNode.ondblclick = function() {
-            el.addClass('insertionPoint');
-            $scope.getParamModal(paramName);
+            $scope.getParamModal(paramName, domNode);
           };
 
           return domNode;
@@ -209,7 +208,9 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
           }
         };
 
-        $scope.getParamModal = function(currentParamName) {
+        // If eltToReplace is null, a new element should be inserted at the
+        // current caret.
+        $scope.getParamModal = function(currentParamName, eltToReplace) {
           return $modal.open({
             templateUrl: 'modals/editParamName',
             backdrop: 'static',
@@ -242,17 +243,19 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
             ]
           }).result.then(function(paramName) {
             var el = $scope._createRteElement(paramName);
-            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            $(insertionPoint).replaceWith(el);
-            $(rteNode).wysiwyg('save');
-          }, function() {
-            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            if (insertionPoint.localName === 'span') {
-              insertionPoint.parentNode.removeChild(insertionPoint);
+            if (eltToReplace === null) {
+              var doc = $(rteNode).wysiwyg('document').get(0);
+              // For some reason, inserting the element directly removes its
+              // contenteditable="false" attribute.
+              $(rteNode).wysiwyg(
+                'insertHtml', '<span class="insertionPoint"></span>');
+              var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
+              $(insertionPoint).replaceWith(el);
             } else {
-              insertionPoint.className = insertionPoint.className.replace(
-                /\binsertionPoint\b/, '');
+              $(eltToReplace).replaceWith(el);
             }
+
+            $(rteNode).wysiwyg('save');
           });
         };
 
@@ -293,12 +296,9 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
           });
 
           $scope.addParameter = function() {
-            var doc = $(rteNode).wysiwyg('document').get(0);
-            $(rteNode).wysiwyg(
-              'insertHtml', '<span class="insertionPoint"></span>');
             var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
             if (allowedParamNames.length) {
-              $scope.getParamModal(allowedParamNames[0]);
+              $scope.getParamModal(allowedParamNames[0], null);
             }
           };
 
@@ -313,8 +313,7 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
             $scope.editorDoc.querySelectorAll('oppia-parameter'));
           elts.forEach(function(elt) {
             elt.ondblclick = function() {
-              $(elt).addClass('insertionPoint');
-              $scope.getParamModal($(elt).text());
+              $scope.getParamModal($(elt).text(), elt);
             };
           });
 
