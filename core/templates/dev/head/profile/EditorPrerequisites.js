@@ -65,6 +65,8 @@ function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaReque
 
     if (!username) {
       $scope.warningText = 'Please choose a non-empty username.';
+    } else if (username.indexOf(' ') !== -1) {
+      $scope.warningText = 'Please ensure that your username has no spaces.';
     } else if (username.length > 50) {
       $scope.warningText = 'A username can have at most 50 characters.';
     } else if (!alphanumeric.test(username)) {
