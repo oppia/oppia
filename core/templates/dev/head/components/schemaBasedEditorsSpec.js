@@ -31,7 +31,7 @@ describe('HTML to text', function() {
     ['abc  a', 'abc  a', 'abc  a'],
   ];
 
-  it('should convert HTML to raw text correctly', inject(function($filter) {
+  it('should convert HTML to and from raw text correctly', inject(function($filter) {
     htmlUnicodeHtmlPairings.forEach(function(pairing) {
       expect($filter('convertHtmlToUnicode')(pairing[0])).toEqual(pairing[1]);
       expect($filter('convertUnicodeToHtml')(pairing[1])).toEqual(pairing[2]);
@@ -40,10 +40,11 @@ describe('HTML to text', function() {
 
   var htmlUnicodeHtmlPairingsWithParams = [
     ['abc <oppia-parameter>name</oppia-parameter>  a', 'abc {{name}}  a', 'abc <oppia-parameter>name</oppia-parameter>  a'],
-    ['{{{<oppia-parameter>name</oppia-parameter>', '\\{\\{\\{{{name}}', '{{{<oppia-parameter>name</oppia-parameter>']
+    ['{{{<oppia-parameter>name</oppia-parameter>', '\\{\\{\\{{{name}}', '{{{<oppia-parameter>name</oppia-parameter>'],
+    ['\\{\\{', '\\\\{\\\\{', '\\{\\{']
   ];
 
-  it('should convert HTML-with-params to raw text correctly', inject(function($filter) {
+  it('should convert HTML-with-params to and from raw text correctly', inject(function($filter) {
     htmlUnicodeHtmlPairings.forEach(function(pairing) {
       expect($filter('convertHtmlWithParamsToUnicode')(pairing[0])).toEqual(pairing[1]);
       expect($filter('convertUnicodeWithParamsToHtml')(pairing[1])).toEqual(pairing[2]);
