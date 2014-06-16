@@ -4,7 +4,7 @@
       <span class="glyphicon glyphicon-remove" title="Remove Rule"></span>
     </button>
     <span ng-if="!isDefaultRule() && isEditable" class="pull-left">
-      <span class="glyphicon glyphicon-resize-vertical" style="font-size: 20px;"></span>
+      <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
     </span>
     <div class="oppia-rule-description-editor" ng-class="getEditableCssClassForRule()" ng-click="openRuleDescriptionEditorIfNotDefault()">
       <span ng-if="isRuleConfusing()" class="glyphicon glyphicon-warning-sign" title="Please add feedback for this rule, since it loops back to the same state. Otherwise, it may confuse readers."></span>

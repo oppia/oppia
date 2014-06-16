@@ -803,8 +803,10 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   margin-left: 5px;
 }
 
-.oppia-rule-swap-arrows {
-  margin-top: 10px;
+.oppia-rule-sort-arrows {
+  cursor: move;
+  font-size: 14px;
+  margin-top: 3px;
 }
 
 .oppia-rule-bubble {
