@@ -549,8 +549,8 @@ class ExplorationStatisticsHandler(EditorHandler):
             'num_completions': exploration_annotations.num_completions,
             'state_stats': stats_services.get_state_stats_for_exploration(
                 exploration_id),
-            'imp': stats_services.get_top_improvable_states(
-                [exploration_id], 10),
+            'improvements': stats_services.get_state_improvements(
+                exploration_id),
         })
 
 

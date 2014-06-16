@@ -21,25 +21,32 @@
 oppia.directive('barChart', [function() {
   return {
     restrict: 'E',
-    scope: {chartData: '=', chartColors: '='},
-    controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+    scope: {
+      // A read-only array representing the table of chart data.
+      data: '&',
+      // A read-only object containing several chart options. This object
+      // should have the following keys: chartAreaWidth, colors, height,
+      // legendPosition and width.
+      options: '&'
+    },
+    controller: ['$scope', '$element', function($scope, $element) {
+      if (!$.isArray($scope.data())) {
+        return;
+      }
+      var options = $scope.options();
       var chart = new google.visualization.BarChart($element[0]);
-      $scope.$watch($attrs.chartData, function(value) {
-        value = $scope.chartData;
-        if (!$.isArray(value)) {
-          return;
-        }
-        var data = google.visualization.arrayToDataTable(value);
-        var legendPosition = ($attrs.showLegend == 'false' ? 'none' : 'right');
-        chart.draw(data, {
-          colors: $scope.chartColors,
-          isStacked: true,
-          width: $attrs.width,
-          height: $attrs.height,
-          legend: {position: legendPosition},
-          hAxis: {gridlines: {color: 'transparent'}},
-          chartArea: {width: $attrs.chartAreaWidth, left:0}
-        });
+      chart.draw(
+        google.visualization.arrayToDataTable($scope.data()), {
+        chartArea: {
+          left: 0,
+          width: options.chartAreaWidth
+        },
+        colors: options.colors,
+        hAxis: {gridlines: {color: 'transparent'}},
+        height: options.height,
+        isStacked: true,
+        legend: {position:  options.legendPosition || 'none'},
+        width: options.width
       });
     }]
   };
