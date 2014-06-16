@@ -349,27 +349,27 @@ class UnresolvedAnswersTests(test_utils.GenericTestBase):
         'sid', 'NormalizedString')
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
-    def test_get_unresolved_answers(self):
+    def test_get_top_unresolved_answers(self):
         self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
+            stats_services.get_top_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
         stats_services.EventHandler.record_answer_submitted(
             'eid', 1, 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC, 'a1')
         self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
+            stats_services.get_top_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {'a1': 1})
 
         stats_services.EventHandler.record_answer_submitted(
             'eid', 1, 'sid', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC, 'a1')
         self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
+            stats_services.get_top_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {'a1': 2})
 
         stats_services.EventHandler.resolve_answers_for_default_rule(
             'eid', 'sid', self.SUBMIT_HANDLER, ['a1'])
         self.assertEquals(
-            stats_services.get_unresolved_answers_for_default_rule(
+            stats_services.get_top_unresolved_answers_for_default_rule(
                 'eid', 'sid'), {})
 
 
@@ -378,7 +378,7 @@ class EventLogEntryTests(test_utils.GenericTestBase):
 
     def test_create_events(self):
         """Basic test that makes sure there are no exceptions thrown."""
-        stats_services.EventHandler.start_exploration('eid', 2, 'state', 'session',
-            {}, feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.maybe_leave_exploration('eid', 2, 'state', 'session',
-            27.2, {}, feconf.PLAY_TYPE_NORMAL)
+        stats_services.EventHandler.start_exploration(
+            'eid', 2, 'state', 'session', {}, feconf.PLAY_TYPE_NORMAL)
+        stats_services.EventHandler.maybe_leave_exploration(
+            'eid', 2, 'state', 'session', 27.2, {}, feconf.PLAY_TYPE_NORMAL)

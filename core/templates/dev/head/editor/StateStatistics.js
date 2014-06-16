@@ -19,12 +19,12 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateStats(
+function StateStatistics(
     $scope, $log, warningsData, explorationData, editorContextService) {
 
   $scope.unresolvedAnswersList = [];
 
-  $scope.initStateStats = function(data) {
+  $scope.initStateStatistics = function(data) {
     $scope.unresolvedAnswers = data.unresolved_answers;
     $scope.generateUnresolvedAnswersList();
   };
@@ -32,7 +32,7 @@ function StateStats(
   $scope.$on('refreshStateEditor', function(evt) {
     $scope.stateName = editorContextService.getActiveStateName();
     var stateData = $scope.$parent.states[$scope.stateName];
-    $scope.initStateStats(stateData);
+    $scope.initStateStatistics(stateData);
   });
 
   $scope.generateUnresolvedAnswersList = function() {
@@ -52,5 +52,5 @@ function StateStats(
   };
 }
 
-StateStats.$inject = [
+StateStatistics.$inject = [
   '$scope', '$log', 'warningsData', 'explorationData', 'editorContextService'];

@@ -240,7 +240,7 @@ class ExplorationHandler(EditorHandler):
             state_frontend_dict = exploration.export_state_to_frontend_dict(
                 state_name)
             state_frontend_dict['unresolved_answers'] = (
-                stats_services.get_unresolved_answers_for_default_rule(
+                stats_services.get_top_unresolved_answers_for_default_rule(
                     exploration_id, state_name))
             states[state_name] = state_frontend_dict
 

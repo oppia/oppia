@@ -74,11 +74,14 @@ class EventHandler(object):
             params, play_type)
 
 
-def get_unresolved_answers_for_default_rule(exploration_id, state_name):
-    return stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_name, SUBMIT_HANDLER_NAME,
-        exp_domain.DEFAULT_RULESPEC_STR
-    ).answers
+def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
+    return {
+        answer: count for (answer, count) in
+        stats_domain.StateRuleAnswerLog.get(
+            exploration_id, state_name, SUBMIT_HANDLER_NAME,
+            exp_domain.DEFAULT_RULESPEC_STR
+        ).get_top_answers(10)
+    }
 
 
 def get_state_rules_stats(exploration_id, state_name):
