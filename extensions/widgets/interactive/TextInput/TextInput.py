@@ -43,15 +43,6 @@ class TextInput(widget_domain.BaseWidget):
             'value': 1
         },
         'obj_type': 'Int',
-    }, {
-        'name': 'columns',
-        'description': 'The number of columns for the text input field.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 60
-        },
-        'obj_type': 'Int',
     }]
 
     # Actions that the reader can perform on this widget which trigger a
