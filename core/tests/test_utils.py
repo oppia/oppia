@@ -24,6 +24,7 @@ current_user_services = models.Registry.import_current_user_services()
 import feconf
 import main
 
+import inspect
 import json
 
 
@@ -296,29 +297,47 @@ class Spy(object):
     """A wrapper to keep track of how often a function or method gets called."""
     def __init__(self, f):
         self._f = f
+        self._instance = None
         self._times_called = 0
+        self._exception = None
+        self._fail_times = 0
+        self._call_args = []
 
     @property
     def times_called(self):
         return self._times_called
 
+    @property
+    def call_args(self):
+        return self._call_args
+
     def __call__(self, *args, **kwargs):
+        argdict = inspect.getcallargs(self._f, *args, **kwargs)
+        self._call_args.append(argdict)
+
         self._times_called += 1
+        if self._times_called <= self._fail_times:
+            raise self._exception
+
+        if self._instance is not None:
+            args = [self._instance] + list(args)
+
         return self._f(*args, **kwargs)
 
+    def __get__(self, instance, owner):
+        # We have to implement __get__ because otherwise, we don't have a chance
+        # to the instance self._f was bound to.
+        if instance is None:
+            return self
 
-def succeed_after_n_tries(func, n, exception):
-    """Makes a function raise an exception for the first n times it's called,
-       then succeed."""
-    global count
-    count = 0
+        self._instance = instance
+        return self
 
-    def failing_function(*args, **kwargs):
-        global count
-        if count < n:
-            count += 1
-            raise exception
+    def succeed_after_n_tries(self, n, exception):
+        """Makes the function raise an exception for the first n times it is
+        called, then succeed."""
+        self._exception = exception
+        self._fail_times = n
+        assert isinstance(n, int)
 
-        return func(*args, **kwargs)
 
-    return failing_function
