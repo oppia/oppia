@@ -485,11 +485,13 @@ class LogicErrorCategory(BaseObject):
     edit_html_filename = 'logic_error_category_editor'
     edit_js_filename = 'LogicErrorCategoryEditor'
 
-    @classmethod
-    def normalize(cls, raw):
-        try:
-            assert raw in ['parsing', 'typing', 'line', 'layout', 'variables',
-                           'logic', 'target', 'mistake']
-        except Exception:
-            raise TypeError('Cannot convert to an error category.')
-        return raw
+    _schema = {
+        'type': 'unicode',
+        'post_normalizers': [{
+            'id': 'require_is_one_of',
+            'choices': [
+                'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
+                'target', 'mistake'
+            ]
+        }]
+    }
