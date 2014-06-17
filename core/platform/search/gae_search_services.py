@@ -203,7 +203,7 @@ def search(query_string, index, cursor=None, limit=20, sort='', ids_only=False,
         https://developers.google.com/appengine/docs/python/search/query_strings
       - index: the name of the index to search.
       - cursor: a cursor string, as returned by this function. Pass this in to
-        get the next 'page' of results. Leave blank to start at the beginning.
+        get the next 'page' of results. Leave as None to start at the beginning.
         This function returns a cursor that you can use to retrieve
         the next 'page' of search results.
       - sort: a string indicating how to sort results.
