@@ -807,6 +807,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   cursor: move;
   font-size: 14px;
   margin-top: 3px;
+  margin-left: 5px;
 }
 
 .oppia-rule-bubble {
