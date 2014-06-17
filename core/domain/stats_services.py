@@ -23,6 +23,7 @@ from core.domain import exp_services
 from core.domain import stats_domain
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+import feconf
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
@@ -74,6 +75,22 @@ class EventHandler(object):
             params, play_type)
 
 
+def get_exploration_visit_count(exploration_id):
+    """Returns the number of times this exploration has been accessed."""
+    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
+    exploration = exp_services.get_exploration_by_id(exploration_id)
+    return stats_domain.StateCounter.get(
+        exploration_id, exploration.init_state_name).first_entry_count
+
+
+def get_exploration_completed_count(exploration_id):
+    """Returns the number of times this exploration has been completed."""
+    # Note that the subsequent_entries_count for END_DEST should be 0.
+    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
+    return stats_domain.StateCounter.get(
+        exploration_id, feconf.END_DEST).first_entry_count
+
+
 def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
     return {
         answer: count for (answer, count) in
@@ -118,6 +135,11 @@ def get_state_rules_stats(exploration_id, state_name):
 
 
 def get_exploration_annotations(exp_id):
+    """Gets exploration annotations.
+
+    NB: Currently unused.
+    """
+    # TODO(sll): This should return a domain object, not an ndb.Model instance.
     exp_annotations = stats_models.ExplorationAnnotationsModel.get(
         exp_id, strict=False)
     if not exp_annotations:
