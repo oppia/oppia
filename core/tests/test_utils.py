@@ -292,18 +292,24 @@ else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
 
-class CallCounter(object):
+class Spy(object):
     """A wrapper to keep track of how often a function or method gets called."""
     def __init__(self, f):
         self._f = f
-        self.times_called = 0
+        self._times_called = 0
+
+    @property
+    def times_called(self):
+        return self._times_called
 
     def __call__(self, *args, **kwargs):
-        self.times_called += 1
+        self._times_called += 1
         return self._f(*args, **kwargs)
 
 
 def succeed_after_n_tries(func, n, exception):
+    """Makes a function raise an exception for the first n times it's called,
+       then succeed."""
     global count
     count = 0
 
