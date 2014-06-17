@@ -51,7 +51,8 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         # time at midnight.
         self.assertEqual(
             result_doc.field('datefield').value, 
-            datetime.datetime.combine(date=date, 
+            datetime.datetime.combine(
+                date=date,
                 time=datetime.datetime.min.time()))
         self.assertEqual(result_doc.field('datetimefield').value, dt)
 
@@ -113,8 +114,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_index_must_be_string(self):
         index = search.Index('test')
-        # I'm giving the str of the type of 'index' as a regexp to ensure that
-        # we mention the type the user passed in.
+        # Check that the error message mentions the type the user passed in.
         with self.assertRaisesRegexp(ValueError, str(type(index))):
             gae_search_services.add_documents_to_index(
                 {'id': 'one', 'key': 'value'}, index)
@@ -180,7 +180,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
     def test_arguments_are_preserved_in_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
-        exception = self._get_put_error(1,  0)
+        exception = self._get_put_error(1, 0)
         put_spy = test_utils.Spy(search.Index.put)
         put_spy.succeed_after_n_tries(3, exception)
 
@@ -255,7 +255,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def test_delete_single_document(self):
         doc = search.Document(doc_id='doc_id', fields=[
-            search.TextField(name='k',  value='v')])
+            search.TextField(name='k', value='v')])
         index = search.Index('my_index')
         index.put([doc])
         gae_search_services.delete_documents_from_index(['doc_id'], 'my_index')
@@ -275,7 +275,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
     def test_doc_ids_must_be_strings(self):
         with self.assertRaisesRegexp(ValueError, str(dict)):
             gae_search_services.delete_documents_from_index(
-                ['d1',  {'id': 'd2'}], 
+                ['d1', {'id': 'd2'}], 
                 'index')
 
     def test_index_must_be_string(self):
@@ -296,7 +296,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         return search.DeleteError('lol', results=results)
 
     def test_use_default_num_retries(self):
-        exception = self._get_delete_error(1,  0)
+        exception = self._get_delete_error(1, 0)
         delete_spy = test_utils.Spy(search.Index.delete)
         delete_spy.succeed_after_n_tries(
             gae_search_services.DEFAULT_NUM_RETRIES,
@@ -344,7 +344,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
     def test_arguments_are_preserved_in_retries(self):
         index = search.Index('index')
         index.put([search.Document(doc_id='doc', fields=[
-            search.TextField(name='prop',  value='val')
+            search.TextField(name='prop', value='val')
         ])])
         exception = self._get_delete_error(1, 0)
         delete_spy = test_utils.Spy(search.Index.delete)
@@ -399,14 +399,16 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         delete_spy.succeed_after_n_tries(1, error)
         delete_docs_spy = test_utils.Spy(
             gae_search_services.delete_documents_from_index)
-        delete_docs_ctx = self.swap(gae_search_services, 
-                              'delete_documents_from_index', delete_docs_spy)
+        delete_docs_ctx = self.swap(
+            gae_search_services,
+            'delete_documents_from_index',
+            delete_docs_spy)
         delete_ctx = self.swap(search.Index, 'delete', delete_spy)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with delete_docs_ctx, delete_ctx, assert_raises_ctx as e:
             gae_search_services.delete_documents_from_index(
-                ['a', 'b', 'c'],  
+                ['a', 'b', 'c'], 
                 'my_index')
 
         # assert that the method only gets called once, since the error is not
@@ -419,11 +421,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
     """Test searching for documents in an index."""
 
     def test_search_all_documents(self):
-        doc1 = search.Document(doc_id='doc1',  fields=[
+        doc1 = search.Document(doc_id='doc1', fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2',  fields=[
+        doc2 = search.Document(doc_id='doc2', fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3',  fields=[
+        doc3 = search.Document(doc_id='doc3', fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
@@ -433,11 +435,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn({'id': 'doc3', 'k': 'abc jkl ghi'}, result)
 
     def test_respect_search_query(self):
-        doc1 = search.Document(doc_id='doc1',  fields=[
+        doc1 = search.Document(doc_id='doc1', fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2',  fields=[
+        doc2 = search.Document(doc_id='doc2', fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3',  fields=[
+        doc3 = search.Document(doc_id='doc3', fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
@@ -447,11 +449,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn({'id': 'doc3', 'k': 'abc jkl ghi'}, result)
 
     def test_respect_limit(self):
-        doc1 = search.Document(doc_id='doc1',  fields=[
+        doc1 = search.Document(doc_id='doc1', fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2',  fields=[
+        doc2 = search.Document(doc_id='doc2', fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3',  fields=[
+        doc3 = search.Document(doc_id='doc3', fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
@@ -459,11 +461,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(len(result), 2)
 
     def test_use_cursor(self):
-        doc1 = search.Document(doc_id='doc1',  fields=[
+        doc1 = search.Document(doc_id='doc1', fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2',  fields=[
+        doc2 = search.Document(doc_id='doc2', fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3',  fields=[
+        doc3 = search.Document(doc_id='doc3', fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
@@ -478,11 +480,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn({'id': 'doc3', 'k': 'abc jkl ghi'}, result1 + result2)
 
     def test_ids_only(self):
-        doc1 = search.Document(doc_id='doc1',  fields=[
+        doc1 = search.Document(doc_id='doc1', fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2',  fields=[
+        doc2 = search.Document(doc_id='doc2', fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3',  fields=[
+        doc3 = search.Document(doc_id='doc3', fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
@@ -495,11 +497,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertIn({'id':'doc3'}, result)
 
     def test_cursor_is_none_if_no_more_results(self):
-        doc1 = search.Document(doc_id='doc1',  fields=[
+        doc1 = search.Document(doc_id='doc1', fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2',  fields=[
+        doc2 = search.Document(doc_id='doc2', fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3',  fields=[
+        doc3 = search.Document(doc_id='doc3', fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
