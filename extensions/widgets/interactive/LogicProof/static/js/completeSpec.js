@@ -61,17 +61,8 @@ describe('Full system', function() {
 
     expect(completeCheck('p', 'p', 'we know p')).toBeUndefined();
 
-    /* Removed for now because the template of the sixth line has been removed
-    expect(
-      completeCheck('~R, ~S', '~(R∨S)', [
-        'if R∨S',
-        '  if R',
-        '    from R and ~R have contradiction',
-        '  if S',
-        '    from S and ~S have contradiction',
-        '  we know R∨S and whichever is true we have contradiction',
-        'hence ~(R∨S)'].join('\n'))).toBeUndefined();
-    */
+    // TODO: add back additional tests from commit 2d9335019521 when speed 
+    // issues are fixed.
 
     expect(
       completeCheck('∀x.(A(x)∧B(x))', '(∀x.A(x))∧(∀x.B(x))', [
@@ -100,21 +91,6 @@ describe('Full system', function() {
     }).toThrow(
       'This line uses q, so you need to have an earlier line proving that q is true.');
 
-    /* Removed for now because the template of the seventh line has been removed
-    expect(function() {
-      completeCheck('~R, ~S', '~(R∨S)', [
-        'if R∨S',
-        '  if R',
-        '    from R and ~R have contradiction',
-        '  if A',
-        '    if S',
-        '      from S and ~S have contradiction',
-        '  we know R∨S and whichever is true we have contradiction',
-        'hence ~(R∨S)'].join('\n'))
-    }).toThrow('You proved that if S then contradiction follows, ' +
-      'but this was in the context of \'  if A\', which we have since left.');
-    */
-
     expect(function() {
       completeCheck('∀x.(A(x)∧B(x)), p', '(∀x.A(x))', [
         'given c',
@@ -137,7 +113,7 @@ describe('Full system', function() {
 
   });
 
-  it ('should check proofs reasonably quickly', function() {
+  it ('should check proofs in less than 10 seconds', function() {
     var startTime = new Date().getTime();
 
     expect(

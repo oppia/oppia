@@ -174,14 +174,9 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'T',
   variables: '',
   error: []
-}, /* Removed for now because the supporting logic mistakes are too slow. {
-  name: 'or_eliminate_false',
-  reader_view: 'We know R\u2228S and whichever is true we have contradiction',
-  antecedents: 'R\u2228S',
-  results: '',
-  variables: '',
-  error: []
-},*/ {
+  // TODO: add back or_eliminate_false template and associated logic mistakes
+  // from commit 2d9335019521 when speed issues are fixed.
+}, {
   name: 'or_introduce_left',
   reader_view: 'From R we have R\u2228S',
   antecedents: 'R',
@@ -455,27 +450,7 @@ var DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   name: 'or_inaccessible_antecedent_right',
   occurs: 'template(n)=\'or_eliminate\' \u2227 ~is_available_implication(element(\'S\',n),element(\'T\',n),n)',
   message: ['You proved that if {{element(\'S\',n)}} then {{element(\'T\',n)}}, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implication(element(\'S\',n),element(\'T\',n),i,j)}))}}\', which we have since left.']
-}/* Removed because they run too slow on long proofs, {
-  name: 'or_false_missing_antecedent_both',
-  occurs: 'template(n)=\'or_eliminate_false\' \u2227 (~\u2203j<n.\u2203i<j.yields_implies_false(element(\'R\',n),i,j)) \u2227 (~\u2203j<n.\u2203i<j.yields_implies_false(element(\'S\',n),i,j))',
-  message: ['To conclude that contradiction follows from {{entry(1,antecedents(n))}} you need to show that it follows if either {{element(\'R\',n)}} or {{element(\'S\',n)}} is true.']
-}, {
-  name: 'or_false_missing_antecedent_left',
-  occurs: 'template(n)=\'or_eliminate_false\' \u2227  ~\u2203j<n.\u2203i<j.yields_implies_false(element(\'R\',n),i,j)',
-  message: ['You have proved that contradiction follows if {{element(\'S\',n)}} holds; you need to also prove it follows if {{element(\'R\',n)}} holds.']
-}, {
-  name: 'or_false_missing_antecedent_right',
-  occurs: 'template(n)=\'or_eliminate_false\' \u2227 ~\u2203j<n.\u2203i<j.yields_implies_false(element(\'S\',n),i,j)',
-  message: ['You have proved that contradiction follows if {{element(\'R\',n)}} holds; you need to also prove it follows if {{element(\'S\',n)}} holds.']
-}, {
-  name: 'or_false_inaccessible_antecedent_left',
-  occurs: 'template(n)=\'or_eliminate_false\' \u2227 ~is_available_implies_false(element(\'R\',n),n)',
-  message: ['You proved that if {{element(\'R\',n)}} then contradiction follows, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implies_false(element(\'R\',n),i,j)}))}}\', which we have since left.']
-}, {
-  name: 'or_false_inaccessible_antecedent_right',
-  occurs: 'template(n)=\'or_eliminate_false\' \u2227 ~is_available_implies_false(element(\'S\',n),n)',
-  message: ['You proved that if {{element(\'S\',n)}} then contradiction follows, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implies_false(element(\'S\',n),i,j)}))}}\', which we have since left.']
-}*/];
+}];
 
 var DEFAULT_TARGET_MISTAKE_STRINGS = [{
   name: 'last_line_indented_assumption',
