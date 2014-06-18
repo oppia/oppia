@@ -17,7 +17,6 @@
 __author__ = 'Jacob Davis'
 
 from core.domain import widget_domain
-from extensions.objects.models import objects
 from extensions.value_generators.models import generators
 
 

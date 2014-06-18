@@ -6,29 +6,21 @@
 <script src="/extensions/widgets/interactive/LogicProof/static/js/generatedParser.js"></script>
 <script src="/extensions/widgets/interactive/LogicProof/static/js/conversion.js"></script>
 
-<style>
-  td {
-    padding:5px;
-  }
-  .mistake-message {
-    color:red;
-  }
-  .erroneous-line {
-    font-weight:bold;
-  }
-</style>
-
-
+<!-- TODO(sll): Find a way to move this to the HTML. -->
 <script type="text/ng-template" id="modals/logicProofHelp">
   <div class="modal-header">
     Possible line layouts
   </div>
   <div class="modal-body">
-
+    <style>
+      td {
+        padding: 5px;
+      }
+    </style>
+    <p><i>Just use the lines you have seen so far.</i></p>
     <p>
       <div class="row">
         <div class="col-xs-6">
-          <p><i>Just use the lines you have seen so far</i></p>
           From R∧S we have R<br>
           From R∧S we have S<br>
           From R and S we have R∧S<br><br>
@@ -62,7 +54,7 @@
           Take x<br><br>
 
           <i>An indent is two spaces at the start of the line</i><br><br>
- 
+
           <table class="table-bordered">
             <tr>
               <td><i>Type</i></td>
