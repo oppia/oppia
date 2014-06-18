@@ -122,3 +122,23 @@ class EditorPrerequisitesHandler(base.BaseHandler):
             raise self.InvalidInputException(e)
 
         self.render_json({})
+
+
+class UsernameCheckHandler(base.BaseHandler):
+    """Checks whether a username has already been taken."""
+
+    PAGE_NAME_FOR_CSRF = 'editor_prerequisites_page'
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        username = self.payload.get('username')
+        try:
+            user_services.UserSettings.require_valid_username(username)
+        except utils.ValidationError as e:
+            raise self.InvalidInputException(e)
+
+        username_is_taken = user_services.is_username_taken(username)
+        self.render_json({
+            'username_is_taken': username_is_taken,
+        })

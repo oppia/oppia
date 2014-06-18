@@ -113,9 +113,8 @@ function ExplorationEditor(
       oppiaRequestCreator.createRequest({
         change_list: changeListService.getChangeList(),
         version: explorationData.data.version
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .success(function(data) {
+      })
+    ).success(function(data) {
       if (data.error) {
         warningsData.addWarning(data.error);
         return;
@@ -192,7 +191,15 @@ function ExplorationEditor(
               'category': 'Category',
               'objective': 'Objective',
               'param_specs': 'Parameter specifications',
-              'param_changes': 'Initial parameter changes'
+              'param_changes': 'Initial parameter changes',
+              'default_skin_id': 'Default skin'
+            };
+
+            var EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS = {
+              'title': true,
+              'category': true,
+              'objective': true,
+              'default_skin_id': true
             };
 
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
@@ -225,7 +232,7 @@ function ExplorationEditor(
             };
 
             $scope.formatExplorationPropertyChange = function(propertyName, changeInfo) {
-              if (['title', 'category', 'objective'].indexOf(propertyName) !== -1) {
+              if (EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS[propertyName]) {
                 return $scope._getLongFormPropertyChange(
                   $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES[propertyName],
                   changeInfo);
@@ -412,46 +419,104 @@ function ExplorationEditor(
     $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
   };
 
-  $scope.getExplorationWarningsList = function() {
-    var warningsList = [];
-    if (!$scope.isEndStateReachable()) {
-      warningsList.push('The END state is unreachable.');
+  // Given an initial node name, a list of node names, and a list of edges
+  // (each of which is an object with keys 'source' and 'target', and values
+  // equal to the respective node names), returns a list of names of all nodes
+  // which are unreachable from the initial node.
+  $scope._getUnreachableNodeNames = function(initNodeName, nodes, edges) {
+    var queue = [initNodeName];
+    var seen = {};
+    seen[initNodeName] = true;
+    while (queue.length > 0) {
+      var currNodeName = queue.shift();
+      edges.forEach(function(edge) {
+        if (edge.source === currNodeName && !seen.hasOwnProperty(edge.target)) {
+          seen[edge.target] = true;
+          queue.push(edge.target);
+        }
+      });
     }
-    if (!explorationObjectiveService.displayed) {
-      warningsList.push('An objective should be specified.');
-    }
-    return warningsList;
+
+    return nodes.filter(function(node) {
+      return !seen.hasOwnProperty(node);
+    });
   };
 
-  $scope.isEndStateReachable = function() {
-    if (!$scope.graphData) {
-      return true;
-    }
+  // Given an array of objects with two keys 'source' and 'target', returns
+  // an array with the same objects but with the values of 'source' and 'target'
+  // switched. (The objects represent edges in a graph, and this operation
+  // amounts to reversing all the edges.)
+  $scope._getReversedLinks = function(links) {
+    return links.map(function(link) {
+      return {
+        source: link.target,
+        target: link.source
+      };
+    });
+  };
 
-    var queue = [$scope.graphData.initStateName];
-    var seen = [$scope.graphData.initStateName];
-    var reachedEnd = false;
-    while (queue.length > 0) {
-      var currNodeName = queue[0];
-      queue.shift();
+  // Returns a list of states which have rules that have no feedback and that
+  // point back to the same state.
+  $scope._getStatesWithInsufficientFeedback = function() {
+    var problematicStates = [];
+    for (var stateName in $scope.states) {
+      var handlers = $scope.states[stateName].widget.handlers;
+      var isProblematic = handlers.some(function(handler) {
+        return handler.rule_specs.some(function(ruleSpec) {
+          return (
+            ruleSpec.dest === stateName &&
+            !ruleSpec.feedback.some(function(feedbackItem) {
+              return feedbackItem.length > 0;
+            })
+          );
+        });
+      });
 
-      if (currNodeName === $scope.graphData.finalStateName) {
-        reachedEnd = true;
-        break;
+      if (isProblematic) {
+        problematicStates.push(stateName);
       }
+    }
+    return problematicStates;
+  };
 
-      for (var i = 0; i < $scope.graphData.links.length; i++) {
-        if ($scope.graphData.links[i].source === currNodeName &&
-            seen.indexOf($scope.graphData.links[i].target) === -1) {
-          queue.push($scope.graphData.links[i].target);
-          seen.push($scope.graphData.links[i].target);
+  $scope.updateWarningsList = function() {
+    $scope.refreshGraph();
+    $scope.warningsList = [];
+
+    if ($scope.graphData) {
+      var unreachableStateNames = $scope._getUnreachableNodeNames(
+        $scope.graphData.initStateName, $scope.graphData.nodes,
+        $scope.graphData.links);
+      if (unreachableStateNames.length) {
+        $scope.warningsList.push(
+          'The following state(s) are unreachable: ' +
+          unreachableStateNames.join(', ') + '.');
+      } else {
+        // Only perform this check if all states are reachable.
+        var deadEndStates = $scope._getUnreachableNodeNames(
+          $scope.graphData.finalStateName, $scope.graphData.nodes,
+          $scope._getReversedLinks($scope.graphData.links));
+        if (deadEndStates.length) {
+          $scope.warningsList.push(
+            'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
         }
       }
     }
 
-    return reachedEnd;
+    var statesWithInsufficientFeedback = $scope._getStatesWithInsufficientFeedback();
+    if (statesWithInsufficientFeedback.length) {
+      $scope.warningsList.push(
+        'The following states need more feedback: ' +
+        statesWithInsufficientFeedback.join(', ') + '.');
+    }
+
+    if (!explorationObjectiveService.displayed) {
+      $scope.warningsList.push('An objective should be specified.');
+    }
   };
 
+  $scope.warningsList = [];
+  changeListService.setPostChangeHook($scope.updateWarningsList);
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
@@ -474,7 +539,6 @@ function ExplorationEditor(
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
-  $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
   $scope.explorationSnapshots = null;
@@ -555,55 +619,14 @@ function ExplorationEditor(
         oppiaRequestCreator.createRequest({
           current_version: explorationData.data.version,
           revert_to_version: version
-        }),
-        {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-      .success(function(response) {
+        })
+      ).success(function(response) {
         location.reload();
       }).error(function(data) {
         $log.error(data);
         warningsData.addWarning(
           data.error || 'Error communicating with server.');
       });
-    });
-  };
-
-  $scope.refreshExplorationStatistics = function() {
-    $http.get($scope.explorationStatisticsUrl).then(function(response) {
-      var data = response.data;
-      $scope.stats = {
-        'numVisits': data.num_visits,
-        'numCompletions': data.num_completions,
-        'stateStats': data.state_stats,
-        'imp': data.imp
-      };
-
-      $scope.chartData = [
-        ['', 'Completions', 'Non-completions'],
-        ['', data.num_completions, data.num_visits - data.num_completions]
-      ];
-      $scope.chartColors = ['green', 'firebrick'];
-
-      $scope.statsGraphOpacities = {
-        legend: 'Students entering state'
-      };
-      for (var stateName in $scope.states) {
-        var visits = $scope.stats.stateStats[stateName].firstEntryCount;
-        $scope.statsGraphOpacities[stateName] = Math.max(
-            visits / $scope.stats.numVisits, 0.05);
-      }
-      $scope.statsGraphOpacities[END_DEST] = Math.max(
-          $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
-
-      $scope.highlightStates = {};
-
-      for (var j = 0; j < data.imp.length; j++) {
-        if (data.imp[j].type == 'default') {
-          $scope.highlightStates[data.imp[j].state_name] = 'Needs more feedback';
-        }
-        if (data.imp[j].type == 'incomplete') {
-          $scope.highlightStates[data.imp[j].state_name] = 'May be confusing';
-        }
-      }
     });
   };
 
@@ -643,6 +666,8 @@ function ExplorationEditor(
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
       $scope.states = angular.copy(data.states);
+      $scope.defaultSkinId = data.default_skin_id;
+      $scope.allSkinIds = data.all_skin_ids;
 
       $scope.paramSpecs = data.param_specs || {};
 
@@ -669,9 +694,11 @@ function ExplorationEditor(
         $scope.doFullRefresh = false;
       }
 
+      $scope.updateWarningsList();
+
       $rootScope.loadingMessage = '';
 
-      $scope.refreshExplorationStatistics();
+      $scope.$broadcast('refreshStatisticsTab');
 
       var stateName = editorContextService.getActiveStateName();
       var stateData = $scope.states[stateName];
@@ -812,9 +839,8 @@ function ExplorationEditor(
       $scope.newStateTemplateUrl,
       oppiaRequestCreator.createRequest({
         state_name: newStateName
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}})
-    .success(function(data) {
+      })
+    ).success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
       changeListService.addState(newStateName);

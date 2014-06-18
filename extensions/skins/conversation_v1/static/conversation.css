@@ -1,0 +1,92 @@
+/*
+  Copyright 2014 The Oppia Authors. All Rights Reserved.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+*/
+
+/* Additional CSS for the conversation_v1 skin. */
+@media (max-width: 500px) {
+  .conversation-skin-feedback-button {
+    display: none;
+  }
+}
+
+.conversation-skin-feedback-button {
+  transition-property: all;
+  transition-duration: 0.2s;
+  align-content: center;
+  background: green;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  bottom: 10px;
+  box-shadow: -5px 5px 3px #CCCCCC;
+  color: white;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: bold;
+  height: 90px;
+  left: 0;
+  opacity: 0.75;
+  position: fixed;
+  top: 50%;
+  width: 100px;
+
+  -moz-transform-origin: 25px 75px;
+  -ms-transform-origin: 25px 75px;
+  -o-transform-origin: 25px 75px;
+  -webkit-transform-origin: 25px 75px;
+  transform-origin: 25px 75px;
+
+  -moz-transform: rotate(-90deg);
+  -ms-transform: rotate(-90deg);
+  -o-transform: rotate(-90deg);
+  -webkit-transform: rotate(-90deg);
+  transform: rotate(-90deg);
+}
+.conversation-skin-feedback-button:hover {
+  opacity: 1;
+  -moz-transform-origin: 35px 65px;
+  -ms-transform-origin: 35px 65px;
+  -o-transform-origin: 35px 65px;
+  -webkit-transform-origin: 35px 65px;
+  transform-origin: 35px 65px;
+}
+
+.conversation-skin-exploration-header {
+  padding-left: 7px;
+}
+.conversation-skin-exploration-header-sublink {
+  padding-top: 5px;
+}
+
+.conversation-skin-iframe-container {
+  -webkit-overflow-scrolling: touch;
+}
+
+.conversation-skin-conversation-log {
+  margin-top: 30px;
+  opacity: 0.7;
+}
+
+.conversation-skin-response {
+  background: rgba(0,0,0,0.04);
+  border-radius: 6px;
+  margin-top: 30px;
+  padding: 10px 10px;
+}
+.conversation-skin-response-finished {
+  background: rgb(228,255,228);
+  border-radius: 6px;
+  margin-top: 30px;
+  padding: 10px 10px;
+}

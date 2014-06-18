@@ -18,7 +18,62 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ExplorationStatistics($scope, $http, $location, $modal, warningsData, activeInputData) {
+function ExplorationStatistics($scope, $http, $location, $modal, warningsData) {
+  $scope.COMPLETION_RATE_CHART_OPTIONS = {
+    chartAreaWidth: 300,
+    colors: ['green', 'firebrick'],
+    height: 100,
+    legendPosition: 'right',
+    width: 500
+  };
+
+  $scope.hasTabLoaded = false;
+  $scope.$on('refreshStatisticsTab', function(evt) {
+    $scope.refreshExplorationStatistics();
+  });
+
+  $scope.hasExplorationBeenVisited = false;
+  $scope.refreshExplorationStatistics = function() {
+    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.$parent.explorationId;
+    $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      var data = response.data;
+      var numVisits = data.num_visits;
+      var numCompletions = data.num_completions;
+      var improvements = data.improvements;
+      $scope.stateStats = data.state_stats;
+
+      if (numVisits > 0) {
+        $scope.hasExplorationBeenVisited = true;
+      }
+
+      $scope.chartData = [
+        ['', 'Completions', 'Non-completions'],
+        ['', numCompletions, numVisits - numCompletions]
+      ];
+
+      $scope.statsGraphOpacities = {
+        legend: 'Students entering state'
+      };
+      for (var stateName in $scope.states) {
+        var visits = $scope.stateStats[stateName].firstEntryCount;
+        $scope.statsGraphOpacities[stateName] = Math.max(
+          visits / numVisits, 0.05);
+      }
+      $scope.statsGraphOpacities[END_DEST] = Math.max(
+        numCompletions / numVisits, 0.05);
+
+      $scope.highlightStates = {};
+      improvements.forEach(function(impItem) {
+        if (impItem.type == 'default') {
+          $scope.highlightStates[impItem.state_name] = 'Needs more feedback';
+        } else if (impItem.type == 'incomplete') {
+          $scope.highlightStates[impItem.state_name] = 'May be confusing';
+        }
+      });
+
+      $scope.hasTabLoaded = true;
+    });
+  };
 
   $scope.onClickStateInStatsGraph = function(stateName) {
     if (stateName !== END_DEST) {
@@ -30,11 +85,9 @@ function ExplorationStatistics($scope, $http, $location, $modal, warningsData, a
     warningsData.clear();
 
     $http.get(
-        '/createhandler/state_rules_stats/' + $scope.explorationId + '/' + encodeURIComponent(stateName)
+      '/createhandler/state_rules_stats/' + $scope.explorationId + '/' + encodeURIComponent(stateName)
     ).then(function(response) {
-      var rulesStats = response.data.rules_stats;
-
-      var modalInstance = $modal.open({
+      $modal.open({
         templateUrl: 'modals/stateStats',
         backdrop: 'static',
         resolve: {
@@ -42,66 +95,63 @@ function ExplorationStatistics($scope, $http, $location, $modal, warningsData, a
             return stateName;
           },
           stateStats: function() {
-            return $scope.stats.stateStats[stateName];
+            return $scope.stateStats[stateName];
           },
           improvementType: function() {
             return improvementType;
           },
           rulesStats: function() {
-            return rulesStats;
+            return response.data.rules_stats;
           }
         },
         controller: [
-            '$scope', '$modalInstance', 'editabilityService', 'stateName',
-            'stateStats', 'improvementType', 'rulesStats', function(
-               $scope, $modalInstance, editabilityService, stateName,
-               stateStats, improvementType, rulesStats) {
-            $scope.editabilityService = editabilityService;
-            $scope.stateName = stateName;
-            $scope.stateStats = stateStats;
-            $scope.improvementType = improvementType;
-            $scope.rulesStats = rulesStats;
+          '$scope', '$modalInstance', 'editabilityService', 'stateName',
+          'stateStats', 'improvementType', 'rulesStats', function(
+             $scope, $modalInstance, editabilityService, stateName,
+             stateStats, improvementType, rulesStats) {
+          $scope.editabilityService = editabilityService;
+          $scope.stateName = stateName;
+          $scope.stateStats = stateStats;
+          $scope.improvementType = improvementType;
+          $scope.rulesStats = rulesStats;
 
-            $scope.getNumTimesString = function(numberOfTimes) {
-              var suffix = (numberOfTimes == 1 ? ' time' : ' times');
-              return numberOfTimes + suffix;
-            };
+          $scope.getNumTimesString = function(numberOfTimes) {
+            var suffix = (numberOfTimes == 1 ? ' time' : ' times');
+            return numberOfTimes + suffix;
+          };
 
-            $scope.getHumanReadableRuleName = function(ruleName) {
-              return ruleName.substring('submit.'.length);
-            };
+          $scope.getHumanReadableRuleName = function(ruleName) {
+            return ruleName.substring('submit.'.length);
+          };
 
-            $scope.isEmpty = function(obj) {
-              for (var property in obj) {
-                if (obj.hasOwnProperty(property)) {
-                  return false;
-                }
+          $scope.isEmpty = function(obj) {
+            for (var property in obj) {
+              if (obj.hasOwnProperty(property)) {
+                return false;
               }
-              return true;
-            };
+            }
+            return true;
+          };
 
-            $scope.doesAnswerExist = function() {
-              for (var rule in $scope.rulesStats) {
-                if ($scope.rulesStats[rule].answers.length > 0) {
-                  return true;
-                }
+          $scope.doesAnswerExist = function() {
+            for (var rule in $scope.rulesStats) {
+              if ($scope.rulesStats[rule].answers.length > 0) {
+                return true;
               }
-              return false;
-            };
+            }
+            return false;
+          };
 
-            $scope.gotoStateEditor = function(locationHash) {
-              $modalInstance.close({});
-            };
+          $scope.gotoStateEditor = function(locationHash) {
+            $modalInstance.close({});
+          };
 
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-              warningsData.clear();
-            };
-          }
-        ]
-      });
-
-      modalInstance.result.then(function(result) {
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }]
+      }).result.then(function(result) {
         $scope.$parent.showStateEditor(stateName);
       });
     });
@@ -112,5 +162,5 @@ function ExplorationStatistics($scope, $http, $location, $modal, warningsData, a
  * Injects dependencies in a way that is preserved by minification.
  */
 ExplorationStatistics.$inject = [
-  '$scope', '$http', '$location', '$modal', 'warningsData', 'activeInputData'
+  '$scope', '$http', '$location', '$modal', 'warningsData'
 ];

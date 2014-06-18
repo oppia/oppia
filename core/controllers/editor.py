@@ -27,6 +27,7 @@ from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.domain import obj_services
+from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
@@ -216,6 +217,7 @@ class ExplorationPage(EditorHandler):
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
             'widget_dependencies': jinja2.utils.Markup(
                 widget_dependencies),
+            'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 
         self.render_template('editor/exploration_editor.html')
@@ -238,11 +240,11 @@ class ExplorationHandler(EditorHandler):
             state_frontend_dict = exploration.export_state_to_frontend_dict(
                 state_name)
             state_frontend_dict['unresolved_answers'] = (
-                stats_services.get_unresolved_answers_for_default_rule(
+                stats_services.get_top_unresolved_answers_for_default_rule(
                     exploration_id, state_name))
             states[state_name] = state_frontend_dict
 
-        return {
+        editor_dict = {
             'exploration_id': exploration_id,
             'init_state_name': exploration.init_state_name,
             'category': exploration.category,
@@ -255,6 +257,13 @@ class ExplorationHandler(EditorHandler):
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
         }
+
+        if feconf.SHOW_SKIN_CHOOSER:
+            editor_dict['all_skin_ids'] = (
+                skins_services.Registry.get_all_skin_ids())
+            editor_dict['default_skin_id'] = exploration.default_skin
+
+        return editor_dict
 
     def get(self, exploration_id):
         """Gets the data for the exploration overview page."""
@@ -541,8 +550,8 @@ class ExplorationStatisticsHandler(EditorHandler):
                 exploration_id),
             'state_stats': stats_services.get_state_stats_for_exploration(
                 exploration_id),
-            'imp': stats_services.get_top_improvable_states(
-                [exploration_id], 10),
+            'improvements': stats_services.get_state_improvements(
+                exploration_id),
         })
 
 

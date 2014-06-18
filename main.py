@@ -196,6 +196,9 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
         profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
+    get_redirect_route(
+        r'%s' % feconf.USERNAME_CHECK_DATA_URL,
+        profile.UsernameCheckHandler, 'username_check_handler'),
 
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),
@@ -216,6 +219,9 @@ urls = [
     get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
+    get_redirect_route(
+        r'/explorehandler/leave/<exploration_id>/<escaped_state_name>',
+        reader.ReaderLeaveHandler, 'reader_leave_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

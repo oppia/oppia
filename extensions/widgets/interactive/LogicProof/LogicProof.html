@@ -1,0 +1,11 @@
+<link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
+
+<div>
+  <[questionString]>
+  <div ui-codemirror="{onLoad: codeEditor}">
+    <textarea ng-trim="false" rows="10"></textarea>
+  </div>
+  <button ng-click="showHelp()">Possible lines</button>
+  <button ng-click="submitProof()">Submit</button>
+  <p class="mistake-message"> <[proofError]>  </p>
+</div>

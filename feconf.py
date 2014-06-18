@@ -93,12 +93,12 @@ part of an exploration) whose licensing is not compatible with CC-BY-SA v4.0.
 
 # Static file url to path mapping
 PATH_MAP = {
-    '/css': 'core/templates/dev/head/css',
-    '/extensions/widgets': 'extensions/widgets',
-    '/favicon.ico': 'static/images/favicon.ico',
-    '/images': 'static/images',
-    '/lib/static': 'lib/static',
-    '/third_party/static': 'third_party/static',
+    '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
+    '/extensions/widgets': os.path.join('extensions', 'widgets'),
+    '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
+    '/images': os.path.join('static', 'images'),
+    '/lib/static': os.path.join('lib', 'static'),
+    '/third_party/static': os.path.join('third_party', 'static'),
 }
 
 # Format string for displaying datetimes in the UI.
@@ -147,54 +147,57 @@ ABOUT_PAGES = [{
 ALLOWED_WIDGETS = {
     NONINTERACTIVE_PREFIX: {
         'Collapsible': {
-            'dir': 'extensions/widgets/noninteractive/Collapsible'
+            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Collapsible')
         },
         'Image': {
-            'dir': 'extensions/widgets/noninteractive/Image'
+            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Image')
         },
         'Link': {
-            'dir': 'extensions/widgets/noninteractive/Link'
+            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Link')
         },
         'Math': {
-            'dir': 'extensions/widgets/noninteractive/Math'
+            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Math')
         },
         'Tabs': {
-            'dir': 'extensions/widgets/noninteractive/Tabs'
+            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Tabs')
         },
         'Video': {
-            'dir': 'extensions/widgets/noninteractive/Video'
+            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Video')
         },
     },
     INTERACTIVE_PREFIX: {
         'Continue': {
-            'dir': 'extensions/widgets/interactive/Continue'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'Continue')
         },
         'MultipleChoiceInput': {
-            'dir': 'extensions/widgets/interactive/MultipleChoiceInput'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MultipleChoiceInput')
         },
         'NumericInput': {
-            'dir': 'extensions/widgets/interactive/NumericInput'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'NumericInput')
         },
         'TextInput': {
-            'dir': 'extensions/widgets/interactive/TextInput'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'TextInput')
         },
         'InteractiveMap': {
-            'dir': 'extensions/widgets/interactive/InteractiveMap'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'InteractiveMap')
         },
         'SetInput': {
-            'dir': 'extensions/widgets/interactive/SetInput'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'SetInput')
         },
         'FileReadInput': {
-            'dir': 'extensions/widgets/interactive/FileReadInput'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'FileReadInput')
         },
         'TarFileReadInput': {
-            'dir': 'extensions/widgets/interactive/TarFileReadInput'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'TarFileReadInput')
         },
         'CodeRepl': {
-            'dir': 'extensions/widgets/interactive/CodeRepl'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'CodeRepl')
+        },
+        'LogicProof': {
+            'dir': 'extensions/widgets/interactive/LogicProof'
         },
         'MusicNotesInput': {
-            'dir': 'extensions/widgets/interactive/MusicNotesInput'
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MusicNotesInput')
         },
     }
 }
@@ -247,6 +250,7 @@ PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
+USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 SPLASH_PAGE_URL = '/'
 
 NAV_MODE_ABOUT = 'about'
@@ -257,3 +261,15 @@ NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_LEARN = 'learn'
 NAV_MODE_PLAYTEST = 'playtest'
 NAV_MODE_PROFILE = 'profile'
+
+# Event types
+EVENT_TYPE_LEAVE = 'leave'
+EVENT_TYPE_START = 'start'
+EVENT_TYPE_COMPLETE = 'complete'
+
+# Play type constants
+PLAY_TYPE_PLAYTEST = 'playtest'
+PLAY_TYPE_NORMAL = 'normal'
+
+# Unlaunched feature.
+SHOW_SKIN_CHOOSER = False

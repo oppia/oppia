@@ -82,32 +82,30 @@ describe('Editor prerequisites controller', function() {
     });
 
     it('should show warning if no username provided', function($http) {
-      scope.submitPrerequisitesForm(true, '');
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'Please choose a non-empty username.');
+      scope.updateWarningText('');
+      expect(scope.warningText).toEqual('Please choose a non-empty username.');
 
-      scope.submitPrerequisitesForm(true, false);
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
-        'Please choose a non-empty username.');
+      scope.submitPrerequisitesForm(false);
+      expect(scope.warningText).toEqual('Please choose a non-empty username.');
     });
 
     it('should show warning if username is too long', function($http) {
-      scope.submitPrerequisitesForm(true, 'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+      scope.updateWarningText(
+        'abcdefghijklmnopqrstuvwxyzyxwvutsrqponmlkjihgfedcba');
+      expect(scope.warningText).toEqual(
         'A username can have at most 50 characters.');
     });
 
     it('should show warning if username has non-alphanumeric characters', function($http) {
-      scope.submitPrerequisitesForm(true, 'a-a');
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+      scope.updateWarningText('a-a');
+      expect(scope.warningText).toEqual(
         'Usernames can only have alphanumeric characters.');
     });
 
     it('should show warning if username has \'admin\' in it', function($http) {
-      scope.submitPrerequisitesForm(true, 'administrator');
-      expect(mockWarningsData.addWarning).toHaveBeenCalledWith(
+      scope.updateWarningText('administrator');
+      expect(scope.warningText).toEqual(
         'User names with \'admin\' are reserved.');
     });
-
   });
 });

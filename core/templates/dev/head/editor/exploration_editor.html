@@ -245,7 +245,7 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row oppia-exploration-editor-top-row">
         <div class="col-lg-5 col-md-5 col-sm-5">
           <div>
             <span class="oppia-page-title">
@@ -285,7 +285,7 @@
 
                 {% if can_publish %}
                   <span ng-if="explorationRightsService.isPrivate()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !getExplorationWarningsList().length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || getExplorationWarningsList().length">
+                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length">
                       publish
                     </button>
                     <img class="oppia-help" src="/images/help.png"
@@ -330,7 +330,7 @@
             <div class="col-lg-6 col-md-6 col-sm-6">
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6">
-              <div ng-show="getExplorationWarningsList().length" ng-click="toggleExplorationWarningVisibility()">
+              <div ng-show="warningsList.length" ng-click="toggleExplorationWarningVisibility()">
                 <div class="alert alert-warning pull-right" style="padding: 2px 5px; margin-bottom: 2px; cursor: pointer; position: absolute; opacity: 1; z-index: 5;">
                   <div>
                     <span ng-if="!areExplorationWarningsVisible" style="color: black;">
@@ -340,11 +340,11 @@
                       <span class="glyphicon glyphicon-minus-sign"></span>
                     </span>
                     <span class="glyphicon glyphicon-warning-sign"></span>
-                    This exploration has <strong><[getExplorationWarningsList().length]></strong> warning(s).
+                    This exploration has <strong><[warningsList.length]></strong> warning(s).
                   </div>
                   <div collapse="!areExplorationWarningsVisible">
                     <ul>
-                      <li ng-repeat="warningText in getExplorationWarningsList() track by $index">
+                      <li ng-repeat="warningText in warningsList track by $index">
                         <[warningText]>
                       </li>
                     </ul>
@@ -366,7 +366,7 @@
               <div class="col-lg-3 col-md-3 col-sm-3">
                 {% include 'editor/exploration_graph.html' %}
                 <hr class="oppia-graph-and-stats-separator">
-                {% include 'editor/state_stats.html' %}
+                {% include 'editor/state_statistics.html' %}
               </div>
             </div>
           </tab>
@@ -415,7 +415,7 @@
     {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
-    {{ include_js_file('editor/StateStats.js') }}
+    {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/InteractiveWidgetEditor.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}

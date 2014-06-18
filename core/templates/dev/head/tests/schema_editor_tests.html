@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Tests for the Schema Editor
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="container" ng-controller="SchemaEditorTests">
+    <h3>Test page for object editors</h3>
+
+    <h4>Editors sharing a common value</h4>
+    <table class="table">
+      <tr>
+        <th>Form name</th>
+        <th>Read-only version</th>
+        <th>Editable version</th>
+      </tr>
+      <tr>
+        <td class="col-sm-4 col-md-4 col-lg-4">
+          <h5>Unicode form (copy 1)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        </td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
+          </schema-based-editor>
+        </td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
+          </schema-based-editor>
+        </td>
+      </tr>
+      <tr>
+        <td class="col-sm-4 col-md-4 col-lg-4">
+          <h5>Unicode form (copy 2)</h5>
+          <em>Saved value:</em> <[unicodeForm.value]>
+        <td class="col-sm-4 col-md-4 col-lg-4">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
+          </schema-based-editor>
+        </td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
+          </schema-based-editor>
+        </td>
+      </tr>
+    </table>
+
+    <div ng-repeat="formset in formsets">
+      <h4><[formset.name]></h4>
+      <table class="table">
+        <tr>
+          <th>Form name</th>
+          <th>Read-only version</th>
+          <th>Editable version</th>
+        </tr>
+        <tr ng-repeat="form in formset.forms">
+          <td class="col-sm-4 col-md-4 col-lg-4">
+            <h5><[form.name]></h5>
+            <em>Saved value:</em> <[form.value]>
+          </td>
+          <td class="col-sm-4 col-md-4 col-lg-4">
+            <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="false">
+            </schema-based-editor>
+          </td>
+          <td class="col-sm-4 col-md-4 col-lg-4">
+            <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="true">
+            </schema-based-editor>
+          </td>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  {% include 'components/schema_based_editor_templates.html' %}
+
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('filters.js') }}
+    {{ include_js_file('components/schemaBasedEditors.js') }}
+    {{ include_js_file('tests/SchemaEditorTests.js') }}
+  </script>
+{% endblock footer_js %}

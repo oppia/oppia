@@ -21,6 +21,7 @@
 describe('Testing filters', function() {
   var filterNames = [
     'spacesToUnderscores',
+    'underscoresToCamelCase',
     'truncate',
     'round1',
     'bracesToText',
@@ -44,6 +45,21 @@ describe('Testing filters', function() {
     expect(filter('  Test  App ')).toEqual('Test__App');
   }));
 
+  it('should convert underscores to camelCase properly', inject(function($filter) {
+    var filter = $filter('underscoresToCamelCase');
+    expect(filter('Test')).toEqual('Test');
+    expect(filter('test')).toEqual('test');
+    expect(filter('test_app')).toEqual('testApp');
+    expect(filter('Test_App_Two')).toEqual('TestAppTwo');
+    expect(filter('test_App_Two')).toEqual('testAppTwo');
+    expect(filter('test_app_two')).toEqual('testAppTwo');
+    expect(filter('test__App')).toEqual('testApp');
+    // Trailing underscores at the beginning and end should never happen --
+    // they will give weird results.
+    expect(filter('_test_App')).toEqual('TestApp');
+    expect(filter('__Test_ App_')).toEqual('Test App_');
+  }));
+
   it('should round numbers to 1 decimal place', inject(function($filter) {
     var filter = $filter('round1');
     expect(filter(1)).toEqual(1.0);
@@ -65,19 +81,6 @@ describe('Testing filters', function() {
       '<code>INPUT</code> and <code>INPUT</code>');
     expect(filter('{{}}{{hello}}')).toEqual(
       '{{}}<code>INPUT</code>');
-  }));
-
-  it('should convert a list to a comma-separated string', inject(function($filter) {
-    var filter = $filter('commaSeparatedList');
-
-    expect(filter('a')).toEqual('ERROR');
-    expect(filter(null)).toEqual('ERROR');
-    expect(filter(undefined)).toEqual('ERROR');
-
-    expect(filter([])).toEqual('');
-    expect(filter(['a'])).toEqual('a');
-    expect(filter(['a', 'b'])).toEqual('a, b');
-    expect(filter(['a', 'b', 'c'])).toEqual('a, b, c');
   }));
 
   it('should correctly normalize whitespace', inject(function($filter) {

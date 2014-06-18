@@ -136,3 +136,27 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(len(full_hash), 28)
         self.assertEqual(len(abbreviated_hash), 5)
         self.assertEqual(full_hash[:5], abbreviated_hash)
+
+    def test_vfs_construct_path(self):
+        """Test vfs_construct_path method."""
+        p = utils.vfs_construct_path('a', 'b', 'c')
+        self.assertEqual(p, 'a/b/c')
+        p = utils.vfs_construct_path('a/', '/b', 'c')
+        self.assertEqual(p, '/b/c')
+        p = utils.vfs_construct_path('a/', 'b', 'c')
+        self.assertEqual(p, 'a/b/c')
+        p = utils.vfs_construct_path('a', '/b', 'c')
+        self.assertEqual(p, '/b/c')
+        p = utils.vfs_construct_path('/a', 'b/')
+        self.assertEqual(p, '/a/b/')
+
+    def test_vfs_normpath(self):
+        p = utils.vfs_normpath('/foo/../bar')
+        self.assertEqual(p, '/bar')
+        p = utils.vfs_normpath('foo//bar')
+        self.assertEqual(p, 'foo/bar')
+        p = utils.vfs_normpath('foo/bar/..')
+        self.assertEqual(p, 'foo')
+        p = utils.vfs_normpath('/foo//bar//baz//')
+        self.assertEqual(p, '/foo/bar/baz')
+        

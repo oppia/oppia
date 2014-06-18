@@ -133,6 +133,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 
 .navbar {
+  border: 0px;
   margin-bottom: 0;
 }
 
@@ -377,10 +378,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   width: 80%;
 }
 
-.oppia-iframe-container {
-  -webkit-overflow-scrolling: touch;
-}
-
 .oppia-alert-blocks {
   left: 10%;
   position: fixed;
@@ -397,23 +394,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 .oppia-reader-response {
   font-style: italic;
   margin: 5px 20px;
-}
-
-.oppia-conversation-log {
-  margin-top: 30px;
-  opacity: 0.7;
-}
-.oppia-response {
-  background: rgba(0,0,0,0.04);
-  border-radius: 6px;
-  margin-top: 30px;
-  padding: 10px 10px;
-}
-.oppia-response-finished {
-  background: rgb(228,255,228);
-  border-radius: 6px;
-  margin-top: 30px;
-  padding: 10px 10px;
 }
 
 .oppia-btn {
@@ -533,13 +513,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   text-decoration: underline;
 }
 
-.oppia-exploration-header {
-  padding-left: 7px;
-}
-.oppia-exploration-header-sublink {
-  padding-top: 5px;
-}
-
 .oppia-wide-panel {
   border: 1px solid #dde0FF;
   border-radius: 20px;
@@ -563,6 +536,10 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   font-size: 24pt;
   font-weight: bold;
   margin-bottom: 30px;
+}
+
+.oppia-exploration-editor-top-row {
+  margin-top: 5px;
 }
 
 .oppia-btn-container {
@@ -724,47 +701,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 .oppia-stats-table {
   border: 1px solid black;
   padding: 10px;
-}
-
-.oppia-feedback-button {
-  transition-property: all;
-  transition-duration: 0.2s;
-  align-content: center;
-  background: green;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  bottom: 10px;
-  box-shadow: -5px 5px 3px #CCCCCC;
-  color: white;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: bold;
-  height: 90px;
-  left: 0;
-  opacity: 0.75;
-  position: fixed;
-  top: 50%;
-  width: 100px;
-
-  -moz-transform-origin: 25px 75px;
-  -ms-transform-origin: 25px 75px;
-  -o-transform-origin: 25px 75px;
-  -webkit-transform-origin: 25px 75px;
-  transform-origin: 25px 75px;
-
-  -moz-transform: rotate(-90deg);
-  -ms-transform: rotate(-90deg);
-  -o-transform: rotate(-90deg);
-  -webkit-transform: rotate(-90deg);
-  transform: rotate(-90deg);
-}
-.oppia-feedback-button:hover {
-  opacity: 1;
-  -moz-transform-origin: 35px 65px;
-  -ms-transform-origin: 35px 65px;
-  -o-transform-origin: 35px 65px;
-  -webkit-transform-origin: 35px 65px;
-  transform-origin: 35px 65px;
 }
 
 .oppia-feedback-status {

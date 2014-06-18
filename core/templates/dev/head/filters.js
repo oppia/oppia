@@ -18,15 +18,23 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.filter('spacesToUnderscores', function() {
+oppia.filter('spacesToUnderscores', [function() {
   return function(input) {
     return input.trim().replace(/ /g, '_');
   };
-});
+}]);
+
+oppia.filter('underscoresToCamelCase', [function() {
+  return function(input) {
+    return input.replace(/_+(.)/g, function(match, group1) {
+      return group1.toUpperCase();
+    });
+  };
+}]);
 
 // Filter that truncates long descriptors.
 // TODO(sll): Strip out HTML tags before truncating.
-oppia.filter('truncate', function() {
+oppia.filter('truncate', [function() {
   return function(input, length, suffix) {
     if (!input)
       return '';
@@ -39,25 +47,25 @@ oppia.filter('truncate', function() {
     return (input.length <= length ? input
             : input.substring(0, length - suffix.length) + suffix);
   };
-});
+}]);
 
 // Filter that rounds a number to 1 decimal place.
-oppia.filter('round1', function() {
+oppia.filter('round1', [function() {
   return function(input) {
     return Math.round(input * 10) / 10;
   };
-});
+}]);
 
 // Filter that changes {{...}} tags into INPUT indicators.
-oppia.filter('bracesToText', function() {
+oppia.filter('bracesToText', [function() {
   var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
   return function(input) {
     return input ? input.replace(pattern, '<code>INPUT</code>') : '';
   };
-});
+}]);
 
 // Filter that changes {{...}} tags into the corresponding parameter input values.
-oppia.filter('parameterizeRuleDescription', function() {
+oppia.filter('parameterizeRuleDescription', [function() {
   return function(input, choices) {
     if (!input || !(input.description)) {
       return '';
@@ -107,21 +115,11 @@ oppia.filter('parameterizeRuleDescription', function() {
     }
     return 'Answer ' + finalRule;
   };
-});
-
-// Filter that converts a list into a comma-separated string.
-oppia.filter('commaSeparatedList', function() {
-  return function(input) {
-    if (!angular.isArray(input)) {
-      return 'ERROR';
-    }
-    return input.join(', ');
-  };
-});
+}]);
 
 // Filter that removes whitespace from the beginning and end of a string, and
 // replaces interior whitespace with a single space character.
-oppia.filter('normalizeWhitespace', function() {
+oppia.filter('normalizeWhitespace', [function() {
   return function(input) {
     if (typeof input == 'string' || input instanceof String) {
       // Remove whitespace from the beginning and end of the string, and
@@ -133,4 +131,4 @@ oppia.filter('normalizeWhitespace', function() {
       return input;
     }
   };
-});
+}]);

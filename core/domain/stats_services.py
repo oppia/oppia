@@ -18,24 +18,21 @@
 
 __author__ = 'Sean Lip'
 
-import feconf
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+import feconf
 
 
 IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 SUBMIT_HANDLER_NAME = 'submit'
 
-STATUS_FIXED = 'fixed'
-STATUS_WILL_NOT_FIX = 'will_not_fix'
-
 
 class EventHandler(object):
-    """Records events."""
+    """Records analytics events."""
 
     @classmethod
     def record_state_hit(cls, exploration_id, state_name, first_time):
@@ -62,16 +59,25 @@ class EventHandler(object):
             exploration_id, state_name, handler_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
+    @classmethod
+    def start_exploration(cls, exp_id, exp_version, state_name, session_id,
+                          params, play_type):
+        stats_models.StartExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, params,
+            play_type)
 
-def get_unresolved_answers_for_default_rule(exploration_id, state_name):
-    return stats_domain.StateRuleAnswerLog.get(
-        exploration_id, state_name, SUBMIT_HANDLER_NAME,
-        exp_domain.DEFAULT_RULESPEC_STR
-    ).answers
+    @classmethod
+    def maybe_leave_exploration(
+            cls, exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type):
+        stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, time_spent,
+            params, play_type)
 
 
 def get_exploration_visit_count(exploration_id):
     """Returns the number of times this exploration has been accessed."""
+    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
     exploration = exp_services.get_exploration_by_id(exploration_id)
     return stats_domain.StateCounter.get(
         exploration_id, exploration.init_state_name).first_entry_count
@@ -80,8 +86,19 @@ def get_exploration_visit_count(exploration_id):
 def get_exploration_completed_count(exploration_id):
     """Returns the number of times this exploration has been completed."""
     # Note that the subsequent_entries_count for END_DEST should be 0.
+    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
     return stats_domain.StateCounter.get(
         exploration_id, feconf.END_DEST).first_entry_count
+
+
+def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
+    return {
+        answer: count for (answer, count) in
+        stats_domain.StateRuleAnswerLog.get(
+            exploration_id, state_name, SUBMIT_HANDLER_NAME,
+            exp_domain.DEFAULT_RULESPEC_STR
+        ).get_top_answers(10)
+    }
 
 
 def get_state_rules_stats(exploration_id, state_name):
@@ -105,17 +122,30 @@ def get_state_rules_stats(exploration_id, state_name):
             'state_name': state_name,
             'handler_name': rule_key[0],
             'rule_str': rule_key[1]
-        } for rule_key in rule_keys]
-    )
+        } for rule_key in rule_keys])
 
     results = {}
     for ind, answer_log in enumerate(answer_logs):
         results['.'.join(rule_keys[ind])] = {
-            'answers': answer_log.get_top_answers(10),
+            'answers': answer_log.get_top_answers(5),
             'rule_hits': answer_log.total_answer_count
         }
 
     return results
+
+
+def get_exploration_annotations(exp_id):
+    """Gets exploration annotations.
+
+    NB: Currently unused.
+    """
+    # TODO(sll): This should return a domain object, not an ndb.Model instance.
+    exp_annotations = stats_models.ExplorationAnnotationsModel.get(
+        exp_id, strict=False)
+    if not exp_annotations:
+        exp_annotations = stats_models.ExplorationAnnotationsModel(
+            id=exp_id, num_visits=0, num_completions=0)
+    return exp_annotations
 
 
 def get_state_stats_for_exploration(exploration_id):
@@ -127,94 +157,66 @@ def get_state_stats_for_exploration(exploration_id):
         state_counts = stats_domain.StateCounter.get(
             exploration_id, state_name)
 
-        first_entry_count = state_counts.first_entry_count
-        total_entry_count = state_counts.total_entry_count
-
         state_stats[state_name] = {
             'name': state_name,
-            'firstEntryCount': first_entry_count,
-            'totalEntryCount': total_entry_count,
-            # Add information about resolved answers to the chart data.
-            # TODO(sll): This should be made more generic and the chart logic
-            # moved to the frontend.
-            'no_answer_chartdata': [
-                ['', 'No answer', 'Answer given'],
-                ['',  state_counts.no_answer_count,
-                 state_counts.active_answer_count]
-            ]
+            'firstEntryCount': state_counts.first_entry_count,
+            'totalEntryCount': state_counts.total_entry_count,
         }
 
     return state_stats
 
 
-def get_top_improvable_states(exploration_ids, N):
-    """Returns the top N improvable states across the given explorations.
-
-
-    NOTE: This method is temporarily retired from the profile page controller
-    until we can find a way to make it faster.
+def get_state_improvements(exploration_id):
+    """Returns a list of dicts, each representing a suggestion for improvement
+    to a particular state.
     """
-
     ranked_states = []
-    for exploration_id in exploration_ids:
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        state_list = exploration.states.keys()
 
-        answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
-            exploration_id, [{
-                'state_name': state_name,
-                'handler_name': SUBMIT_HANDLER_NAME,
-                'rule_str': exp_domain.DEFAULT_RULESPEC_STR
-            } for state_name in state_list]
-        )
+    exploration = exp_services.get_exploration_by_id(exploration_id)
+    state_list = exploration.states.keys()
 
-        for ind, state_name in enumerate(state_list):
-            state_counts = stats_domain.StateCounter.get(
-                exploration_id, state_name)
-            default_rule_answer_log = answer_logs[ind]
+    default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
+        exploration_id, [{
+            'state_name': state_name,
+            'handler_name': SUBMIT_HANDLER_NAME,
+            'rule_str': exp_domain.DEFAULT_RULESPEC_STR
+        } for state_name in state_list])
 
-            total_entry_count = state_counts.total_entry_count
-            if total_entry_count == 0:
-                continue
+    for ind, state_name in enumerate(state_list):
+        state_counts = stats_domain.StateCounter.get(
+            exploration_id, state_name)
+        total_entry_count = state_counts.total_entry_count
+        if total_entry_count == 0:
+            continue
 
-            default_count = default_rule_answer_log.total_answer_count
-            no_answer_submitted_count = state_counts.no_answer_count
+        threshold = 0.2 * total_entry_count
+        default_rule_answer_log = default_rule_answer_logs[ind]
+        default_count = default_rule_answer_log.total_answer_count
+        no_answer_submitted_count = state_counts.no_answer_count
 
-            eligible_flags = []
+        eligible_flags = []
+        state = exploration.states[state_name]
+        if (default_count > threshold and
+                state.widget.handlers[0].default_rule_spec.dest == state_name):
+            eligible_flags.append({
+                'rank': default_count,
+                'improve_type': IMPROVE_TYPE_DEFAULT})
+        if no_answer_submitted_count > threshold:
+            eligible_flags.append({
+                'rank': no_answer_submitted_count,
+                'improve_type': IMPROVE_TYPE_INCOMPLETE})
 
-            state = exploration.states[state_name]
-            if (default_count > 0.2 * total_entry_count and
-                    state.widget.handlers[0].default_rule_spec.dest ==
-                    state_name):
-                eligible_flags.append({
-                    'rank': default_count,
-                    'improve_type': IMPROVE_TYPE_DEFAULT})
-
-            if no_answer_submitted_count > 0.2 * total_entry_count:
-                eligible_flags.append({
-                    'rank': no_answer_submitted_count,
-                    'improve_type': IMPROVE_TYPE_INCOMPLETE})
-
-            state_rank, improve_type = 0, ''
-            if eligible_flags:
-                eligible_flags = sorted(
-                    eligible_flags, key=lambda flag: flag['rank'],
-                    reverse=True)
-                state_rank = eligible_flags[0]['rank']
-                improve_type = eligible_flags[0]['improve_type']
-
+        state_rank, improve_type = 0, ''
+        if eligible_flags:
+            eligible_flags = sorted(
+                eligible_flags, key=lambda flag: flag['rank'],
+                reverse=True)
             ranked_states.append({
-                'exp_id': exploration_id,
-                'exp_name': exploration.title,
+                'rank': eligible_flags[0]['rank'],
                 'state_name': state_name,
-                'rank': state_rank,
-                'type': improve_type,
-                'top_default_answers': default_rule_answer_log.get_top_answers(
-                    5)
+                'type': eligible_flags[0]['improve_type'],
             })
 
-    problem_states = sorted(
+    return sorted(
         [state for state in ranked_states if state['rank'] != 0],
-        key=lambda state: state['rank'],
-        reverse=True)
-    return problem_states[:N]
+        key=lambda x: -x['rank'])

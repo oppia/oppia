@@ -22,11 +22,18 @@ var oppia = angular.module('oppia', [
   'ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map',
   'ui.sortable']);
 
-// Sets the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
+// Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
-oppia.config(['$interpolateProvider', function($interpolateProvider) {
+// Set default headers for POST requests.
+oppia.config(['$interpolateProvider', '$httpProvider',
+    function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
+
+  $httpProvider.defaults.headers.post = {
+    'Content-Type': 'application/x-www-form-urlencoded'};
+  $httpProvider.defaults.headers.put = {
+    'Content-Type': 'application/x-www-form-urlencoded'};
 }]);
 
 oppia.config(['$provide', function($provide) {

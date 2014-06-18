@@ -29,8 +29,7 @@ function Moderator(
       '/moderatorhandler/user_services',
       oppiaRequestCreator.createRequest({
         username: username
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}
+      })
     ).success(function(data) {
       $scope.userEmail = data.user_email;
     }).error(function(data) {

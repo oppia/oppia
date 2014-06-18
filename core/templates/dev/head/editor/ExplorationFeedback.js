@@ -54,9 +54,8 @@ function ExplorationFeedback($scope, $http, $modal,
         state_name: null,
         subject: newThreadSubject,
         text: newThreadText,
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function() {
+      })
+    ).success(function() {
       $scope._getThreadList();
       $scope.setCurrentThread(null);
       $scope.$parent.refreshFeedbackTabHeader();
@@ -146,9 +145,8 @@ function ExplorationFeedback($scope, $http, $modal,
           updatedStatus : null),
         updated_subject: null,
         text: newMessageText,
-      }),
-      {headers: {'Content-Type': 'application/x-www-form-urlencoded'}}).
-    success(function() {
+      })
+    ).success(function() {
       $scope.currentThreadData.status = updatedStatus;
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
