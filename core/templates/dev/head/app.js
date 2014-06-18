@@ -56,6 +56,40 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
+// Overwrite the built-in exceptionHandler service to log errors to the backend
+// (so that they can be fixed).
+oppia.factory('$exceptionHandler', [
+    '$log', 'oppiaRequestCreator', function($log, oppiaRequestCreator) {
+  return function(exception, cause) {
+    var messageAndSourceAndStackTrace = [
+      '',
+      'Source: ' + window.location.href,
+      exception.message,
+      String((new Error()).stack)
+    ].join('\n');
+
+    // Catch all errors, to guard against infinite recursive loops.
+    try {
+      // We use jQuery here instead of Angular's $http, since the latter
+      // creates a circular dependency.
+      $.ajax({
+        type: 'POST',
+        url: '/frontend_errors',
+        data: oppiaRequestCreator.createRequest({
+          error: messageAndSourceAndStackTrace
+        }),
+        contentType: 'application/x-www-form-urlencoded',
+        dataType: 'text',
+        async: true
+      });
+    } catch(loggingError) {
+      $log.warn('Error logging failed.');
+    }
+
+    $log.error.apply($log, arguments);
+  };
+}]);
+
 // Service for HTML serialization and escaping.
 oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
   var htmlEscaper = {

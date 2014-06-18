@@ -204,7 +204,7 @@ CODEMIRROR_ZIP_URL = 'https://github.com/marijnh/CodeMirror/archive/3.19.0.zip'
 CODEMIRROR_ZIP_ROOT_NAME = 'CodeMirror-%s' % CODEMIRROR_REV
 CODEMIRROR_TARGET_ROOT_NAME = 'code-mirror-%s' % CODEMIRROR_REV
 
-UI_CODEMIRROR_REV = '0.1.0'
+UI_CODEMIRROR_REV = '0.1.1'
 UI_CODEMIRROR_ZIP_URL = (
     'https://github.com/angular-ui/ui-codemirror/archive/src%s.zip'
     % UI_CODEMIRROR_REV)

@@ -690,8 +690,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   cursor: pointer;
 }
 
-/* Styles for interactive widgets. */
-
 .oppia-rule {
   height: 30px;
 }
@@ -755,6 +753,10 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 .oppia-rule-header-bubble {
   font-weight: bold;
   text-align: center;
+}
+
+.oppia-rule-header-bubble img {
+  max-height: 50px;
 }
 
 .oppia-rule-description-picker-bubble {
