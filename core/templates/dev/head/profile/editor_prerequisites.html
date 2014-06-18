@@ -16,14 +16,7 @@
 
         <h4>Licensing</h4>
         <p>
-          In order to maximize the reach and positive impact of the explorations hosted
-          here, we would like to make it easy to copy and redistribute them. In addition,
-          we expect that all explorations on this site will eventually be
-          collectively owned by the Oppia community, so that they can be freely improved
-          by others.
-        </p>
-        <p>
-          Therefore, all explorations on this site, and contributions to them, are deemed
+          All explorations on this site, and contributions to them, are deemed
           to be licensed under
           <a href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">CC-BY-SA v4.0,
           with a waiver of the attribution (BY) requirement</a>. This allows the content of
@@ -59,7 +52,10 @@
               <label for="username">My preferred Oppia username (to be shown in the exploration change logs)</label>
               <div class="row">
                 <div class="col-lg-5 col-md-5 col-sm-5">
-                  <input type="text" ng-model="username" id="username" class="form-control">
+                  <input type="text" ng-model="username" id="username" class="form-control" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false">
+                </div>
+                <div class="col-lg-7 col-md-7 col-sm-7" style="color: red;" aria-live="assertive" ng-show="blurredAtLeastOnce">
+                  <[warningText]>
                 </div>
               </div>
             </div>
@@ -73,7 +69,7 @@
           </div>
           <br>
 
-          <button type="submit" class="btn btn-success">Submit and start contributing</button>
+          <button type="submit" class="btn btn-success" ng-disabled="warningText || !agreedToTerms">Submit and start contributing</button>
         </form>
         <br><br><br>
       </div>

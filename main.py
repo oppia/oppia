@@ -196,6 +196,9 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
         profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
+    get_redirect_route(
+        r'%s' % feconf.USERNAME_CHECK_DATA_URL,
+        profile.UsernameCheckHandler, 'username_check_handler'),
 
     get_redirect_route(
         r'/moderator', moderator.ModeratorPage, 'moderator_page'),

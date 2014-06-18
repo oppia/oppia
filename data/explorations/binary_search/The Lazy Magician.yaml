@@ -67,8 +67,6 @@ states:
     param_changes: []
     widget:
       customization_args:
-        columns:
-          value: 60
         placeholder:
           value: Type your answer here.
         rows:
@@ -480,8 +478,6 @@ states:
       name: redux
     widget:
       customization_args:
-        columns:
-          value: 60
         placeholder:
           value: Type your answer here.
         rows:
@@ -738,8 +734,6 @@ states:
     param_changes: []
     widget:
       customization_args:
-        columns:
-          value: 60
         placeholder:
           value: Type your answer here.
         rows:
@@ -1249,8 +1243,6 @@ states:
     param_changes: []
     widget:
       customization_args:
-        columns:
-          value: 60
         placeholder:
           value: Type your answer here.
         rows:

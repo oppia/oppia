@@ -12,13 +12,13 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/master">
-  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()">
+  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()" allow-parameters="schema().allow_parameters">
   </schema-based-bool-editor>
 
-  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()">
+  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()" allow-parameters="schema().allow_parameters">
   </schema-based-int-editor>
 
-  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
+  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" is-editable="isEditable()" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
   </schema-based-float-editor>
 
   <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
@@ -36,20 +36,64 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">
-  <input ng-if="isEditable()" type="checkbox" ng-model="$parent.localValue">
-  <span ng-if="!isEditable()"><[localValue]></span>
+  <select class="form-control" ng-if="isEditable()" ng-model="$parent.localValue" ng-options="option.value as option.name for option in boolEditorOptions"></select>
+
+  <span ng-if="!isEditable()">
+    <span ng-if="localValue.type === 'raw'">
+      <[localValue.data]>
+    </span>
+    <span class="label label-info" ng-if="localValue.type === 'parameter'">
+      <[localValue.data]>
+    </span>
+  </span>
 </script>
 
 
 <script type="text/ng-template" id="schemaBasedEditor/int">
-  <input ng-if="isEditable()" type="number" ng-model="$parent.localValue" class="form-control">
-  <span ng-if="!isEditable()"><[localValue]></span>
+  <span ng-if="isEditable()">
+    <div class="input-group">
+      <input ng-if="!editAsParameter" type="number" ng-model="$parent.localValue.data" class="form-control">
+      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions"></select>
+
+      <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
+        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><b>P</b></button>
+        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><del><b>P</b></del></button>
+      </span>
+    </div>
+  </span>
+
+  <span ng-if="!isEditable()">
+    <span ng-if="localValue.type === 'raw'">
+      <[localValue.data]>
+    </span>
+    <span class="label label-info" ng-if="localValue.type === 'parameter'">
+      <[localValue.data]>
+    </span>
+  </span>
 </script>
 
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
-  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation>
-  <span ng-if="!isEditable()"><[localValue]></span>
+  <span ng-if="isEditable()">
+    <div class="input-group">
+      <input ng-if="!editAsParameter" type="text" ng-model="$parent.localValue.data" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation>
+      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions"></select>
+
+      <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
+        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><b>P</b></button>
+        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><del><b>P</b></del></button>
+      </span>
+    </div>
+  </span>
+
+  <span ng-if="!isEditable()">
+    <span ng-if="localValue.type === 'raw'">
+      <[localValue.data]>
+    </span>
+    <span class="label label-info" ng-if="localValue.type === 'parameter'">
+      <[localValue.data]>
+    </span>
+  </span>
 </script>
 
 

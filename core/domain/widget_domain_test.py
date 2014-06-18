@@ -65,23 +65,23 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             '<oppia-interactive-text-input '
             'placeholder-with-value="&#34;Type your answer here.&#34;" '
-            'rows-with-value="1" columns-with-value="60">'
+            'rows-with-value="1">'
             '</oppia-interactive-text-input>', tag)
 
         tag = widget.get_interactive_widget_tag(
             {'placeholder': {'value': 'F4'}}, {})
         self.assertEqual(
             '<oppia-interactive-text-input '
-            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1" '
-            'columns-with-value="60"></oppia-interactive-text-input>', tag)
+            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
+            '</oppia-interactive-text-input>', tag)
 
         tag = widget.get_interactive_widget_tag(
             {'placeholder': {'value': '{{ntg}}', 'parse_with_jinja': True}},
             {'ntg': 'F4'})
         self.assertEqual(
             '<oppia-interactive-text-input '
-            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1" '
-            'columns-with-value="60"></oppia-interactive-text-input>', tag)
+            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
+            '</oppia-interactive-text-input>', tag)
 
         parameterized_widget_dict = widget.get_widget_instance_dict(
             {'placeholder': {'value': 'F4'}}, {}

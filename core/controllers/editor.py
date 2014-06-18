@@ -240,7 +240,7 @@ class ExplorationHandler(EditorHandler):
             state_frontend_dict = exploration.export_state_to_frontend_dict(
                 state_name)
             state_frontend_dict['unresolved_answers'] = (
-                stats_services.get_unresolved_answers_for_default_rule(
+                stats_services.get_top_unresolved_answers_for_default_rule(
                     exploration_id, state_name))
             states[state_name] = state_frontend_dict
 
@@ -542,15 +542,16 @@ class ExplorationStatisticsHandler(EditorHandler):
             exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
-        exploration_annotations = stats_services.get_exploration_annotations(
-            exploration_id)
+
         self.render_json({
-            'num_visits': exploration_annotations.num_visits,
-            'num_completions': exploration_annotations.num_completions,
+            'num_visits': stats_services.get_exploration_visit_count(
+                exploration_id),
+            'num_completions': stats_services.get_exploration_completed_count(
+                exploration_id),
             'state_stats': stats_services.get_state_stats_for_exploration(
                 exploration_id),
-            'imp': stats_services.get_top_improvable_states(
-                [exploration_id], 10),
+            'improvements': stats_services.get_state_improvements(
+                exploration_id),
         })
 
 

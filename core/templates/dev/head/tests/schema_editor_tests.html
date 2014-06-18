@@ -6,6 +6,9 @@
 
 {% block content %}
   <div class="container" ng-controller="SchemaEditorTests">
+    <h3>Test page for object editors</h3>
+
+    <h4>Editors sharing a common value</h4>
     <table class="table">
       <tr>
         <th>Form name</th>
@@ -13,47 +16,57 @@
         <th>Editable version</th>
       </tr>
       <tr>
-        <td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
           <h5>Unicode form (copy 1)</h5>
           <em>Saved value:</em> <[unicodeForm.value]>
         </td>
-        <td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
           <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
           </schema-based-editor>
         </td>
-        <td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
           <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
           </schema-based-editor>
         </td>
       </tr>
       <tr>
-        <td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
           <h5>Unicode form (copy 2)</h5>
           <em>Saved value:</em> <[unicodeForm.value]>
-        <td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
           <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
           </schema-based-editor>
         </td>
-        <td>
+        <td class="col-sm-4 col-md-4 col-lg-4">
           <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
           </schema-based-editor>
         </td>
       </tr>
+    </table>
 
-      <tr ng-repeat="form in testForms">
-        <td>
-          <h5><[form.name]></h5>
-          <em>Saved value:</em> <[form.value]>
-        </td>
-        <td>
-          <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="false">
-          </schema-based-editor>
-        </td>
-        <td>
-          <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="true">
-          </schema-based-editor>
-        </td>
-      </tr>
+    <div ng-repeat="formset in formsets">
+      <h4><[formset.name]></h4>
+      <table class="table">
+        <tr>
+          <th>Form name</th>
+          <th>Read-only version</th>
+          <th>Editable version</th>
+        </tr>
+        <tr ng-repeat="form in formset.forms">
+          <td class="col-sm-4 col-md-4 col-lg-4">
+            <h5><[form.name]></h5>
+            <em>Saved value:</em> <[form.value]>
+          </td>
+          <td class="col-sm-4 col-md-4 col-lg-4">
+            <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="false">
+            </schema-based-editor>
+          </td>
+          <td class="col-sm-4 col-md-4 col-lg-4">
+            <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="true">
+            </schema-based-editor>
+          </td>
+        </tr>
+      </table>
     </div>
   </div>
 

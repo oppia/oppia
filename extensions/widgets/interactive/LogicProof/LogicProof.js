@@ -77,7 +77,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // for discussion.
           setTimeout(function() {
             editor.refresh();
-          }, 200);          
+          }, 500);          
 
           // NOTE: we must use beforeChange rather than change here to avoid an
           // infinite loop (which code-mirror will not catch).

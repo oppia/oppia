@@ -133,6 +133,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 
 .navbar {
+  border: 0px;
   margin-bottom: 0;
 }
 
@@ -535,6 +536,10 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   font-size: 24pt;
   font-weight: bold;
   margin-bottom: 30px;
+}
+
+.oppia-exploration-editor-top-row {
+  margin-top: 5px;
 }
 
 .oppia-btn-container {

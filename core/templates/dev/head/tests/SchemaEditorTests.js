@@ -18,7 +18,13 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function SchemaEditorTests($scope) {
+function SchemaEditorTests($scope, parameterSpecsService) {
+  parameterSpecsService.addParamSpec('paramBool1', 'bool');
+  parameterSpecsService.addParamSpec('paramBool2', 'bool');
+  parameterSpecsService.addParamSpec('paramInt1', 'int');
+  parameterSpecsService.addParamSpec('paramFloat1', 'float');
+  parameterSpecsService.addParamSpec('paramFloat2', 'float');
+
   $scope.unicodeForm = {
     schema: {
       type: 'unicode'
@@ -26,7 +32,85 @@ function SchemaEditorTests($scope) {
     value: 'aab'
   };
 
-  $scope.testForms = [{
+  $scope.booleanForms = [{
+    name: 'Boolean form',
+    schema: {
+      type: 'bool'
+    },
+    value: {
+      type: 'raw',
+      data: true
+    }
+  }, {
+    name: 'Boolean form with parameters',
+    schema: {
+      type: 'bool',
+      allow_parameters: true
+    },
+    value: {
+      type: 'parameter',
+      data: 'paramBool1'
+    }
+  }];
+
+  $scope.intForms = [{
+    name: 'Integer form (no parameters)',
+    schema: {
+      type: 'int'
+    },
+    value: {
+      type: 'raw',
+      data: 3
+    }
+  }, {
+    // TODO(sll): Add test for bad initialization.
+    name: 'Integer form with parameters',
+    schema: {
+      type: 'int',
+      allow_parameters: true
+    },
+    value: {
+      type: 'parameter',
+      data: 'paramInt1'
+    }
+  }];
+
+  $scope.floatForms = [{
+    name: 'Float form (value must be between -3 and 6)',
+    schema: {
+      type: 'float',
+      post_normalizers: [{
+        id: 'require_at_least',
+        min_value: -3.0
+      }, {
+        id: 'require_at_most',
+        max_value: 6.0
+      }]
+    },
+    value: {
+      type: 'raw',
+      data: 3.14
+    }
+  }, {
+    name: 'Float form with parameters (value must be between -3 and 6)',
+    schema: {
+      type: 'float',
+      allow_parameters: true,
+      post_normalizers: [{
+        id: 'require_at_least',
+        min_value: -3.0
+      }, {
+        id: 'require_at_most',
+        max_value: 6.0
+      }]
+    },
+    value: {
+      type: 'raw',
+      data: 3.14
+    }
+  }];
+
+  $scope.unicodeForms = [{
     name: 'Restricted unicode form; the value must be either a or b.',
     schema: {
       type: 'unicode',
@@ -36,32 +120,17 @@ function SchemaEditorTests($scope) {
       }]
     },
     value: 'a'
-  }, {
-    name: 'Boolean form',
+  }];
+
+  $scope.htmlForms = [{
+    name: 'HTML form',
     schema: {
-      type: 'bool'
+      type: 'html'
     },
-    value: true
-  }, {
-    name: 'Integer form',
-    schema: {
-      type: 'int'
-    },
-    value: 3
-  }, {
-    name: 'Float form (value must be between 3 and 6)',
-    schema: {
-      type: 'float',
-      post_normalizers: [{
-        id: 'require_at_least',
-        min_value: 3.0
-      }, {
-        id: 'require_at_most',
-        max_value: 6.0
-      }]
-    },
-    value: 3.14
-  }, {
+    value: 'Some <b>HTML</b>' 
+  }];
+
+  $scope.compositeForms = [{
     name: 'Dict with a bool, a unicode string and a list of ints. The string must be either \'abc\' or \'def\'.',
     schema: {
       type: 'dict',
@@ -85,9 +154,18 @@ function SchemaEditorTests($scope) {
       }
     },
     value: {
-      a_boolean: false,
+      a_boolean: {
+        type: 'raw',
+        data: false
+      },
       a_unicode_string: 'abc',
-      a_list: [2, 3]
+      a_list: [{
+        type: 'raw',
+        data: 2
+      }, {
+        type: 'raw',
+        data: 3
+      }]
     }
   }, {
     name: 'List of unicode strings',
@@ -110,16 +188,30 @@ function SchemaEditorTests($scope) {
       }
     },
     value: [['abc'], ['def', 'ghi']]
+  }];
+
+  $scope.formsets = [{
+    name: 'Boolean editors',
+    forms: $scope.booleanForms
   }, {
-    name: 'HTML form',
-    schema: {
-      type: 'html'
-    },
-    value: 'Some <b>HTML</b>'
+    name: 'Integer editors',
+    forms: $scope.intForms
+  }, {
+    name: 'Float editors',
+    forms: $scope.floatForms
+  }, {
+    name: 'Unicode editors',
+    forms: $scope.unicodeForms
+  }, {
+    name: 'HTML editors',
+    forms: $scope.htmlForms
+  }, {
+    name: 'Composite editors',
+    forms: $scope.compositeForms
   }];
 }
 
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-SchemaEditorTests.$inject = ['$scope'];
+SchemaEditorTests.$inject = ['$scope', 'parameterSpecsService'];
