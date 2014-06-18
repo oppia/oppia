@@ -28,7 +28,6 @@ oppia.directive('oppiaInteractiveTextInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
-        $scope.columns = oppiaHtmlEscaper.escapedJsonToObj($attrs.columnsWithValue);
 
         $scope.answer = '';
 
