@@ -232,6 +232,7 @@ function InteractiveWidgetEditor(
     items: '.oppia-rule-block',
     tolerance: 'pointer',
     start: function(e, ui) {
+      $scope.$broadcast('externalSave');
       $scope.$apply();
       $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
       ui.placeholder.height(ui.item.height());
