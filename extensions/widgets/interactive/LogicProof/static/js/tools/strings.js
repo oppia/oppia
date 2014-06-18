@@ -133,6 +133,13 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   variables: '',
   error: []
 }, {
+  name: 'not_eliminate',
+  reader_view: 'From ~R and R we have contradiction',
+  antecedents: 'R, ~R',
+  results: '',
+  variables: '',
+  error: []
+}, {
   name: 'contradiction_eliminate',
   reader_view: 'From contradiction we have R',
   antecedents: '',
@@ -167,14 +174,14 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   results: 'T',
   variables: '',
   error: []
-}, {
+}, /* Removed for now because the supporting logic mistakes are too slow. {
   name: 'or_eliminate_false',
   reader_view: 'We know R\u2228S and whichever is true we have contradiction',
   antecedents: 'R\u2228S',
   results: '',
   variables: '',
   error: []
-}, {
+},*/ {
   name: 'or_introduce_left',
   reader_view: 'From R we have R\u2228S',
   antecedents: 'R',
@@ -219,6 +226,13 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
 }, {
   name: 'given',
   reader_view: 'Given {{a|element}}',
+  antecedents: '',
+  results: '',
+  variables: 'a',
+  error: []
+}, {
+  name: 'take',
+  reader_view: 'Take {{a|element}}',
   antecedents: '',
   results: '',
   variables: 'a',
@@ -441,7 +455,7 @@ var DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   name: 'or_inaccessible_antecedent_right',
   occurs: 'template(n)=\'or_eliminate\' \u2227 ~is_available_implication(element(\'S\',n),element(\'T\',n),n)',
   message: ['You proved that if {{element(\'S\',n)}} then {{element(\'T\',n)}}, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implication(element(\'S\',n),element(\'T\',n),i,j)}))}}\', which we have since left.']
-}, {
+}/* Removed because they run too slow on long proofs, {
   name: 'or_false_missing_antecedent_both',
   occurs: 'template(n)=\'or_eliminate_false\' \u2227 (~\u2203j<n.\u2203i<j.yields_implies_false(element(\'R\',n),i,j)) \u2227 (~\u2203j<n.\u2203i<j.yields_implies_false(element(\'S\',n),i,j))',
   message: ['To conclude that contradiction follows from {{entry(1,antecedents(n))}} you need to show that it follows if either {{element(\'R\',n)}} or {{element(\'S\',n)}} is true.']
@@ -461,7 +475,7 @@ var DEFAULT_LOGIC_MISTAKE_STRINGS = [{
   name: 'or_false_inaccessible_antecedent_right',
   occurs: 'template(n)=\'or_eliminate_false\' \u2227 ~is_available_implies_false(element(\'S\',n),n)',
   message: ['You proved that if {{element(\'S\',n)}} then contradiction follows, but this was in the context of \'{{text(scoper(max{i<n|\u2203j<n.yields_implies_false(element(\'S\',n),i,j)}))}}\', which we have since left.']
-}];
+}*/];
 
 var DEFAULT_TARGET_MISTAKE_STRINGS = [{
   name: 'last_line_indented_assumption',
@@ -505,7 +519,7 @@ var DEFAULT_CONTROL_FUNCTION_STRINGS = [{
   description: 'Whether the results and variables of line k<=n are accessible to line n'
 }, {
   LHS: 'is_initializer(n)',
-  RHS: 'template(n)=\'given\' \u2228 template(n)=\'for_all_eliminate\' \u2228 template(n)=\'exists_eliminate\'',
+  RHS: 'template(n)=\'given\' \u2228 template(n)=\'for_all_eliminate\' \u2228 template(n)=\'exists_eliminate\' \u2228 template(n)=\'take\'',
   description: 'Whether line n initializes its variables'
 }, {
   LHS: 'initializes(x,n)',
