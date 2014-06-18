@@ -768,7 +768,9 @@ function ExplorationEditor(
    * Downloads the zip file for an exploration.
    */
   $scope.downloadExplorationWithVersion = function(versionNumber) {
-    document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
+    // Note that this opens (and then immediately closes) a new tab. If we do
+    // this in the same tab, the beforeunload handler is triggered.
+    window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '_blank');
   };
 
   $scope.showPublishExplorationModal = function() {

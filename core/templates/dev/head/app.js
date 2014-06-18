@@ -94,10 +94,6 @@ oppia.factory('$exceptionHandler', [
 oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
   var htmlEscaper = {
     objToEscapedJson: function(obj) {
-      if (!obj) {
-        $log.error('Empty obj was passed to JSON escaper.');
-        return '';
-      }
       return this.unescapedStrToEscapedStr(JSON.stringify(obj));
     },
     escapedJsonToObj: function(json) {

@@ -19,8 +19,8 @@
  */
 
 oppia.directive('richTextEditor', [
-  '$modal', '$http', '$log', 'oppiaHtmlEscaper', 'oppiaRequestCreator',
-  function($modal, $http, $log, oppiaHtmlEscaper, oppiaRequestCreator) {
+  '$modal', '$http', '$log', '$timeout', 'oppiaHtmlEscaper', 'oppiaRequestCreator',
+  function($modal, $http, $log, $timeout, oppiaHtmlEscaper, oppiaRequestCreator) {
     return {
       restrict: 'E',
       scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
@@ -194,7 +194,10 @@ oppia.directive('richTextEditor', [
           var content = $(rteNode).wysiwyg('getContent');
           if (content !== null && content !== undefined) {
             $scope.htmlContent = $scope._convertRteToHtml(content);
-            $scope.$apply();
+            // The following $timeout removes the '$apply in progress' errors.
+            $timeout(function() {
+              $scope.$apply();
+            });
           }
         };
 
