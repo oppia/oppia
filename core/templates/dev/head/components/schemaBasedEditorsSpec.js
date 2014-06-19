@@ -23,7 +23,7 @@ describe('HTML to text', function() {
 
   var htmlUnicodeHtmlPairings = [
     ['abc', 'abc', 'abc'],
-    ['&lt;a&copy;&deg;', '<a©°', '&lt;a©°'],
+    ['&lt;a&copy;&deg;', '<a©°', '&lt;a&#169;&#176;'],
     ['<b>a</b>', 'a', 'a'],
     ['<br>a', 'a', 'a'],
     ['<br/>a', 'a', 'a'],
@@ -68,9 +68,7 @@ describe('HTML to text', function() {
   it('should detect invalid unicode strings', inject(function($filter) {
     invalidUnicodeStrings.forEach(function(s) {
       var fn = function() {
-        var a =  $filter('convertUnicodeWithParamsToHtml')(s);
-        console.log(a);
-        return a;
+        return $filter('convertUnicodeWithParamsToHtml')(s);
       };
       expect(fn).toThrow();
     });

@@ -34,7 +34,7 @@ function SchemaEditorTests($scope, parameterSpecsService) {
     schema: {
       type: 'unicode'
     },
-    value: 'aab'
+    value: 'aab{{paramUnicode1}}'
   };
 
   $scope.booleanForms = [{

@@ -84,9 +84,9 @@ oppia.filter('convertHtmlWithParamsToUnicode', ['$filter', function($filter) {
   };
 }]);
 
-oppia.filter('convertUnicodeToHtml', ['oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+oppia.filter('convertUnicodeToHtml', ['$sanitize', 'oppiaHtmlEscaper', function($sanitize, oppiaHtmlEscaper) {
   return function(text) {
-    return oppiaHtmlEscaper.unescapedStrToEscapedStr(text);
+    return $sanitize(oppiaHtmlEscaper.unescapedStrToEscapedStr(text));
   };
 }]);
 
@@ -161,22 +161,23 @@ oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
 }]);
 
 
-oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
+oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData', function($modal, $log, warningsData) {
   return {
     restrict: 'E',
-    scope: {outerValue: '='},
+    scope: {
+      allowedParameterNames: '&',
+      localValue: '='
+    },
     template: (
-      '<div class="row">' +
-      '  <div class="col-lg-11 col-md-11 col-sm-11">' +
-      '    <textarea ng-disabled="!hasFullyLoaded"></textarea>' +
-      '  </div>' +
-      '  <div class="col-lg-1 col-md-1 col-sm-1">' +
-      '    <button ng-click="addParameter()" ng-disabled="!doUnicodeParamsExist()">P</button>' +
-      '  </div>' +
+      '<div class="input-group">' +
+      '  <textarea ng-disabled="!hasFullyLoaded"></textarea>' +
+      '  <span class="input-group-btn">' +
+      '    <button type="button" class="btn btn-default" ng-click="insertNewParameter()">+P</button>' +
+      '  </span>' +
       '</div>'),
     controller: [
-        '$scope', '$element', '$attrs', '$filter', '$timeout', 'parameterSpecsService',
-        function($scope, $element, $attrs, $filter, $timeout, parameterSpecsService) {
+        '$scope', '$element', '$attrs', '$filter', '$timeout',
+        function($scope, $element, $attrs, $filter, $timeout) {
       var rteNode = $element[0].querySelector('textarea');
 
       // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
@@ -196,19 +197,17 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
       var INVISIBLE_IMAGE_TAG = (
         '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="></img>');
 
-      $scope._createRteElement = function(paramName) {
+      $scope._createRteParameterTag = function(paramName) {
         var el = $(
           '<oppia-parameter contenteditable="false">' +
-          INVISIBLE_IMAGE_TAG +
-          paramName +
-          INVISIBLE_IMAGE_TAG +
+          INVISIBLE_IMAGE_TAG + paramName + INVISIBLE_IMAGE_TAG +
           '</oppia-parameter>');
 
         var domNode = el.get(0);
         // This dblclick handler is stripped in the initial HTML --> RTE conversion,
         // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
         domNode.ondblclick = function() {
-          $scope.getParamModal(paramName, domNode);
+          $scope.openEditParameterModal(paramName, domNode);
         };
         return domNode;
       };
@@ -220,9 +219,7 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
 
         var elt = $('<div>' + html + '</div>');
         elt.find('oppia-parameter').replaceWith(function() {
-          return [
-            $scope._createRteElement(this.textContent)
-          ];
+          return $scope._createRteParameterTag(this.textContent)
         });
         return elt.html();
       };
@@ -241,11 +238,10 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
 
       $scope._saveContent = function() {
         var content = $(rteNode).wysiwyg('getContent');
-        if (content === null && content === undefined) {
+        if (content === null || content === undefined) {
           return;
         }
-
-        $scope.outerValue = $scope._convertRteToUnicode(content);
+        $scope.localValue = $scope._convertRteToUnicode(content);
         // The following $timeout removes the '$apply in progress' errors.
         $timeout(function() {
           $scope.$apply();
@@ -254,34 +250,29 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
 
       // If eltToReplace is null, a new element should be inserted at the
       // current caret.
-      $scope.getParamModal = function(currentParamName, eltToReplace) {
+      $scope.openEditParameterModal = function(allowedParameterNames, currentParamName, eltToReplace) {
         return $modal.open({
           templateUrl: 'modals/editParamName',
           backdrop: 'static',
-          controller: [
-            '$scope', '$modalInstance', 'parameterSpecsService',
-            function($scope, $modalInstance, parameterSpecsService) {
-              $scope.currentParamName = currentParamName;
-
-              var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
-              $scope.paramOptions = allowedParamNames.map(function(paramName) {
-                return {
-                  name: paramName,
-                  value: paramName
-                };
-              });
-
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
+          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.currentParamName = currentParamName;
+            $scope.paramOptions = allowedParameterNames.map(function(paramName) {
+              return {
+                name: paramName,
+                value: paramName
               };
+            });
 
-              $scope.save = function(paramName) {
-                $modalInstance.close(paramName);
-              };
-            }
-          ]
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+
+            $scope.save = function(paramName) {
+              $modalInstance.close(paramName);
+            };
+          }]
         }).result.then(function(paramName) {
-          var el = $scope._createRteElement(paramName);
+          var el = $scope._createRteParameterTag(paramName);
           if (eltToReplace === null) {
             var doc = $(rteNode).wysiwyg('document').get(0);
             // For some reason, inserting the element directly removes its
@@ -299,10 +290,6 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
       };
 
       $scope.init = function() {
-        $scope.rteContent = $scope._convertUnicodeToRte($scope.outerValue);
-        // Disable jquery.ui.dialog (just in case).
-        $.fn.dialog = null;
-
         $(rteNode).wysiwyg({
           autoGrow: true,
           autoSave: true,
@@ -311,6 +298,13 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
           debug: true,
           events: {
             // Prevent use of keyboard shortcuts for bold, italics, etc.
+            // TODO(sll): Prevent copy/paste until we can handle pasting of
+            // newlines and invalid data. One way we could perhaps do this more
+            // robustly is to implement a sanitizeRteContent() function that
+            // strips out characters we don't want, makes sure the oppia-parameter
+            // tags are formatted correctly, etc., check that the parameter names
+            // are valid, etc. -- and always run this function when the content
+            // of the RTE changes.
             keydown: function(e) {
               var vKey = 86, cKey = 67, zKey = 90;
               if (e.ctrlKey) {
@@ -329,20 +323,19 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
             }
           },
           iFrameClass: 'wysiwyg-content',
-          initialContent: $scope.rteContent,
+          initialContent: $scope._convertUnicodeToRte($scope.localValue),
           maxHeight: 30,
           rmUnusedControls: true
         });
 
-        $scope.addParameter = function() {
-          var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
-          if (allowedParamNames.length) {
-            $scope.getParamModal(allowedParamNames[0], null);
+        $scope.insertNewParameter = function() {
+          if ($scope.allowedParameterNames().length) {
+            $scope.openEditParameterModal(
+              $scope.allowedParameterNames(), $scope.allowedParameterNames()[0], null);
+          } else {
+            warningsData.addWarning(
+              'Cannot insert new parameter; no unicode parameters exist.');
           }
-        };
-
-        $scope.doUnicodeParamsExist = function() {
-          return parameterSpecsService.getAllParamsOfType('unicode').length > 0;
         };
 
         $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
@@ -352,7 +345,7 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
           $scope.editorDoc.querySelectorAll('oppia-parameter'));
         elts.forEach(function(elt) {
           elt.ondblclick = function() {
-            $scope.getParamModal($(elt).text(), elt);
+            $scope.openEditParameterModal($scope.allowedParameterNames(), $(elt).text(), elt);
           };
         });
 
@@ -360,6 +353,18 @@ oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
       };
 
       $scope.init();
+
+      // TODO(sll): If two RTEs share the same data source, and one RTE saves
+      // a change to the data, the other RTE should be updated. However, if we
+      // just place a $scope.$watch on the data source, then typing in a single
+      // RTE is going to call that method, and this will replace the content of
+      // the RTE -- which is normally not an issue, but in this case it
+      // moves the cursor back to the beginning of the doc and frustrates the
+      // user. We should find a solution for this -- although it probably is
+      // not a common use case to have multiple unicode RTEs referencing the
+      // same data source, there is a problem in that although the Cancel
+      // button does update the data model, it does not update the appearance
+      // of the RTE.
     }]
   };
 }]);
@@ -742,7 +747,16 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
       postNormalizers: '&'
     },
     templateUrl: 'schemaBasedEditor/unicode',
-    restrict: 'E'
+    restrict: 'E',
+    controller: ['$scope', '$filter', '$sce', 'parameterSpecsService',
+        function($scope, $filter, $sce, parameterSpecsService) {
+      $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType('unicode');
+      $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
+
+      $scope.getDisplayedValue = function() {
+        return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')($scope.localValue));
+      };
+    }]
   };
 }]);
 
