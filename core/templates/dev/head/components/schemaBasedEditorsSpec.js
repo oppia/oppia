@@ -40,8 +40,9 @@ describe('HTML to text', function() {
 
   var htmlUnicodeHtmlPairingsWithParams = [
     ['abc <oppia-parameter>name</oppia-parameter>  a', 'abc {{name}}  a', 'abc <oppia-parameter>name</oppia-parameter>  a'],
-    ['{{{<oppia-parameter>name</oppia-parameter>', '\\{\\{\\{{{name}}', '{{{<oppia-parameter>name</oppia-parameter>'],
-    ['\\{\\{', '\\\\{\\\\{', '\\{\\{']
+    ['{{{<oppia-parameter>name</oppia-parameter>', '\\\{\\\{\\\{{{name}}', '{{{<oppia-parameter>name</oppia-parameter>'],
+    ['\\{\\{', '\\\\\\{\\\\\\{', '\\{\\{'],
+    ['\\}}\\{\\{', '\\\\\\}\\}\\\\\\{\\\\\\{', '\\}}\\{\\{']
   ];
 
   it('should convert HTML-with-params to and from raw text correctly', inject(function($filter) {
@@ -53,6 +54,25 @@ describe('HTML to text', function() {
     htmlUnicodeHtmlPairingsWithParams.forEach(function(pairing) {
       expect($filter('convertHtmlWithParamsToUnicode')(pairing[0])).toEqual(pairing[1]);
       expect($filter('convertUnicodeWithParamsToHtml')(pairing[1])).toEqual(pairing[2]);
+    });
+  }));
+
+  var invalidUnicodeStrings = [
+    '{}',
+    '}}abc{{',
+    '\\{{a}}',
+    '{{a\\}}',
+    '{{a}\\}'
+  ];
+
+  it('should detect invalid unicode strings', inject(function($filter) {
+    invalidUnicodeStrings.forEach(function(s) {
+      var fn = function() {
+        var a =  $filter('convertUnicodeWithParamsToHtml')(s);
+        console.log(a);
+        return a;
+      };
+      expect(fn).toThrow();
     });
   }));
 });

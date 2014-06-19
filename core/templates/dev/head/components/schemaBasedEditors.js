@@ -55,29 +55,32 @@ oppia.filter('convertHtmlToUnicode', [function() {
   };
 }]);
 
-// <oppia-parameter>name</oppia-parameter> tags are converted to {{name}}.
-// '{' characters are converted to '\{'.
+// Escapes the {, } and \ characters, and then converts
+// <oppia-parameter>name</oppia-parameter> tags to {{name}}.
 oppia.filter('convertHtmlWithParamsToUnicode', ['$filter', function($filter) {
+  var escapeSpecialChars = function(str) {
+    // Note that order is important here! Backslashes must be replaced before
+    // the others, since doing either of the others first may give rise to
+    // extra backslashes.
+    return ($filter('convertHtmlToUnicode')(str))
+      .replace(/\\/g, '\\\\')
+      .replace(/\{/g, '\\{')
+      .replace(/\}/g, '\\}');
+  };
+
+  var PARAM_OPENING_TAG = '<oppia-parameter>';
+  var PARAM_CLOSING_TAG = '</oppia-parameter>';
+
   return function(html) {
-    var decodeAndEscapeOpeningBraces = function(str) {
-      return ($filter('convertHtmlToUnicode')(str)).split('{').join('\\{');
-    };
-
-    var PARAM_OPENING_TAG = '<oppia-parameter>';
-    var PARAM_CLOSING_TAG = '</oppia-parameter>';
-
-    var returnValue = '';
-    while (html.indexOf(PARAM_OPENING_TAG) !== -1) {
-      var i = html.indexOf(PARAM_OPENING_TAG);
-      returnValue += decodeAndEscapeOpeningBraces(html.substring(0, i));
-      html = html.substring(i);
-
-      var j = html.indexOf(PARAM_CLOSING_TAG);
-      returnValue += '{{' + html.substring(PARAM_OPENING_TAG.length, j) + '}}';
-      html = html.substring(j + PARAM_CLOSING_TAG.length);
-    }
-    returnValue += decodeAndEscapeOpeningBraces(html);
-    return returnValue;
+    var htmlFragments = html.split(PARAM_OPENING_TAG);
+    htmlFragments.forEach(function(value, index, array) {
+      var htmlFragments2 = value.split(PARAM_CLOSING_TAG);
+      htmlFragments2.forEach(function(value2, index2, array2) {
+        array2[index2] = escapeSpecialChars(value2);
+      });
+      array[index] = htmlFragments2.join('}}');
+    });
+    return htmlFragments.join('{{');
   };
 }]);
 
@@ -87,244 +90,279 @@ oppia.filter('convertUnicodeToHtml', ['oppiaHtmlEscaper', function(oppiaHtmlEsca
   };
 }]);
 
+// Converts {{name}} substrings to <oppia-parameter>name</oppia-parameter> tags
+// and unescapes the {, } and \ characters. This is done by reading the given
+// string from left to right: if we see a backslash, we use the following
+// character; if we see a '{{', this is the start of a parameter; if
+// we see a '}}'; this is the end of a parameter.
 oppia.filter('convertUnicodeWithParamsToHtml', ['$filter', function($filter) {
-  // '\{' characters are converted to '{'.
-  // {{name}} is converted to <oppia-parameter> tags.
-  return function(text) {
-    var unescapeOpeningBracesAndEncode = function(str) {
-      return ($filter('convertUnicodeToHtml')(str)).split('\\{\\').join('{');
-    };
-
-    var PARAM_OPENING_TAG = '{{';
-    var PARAM_CLOSING_TAG = '}}';
-
-    text = text.split('\\{').join('\\{\\');
-
-    var returnValue = '';
-    while (text.indexOf(PARAM_OPENING_TAG) !== -1) {
-      var i = text.indexOf(PARAM_OPENING_TAG);
-      returnValue += unescapeOpeningBracesAndEncode(text.substring(0, i));
-      text = text.substring(i);
-
-      var j = text.indexOf(PARAM_CLOSING_TAG);
-      returnValue += '<oppia-parameter>' + text.substring(PARAM_OPENING_TAG.length, j) + '</oppia-parameter>';
-      text = text.substring(j + PARAM_CLOSING_TAG.length);
+  var assert = function(b) {
+    if (!b) {
+      throw 'Invalid unicode-string-with-parameters: ' + text;
     }
-    returnValue += unescapeOpeningBracesAndEncode(text);
-    return returnValue;
+  };
+
+  return function(text) {
+    // The parsing here needs to be done with more care because we are replacing
+    // two-character strings. We can't naively break by {{ because in strings
+    // like \{{{ the second and third characters will be taken as the opening
+    // brackets, which is wrong. We can't unescape characters because then the
+    // { characters that remain will be ambiguous (they may either be the
+    // openings of parameters or literal '{' characters entered by the user.
+    // So we build a standard left-to-right parser which examines each
+    // character of the string in turn, and processes it accordingly.
+    var textFragments = [];
+    var currentFragment = '';
+    var currentFragmentIsParam = false;
+    for (var i = 0; i < text.length; i++) {
+      if (text[i] == '\\') {
+        assert(
+          !currentFragmentIsParam && text.length > i + 1 &&
+          {'{': true, '}': true, '\\': true}[text[i + 1]]);
+        currentFragment += text[i + 1];
+        i++;
+      } else if (text[i] === '{') {
+        assert(text.length > i + 1 && !currentFragmentIsParam && text[i + 1] === '{');
+        textFragments.push({
+          type: 'text',
+          data: currentFragment
+        });
+        currentFragment = '';
+        currentFragmentIsParam = true;
+        i++;
+      } else if (text[i] === '}') {
+        assert(text.length > i + 1 && currentFragmentIsParam && text[i + 1] === '}');
+        textFragments.push({
+          type: 'parameter',
+          data: currentFragment
+        });
+        currentFragment = '';
+        currentFragmentIsParam = false;
+        i++;
+      } else {
+        currentFragment += text[i];
+      }
+    }
+
+    assert(!currentFragmentIsParam);
+    textFragments.push({
+      type: 'text',
+      data: currentFragment
+    });
+
+    var result = '';
+    textFragments.forEach(function(fragment) {
+      result += (
+        fragment.type === 'text' ? $filter('convertUnicodeToHtml')(fragment.data) :
+        '<oppia-parameter>' + fragment.data + '</oppia-parameter>');
+    });
+    return result;
   };
 }]);
 
 
 oppia.directive('parameterEditor', ['$modal', '$log', function($modal, $log) {
-    return {
-      restrict: 'E',
-      scope: {outerValue: '='},
-      template: (
-        '<div class="row">' +
-        '  <div class="col-lg-11 col-md-11 col-sm-11">' +
-        '    <textarea ng-disabled="!hasFullyLoaded"></textarea>' +
-        '  </div>' +
-        '  <div class="col-lg-1 col-md-1 col-sm-1">' +
-        '    <button ng-click="addParameter()" ng-disabled="!doUnicodeParamsExist()">P</button>' +
-        '  </div>' +
-        '</div>'),
-      controller: [
-          '$scope', '$element', '$attrs', '$filter', '$timeout', 'parameterSpecsService',
-          function($scope, $element, $attrs, $filter, $timeout, parameterSpecsService) {
-        var rteNode = $element[0].children[0].children[0].children[0];
+  return {
+    restrict: 'E',
+    scope: {outerValue: '='},
+    template: (
+      '<div class="row">' +
+      '  <div class="col-lg-11 col-md-11 col-sm-11">' +
+      '    <textarea ng-disabled="!hasFullyLoaded"></textarea>' +
+      '  </div>' +
+      '  <div class="col-lg-1 col-md-1 col-sm-1">' +
+      '    <button ng-click="addParameter()" ng-disabled="!doUnicodeParamsExist()">P</button>' +
+      '  </div>' +
+      '</div>'),
+    controller: [
+        '$scope', '$element', '$attrs', '$filter', '$timeout', 'parameterSpecsService',
+        function($scope, $element, $attrs, $filter, $timeout, parameterSpecsService) {
+      var rteNode = $element[0].querySelector('textarea');
 
-        // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
-        // is initialized.
-        $scope.editorDoc = null;
-        $scope.hasFullyLoaded = false;
+      // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
+      // is initialized.
+      $scope.editorDoc = null;
+      $scope.hasFullyLoaded = false;
 
-        // This is a bit silly. It appears that in contenteditables (in Chrome, anyway)
-        // the cursor will stubbornly remain within the oppia-parameter element (even
-        // though it should be outside it). However the behavior is correct
-        // for images -- so we use images to delimit it. It's still hard to do
-        // selection before the element if it's the first thing in the doc,
-        // after the element if it's the last thing in the doc, or between two
-        // consecutive elements. See this bug for a demonstration:
-        //
-        //     https://code.google.com/p/chromium/issues/detail?id=242110
-        var INVISIBLE_IMAGE_TAG = (
-          '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="></img>');
+      // This is a bit silly. It appears that in contenteditables (in Chrome, anyway)
+      // the cursor will stubbornly remain within the oppia-parameter element (even
+      // though it should be outside it). However the behavior is correct
+      // for images -- so we use images to delimit it. It's still hard to do
+      // selection before the element if it's the first thing in the doc,
+      // after the element if it's the last thing in the doc, or between two
+      // consecutive elements. See this bug for a demonstration:
+      //
+      //     https://code.google.com/p/chromium/issues/detail?id=242110
+      var INVISIBLE_IMAGE_TAG = (
+        '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="></img>');
 
-        $scope._createRteElement = function(paramName) {
-          var el = $(
-            '<oppia-parameter contenteditable="false">' +
-            INVISIBLE_IMAGE_TAG +
-            paramName +
-            INVISIBLE_IMAGE_TAG +
-            '</oppia-parameter>');
+      $scope._createRteElement = function(paramName) {
+        var el = $(
+          '<oppia-parameter contenteditable="false">' +
+          INVISIBLE_IMAGE_TAG +
+          paramName +
+          INVISIBLE_IMAGE_TAG +
+          '</oppia-parameter>');
 
-          var domNode = el.get(0);
-          // This dblclick handler is stripped in the initial HTML --> RTE conversion,
-          // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
-          domNode.ondblclick = function() {
-            $scope.getParamModal(paramName, domNode);
-          };
-
-          return domNode;
+        var domNode = el.get(0);
+        // This dblclick handler is stripped in the initial HTML --> RTE conversion,
+        // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
+        domNode.ondblclick = function() {
+          $scope.getParamModal(paramName, domNode);
         };
+        return domNode;
+      };
 
-        // Convert a unicode string into its RTE representation, and add spaces
-        // at the beginning and end of each oppia-parameter element.
-        $scope._convertUnicodeToRte = function(str) {
-          var html = $filter('convertUnicodeWithParamsToHtml')(str);
+      // Convert a unicode string into its RTE representation, and add spaces
+      // at the beginning and end of each oppia-parameter element.
+      $scope._convertUnicodeToRte = function(str) {
+        var html = $filter('convertUnicodeWithParamsToHtml')(str);
 
-          var elt = $('<div>' + html + '</div>');
-          elt.find('oppia-parameter').replaceWith(function() {
-            return [
-              $scope._createRteElement(this.textContent)
-            ];
-          });
-          return elt.html();
-        };
+        var elt = $('<div>' + html + '</div>');
+        elt.find('oppia-parameter').replaceWith(function() {
+          return [
+            $scope._createRteElement(this.textContent)
+          ];
+        });
+        return elt.html();
+      };
 
-        // Convert an RTE representation into a unicode string by removing all
-        // insertion points and replacing <oppia-parameter> tags with {{...}}.
-        $scope._convertRteToUnicode = function(rte) {
-          var elt = $('<div>' + rte + '</div>');
-          elt.find('oppia-parameter').replaceWith(function() {
-            var jQueryElt = $('<oppia-parameter/>').text(this.textContent);
-            return jQueryElt.get(0);
-          });
-          elt.find('span').replaceWith(function() {
-            return '';
-          });
-          return $filter('convertHtmlWithParamsToUnicode')(elt.html());
-        };
+      // Convert an RTE representation into a unicode string by removing all
+      // insertion points and replacing <oppia-parameter> tags with {{...}}.
+      $scope._convertRteToUnicode = function(rte) {
+        var elt = $('<div>' + rte + '</div>');
+        // Ensures that the oppia-parameter tag has no additional attributes
+        // or class names.
+        elt.find('oppia-parameter').replaceWith(function() {
+          return $('<oppia-parameter/>').text(this.textContent).get(0);
+        });
+        return $filter('convertHtmlWithParamsToUnicode')(elt.html());
+      };
 
-        $scope._saveContent = function() {
-          var content = $(rteNode).wysiwyg('getContent');
-          if (content !== null && content !== undefined) {
-            $scope.outerValue = $scope._convertRteToUnicode(content);
-            // The following $timeout removes the '$apply in progress' errors.
-            $timeout(function() {
-              $scope.$apply();
-            });
+      $scope._saveContent = function() {
+        var content = $(rteNode).wysiwyg('getContent');
+        if (content === null && content === undefined) {
+          return;
+        }
+
+        $scope.outerValue = $scope._convertRteToUnicode(content);
+        // The following $timeout removes the '$apply in progress' errors.
+        $timeout(function() {
+          $scope.$apply();
+        });
+      };
+
+      // If eltToReplace is null, a new element should be inserted at the
+      // current caret.
+      $scope.getParamModal = function(currentParamName, eltToReplace) {
+        return $modal.open({
+          templateUrl: 'modals/editParamName',
+          backdrop: 'static',
+          controller: [
+            '$scope', '$modalInstance', 'parameterSpecsService',
+            function($scope, $modalInstance, parameterSpecsService) {
+              $scope.currentParamName = currentParamName;
+
+              var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
+              $scope.paramOptions = allowedParamNames.map(function(paramName) {
+                return {
+                  name: paramName,
+                  value: paramName
+                };
+              });
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+              };
+
+              $scope.save = function(paramName) {
+                $modalInstance.close(paramName);
+              };
+            }
+          ]
+        }).result.then(function(paramName) {
+          var el = $scope._createRteElement(paramName);
+          if (eltToReplace === null) {
+            var doc = $(rteNode).wysiwyg('document').get(0);
+            // For some reason, inserting the element directly removes its
+            // contenteditable="false" attribute.
+            $(rteNode).wysiwyg(
+              'insertHtml', '<span class="insertionPoint"></span>');
+            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
+            $(insertionPoint).replaceWith(el);
+          } else {
+            $(eltToReplace).replaceWith(el);
+          }
+
+          $(rteNode).wysiwyg('save');
+        });
+      };
+
+      $scope.init = function() {
+        $scope.rteContent = $scope._convertUnicodeToRte($scope.outerValue);
+        // Disable jquery.ui.dialog (just in case).
+        $.fn.dialog = null;
+
+        $(rteNode).wysiwyg({
+          autoGrow: true,
+          autoSave: true,
+          controls: {},
+          css: '/css/rte.css',
+          debug: true,
+          events: {
+            // Prevent use of keyboard shortcuts for bold, italics, etc.
+            keydown: function(e) {
+              var vKey = 86, cKey = 67, zKey = 90;
+              if (e.ctrlKey) {
+                if (e.keyCode !== vKey && e.keyCode !== cKey && e.keyCode !== zKey) {
+                  e.preventDefault();
+                }
+              }
+              // Disable the enter key. Contenteditable does not seem to support
+              // deletion of newlines. Also disable the tab key.
+              if (e.keyCode === 13 || e.keyCode === 9) {
+                e.preventDefault();
+              }
+            },
+            save: function(e) {
+              $scope._saveContent();
+            }
+          },
+          iFrameClass: 'wysiwyg-content',
+          initialContent: $scope.rteContent,
+          maxHeight: 30,
+          rmUnusedControls: true
+        });
+
+        $scope.addParameter = function() {
+          var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
+          if (allowedParamNames.length) {
+            $scope.getParamModal(allowedParamNames[0], null);
           }
         };
 
-        // If eltToReplace is null, a new element should be inserted at the
-        // current caret.
-        $scope.getParamModal = function(currentParamName, eltToReplace) {
-          return $modal.open({
-            templateUrl: 'modals/editParamName',
-            backdrop: 'static',
-            resolve: {
-              currentParamName: function() {
-                return currentParamName;
-              }
-            },
-            controller: [
-              '$scope', '$modalInstance', 'currentParamName', 'parameterSpecsService',
-              function($scope, $modalInstance, currentParamName, parameterSpecsService) {
-                $scope.currentParamName = currentParamName;
-
-                var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
-                $scope.paramOptions = allowedParamNames.map(function(paramName) {
-                  return {
-                    name: paramName,
-                    value: paramName
-                  };
-                });
-
-                $scope.cancel = function() {
-                  $modalInstance.dismiss('cancel');
-                };
-
-                $scope.save = function(paramName) {
-                  $modalInstance.close(paramName);
-                };
-              }
-            ]
-          }).result.then(function(paramName) {
-            var el = $scope._createRteElement(paramName);
-            if (eltToReplace === null) {
-              var doc = $(rteNode).wysiwyg('document').get(0);
-              // For some reason, inserting the element directly removes its
-              // contenteditable="false" attribute.
-              $(rteNode).wysiwyg(
-                'insertHtml', '<span class="insertionPoint"></span>');
-              var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-              $(insertionPoint).replaceWith(el);
-            } else {
-              $(eltToReplace).replaceWith(el);
-            }
-
-            $(rteNode).wysiwyg('save');
-          });
+        $scope.doUnicodeParamsExist = function() {
+          return parameterSpecsService.getAllParamsOfType('unicode').length > 0;
         };
 
-        $scope.init = function() {
-          $scope.rteContent = $scope._convertUnicodeToRte($scope.outerValue);
-          // Disable jquery.ui.dialog (just in case).
-          $.fn.dialog = null;
+        $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
 
-          $(rteNode).wysiwyg({
-            autoGrow: true,
-            autoSave: true,
-            controls: {},
-            css: '/css/rte.css',
-            debug: true,
-            events: {
-              // Prevent use of keyboard shortcuts for bold, italics, etc.
-              keydown: function(e) {
-                var vKey = 86, cKey = 67, zKey = 90;
-                if (e.ctrlKey) {
-                  if (e.keyCode !== vKey && e.keyCode !== cKey && e.keyCode !== zKey) {
-                    e.preventDefault();
-                  }
-                }
-                // Disable the enter key. Contenteditable does not seem to support
-                // deletion of newlines. Also disable the tab key.
-                if (e.keyCode === 13 || e.keyCode === 9) {
-                  e.preventDefault();
-                }
-              },
-              save: function(e) {
-                $scope._saveContent();
-              }
-            },
-            iFrameClass: 'wysiwyg-content',
-            initialContent: $scope.rteContent,
-            maxHeight: 30,
-            rmUnusedControls: true
-          });
-
-          $scope.addParameter = function() {
-            var allowedParamNames = parameterSpecsService.getAllParamsOfType('unicode');
-            if (allowedParamNames.length) {
-              $scope.getParamModal(allowedParamNames[0], null);
-            }
+        // Add dblclick handlers to the various nodes.
+        var elts = Array.prototype.slice.call(
+          $scope.editorDoc.querySelectorAll('oppia-parameter'));
+        elts.forEach(function(elt) {
+          elt.ondblclick = function() {
+            $scope.getParamModal($(elt).text(), elt);
           };
+        });
 
-          $scope.doUnicodeParamsExist = function() {
-            return parameterSpecsService.getAllParamsOfType('unicode').length > 0;
-          };
+        $scope.hasFullyLoaded = true;
+      };
 
-          $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
-
-          // Add dblclick handlers to the various nodes.
-          var elts = Array.prototype.slice.call(
-            $scope.editorDoc.querySelectorAll('oppia-parameter'));
-          elts.forEach(function(elt) {
-            elt.ondblclick = function() {
-              $scope.getParamModal($(elt).text(), elt);
-            };
-          });
-
-          $scope.hasFullyLoaded = true;
-        };
-
-        $scope.init();
-      }]
-    };
-  }
-]);
+      $scope.init();
+    }]
+  };
+}]);
 
 oppia.factory('schemaDefaultValueService', [function() {
   return {
