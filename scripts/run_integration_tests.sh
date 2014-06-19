@@ -41,10 +41,6 @@ function cleanup {
   echo Done!
 }
 
-# Forces the cleanup function to run on exit.
-trap cleanup EXIT
-
-
 if [ -z "$BASH_VERSION" ]
 then
   echo ""
@@ -61,7 +57,6 @@ source $(dirname $0)/setup_gae.sh || exit 1
 
 # Install third party dependencies
 bash scripts/install_third_party.sh
-
 
 echo Checking whether karma is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
@@ -91,6 +86,21 @@ fi
 
 $NODE_MODULE_DIR/.bin/webdriver-manager update
 
+if ( nc -vz localhost 8181 ); then
+  echo ""
+  echo "  There is already a server running on localhost:8181."
+  echo "  Please terminate it before running the integration tests."
+  echo "  Exiting."
+  echo ""
+  exit 1
+fi
+
+
+# Forces the cleanup function to run on exit.
+# Developers: note that at the end of this script, the cleanup() function at
+# the top of the file is run.
+trap cleanup EXIT
+
 # Start a selenium process.
 ($NODE_MODULE_DIR/.bin/webdriver-manager start )&
 # Start a demo server.
@@ -102,6 +112,3 @@ while ! nc -vz localhost 4445; do sleep 1; done
 
 # Run the integration tests.
 $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js
-
-# Developers: note that at the end of this script, the cleanup() function at
-# the top of the file is run.
