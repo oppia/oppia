@@ -24,6 +24,15 @@ import feconf
 import utils
 
 
+DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
+    'codemirror': ['ui.codemirror'],
+    'google_maps': ['ui.map'],
+    'jsrepl': [],
+    'logic_proof': [],
+    'midijs': [],
+}
+
+
 class Registry(object):
     """Registry of all JS/CSS library dependencies."""
 
@@ -31,3 +40,7 @@ class Registry(object):
     def get_dependency_html(cls, dependency_id):
         return utils.get_file_contents(os.path.join(
             feconf.DEPENDENCIES_TEMPLATES_DIR, '%s.html' % dependency_id))
+
+    @classmethod
+    def get_angular_modules(cls, dependency_id):
+        return DEPENDENCIES_TO_ANGULAR_MODULES_DICT.get(dependency_id, [])

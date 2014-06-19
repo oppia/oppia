@@ -19,7 +19,10 @@
  */
 
 var oppia = angular.module(
-  'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map']);
+  'oppia',
+  ['ngSanitize', 'ngResource', 'ui.bootstrap'].concat(
+    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
+                   : []));
 
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.

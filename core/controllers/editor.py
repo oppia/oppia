@@ -184,8 +184,8 @@ class ExplorationPage(EditorHandler):
         all_interactive_widget_ids = (
             widget_registry.Registry.get_widget_ids_of_type(
                 feconf.INTERACTIVE_PREFIX))
-        widget_dependencies = (
-            widget_registry.Registry.get_dependencies_html(
+        widget_dependencies_html, additional_angular_modules = (
+            widget_registry.Registry.get_dependencies_html_and_angular_modules(
                 all_interactive_widget_ids))
         widget_js_directives = (
             widget_registry.Registry.get_noninteractive_widget_js() +
@@ -193,6 +193,7 @@ class ExplorationPage(EditorHandler):
                 all_interactive_widget_ids))
 
         self.values.update({
+            'additional_angular_modules': additional_angular_modules,
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
             'can_delete': rights_manager.Actor(
@@ -215,8 +216,8 @@ class ExplorationPage(EditorHandler):
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
-            'widget_dependencies': jinja2.utils.Markup(
-                widget_dependencies),
+            'widget_dependencies_html': jinja2.utils.Markup(
+                widget_dependencies_html),
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 

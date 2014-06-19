@@ -68,8 +68,8 @@ class ExplorationPage(base.BaseHandler):
 
         # TODO(sll): Cache these computations.
         interactive_widget_ids = exploration.get_interactive_widget_ids()
-        widget_dependencies = (
-            widget_registry.Registry.get_dependencies_html(
+        widget_dependencies_html, additional_angular_modules = (
+            widget_registry.Registry.get_dependencies_html_and_angular_modules(
                 interactive_widget_ids))
         widget_js_directives = (
             widget_registry.Registry.get_noninteractive_widget_js() +
@@ -77,16 +77,17 @@ class ExplorationPage(base.BaseHandler):
                 interactive_widget_ids))
 
         self.values.update({
-            'skin_html': skins_services.Registry.get_skin_html(
-                exploration.default_skin),
+            'additional_angular_modules': additional_angular_modules,
             'exploration_version': version,
             'iframed': is_iframed,
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
+            'skin_html': skins_services.Registry.get_skin_html(
+                exploration.default_skin),
+            'widget_dependencies_html': jinja2.utils.Markup(
+                widget_dependencies_html),
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
-            'widget_dependencies': jinja2.utils.Markup(
-                widget_dependencies),
         })
 
         if is_iframed:

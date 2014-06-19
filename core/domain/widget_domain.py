@@ -168,7 +168,8 @@ class BaseWidget(object):
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
         if '<script>' in html_template or '</script>' in html_template:
             raise Exception(
-                'Unexpected script tag in HTML template for widget ' % self.id)
+                'Unexpected script tag in HTML template for widget %s' %
+                self.id)
 
         widget_type = (
             'interactiveWidget' if self.is_interactive
