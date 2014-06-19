@@ -3,8 +3,8 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 v1.2.7 (19 June 2014)
--------------------
-UI Changes:
+---------------------
+UI changes:
 * Improve the user experience when registering to make contributions.
 * Fix links to tabs within the About pages.
 * Feedback submitted at the END state now automatically refers to the whole exploration.
