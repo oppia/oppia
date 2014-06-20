@@ -178,12 +178,12 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
     controller: [
         '$scope', '$element', '$attrs', '$filter', '$timeout',
         function($scope, $element, $attrs, $filter, $timeout) {
-      var rteNode = $element[0].querySelector('textarea');
-
-      // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
-      // is initialized.
-      $scope.editorDoc = null;
-      $scope.hasFullyLoaded = false;
+      if (!$scope.allowedParameterNames().length) {
+        console.error(
+          'The unicode-with-parameters editor should not be used if there ' +
+          'are no unicode parameters available.');
+        return;
+      }
 
       // This is a bit silly. It appears that in contenteditables (in Chrome, anyway)
       // the cursor will stubbornly remain within the oppia-parameter element (even
@@ -204,16 +204,13 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
           '</oppia-parameter>');
 
         var domNode = el.get(0);
-        // This dblclick handler is stripped in the initial HTML --> RTE conversion,
-        // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
         domNode.ondblclick = function() {
           $scope.openEditParameterModal(paramName, domNode);
         };
         return domNode;
       };
 
-      // Convert a unicode string into its RTE representation, and add spaces
-      // at the beginning and end of each oppia-parameter element.
+      // Convert a unicode string into its RTE representation.
       $scope._convertUnicodeToRte = function(str) {
         var html = $filter('convertUnicodeWithParamsToHtml')(str);
 
@@ -228,33 +225,34 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       // insertion points and replacing <oppia-parameter> tags with {{...}}.
       $scope._convertRteToUnicode = function(rte) {
         var elt = $('<div>' + rte + '</div>');
-        // Ensures that the oppia-parameter tag has no additional attributes
-        // or class names.
+        // Strip out all additional attributes and class names from the
+        // <oppia-parameter> tag before conversion to a unicode string.
         elt.find('oppia-parameter').replaceWith(function() {
           return $('<oppia-parameter/>').text(this.textContent).get(0);
         });
         return $filter('convertHtmlWithParamsToUnicode')(elt.html());
       };
 
-      $scope._saveContent = function() {
-        var content = $(rteNode).wysiwyg('getContent');
-        if (content === null || content === undefined) {
-          return;
-        }
-        $scope.localValue = $scope._convertRteToUnicode(content);
-        // The following $timeout removes the '$apply in progress' errors.
-        $timeout(function() {
-          $scope.$apply();
-        });
-      };
+      var rteNode = $element[0].querySelector('textarea');
+
+      // A pointer to the editorDoc in the RTE iframe. Populated when the RTE
+      // is initialized.
+      $scope.editorDoc = null;
+      $scope.hasFullyLoaded = false;
 
       // If eltToReplace is null, a new element should be inserted at the
       // current caret.
-      $scope.openEditParameterModal = function(allowedParameterNames, currentParamName, eltToReplace) {
+      $scope.openEditParameterModal = function(currentParamName, eltToReplace) {
         return $modal.open({
           templateUrl: 'modals/editParamName',
           backdrop: 'static',
-          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+          resolve: {
+            allowedParameterNames: function() {
+              return $scope.allowedParameterNames();
+            }
+          },
+          controller: ['$scope', '$modalInstance', 'allowedParameterNames', function(
+              $scope, $modalInstance, allowedParameterNames) {
             $scope.currentParamName = currentParamName;
             $scope.paramOptions = allowedParameterNames.map(function(paramName) {
               return {
@@ -275,18 +273,40 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
           var el = $scope._createRteParameterTag(paramName);
           if (eltToReplace === null) {
             var doc = $(rteNode).wysiwyg('document').get(0);
-            // For some reason, inserting the element directly removes its
-            // contenteditable="false" attribute.
             $(rteNode).wysiwyg(
               'insertHtml', '<span class="insertionPoint"></span>');
-            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
-            $(insertionPoint).replaceWith(el);
-          } else {
-            $(eltToReplace).replaceWith(el);
+            eltToReplace = $scope.editorDoc.querySelector('.insertionPoint');
           }
 
+          // Note that this removes the contenteditable="false" and ondblclick
+          // attributes of el (but they are eventually replaced during the
+          // normalization of the RTE content step). Also, we need to save the
+          // change explicitly because the wysiwyg editor does not auto-detect
+          // replaceWith() events.
+          $(eltToReplace).replaceWith(el);
           $(rteNode).wysiwyg('save');
         });
+      };
+
+      $scope.insertNewParameter = function() {
+        $scope.openEditParameterModal($scope.allowedParameterNames()[0], null);
+      };
+
+      var rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
+
+      $scope._normalizeRteContent = function(content) {
+        // TODO(sll): Write this method to validate rather than just normalize.
+
+        // The only top-level tags should be oppia-parameter tags. Each of these
+        // tags should have a contenteditable=false attribute, a dblclick handler
+        // that opens the parameter modal, and content consisting of a valid
+        // parameter name of type unicode surrounded by two invisible image
+        // tags.
+        var elt = $('<div>' + content + '</div>');
+        elt.find('oppia-parameter').replaceWith(function() {
+          return $scope._createRteParameterTag(this.textContent)
+        });
+        return elt.html();
       };
 
       $scope.init = function() {
@@ -297,18 +317,22 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
           css: '/css/rte.css',
           debug: true,
           events: {
-            // Prevent use of keyboard shortcuts for bold, italics, etc.
-            // TODO(sll): Prevent copy/paste until we can handle pasting of
-            // newlines and invalid data. One way we could perhaps do this more
-            // robustly is to implement a sanitizeRteContent() function that
-            // strips out characters we don't want, makes sure the oppia-parameter
-            // tags are formatted correctly, etc., check that the parameter names
-            // are valid, etc. -- and always run this function when the content
-            // of the RTE changes.
+            // Prevent dragging, since this causes weird things to happen when
+            // a user selects text containing all or part of parameter tags and
+            // then drags that text elsewhere.
+            dragstart: function(e) {
+              e.preventDefault();
+            },
+            // Prevent use of keyboard shortcuts for bold, italics, etc. Also
+            // prevent pasting, newlines and tabbing.
             keydown: function(e) {
-              var vKey = 86, cKey = 67, zKey = 90;
+              var aKey = 65, cKey = 67, xKey = 88, zKey = 90;
+              var vKey = 86;
               if (e.ctrlKey) {
-                if (e.keyCode !== vKey && e.keyCode !== cKey && e.keyCode !== zKey) {
+                if (e.keyCode === 86) {
+                  e.preventDefault();
+                  alert('Pasting in string input fields is currently not supported. Sorry about that!');
+                } else if (e.keyCode !== aKey && e.keyCode !== cKey && e.keyCode !== xKey && e.keyCode !== zKey) {
                   e.preventDefault();
                 }
               }
@@ -318,34 +342,58 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
                 e.preventDefault();
               }
             },
+            paste: function(e) {
+              e.preventDefault();
+            },
             save: function(e) {
-              $scope._saveContent();
+              var currentContent = $(rteNode).wysiwyg('getContent');
+              if (currentContent === null || currentContent === undefined) {
+                return;
+              }
+
+              // Normalize the new content. If a validation error occurs,
+              // revert to the memento, and update the external and internal
+              // values. Otherwise, update the external and internal values
+              // with the normalized content, and update the memento as well.
+              var normalizedContent = '';
+              try {
+                normalizedContent = $scope._normalizeRteContent(currentContent);
+              } catch(unusedException) {
+                console.error('Error parsing RTE content: ' + currentContent);
+                normalizedContent = rteContentMemento;
+              }
+
+              if (normalizedContent !== currentContent) {
+                $(rteNode).wysiwyg('setContent', normalizedContent);
+              }
+
+              // Update the external value. The $timeout removes the '$apply in
+              // progress' errors which get triggered if a parameter was edited.
+              $timeout(function() {
+                $scope.$apply(function() {
+                  $scope.localValue = $scope._convertRteToUnicode(normalizedContent);
+                });
+              });
+
+              // Update the memento.
+              rteContentMemento = normalizedContent;
             }
           },
           iFrameClass: 'wysiwyg-content',
-          initialContent: $scope._convertUnicodeToRte($scope.localValue),
+          initialContent: rteContentMemento,
           maxHeight: 30,
           rmUnusedControls: true
         });
 
-        $scope.insertNewParameter = function() {
-          if ($scope.allowedParameterNames().length) {
-            $scope.openEditParameterModal(
-              $scope.allowedParameterNames(), $scope.allowedParameterNames()[0], null);
-          } else {
-            warningsData.addWarning(
-              'Cannot insert new parameter; no unicode parameters exist.');
-          }
-        };
-
         $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
 
-        // Add dblclick handlers to the various nodes.
+        // Add dblclick handlers to the various nodes, since they get stripped
+        // in the initialization.
         var elts = Array.prototype.slice.call(
           $scope.editorDoc.querySelectorAll('oppia-parameter'));
         elts.forEach(function(elt) {
           elt.ondblclick = function() {
-            $scope.openEditParameterModal($scope.allowedParameterNames(), $(elt).text(), elt);
+            $scope.openEditParameterModal($(elt).text(), elt);
           };
         });
 

@@ -41,6 +41,8 @@ oppia-parameter {
   background-color: #18447E;
   border-radius: .25em;
   color: white;
+  /* Note: this is added only for edit mode. */
+  cursor: pointer;
   display: inline;
   font-size: 75%;
   font-weight: bold;
