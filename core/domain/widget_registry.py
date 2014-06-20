@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import itertools
 import pkgutil
 
 from core.domain import dependency_registry
@@ -162,9 +163,20 @@ class Registry(object):
         return list(result)
 
     @classmethod
-    def get_dependencies_html(cls, widget_ids):
-        """Returns HTML for the dependencies of the given interactive widgets.
+    def get_dependencies_html_and_angular_modules(cls, widget_ids):
+        """Returns data needed to load dependencies for the given widgets.
+
+        The return value is a 2-tuple. The first element of the tuple is the
+        additional HTML to insert on the page. The second element of the tuple
+        is a de-duplicated list of strings, each representing an additional
+        angular modules that should be loaded.
         """
-        return '\n'.join([
+        html = '\n'.join([
             dependency_registry.Registry.get_dependency_html(dep)
             for dep in cls.get_deduplicated_dependency_ids(widget_ids)])
+        angular_modules_for_each_widget = [
+            dependency_registry.Registry.get_angular_modules(dep)
+            for dep in cls.get_deduplicated_dependency_ids(widget_ids)]
+        deduplicated_angular_modules = list(set(list(
+            itertools.chain.from_iterable(angular_modules_for_each_widget))))
+        return html, deduplicated_angular_modules

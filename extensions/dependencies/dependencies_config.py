@@ -14,26 +14,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Registry for JavaScript library dependencies."""
+"""Configuration for JavaScript library dependencies."""
 
 __author__ = 'Sean Lip'
 
-import os
 
-from extensions.dependencies import dependencies_config
-import feconf
-import utils
-
-
-class Registry(object):
-    """Registry of all JS/CSS library dependencies."""
-
-    @classmethod
-    def get_dependency_html(cls, dependency_id):
-        return utils.get_file_contents(os.path.join(
-            feconf.DEPENDENCIES_TEMPLATES_DIR, '%s.html' % dependency_id))
-
-    @classmethod
-    def get_angular_modules(cls, dependency_id):
-        return dependencies_config.DEPENDENCIES_TO_ANGULAR_MODULES_DICT.get(
-            dependency_id, [])
+# A dict mapping dependency ids to the Angular module names they
+# should insert when the Angular app is first initialized.
+DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
+    'codemirror': ['ui.codemirror'],
+    'google_maps': ['ui.map'],
+    'jsrepl': [],
+    'logic_proof': [],
+    'midijs': [],
+}

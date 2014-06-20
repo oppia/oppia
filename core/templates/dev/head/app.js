@@ -18,8 +18,15 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// TODO(sll): Remove the check for window.GLOBALS. This check is currently
+// only there so that the Karma tests run, since it looks like Karma doesn't
+// 'see' the GLOBALS variable that is defined in base.html. We should fix this
+// in order to make the testing and production environments match.
 var oppia = angular.module(
-  'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map']);
+  'oppia',
+  ['ngSanitize', 'ngResource', 'ui.bootstrap'].concat(
+    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
+                   : []));
 
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.

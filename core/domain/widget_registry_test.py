@@ -29,9 +29,14 @@ class WidgetRegistryTests(test_utils.GenericTestBase):
         self.assertItemsEqual(
             widget_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl']),
-            ['jsrepl'])
+            ['jsrepl', 'codemirror'])
 
         self.assertItemsEqual(
             widget_registry.Registry.get_deduplicated_dependency_ids(
                 ['CodeRepl', 'CodeRepl', 'CodeRepl']),
-            ['jsrepl'])
+            ['jsrepl', 'codemirror'])
+
+        self.assertItemsEqual(
+            widget_registry.Registry.get_deduplicated_dependency_ids(
+                ['CodeRepl', 'LogicProof']),
+            ['jsrepl', 'codemirror', 'logic_proof'])
