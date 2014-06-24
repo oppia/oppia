@@ -16,7 +16,12 @@
       var GLOBALS = {
         csrf_token: JSON.parse('{{csrf_token|js_string}}'),
         DEV_MODE: JSON.parse('{{DEV_MODE|js_string}}'),
-        NAV_MODE: JSON.parse('{{nav_mode|js_string}}'),
+        NAV_MODE:
+          {% if nav_mode %}
+            JSON.parse('{{nav_mode|js_string}}'),
+          {% else %}
+            null,
+          {% endif %}
         INVALID_NAME_CHARS: JSON.parse('{{INVALID_NAME_CHARS|js_string}}'),
         EXPLORATION_STATUS_PRIVATE: JSON.parse(
           '{{EXPLORATION_STATUS_PRIVATE|js_string}}'),
