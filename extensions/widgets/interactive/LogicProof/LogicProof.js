@@ -69,7 +69,6 @@ oppia.directive('oppiaInteractiveLogicProof', [
           var cursorPosition = editor.doc.getCursor();
 
           editor.setOption('lineNumbers', true);
-          editor.setOption('indentWithTabs', true);
           editor.setOption('lineWrapping', true);
 
           // NOTE: this is necessary to avoid the textarea being greyed-out. See
