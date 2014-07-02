@@ -293,51 +293,87 @@ else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
 
 
-class Spy(object):
-    """A wrapper to keep track of how often a function or method gets called."""
+class FunctionWrapper(object):
+    """A utility for making function wrappers. Create a subclass and override
+       any or both of the before_call and after_call methods. See these methods
+       for more info."""
+
     def __init__(self, f):
+        """Creates a new FunctionWrapper instance.
+
+        args:
+          - f: a callable, or data descriptor. If it's a descriptor, its __get__
+            should return a bound method. For example, f can be a function, a
+            method, a static or class method, but not a @property."""
         self._f = f
         self._instance = None
-        self._times_called = 0
-        self._exception = None
-        self._fail_times = 0
-        self._call_args = []
-
-    @property
-    def times_called(self):
-        return self._times_called
-
-    @property
-    def call_args(self):
-        return self._call_args
 
     def __call__(self, *args, **kwargs):
-        argdict = inspect.getcallargs(self._f, *args, **kwargs)
-        self._call_args.append(argdict)
-
-        self._times_called += 1
-        if self._times_called <= self._fail_times:
-            raise self._exception
-
         if self._instance is not None:
             args = [self._instance] + list(args)
 
-        return self._f(*args, **kwargs)
+        args_dict = inspect.getcallargs(self._f, *args, **kwargs)
+
+        self.before_call(args_dict)
+
+        result = self._f(*args, **kwargs)
+
+        self.after_call(result)
+
+        return result
 
     def __get__(self, instance, owner):
         # We have to implement __get__ because otherwise, we don't have a chance
-        # to the instance self._f was bound to.
-        if instance is None:
-            return self
-
+        # to the instance self._f was bound to. Seee the following SO answer:
+        # http://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
 
-    def succeed_after_n_tries(self, n, exception):
-        """Makes the function raise an exception for the first n times it is
-        called, then succeed."""
+    def before_call(self, args):
+        pass
+
+    def after_call(self, result):
+        pass
+
+
+class CallCounter(FunctionWrapper):
+    """A function wrapper that keeps track of how often the function is called.
+       Note that the counter is incremented before each call, so it is also
+       increased when the function raises an exception."""
+
+    def __init__(self, f):
+        """Counts the number of times the given function has been called.
+           See FunctionWrapper for arguments."""
+        super(CallCounter, self).__init__(f)
+        self._count = 0
+
+    @property
+    def times_called(self):
+        return self._count
+
+    def before_call(self, args):
+        self._count += 1
+
+
+class FailingFunction(CallCounter):
+    """A function wrapper that makes a function fail, raising a given exception.
+       It can be set to succeed after a given number of calls."""
+
+    def __init__(self, f, exception, succeed_after_tries):
+        """Create a new Failing function.
+
+        args:
+          - f: see FunctionWrapper.
+          - exception: the exception to be raised.
+          - succeed_after_tries: the number of times to raise an exception.
+            before a calls succeeds.
+        """
+        super(FailingFunction, self).__init__(f)
         self._exception = exception
-        self._fail_times = n
-        assert isinstance(n, int)
+        self._n = succeed_after_tries
+        self._count = 0
 
-
+    def before_call(self, args):
+        super(FailingFunction, self).before_call(args)
+        if self._n < 0 or self.times_called <= self._n:
+            raise self._exception
