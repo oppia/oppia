@@ -21,12 +21,62 @@
 function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
   $scope.editorPrerequisitesDataUrl = '/editor_prerequisites_handler/data/';
   $rootScope.loadingMessage = 'Loading';
+  $scope.warningText = '';
 
   $http.get($scope.editorPrerequisitesDataUrl).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.username = data.username;
     $scope.agreedToTerms = data.has_agreed_to_terms;
+    $scope.hasUsername = Boolean($scope.username);
   });
+
+  $scope.blurredAtLeastOnce = false;
+
+  $scope.isFormValid = function() {
+    return (
+      $scope.agreedToTerms &&
+      ($scope.hasUsername || !$scope.getWarningText($scope.username))
+    );
+  };
+
+  $scope.onUsernameInputFormBlur = function(username) {
+    warningsData.clear();
+    $scope.blurredAtLeastOnce = true;
+    $scope.updateWarningText(username);
+    if (!$scope.warningText) {
+      $http.post(
+        'usernamehandler/data',
+        oppiaRequestCreator.createRequest({
+          username: $scope.username
+        })
+      ).success(function(data) {
+        if (data.username_is_taken) {
+          $scope.warningText = 'Sorry, this username is already taken.'
+        }
+      });
+    }
+  };
+
+  // Returns the warning text corresponding to the validation error for the
+  // given username, or an empty string if the username is valid.
+  $scope.updateWarningText = function(username) {
+    var alphanumeric = /^[A-Za-z0-9]+$/;
+    var admin = /admin/i;
+
+    if (!username) {
+      $scope.warningText = 'Please choose a non-empty username.';
+    } else if (username.indexOf(' ') !== -1) {
+      $scope.warningText = 'Please ensure that your username has no spaces.';
+    } else if (username.length > 50) {
+      $scope.warningText = 'A username can have at most 50 characters.';
+    } else if (!alphanumeric.test(username)) {
+      $scope.warningText = 'Usernames can only have alphanumeric characters.';
+    } else if (admin.test(username)) {
+      $scope.warningText = 'User names with \'admin\' are reserved.';
+    } else {
+      $scope.warningText = '';
+    }
+  };
 
   $scope.submitPrerequisitesForm = function(agreedToTerms, username) {
     if (!agreedToTerms) {
@@ -36,36 +86,20 @@ function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaReque
       return;
     }
 
-    if (!$scope.hasUsername && !username) {
-      warningsData.addWarning('Please choose a non-empty username.');
+    if (!$scope.hasUsername && $scope.warningText) {
       return;
     }
 
-    if (username.length > 50) {
-      warningsData.addWarning('A username can have at most 50 characters.');
-      return;
-    }
-
-    var alphanumeric = /^[A-Za-z0-9]+$/;
-
-    if (!alphanumeric.test(username)) {
-      warningsData.addWarning('Usernames can only have alphanumeric characters.');
-      return;
-    }
-
-    var admin = /admin/i;
-
-    if (admin.test(username)) {
-      warningsData.addWarning('User names with \'admin\' are reserved.');
-      return;
+    var requestParams = {
+      agreed_to_terms: agreedToTerms
+    };
+    if (!$scope.hasUsername) {
+      requestParams.username = username;
     }
 
     $http.post(
       '/editor_prerequisites_handler/data',
-      oppiaRequestCreator.createRequest({
-        agreed_to_terms: agreedToTerms,
-        username: username
-      })
+      oppiaRequestCreator.createRequest(requestParams)
     ).success(function(data) {
       window.location = window.decodeURIComponent($scope.getUrlParams().return_url);
     }).error(function(data) {
