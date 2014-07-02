@@ -134,19 +134,20 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
     def test_use_default_num_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
         exception = self._get_put_error(1, 0)
-        put_spy = test_utils.Spy(search.Index.put)
-        put_spy.succeed_after_n_tries(
+        failing_put = test_utils.FailingFunction(
+            search.Index.put,
+            exception,
             gae_search_services.DEFAULT_NUM_RETRIES,
-            exception)
+            )
 
-        add_docs_spy = test_utils.Spy(
+        add_docs_counter = test_utils.CallCounter(
             gae_search_services.add_documents_to_index)
 
-        put_ctx = self.swap(search.Index, 'put', put_spy)
+        put_ctx = self.swap(search.Index, 'put', failing_put)
         add_docs_ctx = self.swap(
             gae_search_services, 
             'add_documents_to_index', 
-            add_docs_spy)
+            add_docs_counter)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with put_ctx, add_docs_ctx, assert_raises_ctx as cm:
@@ -155,48 +156,53 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
         self.assertEqual(cm.exception.original_exception, exception)
 
         self.assertEqual(
-            add_docs_spy.times_called,
+            add_docs_counter.times_called,
             gae_search_services.DEFAULT_NUM_RETRIES)
 
     def test_use_custom_number_of_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
         exception = self._get_put_error(1, 0)
-        put_spy = test_utils.Spy(search.Index.put)
-        put_spy.succeed_after_n_tries(42, exception)
+        failing_put = test_utils.FailingFunction(
+            search.Index.put,
+            exception,
+            42)
 
-        add_docs_spy = test_utils.Spy(
+        add_docs_counter = test_utils.CallCounter(
             gae_search_services.add_documents_to_index)
 
-        put_ctx = self.swap(search.Index, 'put', put_spy)
+        put_ctx = self.swap(search.Index, 'put', failing_put)
         add_docs_ctx = self.swap(gae_search_services, 
             'add_documents_to_index', 
-            add_docs_spy)
+            add_docs_counter)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with put_ctx, add_docs_ctx, assert_raises_ctx as cm:
             gae_search_services.add_documents_to_index([doc], 'my_index', 42)
 
-        self.assertEqual(add_docs_spy.times_called, 42)
+        self.assertEqual(add_docs_counter.times_called, 42)
 
     def test_arguments_are_preserved_in_retries(self):
         doc = {'id': 'doc', 'prop': 'val'}
         exception = self._get_put_error(1, 0)
-        put_spy = test_utils.Spy(search.Index.put)
-        put_spy.succeed_after_n_tries(3, exception)
+        failing_put = test_utils.FailingFunction(
+            search.Index.put,
+            exception,
+            3
+        )
 
-        add_docs_spy = test_utils.Spy(
+        add_docs_counter = test_utils.CallCounter(
             gae_search_services.add_documents_to_index)
 
-        put_ctx = self.swap(search.Index, 'put', put_spy)
+        put_ctx = self.swap(search.Index, 'put', failing_put)
         add_docs_ctx = self.swap(
             gae_search_services, 
             'add_documents_to_index', 
-            add_docs_spy)
+            add_docs_counter)
 
         with put_ctx, add_docs_ctx:
             gae_search_services.add_documents_to_index([doc], 'my_index', 4)
 
-        self.assertEqual(add_docs_spy.times_called, 4)
+        self.assertEqual(add_docs_counter.times_called, 4)
         result = search.Index('my_index').get('doc')
         self.assertEqual(result.field('prop').value, 'val')
 
@@ -205,20 +211,23 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
                 {'id': 'doc2', 'prop': 'val2'}, 
                 {'id': 'doc3', 'prop': 'val3'}]
         error = self._get_put_error(3, 1)
-        put_spy = test_utils.Spy(search.Index.put)
-        put_spy.succeed_after_n_tries(4, error)
-        add_docs_spy = test_utils.Spy(
+        failing_put = test_utils.FailingFunction(
+            search.Index.put,
+            error,
+            4)
+
+        add_docs_counter = test_utils.CallCounter(
             gae_search_services.add_documents_to_index)
-        put_ctx = self.swap(search.Index, 'put', put_spy)
+        put_ctx = self.swap(search.Index, 'put', failing_put)
         add_docs_ctx = self.swap(
             gae_search_services, 
             'add_documents_to_index', 
-            add_docs_spy)
+            add_docs_counter)
 
         with put_ctx, add_docs_ctx:
             gae_search_services.add_documents_to_index(docs, 'my_index', 5)
 
-        self.assertEqual(add_docs_spy.times_called, 5)
+        self.assertEqual(add_docs_counter.times_called, 5)
         for i in xrange(1, 4):
             result = search.Index('my_index').get('doc' + str(i))
             self.assertEqual(result.field('prop').value, 'val' + str(i))
@@ -229,16 +238,15 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
                 {'id': 'doc3', 'prop': 'val3'}]
 
         error = self._get_put_error(3)
-        wrapped_put = test_utils.Spy(search.Index.put)
-        wrapped_put.succeed_after_n_tries(1, error)
+        failing_put = test_utils.FailingFunction(search.Index.put, error, 1)
 
-        add_docs_spy = test_utils.Spy(
+        add_docs_counter = test_utils.CallCounter(
             gae_search_services.add_documents_to_index)
         add_docs_ctx = self.swap(
             gae_search_services, 
             'add_documents_to_index', 
-            add_docs_spy)
-        put_ctx = self.swap(search.Index, 'put', wrapped_put)
+            add_docs_counter)
+        put_ctx = self.swap(search.Index, 'put', failing_put)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with add_docs_ctx, put_ctx, assert_raises_ctx as e:
@@ -246,7 +254,7 @@ class SearchAddToIndexTests(test_utils.GenericTestBase):
 
         # assert that the method only gets called once, since the error is not
         # transient.
-        self.assertEqual(add_docs_spy.times_called, 1)
+        self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
 
 
@@ -297,19 +305,20 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
     def test_use_default_num_retries(self):
         exception = self._get_delete_error(1, 0)
-        delete_spy = test_utils.Spy(search.Index.delete)
-        delete_spy.succeed_after_n_tries(
-            gae_search_services.DEFAULT_NUM_RETRIES,
-            exception)
+        failing_delete = test_utils.FailingFunction(
+            search.Index.delete,
+            exception,
+            gae_search_services.DEFAULT_NUM_RETRIES
+            )
 
-        delete_docs_spy = test_utils.Spy(
+        delete_docs_counter = test_utils.CallCounter(
             gae_search_services.delete_documents_from_index)
 
-        delete_ctx = self.swap(search.Index, 'delete', delete_spy)
+        delete_ctx = self.swap(search.Index, 'delete', failing_delete)
         delete_docs_ctx = self.swap(
             gae_search_services, 
             'delete_documents_from_index', 
-            delete_docs_spy)
+            delete_docs_counter)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with delete_ctx, delete_docs_ctx, assert_raises_ctx as cm:
@@ -318,28 +327,27 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
         self.assertEqual(cm.exception.original_exception, exception)
 
         self.assertEqual(
-            delete_docs_spy.times_called,
+            delete_docs_counter.times_called,
             gae_search_services.DEFAULT_NUM_RETRIES)
 
     def test_use_custom_number_of_retries(self):
         exception = self._get_delete_error(1, 0)
-        delete_spy = test_utils.Spy(search.Index.delete)
-        delete_spy.succeed_after_n_tries(42, exception)
+        failing_delete = test_utils.FailingFunction(search.Index.delete, exception, 42)
 
-        delete_docs_spy = test_utils.Spy(
+        delete_docs_counter = test_utils.CallCounter(
             gae_search_services.delete_documents_from_index)
 
-        delete_ctx = self.swap(search.Index, 'delete', delete_spy)
+        delete_ctx = self.swap(search.Index, 'delete', failing_delete)
         delete_docs_ctx = self.swap(
             gae_search_services, 
             'delete_documents_from_index', 
-            delete_docs_spy)
+            delete_docs_counter)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with delete_ctx, delete_docs_ctx, assert_raises_ctx as cm:
             gae_search_services.delete_documents_from_index(['id'], 'index', 42)
 
-        self.assertEqual(delete_docs_spy.times_called, 42)
+        self.assertEqual(delete_docs_counter.times_called, 42)
 
     def test_arguments_are_preserved_in_retries(self):
         index = search.Index('index')
@@ -347,29 +355,30 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
             search.TextField(name='prop', value='val')
         ])])
         exception = self._get_delete_error(1, 0)
-        delete_spy = test_utils.Spy(search.Index.delete)
-        delete_spy.succeed_after_n_tries(3, exception)
+        failing_delete = test_utils.FailingFunction(search.Index.delete, exception, 3)
 
-        delete_docs_spy = test_utils.Spy(
+        delete_docs_counter = test_utils.CallCounter(
             gae_search_services.delete_documents_from_index)
 
-        index_ctx = self.swap(search.Index, 'delete', delete_spy)
+        index_ctx = self.swap(search.Index, 'delete', failing_delete)
         delete_docs_ctx = self.swap(
             gae_search_services, 
             'delete_documents_from_index', 
-            delete_docs_spy)
+            delete_docs_counter)
         with index_ctx, delete_docs_ctx:
             gae_search_services.delete_documents_from_index(['doc'], 'index', 4)
 
-        self.assertEqual(delete_docs_spy.times_called, 4)
+        self.assertEqual(delete_docs_counter.times_called, 4)
         result = search.Index('my_index').get('doc')
         self.assertIsNone(result)
 
     def test_delete_error_with_transient_result(self):
         error = self._get_delete_error(3, transient=1)
-        delete_spy = test_utils.Spy(search.Index.delete)
-        delete_spy.succeed_after_n_tries(4, error)
-        delete_docs_spy = test_utils.Spy(
+        failing_delete = test_utils.FailingFunction(
+            search.Index.delete,
+            error,
+            4)
+        delete_docs_counter = test_utils.CallCounter(
             gae_search_services.delete_documents_from_index)
         index = search.Index('my_index')
         for i in xrange(3):
@@ -377,32 +386,31 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
                 search.TextField(name='prop', value='value')
             ]))
 
-        delete_ctx = self.swap(search.Index, 'delete', delete_spy)
+        delete_ctx = self.swap(search.Index, 'delete', failing_delete)
         delete_docs_ctx = self.swap(
             gae_search_services, 
             'delete_documents_from_index', 
-            delete_docs_spy)
+            delete_docs_counter)
         with delete_ctx, delete_docs_ctx:
             gae_search_services.delete_documents_from_index(
                 ['d0', 'd1', 'd2'], 
                 'my_index', 
                 retries=5)
 
-        self.assertEqual(delete_docs_spy.times_called, 5)
+        self.assertEqual(delete_docs_counter.times_called, 5)
         for i in xrange(3):
             result = search.Index('my_index').get('doc' + str(i))
             self.assertIsNone(result)
 
     def test_put_error_without_transient_result(self):
         error = self._get_delete_error(3)
-        delete_spy = test_utils.Spy(search.Index.delete)
-        delete_spy.succeed_after_n_tries(1, error)
-        delete_docs_spy = test_utils.Spy(
+        delete_spy = test_utils.FailingFunction(search.Index.delete, error, 1)
+        delete_docs_counter = test_utils.CallCounter(
             gae_search_services.delete_documents_from_index)
         delete_docs_ctx = self.swap(
             gae_search_services,
             'delete_documents_from_index',
-            delete_docs_spy)
+            delete_docs_counter)
         delete_ctx = self.swap(search.Index, 'delete', delete_spy)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
@@ -413,7 +421,7 @@ class SearchRemoveFromIndexTests(test_utils.GenericTestBase):
 
         # assert that the method only gets called once, since the error is not
         # transient
-        self.assertEqual(delete_docs_spy.times_called, 1)
+        self.assertEqual(delete_docs_counter.times_called, 1)
         self.assertEqual(e.exception.original_exception, error)
 
 
@@ -557,13 +565,16 @@ class SearchQueryTests(test_utils.GenericTestBase):
 
     def test_use_default_num_retries(self):
         exception = search.TransientError('oops')
-        index_search_spy = test_utils.Spy(search.Index.search)
-        index_search_spy.succeed_after_n_tries(gae_search_services.DEFAULT_NUM_RETRIES, exception)
+        failing_index_search = test_utils.FailingFunction(
+            search.Index.search,
+            exception,
+            gae_search_services.DEFAULT_NUM_RETRIES
+            )
 
-        search_spy = test_utils.Spy(gae_search_services.search)
+        search_counter = test_utils.CallCounter(gae_search_services.search)
 
-        search_ctx = self.swap(search.Index, 'search', index_search_spy)
-        search_counter_ctx = self.swap(gae_search_services, 'search', search_spy)
+        search_ctx = self.swap(search.Index, 'search', failing_index_search)
+        search_counter_ctx = self.swap(gae_search_services, 'search', search_counter)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with search_ctx, search_counter_ctx, assert_raises_ctx as cm:
@@ -572,24 +583,26 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(cm.exception.original_exception, exception)
 
         self.assertEqual(
-            search_spy.times_called,
+            search_counter.times_called,
             gae_search_services.DEFAULT_NUM_RETRIES)
 
     def test_use_custom_number_of_retries(self):
         exception = search.TransientError('oops')
-        index_search_spy = test_utils.Spy(search.Index.search)
-        index_search_spy.succeed_after_n_tries(3, exception)
+        failing_index_search = test_utils.FailingFunction(
+            search.Index.search,
+            exception,
+            3)
 
-        search_spy = test_utils.Spy(gae_search_services.search)
+        search_counter = test_utils.CallCounter(gae_search_services.search)
 
-        index_ctx = self.swap(search.Index, 'search', index_search_spy)
-        search_counter_ctx = self.swap(gae_search_services, 'search', search_spy)
+        index_ctx = self.swap(search.Index, 'search', failing_index_search)
+        search_counter_ctx = self.swap(gae_search_services, 'search', search_counter)
         assert_raises_ctx = self.assertRaises(
             gae_search_services.SearchFailureError)
         with index_ctx, search_counter_ctx, assert_raises_ctx as cm:
             gae_search_services.search('query', 'my_index', retries=3)
 
-        self.assertEqual(search_spy.times_called, 3)
+        self.assertEqual(search_counter.times_called, 3)
 
     def test_arguments_are_preserved_in_retries(self):
         for i in xrange(3):
@@ -600,13 +613,12 @@ class SearchQueryTests(test_utils.GenericTestBase):
             search.Index('my_index').put(doc)
 
         exception = search.TransientError('oops')
-        index_search_spy = test_utils.Spy(search.Index.search)
-        index_search_spy.succeed_after_n_tries(3, exception)
+        failing_index_search = test_utils.FailingFunction(search.Index.search, exception, 3)
 
-        search_spy = test_utils.Spy(gae_search_services.search)
+        search_counter = test_utils.CallCounter(gae_search_services.search)
 
-        gae_search_ctx = self.swap(search.Index, 'search', index_search_spy)
-        search_counter_ctx = self.swap(gae_search_services, 'search', search_spy)
+        gae_search_ctx = self.swap(search.Index, 'search', failing_index_search)
+        search_counter_ctx = self.swap(gae_search_services, 'search', search_counter)
         with gae_search_ctx, search_counter_ctx:
             result, cursor = gae_search_services.search(
                 'prop:val', 
@@ -617,13 +629,15 @@ class SearchQueryTests(test_utils.GenericTestBase):
                 retries=4)
 
 
-        index_search_spy2 = test_utils.Spy(search.Index.search)
-        index_search_spy2.succeed_after_n_tries(3, exception)
+        failing_index_search2 = test_utils.FailingFunction(
+            search.Index.search,
+            exception,
+            3)
 
-        search_spy2 = test_utils.Spy(gae_search_services.search)
+        search_counter2 = test_utils.CallCounter(gae_search_services.search)
 
-        gae_search_ctx2 = self.swap(search.Index, 'search', index_search_spy2)
-        search_counter_ctx2 = self.swap(gae_search_services, 'search', search_spy2)
+        gae_search_ctx2 = self.swap(search.Index, 'search', failing_index_search2)
+        search_counter_ctx2 = self.swap(gae_search_services, 'search', search_counter2)
         with gae_search_ctx2, search_counter_ctx2:
             result2, cursor = gae_search_services.search(
                 'prop:val', 
@@ -634,9 +648,9 @@ class SearchQueryTests(test_utils.GenericTestBase):
                 ids_only=True, 
                 retries=4)
 
-        self.assertEqual(search_spy.times_called, 4)
+        self.assertEqual(search_counter.times_called, 4)
         self.assertEqual(result, [{'id': 'doc2'}, {'id': 'doc1'}])
 
         # also check that the cursor is preserved
-        self.assertEqual(search_spy2.times_called, 4)
+        self.assertEqual(search_counter2.times_called, 4)
         self.assertEqual(result2, [{'id': 'doc0'}])
