@@ -25,6 +25,8 @@ from google.appengine.api import search
 from core.platform.search import gae_search_services
 from core.tests import test_utils
 
+import feconf
+
 
 class SearchAddToIndexTests(test_utils.GenericTestBase):
     """Test inserting documents into search indexes"""
@@ -429,32 +431,44 @@ class SearchQueryTests(test_utils.GenericTestBase):
     """Test searching for documents in an index."""
 
     def test_search_all_documents(self):
-        doc1 = search.Document(doc_id='doc1', fields=[
+        doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2', fields=[
+        doc2 = search.Document(doc_id='doc2', language='en', rank=2, fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3', fields=[
+        doc3 = search.Document(doc_id='doc3', language='en', rank=3, fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
         result, cursor = gae_search_services.search('k:abc', 'my_index')
-        self.assertIn({'id': 'doc1', 'k': 'abc def ghi'}, result)
-        self.assertIn({'id': 'doc2', 'k': 'abc jkl mno'}, result)
-        self.assertIn({'id': 'doc3', 'k': 'abc jkl ghi'}, result)
+        self.assertIn(
+            {'id': 'doc1', 'k': 'abc def ghi', 'rank': 1, 'language_code': 'en'},
+            result)
+        self.assertIn(
+            {'id': 'doc2', 'k': 'abc jkl mno', 'rank': 2, 'language_code': 'en'},
+            result)
+        self.assertIn(
+            {'id': 'doc3', 'k': 'abc jkl ghi', 'rank': 3, 'language_code': 'en'},
+            result)
 
     def test_respect_search_query(self):
-        doc1 = search.Document(doc_id='doc1', fields=[
+        doc1 = search.Document(doc_id='doc1', rank=1, language='en', fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2', fields=[
+        doc2 = search.Document(doc_id='doc2', rank=1, language='en', fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3', fields=[
+        doc3 = search.Document(doc_id='doc3', rank=1, language='en', fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
         result, cursor = gae_search_services.search('k:jkl', 'my_index')
-        self.assertNotIn({'id': 'doc1', 'k': 'abc def ghi'}, result)
-        self.assertIn({'id': 'doc2', 'k': 'abc jkl mno'}, result)
-        self.assertIn({'id': 'doc3', 'k': 'abc jkl ghi'}, result)
+        self.assertNotIn(
+            {'id': 'doc1', 'k': 'abc def ghi', 'language_code': 'en', 'rank': 1},
+            result)
+        self.assertIn(
+            {'id': 'doc2', 'k': 'abc jkl mno', 'language_code': 'en', 'rank': 1},
+            result)
+        self.assertIn(
+            {'id': 'doc3', 'k': 'abc jkl ghi', 'language_code': 'en', 'rank': 1},
+            result)
 
     def test_respect_limit(self):
         doc1 = search.Document(doc_id='doc1', fields=[
@@ -469,11 +483,11 @@ class SearchQueryTests(test_utils.GenericTestBase):
         self.assertEqual(len(result), 2)
 
     def test_use_cursor(self):
-        doc1 = search.Document(doc_id='doc1', fields=[
+        doc1 = search.Document(doc_id='doc1', language='en', rank=1, fields=[
             search.TextField(name='k', value='abc def ghi')])
-        doc2 = search.Document(doc_id='doc2', fields=[
+        doc2 = search.Document(doc_id='doc2', language='en', rank=1, fields=[
             search.TextField(name='k', value='abc jkl mno')])
-        doc3 = search.Document(doc_id='doc3', fields=[
+        doc3 = search.Document(doc_id='doc3', language='en', rank=1, fields=[
             search.TextField(name='k', value='abc jkl ghi')])
         index = search.Index('my_index')
         index.put([doc1, doc2, doc3])
@@ -483,9 +497,15 @@ class SearchQueryTests(test_utils.GenericTestBase):
                                                      cursor=cursor)
         self.assertEqual(len(result1), 2)
         self.assertEqual(len(result2), 1)
-        self.assertIn({'id': 'doc1', 'k': 'abc def ghi'}, result1 + result2)
-        self.assertIn({'id': 'doc2', 'k': 'abc jkl mno'}, result1 + result2)
-        self.assertIn({'id': 'doc3', 'k': 'abc jkl ghi'}, result1 + result2)
+        dict1 = {'id': 'doc1', 'k': 'abc def ghi', 'language_code': 'en',
+                 'rank': 1}
+        self.assertIn(dict1, result1 + result2)
+        dict2 = {'id': 'doc2', 'k': 'abc jkl mno', 'language_code': 'en',
+                 'rank': 1}
+        self.assertIn(dict2, result1 + result2)
+        dict3 = {'id': 'doc3', 'k': 'abc jkl ghi', 'language_code': 'en',
+                 'rank': 1}
+        self.assertIn(dict3, result1 + result2)
 
     def test_ids_only(self):
         doc1 = search.Document(doc_id='doc1', fields=[
@@ -500,9 +520,9 @@ class SearchQueryTests(test_utils.GenericTestBase):
             'k:abc', 
             'my_index', 
             ids_only=True)
-        self.assertIn({'id':'doc1'}, result)
-        self.assertIn({'id':'doc2'}, result)
-        self.assertIn({'id':'doc3'}, result)
+        self.assertIn('doc1', result)
+        self.assertIn('doc2', result)
+        self.assertIn('doc3', result)
 
     def test_cursor_is_none_if_no_more_results(self):
         doc1 = search.Document(doc_id='doc1', fields=[
@@ -528,17 +548,15 @@ class SearchQueryTests(test_utils.GenericTestBase):
         gae_search_services.add_documents_to_index([dict2], 'my_index')
         time.sleep(1)
         gae_search_services.add_documents_to_index([dict3], 'my_index')
-        result, cursor = gae_search_services.search('k:abc', index='my_index')
-        self.assertEqual(result, [dict3, dict2, dict1])
+        result, cursor = gae_search_services.search('k:abc', index='my_index',
+                                                    ids_only=True)
+        self.assertEqual(result, ['doc3', 'doc2', 'doc1'])
 
-    def test_search_with_custom_rank(self):
-        doc1 = {'id': 'doc1', 'k': 'abc def', 'rank': 3}
-        doc2 = {'id': 'doc2', 'k': 'abc ghi', 'rank': 1}
-        doc3 = {'id': 'doc3', 'k': 'abc jkl', 'rank': 2}
+    def test_search_with_custom_rank_and_language(self):
+        doc1 = {'id': 'doc1', 'k': 'abc def', 'rank': 3, 'language_code': 'en'}
+        doc2 = {'id': 'doc2', 'k': 'abc ghi', 'rank': 1, 'language_code': 'fr'}
+        doc3 = {'id': 'doc3', 'k': 'abc jkl', 'rank': 2, 'language_code': 'nl'}
         gae_search_services.add_documents_to_index([doc1, doc2, doc3], 'index')
-        del doc1['rank']
-        del doc2['rank']
-        del doc3['rank']
         result, cursor = gae_search_services.search('k:abc', index='index')
         self.assertEqual(result, [doc1, doc3, doc2])
 
@@ -548,9 +566,13 @@ class SearchQueryTests(test_utils.GenericTestBase):
         doc3 = {'id': 'doc3', 'k': 'abc jkl'}
         gae_search_services.add_documents_to_index([doc1, doc2, doc3], 'index')
         result, cursor = gae_search_services.search('k:abc', 'index', sort='+k')
-        self.assertEqual(result, [doc2, doc1, doc3])
+        self.assertEqual(result[0].get('id'), 'doc2')
+        self.assertEqual(result[1].get('id'), 'doc1')
+        self.assertEqual(result[2].get('id'), 'doc3')
         result, cursor = gae_search_services.search('k:abc', 'index', sort='-k')
-        self.assertEqual(result, [doc3, doc1, doc2])
+        self.assertEqual(result[0].get('id'), 'doc3')
+        self.assertEqual(result[1].get('id'), 'doc1')
+        self.assertEqual(result[2].get('id'), 'doc2')
 
     def test_search_using_multiple_sort_expressions(self):
         doc1 = {'id': 'doc1', 'k1': 2, 'k2': 'abc ghi'}
@@ -561,7 +583,10 @@ class SearchQueryTests(test_utils.GenericTestBase):
             'k2:abc', 
             'index', 
             sort='+k1 -k2')
-        self.assertEqual(result, [doc3, doc2, doc1])
+        self.assertEqual(result[0].get('id'), 'doc3')
+        self.assertEqual(result[1].get('id'), 'doc2')
+        self.assertEqual(result[2].get('id'), 'doc1')
+
 
     def test_use_default_num_retries(self):
         exception = search.TransientError('oops')
@@ -649,8 +674,18 @@ class SearchQueryTests(test_utils.GenericTestBase):
                 retries=4)
 
         self.assertEqual(search_counter.times_called, 4)
-        self.assertEqual(result, [{'id': 'doc2'}, {'id': 'doc1'}])
+        self.assertEqual(result, ['doc2', 'doc1'])
 
         # also check that the cursor is preserved
         self.assertEqual(search_counter2.times_called, 4)
-        self.assertEqual(result2, [{'id': 'doc0'}])
+        self.assertEqual(result2, ['doc0'])
+
+class SearchGetFromIndexTests(test_utils.GenericTestBase):
+    def test_get_document_from_index(self):
+        document = search.Document(doc_id="my_doc", fields=[
+            search.TextField(name="my_field", value="value")
+        ])
+        search.Index('my_index').put(document)
+        result = gae_search_services.get_document_from_index('my_doc', 'my_index')
+        self.assertEqual(result.get('id'), 'my_doc')
+        self.assertEqual(result.get('my_field'), 'value')

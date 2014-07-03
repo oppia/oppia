@@ -218,7 +218,8 @@ def search(query_string, index, cursor=None, limit=20, sort='', ids_only=False,
 
     Returns:
       returns a tuple with two elements:
-        - a list of dictionaries representing search documents
+        - a list of dictionaries representing search documents. If ids_only is
+          True, this will be a list of strings, doc_ids.
         - a cursor that you can pass back in to get the next page of results.
           This wil be a web safe string that you can use in urls.
           It will be None if there is no next page.
@@ -264,8 +265,12 @@ def search(query_string, index, cursor=None, limit=20, sort='', ids_only=False,
     if results.cursor:
         result_cursor_str = results.cursor.web_safe_string
 
-    dicts = [_search_document_to_dict(doc) for doc in results.results]
-    return dicts, result_cursor_str
+    if ids_only:
+        result_docs = [doc.doc_id for doc in results.results]
+    else:
+        result_docs = [_search_document_to_dict(doc) for doc in results.results]
+
+    return result_docs, result_cursor_str
 
 
 def _string_to_sort_expressions(s):
@@ -287,8 +292,22 @@ def _string_to_sort_expressions(s):
     return sort_expressions
 
 
+def get_document_from_index(doc_id, index):
+    """Returns a document with a give doc_id(s) from the index.
+
+    args:
+      - doc_ids: a doc_id as a string
+      - index: the name of an index, a string.
+
+    returns
+      - the requested document as a dict
+    """
+    index = gae_search.Index(index)
+    return _search_document_to_dict(index.get(doc_id))
+
+
 def _search_document_to_dict(doc):
-    d = {'id': doc.doc_id}
+    d = {'id': doc.doc_id, 'language_code': doc.language, 'rank': doc.rank}
 
     for field in doc.fields:
         d[field.name] = field.value
