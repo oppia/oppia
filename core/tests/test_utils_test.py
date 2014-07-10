@@ -27,8 +27,8 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
     def test_wrapper_calls_subclass_methods(self):
         """Tests the basic functionality of FunctionWrapper."""
 
-        # Keeps track of which functions have been called, to test that before_call,
-        # the actual function, and after_call are called in the right order.
+        # Keeps track of which functions have been called, to test that pre_call_hook,
+        # the actual function, and post_call_hook are called in the right order.
         order = []
         testcase = self
 
@@ -40,7 +40,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 testcase.assertEqual(args.get('foo'), 'foo')
                 testcase.assertEqual(args.get('bar'), 'bar')
 
-            def after_call(self, result):
+            def post_call_hook(self, result):
                 order.append('after')
                 testcase.assertEqual(result, "foobar")
 

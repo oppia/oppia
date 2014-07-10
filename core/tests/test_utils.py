@@ -295,7 +295,7 @@ else:
 
 class FunctionWrapper(object):
     """A utility for making function wrappers. Create a subclass and override
-       any or both of the before_call and after_call methods. See these methods
+       any or both of the pre_call_hook and post_call_hook methods. See these methods
        for more info."""
 
     def __init__(self, f):
@@ -314,25 +314,25 @@ class FunctionWrapper(object):
 
         args_dict = inspect.getcallargs(self._f, *args, **kwargs)
 
-        self.before_call(args_dict)
+        self.pre_call_hook(args_dict)
 
         result = self._f(*args, **kwargs)
 
-        self.after_call(result)
+        self.post_call_hook(result)
 
         return result
 
     def __get__(self, instance, owner):
         # We have to implement __get__ because otherwise, we don't have a chance
-        # to the instance self._f was bound to. Seee the following SO answer:
+        # to bind to the instance self._f was bound to. See the following SO answer:
         # http://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
 
-    def before_call(self, args):
+    def pre_call_hook(self, args):
         pass
 
-    def after_call(self, result):
+    def post_call_hook(self, result):
         pass
 
 
@@ -345,35 +345,35 @@ class CallCounter(FunctionWrapper):
         """Counts the number of times the given function has been called.
            See FunctionWrapper for arguments."""
         super(CallCounter, self).__init__(f)
-        self._count = 0
+        self._times_called = 0
 
     @property
     def times_called(self):
-        return self._count
+        return self._times_called
 
-    def before_call(self, args):
-        self._count += 1
+    def pre_call_hook(self, args):
+        self._times_called += 1
 
 
-class FailingFunction(CallCounter):
+class FailingFunction(FunctionWrapper):
     """A function wrapper that makes a function fail, raising a given exception.
        It can be set to succeed after a given number of calls."""
 
-    def __init__(self, f, exception, succeed_after_tries):
+    def __init__(self, f, exception, num_tries_before_success):
         """Create a new Failing function.
 
         args:
           - f: see FunctionWrapper.
           - exception: the exception to be raised.
-          - succeed_after_tries: the number of times to raise an exception.
-            before a calls succeeds.
+          - num_tries_before_success: the number of times to raise an exception,
+            before a call succeeds. If this is 0, all calls will succeed, if it
+            is negative, all calls will fail.
         """
-        super(FailingFunction, self).__init__(f)
         self._exception = exception
-        self._n = succeed_after_tries
-        self._count = 0
+        self._num_tries_before_success = num_tries_before_success
+        self._times_called = 0
 
-    def before_call(self, args):
-        super(FailingFunction, self).before_call(args)
-        if self._n < 0 or self.times_called <= self._n:
+    def pre_call_hook(self, args):
+        self._times_called += 1
+        if not 0 <= self._num_tries_before_success <= self._times_called :
             raise self._exception
