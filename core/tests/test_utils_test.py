@@ -34,10 +34,10 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
         class MyWrapper(test_utils.FunctionWrapper):
 
-            def before_call(self, args):
+            def pre_call_hook(self, args):
                 order.append('before')
-                testcase.assertEqual(args.get('foo'), 'foo')
-                testcase.assertEqual(args.get('bar'), 'bar')
+                testcase.assertEqual(args.get('posarg'), 'foo')
+                testcase.assertEqual(args.get('kwarg'), 'bar')
 
             def post_call_hook(self, result):
                 order.append('after')
@@ -45,7 +45,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
         def function(posarg, kwarg):
             order.append("call")
-            return foo + bar
+            return posarg + kwarg
 
         wrapped = MyWrapper(function)
 
@@ -118,6 +118,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         self.assertEqual(wrapped('foobar'), 'foobarfoobar')
         self.assertEqual(data.get('value'), 'foobar')
 
+
 class CallCounterTests(test_utils.GenericTestBase):
     def test_call_counter_counts_the_number_of_times_a_function_gets_called(self):
         f = lambda x: x ** 2
@@ -143,6 +144,7 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         for i in xrange(5):
             with self.assertRaises(CustomError):
                 ff(i)
+                raise ValueError(str(i))
 
         self.assertEqual(ff(5), 25)
 
@@ -157,4 +159,3 @@ class FailingFunctionTests(test_utils.GenericTestBase):
         for i in xrange(20):
             with self.assertRaises(CustomError):
                 ff(i)
-

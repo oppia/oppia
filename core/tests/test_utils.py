@@ -369,11 +369,12 @@ class FailingFunction(FunctionWrapper):
             before a call succeeds. If this is 0, all calls will succeed, if it
             is negative, all calls will fail.
         """
+        super(FailingFunction, self).__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
         self._times_called = 0
 
     def pre_call_hook(self, args):
         self._times_called += 1
-        if not 0 <= self._num_tries_before_success <= self._times_called :
+        if not (0 <= self._num_tries_before_success < self._times_called):
             raise self._exception
