@@ -34,7 +34,6 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
         class MyWrapper(test_utils.FunctionWrapper):
 
-
             def before_call(self, args):
                 order.append('before')
                 testcase.assertEqual(args.get('foo'), 'foo')
@@ -44,13 +43,13 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 order.append('after')
                 testcase.assertEqual(result, "foobar")
 
-        def function(foo, bar):
+        def function(posarg, kwarg):
             order.append("call")
             return foo + bar
 
         wrapped = MyWrapper(function)
 
-        self.assertEqual(wrapped('foo', bar='bar'), 'foobar')
+        self.assertEqual(wrapped('foo', kwarg='bar'), 'foobar')
         self.assertEqual(order, ['before', 'call', 'after'])
 
     def test_wrapper_calls_passed_method(self):
@@ -63,7 +62,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
 
             def my_method(self, b):
                 data['value'] = self.a + b
-                return (self.a + b)*2
+                return (self.a + b) * 2
 
         wrapped = test_utils.FunctionWrapper(A.my_method)
 
@@ -82,7 +81,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
             @classmethod
             def class_method(cls, b):
                 data['value'] = cls.a + b
-                return (cls.a + b)*2
+                return (cls.a + b) * 2
 
         wrapped = test_utils.FunctionWrapper(A.class_method)
         with self.swap(A, 'class_method', wrapped):
@@ -98,7 +97,7 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
             @staticmethod
             def static_method(ab):
                 data['value'] = ab
-                return ab*2
+                return ab * 2
 
         wrapped = test_utils.FunctionWrapper(A.static_method)
         with self.swap(A, 'static_method', wrapped):
@@ -120,16 +119,16 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
         self.assertEqual(data.get('value'), 'foobar')
 
 class CallCounterTests(test_utils.GenericTestBase):
-    def call_counter_counts_the_number_of_times_a_function_gets_called(self):
+    def test_call_counter_counts_the_number_of_times_a_function_gets_called(self):
         f = lambda x: x ** 2
 
-        counter = test_utils.CallCounter(f)
+        wrapped_function = test_utils.CallCounter(f)
 
-        self.assertEqual(counter.times_called, 0)
+        self.assertEqual(wrapped_function.times_called, 0)
 
         for i in xrange(5):
-            self.assertEqual(counter(i), i ** 2)
-            self.assertEqual(counter.times_called, i + 1)
+            self.assertEqual(wrapped_function(i), i ** 2)
+            self.assertEqual(wrapped_function.times_called, i + 1)
 
 
 class FailingFunctionTests(test_utils.GenericTestBase):
