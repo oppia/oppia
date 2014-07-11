@@ -98,7 +98,7 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                          'state_name': item.state_name}
             yield (key_fmt % (item.exploration_id, item.state_name), map_value)
         if isinstance(item, stats_models.MaybeLeaveExplorationEventLogEntryModel):
-            if item.state_name is not feconf.END_DEST:
+            if item.state_name != feconf.END_DEST:
                 return
             map_value = {'type': 'EndExploration',
                          'exp_id': item.exploration_id,
