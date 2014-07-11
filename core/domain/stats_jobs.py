@@ -112,34 +112,39 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
         _, state_name = key.split(':')
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if (value['type'] == 'StartExploration' and state_name != feconf.END_DEST) or (value['type'] == 'EndExploration' and state_name == feconf.END_DEST): 
+            if ((value['type'] == 'StartExploration' 
+                     and state_name != feconf.END_DEST)
+                 or (value['type'] == 'EndExploration'
+                     and state_name == feconf.END_DEST)): 
                events_count += 1
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
             if value['type'] == 'StateCounterModel':
                 missing_events = value['count'] - events_count
                 for i in range(missing_events):
+                    version = exp_services.get_exploration_by_id(value['exp_id']).version
+                    created_on = datetime.fromtimestamp(value['created_on']/1000)
                     if state_name != feconf.END_DEST:
                         start = stats_models.StartExplorationEventLogEntryModel(
                             event_type=feconf.EVENT_TYPE_START,
                             exploration_id=value['exp_id'],
-                            exploration_version=exp_services.get_exploration_by_id(value['exp_id']).version,
+                            exploration_version=version,
                             state_name=value['state_name'],
                             session_id=utils.generate_random_string(24),
                             client_time_spent_in_secs=0.0,
                             params={},
                             play_type=feconf.PLAY_TYPE_NORMAL)
-                        start.created_on = datetime.fromtimestamp(value['created_on']/1000)
+                        start.created_on = created_on
                         start.put()
                     if state_name == feconf.END_DEST:
                         leave_event_entity = stats_models.MaybeLeaveExplorationEventLogEntryModel(
                             event_type=feconf.EVENT_TYPE_LEAVE,
                             exploration_id=value['exp_id'],
-                            exploration_version=exp_services.get_exploration_by_id(value['exp_id']).version,
+                            exploration_version=version,
                             state_name=state_name,
                             session_id=utils.generate_random_string(24),
                             client_time_spent_in_secs=0.0,
                             params={},
                             play_type=feconf.PLAY_TYPE_NORMAL)
-                        leave_event_entity.created_on = datetime.fromtimestamp(value['created_on']/1000)
+                        leave_event_entity.created_on = created_on
                         leave_event_entity.put()
