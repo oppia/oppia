@@ -24,6 +24,7 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
+import datetime
 
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
@@ -105,6 +106,15 @@ class BaseModel(ndb.Model):
         if not include_deleted_entities:
             query = query.filter(cls.deleted == False)
         return query
+
+    @classmethod
+    def get_all_updated_within_timedelta(cls, timedelta):
+        """Returns all instances that were updated at most timedelta time ago."""
+        if not isinstance(timedelta, datetime.timedelta):
+            raise ValueError("timedelta must be a datetime.timedelta instance.")
+
+        first_date = datetime.datetime.now() - timedelta
+        return cls.get_all().filter(cls.last_updated >= first_date)
 
     @classmethod
     def get_new_id(cls, entity_name):
