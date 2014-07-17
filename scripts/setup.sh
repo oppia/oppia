@@ -74,3 +74,4 @@ export OS=`uname`
 
 export NPM_INSTALL="$TOOLS_DIR/node-0.10.1/bin/npm install"
 export PHANTOMJS_BIN="$NODE_MODULE_DIR/phantomjs/bin/phantomjs"
+export CHROME_BIN="/usr/bin/google-chrome"

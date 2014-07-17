@@ -33,7 +33,7 @@ module.exports = function(config) {
       dir: '../karma_coverage_reports/'
     },
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     // Continue running in the background after running tests.

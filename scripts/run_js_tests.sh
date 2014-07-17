@@ -42,10 +42,17 @@ source $(dirname $0)/setup_gae.sh || exit 1
 # TODO(sll): Make this work with fewer third-party dependencies.
 bash scripts/install_third_party.sh
 
+echo $NPM_INSTALL
 echo Checking whether karma is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
   echo Installing karma
   $NPM_INSTALL karma@0.12.16
+fi
+
+echo Checking whether karma-chrome-launcher is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/karma-chrome-launcher" ]; then
+  echo Installing karma-chrome-launcher
+  $NPM_INSTALL karma-chrome-launcher@0.1.4
 fi
 
 echo Checking whether karma-jasmine is installed in $TOOLS_DIR
@@ -60,18 +67,6 @@ echo Checking whether karma-coverage is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/karma-coverage" ]; then
   echo Installing karma-coverage
   $NPM_INSTALL karma-coverage@0.2.4
-fi
-
-echo Checking whether phantomjs is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/phantomjs" ]; then
-  echo Installing phantomjs
-  $NPM_INSTALL phantomjs@1.9
-fi
-
-echo Checking whether karma-phantomjs-launcher is installed in $TOOLS_DIR
-if [ ! -d "$NODE_MODULE_DIR/karma-phantomjs-launcher" ]; then
-  echo Installing karma-phantomjs-launcher
-  $NPM_INSTALL karma-phantomjs-launcher@0.1.4
 fi
 
 echo Checking whether karma-ng-html2js-preprocessor is installed in $TOOLS_DIR
