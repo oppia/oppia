@@ -18,8 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-import os
-
 import feconf
 import jinja_utils
 
@@ -49,7 +47,7 @@ class BaseSkin(object):
             raise Exception(
                 'No entry-point specified for skin %s.' % cls().skin_id)
         return jinja2.Markup(jinja_utils.get_jinja_env(
-            feconf.SKINS_TEMPLATES_DIR).get_template(os.path.join(
+            feconf.SKINS_TEMPLATES_DIR).get_template('%s/%s' % (
                 cls().skin_id, cls.entry_point_path)).render())
 
 
