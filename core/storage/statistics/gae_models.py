@@ -146,7 +146,24 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     Due to complexity on browser end, this event may be logged when user clicks
     close and then cancel. Thus, the real event is the last event of this type
-    logged for the session id."""
+    logged for the session id.
+    Version 0: Has no maybe leave events, just real leave evnts
+        event_type = 'leave'
+        exploration_id = Id of exploration currently being played
+        exploration_version = approximate version of exploration
+        state_name = Name of current state
+        play_type = 'normal'
+        approximate_created_on date, likely not useful
+        version = 0
+
+    Version 1:
+        V0 + exact_version, exact created_on
+        session_id = ID of current student's session
+        params = Current parameter values, map of parameter name to value
+        client_time_spent_in_secs = time spent in this state before this event
+        version = 1
+
+    """
 
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
@@ -196,7 +213,24 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a student starting the exploration."""
+    """An event triggered by a student starting the exploration.
+ 
+    Version 0:
+        event_type = 'start'
+        exploration_id = Id of exploration currently being played
+        exploration_version = approximate version of exploration
+        state_name = Name of current state
+        client_time_spent_in_secs = 0
+        play_type = 'normal'
+        approximate_created_on date, likely not useful
+        version = 0
+
+    Version 1:
+        V0 + exact_version, exact created_on
+        session_id = ID of current student's session
+        params = Current parameter values, map of parameter name to value
+        version = 1
+    """
 
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
