@@ -166,6 +166,8 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
+    # Which version this event is.
+    version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -177,7 +179,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-               client_time_spent_in_secs, params, play_type):
+               client_time_spent_in_secs, params, play_type, version=1):
         """Creates a new leave exploration event."""
         entity_id = cls.get_new_event_entity_id(exp_id,
                                                 session_id)
@@ -188,7 +190,8 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
                                  session_id=session_id,
                                  client_time_spent_in_secs=client_time_spent_in_secs,
                                  params=params,
-                                 play_type=play_type)
+                                 play_type=play_type,
+                                 version=version)
         leave_event_entity.put()
 
 
@@ -213,6 +216,8 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
+    # Version of the event type
+    version = ndb.IntegerProperty(indexed=True)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -224,7 +229,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-               params, play_type):
+               params, play_type, version=1):
         """Creates a new start exploration event."""
         entity_id = cls.get_new_event_entity_id(exp_id,
                                                 session_id)
@@ -235,7 +240,8 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
                                  session_id=session_id,
                                  client_time_spent_in_secs=0.0,
                                  params=params,
-                                 play_type=play_type)
+                                 play_type=play_type,
+                                 version=version)
         start_event_entity.put()
 
 

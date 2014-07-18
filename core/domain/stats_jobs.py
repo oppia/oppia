@@ -130,10 +130,11 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                             exploration_id=value['exp_id'],
                             exploration_version=version,
                             state_name=value['state_name'],
-                            session_id=utils.generate_random_string(24),
+                            session_id=None,
                             client_time_spent_in_secs=0.0,
-                            params={},
-                            play_type=feconf.PLAY_TYPE_NORMAL)
+                            params=None,
+                            play_type=feconf.PLAY_TYPE_NORMAL,
+                            version=0)
                         start.created_on = created_on
                         start.put()
                     if state_name == feconf.END_DEST:
@@ -142,9 +143,10 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                             exploration_id=value['exp_id'],
                             exploration_version=version,
                             state_name=state_name,
-                            session_id=utils.generate_random_string(24),
-                            client_time_spent_in_secs=0.0,
-                            params={},
-                            play_type=feconf.PLAY_TYPE_NORMAL)
+                            session_id=None,
+                            client_time_spent_in_secs=None,
+                            params=None,
+                            play_type=feconf.PLAY_TYPE_NORMAL,
+                            version=0)
                         leave_event_entity.created_on = created_on
                         leave_event_entity.put()
