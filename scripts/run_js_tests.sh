@@ -42,7 +42,6 @@ source $(dirname $0)/setup_gae.sh || exit 1
 # TODO(sll): Make this work with fewer third-party dependencies.
 bash scripts/install_third_party.sh
 
-echo $NPM_INSTALL
 echo Checking whether karma is installed in $TOOLS_DIR
 if [ ! -d "$NODE_MODULE_DIR/karma" ]; then
   echo Installing karma
