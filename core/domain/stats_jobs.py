@@ -47,25 +47,21 @@ class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        started_session_ids = set()
+        started_count = 0
+        complete_count = 0
         last_maybe_leave_by_session_id = {}
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
             if value['event_type'] == feconf.EVENT_TYPE_START:
-                started_session_ids.add(value['session_id'])
+                started_count += 1
             elif value['event_type'] == feconf.EVENT_TYPE_LEAVE:
-                session_id = value['session_id']
-                if (session_id not in last_maybe_leave_by_session_id or
-                    value['created_on'] > 
-                    last_maybe_leave_by_session_id[session_id]['created_on']):
-                    last_maybe_leave_by_session_id[session_id] = value
-        complete_events = [e for 
-                           e in last_maybe_leave_by_session_id.values() 
-                           if e['state_name'] == feconf.END_DEST]
+                if value['state_name'] == feconf.END_DEST:
+                    complete_count += 1
         stats_models.ExplorationAnnotationsModel(
             id=key,
-            num_visits=len(started_session_ids),
-            num_completions=len(complete_events)).put()
+            num_visits=started_count,
+            num_completions=complete_count).put()
+
 
 class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
     """Job that finds old versions of feedback events and translates them."""
@@ -75,32 +71,34 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                 stats_models.StartExplorationEventLogEntryModel,
                 stats_models.MaybeLeaveExplorationEventLogEntryModel]
 
+    START_EXPLORATION = 'StartExploration'
+    STATE_COUNTER_MODEL = 'StateCounterModel'
+    END_EXPLORATION = 'EndExploration'
+
     @staticmethod
     def map(item):
-        key_fmt = '%s:%s'
         if isinstance(item, stats_models.StateCounterModel):
             exp_id, state_name = item.key.id().split('.')
             exploration = exp_services.get_exploration_by_id(exp_id)
             start_state_name = exploration.init_state_name
-            if (state_name != feconf.END_DEST and
-                state_name != start_state_name):
+            if (state_name not in [feconf.END_DEST, start_state_name]):
                 return
-            map_value = {'type': 'StateCounterModel',
+            map_value = {'type': STATE_COUNTER_MODEL,
                          'exp_id': exp_id,
                          'state_name': state_name,
                          'created_on': int(utils.get_time_in_millisecs(item.created_on)),
                          'count': item.first_entry_count}
             yield (key_fmt % (exp_id, state_name), map_value)
-        if isinstance(item, stats_models.StartExplorationEventLogEntryModel):
-            map_value = {'type': 'StartExploration',
+        elif isinstance(item, stats_models.StartExplorationEventLogEntryModel):
+            map_value = {'type': START_EXPLORATION,
                          'exp_id': item.exploration_id,
                          'created_on': int(utils.get_time_in_millisecs(item.created_on)),
                          'state_name': item.state_name}
             yield (key_fmt % (item.exploration_id, item.state_name), map_value)
-        if isinstance(item, stats_models.MaybeLeaveExplorationEventLogEntryModel):
+        elif isinstance(item, stats_models.MaybeLeaveExplorationEventLogEntryModel):
             if item.state_name != feconf.END_DEST:
                 return
-            map_value = {'type': 'EndExploration',
+            map_value = {'type': END_EXPLORATION,
                          'exp_id': item.exploration_id,
                          'created_on': int(utils.get_time_in_millisecs(item.created_on)),
                          'state_name': item.state_name}
@@ -109,17 +107,17 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, stringified_values):
         events_count = 0
-        _, state_name = key.split(':')
+        state_name = value['state_name'] 
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if ((value['type'] == 'StartExploration' 
+            if ((value['type'] == START_EXPLORATION 
                      and state_name != feconf.END_DEST)
-                 or (value['type'] == 'EndExploration'
+                 or (value['type'] == END_EXPLORATION
                      and state_name == feconf.END_DEST)): 
                events_count += 1
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value['type'] == 'StateCounterModel':
+            if value['type'] == STATE_COUNTER_MODEL:
                 missing_events = value['count'] - events_count
                 for i in range(missing_events):
                     version = exp_services.get_exploration_by_id(value['exp_id']).version
