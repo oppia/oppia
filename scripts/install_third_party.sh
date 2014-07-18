@@ -32,106 +32,105 @@ if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
   echo ""
   echo "  STATUS: Installation completed except for node.js and jsrepl. Exiting."
   echo ""
-  exit 0
-fi
+else
+  # If the OS supports it, download and install node.js and jsrepl.
+  echo Checking if node.js is installed in $TOOLS_DIR
+  if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
+    echo Installing Node.js
+    if [ ${OS} == "Darwin" ]; then
+      if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        NODE_FILE_NAME=node-v0.10.1-darwin-x64
+      else
+        NODE_FILE_NAME=node-v0.10.1-darwin-x86
+      fi
+    elif [ ${OS} == "Linux" ]; then
+      if [ ${MACHINE_TYPE} == 'x86_64' ]; then
+        NODE_FILE_NAME=node-v0.10.1-linux-x64
+      else
+        NODE_FILE_NAME=node-v0.10.1-linux-x86
+      fi
+    fi
 
-# If the OS supports it, download and install node.js and jsrepl.
-echo Checking if node.js is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
-  echo Installing Node.js
-  if [ ${OS} == "Darwin" ]; then
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.1-darwin-x64
-    else
-      NODE_FILE_NAME=node-v0.10.1-darwin-x86
-    fi
-  elif [ ${OS} == "Linux" ]; then
-    if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.1-linux-x64
-    else
-      NODE_FILE_NAME=node-v0.10.1-linux-x86
-    fi
+    wget http://nodejs.org/dist/v0.10.1/$NODE_FILE_NAME.tar.gz -O node-download.tgz
+    tar xzf node-download.tgz --directory $TOOLS_DIR
+    mv $TOOLS_DIR/$NODE_FILE_NAME $TOOLS_DIR/node-0.10.1
+    rm node-download.tgz
   fi
 
-  wget http://nodejs.org/dist/v0.10.1/$NODE_FILE_NAME.tar.gz -O node-download.tgz
-  tar xzf node-download.tgz --directory $TOOLS_DIR
-  mv $TOOLS_DIR/$NODE_FILE_NAME $TOOLS_DIR/node-0.10.1
-  rm node-download.tgz
-fi
+  # Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
+  #
+  #   http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
+  #
+  $TOOLS_DIR/node-0.10.1/bin/npm config set ca ""
 
-# Prevent SELF_SIGNED_CERT_IN_CHAIN error as per
-#
-#   http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
-#
-$TOOLS_DIR/node-0.10.1/bin/npm config set ca ""
+  echo Checking whether jsrepl is installed in third_party
+  if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
+    echo Installing CoffeeScript
+    $NPM_INSTALL coffee-script@1.2.0 ||
+    {
+      echo ""
+      echo "  [oppia-message]"
+      echo ""
+      echo "  Instructions:"
+      echo "    If the script fails here, please try running these commands (you"
+      echo "    may need to use sudo):"
+      echo ""
+      echo "      chown -R $ME ~/.npm"
+      echo "      rm -rf ~/tmp"
+      echo ""
+      echo "    Then run the script again."
+      echo ""
+      echo "  What is happening:"
+      echo "    npm, a package manager that Oppia uses to install some of its"
+      echo "    dependencies, is putting things into the ~/tmp and ~/.npm"
+      echo "    folders, and then encounters issues with permissions."
+      echo ""
+      echo "  More information:"
+      echo "    http://stackoverflow.com/questions/16151018/npm-throws-error-without-sudo"
+      echo "    https://github.com/isaacs/npm/issues/3664"
+      echo "    https://github.com/isaacs/npm/issues/2952"
+      echo ""
 
-echo Checking whether jsrepl is installed in third_party
-if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
-  echo Installing CoffeeScript
-  $NPM_INSTALL coffee-script@1.2.0 ||
-  {
-    echo ""
-    echo "  [oppia-message]"
-    echo ""
-    echo "  Instructions:"
-    echo "    If the script fails here, please try running these commands (you"
-    echo "    may need to use sudo):"
-    echo ""
-    echo "      chown -R $ME ~/.npm"
-    echo "      rm -rf ~/tmp"
-    echo ""
-    echo "    Then run the script again."
-    echo ""
-    echo "  What is happening:"
-    echo "    npm, a package manager that Oppia uses to install some of its"
-    echo "    dependencies, is putting things into the ~/tmp and ~/.npm"
-    echo "    folders, and then encounters issues with permissions."
-    echo ""
-    echo "  More information:"
-    echo "    http://stackoverflow.com/questions/16151018/npm-throws-error-without-sudo"
-    echo "    https://github.com/isaacs/npm/issues/3664"
-    echo "    https://github.com/isaacs/npm/issues/2952"
-    echo ""
+      exit 1
+    }
 
-    exit 1
-  }
+    echo Installing uglify
+    $NPM_INSTALL uglify-js
 
-  echo Installing uglify
-  $NPM_INSTALL uglify-js
+    if [ ! -d "$TOOLS_DIR/jsrepl/build" ]; then
+      echo Downloading jsrepl
+      cd $TOOLS_DIR
+      rm -rf jsrepl
+      git clone git://github.com/replit/jsrepl.git
+      cd jsrepl
+      # Use a specific version of the JSRepl repository.
+      git checkout 13f89c2cab0ee9163e0077102478958a14afb781
 
-  if [ ! -d "$TOOLS_DIR/jsrepl/build" ]; then
-    echo Downloading jsrepl
-    cd $TOOLS_DIR
-    rm -rf jsrepl
-    git clone git://github.com/replit/jsrepl.git
-    cd jsrepl
-    # Use a specific version of the JSRepl repository.
-    git checkout 13f89c2cab0ee9163e0077102478958a14afb781
+      git submodule update --init --recursive
 
-    git submodule update --init --recursive
+      # Add a temporary backup file so that this script works on both Linux and Mac.
+      TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
 
-    # Add a temporary backup file so that this script works on both Linux and Mac.
-    TMP_FILE=`mktemp /tmp/backup.XXXXXXXXXX`
+      echo Compiling jsrepl
+      # Sed fixes some issues:
+      # - Reducing jvm memory requirement from 4G to 1G.
+      # - This version of node uses fs.existsSync.
+      # - CoffeeScript is having trouble with octal representation.
+      # - Use our installed version of uglifyjs.
+      sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
+      sed -e 's/path\.existsSync/fs\.existsSync/' |\
+      sed -e 's/0o755/493/' |\
+      sed -e 's,uglifyjs,'$NODE_MODULE_DIR'/.bin/uglifyjs,' > $TMP_FILE
+      mv $TMP_FILE Cakefile
+      export NODE_PATH=$NODE_MODULE_DIR
+      $NODE_MODULE_DIR/.bin/cake bake
 
-    echo Compiling jsrepl
-    # Sed fixes some issues:
-    # - Reducing jvm memory requirement from 4G to 1G.
-    # - This version of node uses fs.existsSync.
-    # - CoffeeScript is having trouble with octal representation.
-    # - Use our installed version of uglifyjs.
-    sed -e 's/Xmx4g/Xmx1g/' Cakefile |\
-    sed -e 's/path\.existsSync/fs\.existsSync/' |\
-    sed -e 's/0o755/493/' |\
-    sed -e 's,uglifyjs,'$NODE_MODULE_DIR'/.bin/uglifyjs,' > $TMP_FILE
-    mv $TMP_FILE Cakefile
-    export NODE_PATH=$NODE_MODULE_DIR
-    $NODE_MODULE_DIR/.bin/cake bake
+      # Return to the Oppia root folder.
+      cd $OPPIA_DIR
+    fi
 
-    # Return to the Oppia root folder.
-    cd $OPPIA_DIR
+    # Move the build directory to the static resources folder.
+    mkdir -p $THIRD_PARTY_DIR/static/jsrepl
+    cp -r $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
   fi
-
-  # Move the build directory to the static resources folder.
-  mkdir -p $THIRD_PARTY_DIR/static/jsrepl
-  cp -r $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 fi
