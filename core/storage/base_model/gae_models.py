@@ -108,15 +108,6 @@ class BaseModel(ndb.Model):
         return query
 
     @classmethod
-    def get_all_updated_within_timedelta(cls, timedelta):
-        """Returns all instances that were updated at most timedelta time ago."""
-        if not isinstance(timedelta, datetime.timedelta):
-            raise ValueError("timedelta must be a datetime.timedelta instance.")
-
-        first_date = datetime.datetime.now() - timedelta
-        return cls.get_all().filter(cls.last_updated >= first_date)
-
-    @classmethod
     def get_new_id(cls, entity_name):
         """Gets a new id for an entity, based on its name.
 
