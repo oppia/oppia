@@ -75,6 +75,9 @@ class StateCounterModel(base_models.BaseModel):
 
         counter.put()
 
+    def get_exploration_id_and_state_name(self):
+        return self.id.split('.')
+
 
 class StateRuleAnswerLogModel(base_models.BaseModel):
     """The log of all answers hitting a given state rule.
@@ -146,7 +149,31 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     Due to complexity on browser end, this event may be logged when user clicks
     close and then cancel. Thus, the real event is the last event of this type
-    logged for the session id."""
+    logged for the session id.
+
+    Event schema documentation
+    --------------------------
+    V0: The attribute values are as follows:
+        event_type: 'leave' (there are no 'maybe leave' events in V0)
+        exploration_id: id of exploration currently being played
+        exploration_version: approximate version of exploration
+        state_name: Name of current state
+        play_type: 'normal'
+        approximate_created_on date (probably not useful)
+        version: 0
+
+    V1: As in V0 with the following modifications:
+      - The exploration_version and created_on dates are exact.
+      - The following additional fields were added:
+          session_id: ID of current student's session
+          params: current parameter values, in the form of a map of parameter name
+            to value
+          client_time_spent_in_secs: time spent in this state before the event was
+            triggered
+      - version: 1
+    """
+    # This value should be updated in the event of any event schema change.
+    CURRENT_EVENT_SCHEMA_VERSION = 1
 
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
@@ -166,6 +193,10 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
+    # The version of the event schema used to describe an event of this type.
+    # Details on the schema are given in the docstring for this class.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -193,7 +224,30 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
 
 class StartExplorationEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a student starting the exploration."""
+    """An event triggered by a student starting the exploration.
+ 
+    Event schema documentation
+    --------------------------
+    V0: The attribute values are as follows:
+        event_type: 'start'
+        exploration_id: id of exploration currently being played
+        exploration_version: approximate version of exploration
+        state_name: Name of current state
+        client_time_spent_in_secs: 0
+        play_type: 'normal'
+        approximate_created_on date (probably not useful)
+        version: 0
+
+    V1: As in V0 with the following modifications:
+      - The exploration_version and created_on dates are exact.
+      - The following additional fields were added:
+          session_id: ID of current student's session
+          params: current parameter values, in the form of a map of parameter name
+            to value
+      - version: 1
+    """
+    # This value should be updated in the event of any event schema change.
+    CURRENT_EVENT_SCHEMA_VERSION = 1
 
     # Which specific type of event this is
     event_type = ndb.StringProperty(indexed=True)
@@ -213,6 +267,10 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
                                             feconf.PLAY_TYPE_NORMAL])
+    # The version of the event schema used to describe an event of this type.
+    # Details on the schema are given in the docstring for this class.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
 
     @classmethod
     def get_new_event_entity_id(cls, exp_id, session_id):
@@ -224,7 +282,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, exp_id, exp_version, state_name, session_id,
-               params, play_type):
+               params, play_type, version=1):
         """Creates a new start exploration event."""
         entity_id = cls.get_new_event_entity_id(exp_id,
                                                 session_id)

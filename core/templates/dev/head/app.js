@@ -18,8 +18,15 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// TODO(sll): Remove the check for window.GLOBALS. This check is currently
+// only there so that the Karma tests run, since it looks like Karma doesn't
+// 'see' the GLOBALS variable that is defined in base.html. We should fix this
+// in order to make the testing and production environments match.
 var oppia = angular.module(
-  'oppia', ['ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.codemirror', 'ui.map']);
+  'oppia',
+  ['ngSanitize', 'ngResource', 'ui.bootstrap'].concat(
+    window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
+                   : []));
 
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
@@ -56,14 +63,44 @@ oppia.config(['$provide', function($provide) {
   }]);
 }]);
 
+// Overwrite the built-in exceptionHandler service to log errors to the backend
+// (so that they can be fixed).
+oppia.factory('$exceptionHandler', [
+    '$log', 'oppiaRequestCreator', function($log, oppiaRequestCreator) {
+  return function(exception, cause) {
+    var messageAndSourceAndStackTrace = [
+      '',
+      'Source: ' + window.location.href,
+      exception.message,
+      String((new Error()).stack)
+    ].join('\n');
+
+    // Catch all errors, to guard against infinite recursive loops.
+    try {
+      // We use jQuery here instead of Angular's $http, since the latter
+      // creates a circular dependency.
+      $.ajax({
+        type: 'POST',
+        url: '/frontend_errors',
+        data: oppiaRequestCreator.createRequest({
+          error: messageAndSourceAndStackTrace
+        }),
+        contentType: 'application/x-www-form-urlencoded',
+        dataType: 'text',
+        async: true
+      });
+    } catch(loggingError) {
+      $log.warn('Error logging failed.');
+    }
+
+    $log.error.apply($log, arguments);
+  };
+}]);
+
 // Service for HTML serialization and escaping.
 oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
   var htmlEscaper = {
     objToEscapedJson: function(obj) {
-      if (!obj) {
-        $log.error('Empty obj was passed to JSON escaper.');
-        return '';
-      }
       return this.unescapedStrToEscapedStr(JSON.stringify(obj));
     },
     escapedJsonToObj: function(json) {

@@ -17,7 +17,26 @@
 set -e
 source $(dirname $0)/setup.sh || exit 1
 
+# Download and install required JS and zip files.
+echo Installing third-party JS libraries and zip files.
+python scripts/install_third_party.py
 
+# Check if the OS supports node.js and jsrepl installation; if not, return
+# to the calling script.
+if [ ! "${OS}" == "Darwin" -a ! "${OS}" == "Linux" ]; then
+  echo ""
+  echo "  WARNING: Unsupported OS for installation of node.js and jsrepl."
+  echo "  If you are running this script on Windows, see the instructions"
+  echo "  here regarding installation of node.js:"
+  echo ""
+  echo "    https://code.google.com/p/oppia/wiki/WindowsGuidelines"
+  echo ""
+  echo "  STATUS: Installation completed except for node.js and jsrepl. Exiting."
+  echo ""
+  exit 0
+fi
+
+# If the OS supports it, download and install node.js and jsrepl.
 echo Checking if node.js is installed in $TOOLS_DIR
 if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
   echo Installing Node.js
@@ -33,11 +52,6 @@ if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
     else
       NODE_FILE_NAME=node-v0.10.1-linux-x86
     fi
-  else
-    echo
-    echo     Unsupported OS: failed to determine correct URL for node.js binary.
-    echo     See the install_third_party.sh script for details.
-    echo
   fi
 
   wget http://nodejs.org/dist/v0.10.1/$NODE_FILE_NAME.tar.gz -O node-download.tgz
@@ -122,6 +136,3 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
   mkdir -p $THIRD_PARTY_DIR/static/jsrepl
   cp -r $TOOLS_DIR/jsrepl/build/* $THIRD_PARTY_DIR/static/jsrepl
 fi
-
-# Download and install other required JS and zip files.
-python scripts/install_third_party.py

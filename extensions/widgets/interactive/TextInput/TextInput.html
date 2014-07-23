@@ -1,14 +1,16 @@
 <div>
-  <form ng-submit="submitAnswer(answer)" class="form-horizontal">
-    <input ng-if="rows == 1" ng-model="$parent.answer"
-           placeholder="<[placeholder]>" size="<[columns]>" required autofocus>
+  <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <input ng-if="rows == 1" ng-model="$parent.answer"
+             placeholder="<[placeholder]>" required autofocus class="form-control">
 
-    <!-- The 'width: auto' is necessary to get around auto-resizing by Twitter Bootstrap. -->
-    <textarea ng-if="rows != 1" ng-model="$parent.answer"
-              placeholder="<[placeholder]>" required autofocus rows="<[rows]>" cols="<[columns]>"
-              style="width: auto;">
-    </textarea>
-
-    <button type="submit" class="btn btn-default">Submit</button>
+      <!-- The 'width: auto' is necessary to get around auto-resizing by Twitter Bootstrap. -->
+      <textarea ng-if="rows != 1" ng-model="$parent.answer"
+                placeholder="<[placeholder]>" required autofocus rows="<[rows]>" class="form-control">
+      </textarea>
+    </div>
+    <div class="col-lg-2 col-md-2 col-sm-2">
+      <button type="submit" class="btn btn-default">Submit</button>
+    </div>
   </form>
 </div>

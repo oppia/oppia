@@ -221,7 +221,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'error_line_number': 2
         }
         mappings = [
-            (valid_example_1, valid_example_1), 
+            (valid_example_1, valid_example_1),
             (valid_example_2, valid_example_2)]
 
         invalid_values = [
@@ -267,7 +267,7 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         """Tests objects of type LogicErrorCategory"""
 
         mappings = [
-            ('parsing', 'parsing'), ('typing', 'typing'), 
+            ('parsing', 'parsing'), ('typing', 'typing'),
             ('mistake', 'mistake')]
 
         invalid_values = [None, 2, 'string', 'item']
@@ -286,4 +286,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils.validate_schema(member._schema)
                     count += 1
 
-        self.assertEquals(count, 17)
+        self.assertEquals(count, 18)

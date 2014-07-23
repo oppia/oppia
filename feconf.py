@@ -158,6 +158,9 @@ ALLOWED_WIDGETS = {
         'Math': {
             'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Math')
         },
+        'Parameter': {
+            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Parameter')
+        },
         'Tabs': {
             'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Tabs')
         },

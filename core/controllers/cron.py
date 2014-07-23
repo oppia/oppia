@@ -21,8 +21,9 @@ from core import jobs_registry
 
 class StatisticsHandler(base.BaseHandler):
     """Handler for statistics cron job."""
+
     def get(self):
-        """Handles get requests."""
+        """Handles GET requests."""
         for klass in jobs_registry.JOB_MANAGER_CLASSES:
              if klass.__name__ == 'StatisticsPageJobManager':
                  klass.enqueue(klass.create_new())

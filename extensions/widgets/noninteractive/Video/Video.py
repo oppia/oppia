@@ -27,7 +27,9 @@ class Video(widget_domain.BaseWidget):
     # values. This attribute name MUST be prefixed by '_'.
     _params = [{
         'name': 'video_id',
-        'description': 'The YouTube id for this video.',
+        'description': (
+            'The YouTube id for this video. This is the 11-character string '
+            'after \'v=\' in the video URL.'),
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True
@@ -36,10 +38,10 @@ class Video(widget_domain.BaseWidget):
             'value': ''
         },
         'obj_type': 'UnicodeString',
-    },
-    {
+    }, {
         'name': 'end',
-        'description': 'Video end time in seconds: (leave at 0 to play until the end.)',
+        'description': (
+            'Video end time in seconds: (leave at 0 to play until the end.)'),
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True
@@ -48,10 +50,11 @@ class Video(widget_domain.BaseWidget):
             'value': 0
         },
         'obj_type': 'NonnegativeInt'
-    },
-    {
+    }, {
         'name': 'start',
-        'description': 'Video start time in seconds: (leave at 0 to start at the beginning.)',
+        'description': (
+            'Video start time in seconds: (leave at 0 to start at the '
+            'beginning.)'),
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True

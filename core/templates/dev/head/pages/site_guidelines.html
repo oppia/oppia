@@ -6,8 +6,10 @@
 
 {% block content %}
   <script>
-    // Navigate to the active tab on page load, if one is specified in the
-    // location hash.
+    /*
+      Navigate to the active tab on page load, if one is specified in the
+      location hash.
+    */
     $(function () {
       var activeTab = $('[href=#' + location.hash.substring(2) + ']');
       activeTab && activeTab.tab('show');

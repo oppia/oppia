@@ -133,6 +133,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 
 .navbar {
+  border: 0px;
   margin-bottom: 0;
 }
 
@@ -537,6 +538,10 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   margin-bottom: 30px;
 }
 
+.oppia-exploration-editor-top-row {
+  margin-top: 5px;
+}
+
 .oppia-btn-container {
   padding: 10px;
 }
@@ -685,8 +690,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   cursor: pointer;
 }
 
-/* Styles for interactive widgets. */
-
 .oppia-rule {
   height: 30px;
 }
@@ -750,6 +753,10 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 .oppia-rule-header-bubble {
   font-weight: bold;
   text-align: center;
+}
+
+.oppia-rule-header-bubble img {
+  max-height: 50px;
 }
 
 .oppia-rule-description-picker-bubble {

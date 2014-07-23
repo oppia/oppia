@@ -2,6 +2,30 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://code.google.com/p/oppia/source/list
 
+v1.2.7 (19 June 2014)
+---------------------
+UI changes:
+* Improve the user experience when registering to make contributions.
+* Fix links to tabs within the About pages.
+* Feedback submitted at the END state now automatically refers to the whole exploration.
+* Set a maximum width for images in multiple choice question options, so that they don’t overwhelm the rule editor.
+* Update ui-codemirror to version 1.0.1.
+* Separate the learner user interface into a presentation layer and a data layer, in order to support multiple skins in the future.
+
+Editor features:
+* Ensure that the state graph is never panned out of the viewport.
+* Downloading exploration zip files while the exploration is being edited no longer issues a warning.
+* Return only the top ten unresolved answers for each state, in order to avoid overloading the client browser.
+
+Widget improvements:
+* Add a new LogicProof widget in which students prove logical formulas.
+* Remove the 'columns' customization option for the TextInput widget.
+* Add a docstring for the video id in the non-interactive Video widget.
+
+Backend changes:
+* Implement schemas to standardise the backend handling of objects used by widgets (e.g. lists of strings).
+* Log frontend errors to the backend, so that the developers can see and handle them.
+
 
 v1.2.6 (4 Jun 2014)
 -------------------

@@ -89,7 +89,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         });
 
         jsrepl.loadLanguage($scope.language, function() {
-          // Initialization done. Allow submit.
+          console.log('Code REPL widget initialized.');
           $scope.hasLoaded = true;
           $scope.$apply();
         });

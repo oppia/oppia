@@ -13,31 +13,26 @@
 // limitations under the License.
 
 /**
- * Directive for the TextInput interactive widget.
+ * Directive for the Parameter non-interactive widget.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
  * followed by the name of the arg.
  */
-oppia.directive('oppiaInteractiveTextInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+oppia.directive('oppiaNoninteractiveParameter', [
+  '$rootScope', 'oppiaHtmlEscaper', function($rootScope, oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/TextInput',
+      templateUrl: 'noninteractiveWidget/Parameter',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
-        $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
-
-        $scope.answer = '';
-
-        $scope.submitAnswer = function(answer) {
-          if (!answer) {
-            return;
-          }
-
-          $scope.$parent.$parent.submitAnswer(answer, 'submit');
-        };
+        var paramName = oppiaHtmlEscaper.escapedJsonToObj(
+            $attrs.paramNameWithValue);
+        $scope.paramName = paramName;
+        if ($rootScope.currentParams) {
+          $scope.paramValue = $rootScope.currentParams[paramName];
+        }
+        $scope.navMode = GLOBALS.NAV_MODE;
       }]
     };
   }

@@ -539,7 +539,6 @@ function ExplorationEditor(
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
-  $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
   $scope.explorationSnapshots = null;
@@ -631,46 +630,6 @@ function ExplorationEditor(
     });
   };
 
-  $scope.refreshExplorationStatistics = function() {
-    $http.get($scope.explorationStatisticsUrl).then(function(response) {
-      var data = response.data;
-      $scope.stats = {
-        'numVisits': data.num_visits,
-        'numCompletions': data.num_completions,
-        'stateStats': data.state_stats,
-        'imp': data.imp
-      };
-
-      $scope.chartData = [
-        ['', 'Completions', 'Non-completions'],
-        ['', data.num_completions, data.num_visits - data.num_completions]
-      ];
-      $scope.chartColors = ['green', 'firebrick'];
-
-      $scope.statsGraphOpacities = {
-        legend: 'Students entering state'
-      };
-      for (var stateName in $scope.states) {
-        var visits = $scope.stats.stateStats[stateName].firstEntryCount;
-        $scope.statsGraphOpacities[stateName] = Math.max(
-            visits / $scope.stats.numVisits, 0.05);
-      }
-      $scope.statsGraphOpacities[END_DEST] = Math.max(
-          $scope.stats.numCompletions / $scope.stats.numVisits, 0.05);
-
-      $scope.highlightStates = {};
-
-      for (var j = 0; j < data.imp.length; j++) {
-        if (data.imp[j].type == 'default') {
-          $scope.highlightStates[data.imp[j].state_name] = 'Needs more feedback';
-        }
-        if (data.imp[j].type == 'incomplete') {
-          $scope.highlightStates[data.imp[j].state_name] = 'May be confusing';
-        }
-      }
-    });
-  };
-
   $scope.initializeNewActiveInput = function(newActiveInput) {
     // TODO(sll): Rework this so that in general it saves the current active
     // input, if any, first. If it is bad input, display a warning and cancel
@@ -739,7 +698,7 @@ function ExplorationEditor(
 
       $rootScope.loadingMessage = '';
 
-      $scope.refreshExplorationStatistics();
+      $scope.$broadcast('refreshStatisticsTab');
 
       var stateName = editorContextService.getActiveStateName();
       var stateData = $scope.states[stateName];
@@ -809,7 +768,9 @@ function ExplorationEditor(
    * Downloads the zip file for an exploration.
    */
   $scope.downloadExplorationWithVersion = function(versionNumber) {
-    document.location.href = $scope.explorationDownloadUrl + '?v=' + versionNumber;
+    // Note that this opens (and then immediately closes) a new tab. If we do
+    // this in the same tab, the beforeunload handler is triggered.
+    window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '_blank');
   };
 
   $scope.showPublishExplorationModal = function() {

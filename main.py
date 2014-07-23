@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 import feconf
+import logging
 
 from core.controllers import admin
 from core.controllers import base
@@ -51,6 +52,17 @@ class Error404Handler(base.BaseHandler):
         """
         if not self.request.uri.endswith('robots.txt'):
             raise self.PageNotFoundException
+
+
+class FrontendErrorHandler(base.BaseHandler):
+    """Handles errors arising from the frontend."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def post(self):
+        """Records errors reported by the frontend."""
+        logging.error('Frontend error: %s' % self.payload.get('error'))
+        self.render_json(self.values)
 
 
 class WarmupHandler(base.BaseHandler):
@@ -290,6 +302,9 @@ urls = [
 
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
+
+    get_redirect_route(
+        r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
 ]
 
 # 404 error handler.

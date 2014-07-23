@@ -25,6 +25,13 @@ class TextInput(widget_domain.BaseWidget):
 
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.
+    # NB: There used to be an integer-typed parameter here called 'columns'
+    # that was removed in revision 628942010573. Some text widgets in
+    # older explorations may have this customization parameter still set
+    # in the exploration definition, so, in order to minimize the possibility
+    # of collisions, do not add a new parameter with this name to this list.
+    # TODO(sll): Migrate old definitions which still contain the 'columns'
+    # parameter.
     _params = [{
         'name': 'placeholder',
         'description': 'The placeholder for the text input field.',
@@ -41,15 +48,6 @@ class TextInput(widget_domain.BaseWidget):
         'init_args': {},
         'customization_args': {
             'value': 1
-        },
-        'obj_type': 'Int',
-    }, {
-        'name': 'columns',
-        'description': 'The number of columns for the text input field.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 60
         },
         'obj_type': 'Int',
     }]

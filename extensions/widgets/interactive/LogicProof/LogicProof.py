@@ -17,7 +17,6 @@
 __author__ = 'Jacob Davis'
 
 from core.domain import widget_domain
-from extensions.objects.models import objects
 from extensions.value_generators.models import generators
 
 
@@ -79,4 +78,4 @@ class LogicProof(widget_domain.BaseWidget):
     # Additional JS library dependencies that should be loaded in pages
     # containing this widget. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = ['logic_proof']
+    _dependency_ids = ['logic_proof', 'codemirror']

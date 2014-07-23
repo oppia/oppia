@@ -10,7 +10,7 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js',
       'third_party/static/angularjs-1.2.0-rc.3/angular-mocks.js',
       'third_party/static/ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.js',
-      'third_party/static/ui-codemirror-0.1.0/src/ui-codemirror.js',
+      'third_party/static/ui-codemirror-0.1.1/src/ui-codemirror.js',
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
       'core/templates/dev/head/**/*.js',
@@ -33,7 +33,7 @@ module.exports = function(config) {
       dir: '../karma_coverage_reports/'
     },
     autoWatch: true,
-    browsers: ['PhantomJS'],
+    browsers: ['Chrome'],
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     // Continue running in the background after running tests.

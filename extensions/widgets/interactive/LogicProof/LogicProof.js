@@ -69,7 +69,6 @@ oppia.directive('oppiaInteractiveLogicProof', [
           var cursorPosition = editor.doc.getCursor();
 
           editor.setOption('lineNumbers', true);
-          editor.setOption('indentWithTabs', true);
           editor.setOption('lineWrapping', true);
 
           // NOTE: this is necessary to avoid the textarea being greyed-out. See
@@ -77,7 +76,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // for discussion.
           setTimeout(function() {
             editor.refresh();
-          }, 200);          
+          }, 500);          
 
           // NOTE: we must use beforeChange rather than change here to avoid an
           // infinite loop (which code-mirror will not catch).
