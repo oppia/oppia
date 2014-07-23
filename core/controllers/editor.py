@@ -23,6 +23,7 @@ import logging
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import event_services
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -441,7 +442,7 @@ class ResolvedAnswersHandler(EditorHandler):
                 resolved_answers)
 
         if 'resolved_answers' in self.payload:
-            stats_services.EventHandler.resolve_answers_for_default_rule(
+            event_services.EventHandler.resolve_answers_for_default_rule(
                 exploration_id, state_name, 'submit', resolved_answers)
 
         self.render_json({})
