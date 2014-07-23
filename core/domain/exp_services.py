@@ -966,7 +966,7 @@ def _get_unindexed_exploration_ids():
     more = True
     while more:
         log_entries, cursor, more = get_next_page_of_all_non_private_commits(
-            max_age=SEARCH_INDEXING_FREQUENCY)
+            max_age=SEARCH_INDEXING_FREQUENCY*2) #We take 2 indexing periods to account for delays.
         entries.extend(log_entries)
 
     return set([entry.exploration_id for entry in entries])
