@@ -18,6 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
+
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
@@ -214,6 +216,19 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).fetch(QUERY_LIMIT)
 
     @classmethod
+    def get_page_of_non_private_exploration_rights(cls, page_size=QUERY_LIMIT,
+                                                   cursor=None):
+        """Returns a page o non-private exp rights models."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).order( #these orders are because inequality filters require them.
+                 #more info: http://stackoverflow.com/questions/12449197/badargumenterror-multiquery-with-cursors-requires-key-order-in-ndb
+            ExplorationRightsModel.status, ExplorationRightsModel._key
+        ).fetch_page(page_size=page_size, start_cursor=cursor)
+
+    @classmethod
     def get_community_owned(cls):
         """Returns an iterable with community-owned exp rights models."""
         return ExplorationRightsModel.query().filter(
@@ -345,10 +360,17 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
             cls.query(), page_size, urlsafe_start_cursor)
 
     @classmethod
-    def get_all_non_private_commits(cls, page_size, urlsafe_start_cursor):
+    def get_all_non_private_commits(cls, page_size, urlsafe_start_cursor, max_age=None):
+        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
+            raise ValueError("max_age must be a datetime.timedelta instance or None.")
+
+
+        query = cls.query(cls.post_commit_is_private == False)
+        if max_age:
+            query = query.filter(
+                cls.last_updated >=(datetime.datetime.utcnow() - max_age))
         return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.post_commit_is_private == False),
-            page_size, urlsafe_start_cursor)
+            query, page_size, urlsafe_start_cursor)
 
     @classmethod
     def get_all_commits_by_exp_id(

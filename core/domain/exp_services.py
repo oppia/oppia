@@ -25,6 +25,7 @@ storage model to be changed without affecting this module and others above it.
 __author__ = 'Sean Lip'
 
 import copy
+import datetime
 import logging
 import os
 import StringIO
@@ -36,6 +37,8 @@ from core.domain import rights_manager
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
+search_services = models.Registry.import_search_services()
+taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
 
@@ -45,6 +48,12 @@ CMD_CREATE_NEW = 'create_new'
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
 
+# TODO(frederikcreemers@gmail.com) Posibly read this directly from cron.yml to
+# have a single source of truth for this
+SEARCH_INDEXING_FREQUENCY = datetime.timedelta(seconds=3600) #every hour
+
+#Name for the exploration search index
+EXPLORATION_SEARCH_INDEX_NAME = "explorations"
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -85,6 +94,35 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return exploration
         else:
             return None
+
+def get_multiple_explorations_by_id(exp_ids, strict=True):
+    """Returns a dict of domain objects representing explorations with the given
+    ids as keys..
+    """
+    exp_ids = set(exp_ids)
+    result = {}
+    uncached = []
+    memcache_keys = [_get_exploration_memcache_key(i) for i in exp_ids]
+    cache_result = memcache_services.get_multi(memcache_keys)
+
+    for exp_obj in cache_result.itervalues():
+        result[exp_obj.id] = exp_obj
+
+    for _id in exp_ids:
+        if _id not in result:
+            uncached.append(_id)
+
+    db_exp_models = exp_models.ExplorationModel.get_multi(uncached)
+    cache_update = {}
+    for model in db_exp_models:
+        exploration = get_exploration_from_model(model)
+        cache_update[exploration.id] = exploration
+
+    if cache_update:
+        memcache_services.set_multi(cache_update)
+
+    result.update(cache_update)
+    return result
 
 
 def get_new_exploration_id():
@@ -611,6 +649,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
     memcache_services.delete(exploration_memcache_key)
 
+    #delete the exploration from search.
+    search_services.delete_documents_from_index([exploration_id],
+                                                EXPLORATION_SEARCH_INDEX_NAME)
+
 
 # Operations on exploration snapshots.
 def _get_simple_changelist_summary(
@@ -847,17 +889,21 @@ def get_next_page_of_all_commits(
 
 
 def get_next_page_of_all_non_private_commits(
-        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns a page of non-private commits in reverse time order.
+        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None, max_age=None):
+    """Returns a page of non-private commits in reverse time order. If max_age
+    is given, it should be a datetime.timedelta instance.
 
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
+    if max_age is not None and not isinstance(max_age, datetime.timedelta):
+        raise ValueError("max_age must be a datetime.timedelta instance. or None.")
+
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
-            page_size, urlsafe_start_cursor))
+            page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([exp_domain.ExplorationCommitLogEntry(
         entry.created_on, entry.last_updated, entry.user_id, entry.username,
@@ -897,7 +943,7 @@ def get_next_page_of_all_commits_by_user_id(
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
-        https://developers.google.com/appengine/docs/python/ndb/queryclass
+        https://developers.google.com/appengine/docs/python/ndb/queryclass#Query_fetch_page
     """
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_user_id(
@@ -909,3 +955,94 @@ def get_next_page_of_all_commits_by_user_id(
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
     ) for entry in results], new_urlsafe_start_cursor, more)
+
+
+#search
+def _get_unindexed_exploration_ids():
+    """Returns a list of unindexed exploration's ideas. Note that this is based
+    on the time interval between indexing tasks. If changes about the implementation of search,
+    all public explorations will need to be reindexed."""
+    entries = []
+    more = True
+    while more:
+        log_entries, cursor, more = get_next_page_of_all_non_private_commits(
+            max_age=SEARCH_INDEXING_FREQUENCY)
+        entries.extend(log_entries)
+
+    return set([entry.exploration_id for entry in entries])
+
+
+def _exp_to_search_dict(model):
+    rights = rights_manager.get_exploration_rights(model.id)
+    doc = {
+        'id': model.id,
+        'language_code': model.language_code,
+        #rank = last_updated as unix timestamp.
+        'title': model.title,
+        'category': model.category,
+        'skills': model.skill_tags,
+        'blurb': model.blurb,
+        'objective': model.objective,
+        'author_notes': model.author_notes,
+    }
+    # Allow searches like "is:beta" or "is:publicized".
+    if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+        doc['is'] = 'publicized'
+    else:
+        doc['is'] = 'beta'
+
+    return doc
+
+
+def _index_explorations_given_ids(exp_ids):
+    exploration_models = get_multiple_explorations_by_id(exp_ids)
+    search_docs = [_exp_to_search_dict(exploration_models[model])
+                   for model in exploration_models]
+    search_services.add_documents_to_index(search_docs, EXPLORATION_SEARCH_INDEX_NAME)
+
+
+def update_search_index():
+    """Reindexes any explorations that have been created or updated since the
+    last run of this job.
+     """
+    exp_ids = _get_unindexed_exploration_ids()
+    _index_explorations_given_ids(exp_ids)
+
+
+def rebuild_index(cursor=None):
+    """(re)indexes all non-private explorations"""
+    page, new_cursor, more = rights_manager.get_page_of_non_private_exploration_rights(
+        cursor=cursor, page_size=feconf.DEFAULT_PAGE_SIZE)
+    if more:
+        taskqueue_services.defer(rebuild_index, new_cursor)
+
+    exp_ids = [rights.id for rights in page]
+    _index_explorations_given_ids(exp_ids)
+
+def search_explorations(
+    query, sort, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    """Searcher through the exploration
+
+    args:
+      - query_string: the query string to search for.
+      - sort: a string indicating how to sort results.
+        This should be a string of space separated values.
+        Each value should start with a '+' or a '-' character indicating whether
+        to sort in ascending or descending
+        order respectively. This character should be followed by a field name to
+        sort on.
+      - limit: the maximum number of results to return.
+      - cursor: A cursor, used to get the next page of results.
+        If there are more documents that match the query than
+        'limit', this function will return a cursor to get the next page.
+
+    returns: a tuple:
+      - a list of Exploration domain objects that match the query.
+      - a cursor if there are more matching exploration to fetch, None otherwise.
+        If a cursor is returned, it will be a web-safe string that can be used in URLs.
+    """
+    results, cursor = search_services.search(query, EXPLORATION_SEARCH_INDEX_NAME,
+                                             cursor, limit, sort, ids_only=True)
+    ids = [result.get('id') for result in results]
+    explorations = get_multiple_explorations_by_id(ids)
+    return [explorations[_id] for _id in ids ], cursor

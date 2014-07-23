@@ -672,6 +672,9 @@ class Exploration(object):
 
         self.version = version
 
+    def __eq__(self, other):
+        return self.to_yaml() == other.to_yaml()
+
     @classmethod
     def create_default_exploration(
             cls, exploration_id, title, category,
