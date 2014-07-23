@@ -27,6 +27,7 @@ from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+import feconf
 import utils
 
 
@@ -196,6 +197,15 @@ def get_non_private_exploration_rights():
     """Returns a list of rights domain objects for non-private explorations."""
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_non_private()]
+
+
+def get_page_of_non_private_exploration_rights(page_size=feconf.DEFAULT_PAGE_SIZE,
+                                                    cursor=None):
+    """Returns a page of non-private explorations"""
+    results, cursor, more = exp_models.ExplorationRightsModel.get_page_of_non_private_exploration_rights(
+        page_size=page_size, cursor=cursor
+    )
+    return [_get_exploration_rights_from_model(result) for result in results], cursor, more
 
 
 def get_community_owned_exploration_rights():

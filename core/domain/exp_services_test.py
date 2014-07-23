@@ -33,6 +33,8 @@ from core.platform import models
 (base_models, exp_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration
 ])
+search_services = models.Registry.import_search_services()
+taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 import feconf
 import test_utils
@@ -46,7 +48,7 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         """Before each individual test, create a dummy exploration."""
         super(ExplorationServicesUnitTests, self).setUp()
 
-        self.EXP_ID = 'An exploration_id'
+        self.EXP_ID = 'An_exploration_id'
 
         self.OWNER_EMAIL = 'owner@example.com'
         self.EDITOR_EMAIL = 'editor@example.com'
@@ -281,6 +283,18 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id('fake_exploration')
+
+    def test_retrieval_of_multiple_explorations(self):
+        exps = {}
+        chars = "abcde"
+        for _id in [self.EXP_ID + c for c in chars]:
+            exp = self.save_new_valid_exploration(_id, self.OWNER_ID)
+            exps[_id] = exp
+
+        result = exp_services.get_multiple_explorations_by_id(
+            [self.EXP_ID + c for c in chars])
+        for _id in [self.EXP_ID + c for c in chars]:
+            self.assertEqual(result.get(_id).title, exps.get(_id).title)
 
     def test_soft_deletion_of_explorations(self):
         """Test that soft deletion of explorations works correctly."""
@@ -1361,6 +1375,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         self.assertDictContainsSubset(
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
+        #TODO(frederikcreemers@gmail.com) test max_age here.
+
     def test_get_commit_log_for_exploration_id(self):
         all_commits = exp_services.get_next_page_of_all_commits_by_exp_id(
             self.EXP_ID_1)[0]
@@ -1476,3 +1492,104 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
         all_commits, cursor, more = exp_services.get_next_page_of_all_commits(
             page_size=5)
         self.assertEqual(len(all_commits), 0)
+
+
+class SearchTests(ExplorationServicesUnitTests):
+    """Test exploration search."""
+
+    def test_update_index(self):
+
+        def mock_add_docs_to_index(docs, index):
+            self.assertEqual(index, exp_services.EXPLORATION_SEARCH_INDEX_NAME)
+            for i in ['1', '2']:
+                self.assertIn('id' + i, [d.get('id') for d in docs])
+                self.assertIn('title' + i, [d.get('title') for d in docs])
+            self.assertEqual(len(docs), 2)
+
+        search_mock_counter = test_utils.CallCounter(mock_add_docs_to_index)
+
+        search_mock_swap = self.swap(
+            search_services,
+            "add_documents_to_index",
+            search_mock_counter)
+
+        self.save_new_default_exploration('id1', self.OWNER_ID, title='title1')
+        self.save_new_default_exploration('id2', self.OWNER_ID, title='title2')
+        rights_manager.publish_exploration(self.OWNER_ID, 'id1')
+        rights_manager.publish_exploration(self.OWNER_ID, 'id2')
+        rights_manager.publicize_exploration(self.user_id_admin, 'id2')
+
+        with search_mock_swap:
+            exp_services.update_search_index()
+
+        self.assertTrue(search_mock_counter.times_called > 0)
+
+    def test_rebuild_index(self):
+        self.save_new_default_exploration('id1', self.OWNER_ID, title='title1')
+        self.save_new_default_exploration('id2', self.OWNER_ID, title='title2')
+        self.save_new_default_exploration('id3', self.OWNER_ID, title='title3')
+        self.save_new_default_exploration('id4', self.OWNER_ID, title='title4')
+        rights_manager.publish_exploration(self.OWNER_ID, 'id1')
+        rights_manager.publish_exploration(self.OWNER_ID, 'id2')
+        rights_manager.publish_exploration(self.OWNER_ID, 'id3')
+        rights_manager.publish_exploration(self.OWNER_ID, 'id4')
+        rights_manager.publicize_exploration(self.user_id_admin, 'id2')
+
+        def add_docs_mock(docs, index):
+            self.assertEqual(index, exp_services.EXPLORATION_SEARCH_INDEX_NAME)
+            for doc in docs:
+                self.assertIn(doc.get('id'), ['id1', 'id2', 'id3', 'id4'])
+                self.assertIn(doc.get('title'), ['title1', 'title2', 'title3', 'title4'])
+
+        def mock_defer(f, *args):
+            f(*args)
+
+        mock_defer_counter = test_utils.CallCounter(mock_defer)
+
+        add_docs_mock_counter = test_utils.CallCounter(add_docs_mock)
+
+        swap_page_size = self.swap(feconf, 'DEFAULT_PAGE_SIZE', 2)
+        swap_add_docs = self.swap(search_services, 'add_documents_to_index',
+                                  add_docs_mock_counter)
+        swap_defer_mock = self.swap(taskqueue_services, 'defer', mock_defer_counter)
+
+        with swap_page_size, swap_add_docs, swap_defer_mock:
+            exp_services.rebuild_index()
+
+        self.assertEqual(add_docs_mock_counter.times_called, 2)
+
+
+    def test_search_explorations(self):
+        expected_query_string = 'a query string'
+        expected_cursor = 'cursor'
+        expected_sort = 'title'
+        expected_limit = 30
+        expected_result_cursor = 'rcursor'
+        doc_ids = ['id1', 'id2']
+
+        def mock_search(query_string, index, cursor=None, limit=20, sort='',
+                        ids_only=False, retries=3):
+            self.assertEqual(query_string, expected_query_string)
+            self.assertEqual(index, exp_services.EXPLORATION_SEARCH_INDEX_NAME)
+            self.assertEqual(cursor, expected_cursor)
+            self.assertEqual(limit, expected_limit)
+            self.assertEqual(sort, expected_sort)
+            self.assertEqual(ids_only, True)
+            self.assertEqual(retries, 3)
+
+            return [{'id': _id} for _id in doc_ids], expected_result_cursor
+
+        explorations = [self.save_new_default_exploration(_id, self.OWNER_ID)
+                        for _id in doc_ids]
+
+        with self.swap(search_services, "search", mock_search):
+            result, cursor = exp_services.search_explorations(
+                query=expected_query_string,
+                sort=expected_sort,
+                limit=expected_limit,
+                cursor=expected_cursor,
+            )
+
+        self.assertEqual(cursor, expected_result_cursor)
+        self.assertEqual(len(result), 2)
+        self.assertEqual(result, explorations)
