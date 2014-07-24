@@ -67,45 +67,58 @@ class BaseEventHandler(object):
         cls._handle_event(*args, **kwargs)
 
 
-class EventHandler(object):
-    """Records and dispatches events."""
-
-    # TODO(sll): Migrate these over to become subclasses of BaseEventHandler.
+class StateHitEventHandler(BaseEventHandler):
+    """Event handler for recording state hits."""
 
     @classmethod
-    def record_state_hit(cls, exploration_id, state_name, first_time):
+    def _handle_event(cls, exploration_id, state_name, first_time):
         """Record an event when a state is encountered by the reader."""
         stats_models.StateCounterModel.inc(
             exploration_id, state_name, first_time)
 
+
+class AnswerSubmissionEventHandler(BaseEventHandler):
+    """Event handler for recording answer submissions."""
+
     @classmethod
-    def record_answer_submitted(
-            cls, exploration_id, exploration_version, state_name,
-            handler_name, rule, answer):
+    def _handle_event(cls, exploration_id, exploration_version, state_name,
+                      handler_name, rule, answer):
         """Records an event when an answer triggers a rule."""
         # TODO(sll): Escape these args?
         stats_models.process_submitted_answer(
             exploration_id, exploration_version, state_name,
             handler_name, rule, answer)
 
+
+class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
+    """Event handler for recording resolving of answers triggering the default
+    rule."""
+
     @classmethod
-    def resolve_answers_for_default_rule(
-            cls, exploration_id, state_name, handler_name, answers):
+    def _handle_event(cls, exploration_id, state_name, handler_name, answers):
         """Resolves a list of answers for the default rule of this state."""
         # TODO(sll): Escape these args?
         stats_models.resolve_answers(
             exploration_id, state_name, handler_name,
             exp_domain.DEFAULT_RULESPEC_STR, answers)
 
+
+class StartExplorationEventHandler(BaseEventHandler):
+    """Event handler for recording exploration start events."""
+
     @classmethod
-    def start_exploration(cls, exp_id, exp_version, state_name, session_id,
-                          params, play_type):
+    def _handle_event(cls, exp_id, exp_version, state_name, session_id,
+                      params, play_type):
         stats_models.StartExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, params,
             play_type)
 
+
+class MaybeLeaveExplorationEventHandler(BaseEventHandler):
+    """Event handler for recording exploration leave events."""
+
     @classmethod
-    def maybe_leave_exploration(
+    def _handle_event(
             cls, exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type):
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(

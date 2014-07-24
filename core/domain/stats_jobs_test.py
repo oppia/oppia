@@ -36,9 +36,9 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         version = 1
         state = 'sid'
-        event_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         job_id = (
            stats_jobs.StatisticsPageJobManager.create_new())
@@ -57,14 +57,14 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         version = 1
         state = 'sid'
-        event_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.EventHandler.maybe_leave_exploration(
+        event_services.MaybeLeaveExplorationEventHandler.record(
             exp_id, version, feconf.END_DEST, 'session1', 27, {},
             feconf.PLAY_TYPE_NORMAL)
-        event_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.EventHandler.maybe_leave_exploration(
+        event_services.MaybeLeaveExplorationEventHandler.record(
             exp_id, version, feconf.END_DEST, 'session2', 27, {},
             feconf.PLAY_TYPE_NORMAL)
         job_id = stats_jobs.StatisticsPageJobManager.create_new()
@@ -97,13 +97,13 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         version = 1
         state = 'sid'
-        event_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
         self._create_leave_event(exp_id, version, state, 'session1', 0)
         self._create_leave_event(exp_id, version, state, 'session1', 1)
         self._create_leave_event(
             exp_id, version, feconf.END_DEST, 'session1', 2)
-        event_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         self._create_leave_event(exp_id, version, state, 'session2', 3)
         self._create_leave_event(exp_id, version, state, 'session2', 4)
