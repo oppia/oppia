@@ -12,9 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for various static pages (like About, Contact, etc.)."""
+
 __author__ = 'Sean Lip'
 
-import test_utils
+from core.tests import test_utils
 
 
 class SplashPageTest(test_utils.GenericTestBase):

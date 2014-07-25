@@ -30,10 +30,16 @@ class Registry(object):
 
     @classmethod
     def get_dependency_html(cls, dependency_id):
+        """Returns the HTML template needed to inject this dependency in the
+        client webpage.
+        """
         return utils.get_file_contents(os.path.join(
             feconf.DEPENDENCIES_TEMPLATES_DIR, '%s.html' % dependency_id))
 
     @classmethod
     def get_angular_modules(cls, dependency_id):
+        """Returns a list of additional modules that the main Angular module
+        in the client webpage needs to depend on.
+        """
         return dependencies_config.DEPENDENCIES_TO_ANGULAR_MODULES_DICT.get(
             dependency_id, [])

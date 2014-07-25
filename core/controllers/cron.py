@@ -24,6 +24,6 @@ class StatisticsHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         for klass in jobs_registry.JOB_MANAGER_CLASSES:
-             if klass.__name__ == 'StatisticsPageJobManager':
-                 klass.enqueue(klass.create_new())
-                 break
+            if klass.__name__ == 'StatisticsPageJobManager':
+                klass.enqueue(klass.create_new())
+                break

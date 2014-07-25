@@ -93,12 +93,11 @@ class StaticFileHandler(base.BaseHandler):
             if file_path.startswith(path):
                 file_path = file_path.replace(path, feconf.PATH_MAP[path])
         try:
-            f = open(file_path, 'r')
-            self.response.headers['Content-Type'] = mimetypes.guess_type(
-                file_path)[0]
-             # TODO(sll): Add a ALLOW_CACHING flag and set the appropriate
-             # caching headers if that's turned on.
-            self.response.write(f.read())
-            f.close()
+            with open(file_path, 'r') as f:
+                self.response.headers['Content-Type'] = mimetypes.guess_type(
+                    file_path)[0]
+                # TODO(sll): Add a ALLOW_CACHING flag and set the appropriate
+                # caching headers if that's turned on.
+                self.response.write(f.read())
         except Exception:
             self.response.set_status(404)

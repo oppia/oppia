@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Controllers for simple pages."""
+"""Controllers for simple, mostly-static pages (like About, Contact, etc.)."""
 
 __author__ = 'sll@google.com (Sean Lip)'
 

@@ -12,10 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for the profile page."""
+
 __author__ = 'Sean Lip'
 
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class EditorPrerequisitesTest(test_utils.GenericTestBase):

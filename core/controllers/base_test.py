@@ -14,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for generic controller behavior."""
+
 __author__ = 'Sean Lip'
 
 import copy
@@ -21,12 +23,12 @@ import feconf
 import re
 import types
 
+from core.controllers import base
+from core.tests import test_utils
+import main
+
 import webapp2
 import webtest
-
-from core.controllers import base
-import main
-import test_utils
 
 
 class BaseHandlerTest(test_utils.GenericTestBase):
