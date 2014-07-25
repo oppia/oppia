@@ -1003,7 +1003,7 @@ function ExplorationEditor(
       if (data.last_updated) {
         $scope.feedbackTabHeader = (
           'Feedback (updated ' +
-          oppiaDateFormatter.getLocaleDateString(data.last_updated) +
+          oppiaDateFormatter.getLocaleDateString(data.last_updated).replace(/:\d\d /, ' ') +
           ')');
       } else {
         $scope.feedbackTabHeader = 'Feedback';

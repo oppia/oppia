@@ -26,7 +26,7 @@ function ExplorationFeedback($scope, $http, $modal,
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
   $scope.getLocaleStringForDateWithoutSeconds = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getLocaleString(
+    return oppiaDateFormatter.getLocaleDateString(
       millisSinceEpoch).replace(/:\d\d /, ' ');
   };
 
