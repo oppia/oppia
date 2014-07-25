@@ -14,12 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for exploration domain objects and methods defined on them."""
+
 __author__ = 'Sean Lip'
 
 from core.domain import exp_domain
 from core.domain import param_domain
+from core.tests import test_utils
 import feconf
-import test_utils
 import utils
 
 

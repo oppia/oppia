@@ -34,8 +34,8 @@ from core.platform import models
     models.NAMES.base_model, models.NAMES.exploration
 ])
 transaction_services = models.Registry.import_transaction_services()
+from core.tests import test_utils
 import feconf
-import test_utils
 import utils
 
 

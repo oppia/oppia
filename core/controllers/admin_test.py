@@ -12,13 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for the admin page."""
+
 __author__ = 'Sean Lip'
 
 from core.controllers import editor
 from core.controllers import pages
 from core.domain import config_domain
+from core.tests import test_utils
 
-import test_utils
+
+ADMIN_EMAIL = 'admin@example.com'
+BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
+MODERATOR_EMAIL = 'moderator@example.com'
+SITE_NAME = 'sitename.org'
 
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
@@ -93,12 +100,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
     def test_change_splash_page_config_property(self):
         """Test that the correct variables show up on the splash page."""
-        ACTUAL_SITE_NAME = 'oppia.org'
-
         # Navigate to the splash page. The site name is not set.
         response = self.testapp.get('/')
         self.assertIn('SITE_NAME', response.body)
-        self.assertNotIn(ACTUAL_SITE_NAME, response.body)
+        self.assertNotIn(SITE_NAME, response.body)
 
         # Log in as an admin and customize the site name.
         self.login('admin@example.com', is_super_admin=True)
@@ -108,7 +113,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
-                pages.SITE_NAME.name: ACTUAL_SITE_NAME
+                pages.SITE_NAME.name: SITE_NAME
             }
         }, csrf_token)
 
@@ -117,13 +122,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # Navigate to the splash page. The site name is set.
         response = self.testapp.get('/')
         self.assertNotIn('SITE_NAME', response.body)
-        self.assertIn(ACTUAL_SITE_NAME, response.body)
+        self.assertIn(SITE_NAME, response.body)
 
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""
-        MODERATOR_EMAIL = 'moderator@example.com'
-        ADMIN_EMAIL = 'admin@example.com'
-        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
 
         # Navigate to any page. The role is not set.
         response = self.testapp.get('/')

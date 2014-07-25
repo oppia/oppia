@@ -174,7 +174,7 @@ class AdminHandler(base.BaseHandler):
                 job_id = self.payload.get('job_id')
                 job_type = self.payload.get('job_type')
                 for klass in jobs_registry.JOB_MANAGER_CLASSES:
-                    if klass.__name__ == self.payload.get('job_type'):
+                    if klass.__name__ == job_type:
                         klass.cancel(job_id, self.user_id)
                         break
 

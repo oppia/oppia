@@ -12,13 +12,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for Oppia resource handling (e.g. templates, images)."""
+
 __author__ = 'Sean Lip'
 
 import os
 
 from core.domain import exp_services
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class ImageHandlerTest(test_utils.GenericTestBase):

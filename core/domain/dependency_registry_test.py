@@ -21,8 +21,8 @@ __author__ = 'Sean Lip'
 from core.domain import dependency_registry
 from core.domain import exp_services
 from core.domain import widget_registry
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class DependencyRegistryTests(test_utils.GenericTestBase):

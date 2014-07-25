@@ -12,18 +12,24 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for the gallery pages."""
+
 __author__ = 'Sean Lip'
 
 from core.controllers import galleries
 from core.domain import config_services
 from core.domain import exp_services
+from core.domain import rights_manager
+from core.tests import test_utils
 import feconf
-import test_utils
 
 CAN_EDIT_STR = 'can_edit'
 
 
 class LearnGalleryTest(test_utils.GenericTestBase):
+
+    EDITOR_EMAIL = 'editor@example.com'
+    USER_EMAIL = 'user@example.com'
 
     def test_learn_gallery_page(self):
         """Test access to the learners' gallery page."""
@@ -64,23 +70,19 @@ class LearnGalleryTest(test_utils.GenericTestBase):
             self.get_expected_login_url(feconf.CONTRIBUTE_GALLERY_URL),
             no=['To create new explorations or edit existing ones, visit the'])
 
-        USER_EMAIL = 'user@example.com'
-        self.login(USER_EMAIL)
-
+        self.login(self.USER_EMAIL)
         response = self.testapp.get(feconf.LEARN_GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'To create new explorations or edit existing ones, visit the',
             no=['To create new explorations or edit existing ones, you must',
                 self.get_expected_login_url(feconf.CONTRIBUTE_GALLERY_URL)])
-
         self.logout()
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""
-        EDITOR_EMAIL = 'editor@example.com'
-        self.register_editor(EDITOR_EMAIL)
-        self.login(EDITOR_EMAIL)
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
         self.assertEqual(response.status_int, 200)
@@ -93,6 +95,10 @@ class LearnGalleryTest(test_utils.GenericTestBase):
 
 
 class PlaytestQueueTest(test_utils.GenericTestBase):
+
+    EDITOR_EMAIL = 'editor@example.com'
+    PLAYTESTER_A_EMAIL = 'pa@example.com'
+    PLAYTESTER_B_EMAIL = 'pb@example.com'
 
     def test_playtest_queue_page(self):
         """Test access to the playtesters' queue page."""
@@ -135,14 +141,9 @@ class PlaytestQueueTest(test_utils.GenericTestBase):
 
     def test_can_see_explorations_to_playtest(self):
         """Test viewability of playtestable explorations."""
-        EDITOR_EMAIL = 'editor@example.com'
-        PLAYTESTER_A_EMAIL = 'pa@example.com'
-        PLAYTESTER_B_EMAIL = 'pb@example.com'
-        VIEWER_ROLE = 'viewer'
-
         # E registers and logs in as an editor.
-        self.register_editor(EDITOR_EMAIL)
-        self.login(EDITOR_EMAIL)
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         # E creates new explorations A and B.
         response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
@@ -166,14 +167,14 @@ class PlaytestQueueTest(test_utils.GenericTestBase):
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_a_id), {
                 'version': 1,
-                'new_member_email': PLAYTESTER_A_EMAIL,
-                'new_member_role': VIEWER_ROLE
+                'new_member_email': self.PLAYTESTER_A_EMAIL,
+                'new_member_role': rights_manager.ROLE_VIEWER
             }, csrf_token)
         self.put_json(
             '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, exp_b_id), {
                 'version': 1,
-                'new_member_email': PLAYTESTER_B_EMAIL,
-                'new_member_role': VIEWER_ROLE
+                'new_member_email': self.PLAYTESTER_B_EMAIL,
+                'new_member_role': rights_manager.ROLE_VIEWER
             }, csrf_token)
 
         # E logs out.
@@ -191,7 +192,7 @@ class PlaytestQueueTest(test_utils.GenericTestBase):
 
         # If PA logs in, he sees exploration A but not exploration B on the
         # Learn page.
-        self.login(PLAYTESTER_A_EMAIL)
+        self.login(self.PLAYTESTER_A_EMAIL)
         response_dict = self.get_json(feconf.PLAYTEST_QUEUE_DATA_URL)
         self.assertEqual(len(response_dict['public_explorations_list']), 0)
         self.assertEqual(len(response_dict['private_explorations_list']), 1)
@@ -204,7 +205,7 @@ class PlaytestQueueTest(test_utils.GenericTestBase):
         self.logout()
 
         # E does not see either exploration on the Playtest page.
-        self.login(EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
         response_dict = self.get_json(feconf.PLAYTEST_QUEUE_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,
@@ -315,8 +316,10 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
     EMAIL_A = 'a@example.com'
     EMAIL_B = 'b@example.com'
     EMAIL_C = 'c@example.com'
+    EMAIL_USER = 'user@example.com'
     EMAIL_MODERATOR = 'moderator@example.com'
     EMAIL_ADMIN = 'admin@example.com'
+    EMAIL_SUPERADMIN = 'superadmin@example.com'
 
     # These are initialized during the test setup.
     exp_a_id = None
@@ -506,10 +509,9 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
 
         # user@example.com, a regular user, can see exploration B, can see and
         # edit exploration C, and cannot delete any of the explorations.
-        EMAIL_USER = 'user@example.com'
-        self.register_editor(EMAIL_USER)
+        self.register_editor(self.EMAIL_USER)
 
-        self.login(EMAIL_USER)
+        self.login(self.EMAIL_USER)
         response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
 
         self.assertDictContainsSubset({
@@ -642,10 +644,9 @@ class ContributeGalleryRightsTest(test_utils.GenericTestBase):
 
         # superadmin@example.com, a super admin, has no special rights and is
         # equivalent to a user.
-        EMAIL_SUPERADMIN = 'superadmin@example.com'
-        self.register_editor(EMAIL_SUPERADMIN)
+        self.register_editor(self.EMAIL_SUPERADMIN)
 
-        self.login(EMAIL_SUPERADMIN, is_super_admin=True)
+        self.login(self.EMAIL_SUPERADMIN, is_super_admin=True)
         response_dict = self.get_json(feconf.CONTRIBUTE_GALLERY_DATA_URL)
         self.assertDictContainsSubset({
             'is_admin': False,

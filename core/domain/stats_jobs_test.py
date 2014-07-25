@@ -21,12 +21,12 @@ __author__ = 'Stephanie Federwisch'
 from datetime import datetime
 
 from core import jobs
+from core.domain import event_services
 from core.domain import stats_jobs
-from core.domain import stats_services
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
@@ -36,9 +36,9 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         version = 1
         state = 'sid'
-        stats_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         job_id = (
            stats_jobs.StatisticsPageJobManager.create_new())
@@ -57,14 +57,14 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         exp_id = 'eid'
         version = 1
         state = 'sid'
-        stats_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.maybe_leave_exploration(
+        event_services.MaybeLeaveExplorationEventHandler.record(
             exp_id, version, feconf.END_DEST, 'session1', 27, {},
             feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.maybe_leave_exploration(
+        event_services.MaybeLeaveExplorationEventHandler.record(
             exp_id, version, feconf.END_DEST, 'session2', 27, {},
             feconf.PLAY_TYPE_NORMAL)
         job_id = stats_jobs.StatisticsPageJobManager.create_new()
@@ -79,7 +79,7 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(output_model.num_visits, 2)
         self.assertEqual(output_model.num_completions, 2)
 
-    def create_leave_event(self, exp_id, version, state, session, created_on):
+    def _create_leave_event(self, exp_id, version, state, session, created_on):
         leave = stats_models.MaybeLeaveExplorationEventLogEntryModel(
             event_type=feconf.EVENT_TYPE_LEAVE,
             exploration_id=exp_id,
@@ -93,20 +93,20 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         leave.created_on = datetime.fromtimestamp(created_on)
         leave.put()
 
-
     def test_multiple_maybe_leaves_same_session(self):
         exp_id = 'eid'
         version = 1
         state = 'sid'
-        stats_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        self.create_leave_event(exp_id, version, state, 'session1', 0)
-        self.create_leave_event(exp_id, version, state, 'session1', 1)
-        self.create_leave_event(exp_id, version, feconf.END_DEST, 'session1', 2)
-        stats_services.EventHandler.start_exploration(
+        self._create_leave_event(exp_id, version, state, 'session1', 0)
+        self._create_leave_event(exp_id, version, state, 'session1', 1)
+        self._create_leave_event(
+            exp_id, version, feconf.END_DEST, 'session1', 2)
+        event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        self.create_leave_event(exp_id, version, state, 'session2', 3)
-        self.create_leave_event(exp_id, version, state, 'session2', 4)
+        self._create_leave_event(exp_id, version, state, 'session2', 3)
+        self._create_leave_event(exp_id, version, state, 'session2', 4)
         job_id = stats_jobs.StatisticsPageJobManager.create_new()
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)

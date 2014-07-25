@@ -23,6 +23,7 @@ import logging
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import event_services
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -44,10 +45,11 @@ DEFAULT_NUM_SNAPSHOTS = 30
 
 
 def get_value_generators_js():
+    """Return a string that concatenates the JS for all value generators."""
     all_value_generators = (
         value_generators_domain.Registry.get_all_generator_classes())
     value_generators_js = ''
-    for gid, generator_cls in all_value_generators.iteritems():
+    for _, generator_cls in all_value_generators.iteritems():
         value_generators_js += generator_cls.get_js_template()
     return value_generators_js
 
@@ -71,6 +73,7 @@ MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
 
 
 def _require_valid_version(version_from_payload, exploration_version):
+    """Check that the payload version matches the given exploration version."""
     if version_from_payload is None:
         raise base.BaseHandler.InvalidInputException(
             'Invalid POST request: a version must be specified.')
@@ -441,7 +444,7 @@ class ResolvedAnswersHandler(EditorHandler):
                 resolved_answers)
 
         if 'resolved_answers' in self.payload:
-            stats_services.EventHandler.resolve_answers_for_default_rule(
+            event_services.DefaultRuleAnswerResolutionEventHandler.record(
                 exploration_id, state_name, 'submit', resolved_answers)
 
         self.render_json({})

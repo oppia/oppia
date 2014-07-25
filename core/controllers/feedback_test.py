@@ -14,13 +14,15 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for the feedback controllers."""
+
 __author__ = 'Sean Lip'
 
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 EXPECTED_THREAD_KEYS = [
@@ -33,16 +35,16 @@ EXPECTED_MESSAGE_KEYS = [
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
+    EDITOR_EMAIL = 'editor@example.com'
+    EDITOR_USERNAME = 'editor'
+    EXP_ID = '0'
+
     def setUp(self):
         super(FeedbackThreadPermissionsTests, self).setUp()
 
         # Load exploration 0.
-        self.EXP_ID = '0'
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
-
-        self.EDITOR_USERNAME = 'editor'
-        self.EDITOR_EMAIL = 'editor@example.com'
 
         # Get the CSRF token and create a single thread with a single message.
         # The corresponding user has already registered as an editor, and has a
@@ -113,29 +115,30 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
 class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
+    EDITOR_EMAIL = 'editor@example.com'
+    EDITOR_USERNAME = 'editor'
+    EXP_ID = '0'
+
     def setUp(self):
         super(FeedbackThreadIntegrationTests, self).setUp()
 
         # Load exploration 0.
-        self.EXP_ID = '0'
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
 
-        self.EDITOR_USERNAME = 'editor'
-        self.EDITOR_EMAIL = 'editor@example.com'
         self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
         self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
     def test_create_thread(self):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': u'Thread Text ¡unicode!',
-            }, self.csrf_token)
+            }, csrf_token)
         self.logout()
 
         response_dict = self.get_json(
@@ -166,12 +169,12 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
     def test_missing_thread_subject_raises_400_error(self):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'state_name': None,
                 'text': u'Thread Text ¡unicode!',
-            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(
             response_dict['error'], 'A thread subject must be specified.')
         self.logout()
@@ -179,13 +182,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
     def test_missing_thread_text_raises_400_error(self):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(response)
         response_dict = self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
             {
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
-            }, self.csrf_token, expect_errors=True, expected_status_int=400)
+            }, csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(
             response_dict['error'],
             'Text for the first message in the thread must be specified.')
@@ -194,7 +197,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
     def test_post_message_to_existing_thread(self):
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(response)
 
         # First, create a thread.
         self.post_json(
@@ -202,7 +205,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': u'Message 0 ¡unicode!',
-            }, self.csrf_token)
+            }, csrf_token)
 
         # Then, get the thread id.
         response_dict = self.get_json(
@@ -218,7 +221,7 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
             'updated_status': None,
             'updated_subject': None,
             'text': 'Message 1'
-        }, self.csrf_token)
+        }, csrf_token)
 
         # The resulting thread should contain two messages.
         response_dict = self.get_json(thread_url)
@@ -254,14 +257,14 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
         self.login('test@example.com')
         response = self.testapp.get('/create/%s' % NEW_EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, NEW_EXP_ID),
             {
                 'state_name': None,
                 'subject': 'Test thread',
                 'text': 'Test thread text',
-            }, self.csrf_token)
+            }, csrf_token)
 
         response_dict = self.get_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, NEW_EXP_ID))
@@ -279,13 +282,13 @@ class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
         # Create a thread for others to post to.
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/%s' % self.EXP_ID)
-        self.csrf_token = self.get_csrf_token_from_response(response)
+        csrf_token = self.get_csrf_token_from_response(response)
         self.post_json(
             '%s/%s' % (feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID), {
                 'state_name': None,
                 'subject': u'New Thread ¡unicode!',
                 'text': 'Message 0',
-            }, self.csrf_token)
+            }, csrf_token)
         self.logout()
 
         # Get the thread id.

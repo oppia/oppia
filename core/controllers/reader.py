@@ -17,11 +17,11 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import base
+from core.domain import event_services
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
 from core.domain import skins_services
-from core.domain import stats_services
 from core.domain import widget_registry
 import feconf
 import jinja_utils
@@ -137,9 +137,9 @@ class ExplorationHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-        stats_services.EventHandler.record_state_hit(
+        event_services.StateHitEventHandler.record(
             exploration_id, exploration.init_state_name, True)
-        stats_services.EventHandler.start_exploration(
+        event_services.StartExplorationEventHandler.record(
             exploration_id, version, exploration.init_state_name,
             session_id, reader_params, feconf.PLAY_TYPE_NORMAL)
 
@@ -158,7 +158,7 @@ class FeedbackHandler(base.BaseHandler):
 
         recorded_answer = widget.get_stats_log_html(
             old_state.widget.customization_args, old_params, answer)
-        stats_services.EventHandler.record_answer_submitted(
+        event_services.AnswerSubmissionEventHandler.record(
             exploration_id, 1, old_state_name, handler, rule,
             recorded_answer)
 
@@ -226,11 +226,11 @@ class FeedbackHandler(base.BaseHandler):
             None if new_state_name == feconf.END_DEST
             else exploration.states[new_state_name])
 
-        stats_services.EventHandler.record_state_hit(
+        event_services.StateHitEventHandler.record(
             exploration_id, new_state_name,
             (new_state_name not in state_history))
         if new_state_name == feconf.END_DEST:
-            stats_services.EventHandler.maybe_leave_exploration(
+            event_services.MaybeLeaveExplorationEventHandler.record(
                 exploration_id, version, feconf.END_DEST,
                 session_id, client_time_spent_in_secs, old_params,
                 feconf.PLAY_TYPE_NORMAL)
@@ -316,7 +316,7 @@ class ReaderLeaveHandler(base.BaseHandler):
     @require_playable
     def post(self, exploration_id, escaped_state_name):
         """Handles POST requests."""
-        stats_services.EventHandler.maybe_leave_exploration(
+        event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
             self.unescape_state_name(escaped_state_name),

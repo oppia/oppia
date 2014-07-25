@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Tests for the exploration editor page."""
+
 __author__ = 'Sean Lip'
 
 import os
@@ -23,10 +25,9 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
 from core.domain import stats_jobs
-from core.domain import stats_services
 from core.domain import rights_manager
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class BaseEditorControllerTest(test_utils.GenericTestBase):
@@ -642,36 +643,33 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     """Test the handler for managing exploration editing rights."""
 
+    ADMIN_EMAIL = 'admin@example.com'
+    OWNER_EMAIL = 'owner@example.com'
+    COLLABORATOR_EMAIL = 'collaborator@example.com'
+    COLLABORATOR2_EMAIL = 'collaborator2@example.com'
+    VIEWER_EMAIL = 'viewer@example.com'
+    VIEWER2_EMAIL = 'viewer2@example.com'
+
     def test_exploration_rights_handler(self):
         """Test exploration rights handler."""
 
         # Create several users
-        self.admin_email = 'admin@example.com'
-        self.owner_email = 'owner@example.com'
-        self.collaborator_email = 'collaborator@example.com'
-        self.collaborator2_email = 'collaborator2@example.com'
-        self.viewer_email = 'viewer@example.com'
-        self.viewer2_email = 'viewer2@example.com'
+        self.register_editor(self.ADMIN_EMAIL, username='adm')
+        self.register_editor(self.OWNER_EMAIL, username='owner')
+        self.register_editor(self.COLLABORATOR_EMAIL, username='collab')
+        self.register_editor(self.VIEWER_EMAIL, username='viewer')
 
-        self.register_editor(self.admin_email, username='adm')
-        self.register_editor(self.owner_email, username='owner')
-        self.register_editor(self.collaborator_email, username='collab')
-        self.register_editor(self.viewer_email, username='viewer')
-
-        self.admin_id = self.get_user_id_from_email(self.admin_email)
-        self.owner_id = self.get_user_id_from_email(self.owner_email)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.collaborator_id = self.get_user_id_from_email(
-            self.collaborator_email)
-        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+            self.COLLABORATOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
         config_services.set_property(
             feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
 
-        self.viewer_role = rights_manager.ROLE_VIEWER
-        self.collaborator_role = rights_manager.ROLE_EDITOR
-
         # Owner creates exploration
-        self.login(self.owner_email)
+        self.login(self.OWNER_EMAIL)
         EXP_ID = 'eid'
         exploration = exp_domain.Exploration.create_default_exploration(
             EXP_ID, 'Title for rights handler test!',
@@ -688,27 +686,27 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.viewer_email,
-                'new_member_role': self.viewer_role
+                'new_member_email': self.VIEWER_EMAIL,
+                'new_member_role': rights_manager.ROLE_VIEWER
             }, csrf_token)
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.collaborator_email,
-                'new_member_role': self.collaborator_role
+                'new_member_email': self.COLLABORATOR_EMAIL,
+                'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
 
         self.logout()
 
         # Check that viewer can access editor page but cannot edit.
-        self.login(self.viewer_email)
+        self.login(self.VIEWER_EMAIL)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
-        self.login(self.collaborator_email)
+        self.login(self.COLLABORATOR_EMAIL)
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
@@ -737,16 +735,16 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.viewer2_email,
-                'new_member_role': self.viewer_role
+                'new_member_email': self.VIEWER2_EMAIL,
+                'new_member_role': rights_manager.ROLE_VIEWER
             }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
 
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.collaborator2_email,
-                'new_member_role': self.collaborator_role,
+                'new_member_email': self.COLLABORATOR2_EMAIL,
+                'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
 

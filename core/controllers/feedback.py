@@ -21,6 +21,8 @@ from core.domain import feedback_services
 
 
 class ThreadListHandler(base.BaseHandler):
+    """Handles operations relating to feedback thread lists."""
+
     PAGE_NAME_FOR_CSRF = 'editor'
 
     def get(self, exploration_id):
@@ -50,6 +52,8 @@ class ThreadListHandler(base.BaseHandler):
 
 
 class ThreadHandler(base.BaseHandler):
+    """Handles operations relating to feedback threads."""
+
     PAGE_NAME_FOR_CSRF = 'editor'
 
     def get(self, exploration_id, thread_id):
