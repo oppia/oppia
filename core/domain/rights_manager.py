@@ -199,9 +199,9 @@ def get_non_private_exploration_rights():
             exp_models.ExplorationRightsModel.get_non_private()]
 
 
-def get_page_of_non_private_exploration_rights(page_size=feconf.DEFAULT_PAGE_SIZE,
-                                                    cursor=None):
-    """Returns a page of non-private explorations"""
+def get_page_of_non_private_exploration_rights(
+        page_size=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    """Returns a page of rights domain objects non-private explorations."""
     results, cursor, more = exp_models.ExplorationRightsModel.get_page_of_non_private_exploration_rights(
         page_size=page_size, cursor=cursor
     )

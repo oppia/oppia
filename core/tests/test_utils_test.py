@@ -39,9 +39,11 @@ class FunctionWrapperTests(test_utils.GenericTestBase):
                 testcase.assertEqual(args.get('posarg'), 'foo')
                 testcase.assertEqual(args.get('kwarg'), 'bar')
 
-            def post_call_hook(self, result):
+            def post_call_hook(self, args, result):
                 order.append('after')
-                testcase.assertEqual(result, "foobar")
+                testcase.assertEqual(result, 'foobar')
+                testcase.assertEqual(args.get('posarg'), 'foo')
+                testcase.assertEqual(args.get('kwarg'), 'bar')
 
         def function(posarg, kwarg):
             order.append("call")
@@ -148,13 +150,13 @@ class FailingFunctionTests(test_utils.GenericTestBase):
 
         self.assertEqual(ff(5), 25)
 
-    def test_failing_function_never_succeeds_when_n_is_negative(self):
+    def test_failing_function_never_succeeds_when_n_is_infinity(self):
         class CustomError(Exception):
             pass
 
         function = lambda x: x ** 2
 
-        ff = test_utils.FailingFunction(function, CustomError, -42)
+        ff = test_utils.FailingFunction(function, CustomError, test_utils.FailingFunction.INFINITY)
 
         for i in xrange(20):
             with self.assertRaises(CustomError):

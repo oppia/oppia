@@ -318,7 +318,7 @@ class FunctionWrapper(object):
 
         result = self._f(*args, **kwargs)
 
-        self.post_call_hook(result)
+        self.post_call_hook(args_dict, result)
 
         return result
 
@@ -332,7 +332,7 @@ class FunctionWrapper(object):
     def pre_call_hook(self, args):
         pass
 
-    def post_call_hook(self, result):
+    def post_call_hook(self, args, result):
         pass
 
 
@@ -359,6 +359,8 @@ class FailingFunction(FunctionWrapper):
     """A function wrapper that makes a function fail, raising a given exception.
        It can be set to succeed after a given number of calls."""
 
+    INFINITY = 'infinity'
+
     def __init__(self, f, exception, num_tries_before_success):
         """Create a new Failing function.
 
@@ -367,14 +369,23 @@ class FailingFunction(FunctionWrapper):
           - exception: the exception to be raised.
           - num_tries_before_success: the number of times to raise an exception,
             before a call succeeds. If this is 0, all calls will succeed, if it
-            is negative, all calls will fail.
+            is FailingFunction.INFINITY, all calls will fail.
         """
         super(FailingFunction, self).__init__(f)
         self._exception = exception
         self._num_tries_before_success = num_tries_before_success
+        self._always_fail = self._num_tries_before_success == FailingFunction.INFINITY
         self._times_called = 0
+
+
+        if not (self._num_tries_before_success >= 0 or self._always_fail):
+            raise ValueError(
+                             'num_tries_before_success should either be an'
+                             'integer greater than or equal to 0,'
+                             'or FailingFunction.INFINITY')
 
     def pre_call_hook(self, args):
         self._times_called += 1
-        if not (0 <= self._num_tries_before_success < self._times_called):
+        call_should_fail = not self._num_tries_before_success < self._times_called
+        if call_should_fail or self._always_fail:
             raise self._exception

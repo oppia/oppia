@@ -42,7 +42,7 @@ def get_redirect_route(regex_route, handler, name, defaults=None):
 urls = [
     get_redirect_route(r'/cron/statistics', cron.StatisticsHandler, 'statistics_handler'),
     get_redirect_route(r'/cron/search/update', cron.SearchUpdateIndexHandler, 'search_update_handler'),
-    get_redirect_route(r'/cron/search/rebuild', cron.SearchRebuildIndexHandler, 'serch_rebuild_handler')
+    get_redirect_route(r'/cron/search/rebuild', cron.SearchRebuildIndexHandler, 'search_rebuild_handler')
 ]
 
 

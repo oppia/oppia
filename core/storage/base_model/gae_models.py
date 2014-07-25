@@ -84,9 +84,35 @@ class BaseModel(ndb.Model):
         super(BaseModel, self).put()
 
     @classmethod
-    def get_multi(cls, entity_ids):
+    def get_multi(cls, entity_ids, strict=True):
+        """Gets multiple entities by id. Fails noisily if strict == True..
+
+        args:
+         entity_ids: [str, ...]. A list of entity ids.
+         strict: bool. Whether to fail noisily if any of the given ids does not
+                 have an undeleted entity in the datastore.
+
+        returns:
+         A list of entities, corresponding to the entity_ids list argument.
+         If strict == False, list elements corresponding to entity_ids with no undeleted
+         entities will be None.
+        """
         entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
-        return ndb.get_multi(entity_keys)
+        entities = ndb.get_multi(entity_keys)
+        if strict:
+            not_found = []
+            for i in xrange(len(entity_ids)):
+                entity = entities[i]
+                if entity == None or entity.deleted:
+                    not_found.append(entity_ids[i])
+
+            not_found_str = "\n".join(not_found)
+            raise cls.EntityNotFoundError('Entities of class %s with these'
+                                          'id(s) could not be found:\n%s'
+                                          % (cls.__name__, not_found_str))
+
+        return entities
+
 
     @classmethod
     def put_multi(cls, entities):

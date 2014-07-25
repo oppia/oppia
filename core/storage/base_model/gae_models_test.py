@@ -64,6 +64,41 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             model.get(model_id)
 
+    def test_get_multi(self):
+        model1 = base_models.BaseModel()
+        model2 = base_models.BaseModel()
+
+        model1.put()
+        model2.put()
+
+        model1_id = model1.id
+        model2_id = model2.id
+
+        result = base_models.BaseModel.get_multi([model1_id, model2_id])
+
+        self.assertEqual(result, [model1, model2])
+
+        # Testing the case where a non-existent id is given.
+
+        result = base_models.BaseModel.get_all([model1_id, model2_id, 'unknown'], False)
+        self.assertEqual(result, [model1, model2, None])
+
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            result = base_models.BaseModel.get_all([model1_id, model2_id, 'unknown'])
+
+        # Testing  the case where a model is marked as deleted
+
+        model3 = base_models.BaseModel()
+        model3.deleted = True
+        model3.put()
+
+        result = base_models.BaseModel.get_all([model1_id, model2_id, model3.id],
+                                               False)
+        self.assertEqual(result, [model1, model2, None])
+
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            result = base_models.BaseModel.get_all([model1_id, model2_id, model3.id])
+
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
         for item in range(100):
