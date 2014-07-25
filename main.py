@@ -43,14 +43,6 @@ import webapp2
 from webapp2_extras.routes import RedirectRoute
 
 
-# Clear all event listeners.
-event_services.Registry.clear_all_event_listeners()
-
-# Add hooks so that incoming events can be routed to the realtime layers
-# of ContinuousComputations (see jobs.py for details).
-jobs_registry.init_realtime_layer_event_hooks()
-
-
 class Error404Handler(base.BaseHandler):
     """Handles 404 errors."""
 

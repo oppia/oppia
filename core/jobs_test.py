@@ -673,6 +673,8 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
     ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS = [
         StartExplorationMapReduceJobManager]
+    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+        StartExplorationEventCounter]
 
     def setUp(self):
         """Create an exploration and register the event listener manually."""
@@ -682,46 +684,41 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.EXP_ID, 'title', 'A category')
         exp_services.save_new_exploration('owner_id', exploration)
 
-        # Register the custom continuous computation class manually.
-        listener_method = StartExplorationEventCounter.on_incoming_event
-        for event_type in (
-                StartExplorationEventCounter.get_event_types_listened_to()):
-            event_class = event_services.Registry.get_event_class_by_type(
-                event_type)
-            event_class.add_listener(listener_method)
-
     def test_continuous_computation_workflow(self):
         """An integration test for continuous computations."""
-        self.assertEqual(
-            StartExplorationEventCounter.get_count(self.EXP_ID), 0)
-
-        # Record an event. This will put the event in the task queue.
-        event_services.StartExplorationEventHandler.record(
-            self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
-            feconf.PLAY_TYPE_NORMAL)
-        self.assertEqual(
-            StartExplorationEventCounter.get_count(self.EXP_ID), 0)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
-        # When the task queue is flushed, the data is recorded in the two
-        # realtime layers.
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
-        self.assertEqual(
-            StartExplorationEventCounter.get_count(self.EXP_ID), 1)
-        self.assertEqual(
-            StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
-        self.assertEqual(
-            StartExplorationRealtimeModel1.get(self.EXP_ID).count, 1)
-
-        # The batch job has not run yet, so no entity for self.EXP_ID will have
-        # been created in the batch model yet.
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
-            stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
-
         with self.swap(
                 jobs, 'ALL_MAPREDUCE_JOB_MANAGERS',
-                self.ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS):
+                self.ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS
+            ), self.swap(
+                jobs, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+
+            # Record an event. This will put the event in the task queue.
+            event_services.StartExplorationEventHandler.record(
+                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+            # When the task queue is flushed, the data is recorded in the two
+            # realtime layers.
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+            self.assertEqual(
+                StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
+            self.assertEqual(
+                StartExplorationRealtimeModel1.get(self.EXP_ID).count, 1)
+
+            # The batch job has not run yet, so no entity for self.EXP_ID will
+            # have been created in the batch model yet.
+            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+                stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
+
             # Launch the batch computation.
             StartExplorationEventCounter.start_computation()
             # Data in realtime layer 0 is still there.

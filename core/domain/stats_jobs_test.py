@@ -46,8 +46,8 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
            stats_jobs.StatisticsPageJobManager.create_new())
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
+
         self.assertEqual(
             stats_jobs.StatisticsPageJobManager.get_status_code(job_id), 
             jobs.STATUS_CODE_COMPLETED)
@@ -69,11 +69,13 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         event_services.MaybeLeaveExplorationEventHandler.record(
             exp_id, version, feconf.END_DEST, 'session2', 27, {},
             feconf.PLAY_TYPE_NORMAL)
+        self.process_and_flush_pending_tasks()
+
         job_id = stats_jobs.StatisticsPageJobManager.create_new()
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
+
         self.assertEqual(
             stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
@@ -109,15 +111,16 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         self._create_leave_event(exp_id, version, state, 'session2', 3)
         self._create_leave_event(exp_id, version, state, 'session2', 4)
+        self.process_and_flush_pending_tasks()
+
         job_id = stats_jobs.StatisticsPageJobManager.create_new()
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
+
         self.assertEqual(
             stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
         self.assertEqual(output_model.num_visits, 2)
         self.assertEqual(output_model.num_completions, 1)
-

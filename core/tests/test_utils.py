@@ -252,9 +252,6 @@ class AppEngineTestBase(TestBase):
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
 
-        # Clear all event listeners.
-        event_services.Registry.clear_all_event_listeners()
-
     def tearDown(self):
         self.logout()
         self._delete_all_models()

@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import inspect
 
+from core import jobs
 from core.domain import exp_domain
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
@@ -38,47 +39,31 @@ class BaseEventHandler(object):
     # A string denoting the type of the event. Should be specified by
     # subclasses and considered immutable.
     event_type = None
-    # Methods/functions that should be called asynchronously when an incoming
-    # event arrives.
-    # IMPORTANT: Implementers should be aware that listeners may receive events
-    # after an extended period of time, so they should not refer to things like
-    # the user currently in session. In addition, listeners should ensure that
-    # they are robust to retries in the event of failure (or raise a
-    # taskqueue_services.PermanentTaskFailure exception).
-    _listeners = []
 
     @classmethod
-    def add_listener(cls, listener):
-        if listener not in cls._listeners:
-            cls._listeners.append(listener)
-
-    @classmethod
-    def remove_listener(cls, listener):
-        if listener in cls._listeners:
-            cls._listeners.remove(listener)
-
-    @classmethod
-    def clear_listeners(cls):
-        cls._listeners = []
-
-    @classmethod
-    def _notify_listeners_async(cls, *args, **kwargs):
-        # Listeners are called with 'event_type' followed by the args and
-        # kwargs passed to record().
-        for listener in cls._listeners:
-            taskqueue_services.defer(
-                listener, cls.event_type, *args, **kwargs)
+    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
+        """Dispatch events asynchronously to continuous computation realtime
+        layers that are listening for them.
+        """
+        taskqueue_services.defer(
+            jobs.ContinuousComputationEventDispatcher.dispatch_event,
+            cls.event_type, *args, **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):
-        """This method should specify what to do when an event is received."""
+        """Perform in-request processing of an incoming event."""
         raise NotImplementedError(
-            'This method should be implemented by subclasses.')
+            'Subclasses of BaseEventHandler should implement the '
+            '_handle_event() method, using explicit arguments '
+            '(no *args or **kwargs).')
 
     @classmethod
     def record(cls, *args, **kwargs):
-        """This is the public method that callers should use."""
-        cls._notify_listeners_async(*args, **kwargs)
+        """Process incoming events.
+
+        Callers of event handlers should call this method, not _handle_event().
+        """
+        cls._notify_continuous_computation_listeners_async(*args, **kwargs)
         cls._handle_event(*args, **kwargs)
 
 
@@ -98,6 +83,12 @@ class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
     event_type = EVENT_TYPE_ANSWER_SUBMITTED
+
+    @classmethod
+    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
+        # Disable this method until we can deal with large answers, otherwise
+        # the data that is being placed on the task queue is too large.
+        pass
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
@@ -175,13 +166,6 @@ class Registry(object):
                     raise Exception('Duplicate event type %s' % obj.EVENT_TYPE)
 
                 cls._event_types_to_classes[obj.event_type] = obj
-
-    @classmethod
-    def clear_all_event_listeners(cls):
-        """Clears all listeners."""
-        cls._refresh_registry()
-        for event_class in cls._event_types_to_classes.values():
-            event_class.clear_listeners()
 
     @classmethod
     def get_event_class_by_type(cls, event_type):

@@ -26,18 +26,3 @@ from core.domain import stats_jobs
 # dashboard.
 JOB_MANAGER_CLASSES = [stats_jobs.StatisticsPageJobManager,
                        stats_jobs.TranslateStartAndCompleteEventsJobManager]
-
-CONTINUOUS_COMPUTATION_MANAGER_CLASSES = []
-
-
-def init_realtime_layer_event_hooks():
-    """This function should be called on every incoming request. It adds
-    hooks to the dispatchers for incoming events, so that the relevant classes
-    implementing the realtime layers of ContinuousComputations are notified
-    and can process them.
-    """
-    for klass in CONTINUOUS_COMPUTATION_MANAGER_CLASSES:
-        for event_type in klass.get_event_types_listened_to():
-            event_class = event_services.Registry.get_event_class_by_type(
-                event_type)
-            event_class.add_listener(klass.on_incoming_event)

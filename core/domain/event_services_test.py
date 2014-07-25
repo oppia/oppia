@@ -38,12 +38,6 @@ class TestEventHandler(event_services.BaseEventHandler):
         NumbersModel(number=number).put()
 
 
-def dummy_listener(unused_event_type, number):
-    # Due to pickling restrictions, listeners cannot be defined as inner
-    # functions.
-    assert number == 2
-
-
 class EventHandlerUnitTests(test_utils.GenericTestBase):
     """Test basic event handler operations."""
 
@@ -54,19 +48,3 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual([
             numbers_model.number for numbers_model in NumbersModel.query()
         ], [2])
-
-    def test_event_listener_is_called(self):
-        TestEventHandler.add_listener(dummy_listener)
-        self.assertEqual(len(TestEventHandler._listeners), 1)
-
-        TestEventHandler.record(2)
-
-        # TODO(sll): Wrap the listener in a counter in order to ensure that
-        # it is actually called.
-
-        # Note that the listener will not actually be called until the task
-        # queue is flushed.
-        self.process_and_flush_pending_tasks()
-
-        TestEventHandler.remove_listener(dummy_listener)
-        self.assertEqual(TestEventHandler._listeners, [])

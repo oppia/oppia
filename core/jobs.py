@@ -66,6 +66,11 @@ DEFAULT_RECENCY_SECS = 14 * 24 * 60 * 60
 # TODO(sll): Move existing MapReduce jobs to this list.
 ALL_MAPREDUCE_JOB_MANAGERS = []
 
+# NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
+# it should be registered here.
+# TODO(sll): Do automatic discovery.
+ALL_CONTINUOUS_COMPUTATION_MANAGERS = []
+
 
 class BaseJobManager(object):
     """Base class for managing long-running jobs.
@@ -659,6 +664,28 @@ class BaseContinuousComputationManager(object):
             'manager class for the continuously-running batch job.')
 
     @classmethod
+    def _handle_incoming_event(
+            cls, datastore_class, event_type, *args, **kwargs):
+        """Records incoming events in the given realtime datastore_class.
+
+        This method should be implemented by subclasses. The args are the
+        same as those sent to the event handler corresponding to the event
+        type. Note that there may be more than one event type.
+
+        IMPORTANT: This method only gets called as part of the dequeue process
+        from a deferred task queue. Thus, it should not refer to things like
+        the user currently in session. In addition, if an exception is raised
+        in this method, the task queue will usually retry calling it, so this
+        method must be robust to multiple calls for the same event (or raise a
+        taskqueue_services.PermanentTaskFailure exception on failure).
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseContinuousComputationManager must implement '
+            '_handle_incoming_event(...). Please check the docstring of this '
+            'method in jobs.BaseContinuousComputationManager for important '
+            'developer information.')
+
+    @classmethod
     def _get_active_realtime_index(cls):
         cc_model = job_models.ContinuousComputationModel.get(
             cls.__name__, strict=False)
@@ -686,6 +713,21 @@ class BaseContinuousComputationManager(object):
         cc_model.active_realtime_layer_index = (
             1 - cc_model.active_realtime_layer_index)
         cc_model.put()
+
+    @classmethod
+    def _clear_realtime_datastore_class(cls, datastore_class):
+        """Deletes all entries in the given realtime datastore class."""
+        ndb.delete_multi(datastore_class.query().iter(keys_only=True))
+
+    @classmethod
+    def _kickoff_batch_job(cls):
+        """Create and enqueue a new batch job."""
+        # TODO(sll): Make this job only process events before the current
+        # timestamp.
+        # TODO(sll): Ensure there is no other running job in the queue.
+        job_manager = cls._get_batch_job_manager_class()
+        job_id = job_manager.create_new()
+        job_manager.enqueue(job_id)
 
     @classmethod
     def start_computation(cls):
@@ -726,42 +768,15 @@ class BaseContinuousComputationManager(object):
         cc_model.put()
 
     @classmethod
-    def _kickoff_batch_job(cls):
-        """Create and enqueue a new batch job."""
-        # TODO(sll): Make this job only process events before the current
-        # timestamp.
-        # TODO(sll): Ensure there is no other running job in the queue.
-        job_manager = cls._get_batch_job_manager_class()
-        job_id = job_manager.create_new()
-        job_manager.enqueue(job_id)
-
-    @classmethod
-    def _handle_incoming_event(
-            cls, datastore_class, event_type, *args, **kwargs):
-        """Records incoming events in the given realtime datastore_class.
-
-        This method should be implemented by subclasses. The args are the
-        same as those sent to the event handler corresponding to the event
-        type. Note that there may be more than one event type.
-        """
-        # TODO(sll): Refactor the event handlers so that each takes a single
-        # 'data' dict that is defined by a schema and verified on receipt.
-        # Then we don't have to deal with variadic functions all over the
-        # place.
-        raise NotImplementedError(
-            'Subclasses of BaseContinuousComputationManager must implement '
-            '_handle_incoming_event(...).')
-
-    @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
+        """Handle an incoming event.
+
+        The *args and **kwargs match those passed to the _handle_event() method
+        of the corresponding EventHandler subclass.
+        """
         for datastore_class in cls._get_realtime_datastore_classes():
             cls._handle_incoming_event(
                 datastore_class, event_type, *args, **kwargs)
-
-    @classmethod
-    def _clear_realtime_datastore_class(cls, datastore_class):
-        """Deletes all entries in the given realtime datastore class."""
-        ndb.delete_multi(datastore_class.query().iter(keys_only=True))
 
     @classmethod
     def on_batch_job_completion(cls):
@@ -825,3 +840,16 @@ class MapReduceJobManagerRegistry(object):
         if job_manager_name not in cls._mr_job_manager_names_to_classes:
             cls._refresh_registry()
         return cls._mr_job_manager_names_to_classes[job_manager_name]
+
+
+class ContinuousComputationEventDispatcher(object):
+    """Dispatches events to the relevant ContinuousComputation classes."""
+
+    @classmethod
+    def dispatch_event(cls, event_type, *args, **kwargs):
+        """Dispatches an incoming event to the ContinuousComputation
+        classes which listen to events of that type.
+        """
+        for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+            if event_type in klass.get_event_types_listened_to():
+                klass.on_incoming_event(event_type, *args, **kwargs)
