@@ -96,3 +96,31 @@ class JobModel(base_models.BaseModel):
     def get_unfinished_jobs(cls, job_type):
         return cls.query().filter(cls.job_type == job_type).filter(
             cls.is_cancelable == True)
+
+
+# Allowed transitions: idle --> running --> stopping --> idle.
+CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE = 'idle'
+CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING = 'running'
+CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING = 'stopping'
+
+
+class ContinuousComputationModel(base_models.BaseModel):
+    """Class representing a continuous computation.
+
+    The id is the class name.
+    """
+    # The current status code for the computation.
+    status_code = ndb.StringProperty(
+        indexed=True,
+        default=CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE,
+        choices=[
+            CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE,
+            CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING,
+            CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING
+        ])
+    # The realtime layer that is currently 'active' (i.e., the one that is
+    # going to be cleared immediately after the current batch job run
+    # completes).
+    active_realtime_layer_index = ndb.IntegerProperty(
+        default=0,
+        choices=[0, 1])

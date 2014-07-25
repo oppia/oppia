@@ -25,11 +25,19 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
+EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
+EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
+EVENT_TYPE_START_EXPLORATION = 'start_exploration'
+EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'maybe_leave_exploration'
+
 
 class BaseEventHandler(object):
     """Base class for event dispatchers."""
 
-    EVENT_TYPE = None
+    # A string denoting the type of the event. Should be specified by
+    # subclasses and considered immutable.
+    event_type = None
     # Methods/functions that should be called asynchronously when an incoming
     # event arrives.
     # IMPORTANT: Implementers should be aware that listeners may receive events
@@ -41,18 +49,25 @@ class BaseEventHandler(object):
 
     @classmethod
     def add_listener(cls, listener):
-        cls._listeners.append(listener)
+        if listener not in cls._listeners:
+            cls._listeners.append(listener)
 
     @classmethod
     def remove_listener(cls, listener):
-        cls._listeners.remove(listener)
+        if listener in cls._listeners:
+            cls._listeners.remove(listener)
+
+    @classmethod
+    def clear_listeners(cls):
+        cls._listeners = []
 
     @classmethod
     def _notify_listeners_async(cls, *args, **kwargs):
-        # Listeners are called with the same args as the ones passed to
-        # record().
+        # Listeners are called with 'event_type' followed by the args and
+        # kwargs passed to record().
         for listener in cls._listeners:
-            taskqueue_services.defer(listener, *args, **kwargs)
+            taskqueue_services.defer(
+                listener, cls.event_type, *args, **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):
@@ -70,6 +85,8 @@ class BaseEventHandler(object):
 class StateHitEventHandler(BaseEventHandler):
     """Event handler for recording state hits."""
 
+    event_type = EVENT_TYPE_STATE_HIT
+
     @classmethod
     def _handle_event(cls, exploration_id, state_name, first_time):
         """Record an event when a state is encountered by the reader."""
@@ -79,6 +96,8 @@ class StateHitEventHandler(BaseEventHandler):
 
 class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
+
+    event_type = EVENT_TYPE_ANSWER_SUBMITTED
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
@@ -94,6 +113,8 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
     """Event handler for recording resolving of answers triggering the default
     rule."""
 
+    event_type = EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
+
     @classmethod
     def _handle_event(cls, exploration_id, state_name, handler_name, answers):
         """Resolves a list of answers for the default rule of this state."""
@@ -106,6 +127,8 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
 class StartExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration start events."""
 
+    event_type = EVENT_TYPE_START_EXPLORATION
+
     @classmethod
     def _handle_event(cls, exp_id, exp_version, state_name, session_id,
                       params, play_type):
@@ -116,6 +139,8 @@ class StartExplorationEventHandler(BaseEventHandler):
 
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration leave events."""
+
+    event_type = EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
 
     @classmethod
     def _handle_event(
@@ -140,14 +165,23 @@ class Registry(object):
         # Find all subclasses of BaseEventHandler in the current module.
         for obj_name, obj in globals().iteritems():
             if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
-                if not obj.EVENT_TYPE:
+                if obj_name == 'BaseEventHandler':
+                    continue
+                if not obj.event_type:
                     raise Exception(
                         'Event handler class %s does not specify an event '
                         'type' % obj_name)
-                elif obj.EVENT_TYPE in cls._event_types_to_classes:
+                elif obj.event_type in cls._event_types_to_classes:
                     raise Exception('Duplicate event type %s' % obj.EVENT_TYPE)
 
-                cls._event_types_to_classes[obj.EVENT_TYPE] = obj
+                cls._event_types_to_classes[obj.event_type] = obj
+
+    @classmethod
+    def clear_all_event_listeners(cls):
+        """Clears all listeners."""
+        cls._refresh_registry()
+        for event_class in cls._event_types_to_classes.values():
+            event_class.clear_listeners()
 
     @classmethod
     def get_event_class_by_type(cls, event_type):

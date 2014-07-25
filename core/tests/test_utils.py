@@ -19,6 +19,7 @@ import unittest
 import webtest
 
 from core.domain import config_domain
+from core.domain import event_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -250,6 +251,9 @@ class AppEngineTestBase(TestBase):
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)
+
+        # Clear all event listeners.
+        event_services.Registry.clear_all_event_listeners()
 
     def tearDown(self):
         self.logout()

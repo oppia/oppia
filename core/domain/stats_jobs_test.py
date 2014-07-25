@@ -40,6 +40,8 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
         event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
+        self.process_and_flush_pending_tasks()
+
         job_id = (
            stats_jobs.StatisticsPageJobManager.create_new())
         stats_jobs.StatisticsPageJobManager.enqueue(job_id)

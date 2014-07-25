@@ -29,6 +29,8 @@ from core.platform import models
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
+from google.appengine.ext import ndb
+
 from mapreduce import base_handler
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
@@ -55,6 +57,14 @@ VALID_STATUS_CODE_TRANSITIONS = {
 # queued more recently than this number of seconds ago are considered
 # 'recent'.
 DEFAULT_RECENCY_SECS = 14 * 24 * 60 * 60
+
+# A list of mapreduce job managers. The class name of each job manager is
+# stored with the job, and this means that when the MR job finishes, the
+# original job class can be identified.
+# NOTE TO DEVELOPERS: When a new MapReduce job is added, it should be
+# registered here.
+# TODO(sll): Move existing MapReduce jobs to this list.
+ALL_MAPREDUCE_JOB_MANAGERS = []
 
 
 class BaseJobManager(object):
@@ -345,9 +355,17 @@ class BaseDeferredJobManager(BaseJobManager):
 class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, kwargs):
-        BaseMapReduceJobManager.register_start(job_id, {
-            BaseMapReduceJobManager._OUTPUT_KEY_ROOT_PIPELINE_ID: (
-                self.root_pipeline_id)
+        model = job_models.JobModel.get(job_id, strict=True)
+        # TODO(sll): Remove the fallback to BaseMapReduceJobManager here once
+        # all existing jobs have been specified in the registry.
+        try:
+            job_class = MapReduceJobManagerRegistry.get_job_class(
+                model.job_type)
+        except KeyError:
+            job_class = BaseMapReduceJobManager
+
+        job_class.register_start(job_id, {
+            job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id
         })
         output = yield mapreduce_pipeline.MapreducePipeline(**kwargs)
         yield StoreMapReduceResults(job_id, output)
@@ -360,6 +378,15 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 class StoreMapReduceResults(base_handler.PipelineBase):
 
     def run(self, job_id, output):
+        # TODO(sll): Remove the fallback to BaseMapReduceJobManager here once
+        # all existing jobs have been specified in the registry.
+        model = job_models.JobModel.get(job_id, strict=True)
+        try:
+            job_class = MapReduceJobManagerRegistry.get_job_class(
+                model.job_type)
+        except KeyError:
+            job_class = BaseMapReduceJobManager
+
         try:
             iterator = input_readers.RecordsReader(output, 0)
             results_list = []
@@ -368,14 +395,12 @@ class StoreMapReduceResults(base_handler.PipelineBase):
                 # string obtained via "str(result)".  Use AST as a safe
                 # alternative to eval() to get the Python object back.
                 results_list.append(ast.literal_eval(item))
-            transaction_services.run_in_transaction(
-                BaseMapReduceJobManager.register_completion,
-                job_id, results_list)
+            job_class.register_completion(job_id, results_list)
         except Exception as e:
             logging.error(traceback.format_exc())
             logging.error('Job %s failed at %s' % (job_id, time.time()))
-            transaction_services.run_in_transaction(
-                BaseMapReduceJobManager.register_failure, job_id,
+            job_class.register_failure(
+                job_id,
                 '%s\n%s' % (unicode(e), traceback.format_exc()))
 
 
@@ -552,3 +577,251 @@ class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
     @classmethod
     def validate(cls, mapper_spec):
         return True  # TODO
+
+
+class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        """Returns the ContinuousComputationManager class associated with this
+        MapReduce job.
+        """
+        raise NotImplementedError(
+            'The _get_continuous_computation_class() method must be '
+            'implemented by subclasses of '
+            'BaseMapReduceJobManagerForContinuousComputations.')
+
+    @classmethod
+    def _post_completed_hook(cls, job_id):
+        cls._get_continuous_computation_class().on_batch_job_completion()
+
+    @classmethod
+    def _post_failure_hook(cls, job_id):
+        cls._get_continuous_computation_class().on_batch_job_failure()
+
+
+class BaseContinuousComputationManager(object):
+    """This class represents a manager for a continuously-running computation.
+    Such computations consist of two parts: a batch job to compute summary
+    views, and a realtime layer to augment these batch views with additional
+    data that has come in since the last batch job results were computed. The
+    realtime layer may provide only approximate results, but the discrepancy
+    should be small because the realtime layer handles a much smaller amount of
+    data than the batch layer.
+
+    The batch jobs are run continuously, with each batch job starting
+    immediately after the previous run has finished. There are two realtime
+    layers that are cleared alternatively after successive batch runs. Events
+    are recorded to all three layers.
+
+    Here is a schematic showing how this works. The x-axis represents the
+    progression of time. The arrowed intervals in the batch layer indicate how
+    long the corresponding batch job takes to run, and the intervals in each
+    realtime layer indicate spans between when the data in the realtime layer
+    is cleared.
+
+    Batch layer         <----->  <------->  <-------> <-------> <-------->
+    Realtime layer 0    <----->  <------------------> <------------------>
+    Realtime layer 1    <---------------->  <-----------------> <------ ...
+                                 <-- A -->  <-- B -->
+
+    For example, queries arising during the time interval A will use the
+    results of the first batch run, plus data from the realtime layer R1.
+    Queries arising during the time interval B will use the results of the
+    second batch run, plus data from the realtime layer R0.
+    """
+
+    @classmethod
+    def get_event_types_listened_to(cls):
+        """Returns a list of event types that this class subscribes to."""
+        raise NotImplementedError(
+            'Subclasses of BaseContinuousComputationManager must implement '
+            '_get_event_types_listened_to(). This method should return a list '
+            'of event types that are subscribed to by this class.')
+
+    @classmethod
+    def _get_realtime_datastore_classes(cls):
+        """Returns a 2-element list with datastore classes used by the
+        realtime layers.
+        """
+        raise NotImplementedError(
+            'Subclasses of BaseContinuousComputationManager must implement '
+            '_get_realtime_datastore_classes(). This method should return '
+            'a 2-element list specifying the datastore classes to be used by '
+            'the realtime layers.')
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        """Returns the manager class for the batch job."""
+        raise NotImplementedError(
+            'Subclasses of BaseContinuousComputationManager must implement '
+            '_get_batch_job_manager_class(). This method should return the'
+            'manager class for the continuously-running batch job.')
+
+    @classmethod
+    def _get_active_realtime_index(cls):
+        cc_model = job_models.ContinuousComputationModel.get(
+            cls.__name__, strict=False)
+        if cc_model is None:
+            cc_model = job_models.ContinuousComputationModel(
+                id=cls.__name__)
+            cc_model.put()
+
+        return cc_model.active_realtime_layer_index
+
+    @classmethod
+    def _get_active_realtime_datastore_class(cls):
+        return cls._get_realtime_datastore_classes()[
+            cls._get_active_realtime_index()]
+
+    @classmethod
+    def _get_inactive_realtime_datastore_class(cls):
+        return cls._get_realtime_datastore_classes()[
+            1 - cls._get_active_realtime_index()]
+
+    @classmethod
+    def _switch_active_realtime_class(cls):
+        cc_model = job_models.ContinuousComputationModel.get(
+            cls.__name__)
+        cc_model.active_realtime_layer_index = (
+            1 - cc_model.active_realtime_layer_index)
+        cc_model.put()
+
+    @classmethod
+    def start_computation(cls):
+        cc_model = job_models.ContinuousComputationModel.get(
+            cls.__name__, strict=False)
+        if cc_model is None:
+            cc_model = job_models.ContinuousComputationModel(
+                id=cls.__name__)
+
+        if (cc_model.status_code != 
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE):
+            raise Exception(
+                'Attempted to start computation %s, which is already '
+                'running.' % cls.__name__)
+
+        cc_model.status_code = (
+            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
+        cc_model.put()
+
+        # Clear the inactive realtime layer.
+        cls._clear_realtime_datastore_class(
+            cls._get_inactive_realtime_datastore_class())
+
+        cls._kickoff_batch_job()
+
+    @classmethod
+    def stop_computation(cls):
+        """Sends a halt signal to the computation.
+
+        Any currently-running batch jobs will still run to completion, but no
+        further batch runs will be kicked off.
+        """
+        cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
+        # TODO(sll): If there is no job currently running, go to IDLE
+        # immediately.
+        cc_model.status_code = (
+            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING)
+        cc_model.put()
+
+    @classmethod
+    def _kickoff_batch_job(cls):
+        """Create and enqueue a new batch job."""
+        # TODO(sll): Make this job only process events before the current
+        # timestamp.
+        # TODO(sll): Ensure there is no other running job in the queue.
+        job_manager = cls._get_batch_job_manager_class()
+        job_id = job_manager.create_new()
+        job_manager.enqueue(job_id)
+
+    @classmethod
+    def _handle_incoming_event(
+            cls, datastore_class, event_type, *args, **kwargs):
+        """Records incoming events in the given realtime datastore_class.
+
+        This method should be implemented by subclasses. The args are the
+        same as those sent to the event handler corresponding to the event
+        type. Note that there may be more than one event type.
+        """
+        # TODO(sll): Refactor the event handlers so that each takes a single
+        # 'data' dict that is defined by a schema and verified on receipt.
+        # Then we don't have to deal with variadic functions all over the
+        # place.
+        raise NotImplementedError(
+            'Subclasses of BaseContinuousComputationManager must implement '
+            '_handle_incoming_event(...).')
+
+    @classmethod
+    def on_incoming_event(cls, event_type, *args, **kwargs):
+        for datastore_class in cls._get_realtime_datastore_classes():
+            cls._handle_incoming_event(
+                datastore_class, event_type, *args, **kwargs)
+
+    @classmethod
+    def _clear_realtime_datastore_class(cls, datastore_class):
+        """Deletes all entries in the given realtime datastore class."""
+        ndb.delete_multi(datastore_class.query().iter(keys_only=True))
+
+    @classmethod
+    def on_batch_job_completion(cls):
+        """Delete all data in the currently-active realtime_datastore_class."""
+        # TODO(sll): Handle the case when new data gets added while the
+        # deletion is happening.
+        cls._clear_realtime_datastore_class(
+            cls._get_active_realtime_datastore_class())
+        cls._switch_active_realtime_class()
+
+        cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
+        if (cc_model.status_code ==
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
+            cc_model.status_code = (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+            cc_model.put()
+            return
+        else:
+            cls._kickoff_batch_job()
+
+    @classmethod
+    def on_batch_job_failure(cls):
+        # TODO(sll): Alert the admin via email.
+        logging.error('Job failed')
+        cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
+        if (cc_model.status_code ==
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
+            cc_model.status_code = (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+            cc_model.put()
+            return
+        else:
+            cls._kickoff_batch_job()
+
+
+class MapReduceJobManagerRegistry(object):
+    """Registry of mapreduce job managers."""
+
+    # Dict mapping mapreduce job manager names to their classes.
+    _mr_job_manager_names_to_classes = {}
+
+    @classmethod
+    def _refresh_registry(cls):
+        """Regenerates the job manager registry."""
+        cls._mr_job_manager_names_to_classes = {}
+
+        for klass in ALL_MAPREDUCE_JOB_MANAGERS:
+            if klass.__name__ in cls._mr_job_manager_names_to_classes:
+                raise Exception(
+                    'Duplicate MR job manager class name: %s' %
+                    klass.__name__)
+            cls._mr_job_manager_names_to_classes[klass.__name__] = klass
+
+    @classmethod
+    def get_job_class(cls, job_manager_name):
+        """Gets a MR job manager class by its name.
+
+        Refreshes once if the name is not found; subsequently, throws an
+        error.
+        """
+        if job_manager_name not in cls._mr_job_manager_names_to_classes:
+            cls._refresh_registry()
+        return cls._mr_job_manager_names_to_classes[job_manager_name]

@@ -18,14 +18,21 @@
 
 __author__ = 'Sean Lip'
 
+import ast
+
 from core import jobs
 from core import jobs_registry
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
+from core.domain import stats_jobs
 from core.platform import models
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(base_models, exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
+import feconf
 import test_utils
+import utils
 
 from google.appengine.ext import ndb
 
@@ -562,3 +569,200 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             TwoClassesMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
+
+
+class StartExplorationRealtimeModel0(base_models.BaseModel):
+    count = ndb.IntegerProperty(default=0)
+
+
+class StartExplorationRealtimeModel1(base_models.BaseModel):
+    count = ndb.IntegerProperty(default=0)
+
+
+class StartExplorationMapReduceJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return StartExplorationEventCounter
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StartExplorationEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield (item.exploration_id, {
+            'event_type': item.event_type,
+        })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        started_count = 0
+        for value_str in stringified_values:
+            value = ast.literal_eval(value_str)
+            if value['event_type'] == feconf.EVENT_TYPE_START:
+                started_count += 1
+        stats_models.ExplorationAnnotationsModel(
+            id=key, num_visits=started_count).put()
+
+
+class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that counts 'start exploration' events.
+
+    This class should only be used in tests.
+    """
+
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return [event_services.EVENT_TYPE_START_EXPLORATION]
+
+    @classmethod
+    def _get_realtime_datastore_classes(cls):
+        return [
+            StartExplorationRealtimeModel0, StartExplorationRealtimeModel1]
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return StartExplorationMapReduceJobManager
+
+    @classmethod
+    def _handle_incoming_event(
+            cls, datastore_class, event_type, exp_id, exp_version,
+            state_name, session_id, params, play_type):
+        model = datastore_class.get(exp_id, strict=False)
+        if model is None:
+            datastore_class(id=exp_id, count=1).put()
+        else:
+            model.count += 1
+            model.put()
+
+    @classmethod
+    def on_batch_job_completion(cls):
+        ndb.delete_multi(cls._get_active_realtime_datastore_class().query(
+            ).iter(keys_only=True))
+        cls._switch_active_realtime_class()
+
+        # For this computation, don't immediately start a new MapReduce job.
+
+    # Public query method.
+    @classmethod
+    def get_count(cls, exploration_id):
+        """Return the number of 'start exploration' events received.
+
+        Answers the query by combining the existing MR job output and the
+        active realtime_datastore_class.
+        """
+        mr_model = stats_models.ExplorationAnnotationsModel.get(
+            exploration_id, strict=False)
+        realtime_model = cls._get_active_realtime_datastore_class().get(
+            exploration_id, strict=False)
+
+        answer = 0
+        if mr_model is not None:
+            answer += mr_model.num_visits
+        if realtime_model is not None:
+            answer += realtime_model.count
+        return answer
+
+
+class ContinuousComputationTests(test_utils.GenericTestBase):
+    """Tests continuous computations for 'start exploration' events."""
+
+    EXP_ID = 'exp_id'
+
+    ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS = [
+        StartExplorationMapReduceJobManager]
+
+    def setUp(self):
+        """Create an exploration and register the event listener manually."""
+        super(ContinuousComputationTests, self).setUp()
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'title', 'A category')
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        # Register the custom continuous computation class manually.
+        listener_method = StartExplorationEventCounter.on_incoming_event
+        for event_type in (
+                StartExplorationEventCounter.get_event_types_listened_to()):
+            event_class = event_services.Registry.get_event_class_by_type(
+                event_type)
+            event_class.add_listener(listener_method)
+
+    def test_continuous_computation_workflow(self):
+        """An integration test for continuous computations."""
+        self.assertEqual(
+            StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+
+        # Record an event. This will put the event in the task queue.
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEqual(
+            StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+        # When the task queue is flushed, the data is recorded in the two
+        # realtime layers.
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+        self.assertEqual(
+            StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+        self.assertEqual(
+            StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
+        self.assertEqual(
+            StartExplorationRealtimeModel1.get(self.EXP_ID).count, 1)
+
+        # The batch job has not run yet, so no entity for self.EXP_ID will have
+        # been created in the batch model yet.
+        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+            stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
+
+        with self.swap(
+                jobs, 'ALL_MAPREDUCE_JOB_MANAGERS',
+                self.ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS):
+            # Launch the batch computation.
+            StartExplorationEventCounter.start_computation()
+            # Data in realtime layer 0 is still there.
+            self.assertEqual(
+                StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
+            # Data in realtime layer 1 has been deleted.
+            self.assertIsNone(
+                StartExplorationRealtimeModel1.get(self.EXP_ID, strict=False))
+
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                stats_models.ExplorationAnnotationsModel.get(
+                    self.EXP_ID).num_visits, 1)
+
+            # The overall count is still 1.
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+            # Data in realtime layer 0 has been deleted.
+            self.assertIsNone(
+                StartExplorationRealtimeModel0.get(self.EXP_ID, strict=False))
+            # Data in realtime layer 1 has been deleted.
+            self.assertIsNone(
+                StartExplorationRealtimeModel1.get(self.EXP_ID, strict=False))
+
+            # Launch the batch computation again. The overall count is still 1.
+            StartExplorationEventCounter._kickoff_batch_job()
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+
+            # TODO(sll): Once MR jobs can be configured to ignore events with
+            # timestamps later than the times they are started, implement the
+            # following test script:
+            # - Start a new run of the batch job.
+            # - While this job is running, record another event. The overall
+            #   count is now 2.
+            # - When a new run of the batch job completes, the overall count is
+            #   still 2.
+
+
+# TODO(sll): When we have some concrete ContinuousComputations running in
+# production, add an integration test to ensure that the registration of event
+# handlers is happening correctly.

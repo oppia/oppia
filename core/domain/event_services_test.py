@@ -38,7 +38,7 @@ class TestEventHandler(event_services.BaseEventHandler):
         NumbersModel(number=number).put()
 
 
-def dummy_listener(number):
+def dummy_listener(unused_event_type, number):
     # Due to pickling restrictions, listeners cannot be defined as inner
     # functions.
     assert number == 2
