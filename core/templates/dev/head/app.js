@@ -160,13 +160,16 @@ oppia.factory('oppiaDateFormatter', [function() {
       var date = new Date(millisSinceEpoch);
       return date.toLocaleString();
     },
-    getLocaleDateString: function(millisSinceEpoch) {
+    // Returns time of the day if milliseconds since the Epoch
+    // translates to current date otherwise returns the date.
+    getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() == new Date().toLocaleDateString()) {
-        return date.toLocaleTimeString();
+        // The replace function removes 'seconds' from the time returned.
+        return date.toLocaleTimeString().replace(/:\d\d /, ' ');
       }
       return date.toLocaleDateString();
-    }, 
+    }
   };
 }]);
 

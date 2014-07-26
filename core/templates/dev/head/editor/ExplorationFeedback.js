@@ -26,8 +26,8 @@ function ExplorationFeedback($scope, $http, $modal,
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
   $scope.getLocaleStringForDateWithoutSeconds = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getLocaleDateString(
-      millisSinceEpoch).replace(/:\d\d /, ' ');
+    return oppiaDateFormatter.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch);
   };
 
   $scope._getThreadById = function(threadId) {
