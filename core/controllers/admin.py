@@ -96,14 +96,14 @@ class AdminPage(base.BaseHandler):
 
         job_data = jobs.get_data_for_recent_jobs()
         for job in job_data:
-            if job['time_started']:
+            if job['time_started_msec']:
                 job['human_readable_time_started'] = time.strftime(
                     '%B %d %H:%M:%S',
-                    time.gmtime(job['time_started']))
-            if job['time_finished']:
+                    time.gmtime(job['time_started_msec'] / 1000.0))
+            if job['time_finished_msec']:
                 job['human_readable_time_finished'] = time.strftime(
                     '%B %d %H:%M:%S',
-                    time.gmtime(job['time_finished']))
+                    time.gmtime(job['time_finished_msec'] / 1000.0))
 
         self.values.update({
             'demo_explorations': demo_explorations,

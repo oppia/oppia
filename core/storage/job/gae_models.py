@@ -50,13 +50,14 @@ class JobModel(base_models.BaseModel):
 
     # The job type.
     job_type = ndb.StringProperty(indexed=True)
-    # The time at which the job was queued.
-    time_queued = ndb.FloatProperty(indexed=True)
-    # The time at which the job was started. This is never set if the job was
-    # canceled before it was started.
-    time_started = ndb.FloatProperty(indexed=True)
-    # The time at which the job was completed, failed or canceled.
-    time_finished = ndb.FloatProperty(indexed=True)
+    # The time at which the job was queued, in milliseconds since the epoch.
+    time_queued_msec = ndb.FloatProperty(indexed=True)
+    # The time at which the job was started, in milliseconds since the epoch.
+    # This is never set if the job was canceled before it was started.
+    time_started_msec = ndb.FloatProperty(indexed=True)
+    # The time at which the job was completed, failed or canceled, in
+    # milliseconds since the epoch.
+    time_finished_msec = ndb.FloatProperty(indexed=True)
     # The current status code for the job.
     status_code = ndb.StringProperty(
         indexed=True,
@@ -83,10 +84,12 @@ class JobModel(base_models.BaseModel):
     is_cancelable = ndb.ComputedProperty(can_be_canceled)
 
     @classmethod
-    def get_recent_jobs(cls, recency_secs):
-        earliest_time = time.time() - recency_secs
+    def get_recent_jobs(cls, recency_msec):
+        earliest_time_msec = (
+            utils.get_current_time_in_millisecs() - recency_msec)
         return cls.query().filter(
-            cls.time_queued > earliest_time).order(-cls.time_queued)
+            cls.time_queued_msec > earliest_time_msec
+        ).order(-cls.time_queued_msec)
 
     @classmethod
     def get_jobs(cls, job_type):

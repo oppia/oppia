@@ -23,6 +23,7 @@ import copy
 import logging
 import time
 import traceback
+import utils
 
 from core.platform import models
 (job_models,) = models.Registry.import_models([models.NAMES.job])
@@ -32,9 +33,13 @@ transaction_services = models.Registry.import_transaction_services()
 from google.appengine.ext import ndb
 
 from mapreduce import base_handler
+from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
 from mapreduce.lib.pipeline import pipeline
+
+MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
+MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
 
 STATUS_CODE_NEW = job_models.STATUS_CODE_NEW
 STATUS_CODE_QUEUED = job_models.STATUS_CODE_QUEUED
@@ -54,9 +59,9 @@ VALID_STATUS_CODE_TRANSITIONS = {
 }
 
 # The default amount of time that defines a 'recent' job. Jobs that were
-# queued more recently than this number of seconds ago are considered
+# queued more recently than this number of milliseconds ago are considered
 # 'recent'.
-DEFAULT_RECENCY_SECS = 14 * 24 * 60 * 60
+DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 
 # A list of mapreduce job managers. The class name of each job manager is
 # stored with the job, and this means that when the MR job finishes, the
@@ -128,7 +133,7 @@ class BaseJobManager(object):
         cls._real_enqueue(job_id)
 
         model.status_code = STATUS_CODE_QUEUED
-        model.time_queued = time.time()
+        model.time_queued_msec = utils.get_current_time_in_millisecs()
         model.put()
 
         cls._post_enqueue_hook(job_id)
@@ -144,7 +149,7 @@ class BaseJobManager(object):
 
         model.metadata = metadata
         model.status_code = STATUS_CODE_STARTED
-        model.time_started = time.time()
+        model.time_started_msec = utils.get_current_time_in_millisecs()
         model.put()
 
         cls._post_start_hook(job_id)
@@ -159,7 +164,7 @@ class BaseJobManager(object):
         cls._require_correct_job_type(model.job_type)
 
         model.status_code = STATUS_CODE_COMPLETED
-        model.time_finished = time.time()
+        model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.output = output
         model.put()
 
@@ -175,7 +180,7 @@ class BaseJobManager(object):
         cls._require_correct_job_type(model.job_type)
 
         model.status_code = STATUS_CODE_FAILED
-        model.time_finished = time.time()
+        model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = error
         model.put()
 
@@ -195,7 +200,7 @@ class BaseJobManager(object):
         cls._pre_cancel_hook(job_id, cancel_message)
 
         model.status_code = STATUS_CODE_CANCELED
-        model.time_finished = time.time()
+        model.time_finished_msec = utils.get_current_time_in_millisecs()
         model.error = cancel_message
         model.put()
 
@@ -237,22 +242,22 @@ class BaseJobManager(object):
         return model.status_code
 
     @classmethod
-    def get_time_queued(cls, job_id):
+    def get_time_queued_msec(cls, job_id):
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
-        return model.time_queued
+        return model.time_queued_msec
 
     @classmethod
-    def get_time_started(cls, job_id):
+    def get_time_started_msec(cls, job_id):
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
-        return model.time_started
+        return model.time_started_msec
 
     @classmethod
-    def get_time_finished(cls, job_id):
+    def get_time_finished_msec(cls, job_id):
         model = job_models.JobModel.get(job_id, strict=True)
         cls._require_correct_job_type(model.job_type)
-        return model.time_finished
+        return model.time_finished_msec
 
     @classmethod
     def get_metadata(cls, job_id):
@@ -333,14 +338,18 @@ class BaseDeferredJobManager(BaseJobManager):
     @classmethod
     def _run_job(cls, job_id):
         """Starts the job."""
-        logging.info('Job %s started at %s' % (job_id, time.time()))
+        logging.info(
+            'Job %s started at %s' %
+            (job_id, utils.get_current_time_in_millisecs()))
         cls.register_start(job_id)
 
         try:
             result = cls._run()
         except Exception as e:
             logging.error(traceback.format_exc())
-            logging.error('Job %s failed at %s' % (job_id, time.time()))
+            logging.error(
+                'Job %s failed at %s' %
+                (job_id, utils.get_current_time_in_millisecs()))
             cls.register_failure(
                 job_id, '%s\n%s' % (unicode(e), traceback.format_exc()))
             raise taskqueue_services.PermanentTaskFailure(
@@ -350,7 +359,9 @@ class BaseDeferredJobManager(BaseJobManager):
         # it reached this stage. This will result in an exception when the
         # validity of the status code transition is checked.
         cls.register_completion(job_id, result)
-        logging.info('Job %s completed at %s' % (job_id, time.time()))
+        logging.info(
+            'Job %s completed at %s' %
+            (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
     def _real_enqueue(cls, job_id):
@@ -403,7 +414,9 @@ class StoreMapReduceResults(base_handler.PipelineBase):
             job_class.register_completion(job_id, results_list)
         except Exception as e:
             logging.error(traceback.format_exc())
-            logging.error('Job %s failed at %s' % (job_id, time.time()))
+            logging.error(
+                'Job %s failed at %s' %
+                (job_id, utils.get_current_time_in_millisecs()))
             job_class.register_failure(
                 job_id,
                 '%s\n%s' % (unicode(e), traceback.format_exc()))
@@ -482,7 +495,13 @@ class BaseMapReduceJobManager(BaseJobManager):
             'output_writer_spec': (
                 'mapreduce.output_writers.BlobstoreRecordsOutputWriter'),
             'mapper_params': {
-                'entity_kinds': entity_class_names,
+                MAPPER_PARAM_KEY_ENTITY_KINDS: entity_class_names,
+                # Note that all parameters passed to the mapper need to be
+                # strings. Also note that the value for this key is determined
+                # just before enqueue time, so it will be roughly equal to the
+                # actual enqueue time.
+                MAPPER_PARAM_KEY_QUEUED_TIME_MSECS: str(
+                    utils.get_current_time_in_millisecs()),
             }
         }
         mr_pipeline = MapReduceJobPipeline(job_id, kwargs)
@@ -506,7 +525,7 @@ ABSTRACT_BASE_CLASSES = frozenset([
     BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager])
 
 
-def get_data_for_recent_jobs(recency_secs=DEFAULT_RECENCY_SECS):
+def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
     """Get a list containing data about all jobs.
 
     This list is arranged in descending order based on the time the job
@@ -518,19 +537,21 @@ def get_data_for_recent_jobs(recency_secs=DEFAULT_RECENCY_SECS):
     Each element of this list is a dict that represents a job. The dict has the
     following keys:
     - 'id': the job id
-    - 'time_started': when the job was started
-    - 'time_finished': when the job was finished
+    - 'time_started_msec': when the job was started, in milliseconds since the
+          epoch
+    - 'time_finished_msec': when the job was finished, in milliseconds since
+          the epoch
     - 'status_code': the current status of the job
     - 'job_type': the type of this job
     - 'is_cancelable': whether the job can be canceled
     - 'error': any errors pertaining to this job
     """
     recent_job_models = job_models.JobModel.get_recent_jobs(
-        recency_secs=recency_secs)
+        recency_msec=recency_msec)
     result = [{
         'id': model.id,
-        'time_started': model.time_started,
-        'time_finished': model.time_finished,
+        'time_started_msec': model.time_started_msec,
+        'time_finished_msec': model.time_finished_msec,
         'status_code': model.status_code,
         'job_type': model.job_type,
         'is_cancelable': model.is_cancelable,
@@ -592,9 +613,28 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         MapReduce job.
         """
         raise NotImplementedError(
-            'The _get_continuous_computation_class() method must be '
-            'implemented by subclasses of '
-            'BaseMapReduceJobManagerForContinuousComputations.')
+            'Subclasses of BaseMapReduceJobManagerForContinuousComputations '
+            'must implement the _get_continuous_computation_class() method.')
+
+    @staticmethod
+    def _entity_created_before_job_queued(entity):
+        """Checks that the given entity was created before the MR job was queued.
+
+        Mapper methods may want to use this as a precomputation check,
+        especially if the datastore classes being iterated over are append-only
+        event logs.
+        """
+        created_on_msecs = utils.get_time_in_millisecs(entity.created_on)
+        job_queued_msecs = float(context.get().mapreduce_spec.mapper.params[
+            MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
+        return job_queued_msecs >= created_on_msecs
+
+    @staticmethod
+    def map(item):
+        """Implements the map function.  Must be declared @staticmethod."""
+        raise NotImplementedError(
+            'Classes derived from BaseMapReduceJobManager must implement map '
+            'as a @staticmethod.')
 
     @classmethod
     def _post_completed_hook(cls, job_id):
@@ -616,8 +656,9 @@ class BaseContinuousComputationManager(object):
 
     The batch jobs are run continuously, with each batch job starting
     immediately after the previous run has finished. There are two realtime
-    layers that are cleared alternatively after successive batch runs. Events
-    are recorded to all three layers.
+    layers that are cleared alternatively after successive batch runs, just
+    before a new batch job is enqueued. Events are recorded to all three
+    layers.
 
     Here is a schematic showing how this works. The x-axis represents the
     progression of time. The arrowed intervals in the batch layer indicate how
@@ -781,8 +822,8 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def on_batch_job_completion(cls):
         """Delete all data in the currently-active realtime_datastore_class."""
-        # TODO(sll): Handle the case when new data gets added while the
-        # deletion is happening.
+        # TODO(sll): Investigate if it is possible for new data to get added
+        # while the deletion is happening.
         cls._clear_realtime_datastore_class(
             cls._get_active_realtime_datastore_class())
         cls._switch_active_realtime_class()

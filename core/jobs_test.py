@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 import ast
+import time
 
 from core import jobs
 from core import jobs_registry
@@ -70,9 +71,9 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(job_id.startswith('DummyJob'))
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_NEW)
-        self.assertIsNone(DummyJobManager.get_time_queued(job_id))
-        self.assertIsNone(DummyJobManager.get_time_started(job_id))
-        self.assertIsNone(DummyJobManager.get_time_finished(job_id))
+        self.assertIsNone(DummyJobManager.get_time_queued_msec(job_id))
+        self.assertIsNone(DummyJobManager.get_time_started_msec(job_id))
+        self.assertIsNone(DummyJobManager.get_time_finished_msec(job_id))
         self.assertIsNone(DummyJobManager.get_metadata(job_id))
         self.assertIsNone(DummyJobManager.get_output(job_id))
         self.assertIsNone(DummyJobManager.get_error(job_id))
@@ -88,7 +89,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_QUEUED)
-        self.assertIsNotNone(DummyJobManager.get_time_queued(job_id))
+        self.assertIsNotNone(DummyJobManager.get_time_queued_msec(job_id))
         self.assertIsNone(DummyJobManager.get_output(job_id))
 
     def test_failure_for_job_enqueued_using_wrong_manager(self):
@@ -112,14 +113,14 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             DummyJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
-        time_queued = DummyJobManager.get_time_queued(job_id)
-        time_started = DummyJobManager.get_time_started(job_id)
-        time_finished = DummyJobManager.get_time_finished(job_id)
-        self.assertIsNotNone(time_queued)
-        self.assertIsNotNone(time_started)
-        self.assertIsNotNone(time_finished)
-        self.assertLess(time_queued, time_started)
-        self.assertLess(time_started, time_finished)
+        time_queued_msec = DummyJobManager.get_time_queued_msec(job_id)
+        time_started_msec = DummyJobManager.get_time_started_msec(job_id)
+        time_finished_msec = DummyJobManager.get_time_finished_msec(job_id)
+        self.assertIsNotNone(time_queued_msec)
+        self.assertIsNotNone(time_started_msec)
+        self.assertIsNotNone(time_finished_msec)
+        self.assertLess(time_queued_msec, time_started_msec)
+        self.assertLess(time_started_msec, time_finished_msec)
 
         metadata = DummyJobManager.get_metadata(job_id)
         output = DummyJobManager.get_output(job_id)
@@ -141,14 +142,16 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             DummyFailingJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_FAILED)
-        time_queued = DummyFailingJobManager.get_time_queued(job_id)
-        time_started = DummyFailingJobManager.get_time_started(job_id)
-        time_finished = DummyFailingJobManager.get_time_finished(job_id)
-        self.assertIsNotNone(time_queued)
-        self.assertIsNotNone(time_started)
-        self.assertIsNotNone(time_finished)
-        self.assertLess(time_queued, time_started)
-        self.assertLess(time_started, time_finished)
+        time_queued_msec = DummyFailingJobManager.get_time_queued_msec(job_id)
+        time_started_msec = DummyFailingJobManager.get_time_started_msec(
+            job_id)
+        time_finished_msec = DummyFailingJobManager.get_time_finished_msec(
+            job_id)
+        self.assertIsNotNone(time_queued_msec)
+        self.assertIsNotNone(time_started_msec)
+        self.assertIsNotNone(time_finished_msec)
+        self.assertLess(time_queued_msec, time_started_msec)
+        self.assertLess(time_started_msec, time_finished_msec)
 
         metadata = DummyFailingJobManager.get_metadata(job_id)
         output = DummyFailingJobManager.get_output(job_id)
@@ -579,7 +582,7 @@ class StartExplorationRealtimeModel1(base_models.BaseModel):
     count = ndb.IntegerProperty(default=0)
 
 
-class StartExplorationMapReduceJobManager(
+class StartExplorationMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
 
     @classmethod
@@ -592,9 +595,11 @@ class StartExplorationMapReduceJobManager(
 
     @staticmethod
     def map(item):
-        yield (item.exploration_id, {
-            'event_type': item.event_type,
-        })
+        current_class = StartExplorationMRJobManager
+        if current_class._entity_created_before_job_queued(item):
+            yield (item.exploration_id, {
+                'event_type': item.event_type,
+            })
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -624,7 +629,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def _get_batch_job_manager_class(cls):
-        return StartExplorationMapReduceJobManager
+        return StartExplorationMRJobManager
 
     @classmethod
     def _handle_incoming_event(
@@ -671,8 +676,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
-    ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS = [
-        StartExplorationMapReduceJobManager]
+    ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS = [StartExplorationMRJobManager]
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         StartExplorationEventCounter]
 
@@ -744,22 +748,47 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertIsNone(
                 StartExplorationRealtimeModel1.get(self.EXP_ID, strict=False))
 
-            # Launch the batch computation again. The overall count is still 1.
+    def test_events_coming_in_while_batch_job_is_running(self):
+        with self.swap(
+                jobs, 'ALL_MAPREDUCE_JOB_MANAGERS',
+                self.ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS
+            ), self.swap(
+                jobs, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            # Currently no events have been recorded.
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+
+            # Enqueue the batch computation. (It is running on 0 events.)
             StartExplorationEventCounter._kickoff_batch_job()
-            self.process_and_flush_pending_tasks()
+            # Record an event while this job is in the queue. Simulate
+            # this by directly calling on_incoming_event(), because using
+            # StartExplorationEventHandler.record() would just put the event
+            # in the task queue, which we don't want to flush yet.
+            event_services.StartExplorationEventHandler._handle_event(
+                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                feconf.PLAY_TYPE_NORMAL)
+            StartExplorationEventCounter.on_incoming_event(
+                event_services.StartExplorationEventHandler.event_type,
+                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                feconf.PLAY_TYPE_NORMAL)
+            # The overall count is now 1.
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
 
-            # TODO(sll): Once MR jobs can be configured to ignore events with
-            # timestamps later than the times they are started, implement the
-            # following test script:
-            # - Start a new run of the batch job.
-            # - While this job is running, record another event. The overall
-            #   count is now 2.
-            # - When a new run of the batch job completes, the overall count is
-            #   still 2.
+            # Wait for more than one second.
+            time.sleep(1.5)
+            # Finish the job.
+            self.process_and_flush_pending_tasks()
+            # When the batch job completes, the overall count is still 1.
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+            # The batch job result should still be 0, since the event arrived
+            # after the batch job started.
+            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+                stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
 
 
 # TODO(sll): When we have some concrete ContinuousComputations running in
 # production, add an integration test to ensure that the registration of event
-# handlers is happening correctly.
+# handlers in the main codebase is happening correctly.
