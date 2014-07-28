@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for long running jobs."""
+"""Tests for long running jobs and continuous computations."""
 
 __author__ = 'Sean Lip'
 
@@ -26,14 +26,12 @@ from core import jobs_registry
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
-from core.domain import stats_jobs
 from core.platform import models
 (base_models, exp_models, stats_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
+from core.tests import test_utils
 import feconf
-import test_utils
-import utils
 
 from google.appengine.ext import ndb
 

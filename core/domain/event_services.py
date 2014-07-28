@@ -26,6 +26,7 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
 
+
 EVENT_TYPE_STATE_HIT = 'state_hit'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'

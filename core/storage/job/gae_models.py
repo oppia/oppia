@@ -114,7 +114,8 @@ CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING = 'stopping'
 class ContinuousComputationModel(base_models.BaseModel):
     """Class representing a continuous computation.
 
-    The id is the class name.
+    The id of each instance of this model is the name of the continuous
+    computation manager class.
     """
     # The current status code for the computation.
     status_code = ndb.StringProperty(

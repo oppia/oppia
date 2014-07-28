@@ -21,7 +21,6 @@ __author__ = 'Sean Lip'
 import ast
 import copy
 import logging
-import time
 import traceback
 import utils
 
