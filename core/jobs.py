@@ -763,9 +763,11 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _kickoff_batch_job(cls):
         """Create and enqueue a new batch job."""
-        # TODO(sll): Make this job only process events before the current
-        # timestamp.
-        # TODO(sll): Ensure there is no other running job in the queue.
+        if job_models.JobModel.do_unfinished_jobs_exist(cls.__name__):
+            logging.error(
+                'Tried to start a new batch job of type %s while an existing '
+                'job was still running ' % cls.__name__)
+            return
         job_manager = cls._get_batch_job_manager_class()
         job_id = job_manager.create_new()
         job_manager.enqueue(job_id)
@@ -802,10 +804,12 @@ class BaseContinuousComputationManager(object):
         further batch runs will be kicked off.
         """
         cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
-        # TODO(sll): If there is no job currently running, go to IDLE
-        # immediately.
-        cc_model.status_code = (
-            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING)
+        # If there is no job currently running, go to IDLE immediately.
+        new_status_code = (
+            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if 
+            job_models.JobModel.do_unfinished_jobs_exist(cls.__name__) else
+            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+        cc_model.status_code = new_status_code
         cc_model.put()
 
     @classmethod

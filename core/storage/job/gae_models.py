@@ -100,6 +100,10 @@ class JobModel(base_models.BaseModel):
         return cls.query().filter(cls.job_type == job_type).filter(
             cls.is_cancelable == True)
 
+    @classmethod
+    def do_unfinished_jobs_exist(cls, job_type):
+        return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
+
 
 # Allowed transitions: idle --> running --> stopping --> idle.
 CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE = 'idle'
