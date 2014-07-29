@@ -650,8 +650,8 @@ class BaseContinuousComputationManager(object):
     views, and a realtime layer to augment these batch views with additional
     data that has come in since the last batch job results were computed. The
     realtime layer may provide only approximate results, but the discrepancy
-    should be small because the realtime layer handles a much smaller amount of
-    data than the batch layer.
+    should be small because the realtime layer is expected to handle a much
+    smaller amount of data than the batch layer.
 
     The batch jobs are run continuously, with each batch job starting
     immediately after the previous run has finished. There are two realtime
@@ -663,7 +663,10 @@ class BaseContinuousComputationManager(object):
     progression of time. The arrowed intervals in the batch layer indicate how
     long the corresponding batch job takes to run, and the intervals in each
     realtime layer indicate spans between when the data in the realtime layer
-    is cleared.
+    is cleared. Note that a realtime layer is cleared as part of the post-
+    processing that happens when a batch job completes, which explains why the
+    termination of each batch interval and one of the realtime intervals
+    always coincides.
 
     Batch layer         <----->  <------->  <-------> <-------> <-------->
     Realtime layer 0    <----->  <------------------> <------------------>
@@ -675,6 +678,8 @@ class BaseContinuousComputationManager(object):
     Queries arising during the time interval B will use the results of the
     second batch run, plus data from the realtime layer R0.
     """
+    # TODO(sll): In the previous docstring, quantify what 'small' means
+    # once we have some experience with this running in production.
 
     @classmethod
     def get_event_types_listened_to(cls):
@@ -687,7 +692,11 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _get_realtime_datastore_classes(cls):
         """Returns a 2-element list with datastore classes used by the
-        realtime layers.
+        realtime layers. These two classes should be defined with exactly the
+        same attributes and methods so that, regardless of which one is used,
+        the logic remains the same. See StartExplorationRealtimeModel0 and
+        StartExplorationRealtimeModel1 in core/jobs_test.py for an example
+        of how to do this.
         """
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
@@ -714,10 +723,13 @@ class BaseContinuousComputationManager(object):
 
         IMPORTANT: This method only gets called as part of the dequeue process
         from a deferred task queue. Thus, it should not refer to things like
-        the user currently in session. In addition, if an exception is raised
-        in this method, the task queue will usually retry calling it, so this
-        method must be robust to multiple calls for the same event (or raise a
-        taskqueue_services.PermanentTaskFailure exception on failure).
+        the user currently in session.
+
+        IMPORTANT: If an exception is raised here, the task queue will retry
+        calling it and any mutations made will be redone -- unless the
+        exception has type taskqueue_services.PermanentTaskFailure. Developers
+        should therefore ensure that _handle_incoming_event() is robust to
+        multiple calls for the same incoming event.
         """
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
@@ -727,14 +739,18 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _get_active_realtime_index(cls):
-        cc_model = job_models.ContinuousComputationModel.get(
-            cls.__name__, strict=False)
-        if cc_model is None:
-            cc_model = job_models.ContinuousComputationModel(
-                id=cls.__name__)
-            cc_model.put()
+        def _get_active_realtime_index_transactional():
+            cc_model = job_models.ContinuousComputationModel.get(
+                cls.__name__, strict=False)
+            if cc_model is None:
+                cc_model = job_models.ContinuousComputationModel(
+                    id=cls.__name__)
+                cc_model.put()
 
-        return cc_model.active_realtime_layer_index
+            return cc_model.active_realtime_layer_index
+
+        return transaction_services.run_in_transaction(
+            _get_active_realtime_index_transactional)
 
     @classmethod
     def _get_active_realtime_datastore_class(cls):
@@ -748,11 +764,15 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _switch_active_realtime_class(cls):
-        cc_model = job_models.ContinuousComputationModel.get(
-            cls.__name__)
-        cc_model.active_realtime_layer_index = (
-            1 - cc_model.active_realtime_layer_index)
-        cc_model.put()
+        def _switch_active_realtime_class_transactional():
+            cc_model = job_models.ContinuousComputationModel.get(
+                cls.__name__)
+            cc_model.active_realtime_layer_index = (
+                1 - cc_model.active_realtime_layer_index)
+            cc_model.put()
+        
+        transaction_services.run_in_transaction(
+            _switch_active_realtime_class_transactional)
 
     @classmethod
     def _clear_realtime_datastore_class(cls, datastore_class):
@@ -772,22 +792,59 @@ class BaseContinuousComputationManager(object):
         job_manager.enqueue(job_id)
 
     @classmethod
+    def _register_batch_job_end_and_return_status(cls):
+        """Processes a 'job finished' event and returns the job's updated status
+        code.
+
+        Note that 'finish' in this context might mean 'completed successfully'
+        or 'failed'.
+
+        Processing means the following: if the job is currently 'stopping', its
+        status is set to 'idle'; otherwise, its status remains as 'running'.
+        """
+        def _register_batch_job_end_transactional():
+            """Transactionally change the computation's status when a batch job
+            ends."""
+            cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
+            if (cc_model.status_code ==
+                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
+                cc_model.status_code = (
+                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+                cc_model.put()
+
+            return cc_model.status_code
+
+        return transaction_services.run_in_transaction(
+            _register_batch_job_end_transactional)
+
+    @classmethod
     def start_computation(cls):
-        cc_model = job_models.ContinuousComputationModel.get(
-            cls.__name__, strict=False)
-        if cc_model is None:
-            cc_model = job_models.ContinuousComputationModel(
-                id=cls.__name__)
+        """(Re)starts the continuous computation corresponding to this class.
 
-        if (cc_model.status_code != 
-                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE):
-            raise Exception(
-                'Attempted to start computation %s, which is already '
-                'running.' % cls.__name__)
+        Raises an Exception if the computation is already running.
+        """
+        def _start_computation_transactional():
+            """Transactional implementation for marking a continuous
+            computation as started.
+            """
+            cc_model = job_models.ContinuousComputationModel.get(
+                cls.__name__, strict=False)
+            if cc_model is None:
+                cc_model = job_models.ContinuousComputationModel(
+                    id=cls.__name__)
 
-        cc_model.status_code = (
-            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
-        cc_model.put()
+            if (cc_model.status_code != 
+                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE):
+                raise Exception(
+                    'Attempted to start computation %s, which is already '
+                    'running.' % cls.__name__)
+
+            cc_model.status_code = (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
+            cc_model.put()
+
+        transaction_services.run_in_transaction(
+            _start_computation_transactional)
 
         # Clear the inactive realtime layer.
         cls._clear_realtime_datastore_class(
@@ -802,14 +859,21 @@ class BaseContinuousComputationManager(object):
         Any currently-running batch jobs will still run to completion, but no
         further batch runs will be kicked off.
         """
-        cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
-        # If there is no job currently running, go to IDLE immediately.
-        new_status_code = (
-            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if 
-            job_models.JobModel.do_unfinished_jobs_exist(cls.__name__) else
-            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-        cc_model.status_code = new_status_code
-        cc_model.put()
+        def _stop_computation_transactional():
+            """Transactional implementation for marking a continuous
+            computation as stopping/idle.
+            """
+            cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
+            # If there is no job currently running, go to IDLE immediately.
+            new_status_code = (
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if 
+                job_models.JobModel.do_unfinished_jobs_exist(cls.__name__) else
+                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
+            cc_model.status_code = new_status_code
+            cc_model.put()
+
+        transaction_services.run_in_transaction(
+            _stop_computation_transactional)
 
     @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
@@ -831,28 +895,16 @@ class BaseContinuousComputationManager(object):
             cls._get_active_realtime_datastore_class())
         cls._switch_active_realtime_class()
 
-        cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
-        if (cc_model.status_code ==
-                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
-            cc_model.status_code = (
-                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-            cc_model.put()
-            return
-        else:
+        job_status = cls._register_batch_job_end_and_return_status()
+        if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job()
 
     @classmethod
     def on_batch_job_failure(cls):
         # TODO(sll): Alert the admin via email.
-        logging.error('Job failed')
-        cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
-        if (cc_model.status_code ==
-                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING):
-            cc_model.status_code = (
-                job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
-            cc_model.put()
-            return
-        else:
+        logging.error('Job %s failed.' % cls.__name__)
+        job_status = cls._register_batch_job_end_and_return_status()
+        if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job()
 
 

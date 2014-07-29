@@ -39,7 +39,7 @@ class BaseEventHandler(object):
 
     # A string denoting the type of the event. Should be specified by
     # subclasses and considered immutable.
-    event_type = None
+    EVENT_TYPE = None
 
     @classmethod
     def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
@@ -48,7 +48,7 @@ class BaseEventHandler(object):
         """
         taskqueue_services.defer(
             jobs.ContinuousComputationEventDispatcher.dispatch_event,
-            cls.event_type, *args, **kwargs)
+            cls.EVENT_TYPE, *args, **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):
@@ -71,7 +71,7 @@ class BaseEventHandler(object):
 class StateHitEventHandler(BaseEventHandler):
     """Event handler for recording state hits."""
 
-    event_type = EVENT_TYPE_STATE_HIT
+    EVENT_TYPE = EVENT_TYPE_STATE_HIT
 
     @classmethod
     def _handle_event(cls, exploration_id, state_name, first_time):
@@ -83,7 +83,7 @@ class StateHitEventHandler(BaseEventHandler):
 class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
-    event_type = EVENT_TYPE_ANSWER_SUBMITTED
+    EVENT_TYPE = EVENT_TYPE_ANSWER_SUBMITTED
 
     @classmethod
     def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
@@ -105,7 +105,7 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
     """Event handler for recording resolving of answers triggering the default
     rule."""
 
-    event_type = EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
+    EVENT_TYPE = EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
 
     @classmethod
     def _handle_event(cls, exploration_id, state_name, handler_name, answers):
@@ -119,7 +119,7 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
 class StartExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration start events."""
 
-    event_type = EVENT_TYPE_START_EXPLORATION
+    EVENT_TYPE = EVENT_TYPE_START_EXPLORATION
 
     @classmethod
     def _handle_event(cls, exp_id, exp_version, state_name, session_id,
@@ -132,7 +132,7 @@ class StartExplorationEventHandler(BaseEventHandler):
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration leave events."""
 
-    event_type = EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
+    EVENT_TYPE = EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
 
     @classmethod
     def _handle_event(
@@ -159,14 +159,14 @@ class Registry(object):
             if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
                 if obj_name == 'BaseEventHandler':
                     continue
-                if not obj.event_type:
+                if not obj.EVENT_TYPE:
                     raise Exception(
                         'Event handler class %s does not specify an event '
                         'type' % obj_name)
-                elif obj.event_type in cls._event_types_to_classes:
+                elif obj.EVENT_TYPE in cls._event_types_to_classes:
                     raise Exception('Duplicate event type %s' % obj.EVENT_TYPE)
 
-                cls._event_types_to_classes[obj.event_type] = obj
+                cls._event_types_to_classes[obj.EVENT_TYPE] = obj
 
     @classmethod
     def get_event_class_by_type(cls, event_type):

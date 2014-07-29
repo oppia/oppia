@@ -30,6 +30,7 @@ from core.platform import models
 (base_models, exp_models, stats_models) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
+transaction_services = models.Registry.import_transaction_services()
 from core.tests import test_utils
 import feconf
 
@@ -633,12 +634,16 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
     def _handle_incoming_event(
             cls, datastore_class, event_type, exp_id, exp_version,
             state_name, session_id, params, play_type):
-        model = datastore_class.get(exp_id, strict=False)
-        if model is None:
-            datastore_class(id=exp_id, count=1).put()
-        else:
-            model.count += 1
-            model.put()
+
+        def _increment_counter():
+            model = datastore_class.get(exp_id, strict=False)
+            if model is None:
+                datastore_class(id=exp_id, count=1).put()
+            else:
+                model.count += 1
+                model.put()
+
+        transaction_services.run_in_transaction(_increment_counter)
 
     @classmethod
     def on_batch_job_completion(cls):
@@ -767,7 +772,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
                 self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
                 feconf.PLAY_TYPE_NORMAL)
             StartExplorationEventCounter.on_incoming_event(
-                event_services.StartExplorationEventHandler.event_type,
+                event_services.StartExplorationEventHandler.EVENT_TYPE,
                 self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
                 feconf.PLAY_TYPE_NORMAL)
             # The overall count is now 1.
