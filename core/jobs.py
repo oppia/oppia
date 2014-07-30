@@ -760,16 +760,12 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _clear_realtime_datastore_class(
-            cls, datastore_class, latest_created_on_datetime=None):
-        """Deletes all entries in the given realtime datastore class.
-
-        If latest_timestamp is not None, deletes only entries whose created_on
-        date is before latest_timestamp.
+            cls, datastore_class, latest_created_on_datetime):
+        """Deletes all entries in the given realtime datastore class whose
+        created_on date is before latest_timestamp.
         """
-        query = (
-            datastore_class.query() if latest_created_on_datetime is None else
-            datastore_class.query(
-                datastore_class.created_on < latest_created_on_datetime))
+        query = datastore_class.query(
+            datastore_class.created_on < latest_created_on_datetime)
         ndb.delete_multi(query.iter(keys_only=True))
 
     @classmethod
@@ -841,7 +837,8 @@ class BaseContinuousComputationManager(object):
 
         # Clear the inactive realtime layer.
         cls._clear_realtime_datastore_class(
-            cls._get_inactive_realtime_datastore_class())
+            cls._get_inactive_realtime_datastore_class(),
+            datetime.datetime.utcnow())
 
         cls._kickoff_batch_job()
 
@@ -890,7 +887,7 @@ class BaseContinuousComputationManager(object):
         """
         cls._clear_realtime_datastore_class(
             cls._get_active_realtime_datastore_class(),
-            latest_created_on_datetime=datetime.datetime.utcnow())
+            datetime.datetime.utcnow())
         cls._switch_active_realtime_class()
         return cls._register_end_of_batch_job_and_return_status()
 
