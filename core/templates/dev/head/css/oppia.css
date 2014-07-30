@@ -204,6 +204,18 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   color: white;
 }
 
+/* Show the navbar submenu dropdowns on-hover rather than on-click. */
+.nav .dropdown:hover > .dropdown-menu {
+  display: block;
+}
+.nav .dropdown:hover > .dropdown-menu > li > a {
+  color: white;
+}
+.nav .dropdown:hover > .dropdown-menu > li > a:hover {
+  background: rgb(10, 48, 106);
+  color: white;
+}
+
 .oppia-main-content {
   margin: 10px;
   padding: 10px;
@@ -564,18 +576,20 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 
 .oppia-selected-accordion-item {
-  opacity: 0.5;
-  padding: 3px;
+  background-color: #18447e;
+  border-radius: 5px;
+  color: white;
+  padding: 2px 3px;
 }
 
 .oppia-unselected-accordion-item {
   cursor: pointer;
-  padding: 3px;
+  padding: 2px 3px;
 }
 .oppia-unselected-accordion-item:hover {
-  background-color: #18447e;
+  background-color: #ddd;
   border-radius: 5px;
-  color: white;
+  color: black;
 }
 
 .oppia-placeholder {

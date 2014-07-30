@@ -18,26 +18,17 @@
     </div>
 
     <div ng-if="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
-      <span class="pull-right" ng-if="tmpWidget">
-        <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)">
-          Use this interaction
-        </button>
-        <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
-          Cancel
-        </button>
-      </span>
-
-      <h5>Interaction Editor</h5>
+      <h5>
+        <strong>Interaction Editor</strong>
+      </h5>
 
       <div class="row">
         <div class="col-lg-4 col-md-4 col-sm-4">
           <accordion close-others="true">
             <accordion-group heading="<[category]>" ng-repeat="(category, widgetList) in interactiveWidgetRepository" is-open="category === 'Basic Input'">
-              <ul>
-                <li ng-repeat="widget in widgetList" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'" style="list-style-type: none;">
-                  <[widget.name]>
-                </li>
-              </ul>
+              <div ng-repeat="widget in widgetList" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'">
+                <[widget.name]>
+              </div>
             </accordion-group>
           </accordion>
         </div>
@@ -48,9 +39,9 @@
               <accordion-group is-open="true">
                 <accordion-heading>
                   <!-- Due to how ui.bootstrap.accordion is set up, the manipulation of margin and padding is (unfortunately) necessary for the click target to cover the whole heading. -->
-                  <div style="width: 100%; margin: -8px -15px; padding: 8px 15px;" ng-click="generateTmpWidgetPreview()">
+                  <a style="width: 100%; margin: -8px -15px; padding: 8px 15px;" ng-click="generateTmpWidgetPreview()" href="#">
                     Preview
-                  </div>
+                  </a>
                 </accordion-heading>
                 <div class="oppia-preview">
                   <div angular-html-bind="tmpWidget.tag"></div>
@@ -58,7 +49,10 @@
               </accordion-group>
 
               <div ng-if="!isEmpty(tmpWidget.params)">
-                <accordion-group heading="Edit">
+                <accordion-group>
+                  <accordion-heading>
+                    <a href="#">Customize</a>
+                  </accordion-heading>
                   <div ng-repeat="(paramName, paramSpecDict) in tmpWidget.params">
                     <strong><[tmpWidget.params[paramName].description]></strong>
                     <value-generator-editor generator-id="paramSpecDict.generator_id"
@@ -73,8 +67,21 @@
             </accordion>
           </div>
         </div>
-
       </div>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <span class="pull-right" ng-if="tmpWidget">
+            <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
+              Cancel
+            </button>
+            <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)">
+              Use this interaction
+            </button>
+          </span>
+        </div>
+      </div>
+
     </div>
   </div>
 {% endblock %}
