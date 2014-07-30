@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 import ast
-import datetime
 import time
 
 from core import jobs
@@ -606,10 +605,10 @@ class StartExplorationMRJobManager(
         started_count = 0
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value['event_type'] == feconf.EVENT_TYPE_START:
+            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
                 started_count += 1
         stats_models.ExplorationAnnotationsModel(
-            id=key, num_visits=started_count).put()
+            id=key, num_starts=started_count).put()
 
 
 class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
@@ -620,7 +619,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def get_event_types_listened_to(cls):
-        return [event_services.EVENT_TYPE_START_EXPLORATION]
+        return [feconf.EVENT_TYPE_START_EXPLORATION]
 
     @classmethod
     def _get_realtime_datastore_classes(cls):
@@ -668,7 +667,7 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
 
         answer = 0
         if mr_model is not None:
-            answer += mr_model.num_visits
+            answer += mr_model.num_starts
         if realtime_model is not None:
             answer += realtime_model.count
         return answer
@@ -693,7 +692,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
     def test_continuous_computation_workflow(self):
         """An integration test for continuous computations."""
         with self.swap(
-                jobs, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
@@ -735,7 +734,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
             self.assertEqual(
                 stats_models.ExplorationAnnotationsModel.get(
-                    self.EXP_ID).num_visits, 1)
+                    self.EXP_ID).num_starts, 1)
 
             # The overall count is still 1.
             self.assertEqual(
@@ -749,7 +748,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
     def test_events_coming_in_while_batch_job_is_running(self):
         with self.swap(
-                jobs, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             # Currently no events have been recorded.
             self.assertEqual(

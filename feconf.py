@@ -265,10 +265,14 @@ NAV_MODE_LEARN = 'learn'
 NAV_MODE_PLAYTEST = 'playtest'
 NAV_MODE_PROFILE = 'profile'
 
-# Event types
-EVENT_TYPE_LEAVE = 'leave'
-EVENT_TYPE_START = 'start'
-EVENT_TYPE_COMPLETE = 'complete'
+# Event types.
+EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
+EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
+# The values for these two event types should be left as-is for backwards
+# compatibility.
+EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'

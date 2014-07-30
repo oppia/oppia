@@ -64,11 +64,6 @@ VALID_STATUS_CODE_TRANSITIONS = {
 # 'recent'.
 DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
 
-# NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
-# it should be registered here.
-# TODO(sll): Do automatic discovery.
-ALL_CONTINUOUS_COMPUTATION_MANAGERS = []
-
 
 class BaseJobManager(object):
     """Base class for managing long-running jobs.
@@ -807,6 +802,12 @@ class BaseContinuousComputationManager(object):
             _register_end_of_batch_job_transactional)
 
     @classmethod
+    def get_status_code(cls):
+        """Returns the status code of the job."""
+        return job_models.ContinuousComputationModel.get(
+            cls.__name__).status_code
+
+    @classmethod
     def start_computation(cls):
         """(Re)starts the continuous computation corresponding to this class.
 
@@ -849,6 +850,11 @@ class BaseContinuousComputationManager(object):
         Any currently-running batch jobs will still run to completion, but no
         further batch runs will be kicked off.
         """
+        # This is not an ancestor query, so it must be run outside a
+        # transaction.
+        do_unfinished_jobs_exist = job_models.JobModel.do_unfinished_jobs_exist(
+            cls.__name__)
+
         def _stop_computation_transactional():
             """Transactional implementation for marking a continuous
             computation as stopping/idle.
@@ -857,7 +863,7 @@ class BaseContinuousComputationManager(object):
             # If there is no job currently running, go to IDLE immediately.
             new_status_code = (
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING if 
-                job_models.JobModel.do_unfinished_jobs_exist(cls.__name__) else
+                do_unfinished_jobs_exist else
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
             cc_model.status_code = new_status_code
             cc_model.put()
@@ -905,16 +911,3 @@ class BaseContinuousComputationManager(object):
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job()
-
-
-class ContinuousComputationEventDispatcher(object):
-    """Dispatches events to the relevant ContinuousComputation classes."""
-
-    @classmethod
-    def dispatch_event(cls, event_type, *args, **kwargs):
-        """Dispatches an incoming event to the ContinuousComputation
-        classes which listen to events of that type.
-        """
-        for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
-            if event_type in klass.get_event_types_listened_to():
-                klass.on_incoming_event(event_type, *args, **kwargs)

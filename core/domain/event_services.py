@@ -20,18 +20,12 @@ __author__ = 'Sean Lip'
 
 import inspect
 
-from core import jobs
+from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
-
-
-EVENT_TYPE_STATE_HIT = 'state_hit'
-EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
-EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
-EVENT_TYPE_START_EXPLORATION = 'start_exploration'
-EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'maybe_leave_exploration'
+import feconf
 
 
 class BaseEventHandler(object):
@@ -47,7 +41,7 @@ class BaseEventHandler(object):
         layers that are listening for them.
         """
         taskqueue_services.defer(
-            jobs.ContinuousComputationEventDispatcher.dispatch_event,
+            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event,
             cls.EVENT_TYPE, *args, **kwargs)
 
     @classmethod
@@ -71,7 +65,7 @@ class BaseEventHandler(object):
 class StateHitEventHandler(BaseEventHandler):
     """Event handler for recording state hits."""
 
-    EVENT_TYPE = EVENT_TYPE_STATE_HIT
+    EVENT_TYPE = feconf.EVENT_TYPE_STATE_HIT
 
     @classmethod
     def _handle_event(cls, exploration_id, state_name, first_time):
@@ -83,7 +77,7 @@ class StateHitEventHandler(BaseEventHandler):
 class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
-    EVENT_TYPE = EVENT_TYPE_ANSWER_SUBMITTED
+    EVENT_TYPE = feconf.EVENT_TYPE_ANSWER_SUBMITTED
 
     @classmethod
     def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
@@ -105,7 +99,7 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
     """Event handler for recording resolving of answers triggering the default
     rule."""
 
-    EVENT_TYPE = EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
+    EVENT_TYPE = feconf.EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
 
     @classmethod
     def _handle_event(cls, exploration_id, state_name, handler_name, answers):
@@ -119,7 +113,7 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
 class StartExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration start events."""
 
-    EVENT_TYPE = EVENT_TYPE_START_EXPLORATION
+    EVENT_TYPE = feconf.EVENT_TYPE_START_EXPLORATION
 
     @classmethod
     def _handle_event(cls, exp_id, exp_version, state_name, session_id,
@@ -132,7 +126,7 @@ class StartExplorationEventHandler(BaseEventHandler):
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration leave events."""
 
-    EVENT_TYPE = EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
+    EVENT_TYPE = feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
 
     @classmethod
     def _handle_event(

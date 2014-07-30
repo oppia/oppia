@@ -16,15 +16,15 @@
 
 __author__ = 'Stephanie Federwisch'
 
-"""Tests for statistics MapReduce jobs."""
+"""Tests for statistics continuous computations."""
 
 from datetime import datetime
 
-from core import jobs
 from core.domain import event_services
 from core.domain import stats_jobs
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(job_models, stats_models,) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.statistics])
 from core.tests import test_utils
 import feconf
 
@@ -42,17 +42,16 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         self.process_and_flush_pending_tasks()
 
-        job_id = (
-           stats_jobs.StatisticsPageJobManager.create_new())
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
+        stats_jobs.StatisticsAggregator.start_computation()
+        stats_jobs.StatisticsAggregator.stop_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id), 
-            jobs.STATUS_CODE_COMPLETED)
+            stats_jobs.StatisticsAggregator.get_status_code(),
+            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
+        self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 0)
 
     def test_all_complete(self):
@@ -71,21 +70,21 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.process_and_flush_pending_tasks()
 
-        job_id = stats_jobs.StatisticsPageJobManager.create_new()
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
+        stats_jobs.StatisticsAggregator.start_computation()
+        stats_jobs.StatisticsAggregator.stop_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
+            stats_jobs.StatisticsAggregator.get_status_code(),
+            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
+        self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 2)
 
     def _create_leave_event(self, exp_id, version, state, session, created_on):
         leave = stats_models.MaybeLeaveExplorationEventLogEntryModel(
-            event_type=feconf.EVENT_TYPE_LEAVE,
+            event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
             exploration_id=exp_id,
             exploration_version=version,
             state_name=state,
@@ -113,14 +112,14 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         self._create_leave_event(exp_id, version, state, 'session2', 4)
         self.process_and_flush_pending_tasks()
 
-        job_id = stats_jobs.StatisticsPageJobManager.create_new()
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
+        stats_jobs.StatisticsAggregator.start_computation()
+        stats_jobs.StatisticsAggregator.stop_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
+            stats_jobs.StatisticsAggregator.get_status_code(),
+            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
+        self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 1)
