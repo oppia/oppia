@@ -759,9 +759,17 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 .oppia-rule-bubble {
   background: #18447E;
   border-top-right-radius: 8px;
-  padding: 5px;
   color: #ffffff;
+  padding: 5px;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+}
+
+.oppia-non-default-rule-header-bubble {
+  cursor: move;
+}
+
+.oppia-default-rule-header-bubble {
+  border-top-left-radius: 8px;
 }
 
 .oppia-rule-header-bubble {

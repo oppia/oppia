@@ -228,7 +228,7 @@ function InteractiveWidgetEditor(
   $scope.RULE_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
-    handle: '.oppia-rule-sort-arrows',
+    handle: '.oppia-non-default-rule-header-bubble',
     items: '.oppia-rule-block',
     tolerance: 'pointer',
     start: function(e, ui) {
