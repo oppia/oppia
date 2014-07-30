@@ -68,7 +68,7 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             if model is None:
                 datastore_class(id=exp_id, num_starts=1).put()
             else:
-                model.count += 1
+                model.num_starts += 1
                 model.put()
 
         def _increment_completion_counter():
@@ -76,7 +76,7 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             if model is None:
                 datastore_class(id=exp_id, num_completions=1).put()
             else:
-                model.count += 1
+                model.num_completions += 1
                 model.put()
 
         if event_type == feconf.EVENT_TYPE_START_EXPLORATION:

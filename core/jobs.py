@@ -831,6 +831,7 @@ class BaseContinuousComputationManager(object):
 
             cc_model.status_code = (
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING)
+            cc_model.last_started_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -850,10 +851,13 @@ class BaseContinuousComputationManager(object):
         Any currently-running batch jobs will still run to completion, but no
         further batch runs will be kicked off.
         """
+        # TODO(sll): Should we try to cancel the currently-running batch job
+        # as well, instead of just subsequent ones?
+
         # This is not an ancestor query, so it must be run outside a
         # transaction.
         do_unfinished_jobs_exist = job_models.JobModel.do_unfinished_jobs_exist(
-            cls.__name__)
+            cls._get_batch_job_manager_class().__name__)
 
         def _stop_computation_transactional():
             """Transactional implementation for marking a continuous
@@ -866,6 +870,7 @@ class BaseContinuousComputationManager(object):
                 do_unfinished_jobs_exist else
                 job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
             cc_model.status_code = new_status_code
+            cc_model.last_stopped_msec = utils.get_current_time_in_millisecs()
             cc_model.put()
 
         transaction_services.run_in_transaction(
@@ -895,6 +900,15 @@ class BaseContinuousComputationManager(object):
             cls._get_active_realtime_datastore_class(),
             datetime.datetime.utcnow())
         cls._switch_active_realtime_class()
+
+        def _update_last_finished_time_transactional():
+            cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
+            cc_model.last_finished_msec = utils.get_current_time_in_millisecs()
+            cc_model.put()
+
+        transaction_services.run_in_transaction(
+            _update_last_finished_time_transactional)
+
         return cls._register_end_of_batch_job_and_return_status()
 
     @classmethod
@@ -911,3 +925,64 @@ class BaseContinuousComputationManager(object):
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job()
+
+
+def get_continuous_computations_info(cc_classes):
+    """Returns data about the given computations.
+
+    Args:
+      cc_classes: a list of subclasses of BaseContinuousComputationManager.
+
+    Returns:
+      A list of dicts, each representing a continuous computation. Each dict
+      has the following keys:
+      - 'computation_type': the type of the computation
+      - 'status_code': the current status of the computation
+      - 'last_started_msec': when a batch job for the computation was last
+            started, in milliseconds since the epoch
+      - 'last_finished_msec': when a batch job for the computation last
+            finished, in milliseconds since the epoch
+      - 'last_stopped_msec': when a batch job for the computation was last
+            stopped, in milliseconds since the epoch
+      - 'active_realtime_layer_index': the index of the active realtime layer
+      - 'is_startable': whether an admin should be allowed to start this
+            computation
+      - 'is_stoppable': whether an admin should be allowed to stop this
+            computation
+    """
+    cc_models = job_models.ContinuousComputationModel.get_multi(
+        [cc_class.__name__ for cc_class in cc_classes])
+
+    result = []
+    for ind, model in enumerate(cc_models):
+        if model is None:
+            cc_dict = {
+                'computation_type': cc_classes[ind].__name__,
+                'status_code': 'never_started',
+                'last_started_msec': None,
+                'last_finished_msec': None,
+                'last_stopped_msec': None,
+                'active_realtime_layer_index': None,
+                'is_startable': True,
+                'is_stoppable': False,
+            }
+        else:
+            cc_dict = {
+                'computation_type': cc_classes[ind].__name__,
+                'status_code': model.status_code,
+                'last_started_msec': model.last_started_msec,
+                'last_finished_msec': model.last_finished_msec,
+                'last_stopped_msec': model.last_stopped_msec,
+                'active_realtime_layer_index': (
+                    model.active_realtime_layer_index),
+                # TODO(sll): If a job is stopping, can it be started while it
+                # is in the process of stopping?
+                'is_startable': model.status_code == (
+                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE),
+                'is_stoppable': model.status_code == (
+                    job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING),
+            }
+
+        result.append(cc_dict)
+
+    return result

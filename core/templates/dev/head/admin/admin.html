@@ -130,6 +130,41 @@
       {% endfor %}
     </ul>
 
+    <h4>Continuous computations</h4>
+    <table class="table">
+      <tr>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Last started</th>
+        <th>Last stop signal sent</th>
+        <th>Last finished</th>
+        <th>Active realtime layer</th>
+        <th>Controls</th>
+      </tr>
+      {% for computation in continuous_computations_data %}
+        <tr>
+          <td>{{computation.computation_type}}</td>
+          <td>{{computation.status_code}}</td>
+          <td>{{computation.human_readable_last_started}}</td>
+          <td>{{computation.human_readable_last_stopped}}</td>
+          <td>{{computation.human_readable_last_finished}}</td>
+          <td>{{computation.active_realtime_layer_index}}</td>
+          <td>
+            {% if computation.is_startable %}
+              <button ng-click="startComputation('{{computation.computation_type}}')">
+                Start
+              </button>
+            {% endif %}
+            {% if computation.is_stoppable %}
+              <button ng-click="stopComputation('{{computation.computation_type}}')">
+                Stop
+              </button>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </ul>
+
     {% include 'footer_js_libs.html' %}
     {% include 'rte_js_libs.html' %}
 

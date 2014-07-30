@@ -132,3 +132,13 @@ class ContinuousComputationModel(base_models.BaseModel):
     active_realtime_layer_index = ndb.IntegerProperty(
         default=0,
         choices=[0, 1])
+
+    # The time at which a batch job for this computation was last kicked off,
+    # in milliseconds since the epoch.
+    last_started_msec = ndb.FloatProperty(indexed=True)
+    # The time at which a batch job for this computation was last completed or
+    # failed, in milliseconds since the epoch.
+    last_finished_msec = ndb.FloatProperty(indexed=True)
+    # The time at which a halt signal was last sent to this batch job, in
+    # milliseconds since the epoch.
+    last_stopped_msec = ndb.FloatProperty(indexed=True)
