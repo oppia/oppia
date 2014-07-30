@@ -19,6 +19,7 @@
 __author__ = 'Sean Lip'
 
 import ast
+import datetime
 import time
 
 from core import jobs
@@ -647,11 +648,10 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
 
     @classmethod
     def on_batch_job_completion(cls):
-        ndb.delete_multi(cls._get_active_realtime_datastore_class().query(
-            ).iter(keys_only=True))
-        cls._switch_active_realtime_class()
-
-        # For this computation, don't immediately start a new MapReduce job.
+        """Override on_batch_job_completion() so that it does not immediately
+        start a new MapReduce job. Other non-test subclasses should, in
+        general, not do this."""
+        cls._process_job_completion_and_return_status()
 
     # Public query method.
     @classmethod
@@ -679,7 +679,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
     EXP_ID = 'exp_id'
 
-    ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS = [StartExplorationMRJobManager]
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         StartExplorationEventCounter]
 
@@ -694,9 +693,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
     def test_continuous_computation_workflow(self):
         """An integration test for continuous computations."""
         with self.swap(
-                jobs, 'ALL_MAPREDUCE_JOB_MANAGERS',
-                self.ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS
-            ), self.swap(
                 jobs, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             self.assertEqual(
@@ -753,9 +749,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
     def test_events_coming_in_while_batch_job_is_running(self):
         with self.swap(
-                jobs, 'ALL_MAPREDUCE_JOB_MANAGERS',
-                self.ALL_MAPREDUCE_JOB_MANAGERS_FOR_TESTS
-            ), self.swap(
                 jobs, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             # Currently no events have been recorded.

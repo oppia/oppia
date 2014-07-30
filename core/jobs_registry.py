@@ -18,7 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-from core.domain import event_services
 from core.domain import stats_jobs
 
 # Add a list of job manager classes (i.e., subclasses of jobs.BaseJobManager)

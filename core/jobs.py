@@ -20,6 +20,7 @@ __author__ = 'Sean Lip'
 
 import ast
 import copy
+import datetime
 import logging
 import traceback
 import utils
@@ -36,6 +37,7 @@ from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
 from mapreduce.lib.pipeline import pipeline
+from mapreduce import util as mapreduce_util
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
@@ -61,14 +63,6 @@ VALID_STATUS_CODE_TRANSITIONS = {
 # queued more recently than this number of milliseconds ago are considered
 # 'recent'.
 DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
-
-# A list of mapreduce job managers. The class name of each job manager is
-# stored with the job, and this means that when the MR job finishes, the
-# original job class can be identified.
-# NOTE TO DEVELOPERS: When a new MapReduce job is added, it should be
-# registered here.
-# TODO(sll): Move existing MapReduce jobs to this list.
-ALL_MAPREDUCE_JOB_MANAGERS = []
 
 # NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
 # it should be registered here.
@@ -369,38 +363,26 @@ class BaseDeferredJobManager(BaseJobManager):
 
 class MapReduceJobPipeline(base_handler.PipelineBase):
 
-    def run(self, job_id, kwargs):
-        model = job_models.JobModel.get(job_id, strict=True)
-        # TODO(sll): Remove the fallback to BaseMapReduceJobManager here once
-        # all existing jobs have been specified in the registry.
-        try:
-            job_class = MapReduceJobManagerRegistry.get_job_class(
-                model.job_type)
-        except KeyError:
-            job_class = BaseMapReduceJobManager
-
+    def run(self, job_id, job_class_str, kwargs):
+        job_class = mapreduce_util.for_name(job_class_str)
         job_class.register_start(job_id, {
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id
         })
+
+        # TODO(sll): Need try/except/mark-as-canceled here?
         output = yield mapreduce_pipeline.MapreducePipeline(**kwargs)
-        yield StoreMapReduceResults(job_id, output)
+        yield StoreMapReduceResults(job_id, job_class_str, output)
 
     def finalized(self):
         # Suppress the default Pipeline behavior of sending email.
+        # TODO(sll): Should mark-as-done be here instead?
         pass
 
 
 class StoreMapReduceResults(base_handler.PipelineBase):
 
-    def run(self, job_id, output):
-        # TODO(sll): Remove the fallback to BaseMapReduceJobManager here once
-        # all existing jobs have been specified in the registry.
-        model = job_models.JobModel.get(job_id, strict=True)
-        try:
-            job_class = MapReduceJobManagerRegistry.get_job_class(
-                model.job_type)
-        except KeyError:
-            job_class = BaseMapReduceJobManager
+    def run(self, job_id, job_class_str, output):
+        job_class = mapreduce_util.for_name(job_class_str)
 
         try:
             iterator = input_readers.RecordsReader(output, 0)
@@ -503,7 +485,8 @@ class BaseMapReduceJobManager(BaseJobManager):
                     utils.get_current_time_in_millisecs()),
             }
         }
-        mr_pipeline = MapReduceJobPipeline(job_id, kwargs)
+        mr_pipeline = MapReduceJobPipeline(
+            job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
         mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
 
     @classmethod
@@ -692,7 +675,8 @@ class BaseContinuousComputationManager(object):
     @classmethod
     def _get_realtime_datastore_classes(cls):
         """Returns a 2-element list with datastore classes used by the
-        realtime layers. These two classes should be defined with exactly the
+        realtime layers. These two classes should be subclasses of
+        base_models.BaseModel, and should be defined with exactly the
         same attributes and methods so that, regardless of which one is used,
         the logic remains the same. See StartExplorationRealtimeModel0 and
         StartExplorationRealtimeModel1 in core/jobs_test.py for an example
@@ -775,9 +759,18 @@ class BaseContinuousComputationManager(object):
             _switch_active_realtime_class_transactional)
 
     @classmethod
-    def _clear_realtime_datastore_class(cls, datastore_class):
-        """Deletes all entries in the given realtime datastore class."""
-        ndb.delete_multi(datastore_class.query().iter(keys_only=True))
+    def _clear_realtime_datastore_class(
+            cls, datastore_class, latest_created_on_datetime=None):
+        """Deletes all entries in the given realtime datastore class.
+
+        If latest_timestamp is not None, deletes only entries whose created_on
+        date is before latest_timestamp.
+        """
+        query = (
+            datastore_class.query() if latest_created_on_datetime is None else
+            datastore_class.query(
+                datastore_class.created_on < latest_created_on_datetime))
+        ndb.delete_multi(query.iter(keys_only=True))
 
     @classmethod
     def _kickoff_batch_job(cls):
@@ -792,7 +785,7 @@ class BaseContinuousComputationManager(object):
         job_manager.enqueue(job_id)
 
     @classmethod
-    def _register_batch_job_end_and_return_status(cls):
+    def _register_end_of_batch_job_and_return_status(cls):
         """Processes a 'job finished' event and returns the job's updated status
         code.
 
@@ -802,7 +795,7 @@ class BaseContinuousComputationManager(object):
         Processing means the following: if the job is currently 'stopping', its
         status is set to 'idle'; otherwise, its status remains as 'running'.
         """
-        def _register_batch_job_end_transactional():
+        def _register_end_of_batch_job_transactional():
             """Transactionally change the computation's status when a batch job
             ends."""
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
@@ -815,7 +808,7 @@ class BaseContinuousComputationManager(object):
             return cc_model.status_code
 
         return transaction_services.run_in_transaction(
-            _register_batch_job_end_transactional)
+            _register_end_of_batch_job_transactional)
 
     @classmethod
     def start_computation(cls):
@@ -887,15 +880,24 @@ class BaseContinuousComputationManager(object):
                 datastore_class, event_type, *args, **kwargs)
 
     @classmethod
-    def on_batch_job_completion(cls):
-        """Delete all data in the currently-active realtime_datastore_class."""
-        # TODO(sll): Investigate if it is possible for new data to get added
-        # while the deletion is happening.
-        cls._clear_realtime_datastore_class(
-            cls._get_active_realtime_datastore_class())
-        cls._switch_active_realtime_class()
+    def _process_job_completion_and_return_status(cls):
+        """Delete all data in the currently-active realtime_datastore class,
+        switch the active class, and return the status.
 
-        job_status = cls._register_batch_job_end_and_return_status()
+        This seam was created so that tests would be able to override
+        on_batch_job_completion() to avoid kicking off the next job
+        immediately.
+        """
+        cls._clear_realtime_datastore_class(
+            cls._get_active_realtime_datastore_class(),
+            latest_created_on_datetime=datetime.datetime.utcnow())
+        cls._switch_active_realtime_class()
+        return cls._register_end_of_batch_job_and_return_status()
+
+    @classmethod
+    def on_batch_job_completion(cls):
+        """Called when a batch job completes."""
+        job_status = cls._process_job_completion_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job()
 
@@ -903,39 +905,9 @@ class BaseContinuousComputationManager(object):
     def on_batch_job_failure(cls):
         # TODO(sll): Alert the admin via email.
         logging.error('Job %s failed.' % cls.__name__)
-        job_status = cls._register_batch_job_end_and_return_status()
+        job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job()
-
-
-class MapReduceJobManagerRegistry(object):
-    """Registry of mapreduce job managers."""
-
-    # Dict mapping mapreduce job manager names to their classes.
-    _mr_job_manager_names_to_classes = {}
-
-    @classmethod
-    def _refresh_registry(cls):
-        """Regenerates the job manager registry."""
-        cls._mr_job_manager_names_to_classes = {}
-
-        for klass in ALL_MAPREDUCE_JOB_MANAGERS:
-            if klass.__name__ in cls._mr_job_manager_names_to_classes:
-                raise Exception(
-                    'Duplicate MR job manager class name: %s' %
-                    klass.__name__)
-            cls._mr_job_manager_names_to_classes[klass.__name__] = klass
-
-    @classmethod
-    def get_job_class(cls, job_manager_name):
-        """Gets a MR job manager class by its name.
-
-        Refreshes once if the name is not found; subsequently, throws an
-        error.
-        """
-        if job_manager_name not in cls._mr_job_manager_names_to_classes:
-            cls._refresh_registry()
-        return cls._mr_job_manager_names_to_classes[job_manager_name]
 
 
 class ContinuousComputationEventDispatcher(object):
