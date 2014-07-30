@@ -20,9 +20,9 @@ __author__ = 'Sean Lip'
 
 from core.domain import stats_jobs
 
-# List of all job manager classes (i.e., subclasses of jobs.BaseJobManager)
-# for which to show controls on the admin dashboard.
-JOB_MANAGER_CLASSES = [stats_jobs.TranslateStartAndCompleteEventsJobManager]
+# List of all manager classes for one-off batch jobs for which to show controls
+# on the admin dashboard.
+ONE_OFF_JOB_MANAGERS = [stats_jobs.TranslateStartAndCompleteEventsJobManager]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

@@ -665,7 +665,8 @@ class BaseContinuousComputationManager(object):
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
             '_get_event_types_listened_to(). This method should return a list '
-            'of event types that are subscribed to by this class.')
+            'of strings, each representing an event type that this class '
+            'subscribes to.')
 
     @classmethod
     def _get_realtime_datastore_classes(cls):

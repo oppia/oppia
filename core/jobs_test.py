@@ -501,13 +501,46 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
 class JobRegistryTests(test_utils.GenericTestBase):
     """Tests job registry."""
 
-    def test_each_class_is_subclass_of_BaseJobManager(self):
-        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+    def test_each_one_off_class_is_subclass_of_BaseJobManager(self):
+        for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertTrue(issubclass(klass, jobs.BaseJobManager))
 
-    def test_each_class_is_not_abstract(self):
-        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+    def test_each_one_off_class_is_not_abstract(self):
+        for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertFalse(klass._is_abstract())
+
+    def test_validity_of_each_continuous_computation_class(self):
+        for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+            self.assertTrue(
+                issubclass(klass, jobs.BaseContinuousComputationManager))
+
+            event_types_listened_to = klass.get_event_types_listened_to()
+            self.assertTrue(isinstance(event_types_listened_to, list))
+            self.assertGreater(len(event_types_listened_to), 0)
+            for event_type in event_types_listened_to:
+                self.assertTrue(isinstance(event_type, basestring))
+                self.assertTrue(issubclass(
+                    event_services.Registry.get_event_class_by_type(
+                        event_type),
+                    event_services.BaseEventHandler))
+
+            rdcs = klass._get_realtime_datastore_classes()
+            self.assertTrue(isinstance(rdcs, list))
+            self.assertEqual(len(rdcs), 2)
+            for rdc in rdcs:
+                self.assertTrue(issubclass(rdc, base_models.BaseModel))
+            self.assertEqual(rdcs[0]().to_dict(), rdcs[1]().to_dict())
+
+            # The list of allowed base classes. This can be extended as the
+            # need arises, though we may also want to implement
+            # _get_continuous_computation_class() and
+            # _entity_created_before_job_queued() for other base classes
+            # that are added to this list.
+            ALLOWED_BASE_BATCH_JOB_CLASSES = [
+                jobs.BaseMapReduceJobManagerForContinuousComputations]
+            self.assertTrue(any([
+                issubclass(klass._get_batch_job_manager_class(), superclass)
+                for superclass in ALLOWED_BASE_BATCH_JOB_CLASSES]))
 
 
 class JobQueriesTests(test_utils.GenericTestBase):
