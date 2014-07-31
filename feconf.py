@@ -118,7 +118,8 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
-ADMIN_EMAIL_ADDRESS = 'admin@oppia'
+ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
+CAN_SEND_EMAILS_TO_ADMIN = False
 
 # The maximum size of an uploaded file, in bytes.
 MAX_FILE_SIZE_BYTES = 1048576

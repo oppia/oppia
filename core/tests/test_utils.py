@@ -241,12 +241,16 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_user_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-        self.testbed.init_taskqueue_stub()
-        self.taskqueue_stub = self.testbed.get_stub(
-            testbed.TASKQUEUE_SERVICE_NAME)
         self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
         self.testbed.init_blobstore_stub()
+
+        self.testbed.init_taskqueue_stub()
+        self.taskqueue_stub = self.testbed.get_stub(
+            testbed.TASKQUEUE_SERVICE_NAME)
+
+        self.testbed.init_mail_stub()
+        self.mail_stub = self.testbed.get_stub(testbed.MAIL_SERVICE_NAME)
 
         # Set up the app to be tested.
         self.testapp = webtest.TestApp(main.app)

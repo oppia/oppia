@@ -93,3 +93,7 @@ JSON_RESPONSE_TIME_SECS = PerfCounter(
 JSON_RESPONSE_COUNT = PerfCounter(
     'json-response-count',
     'Number of times a JSON response was sent out')
+
+EMAILS_SENT = PerfCounter(
+    'emails-sent',
+    'Number of times a call to send_mail() was made')
