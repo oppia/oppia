@@ -495,3 +495,52 @@ class LogicErrorCategory(BaseObject):
             ]
         }]
     }
+
+class Graph(BaseObject):
+    """A (mathematical) graph with edges and vertices"""
+
+    description = 'A (mathematical) graph'
+    edit_html_filename = 'graph_editor'
+    edit_js_filename = 'GraphEditor'
+
+    _schema = {
+        'type': 'dict',
+        'properties': {
+           'vertices': {
+               'type': 'list',
+               'items': {
+                   'type': 'dict',
+                   'properties': {
+                       'label': {
+                           'type': 'unicode'
+                       },
+                       'x': {
+                           'type': 'float'
+                       },
+                       'y': {
+                           'type': 'float'
+                       }
+                   }
+               }
+           },
+           'edges': {
+               'type': 'list',
+               'items': {
+                   'type': 'list',
+                   'length': 3,
+                   'items': {
+                       'type': 'int'
+                   }
+               }
+           },
+           'isDirected': {
+               'type': 'bool'
+           },
+           'isWeighted': {
+               'type': 'bool'
+           },
+           'isLabeled': {
+               'type': 'bool'
+           }
+        }
+    }

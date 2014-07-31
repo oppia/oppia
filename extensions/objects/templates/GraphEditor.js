@@ -12,23 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/**
- * Directive for the GraphInput interactive widget.
- *
- * IMPORTANT NOTE: The naming convention for customization args that are passed
- * into the directive is: the name of the parameter, followed by 'With',
- * followed by the name of the arg.
- */
+// Every editor directive should implement an alwaysEditable option. There
+// may be additional customization options for the editor that should be passed
+// in via initArgs.
 
-oppia.directive('oppiaInteractiveGraphInput',[
-	'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-		return {
-			restrict: 'E',
-			scope: {},
-			templateUrl: 'interactiveWidget/GraphInput',
-			controller: ['$scope', '$attrs',function($scope, $attrs) {
-				
-			}]
-		};
-	}
-]);
+oppia.directive('GraphEditor', function($compile, warningsData) {
+	return {
+		link: function(scope, element, attrs) {},
+		restrict: 'E',
+		scope: true,
+		template: '',
+		controller: function($scope, $element, $attrs) {}
+	};
+});
