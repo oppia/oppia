@@ -63,24 +63,19 @@ oppia.filter('convertHtmlWithParamsToUnicode', ['$filter', function($filter) {
     // the others, since doing either of the others first may give rise to
     // extra backslashes.
     return ($filter('convertHtmlToUnicode')(str))
-      .replace(/\\/g, '\\\\')
-      .replace(/\{/g, '\\{')
-      .replace(/\}/g, '\\}');
+      .replace(/[\\\{\}]/g, '\\\1')
   };
 
   var PARAM_OPENING_TAG = '<oppia-parameter>';
   var PARAM_CLOSING_TAG = '</oppia-parameter>';
 
   return function(html) {
-    var htmlFragments = html.split(PARAM_OPENING_TAG);
-    htmlFragments.forEach(function(value, index, array) {
-      var htmlFragments2 = value.split(PARAM_CLOSING_TAG);
-      htmlFragments2.forEach(function(value2, index2, array2) {
-        array2[index2] = escapeSpecialChars(value2);
-      });
-      array[index] = htmlFragments2.join('}}');
-    });
-    return htmlFragments.join('{{');
+    var x = html.split(PARAM_OPENING_TAG).map(function(value) {
+      return value.split(PARAM_CLOSING_TAG).map(function(value2) {
+        return escapeSpecialChars(value2);
+      }).join('}}');
+    }).join('{{');
+    return x;
   };
 }]);
 
@@ -196,12 +191,17 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       //     https://code.google.com/p/chromium/issues/detail?id=242110
       var INVISIBLE_IMAGE_TAG = (
         '<img src="data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="></img>');
+      var PARAM_CONTAINER_CLASS = 'oppia-parameter-container';
 
       $scope._createRteParameterTag = function(paramName) {
         var el = $(
-          '<oppia-parameter contenteditable="false">' +
-          INVISIBLE_IMAGE_TAG + paramName + INVISIBLE_IMAGE_TAG +
-          '</oppia-parameter>');
+          '<span class="' + PARAM_CONTAINER_CLASS + " contenteditable="false">' +
+            INVISIBLE_IMAGE_TAG +
+              '<oppia-parameter>' +
+                paramName +
+              '</oppia-parameter>' +
+            INVISIBLE_IMAGE_TAG +
+          '</span>');
 
         var domNode = el.get(0);
         domNode.ondblclick = function() {
@@ -227,7 +227,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
         var elt = $('<div>' + rte + '</div>');
         // Strip out all additional attributes and class names from the
         // <oppia-parameter> tag before conversion to a unicode string.
-        elt.find('oppia-parameter').replaceWith(function() {
+        elt.find('.' + PARAM_CONTAINER_CLASS).replaceWith(function() {
           return $('<oppia-parameter/>').text(this.textContent).get(0);
         });
         return $filter('convertHtmlWithParamsToUnicode')(elt.html());
@@ -303,8 +303,8 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
         // parameter name of type unicode surrounded by two invisible image
         // tags.
         var elt = $('<div>' + content + '</div>');
-        elt.find('oppia-parameter').replaceWith(function() {
-          return $scope._createRteParameterTag(this.textContent)
+        elt.find('.' + PARAM_CONTAINER_CLASS).replaceWith(function() {
+          return $scope._createRteParameterTag(this.textContent.trim())
         });
         return elt.html();
       };
