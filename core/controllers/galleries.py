@@ -55,8 +55,7 @@ class LearnPage(base.BaseHandler):
                 current_user_services.create_login_url(
                     feconf.CONTRIBUTE_GALLERY_URL))
         })
-        #self.render_template('galleries/learn.html')
-        self.render_template('tests/schema_editor_tests.html')
+        self.render_template('galleries/learn.html')
 
 
 class LearnHandler(base.BaseHandler):
