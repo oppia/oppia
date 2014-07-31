@@ -28,7 +28,8 @@ class Math(widget_domain.BaseWidget):
         'description': 'The raw string to be displayed as LaTeX.',
         'generator': generators.Copier,
         'init_args': {
-            'disallow_parse_with_jinja': True
+            'disallow_parse_with_jinja': True,
+            'largeInput': True,
         },
         'customization_args': {
             'value': ''
