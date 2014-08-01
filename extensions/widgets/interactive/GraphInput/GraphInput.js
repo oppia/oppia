@@ -28,26 +28,12 @@ oppia.directive('oppiaInteractiveGraphInput',[
 			templateUrl: 'interactiveWidget/GraphInput',
 			controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
 				$scope.errorMessage = '';
+				//var testGraph = {"vertices":[{"x":50,"y":50},{"x":100,"y":50},{"x":50,"y":100}],"edges":[{"src":0,"dst":1},{"src":0,"dst":2}]}
 				$scope.graph = {'vertices':[],'edges':[],'isDirected':[],'isWeighted':[],'isLabeled':[]};
-				//$scope.updateGraphViz = function() {}
-
-				//TODO: Actually write this function?
-				$scope.checkValidGraph = function(g) {
-					return true;
-				}
-
-				//Updates graph using json input
-				$scope.updateGraphFromJSON = function(jsonGraph) {
-					var newGraph = JSON.parse(jsonGraph);
-					if ($scope.checkValidGraph(newGraph)) {
-						$scope.graph = newGraph;
-						//$scope.updateGraphViz();
-					} else {
-						errorMessage = "Invalid graph!";
-					}
-				}
+				
+				//Updates graph using json in input field
 				$scope.updateGraphFromInput = function() {
-					$scope.updateGraphFromJSON(d3.select($element[0]).select('.json-graph-input')[0][0].value);
+					updateGraphFromJSON(d3.select($element[0]).select('.json-graph-input')[0][0].value);
 				}
 				
 				$scope.submitGraph = function() {
@@ -56,9 +42,24 @@ oppia.directive('oppiaInteractiveGraphInput',[
 				};
 				
 				$scope.init = function() {
-					$scope.updateGraphFromJSON($attrs.graphWithValue);
+					updateGraphFromJSON($attrs.graphWithValue);
 				};
 				$scope.init();
+				
+				//TODO: Actually write this function?
+				function checkValidGraph(graph) {
+					return true;
+				}
+
+				function updateGraphFromJSON (jsonGraph) {
+					var newGraph = JSON.parse(jsonGraph);
+					if (checkValidGraph(newGraph)) {
+						$scope.graph = newGraph;
+					} else {
+						$scope.errorMessage = "Invalid graph!";
+					}
+				}
+
 			}]
 		};
 	}
@@ -85,6 +86,7 @@ oppia.directive('graphInputDraggableVertex', ['$document', function($document){
 			$document.on('mouseup',mouseup);
 		});
 
+		//TODO: Prevent vertices from leaving boundaries of svg element
 		function mousemove(event) {
 			vertex.x = event.pageX - startX + startCX;
 			vertex.y = event.pageY - startY + startCY;
