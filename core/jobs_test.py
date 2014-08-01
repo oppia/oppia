@@ -804,8 +804,6 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
 
-            # Wait for more than one second.
-            time.sleep(1.5)
             # Finish the job.
             self.process_and_flush_pending_tasks()
             # When the batch job completes, the overall count is still 1.

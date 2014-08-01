@@ -686,7 +686,9 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _get_batch_job_manager_class(cls):
-        """Returns the manager class for the batch job."""
+        """Returns the manager class for the continuously-running batch job.
+        See jobs_test.py for an example of how to do this.
+        """
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
             '_get_batch_job_manager_class(). This method should return the'
@@ -702,8 +704,11 @@ class BaseContinuousComputationManager(object):
         type. Note that there may be more than one event type.
 
         IMPORTANT: This method only gets called as part of the dequeue process
-        from a deferred task queue. Thus, it should not refer to things like
-        the user currently in session.
+        from a deferred task queue. Developers should expect a delay to occur
+        between when the incoming event arrives and when this method is called,
+        and should resolve any arguments that depend on local session
+        variables (such as the user currently in session) before enqueueing
+        this method in the corresponding event handler.
 
         IMPORTANT: If an exception is raised here, the task queue will retry
         calling it and any mutations made will be redone -- unless the
@@ -921,7 +926,7 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_batch_job_failure(cls):
-        # TODO(sll): Alert the admin via email.
+        # TODO(sll): Alert the site admin via email.
         logging.error('Job %s failed.' % cls.__name__)
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
