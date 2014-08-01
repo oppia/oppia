@@ -37,7 +37,7 @@ function ExplorationStatistics($scope, $http, $location, $modal, warningsData) {
     $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.$parent.explorationId;
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
       var data = response.data;
-      var numVisits = data.num_visits;
+      var numVisits = data.num_starts;
       var numCompletions = data.num_completions;
       var improvements = data.improvements;
       $scope.stateStats = data.state_stats;

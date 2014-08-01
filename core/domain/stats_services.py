@@ -31,7 +31,7 @@ IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 SUBMIT_HANDLER_NAME = 'submit'
 
 
-def get_exploration_visit_count(exploration_id):
+def get_exploration_start_count(exploration_id):
     """Returns the number of times this exploration has been accessed."""
     # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
     exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -88,20 +88,6 @@ def get_state_rules_stats(exploration_id, state_name):
         }
 
     return results
-
-
-def get_exploration_annotations(exp_id):
-    """Gets exploration annotations.
-
-    NB: Currently unused.
-    """
-    # TODO(sll): This should return a domain object, not an ndb.Model instance.
-    exp_annotations = stats_models.ExplorationAnnotationsModel.get(
-        exp_id, strict=False)
-    if not exp_annotations:
-        exp_annotations = stats_models.ExplorationAnnotationsModel(
-            id=exp_id, num_visits=0, num_completions=0)
-    return exp_annotations
 
 
 def get_state_stats_for_exploration(exploration_id):

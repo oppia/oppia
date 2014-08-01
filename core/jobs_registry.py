@@ -20,8 +20,25 @@ __author__ = 'Sean Lip'
 
 from core.domain import stats_jobs
 
-# Add a list of job manager classes (i.e., subclasses of jobs.BaseJobManager)
-# here. 'Create new' buttons for these jobs will be displayed on the admin
-# dashboard.
-JOB_MANAGER_CLASSES = [stats_jobs.StatisticsPageJobManager,
-                       stats_jobs.TranslateStartAndCompleteEventsJobManager]
+# List of all manager classes for one-off batch jobs for which to show controls
+# on the admin dashboard.
+ONE_OFF_JOB_MANAGERS = [stats_jobs.TranslateStartAndCompleteEventsJobManager]
+
+# List of all ContinuousComputation managers to show controls for on the
+# admin dashboard.
+# NOTE TO DEVELOPERS: When a new ContinuousComputation manager is defined,
+# it should be registered here.
+ALL_CONTINUOUS_COMPUTATION_MANAGERS = [stats_jobs.StatisticsAggregator]
+
+
+class ContinuousComputationEventDispatcher(object):
+    """Dispatches events to the relevant ContinuousComputation classes."""
+
+    @classmethod
+    def dispatch_event(cls, event_type, *args, **kwargs):
+        """Dispatches an incoming event to the ContinuousComputation
+        classes which listen to events of that type.
+        """
+        for klass in ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+            if event_type in klass.get_event_types_listened_to():
+                klass.on_incoming_event(event_type, *args, **kwargs)

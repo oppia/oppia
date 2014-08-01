@@ -165,7 +165,7 @@ function Admin($scope, $http) {
     }, true);
 
     $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
-      $scope.message = 'Data reloaded successfully.';
+      $scope.message = 'Job started successfully.';
       window.location.reload();
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -184,7 +184,43 @@ function Admin($scope, $http) {
     }, true);
 
     $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
-      $scope.message = 'Data reloaded successfully.';
+      $scope.message = 'Job canceled successfully.';
+      window.location.reload();
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
+
+  $scope.startComputation = function(computationType) {
+    $scope.message = 'Starting computation...';
+    var requestParams = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'start_computation',
+        computation_type: computationType
+      })
+    }, true);
+
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+      $scope.message = 'Computation started successfully.';
+      window.location.reload();
+    }).error(function(errorResponse) {
+      $scope.message = 'Server error: ' + errorResponse.error;
+    });
+  };
+
+  $scope.stopComputation = function(computationType) {
+    $scope.message = 'Stopping computation...';
+    var requestParams = $.param({
+      csrf_token: GLOBALS.csrf_token,
+      payload: JSON.stringify({
+        action: 'stop_computation',
+        computation_type: computationType
+      })
+    }, true);
+
+    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+      $scope.message = 'Computation stopped successfully.';
       window.location.reload();
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;

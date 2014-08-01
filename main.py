@@ -19,6 +19,7 @@ __author__ = 'Sean Lip'
 import feconf
 import logging
 
+from core import jobs_registry
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import editor
@@ -32,6 +33,7 @@ from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import services
 from core.controllers import widgets
+from core.domain import event_services
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
