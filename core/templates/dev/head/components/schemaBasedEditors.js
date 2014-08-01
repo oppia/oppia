@@ -204,7 +204,6 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
 
         var domNode = el.get(0);
         domNode.ondblclick = function() {
-          console.log('---');
           $scope.openEditParameterModal(paramName, domNode);
         };
         return domNode;
@@ -393,7 +392,6 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
           $scope.editorDoc.querySelectorAll('.' + PARAM_CONTAINER_CLASS));
         elts.forEach(function(elt) {
           elt.ondblclick = function() {
-            console.log('xxx');
             $scope.openEditParameterModal($(elt).text(), elt);
           };
         });
