@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Dashboard
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="container" ng-controller="Dashboard">
+    <div class="row">
+      <div class="col-lg-8 col-md-8 col-sm-8">
+        <div class="oppia-main-content">
+
+          <h3 class="oppia-page-title">
+            Dashboard
+          </h3>
+
+          <h4>Exploration counts</h4>
+          <div ng-if="explorationStats.owned > 0"><a href="#owned_section">
+            I manage <[explorationStats.owned]>
+            (<[explorationStats.owned_private]> private) explorations.
+          </a></div>
+          <div ng-if="explorationStats.editable > 0"><a href="#editable_section">
+            I collaborate on <[explorationStats.editable]>
+            (<[explorationStats.editable_private]> private) explorations.
+          </a></div>
+          <div ng-if="explorationStats.viewable > 0"><a href="#viewable_section">
+            I playtest <[explorationStats.viewable]>
+            (<[explorationStats.viewable_private]> private) explorations.
+          </a></div>
+
+          <div ng-show="!isEmpty(ownedExplorations)">
+            <h5 id="owned_section">Explorations I manage</h5>
+            <ul>
+              <li ng-repeat="(expId, expData) in ownedExplorations">
+                <span ng-if="expData.rights.status == 'private'">
+                  (Private)
+                </span>
+                <a ng-href="/create/<[expId]>"><[expData.title]></a>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-show="!isEmpty(editableExplorations)">
+            <h5 id="editable_section">Explorations I collaborate on</h5>
+            <ul>
+              <li ng-repeat="(expId, expData) in editableExplorations">
+                <span ng-if="expData.rights.status == 'private'">
+                  (Private)
+                </span>
+                <a ng-href="/create/<[expId]>"><[expData.title]></a>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-show="!isEmpty(viewableExplorations)">
+            <h5 id="viewable_section">Explorations I can playtest</h5>
+            <ul>
+              <li ng-repeat="(expId, expData) in viewableExplorations">
+                <a ng-href="/explore/<[expId]>"><[expData.title]></a>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-show="isEmpty(ownedExplorations) && isEmpty(editableExplorations) && isEmpty(viewableExplorations)">
+            <em>No explorations here yet!</em>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('/dashboard/Dashboard.js') }}
+  </script>
+{% endblock footer_js %}

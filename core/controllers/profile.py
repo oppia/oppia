@@ -47,25 +47,11 @@ class ProfilePage(base.BaseHandler):
 
 
 class ProfileHandler(base.BaseHandler):
-    """Provides data for the profile gallery."""
+    """Provides data for the profile page."""
 
     @base.require_user
     def get(self):
         """Handles GET requests."""
-        viewable_exps = (
-            exp_services.get_explicit_viewer_explorations_summary_dict(
-                self.user_id))
-        editable_exps = (
-            exp_services.get_explicit_editor_explorations_summary_dict(
-                self.user_id))
-        owned_exps = exp_services.get_owned_explorations_summary_dict(
-            self.user_id)
-
-        self.values.update({
-            'viewable': viewable_exps,
-            'editable': editable_exps,
-            'owned': owned_exps,
-        })
         self.render_json(self.values)
 
 

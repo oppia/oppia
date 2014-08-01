@@ -21,6 +21,7 @@ import logging
 
 from core.controllers import admin
 from core.controllers import base
+from core.controllers import dashboard
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
@@ -151,6 +152,13 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 # Register the URL with the responsible classes
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
+
+    get_redirect_route(
+        r'%s' % feconf.DASHBOARD_URL, dashboard.DashboardPage,
+        'dashboard_page'),
+    get_redirect_route(
+        r'/dashboardhandler/data', dashboard.DashboardHandler,
+        'dashboard_handler'),
 
     webapp2.Route(
         r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),

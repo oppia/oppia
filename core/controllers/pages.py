@@ -51,6 +51,10 @@ class SplashPage(base.BaseHandler):
     """Splash page for Oppia."""
 
     def get(self):
+        if self.user_id:
+            self.redirect('/dashboard')
+            return
+
         if SPLASH_PAGE_EXPLORATION_ID.value:
             splash_exp_id = SPLASH_PAGE_EXPLORATION_ID.value
             if not exp_services.get_exploration_by_id(

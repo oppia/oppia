@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 from core.tests import test_utils
+import feconf
 
 
 class SplashPageTest(test_utils.GenericTestBase):
@@ -33,7 +34,7 @@ class SplashPageTest(test_utils.GenericTestBase):
             no=['class="active"'])
 
     def test_login_and_logout_on_splash_page(self):
-        """Test that the correct buttons/navbar show on login and logout."""
+        """Test that the splash page redirects to the dashboard on login."""
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
@@ -45,11 +46,15 @@ class SplashPageTest(test_utils.GenericTestBase):
         self.login('reader@example.com')
 
         response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
+        self.assertEqual(response.status_int, 302)
+        self.assertIn(
+            feconf.DASHBOARD_URL, response.headers['location'])
+
+        response = response.follow()
         response.mustcontain(
-            'Contribute', 'Profile', 'Logout', 'Create an exploration',
-            self.get_expected_logout_url('/'),
-            no=['Login', 'Create an Oppia account',
+            'Contribute', 'Profile', 'Logout', 'Dashboard',
+            self.get_expected_logout_url('/dashboard'),
+            no=['Login', 'Create an Oppia account', 'Create an exploration',
                 self.get_expected_login_url('/')])
 
         self.logout()

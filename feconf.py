@@ -234,6 +234,7 @@ DEMO_EXPLORATIONS = [
 CLONE_EXPLORATION_URL = '/contributehandler/clone'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
+DASHBOARD_URL = '/dashboard'
 EDITOR_PREREQUISITES_URL = '/editor_prerequisites'
 EDITOR_PREREQUISITES_DATA_URL = '/editor_prerequisites_handler/data'
 EDITOR_URL_PREFIX = '/create'
