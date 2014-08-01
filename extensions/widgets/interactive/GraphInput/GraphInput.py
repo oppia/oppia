@@ -48,7 +48,7 @@ class GraphInput(widget_domain.BaseWidget):
         'init_args': {},
         'customization_args': {
             'value': {
-                'vertices': {},
+                'vertices': [],
                 'edges': [],
                 'isDirected': False,
                 'isWeighted': False,
@@ -57,7 +57,7 @@ class GraphInput(widget_domain.BaseWidget):
         },
         'obj_type': 'Graph'
     }, {
-        'name': 'move_permissions',
+        'name': 'movePermissions',
         'description': 'Whether the user is allowed to move the vertices around.',
         'generator': generators.Copier,
         'init_args': {},
@@ -66,7 +66,7 @@ class GraphInput(widget_domain.BaseWidget):
         },
         'obj_type': 'Boolean'
     }, {
-        'name': 'vertex_edit_permissions',
+        'name': 'vertexEditPermissions',
         'description': 'Whether the user is allowed to edit the vertex set (i.e. add/remove vertices, change vertex names).',
         'generator': generators.Copier,
         'init_args': {},

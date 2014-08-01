@@ -202,6 +202,9 @@ ALLOWED_WIDGETS = {
         'MusicNotesInput': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MusicNotesInput')
         },
+        'GraphInput': {
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'GraphInput')
+        },
     }
 }
 

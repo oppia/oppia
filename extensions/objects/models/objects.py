@@ -496,6 +496,7 @@ class LogicErrorCategory(BaseObject):
         }]
     }
 
+
 class Graph(BaseObject):
     """A (mathematical) graph with edges and vertices"""
 
@@ -526,9 +527,14 @@ class Graph(BaseObject):
            'edges': {
                'type': 'list',
                'items': {
-                   'type': 'list',
-                   'length': 3,
-                   'items': {
+                   'type': 'dict',
+                   'src': {
+                       'type': 'int'
+                   },
+                   'dst': {
+                       'type': 'int'
+                   },
+                   'cost': {
                        'type': 'int'
                    }
                }
@@ -543,4 +549,5 @@ class Graph(BaseObject):
                'type': 'bool'
            }
         }
-    }
+     }
+
