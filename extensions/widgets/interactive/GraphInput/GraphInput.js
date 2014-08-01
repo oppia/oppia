@@ -28,7 +28,7 @@ oppia.directive('oppiaInteractiveGraphInput',[
 			templateUrl: 'interactiveWidget/GraphInput',
 			controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
 				$scope.errorMessage = '';
-				var graph = JSON.parse($attrs.graphWithValue);
+				var graph = {'vertices':[],'edges':[],'isDirected':[],'isWeighted':[],'isLabeled':[]};
 
 				var VIS_WIDTH = '100%';
 				var VIS_HEIGHT = 250;
@@ -72,19 +72,14 @@ oppia.directive('oppiaInteractiveGraphInput',[
 					}
 				}
 
-				$scope.init = function() {
-					$scope.updateGraphViz();
-				};
-				$scope.init();
-				
 				//TODO: Actually write this function?
 				$scope.checkValidGraph = function(g) {
 					return true;
 				}
 
 				//Updates graph using json input
-				$scope.updateGraphFromInput = function() {
-					var newGraph = JSON.parse(d3.select($element[0]).select('.json-graph-input')[0][0].value);
+				$scope.updateGraphFromJSON = function(jsonGraph) {
+					var newGraph = JSON.parse(jsonGraph);
 					if ($scope.checkValidGraph(newGraph)) {
 						graph = newGraph;
 						$scope.updateGraphViz();
@@ -92,9 +87,21 @@ oppia.directive('oppiaInteractiveGraphInput',[
 						errorMessage = "Invalid graph!";
 					}
 				}
+				$scope.updateGraphFromInput = function() {
+					$scope.updateGraphFromJSON(d3.select($element[0]).select('.json-graph-input')[0][0].value);
+				}
 				
 				$scope.submitGraph = function() {
+					var strGraph = JSON.stringify(graph);
+					$scope.$parent.$parent.submitAnswer(strGraph, 'submit');
 				};
+				
+				$scope.init = function() {
+					$scope.updateGraphFromJSON($attrs.graphWithValue);
+				};
+				$scope.init();
+				
+
 			}]
 		};
 	}
