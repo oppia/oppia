@@ -1,7 +1,25 @@
 <div>
 	Input graph JSON: <input class='json-graph-input'>
 	<button class="btn" ng-click="updateGraphFromInput();">Update Graph</button>
-	<div style="border: 1px solid black;" class='oppia-graph-input-viz-container'></div>
+	<div style="border: 1px solid black;" class='oppia-graph-input-viz-container'>
+		<svg width="100%" height="250">
+			<circle 
+				ng-repeat="vertex in graph.vertices" 
+				ng-attr-cx="<[vertex.x]>"
+				ng-attr-cy="<[vertex.y]>"
+				r="5">
+			</circle>
+			<line
+				ng-repeat="edge in graph.edges"
+				ng-attr-x1="<[graph.vertices[edge.src].x]>"
+				ng-attr-y1="<[graph.vertices[edge.src].y]>"
+				ng-attr-x2="<[graph.vertices[edge.dst].x]>"
+				ng-attr-y2="<[graph.vertices[edge.dst].y]>"
+				style="stroke:black;stroke-width:2;"
+			>
+			</line>
+		</svg>
+	</div>
 	<button class="btn btn-default" ng-click="submitGraph()">Submit</button>
 	<span ng-show="errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
 		<[errorMessage]>
