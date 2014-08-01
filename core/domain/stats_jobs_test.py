@@ -29,6 +29,15 @@ from core.tests import test_utils
 import feconf
 
 
+class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
+    """A modified StatisticsAggregator that does not start a new batch
+    job when the previous one has finished.
+    """
+
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
 class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
     """Tests for exploration annotations."""
 
@@ -42,14 +51,10 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         self.process_and_flush_pending_tasks()
 
-        stats_jobs.StatisticsAggregator.start_computation()
-        stats_jobs.StatisticsAggregator.stop_computation()
+        ModifiedStatisticsAggregator.start_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            stats_jobs.StatisticsAggregator.get_status_code(),
-            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
         self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 0)
@@ -70,14 +75,10 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             feconf.PLAY_TYPE_NORMAL)
         self.process_and_flush_pending_tasks()
 
-        stats_jobs.StatisticsAggregator.start_computation()
-        stats_jobs.StatisticsAggregator.stop_computation()
+        ModifiedStatisticsAggregator.start_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            stats_jobs.StatisticsAggregator.get_status_code(),
-            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
         self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 2)
@@ -112,14 +113,10 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         self._create_leave_event(exp_id, version, state, 'session2', 4)
         self.process_and_flush_pending_tasks()
 
-        stats_jobs.StatisticsAggregator.start_computation()
-        stats_jobs.StatisticsAggregator.stop_computation()
+        ModifiedStatisticsAggregator.start_computation()
         self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
-        self.assertEqual(
-            stats_jobs.StatisticsAggregator.get_status_code(),
-            job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE)
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
         self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 1)

@@ -155,12 +155,12 @@
       </tr>
       {% for job in job_data %}
         <tr>
-          <td>{{job['id']}}</td>
-          <td>{{job['status_code']}}</td>
-          <td>{{job['human_readable_time_started']}}</td>
-          <td>{{job['human_readable_time_finished']}}</td>
+          <td>{{job.id}}</td>
+          <td>{{job.status_code}}</td>
+          <td>{{job.human_readable_time_started}}</td>
+          <td>{{job.human_readable_time_finished}}</td>
           <td>
-            {% if job['is_cancelable'] %}
+            {% if job.can_be_canceled %}
               <button ng-click="cancelJob('{{job['id']}}', '{{job['job_type']}}')">
                 Cancel
               </button>

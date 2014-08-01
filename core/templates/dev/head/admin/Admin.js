@@ -184,7 +184,7 @@ function Admin($scope, $http) {
     }, true);
 
     $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
-      $scope.message = 'Job canceled successfully.';
+      $scope.message = 'Abort signal sent to job.';
       window.location.reload();
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -220,7 +220,7 @@ function Admin($scope, $http) {
     }, true);
 
     $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
-      $scope.message = 'Computation stopped successfully.';
+      $scope.message = 'Abort signal sent to computation.';
       window.location.reload();
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;

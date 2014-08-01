@@ -618,6 +618,10 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         cls._get_continuous_computation_class().on_batch_job_completion()
 
     @classmethod
+    def _post_cancel_hook(cls, job_id, cancel_message):
+        cls._get_continuous_computation_class().on_batch_job_canceled()
+
+    @classmethod
     def _post_failure_hook(cls, job_id):
         cls._get_continuous_computation_class().on_batch_job_failure()
 
@@ -851,19 +855,16 @@ class BaseContinuousComputationManager(object):
         cls._kickoff_batch_job()
 
     @classmethod
-    def stop_computation(cls):
-        """Sends a halt signal to the computation.
+    def stop_computation(cls, user_id, test_mode=False):
+        """Cancels the currently-running batch job.
 
-        Any currently-running batch jobs will still run to completion, but no
-        further batch runs will be kicked off.
+        No further batch runs will be kicked off.
         """
-        # TODO(sll): Should we try to cancel the currently-running batch job
-        # as well, instead of just subsequent ones?
-
         # This is not an ancestor query, so it must be run outside a
         # transaction.
-        do_unfinished_jobs_exist = job_models.JobModel.do_unfinished_jobs_exist(
-            cls._get_batch_job_manager_class().__name__)
+        do_unfinished_jobs_exist = (
+            job_models.JobModel.do_unfinished_jobs_exist(
+                cls._get_batch_job_manager_class().__name__))
 
         def _stop_computation_transactional():
             """Transactional implementation for marking a continuous
@@ -881,6 +882,15 @@ class BaseContinuousComputationManager(object):
 
         transaction_services.run_in_transaction(
             _stop_computation_transactional)
+
+        # The cancellation must be done after the continuous computation
+        # status update.
+        if do_unfinished_jobs_exist:
+            unfinished_job_models = job_models.JobModel.get_unfinished_jobs(
+                cls._get_batch_job_manager_class().__name__)
+            for job_model in unfinished_job_models:
+                cls._get_batch_job_manager_class().cancel(
+                    job_model.id, user_id)
 
     @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
@@ -918,11 +928,27 @@ class BaseContinuousComputationManager(object):
         return cls._register_end_of_batch_job_and_return_status()
 
     @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        """Seam that can be overridden by tests."""
+        cls._kickoff_batch_job()
+
+    @classmethod
     def on_batch_job_completion(cls):
         """Called when a batch job completes."""
         job_status = cls._process_job_completion_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
-            cls._kickoff_batch_job()
+            cls._kickoff_batch_job_after_previous_one_ends()
+
+    @classmethod
+    def on_batch_job_canceled(cls):
+        logging.info('Job %s canceled.' % cls.__name__)
+        # The job should already be stopping, and should therefore be marked
+        # idle.
+        job_status = cls._register_end_of_batch_job_and_return_status()
+        if job_status != job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE:
+            logging.error(
+                'Batch job for computation %s canceled but status code not set '
+                'to idle.' % cls.__name__)
 
     @classmethod
     def on_batch_job_failure(cls):
@@ -930,7 +956,7 @@ class BaseContinuousComputationManager(object):
         logging.error('Job %s failed.' % cls.__name__)
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
-            cls._kickoff_batch_job()
+            cls._kickoff_batch_job_after_previous_one_ends()
 
 
 def get_continuous_computations_info(cc_classes):

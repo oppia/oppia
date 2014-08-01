@@ -105,6 +105,9 @@ class AdminPage(base.BaseHandler):
             if job['time_finished_msec']:
                 job['human_readable_time_finished'] = (
                     get_human_readable_time_string(job['time_finished_msec']))
+            job['can_be_canceled'] = job['is_cancelable'] and any([
+                klass.__name__ == job['job_type']
+                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS])
 
         queued_or_running_job_types = set([
             job['job_type'] for job in job_data if job['status_code'] in [
@@ -214,7 +217,7 @@ class AdminHandler(base.BaseHandler):
                 computation_type = self.payload.get('computation_type')
                 for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
                     if klass.__name__ == computation_type:
-                        klass.stop_computation()
+                        klass.stop_computation(self.user_id)
                         break
 
             self.render_json({})

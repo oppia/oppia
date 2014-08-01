@@ -336,12 +336,6 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         # Now switch back to the editor perspective.
         self.login('editor@example.com')
 
-        # Trigger a single round of stats updating.
-        stats_jobs.StatisticsAggregator.start_computation()
-        stats_jobs.StatisticsAggregator.stop_computation()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
-
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
         self.assertEqual(editor_exploration_dict['num_starts'], 1)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
