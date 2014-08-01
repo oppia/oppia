@@ -59,9 +59,41 @@ oppia.directive('oppiaInteractiveGraphInput',[
 					$scope.updateGraphFromJSON($attrs.graphWithValue);
 				};
 				$scope.init();
-				
-
 			}]
 		};
 	}
 ]);
+
+oppia.directive('graphInputDraggableVertex', ['$document', function($document){
+	return function(scope,element,attr){
+		var startX = 0;
+		var startY = 0;
+		var startCX = 0;
+		var startCY = 0;
+		var graph = scope.$parent.graph;
+		var index = parseInt(attr.index);
+		var vertex = graph.vertices[index];
+		element.on('mousedown',function(event){
+			event.preventDefault();
+
+			startX = event.pageX;
+			startY = event.pageY;
+			startCX = parseInt(attr.cx);
+			startCY = parseInt(attr.cy);
+
+			$document.on('mousemove',mousemove);
+			$document.on('mouseup',mouseup);
+		});
+
+		function mousemove(event) {
+			vertex.x = event.pageX - startX + startCX;
+			vertex.y = event.pageY - startY + startCY;
+			scope.$parent.$apply();
+		}
+
+		function mouseup(event) {
+			$document.off('mousemove',mousemove);
+			$document.off('mouseup',mouseup);
+		}
+	};
+}]);
