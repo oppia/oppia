@@ -63,19 +63,18 @@ oppia.filter('convertHtmlWithParamsToUnicode', ['$filter', function($filter) {
     // the others, since doing either of the others first may give rise to
     // extra backslashes.
     return ($filter('convertHtmlToUnicode')(str))
-      .replace(/[\\\{\}]/g, '\\\1')
+      .replace(/([\\\{\}])/g, '\\$1')
   };
 
   var PARAM_OPENING_TAG = '<oppia-parameter>';
   var PARAM_CLOSING_TAG = '</oppia-parameter>';
 
   return function(html) {
-    var x = html.split(PARAM_OPENING_TAG).map(function(value) {
+    return html.split(PARAM_OPENING_TAG).map(function(value) {
       return value.split(PARAM_CLOSING_TAG).map(function(value2) {
         return escapeSpecialChars(value2);
       }).join('}}');
     }).join('{{');
-    return x;
   };
 }]);
 
@@ -195,7 +194,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
 
       $scope._createRteParameterTag = function(paramName) {
         var el = $(
-          '<span class="' + PARAM_CONTAINER_CLASS + " contenteditable="false">' +
+          '<span class="' + PARAM_CONTAINER_CLASS + '" contenteditable="false">' +
             INVISIBLE_IMAGE_TAG +
               '<oppia-parameter>' +
                 paramName +
@@ -205,6 +204,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
 
         var domNode = el.get(0);
         domNode.ondblclick = function() {
+          console.log('---');
           $scope.openEditParameterModal(paramName, domNode);
         };
         return domNode;
@@ -390,9 +390,10 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
         // Add dblclick handlers to the various nodes, since they get stripped
         // in the initialization.
         var elts = Array.prototype.slice.call(
-          $scope.editorDoc.querySelectorAll('oppia-parameter'));
+          $scope.editorDoc.querySelectorAll('.' + PARAM_CONTAINER_CLASS));
         elts.forEach(function(elt) {
           elt.ondblclick = function() {
+            console.log('xxx');
             $scope.openEditParameterModal($(elt).text(), elt);
           };
         });
