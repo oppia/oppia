@@ -524,12 +524,9 @@ class JobRegistryTests(test_utils.GenericTestBase):
                         event_type),
                     event_services.BaseEventHandler))
 
-            rdcs = klass._get_realtime_datastore_classes()
-            self.assertTrue(isinstance(rdcs, list))
-            self.assertEqual(len(rdcs), 2)
-            for rdc in rdcs:
-                self.assertTrue(issubclass(rdc, base_models.BaseModel))
-            self.assertEqual(rdcs[0]().to_dict(), rdcs[1]().to_dict())
+            rdc = klass._get_realtime_datastore_class()
+            self.assertTrue(issubclass(
+                rdc, jobs.BaseRealtimeDatastoreClassForContinuousComputations))
 
             # The list of allowed base classes. This can be extended as the
             # need arises, though we may also want to implement
@@ -606,11 +603,8 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
             jobs.STATUS_CODE_COMPLETED)
 
 
-class StartExplorationRealtimeModel0(base_models.BaseModel):
-    count = ndb.IntegerProperty(default=0)
-
-
-class StartExplorationRealtimeModel1(base_models.BaseModel):
+class StartExplorationRealtimeModel(
+        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     count = ndb.IntegerProperty(default=0)
 
 
@@ -655,35 +649,40 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
         return [feconf.EVENT_TYPE_START_EXPLORATION]
 
     @classmethod
-    def _get_realtime_datastore_classes(cls):
-        return [
-            StartExplorationRealtimeModel0, StartExplorationRealtimeModel1]
+    def _get_realtime_datastore_class(cls):
+        return StartExplorationRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
         return StartExplorationMRJobManager
 
     @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        """Override this method so that it does not immediately start a
+        new MapReduce job. Non-test subclasses should not do this."""
+        pass
+
+    @classmethod
     def _handle_incoming_event(
-            cls, datastore_class, event_type, exp_id, exp_version,
+            cls, active_realtime_layer, event_type, exp_id, exp_version,
             state_name, session_id, params, play_type):
 
         def _increment_counter():
-            model = datastore_class.get(exp_id, strict=False)
-            if model is None:
-                datastore_class(id=exp_id, count=1).put()
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, exp_id)
+
+            realtime_model = realtime_class.get(
+                realtime_model_id, strict=False)
+            if realtime_model is None:
+                realtime_class(
+                    id=realtime_model_id, count=1,
+                    realtime_layer=active_realtime_layer).put()
             else:
-                model.count += 1
-                model.put()
+                realtime_model.count += 1
+                realtime_model.put()
 
         transaction_services.run_in_transaction(_increment_counter)
-
-    @classmethod
-    def on_batch_job_completion(cls):
-        """Override on_batch_job_completion() so that it does not immediately
-        start a new MapReduce job. Other non-test subclasses should, in
-        general, not do this."""
-        cls._process_job_completion_and_return_status()
 
     # Public query method.
     @classmethod
@@ -695,8 +694,8 @@ class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
         """
         mr_model = stats_models.ExplorationAnnotationsModel.get(
             exploration_id, strict=False)
-        realtime_model = cls._get_active_realtime_datastore_class().get(
-            exploration_id, strict=False)
+        realtime_model = cls._get_realtime_datastore_class().get(
+            cls.get_active_realtime_layer_id(exploration_id), strict=False)
 
         answer = 0
         if mr_model is not None:
@@ -744,10 +743,10 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 0)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
-            self.assertEqual(
-                StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
-            self.assertEqual(
-                StartExplorationRealtimeModel1.get(self.EXP_ID).count, 1)
+            self.assertEqual(StartExplorationRealtimeModel.get(
+                '0:%s' % self.EXP_ID).count, 1)
+            self.assertEqual(StartExplorationRealtimeModel.get(
+                '1:%s' % self.EXP_ID).count, 1)
 
             # The batch job has not run yet, so no entity for self.EXP_ID will
             # have been created in the batch model yet.
@@ -757,11 +756,11 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             # Launch the batch computation.
             StartExplorationEventCounter.start_computation()
             # Data in realtime layer 0 is still there.
-            self.assertEqual(
-                StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
+            self.assertEqual(StartExplorationRealtimeModel.get(
+                '0:%s' % self.EXP_ID).count, 1)
             # Data in realtime layer 1 has been deleted.
-            self.assertIsNone(
-                StartExplorationRealtimeModel1.get(self.EXP_ID, strict=False))
+            self.assertIsNone(StartExplorationRealtimeModel.get(
+                '1:%s' % self.EXP_ID, strict=False))
 
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
@@ -773,11 +772,11 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 1)
             # Data in realtime layer 0 has been deleted.
-            self.assertIsNone(
-                StartExplorationRealtimeModel0.get(self.EXP_ID, strict=False))
+            self.assertIsNone(StartExplorationRealtimeModel.get(
+                '0:%s' % self.EXP_ID, strict=False))
             # Data in realtime layer 1 has been deleted.
-            self.assertIsNone(
-                StartExplorationRealtimeModel1.get(self.EXP_ID, strict=False))
+            self.assertIsNone(StartExplorationRealtimeModel.get(
+                '1:%s' % self.EXP_ID, strict=False))
 
     def test_events_coming_in_while_batch_job_is_running(self):
         with self.swap(

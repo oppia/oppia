@@ -20,6 +20,7 @@ __author__ = 'Stephanie Federwisch'
 
 from datetime import datetime
 
+from core import jobs_registry
 from core.domain import event_services
 from core.domain import stats_jobs
 from core.platform import models
@@ -33,55 +34,79 @@ class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
     """A modified StatisticsAggregator that does not start a new batch
     job when the previous one has finished.
     """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return ModifiedStatisticsMRJobManager
 
+    @classmethod
     def _kickoff_batch_job_after_previous_one_ends(cls):
         pass
+
+
+class ModifiedStatisticsMRJobManager(stats_jobs.StatisticsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return ModifiedStatisticsAggregator
 
 
 class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
     """Tests for exploration annotations."""
 
+    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+        ModifiedStatisticsAggregator]
+
     def test_no_completion(self):
-        exp_id = 'eid'
-        version = 1
-        state = 'sid'
-        event_services.StartExplorationEventHandler.record(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.StartExplorationEventHandler.record(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        self.process_and_flush_pending_tasks()
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            version = 1
+            state = 'sid'
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session1', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.process_and_flush_pending_tasks()
 
-        ModifiedStatisticsAggregator.start_computation()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
 
-        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_starts, 2)
-        self.assertEqual(output_model.num_completions, 0)
+            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            self.assertEqual(output_model.num_starts, 2)
+            self.assertEqual(output_model.num_completions, 0)
 
     def test_all_complete(self):
-        exp_id = 'eid'
-        version = 1
-        state = 'sid'
-        event_services.StartExplorationEventHandler.record(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.MaybeLeaveExplorationEventHandler.record(
-            exp_id, version, feconf.END_DEST, 'session1', 27, {},
-            feconf.PLAY_TYPE_NORMAL)
-        event_services.StartExplorationEventHandler.record(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        event_services.MaybeLeaveExplorationEventHandler.record(
-            exp_id, version, feconf.END_DEST, 'session2', 27, {},
-            feconf.PLAY_TYPE_NORMAL)
-        self.process_and_flush_pending_tasks()
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            version = 1
+            state = 'sid'
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session1', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.MaybeLeaveExplorationEventHandler.record(
+                exp_id, version, feconf.END_DEST, 'session1', 27, {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.MaybeLeaveExplorationEventHandler.record(
+                exp_id, version, feconf.END_DEST, 'session2', 27, {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.process_and_flush_pending_tasks()
 
-        ModifiedStatisticsAggregator.start_computation()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
 
-        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_starts, 2)
-        self.assertEqual(output_model.num_completions, 2)
+            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            self.assertEqual(output_model.num_starts, 2)
+            self.assertEqual(output_model.num_completions, 2)
 
     def _create_leave_event(self, exp_id, version, state, session, created_on):
         leave = stats_models.MaybeLeaveExplorationEventLogEntryModel(
@@ -98,25 +123,30 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         leave.put()
 
     def test_multiple_maybe_leaves_same_session(self):
-        exp_id = 'eid'
-        version = 1
-        state = 'sid'
-        event_services.StartExplorationEventHandler.record(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        self._create_leave_event(exp_id, version, state, 'session1', 0)
-        self._create_leave_event(exp_id, version, state, 'session1', 1)
-        self._create_leave_event(
-            exp_id, version, feconf.END_DEST, 'session1', 2)
-        event_services.StartExplorationEventHandler.record(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        self._create_leave_event(exp_id, version, state, 'session2', 3)
-        self._create_leave_event(exp_id, version, state, 'session2', 4)
-        self.process_and_flush_pending_tasks()
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            version = 1
+            state = 'sid'
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session1', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self._create_leave_event(exp_id, version, state, 'session1', 0)
+            self._create_leave_event(exp_id, version, state, 'session1', 1)
+            self._create_leave_event(
+                exp_id, version, feconf.END_DEST, 'session1', 2)
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self._create_leave_event(exp_id, version, state, 'session2', 3)
+            self._create_leave_event(exp_id, version, state, 'session2', 4)
+            self.process_and_flush_pending_tasks()
 
-        ModifiedStatisticsAggregator.start_computation()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
 
-        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_starts, 2)
-        self.assertEqual(output_model.num_completions, 1)
+            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            self.assertEqual(output_model.num_starts, 2)
+            self.assertEqual(output_model.num_completions, 1)
