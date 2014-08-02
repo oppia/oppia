@@ -34,7 +34,7 @@ class Math(widget_domain.BaseWidget):
         'customization_args': {
             'value': ''
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'MathLatexString',
     }]
 
     # The HTML tag name for this non-interactive widget.
