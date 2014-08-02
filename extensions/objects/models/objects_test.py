@@ -186,6 +186,16 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.NormalizedString, mappings, invalid_values)
 
+    def test_math_latex_string_validation(self):
+        """Tests objects of type MathLatexString."""
+        mappings = [
+            ('123456789', u'123456789'), (u'x \\times y', u'x \\times y'),
+        ]
+        invalid_vals = [3.0, {'a': 1}, [1, 2, 1], None]
+
+        self.check_normalization(
+            objects.MathLatexString, mappings, invalid_vals)
+
     def test_sanitized_url_validation(self):
         mappings = [
             ('http://www.google.com', 'http://www.google.com'),
@@ -286,4 +296,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils.validate_schema(member._schema)
                     count += 1
 
-        self.assertEquals(count, 18)
+        self.assertEquals(count, 19)

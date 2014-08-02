@@ -255,6 +255,18 @@ class NormalizedString(BaseObject):
     }
 
 
+class MathLatexString(BaseObject):
+    """Math LaTeX string class"""
+
+    description = 'A LaTeX string.'
+    edit_html_filename = 'math_latex_string_editor'
+    edit_js_filename = 'MathLatexStringEditor'
+
+    _schema = {
+        'type': 'unicode',
+    }
+
+
 class Html(BaseObject):
     """HTML string class."""
 
