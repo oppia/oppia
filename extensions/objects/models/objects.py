@@ -528,14 +528,16 @@ class Graph(BaseObject):
                'type': 'list',
                'items': {
                    'type': 'dict',
-                   'src': {
-                       'type': 'int'
-                   },
-                   'dst': {
-                       'type': 'int'
-                   },
-                   'cost': {
-                       'type': 'int'
+                   'properties': {
+                       'src': {
+                           'type': 'int'
+                       },
+                       'dst': {
+                           'type': 'int'
+                       },
+                       'cost': {
+                           'type': 'int'
+                       }
                    }
                }
            },
