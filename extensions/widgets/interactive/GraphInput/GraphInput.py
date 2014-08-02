@@ -58,7 +58,7 @@ class GraphInput(widget_domain.BaseWidget):
         'obj_type': 'Graph'
     }, {
         'name': 'movePermissions',
-        'description': 'Whether the user is allowed to move the vertices around.',
+        'description': 'Whether the learner is allowed to move the vertices around.',
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
@@ -67,7 +67,7 @@ class GraphInput(widget_domain.BaseWidget):
         'obj_type': 'Boolean'
     }, {
         'name': 'vertexEditPermissions',
-        'description': 'Whether the user is allowed to edit the vertex set (i.e. add/remove vertices, change vertex names).',
+        'description': 'Whether the learner is allowed to edit the vertex set (i.e. add/remove vertices, change vertex names).',
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {

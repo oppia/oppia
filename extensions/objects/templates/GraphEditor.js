@@ -17,11 +17,11 @@
 // in via initArgs.
 
 oppia.directive('graphEditor', function($compile, warningsData) {
-	return {
-		link: function(scope, element, attrs) {},
-		restrict: 'E',
-		scope: true,
-		template: '',
-		controller: function($scope, $element, $attrs) {}
-	};
+  return {
+    link: function(scope, element, attrs) {},
+    restrict: 'E',
+    scope: true,
+    template: '',
+    controller: function($scope, $element, $attrs) {}
+  };
 });

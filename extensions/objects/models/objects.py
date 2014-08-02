@@ -535,7 +535,7 @@ class Graph(BaseObject):
                        'dst': {
                            'type': 'int'
                        },
-                       'cost': {
+                       'weight': {
                            'type': 'int'
                        }
                    }

@@ -21,81 +21,83 @@
  */
 
 oppia.directive('oppiaInteractiveGraphInput',[
-	'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
-		return {
-			restrict: 'E',
-			scope: {},
-			templateUrl: 'interactiveWidget/GraphInput',
-			controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-				$scope.errorMessage = '';
-				//var testGraph = {"vertices":[{"x":50,"y":50},{"x":100,"y":50},{"x":50,"y":100}],"edges":[{"src":0,"dst":1},{"src":0,"dst":2}]}
-				$scope.graph = {'vertices':[],'edges':[],'isDirected':[],'isWeighted':[],'isLabeled':[]};
-				
-				//Updates graph using json in input field
-				$scope.updateGraphFromInput = function() {
-					updateGraphFromJSON(d3.select($element[0]).select('.json-graph-input')[0][0].value);
-				}
-				
-				$scope.submitGraph = function() {
-					var strGraph = JSON.stringify($scope.graph);
-					$scope.$parent.$parent.submitAnswer(strGraph, 'submit');
-				};
-				
-				$scope.init = function() {
-					updateGraphFromJSON($attrs.graphWithValue);
-				};
-				$scope.init();
-				
-				//TODO: Actually write this function?
-				function checkValidGraph(graph) {
-					return true;
-				}
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'interactiveWidget/GraphInput',
+      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+        $scope.errorMessage = '';
+        //var testGraph = {"vertices":[{"x":50,"y":50},{"x":100,"y":50},{"x":50,"y":100}],"edges":[{"src":0,"dst":1},{"src":0,"dst":2}]}
+        $scope.graph = {'vertices':[], 'edges':[], 'isDirected':[], 'isWeighted':[], 'isLabeled':[]};
+        
+        //Updates graph using json in input field
+        $scope.updateGraphFromInput = function() {
+          updateGraphFromJSON(d3.select($element[0]).select('.json-graph-input')[0][0].value);
+        }
+        
+        $scope.submitGraph = function() {
+          var strGraph = JSON.stringify($scope.graph);
+          $scope.$parent.$parent.submitAnswer(strGraph, 'submit');
+        };
+        
+        $scope.init = function() {
+          updateGraphFromJSON($attrs.graphWithValue);
+        };
+        $scope.init();
+        
+        //TODO(czxcjx): Actually write this function?
+        function checkValidGraph(graph) {
+          return true;
+        }
 
-				function updateGraphFromJSON (jsonGraph) {
-					var newGraph = JSON.parse(jsonGraph);
-					if (checkValidGraph(newGraph)) {
-						$scope.graph = newGraph;
-					} else {
-						$scope.errorMessage = "Invalid graph!";
-					}
-				}
+        function updateGraphFromJSON (jsonGraph) {
+          var newGraph = JSON.parse(jsonGraph);
+          if (checkValidGraph(newGraph)) {
+            $scope.graph = newGraph;
+          } else {
+            $scope.errorMessage = "Invalid graph!";
+          }
+        }
 
-			}]
-		};
-	}
+      }]
+    };
+  }
 ]);
 
 oppia.directive('graphInputDraggableVertex', ['$document', function($document){
-	return function(scope,element,attr){
-		var startX = 0;
-		var startY = 0;
-		var startCX = 0;
-		var startCY = 0;
-		var graph = scope.$parent.graph;
-		var index = parseInt(attr.index);
-		var vertex = graph.vertices[index];
-		element.on('mousedown',function(event){
-			event.preventDefault();
+  return function(scope, element, attr){
+    //Starting event.pageX and event.pageY coordinates for mousemove
+    var startX = 0;
+    var startY = 0;
+    //Starting cx and cy coordinates for svg element
+    var startCX = 0;
+    var startCY = 0;
+    var graph = scope.$parent.graph;
+    var index = parseInt(attr.index);
+    var vertex = graph.vertices[index];
+    element.on('mousedown', function(event){
+      event.preventDefault();
 
-			startX = event.pageX;
-			startY = event.pageY;
-			startCX = parseInt(attr.cx);
-			startCY = parseInt(attr.cy);
+      startX = event.pageX;
+      startY = event.pageY;
+      startCX = parseInt(attr.cx);
+      startCY = parseInt(attr.cy);
 
-			$document.on('mousemove',mousemove);
-			$document.on('mouseup',mouseup);
-		});
+      $document.on('mousemove', mousemove);
+      $document.on('mouseup', mouseup);
+    });
 
-		//TODO: Prevent vertices from leaving boundaries of svg element
-		function mousemove(event) {
-			vertex.x = event.pageX - startX + startCX;
-			vertex.y = event.pageY - startY + startCY;
-			scope.$parent.$apply();
-		}
+    //TODO(czxcjx): Prevent vertices from leaving boundaries of svg element
+    function mousemove(event) {
+      vertex.x = event.pageX - startX + startCX;
+      vertex.y = event.pageY - startY + startCY;
+      scope.$parent.$apply();
+    }
 
-		function mouseup(event) {
-			$document.off('mousemove',mousemove);
-			$document.off('mouseup',mouseup);
-		}
-	};
+    function mouseup(event) {
+      $document.off('mousemove', mousemove);
+      $document.off('mouseup', mouseup);
+    }
+  };
 }]);
