@@ -647,6 +647,15 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         return '%s:%s' % (layer_index, raw_entity_id)
 
     @classmethod
+    def delete_layer(cls, layer_index, latest_created_on_datetime):
+        """Deletes all entities in the given layer which were created before
+        the given datetime.
+        """
+        query = cls.query().filter(cls.realtime_layer == layer_index).filter(
+            cls.created_on < latest_created_on_datetime)
+        ndb.delete_multi(query.iter(keys_only=True))
+
+    @classmethod
     def _is_valid_realtime_id(cls, realtime_id):
         return realtime_id.startswith('0:') or realtime_id.startswith('1:')
 
@@ -658,6 +667,16 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
         return super(
             BaseRealtimeDatastoreClassForContinuousComputations, cls
         ).get(entity_id, strict=strict)
+
+    def put(self):
+        if (self.realtime_layer is None or
+                str(self.realtime_layer) != self.id[0]):
+            raise Exception(
+                'Realtime layer %s does not match realtime id %s' %
+                (self.realtime_layer, self.id))
+
+        return super(
+            BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
 class BaseContinuousComputationManager(object):
@@ -798,12 +817,8 @@ class BaseContinuousComputationManager(object):
         created_on date is before latest_timestamp.
         """
         inactive_realtime_index = 1 - cls._get_active_realtime_index()
-        datastore_class = cls._get_realtime_datastore_class()
-        query = datastore_class.query().filter(
-            datastore_class.realtime_layer == inactive_realtime_index
-        ).filter(
-            datastore_class.created_on < latest_created_on_datetime)
-        ndb.delete_multi(query.iter(keys_only=True))
+        cls._get_realtime_datastore_class().delete_layer(
+            inactive_realtime_index, latest_created_on_datetime)
 
     @classmethod
     def _kickoff_batch_job(cls):
