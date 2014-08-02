@@ -17,14 +17,22 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
+from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import user_services
 
 
 class DashboardPage(base.BaseHandler):
     """User dashboard page for Oppia."""
 
+    # We use 'contribute' because the createExploration() modal makes a call
+    # there.
+    PAGE_NAME_FOR_CSRF = 'contribute'
+
     def get(self):
-        if not self.user_id:
+        if (not self.user_id or
+                self.username in config_domain.BANNED_USERNAMES.value or
+                not user_services.has_user_registered_as_editor(self.user_id)):
             self.redirect('/')
             return
 

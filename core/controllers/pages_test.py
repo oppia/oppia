@@ -46,15 +46,11 @@ class SplashPageTest(test_utils.GenericTestBase):
         self.login('reader@example.com')
 
         response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 302)
-        self.assertIn(
-            feconf.DASHBOARD_URL, response.headers['location'])
-
-        response = response.follow()
+        self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Contribute', 'Profile', 'Logout', 'Dashboard',
-            self.get_expected_logout_url('/dashboard'),
-            no=['Login', 'Create an Oppia account', 'Create an exploration',
+            'Contribute', 'Profile', 'Logout', 'Create an exploration',
+            self.get_expected_logout_url('/'),
+            no=['Login', 'Create an Oppia account',
                 self.get_expected_login_url('/')])
 
         self.logout()

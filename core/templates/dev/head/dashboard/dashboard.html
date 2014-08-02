@@ -14,20 +14,6 @@
             Dashboard
           </h3>
 
-          <h4>Exploration counts</h4>
-          <div ng-if="explorationStats.owned > 0"><a href="#owned_section">
-            I manage <[explorationStats.owned]>
-            (<[explorationStats.owned_private]> private) explorations.
-          </a></div>
-          <div ng-if="explorationStats.editable > 0"><a href="#editable_section">
-            I collaborate on <[explorationStats.editable]>
-            (<[explorationStats.editable_private]> private) explorations.
-          </a></div>
-          <div ng-if="explorationStats.viewable > 0"><a href="#viewable_section">
-            I playtest <[explorationStats.viewable]>
-            (<[explorationStats.viewable_private]> private) explorations.
-          </a></div>
-
           <div ng-show="!isEmpty(ownedExplorations)">
             <h5 id="owned_section">Explorations I manage</h5>
             <ul>
@@ -62,18 +48,28 @@
           </div>
 
           <div ng-show="isEmpty(ownedExplorations) && isEmpty(editableExplorations) && isEmpty(viewableExplorations)">
-            <em>No explorations here yet!</em>
+            <p>
+              <em>You currently aren't managing or collaborating on any explorations.</em>
+            </p>
+          </div>
+
+          <div>
+            <a class="btn btn-success btn-lg" ng-click="showCreateExplorationModal()">
+              Create New Exploration
+            </a>
           </div>
 
         </div>
       </div>
     </div>
+    {% include 'components/exploration_creation_button.html' %}
   </div>
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('components/explorationCreationButton.js') }}
     {{ include_js_file('/dashboard/Dashboard.js') }}
   </script>
 {% endblock footer_js %}

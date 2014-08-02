@@ -133,7 +133,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         # Log in as a superadmin. The role is set.
         self.login('superadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/dashboard')
+        response = self.testapp.get('/')
         response.mustcontain('Admin', no=['Moderator'])
 
         # Add a moderator, an admin, and a person with both roles, then log

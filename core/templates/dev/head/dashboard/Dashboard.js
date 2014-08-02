@@ -18,11 +18,39 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function Dashboard($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+function Dashboard(
+    $scope, $http, $rootScope, warningsData, oppiaRequestCreator, createExplorationButtonService) {
   var EXPLORATION_STATUS_PRIVATE = 'private';
+  // TODO(sll): Consider replacing this with an actual list of categories when
+  // we have found a way to do this that does not involve iterating through all
+  // explorations.
+  var CATEGORY_LIST = [
+    'Architecture',
+    'Art',
+    'Biology',
+    'Business',
+    'Chemistry',
+    'Computing',
+    'Earth Science',
+    'Education',
+    'Geography',
+    'Languages',
+    'Law',
+    'Life Skills',
+    'Mathematics',
+    'Music',
+    'Philosophy',
+    'Physics',
+    'Programming',
+    'Statistics',
+  ];
 
   $scope.dashboardDataUrl = '/dashboardhandler/data';
   $rootScope.loadingMessage = 'Loading';
+
+  $scope.showCreateExplorationModal = function() {
+    createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+  };
 
   var computeExplorationStats = function(data) {
     var result = {};
@@ -60,4 +88,6 @@ function Dashboard($scope, $http, $rootScope, warningsData, oppiaRequestCreator)
 /**
  * Injects dependencies in a way that is preserved by minification.
  */
-Dashboard.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+Dashboard.$inject = [
+  '$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator',
+  'createExplorationButtonService'];

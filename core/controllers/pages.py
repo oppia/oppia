@@ -20,6 +20,7 @@ from core.controllers import base
 from core.controllers import editor
 from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import user_services
 import feconf
 
 
@@ -51,7 +52,9 @@ class SplashPage(base.BaseHandler):
     """Splash page for Oppia."""
 
     def get(self):
-        if self.user_id:
+        if (self.user_id and
+                self.username not in config_domain.BANNED_USERNAMES.value and
+                user_services.has_user_registered_as_editor(self.user_id)):
             self.redirect('/dashboard')
             return
 
