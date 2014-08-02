@@ -32,7 +32,7 @@ class Math(widget_domain.BaseWidget):
             'largeInput': True,
         },
         'customization_args': {
-            'value': ''
+            'value': '\\frac{x}{y}'
         },
         'obj_type': 'MathLatexString',
     }]
