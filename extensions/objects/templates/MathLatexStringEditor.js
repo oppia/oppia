@@ -30,14 +30,6 @@ oppia.directive('mathLatexStringEditor', function($compile, warningsData) {
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function ($scope, $attrs) {
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-      $scope.largeInput = false;
-
-      $scope.$watch('$parent.initArgs', function(newValue, oldValue) {
-        $scope.largeInput = false;
-        if (newValue && newValue.largeInput) {
-          $scope.largeInput = newValue.largeInput;
-        }
-      });
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).

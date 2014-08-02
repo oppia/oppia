@@ -29,7 +29,6 @@ class Math(widget_domain.BaseWidget):
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True,
-            'largeInput': True,
         },
         'customization_args': {
             'value': '\\frac{x}{y}'
