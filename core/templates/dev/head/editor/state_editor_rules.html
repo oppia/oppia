@@ -15,37 +15,20 @@
 {% endblock %}
 
 {% block line1 %}
-  <div class="row">
-    <div ng-repeat="rule in handler" ng-hide="$last">
-      <div class="col-lg-11 col-md-11 col-sm-11 oppia-rule-block">
-        <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
-        </rule-editor>
-      </div>
-
-      <div class="col-lg-1 col-md-1 col-sm-1 oppia-rule-swap-arrows">
-        <span class="pull-right" ng-if="editabilityService.isEditable()">
-          <button type="button" class="btn btn-default btn-xs oppia-rule-ctrl" ng-show="$index != 0" ng-click="swapRules(handlerName, $index, $index - 1)">
-            <span class="glyphicon glyphicon-arrow-up" title="Move rule up"></span>
-          </button>
-          <span ng-hide="$index != 0" class="oppia-grayed oppia-rule-ctrl">
-            <span class="glyphicon glyphicon-arrow-up" title="Move rule up"></span>
-          </span>
-
-          <button type="button" class="btn btn-default btn-xs oppia-rule-ctrl" ng-show="$index < handler.length - 2" ng-click="swapRules(handlerName, $index, $index + 1)">
-            <span class="glyphicon glyphicon-arrow-down" title="Move rule down"></span>
-          </button>
-          <span ng-hide="$index < handler.length - 2" class="oppia-grayed oppia-rule-ctrl">
-            <span class="glyphicon glyphicon-arrow-down" title="Move rule down"></span>
-          </span>
-        </span>
-      </div>
+  <div class="row" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
+    <!-- An HTML element marked ui-sortable should contain only one element,
+    and this element should have an ng-repeat defined on it. See the
+    ui-sortable documentation for more details. -->
+    <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
+      <rule-editor rule="rule" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
+      </rule-editor>
     </div>
   </div>
 {% endblock %}
 
 {% block line2 %}
   <div class="row" ng-if="widgetId != 'Continue' && editabilityService.isEditable()">
-    <div class="col-lg-11 col-md-11 col-sm-11 oppia-rule-block">
+    <div class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
       <div ng-if="!tmpRule">
         <button type="button" class="btn btn-default oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
           Add new rule
@@ -62,11 +45,9 @@
 
 {% block line3 %}
   <div class="row">
-    <div class="col-lg-11 col-md-11 col-sm-11 oppia-rule-block">
+    <div class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
       <rule-editor rule="handler[handler.length - 1]" choices="widgetCustomizationArgs.choices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
       </rule-editor>
-    </div>
-    <div class="col-lg-1 col-md-1 col-sm-1">
     </div>
   </div>
 {% endblock %}
