@@ -247,10 +247,29 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
   };
 }]);
 
-// IE8 does not support trim(), so we have to add it manually. See
-//   http://stackoverflow.com/questions/2308134/trim-in-javascript-not-working-in-ie
+// Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, '');
   };
+}
+
+// Add an Object.create() polyfill for IE8.
+if (typeof Object.create !== 'function') {
+  (function() {
+    var F = function() {};
+    Object.create = function(o) {
+      if (arguments.length > 1) {
+        throw Error('Second argument for Object.create() is not supported');
+      }
+      if (o === null) {
+        throw Error('Cannot set a null [[Prototype]]');
+      }
+      if (typeof o !== 'object') {
+        throw TypeError('Argument must be an object');
+      }
+      F.prototype = o;
+      return new F();
+    };
+  })();
 }
