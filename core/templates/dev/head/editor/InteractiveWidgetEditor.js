@@ -45,8 +45,6 @@ function InteractiveWidgetEditor(
       if (successCallback) {
         successCallback();
       }
-    }).error(function(errorData) {
-      warningsData.addWarning(errorData.error);
     });
   };
 

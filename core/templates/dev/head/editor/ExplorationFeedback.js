@@ -42,8 +42,6 @@ function ExplorationFeedback($scope, $http, $modal,
   $scope._getThreadList = function() {
     $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
       $scope.threads = data.threads;
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error getting thread list.');
     });
   };
 
@@ -59,8 +57,6 @@ function ExplorationFeedback($scope, $http, $modal,
       $scope._getThreadList();
       $scope.setCurrentThread(null);
       $scope.$parent.refreshFeedbackTabHeader();
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error creating a thread.');
     });
   };
 
@@ -78,8 +74,6 @@ function ExplorationFeedback($scope, $http, $modal,
       $scope.currentThreadData = $scope._getThreadById(threadId);
       $scope.currentThreadMessages = data.messages;
       $scope.updatedStatus = $scope.currentThreadData.status;
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error getting thread messages.');
     });
   };
 
@@ -152,7 +146,6 @@ function ExplorationFeedback($scope, $http, $modal,
       $scope.messageSendingInProgress = false;
       $scope.$parent.refreshFeedbackTabHeader();
     }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error creating a thread message.');
       $scope.messageSendingInProgress = false;
     });
   };

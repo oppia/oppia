@@ -102,8 +102,6 @@ function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaReque
       oppiaRequestCreator.createRequest(requestParams)
     ).success(function(data) {
       window.location = window.decodeURIComponent($scope.getUrlParams().return_url);
-    }).error(function(data) {
-      warningsData.addWarning(data.error);
     });
   };
 }

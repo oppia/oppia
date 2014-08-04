@@ -41,8 +41,6 @@ function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreat
     $scope.displayedCategories = angular.copy($scope.categories);
 
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
 }
 

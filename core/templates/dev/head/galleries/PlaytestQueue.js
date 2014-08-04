@@ -43,8 +43,6 @@ function PlaytestQueue($scope, $http, $rootScope, warningsData) {
     $scope.publicExplorations = data.public_explorations_list;
     $scope.privateExplorations = data.private_explorations_list;
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
 }
 

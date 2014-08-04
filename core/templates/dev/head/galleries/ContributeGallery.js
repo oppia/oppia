@@ -37,8 +37,6 @@ function ContributeGallery(
     }
 
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
 
   $scope._getCreateModalInstance = function(categoryList, isUploadModal) {
@@ -124,8 +122,6 @@ function ContributeGallery(
       ).success(function(data) {
         window.location = '/create/' + data.explorationId;
       }).error(function(data) {
-        warningsData.addWarning(data.error ? data.error :
-          'Error: Could not add new exploration.');
         $rootScope.loadingMessage = '';
       });
     });

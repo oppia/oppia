@@ -39,6 +39,13 @@ handlers:
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=600'
+- url: /robots.txt
+  static_files: static/pages/robots.txt
+  upload: static/pages/robots.txt
+  secure: always
+  http_headers:
+    Cache-Control: 'public, max-age=2592000'
+    Vary: Accept-Encoding
 - url: /scripts
   static_dir: static/scripts
   secure: always
@@ -50,12 +57,6 @@ handlers:
   secure: always
 - url: /third_party/static
   static_dir: third_party/static
-  secure: always
-  http_headers:
-    Cache-Control: 'public, max-age=2592000'
-    Vary: Accept-Encoding
-- url: /lib/static
-  static_dir: lib/static
   secure: always
   http_headers:
     Cache-Control: 'public, max-age=2592000'

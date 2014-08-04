@@ -32,8 +32,6 @@ function Moderator(
       })
     ).success(function(data) {
       $scope.userEmail = data.user_email;
-    }).error(function(data) {
-      warningsData.addWarning(data.error);
     });
   };
 
@@ -82,8 +80,6 @@ function Moderator(
       if (!data.more) {
         $scope.reachedEndOfCommits = true;
       }
-    }).error(function(data) {
-      warningsData.addWarning(data.error);
     });
   };
 
@@ -112,8 +108,6 @@ function Moderator(
       if (!data.more) {
         $scope.reachedEndOfFeedbackMessages = true;
       }
-    }).error(function(data) {
-      warningsData.addWarning(data.error);
     });
   };
 

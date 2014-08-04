@@ -279,10 +279,6 @@ function ExplorationEditor(
           $scope.isSaveInProgress = false;
         });
       });
-    }).error(function(data) {
-      $log.error(data);
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.');
     });
   };
 
@@ -598,10 +594,6 @@ function ExplorationEditor(
         })
       ).success(function(response) {
         location.reload();
-      }).error(function(data) {
-        $log.error(data);
-        warningsData.addWarning(
-          data.error || 'Error communicating with server.');
       });
     });
   };
@@ -829,9 +821,6 @@ function ExplorationEditor(
       if (successCallback) {
         successCallback(newStateName);
       }
-    }).error(function(data) {
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.');
     });
   };
 

@@ -94,7 +94,6 @@ oppia.factory('explorationData', [
             successCallback();
           }
         }).error(function(data) {
-          warningsData.addWarning(data.error || 'Error communicating with server.');
           if (errorCallback) {
             errorCallback();
           }
@@ -102,16 +101,13 @@ oppia.factory('explorationData', [
       },
 
       resolveAnswers: function(stateName, resolvedAnswersList) {
+        warningsData.clear();
         $http.put(
           resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
           oppiaRequestCreator.createRequest({
             resolved_answers: resolvedAnswersList
           })
-        ).error(function(data) {
-          warningsData.addWarning(data.error || 'Error communicating with server.');
-        });
-
-        warningsData.clear();
+        );
       }
     };
 
@@ -480,10 +476,6 @@ oppia.factory('explorationRightsService', [
         that.init(
           data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
           data.rights.status, data.rights.cloned_from, data.rights.community_owned);
-      }).
-      error(function(data) {
-        warningsData.addWarning(
-          data.error || 'Error communicating with server.');
       });
     }
   };

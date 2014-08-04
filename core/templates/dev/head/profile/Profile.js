@@ -51,8 +51,6 @@ function Profile($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
     $scope.viewableExplorations = data.viewable;
 
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
 }
 

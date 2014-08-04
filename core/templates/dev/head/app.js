@@ -30,7 +30,8 @@ var oppia = angular.module(
 
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
-// Set default headers for POST requests.
+// Set default headers for POST and PUT requests.
+// Add an interceptor to log and show warnings for error responses.
 oppia.config(['$interpolateProvider', '$httpProvider',
     function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
@@ -40,6 +41,19 @@ oppia.config(['$interpolateProvider', '$httpProvider',
     'Content-Type': 'application/x-www-form-urlencoded'};
   $httpProvider.defaults.headers.put = {
     'Content-Type': 'application/x-www-form-urlencoded'};
+
+  $httpProvider.interceptors.push([
+    '$q', '$log', 'warningsData', function($q, $log, warningsData) {
+      return {
+        responseError: function(response) {
+          $log.error(response.data);
+          warningsData.addWarning(
+            response.data.error || 'Error communicating with server.');
+          return $q.reject(response);
+        }
+      };
+    }
+  ]);
 }]);
 
 oppia.config(['$provide', function($provide) {
