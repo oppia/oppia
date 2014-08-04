@@ -14,18 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for long running jobs."""
+"""Tests for long running jobs and continuous computations."""
 
 __author__ = 'Sean Lip'
 
+import ast
+import time
+
 from core import jobs
 from core import jobs_registry
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.platform import models
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(base_models, exp_models, stats_models) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration, models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
-import test_utils
+transaction_services = models.Registry.import_transaction_services()
+from core.tests import test_utils
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -63,9 +70,9 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertTrue(job_id.startswith('DummyJob'))
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_NEW)
-        self.assertIsNone(DummyJobManager.get_time_queued(job_id))
-        self.assertIsNone(DummyJobManager.get_time_started(job_id))
-        self.assertIsNone(DummyJobManager.get_time_finished(job_id))
+        self.assertIsNone(DummyJobManager.get_time_queued_msec(job_id))
+        self.assertIsNone(DummyJobManager.get_time_started_msec(job_id))
+        self.assertIsNone(DummyJobManager.get_time_finished_msec(job_id))
         self.assertIsNone(DummyJobManager.get_metadata(job_id))
         self.assertIsNone(DummyJobManager.get_output(job_id))
         self.assertIsNone(DummyJobManager.get_error(job_id))
@@ -81,7 +88,7 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             DummyJobManager.get_status_code(job_id), jobs.STATUS_CODE_QUEUED)
-        self.assertIsNotNone(DummyJobManager.get_time_queued(job_id))
+        self.assertIsNotNone(DummyJobManager.get_time_queued_msec(job_id))
         self.assertIsNone(DummyJobManager.get_output(job_id))
 
     def test_failure_for_job_enqueued_using_wrong_manager(self):
@@ -105,14 +112,14 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             DummyJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
-        time_queued = DummyJobManager.get_time_queued(job_id)
-        time_started = DummyJobManager.get_time_started(job_id)
-        time_finished = DummyJobManager.get_time_finished(job_id)
-        self.assertIsNotNone(time_queued)
-        self.assertIsNotNone(time_started)
-        self.assertIsNotNone(time_finished)
-        self.assertLess(time_queued, time_started)
-        self.assertLess(time_started, time_finished)
+        time_queued_msec = DummyJobManager.get_time_queued_msec(job_id)
+        time_started_msec = DummyJobManager.get_time_started_msec(job_id)
+        time_finished_msec = DummyJobManager.get_time_finished_msec(job_id)
+        self.assertIsNotNone(time_queued_msec)
+        self.assertIsNotNone(time_started_msec)
+        self.assertIsNotNone(time_finished_msec)
+        self.assertLess(time_queued_msec, time_started_msec)
+        self.assertLess(time_started_msec, time_finished_msec)
 
         metadata = DummyJobManager.get_metadata(job_id)
         output = DummyJobManager.get_output(job_id)
@@ -134,14 +141,16 @@ class JobManagerUnitTests(test_utils.GenericTestBase):
         self.assertEqual(
             DummyFailingJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_FAILED)
-        time_queued = DummyFailingJobManager.get_time_queued(job_id)
-        time_started = DummyFailingJobManager.get_time_started(job_id)
-        time_finished = DummyFailingJobManager.get_time_finished(job_id)
-        self.assertIsNotNone(time_queued)
-        self.assertIsNotNone(time_started)
-        self.assertIsNotNone(time_finished)
-        self.assertLess(time_queued, time_started)
-        self.assertLess(time_started, time_finished)
+        time_queued_msec = DummyFailingJobManager.get_time_queued_msec(job_id)
+        time_started_msec = DummyFailingJobManager.get_time_started_msec(
+            job_id)
+        time_finished_msec = DummyFailingJobManager.get_time_finished_msec(
+            job_id)
+        self.assertIsNotNone(time_queued_msec)
+        self.assertIsNotNone(time_started_msec)
+        self.assertIsNotNone(time_finished_msec)
+        self.assertLess(time_queued_msec, time_started_msec)
+        self.assertLess(time_started_msec, time_finished_msec)
 
         metadata = DummyFailingJobManager.get_metadata(job_id)
         output = DummyFailingJobManager.get_output(job_id)
@@ -492,13 +501,46 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
 class JobRegistryTests(test_utils.GenericTestBase):
     """Tests job registry."""
 
-    def test_each_class_is_subclass_of_BaseJobManager(self):
-        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+    def test_each_one_off_class_is_subclass_of_BaseJobManager(self):
+        for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertTrue(issubclass(klass, jobs.BaseJobManager))
 
-    def test_each_class_is_not_abstract(self):
-        for klass in jobs_registry.JOB_MANAGER_CLASSES:
+    def test_each_one_off_class_is_not_abstract(self):
+        for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
             self.assertFalse(klass._is_abstract())
+
+    def test_validity_of_each_continuous_computation_class(self):
+        for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+            self.assertTrue(
+                issubclass(klass, jobs.BaseContinuousComputationManager))
+
+            event_types_listened_to = klass.get_event_types_listened_to()
+            self.assertTrue(isinstance(event_types_listened_to, list))
+            self.assertGreater(len(event_types_listened_to), 0)
+            for event_type in event_types_listened_to:
+                self.assertTrue(isinstance(event_type, basestring))
+                self.assertTrue(issubclass(
+                    event_services.Registry.get_event_class_by_type(
+                        event_type),
+                    event_services.BaseEventHandler))
+
+            rdcs = klass._get_realtime_datastore_classes()
+            self.assertTrue(isinstance(rdcs, list))
+            self.assertEqual(len(rdcs), 2)
+            for rdc in rdcs:
+                self.assertTrue(issubclass(rdc, base_models.BaseModel))
+            self.assertEqual(rdcs[0]().to_dict(), rdcs[1]().to_dict())
+
+            # The list of allowed base classes. This can be extended as the
+            # need arises, though we may also want to implement
+            # _get_continuous_computation_class() and
+            # _entity_created_before_job_queued() for other base classes
+            # that are added to this list.
+            ALLOWED_BASE_BATCH_JOB_CLASSES = [
+                jobs.BaseMapReduceJobManagerForContinuousComputations]
+            self.assertTrue(any([
+                issubclass(klass._get_batch_job_manager_class(), superclass)
+                for superclass in ALLOWED_BASE_BATCH_JOB_CLASSES]))
 
 
 class JobQueriesTests(test_utils.GenericTestBase):
@@ -562,3 +604,217 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(
             TwoClassesMapReduceJobManager.get_status_code(job_id),
             jobs.STATUS_CODE_COMPLETED)
+
+
+class StartExplorationRealtimeModel0(base_models.BaseModel):
+    count = ndb.IntegerProperty(default=0)
+
+
+class StartExplorationRealtimeModel1(base_models.BaseModel):
+    count = ndb.IntegerProperty(default=0)
+
+
+class StartExplorationMRJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return StartExplorationEventCounter
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StartExplorationEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        current_class = StartExplorationMRJobManager
+        if current_class._entity_created_before_job_queued(item):
+            yield (item.exploration_id, {
+                'event_type': item.event_type,
+            })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        started_count = 0
+        for value_str in stringified_values:
+            value = ast.literal_eval(value_str)
+            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
+                started_count += 1
+        stats_models.ExplorationAnnotationsModel(
+            id=key, num_starts=started_count).put()
+
+
+class StartExplorationEventCounter(jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that counts 'start exploration' events.
+
+    This class should only be used in tests.
+    """
+
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return [feconf.EVENT_TYPE_START_EXPLORATION]
+
+    @classmethod
+    def _get_realtime_datastore_classes(cls):
+        return [
+            StartExplorationRealtimeModel0, StartExplorationRealtimeModel1]
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return StartExplorationMRJobManager
+
+    @classmethod
+    def _handle_incoming_event(
+            cls, datastore_class, event_type, exp_id, exp_version,
+            state_name, session_id, params, play_type):
+
+        def _increment_counter():
+            model = datastore_class.get(exp_id, strict=False)
+            if model is None:
+                datastore_class(id=exp_id, count=1).put()
+            else:
+                model.count += 1
+                model.put()
+
+        transaction_services.run_in_transaction(_increment_counter)
+
+    @classmethod
+    def on_batch_job_completion(cls):
+        """Override on_batch_job_completion() so that it does not immediately
+        start a new MapReduce job. Other non-test subclasses should, in
+        general, not do this."""
+        cls._process_job_completion_and_return_status()
+
+    # Public query method.
+    @classmethod
+    def get_count(cls, exploration_id):
+        """Return the number of 'start exploration' events received.
+
+        Answers the query by combining the existing MR job output and the
+        active realtime_datastore_class.
+        """
+        mr_model = stats_models.ExplorationAnnotationsModel.get(
+            exploration_id, strict=False)
+        realtime_model = cls._get_active_realtime_datastore_class().get(
+            exploration_id, strict=False)
+
+        answer = 0
+        if mr_model is not None:
+            answer += mr_model.num_starts
+        if realtime_model is not None:
+            answer += realtime_model.count
+        return answer
+
+
+class ContinuousComputationTests(test_utils.GenericTestBase):
+    """Tests continuous computations for 'start exploration' events."""
+
+    EXP_ID = 'exp_id'
+
+    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+        StartExplorationEventCounter]
+
+    def setUp(self):
+        """Create an exploration and register the event listener manually."""
+        super(ContinuousComputationTests, self).setUp()
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'title', 'A category')
+        exp_services.save_new_exploration('owner_id', exploration)
+
+    def test_continuous_computation_workflow(self):
+        """An integration test for continuous computations."""
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+
+            # Record an event. This will put the event in the task queue.
+            event_services.StartExplorationEventHandler.record(
+                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+
+            # When the task queue is flushed, the data is recorded in the two
+            # realtime layers.
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+            self.assertEqual(
+                StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
+            self.assertEqual(
+                StartExplorationRealtimeModel1.get(self.EXP_ID).count, 1)
+
+            # The batch job has not run yet, so no entity for self.EXP_ID will
+            # have been created in the batch model yet.
+            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+                stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
+
+            # Launch the batch computation.
+            StartExplorationEventCounter.start_computation()
+            # Data in realtime layer 0 is still there.
+            self.assertEqual(
+                StartExplorationRealtimeModel0.get(self.EXP_ID).count, 1)
+            # Data in realtime layer 1 has been deleted.
+            self.assertIsNone(
+                StartExplorationRealtimeModel1.get(self.EXP_ID, strict=False))
+
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(
+                stats_models.ExplorationAnnotationsModel.get(
+                    self.EXP_ID).num_starts, 1)
+
+            # The overall count is still 1.
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+            # Data in realtime layer 0 has been deleted.
+            self.assertIsNone(
+                StartExplorationRealtimeModel0.get(self.EXP_ID, strict=False))
+            # Data in realtime layer 1 has been deleted.
+            self.assertIsNone(
+                StartExplorationRealtimeModel1.get(self.EXP_ID, strict=False))
+
+    def test_events_coming_in_while_batch_job_is_running(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            # Currently no events have been recorded.
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 0)
+
+            # Enqueue the batch computation. (It is running on 0 events.)
+            StartExplorationEventCounter._kickoff_batch_job()
+            # Record an event while this job is in the queue. Simulate
+            # this by directly calling on_incoming_event(), because using
+            # StartExplorationEventHandler.record() would just put the event
+            # in the task queue, which we don't want to flush yet.
+            event_services.StartExplorationEventHandler._handle_event(
+                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                feconf.PLAY_TYPE_NORMAL)
+            StartExplorationEventCounter.on_incoming_event(
+                event_services.StartExplorationEventHandler.EVENT_TYPE,
+                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                feconf.PLAY_TYPE_NORMAL)
+            # The overall count is now 1.
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+
+            # Finish the job.
+            self.process_and_flush_pending_tasks()
+            # When the batch job completes, the overall count is still 1.
+            self.assertEqual(
+                StartExplorationEventCounter.get_count(self.EXP_ID), 1)
+            # The batch job result should still be 0, since the event arrived
+            # after the batch job started.
+            with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
+                stats_models.ExplorationAnnotationsModel.get(self.EXP_ID)
+
+
+# TODO(sll): When we have some concrete ContinuousComputations running in
+# production, add an integration test to ensure that the registration of event
+# handlers in the main codebase is happening correctly.

@@ -19,6 +19,7 @@ import unittest
 import webtest
 
 from core.domain import config_domain
+from core.domain import event_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf

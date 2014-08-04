@@ -36,6 +36,13 @@ import feconf
 import jinja2
 
 
+def get_human_readable_time_string(time_msec):
+    """Given a time in milliseconds since the epoch, get a human-readable
+    time string for the admin dashboard.
+    """
+    return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
+
+
 def require_super_admin(handler):
     """Decorator that checks if the current user is a super admin."""
     def test_super_admin(self, **kwargs):
@@ -90,20 +97,42 @@ class AdminPage(base.BaseHandler):
             (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
 
-        new_job_types = [
-            klass.__name__ for klass in
-            jobs_registry.JOB_MANAGER_CLASSES]
-
         job_data = jobs.get_data_for_recent_jobs()
         for job in job_data:
-            if job['time_started']:
-                job['human_readable_time_started'] = time.strftime(
-                    '%B %d %H:%M:%S',
-                    time.gmtime(job['time_started']))
-            if job['time_finished']:
-                job['human_readable_time_finished'] = time.strftime(
-                    '%B %d %H:%M:%S',
-                    time.gmtime(job['time_finished']))
+            if job['time_started_msec']:
+                job['human_readable_time_started'] = (
+                    get_human_readable_time_string(job['time_started_msec']))
+            if job['time_finished_msec']:
+                job['human_readable_time_finished'] = (
+                    get_human_readable_time_string(job['time_finished_msec']))
+            job['can_be_canceled'] = job['is_cancelable'] and any([
+                klass.__name__ == job['job_type']
+                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS])
+
+        queued_or_running_job_types = set([
+            job['job_type'] for job in job_data if job['status_code'] in [
+                jobs.STATUS_CODE_QUEUED, jobs.STATUS_CODE_STARTED]])
+        one_off_job_specs = [{
+            'job_type': klass.__name__,
+            'is_queued_or_running': (
+                klass.__name__ in queued_or_running_job_types)
+        } for klass in jobs_registry.ONE_OFF_JOB_MANAGERS]
+
+        continuous_computations_data = jobs.get_continuous_computations_info(
+            jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS)
+        for computation in continuous_computations_data:
+            if computation['last_started_msec']:
+                computation['human_readable_last_started'] = (
+                    get_human_readable_time_string(
+                        computation['last_started_msec']))
+            if computation['last_stopped_msec']:
+                computation['human_readable_last_stopped'] = (
+                    get_human_readable_time_string(
+                        computation['last_stopped_msec']))
+            if computation['last_finished_msec']:
+                computation['human_readable_last_finished'] = (
+                    get_human_readable_time_string(
+                        computation['last_finished_msec']))
 
         self.values.update({
             'demo_explorations': demo_explorations,
@@ -113,8 +142,9 @@ class AdminPage(base.BaseHandler):
                 editor.VALUE_GENERATORS_JS.value),
             'widget_js_directives': jinja2.utils.Markup(
                 widget_registry.Registry.get_noninteractive_widget_js()),
-            'new_job_types': new_job_types,
+            'one_off_job_specs': one_off_job_specs,
             'job_data': job_data,
+            'continuous_computations_data': continuous_computations_data,
         })
 
         self.render_template('admin/admin.html')
@@ -166,16 +196,28 @@ class AdminHandler(base.BaseHandler):
                 config_domain.Registry.get_config_property(
                     computed_property_name).refresh_default_value()
             elif self.payload.get('action') == 'start_new_job':
-                for klass in jobs_registry.JOB_MANAGER_CLASSES:
+                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == self.payload.get('job_type'):
                         klass.enqueue(klass.create_new())
                         break
             elif self.payload.get('action') == 'cancel_job':
                 job_id = self.payload.get('job_id')
                 job_type = self.payload.get('job_type')
-                for klass in jobs_registry.JOB_MANAGER_CLASSES:
+                for klass in jobs_registry.ONE_OFF_JOB_MANAGERS:
                     if klass.__name__ == job_type:
                         klass.cancel(job_id, self.user_id)
+                        break
+            elif self.payload.get('action') == 'start_computation':
+                computation_type = self.payload.get('computation_type')
+                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+                    if klass.__name__ == computation_type:
+                        klass.start_computation()
+                        break
+            elif self.payload.get('action') == 'stop_computation':
+                computation_type = self.payload.get('computation_type')
+                for klass in jobs_registry.ALL_CONTINUOUS_COMPUTATION_MANAGERS:
+                    if klass.__name__ == computation_type:
+                        klass.stop_computation(self.user_id)
                         break
 
             self.render_json({})

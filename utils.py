@@ -329,7 +329,8 @@ def get_time_in_millisecs(datetime_obj):
     Args:
       datetime_obj: An object of type datetime.datetime.
     """
-    return time.mktime(datetime_obj.timetuple()) * 1000
+    seconds = time.mktime(datetime_obj.timetuple()) * 1000
+    return seconds + datetime_obj.microsecond / 1000.0
 
 
 def get_current_time_in_millisecs():
@@ -341,12 +342,9 @@ def get_current_time_in_millisecs():
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
-def get_epoch_time():
-    return int(time.time())
-
-
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
+
 
 def vfs_construct_path(a, *p):
     """Mimics behavior of os.path.join on Posix machines."""
@@ -388,4 +386,3 @@ def vfs_normpath(path):
     if initial_slashes:
         path = slash*initial_slashes + path
     return path or dot
-

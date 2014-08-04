@@ -20,55 +20,52 @@ __author__ = 'Sean Lip'
 
 import inspect
 
+from core import jobs_registry
 from core.domain import exp_domain
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
+import feconf
 
 
 class BaseEventHandler(object):
     """Base class for event dispatchers."""
 
+    # A string denoting the type of the event. Should be specified by
+    # subclasses and considered immutable.
     EVENT_TYPE = None
-    # Methods/functions that should be called asynchronously when an incoming
-    # event arrives.
-    # IMPORTANT: Implementers should be aware that listeners may receive events
-    # after an extended period of time, so they should not refer to things like
-    # the user currently in session. In addition, listeners should ensure that
-    # they are robust to retries in the event of failure (or raise a
-    # taskqueue_services.PermanentTaskFailure exception).
-    _listeners = []
 
     @classmethod
-    def add_listener(cls, listener):
-        cls._listeners.append(listener)
-
-    @classmethod
-    def remove_listener(cls, listener):
-        cls._listeners.remove(listener)
-
-    @classmethod
-    def _notify_listeners_async(cls, *args, **kwargs):
-        # Listeners are called with the same args as the ones passed to
-        # record().
-        for listener in cls._listeners:
-            taskqueue_services.defer(listener, *args, **kwargs)
+    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
+        """Dispatch events asynchronously to continuous computation realtime
+        layers that are listening for them.
+        """
+        taskqueue_services.defer(
+            jobs_registry.ContinuousComputationEventDispatcher.dispatch_event,
+            cls.EVENT_TYPE, *args, **kwargs)
 
     @classmethod
     def _handle_event(cls, *args, **kwargs):
-        """This method should specify what to do when an event is received."""
+        """Perform in-request processing of an incoming event."""
         raise NotImplementedError(
-            'This method should be implemented by subclasses.')
+            'Subclasses of BaseEventHandler should implement the '
+            '_handle_event() method, using explicit arguments '
+            '(no *args or **kwargs).')
 
     @classmethod
     def record(cls, *args, **kwargs):
-        """This is the public method that callers should use."""
-        cls._notify_listeners_async(*args, **kwargs)
+        """Process incoming events.
+
+        Callers of event handlers should call this method, not _handle_event().
+        """
+        cls._notify_continuous_computation_listeners_async(*args, **kwargs)
         cls._handle_event(*args, **kwargs)
 
 
 class StateHitEventHandler(BaseEventHandler):
     """Event handler for recording state hits."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_STATE_HIT
 
     @classmethod
     def _handle_event(cls, exploration_id, state_name, first_time):
@@ -79,6 +76,14 @@ class StateHitEventHandler(BaseEventHandler):
 
 class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_ANSWER_SUBMITTED
+
+    @classmethod
+    def _notify_continuous_computation_listeners_async(cls, *args, **kwargs):
+        # Disable this method until we can deal with large answers, otherwise
+        # the data that is being placed on the task queue is too large.
+        pass
 
     @classmethod
     def _handle_event(cls, exploration_id, exploration_version, state_name,
@@ -94,6 +99,8 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
     """Event handler for recording resolving of answers triggering the default
     rule."""
 
+    EVENT_TYPE = feconf.EVENT_TYPE_DEFAULT_ANSWER_RESOLVED
+
     @classmethod
     def _handle_event(cls, exploration_id, state_name, handler_name, answers):
         """Resolves a list of answers for the default rule of this state."""
@@ -106,6 +113,8 @@ class DefaultRuleAnswerResolutionEventHandler(BaseEventHandler):
 class StartExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration start events."""
 
+    EVENT_TYPE = feconf.EVENT_TYPE_START_EXPLORATION
+
     @classmethod
     def _handle_event(cls, exp_id, exp_version, state_name, session_id,
                       params, play_type):
@@ -116,6 +125,8 @@ class StartExplorationEventHandler(BaseEventHandler):
 
 class MaybeLeaveExplorationEventHandler(BaseEventHandler):
     """Event handler for recording exploration leave events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION
 
     @classmethod
     def _handle_event(
@@ -140,6 +151,8 @@ class Registry(object):
         # Find all subclasses of BaseEventHandler in the current module.
         for obj_name, obj in globals().iteritems():
             if inspect.isclass(obj) and issubclass(obj, BaseEventHandler):
+                if obj_name == 'BaseEventHandler':
+                    continue
                 if not obj.EVENT_TYPE:
                     raise Exception(
                         'Event handler class %s does not specify an event '

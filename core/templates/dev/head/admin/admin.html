@@ -91,8 +91,60 @@
     </ul>
 
     <h3>Jobs</h3>
-    <em>Note: This table may be stale; refresh to see the latest state.</em>
+    <h4>One-off jobs</h4>
+    <ul>
+      {% for job_spec in one_off_job_specs %}
+        <li>
+          {{job_spec.job_type}}
+          <button ng-click="startNewJob('{{job_spec.job_type}}')">
+            Start new job
+          </button>
+          {% if job_spec.is_queued_or_running %}
+            <span class="oppia-serious-warning-text">
+              <strong>(warning: an instance of this job type is already running)</strong>
+            </span>
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+
+    <h4>Continuous computations</h4>
+    <table class="table">
+      <tr>
+        <th>Type</th>
+        <th>Status</th>
+        <th>Last started</th>
+        <th>Last stop signal sent</th>
+        <th>Last finished</th>
+        <th>Active realtime layer</th>
+        <th>Controls</th>
+      </tr>
+      {% for computation in continuous_computations_data %}
+        <tr>
+          <td>{{computation.computation_type}}</td>
+          <td>{{computation.status_code}}</td>
+          <td>{{computation.human_readable_last_started}}</td>
+          <td>{{computation.human_readable_last_stopped}}</td>
+          <td>{{computation.human_readable_last_finished}}</td>
+          <td>{{computation.active_realtime_layer_index}}</td>
+          <td>
+            {% if computation.is_startable %}
+              <button ng-click="startComputation('{{computation.computation_type}}')">
+                Start
+              </button>
+            {% endif %}
+            {% if computation.is_stoppable %}
+              <button ng-click="stopComputation('{{computation.computation_type}}')">
+                Stop
+              </button>
+            {% endif %}
+          </td>
+        </tr>
+      {% endfor %}
+    </table>
+
     <h4>Existing jobs</h4>
+    <em>Note: This table may be stale; refresh to see the latest state.</em>
     <table class="table">
       <tr>
         <th>Job ID</th>
@@ -103,12 +155,12 @@
       </tr>
       {% for job in job_data %}
         <tr>
-          <td>{{job['id']}}</td>
-          <td>{{job['status_code']}}</td>
-          <td>{{job['human_readable_time_started']}}</td>
-          <td>{{job['human_readable_time_finished']}}</td>
+          <td>{{job.id}}</td>
+          <td>{{job.status_code}}</td>
+          <td>{{job.human_readable_time_started}}</td>
+          <td>{{job.human_readable_time_finished}}</td>
           <td>
-            {% if job['is_cancelable'] %}
+            {% if job.can_be_canceled %}
               <button ng-click="cancelJob('{{job['id']}}', '{{job['job_type']}}')">
                 Cancel
               </button>
@@ -117,18 +169,6 @@
         </tr>
       {% endfor %}
     </table>
-
-    <h4>New jobs</h4>
-    <ul>
-      {% for new_job_type in new_job_types %}
-        <li>
-          {{new_job_type}}
-          <button ng-click="startNewJob('{{new_job_type}}')">
-            Start new job
-          </button>
-        </li>
-      {% endfor %}
-    </ul>
 
     {% include 'footer_js_libs.html' %}
     {% include 'rte_js_libs.html' %}

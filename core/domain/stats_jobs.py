@@ -15,22 +15,117 @@
 """Jobs for statistics views."""
 
 import ast
-from datetime import datetime
+import datetime
 
 from core import jobs
 from core.domain import exp_services
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(base_models, stats_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.statistics])
+transaction_services = models.Registry.import_transaction_services()
 import feconf
-import logging
 import utils
 
+from google.appengine.ext import ndb
 
-class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
+
+
+class StatisticsRealtimeModel0(base_models.BaseModel):
+    num_starts = ndb.IntegerProperty(default=0)
+    num_completions = ndb.IntegerProperty(default=0)
+
+
+class StatisticsRealtimeModel1(base_models.BaseModel):
+    num_starts = ndb.IntegerProperty(default=0)
+    num_completions = ndb.IntegerProperty(default=0)
+
+
+class StatisticsAggregator(jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that counts 'start exploration' and
+    'complete exploration' events.
+    """
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return [
+            feconf.EVENT_TYPE_START_EXPLORATION,
+            feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION]
+
+    @classmethod
+    def _get_realtime_datastore_classes(cls):
+        return [
+            StatisticsRealtimeModel0, StatisticsRealtimeModel1]
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return StatisticsMRJobManager
+
+    @classmethod
+    def _handle_incoming_event(cls, datastore_class, event_type, *args):
+        exp_id = args[0]
+
+        def _increment_visit_counter():
+            model = datastore_class.get(exp_id, strict=False)
+            if model is None:
+                datastore_class(id=exp_id, num_starts=1).put()
+            else:
+                model.num_starts += 1
+                model.put()
+
+        def _increment_completion_counter():
+            model = datastore_class.get(exp_id, strict=False)
+            if model is None:
+                datastore_class(id=exp_id, num_completions=1).put()
+            else:
+                model.num_completions += 1
+                model.put()
+
+        if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
+            transaction_services.run_in_transaction(
+                _increment_visit_counter)
+        else:
+            transaction_services.run_in_transaction(
+                _increment_completion_counter)
+
+    # Public query method.
+    @classmethod
+    def get_statistics(cls, exploration_id):
+        """Returns a dict with two keys: 'start_exploration_count' and
+        'complete_exploration_count'. The corresponding values are the
+        number of times the given exploration was started and completed,
+        respectively.
+        """
+        mr_model = stats_models.ExplorationAnnotationsModel.get(
+            exploration_id, strict=False)
+        realtime_model = cls._get_active_realtime_datastore_class().get(
+            exploration_id, strict=False)
+
+        num_starts = 0
+        if mr_model is not None:
+            num_starts += mr_model.num_starts
+        if realtime_model is not None:
+            num_starts += realtime_model.num_starts
+
+        num_completions = 0
+        if mr_model is not None:
+            num_completions += mr_model.num_completions
+        if realtime_model is not None:
+            num_completions += realtime_model.num_completions
+
+        return {
+            'start_exploration_count': num_starts,
+            'complete_exploration_count': num_completions,
+        }
+
+
+class StatisticsMRJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
     """Job that calculates and creates stats models for exploration view.
        Includes: * number of visits to the exploration
                  * number of completions of the exploration
     """
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return StatisticsAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -39,11 +134,11 @@ class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        map_value = {'event_type': item.event_type,
-                     'session_id': item.session_id,
-                     'created_on': int(utils.get_time_in_millisecs(item.created_on)),
-                     'state_name': item.state_name}
-        yield (item.exploration_id, map_value)
+        if StatisticsMRJobManager._entity_created_before_job_queued(item):
+            yield (item.exploration_id, {
+                'event_type': item.event_type,
+                'session_id': item.session_id,
+                'state_name': item.state_name})
 
     @staticmethod
     def reduce(key, stringified_values):
@@ -51,14 +146,15 @@ class StatisticsPageJobManager(jobs.BaseMapReduceJobManager):
         complete_count = 0
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value['event_type'] == feconf.EVENT_TYPE_START:
+            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
                 started_count += 1
-            elif value['event_type'] == feconf.EVENT_TYPE_LEAVE:
+            elif (value['event_type'] ==
+                  feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION):
                 if value['state_name'] == feconf.END_DEST:
                     complete_count += 1
         stats_models.ExplorationAnnotationsModel(
             id=key,
-            num_visits=started_count,
+            num_starts=started_count,
             num_completions=complete_count).put()
 
 
@@ -145,12 +241,12 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
             for _ in range(missing_events_count):
                 version = exp_services.get_exploration_by_id(
                     value['exp_id']).version
-                created_on = datetime.fromtimestamp(
+                created_on = datetime.datetime.fromtimestamp(
                     value['created_on'] / 1000)
                 if state_name != feconf.END_DEST:
                     start_event_entity = (
                         stats_models.StartExplorationEventLogEntryModel(
-                            event_type=feconf.EVENT_TYPE_START,
+                            event_type=feconf.EVENT_TYPE_START_EXPLORATION,
                             exploration_id=value['exp_id'],
                             exploration_version=version,
                             state_name=value['state_name'],
@@ -164,7 +260,8 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                 else:
                     leave_event_entity = (
                         stats_models.MaybeLeaveExplorationEventLogEntryModel(
-                            event_type=feconf.EVENT_TYPE_LEAVE,
+                            event_type=(
+                                feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION),
                             exploration_id=value['exp_id'],
                             exploration_version=version,
                             state_name=state_name,

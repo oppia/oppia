@@ -1,0 +1,16 @@
+<div ng-if="!active && !alwaysEditable">
+  <textarea disabled="true">
+    <[localValue.label]>
+  </textarea>
+  (<a href="#" onclick="return false;" ng-click="openEditor()">Edit</a>)
+</div>
+
+<div ng-if="active || alwaysEditable">
+  <div>
+    <textarea ng-model="localValue.label"></textarea>
+  </div>
+  Preview: <span mathjax-bind="localValue.label"></span>
+  <button type="button" class="btn btn-default"  ng-if="!alwaysEditable" ng-click="replaceValue(localValue.label)">
+    Close
+  </button>
+</div>

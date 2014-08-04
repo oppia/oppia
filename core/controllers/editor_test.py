@@ -304,7 +304,7 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         self.login('editor@example.com')
 
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
-        self.assertEqual(editor_exploration_dict['num_visits'], 0)
+        self.assertEqual(editor_exploration_dict['num_starts'], 0)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
 
         # Switch to the reader perspective. First submit the first
@@ -330,20 +330,14 @@ class StatsIntegrationTest(BaseEditorControllerTest):
                 'state_history': exploration_dict['state_history']
             }
         )
+        # Ensure that all events get propagated.
+        self.process_and_flush_pending_tasks()
 
         # Now switch back to the editor perspective.
         self.login('editor@example.com')
 
-        # Trigger a stats update
-        job_id = (
-            stats_jobs.StatisticsPageJobManager.create_new())
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
-        self.process_and_flush_pending_tasks()
-
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
-        self.assertEqual(editor_exploration_dict['num_visits'], 1)
+        self.assertEqual(editor_exploration_dict['num_starts'], 1)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
 
         # TODO(sll): Add more checks here.

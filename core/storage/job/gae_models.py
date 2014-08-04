@@ -50,13 +50,14 @@ class JobModel(base_models.BaseModel):
 
     # The job type.
     job_type = ndb.StringProperty(indexed=True)
-    # The time at which the job was queued.
-    time_queued = ndb.FloatProperty(indexed=True)
-    # The time at which the job was started. This is never set if the job was
-    # canceled before it was started.
-    time_started = ndb.FloatProperty(indexed=True)
-    # The time at which the job was completed, failed or canceled.
-    time_finished = ndb.FloatProperty(indexed=True)
+    # The time at which the job was queued, in milliseconds since the epoch.
+    time_queued_msec = ndb.FloatProperty(indexed=True)
+    # The time at which the job was started, in milliseconds since the epoch.
+    # This is never set if the job was canceled before it was started.
+    time_started_msec = ndb.FloatProperty(indexed=True)
+    # The time at which the job was completed, failed or canceled, in
+    # milliseconds since the epoch.
+    time_finished_msec = ndb.FloatProperty(indexed=True)
     # The current status code for the job.
     status_code = ndb.StringProperty(
         indexed=True,
@@ -83,10 +84,12 @@ class JobModel(base_models.BaseModel):
     is_cancelable = ndb.ComputedProperty(can_be_canceled)
 
     @classmethod
-    def get_recent_jobs(cls, recency_secs):
-        earliest_time = time.time() - recency_secs
+    def get_recent_jobs(cls, recency_msec):
+        earliest_time_msec = (
+            utils.get_current_time_in_millisecs() - recency_msec)
         return cls.query().filter(
-            cls.time_queued > earliest_time).order(-cls.time_queued)
+            cls.time_queued_msec > earliest_time_msec
+        ).order(-cls.time_queued_msec)
 
     @classmethod
     def get_jobs(cls, job_type):
@@ -96,3 +99,46 @@ class JobModel(base_models.BaseModel):
     def get_unfinished_jobs(cls, job_type):
         return cls.query().filter(cls.job_type == job_type).filter(
             cls.is_cancelable == True)
+
+    @classmethod
+    def do_unfinished_jobs_exist(cls, job_type):
+        return bool(cls.get_unfinished_jobs(job_type).count(limit=1))
+
+
+# Allowed transitions: idle --> running --> stopping --> idle.
+CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE = 'idle'
+CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING = 'running'
+CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING = 'stopping'
+
+
+class ContinuousComputationModel(base_models.BaseModel):
+    """Class representing a continuous computation.
+
+    The id of each instance of this model is the name of the continuous
+    computation manager class.
+    """
+    # The current status code for the computation.
+    status_code = ndb.StringProperty(
+        indexed=True,
+        default=CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE,
+        choices=[
+            CONTINUOUS_COMPUTATION_STATUS_CODE_IDLE,
+            CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING,
+            CONTINUOUS_COMPUTATION_STATUS_CODE_STOPPING
+        ])
+    # The realtime layer that is currently 'active' (i.e., the one that is
+    # going to be cleared immediately after the current batch job run
+    # completes).
+    active_realtime_layer_index = ndb.IntegerProperty(
+        default=0,
+        choices=[0, 1])
+
+    # The time at which a batch job for this computation was last kicked off,
+    # in milliseconds since the epoch.
+    last_started_msec = ndb.FloatProperty(indexed=True)
+    # The time at which a batch job for this computation was last completed or
+    # failed, in milliseconds since the epoch.
+    last_finished_msec = ndb.FloatProperty(indexed=True)
+    # The time at which a halt signal was last sent to this batch job, in
+    # milliseconds since the epoch.
+    last_stopped_msec = ndb.FloatProperty(indexed=True)

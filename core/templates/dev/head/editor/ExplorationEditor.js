@@ -273,7 +273,7 @@ function ExplorationEditor(
         explorationData.save(changeList, commitMessage, function() {
           changeListService.discardAllChanges();
           $scope.initExplorationPage();
-          $scope.refreshVersionHistory();
+          $scope.$broadcast('refreshVersionHistory', {forceRefresh: true});
           $scope.isSaveInProgress = false;
         }, function() {
           $scope.isSaveInProgress = false;
@@ -365,11 +365,8 @@ function ExplorationEditor(
       $scope.saveActiveState();
       resetActiveTags();
       $scope.historyTabActive = true;
-
-      if ($scope.explorationSnapshots === null) {
-        // TODO(sll): Do this on-hover rather than on-click.
-        $scope.refreshVersionHistory();
-      }
+      // TODO(sll): Do this on-hover rather than on-click.
+      $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
     } else if (path === FEEDBACK_URL) {
       $scope.saveActiveState();
       resetActiveTags();
@@ -538,28 +535,7 @@ function ExplorationEditor(
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
-  $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
-
-  $scope.explorationSnapshots = null;
-
-  // Refreshes the displayed version history log.
-  $scope.refreshVersionHistory = function() {
-    $http.get($scope.explorationSnapshotsUrl).then(function(response) {
-      var data = response.data;
-
-      $scope.explorationSnapshots = [];
-      for (var i = 0; i < data.snapshots.length; i++) {
-        $scope.explorationSnapshots.push({
-          'committerId': data.snapshots[i].committer_id,
-          'createdOn': data.snapshots[i].created_on,
-          'commitMessage': data.snapshots[i].commit_message,
-          'versionNumber': data.snapshots[i].version_number,
-          'autoSummary': data.snapshots[i].auto_summary
-        });
-      }
-    });
-  };
 
   $scope.showEmbedExplorationModal = function() {
     warningsData.clear();

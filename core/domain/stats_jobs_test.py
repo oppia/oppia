@@ -16,17 +16,26 @@
 
 __author__ = 'Stephanie Federwisch'
 
-"""Tests for statistics MapReduce jobs."""
+"""Tests for statistics continuous computations."""
 
 from datetime import datetime
 
-from core import jobs
 from core.domain import event_services
 from core.domain import stats_jobs
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(job_models, stats_models,) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.statistics])
 from core.tests import test_utils
 import feconf
+
+
+class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
+    """A modified StatisticsAggregator that does not start a new batch
+    job when the previous one has finished.
+    """
+
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
 
 
 class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
@@ -40,17 +49,14 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
         event_services.StartExplorationEventHandler.record(
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        job_id = (
-           stats_jobs.StatisticsPageJobManager.create_new())
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id), 
-            jobs.STATUS_CODE_COMPLETED)
+
+        ModifiedStatisticsAggregator.start_computation()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
+        self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 0)
 
     def test_all_complete(self):
@@ -67,21 +73,19 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         event_services.MaybeLeaveExplorationEventHandler.record(
             exp_id, version, feconf.END_DEST, 'session2', 27, {},
             feconf.PLAY_TYPE_NORMAL)
-        job_id = stats_jobs.StatisticsPageJobManager.create_new()
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
+
+        ModifiedStatisticsAggregator.start_computation()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
         output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
+        self.assertEqual(output_model.num_starts, 2)
         self.assertEqual(output_model.num_completions, 2)
 
     def _create_leave_event(self, exp_id, version, state, session, created_on):
         leave = stats_models.MaybeLeaveExplorationEventLogEntryModel(
-            event_type=feconf.EVENT_TYPE_LEAVE,
+            event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
             exploration_id=exp_id,
             exploration_version=version,
             state_name=state,
@@ -107,15 +111,12 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
             exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
         self._create_leave_event(exp_id, version, state, 'session2', 3)
         self._create_leave_event(exp_id, version, state, 'session2', 4)
-        job_id = stats_jobs.StatisticsPageJobManager.create_new()
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-
         self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
-        self.assertEqual(output_model.num_completions, 1)
 
+        ModifiedStatisticsAggregator.start_computation()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+        self.assertEqual(output_model.num_starts, 2)
+        self.assertEqual(output_model.num_completions, 1)

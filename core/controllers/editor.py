@@ -548,7 +548,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'num_visits': stats_services.get_exploration_visit_count(
+            'num_starts': stats_services.get_exploration_start_count(
                 exploration_id),
             'num_completions': stats_services.get_exploration_completed_count(
                 exploration_id),

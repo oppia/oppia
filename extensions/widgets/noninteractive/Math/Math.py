@@ -29,12 +29,11 @@ class Math(widget_domain.BaseWidget):
         'generator': generators.Copier,
         'init_args': {
             'disallow_parse_with_jinja': True,
-            'largeInput': True,
         },
         'customization_args': {
-            'value': ''
+            'value': '\\frac{x}{y}'
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'MathLatexString',
     }]
 
     # The HTML tag name for this non-interactive widget.

@@ -210,16 +210,17 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
     def create(cls, exp_id, exp_version, state_name, session_id,
                client_time_spent_in_secs, params, play_type):
         """Creates a new leave exploration event."""
-        entity_id = cls.get_new_event_entity_id(exp_id,
-                                                session_id)
-        leave_event_entity = cls(event_type=feconf.EVENT_TYPE_LEAVE,
-                                 exploration_id=exp_id,
-                                 exploration_version=exp_version,
-                                 state_name=state_name,
-                                 session_id=session_id,
-                                 client_time_spent_in_secs=client_time_spent_in_secs,
-                                 params=params,
-                                 play_type=play_type)
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        leave_event_entity = cls(
+            event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=client_time_spent_in_secs,
+            params=params,
+            play_type=play_type)
         leave_event_entity.put()
 
 
@@ -286,14 +287,15 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         """Creates a new start exploration event."""
         entity_id = cls.get_new_event_entity_id(exp_id,
                                                 session_id)
-        start_event_entity = cls(event_type=feconf.EVENT_TYPE_START,
-                                 exploration_id=exp_id,
-                                 exploration_version=exp_version,
-                                 state_name=state_name,
-                                 session_id=session_id,
-                                 client_time_spent_in_secs=0.0,
-                                 params=params,
-                                 play_type=play_type)
+        start_event_entity = cls(
+            event_type=feconf.EVENT_TYPE_START_EXPLORATION,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            client_time_spent_in_secs=0.0,
+            params=params,
+            play_type=play_type)
         start_event_entity.put()
 
 
@@ -307,7 +309,7 @@ class ExplorationAnnotationsModel(base_models.BaseModel):
     _use_memcache = False
 
     # Number of students who started the exploration
-    num_visits = ndb.IntegerProperty(indexed=True)
+    num_starts = ndb.IntegerProperty(indexed=True)
     # Number of students who have completed the exploration
     num_completions = ndb.IntegerProperty(indexed=True)
 

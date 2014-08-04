@@ -76,7 +76,7 @@ class FeedbackThreadModel(base_models.BaseModel):
         RAND_RANGE = 127 * 127
         for i in range(MAX_RETRIES):
             thread_id = (
-                utils.base64_from_int(utils.get_epoch_time()) +
+                utils.base64_from_int(utils.get_current_time_in_millisecs()) +
                 utils.base64_from_int(utils.get_random_int(RAND_RANGE)))
             if not cls.get_by_exp_and_thread_id(exploration_id, thread_id):
                 return thread_id
