@@ -62,7 +62,7 @@ class GraphInput(widget_domain.BaseWidget):
         'generator': generators.Copier,
         'init_args': {},
         'customization_args': {
-            'value': False
+            'value': True
         },
         'obj_type': 'Boolean'
     }, {
