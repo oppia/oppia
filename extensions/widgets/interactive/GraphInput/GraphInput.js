@@ -73,6 +73,7 @@ oppia.directive('oppiaInteractiveGraphInput',[
         $scope.init = function() {
           updateGraphFromJSON($attrs.graphWithValue);
           $scope.movePermissions = ($attrs.movePermissionsWithValue=="true")?true:false;
+          $scope.vertexEditPermissions = ($attrs.vertexEditPermissionsWithValue=="true")?true:false;
           initButtons();
         };
         $scope.init();
@@ -120,8 +121,7 @@ oppia.directive('graphInputVertex', ['$document', function($document){
     // Tried replacing it with a different way, but for some reason ng-attr- stops
     // evaluating correctly. Probably should take a look again some other day
     var graph = $scope.$parent.graph;
-    var index = parseInt($attrs.index);
-    var vertex = graph.vertices[index];
+    var vertex = graph.vertices[$scope.$index];
     
     $element.on('mousedown', function(event){
       event.preventDefault();
@@ -140,17 +140,29 @@ oppia.directive('graphInputVertex', ['$document', function($document){
       //Adding a new edge
       } else if ($scope.$parent.currentMode == $scope.$parent.modes.ADD_EDGE) { 
         if ($scope.$parent.addEdgeVertex === null) {
-          $scope.$parent.addEdgeVertex = index;
+          $scope.$parent.addEdgeVertex = $scope.$index;
           $document.on('mouseup', tryAddEdge);
         }
+        $scope.$parent.$apply();
+        
+      //Deleting a vertex (and associated edges)
+      } else if ($scope.$parent.currentMode == $scope.$parent.modes.DELETE &&
+                 $scope.$parent.vertexEditPermissions) {
+        graph.edges = $.map(graph.edges,function(edge){
+          if (edge.src == $scope.$index || edge.dst == $scope.$index) return null;
+          if (edge.src > $scope.$index) edge.src--;
+          if (edge.dst > $scope.$index) edge.dst--;
+          return edge;
+        });
+        graph.vertices.splice($scope.$index,1);
         $scope.$parent.$apply();
       }
     });
 
     $($element).mouseenter(function(){
-      $scope.$parent.currentVertex = index;
+      $scope.$parent.currentVertex = $scope.$index;
     }).mouseleave(function(){
-      if ($scope.$parent.currentVertex === index) {
+      if ($scope.$parent.currentVertex === $scope.$index) {
         $scope.$parent.currentVertex = null;
       }
     });
@@ -189,5 +201,17 @@ oppia.directive('graphInputVertex', ['$document', function($document){
       $scope.$parent.$apply();
       $document.off('mouseup', tryAddEdge);
     }
+  };
+}]);
+
+oppia.directive('graphInputEdge', ['$document', function($document){
+  return function($scope,$element,$attrs) {
+    var graph = $scope.$parent.graph;
+    $element.on('click',function(event){
+      if ($scope.$parent.currentMode == $scope.$parent.modes.DELETE) {
+        graph.edges.splice($scope.$index,1);
+        $scope.$parent.$apply();
+      }
+    });
   };
 }]);
