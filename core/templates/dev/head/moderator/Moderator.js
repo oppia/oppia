@@ -18,10 +18,9 @@
 * @author yanamal@google.com (Yana Malysheva)
 */
 
-function Moderator(
-    $scope, $http, $rootScope, warningsData, oppiaRequestCreator,
-    oppiaDateFormatter) {
-
+oppia.controller('Moderator', [
+    '$scope', '$http', '$rootScope', 'oppiaRequestCreator', 'oppiaDateFormatter',
+    function($scope, $http, $rootScope, oppiaRequestCreator, oppiaDateFormatter) {
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
     $scope.lastSubmittedUsername = username;
@@ -112,11 +111,4 @@ function Moderator(
   };
 
   $scope.loadMoreFeedbackMessages();
-}
-
-/**
-* Injects dependencies in a way that is preserved by minification.
-*/
-Moderator.$inject = [
-  '$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator',
-  'oppiaDateFormatter'];
+}]);

@@ -20,12 +20,14 @@
 
 describe('Base controller', function() {
 
+  beforeEach(module('oppia'));
+
   describe('BaseCtrl', function() {
     var scope, ctrl, $httpBackend;
 
     beforeEach(inject(function($rootScope, $controller) {
       scope = $rootScope.$new();
-      ctrl = $controller(Base, {
+      ctrl = $controller('Base', {
         $scope: scope,
         warningsData: null,
         activeInputData: null,

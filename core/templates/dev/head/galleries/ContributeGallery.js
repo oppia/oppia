@@ -18,9 +18,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ContributeGallery(
-    $scope, $http, $rootScope, $filter, $modal, warningsData,
-    oppiaRequestCreator, validatorsService) {
+oppia.controller('ContributeGallery', [
+    '$scope', '$http', '$rootScope', '$filter', '$modal', 'warningsData',
+    'oppiaRequestCreator', 'validatorsService', function(
+      $scope, $http, $rootScope, $filter, $modal, warningsData,
+      oppiaRequestCreator, validatorsService) {
   $scope.contributeGalleryDataUrl = '/contributehandler/data';
   $scope.categoryList = [];
   $scope.categories = {};
@@ -172,11 +174,4 @@ function ContributeGallery(
      });
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ContributeGallery.$inject = [
-  '$scope', '$http', '$rootScope', '$filter', '$modal', 'warningsData',
-  'oppiaRequestCreator', 'validatorsService'];
+}]);

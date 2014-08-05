@@ -18,9 +18,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function InteractiveWidgetEditor(
-    $scope, $http, $modal, $log, warningsData, oppiaRequestCreator,
-    editorContextService, changeListService) {
+oppia.controller('InteractiveWidgetEditor', [
+    '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
+    'editorContextService', 'changeListService', function(
+      $scope, $http, $modal, warningsData, oppiaRequestCreator,
+      editorContextService, changeListService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -275,9 +277,4 @@ function InteractiveWidgetEditor(
       stateDict.widget.handlers[i].rule_specs = $scope.widgetHandlers[handlerName];
     }
   };
-}
-
-InteractiveWidgetEditor.$inject = [
-  '$scope', '$http', '$modal', '$log', 'warningsData', 'oppiaRequestCreator',
-  'editorContextService', 'changeListService'
-];
+}]);

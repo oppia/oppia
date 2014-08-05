@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function Admin($scope, $http) {
+oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
   $scope.configProperties = {};
@@ -226,9 +226,4 @@ function Admin($scope, $http) {
       $scope.message = 'Server error: ' + errorResponse.error;
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-Admin.$inject = ['$scope', '$http'];
+}]);

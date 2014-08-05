@@ -18,9 +18,11 @@
  * @author kashida@google.com (Koji Ashida)
  */
 
-function ExplorationFeedback($scope, $http, $modal,
-    warningsData, oppiaRequestCreator, explorationData, oppiaDateFormatter,
-    editabilityService) {
+oppia.controller('ExplorationFeedback', [
+  '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
+  'explorationData', 'oppiaDateFormatter', function(
+    $scope, $http, $modal, warningsData, oppiaRequestCreator,
+    explorationData, oppiaDateFormatter) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
@@ -175,8 +177,4 @@ function ExplorationFeedback($scope, $http, $modal,
   $scope.currentThreadMessages = null;
   $scope.updatedStatus = null;
   $scope._getThreadList();
-}
-
-ExplorationFeedback.$inject = [
-  '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
-  'explorationData', 'oppiaDateFormatter', 'editabilityService'];
+}]);

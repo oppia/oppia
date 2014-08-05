@@ -46,7 +46,7 @@ describe('Editor prerequisites controller', function() {
         }
       };
 
-      ctrl = $controller(EditorPrerequisites, {
+      ctrl = $controller('EditorPrerequisites', {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,

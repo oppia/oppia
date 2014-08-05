@@ -18,7 +18,9 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+oppia.controller('EditorPrerequisites', [
+    '$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator',
+    function($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
   $scope.editorPrerequisitesDataUrl = '/editor_prerequisites_handler/data/';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
@@ -104,9 +106,4 @@ function EditorPrerequisites($scope, $http, $rootScope, warningsData, oppiaReque
       window.location = window.decodeURIComponent($scope.getUrlParams().return_url);
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-EditorPrerequisites.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+}]);

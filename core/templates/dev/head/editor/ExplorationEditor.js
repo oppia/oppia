@@ -21,7 +21,13 @@
 // TODO(sll): Move all hardcoded strings to the top of the file.
 var END_DEST = 'END';
 
-function ExplorationEditor(
+oppia.controller('ExplorationEditor', [
+  '$scope', '$http', '$location', '$modal', '$window',
+  '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
+  'activeInputData', 'oppiaRequestCreator', 'editorContextService',
+  'changeListService', 'explorationTitleService', 'explorationCategoryService',
+  'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
+  'editabilityService', 'oppiaDateFormatter', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
     editorContextService, changeListService, explorationTitleService,
@@ -975,16 +981,4 @@ function ExplorationEditor(
       }
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ExplorationEditor.$inject = [
-  '$scope', '$http', '$location', '$modal', '$window',
-  '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
-  'activeInputData', 'oppiaRequestCreator', 'editorContextService',
-  'changeListService', 'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
-  'editabilityService', 'oppiaDateFormatter'
-];
+}]);
