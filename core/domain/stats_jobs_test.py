@@ -50,7 +50,7 @@ class ModifiedStatisticsMRJobManager(stats_jobs.StatisticsMRJobManager):
         return ModifiedStatisticsAggregator
 
 
-class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
+class StatsPageJobUnitTests(test_utils.GenericTestBase):
     """Tests for exploration annotations."""
 
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [

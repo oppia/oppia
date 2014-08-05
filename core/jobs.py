@@ -704,8 +704,8 @@ class BaseContinuousComputationManager(object):
     always coincides.
 
     Batch layer         <----->  <------->  <-------> <-------> <-------->
-    Realtime layer 0    <----->  <------------------> <------------------>
-    Realtime layer 1    <---------------->  <-----------------> <------ ...
+    Realtime layer R0   <----->  <------------------> <------------------>
+    Realtime layer R1   <---------------->  <-----------------> <------ ...
                                  <-- A -->  <-- B -->
 
     For example, queries arising during the time interval A will use the
@@ -721,7 +721,7 @@ class BaseContinuousComputationManager(object):
         """Returns a list of event types that this class subscribes to."""
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
-            '_get_event_types_listened_to(). This method should return a list '
+            'get_event_types_listened_to(). This method should return a list '
             'of strings, each representing an event type that this class '
             'subscribes to.')
 
