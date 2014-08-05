@@ -43,19 +43,6 @@ import webapp2
 from webapp2_extras.routes import RedirectRoute
 
 
-class Error404Handler(base.BaseHandler):
-    """Handles 404 errors."""
-
-    def get(self):
-        """Raises a PageNotFoundException if an invalid URL is entered.
-
-        For robots.txt requests, returns an empty response so that the error
-        does not show up in the logs.
-        """
-        if not self.request.uri.endswith('robots.txt'):
-            raise self.PageNotFoundException
-
-
 class FrontendErrorHandler(base.BaseHandler):
     """Handles errors arising from the frontend."""
 
@@ -307,13 +294,12 @@ urls = [
 
     get_redirect_route(
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
+
+    # 404 error handler.
+    get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),
 ]
 
-# 404 error handler.
-error404_handler = [webapp2.Route(r'/.*', Error404Handler)]
-
-urls = mapreduce_handlers + urls + error404_handler
-
+urls = mapreduce_handlers + urls
 
 app = transaction_services.toplevel_wrapper(
     webapp2.WSGIApplication(urls, debug=feconf.DEBUG))

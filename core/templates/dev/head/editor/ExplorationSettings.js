@@ -18,11 +18,15 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ExplorationSettings(
-    $scope, $http, $window, $modal, activeInputData, explorationData,
-    explorationTitleService, explorationCategoryService,
-    explorationObjectiveService, explorationRightsService, changeListService,
-    warningsData) {
+oppia.controller('ExplorationSettings', [
+    '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
+    'explorationTitleService', 'explorationCategoryService',
+    'explorationObjectiveService', 'explorationRightsService',
+    'changeListService', 'warningsData', function(
+      $scope, $http, $window, $modal, activeInputData, explorationData,
+      explorationTitleService, explorationCategoryService,
+      explorationObjectiveService, explorationRightsService, changeListService,
+      warningsData) {
 
   var CONTRIBUTE_GALLERY_PAGE = '/contribute';
 
@@ -161,13 +165,4 @@ function ExplorationSettings(
   $scope.unpublishExploration = function() {
     explorationRightsService.saveChangeToBackend({is_public: false});
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ExplorationSettings.$inject = [
-  '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
-  'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationRightsService',
-  'changeListService', 'warningsData'];
+}]);

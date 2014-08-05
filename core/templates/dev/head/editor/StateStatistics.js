@@ -19,9 +19,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateStatistics(
-    $scope, $log, warningsData, explorationData, editorContextService) {
-
+oppia.controller('StateStatistics', [
+    '$scope', 'explorationData', 'editorContextService',
+    function($scope, explorationData, editorContextService) {
   $scope.unresolvedAnswersList = [];
 
   $scope.initStateStatistics = function(data) {
@@ -50,7 +50,4 @@ function StateStatistics(
     explorationData.resolveAnswers($scope.stateName, [answer]);
     $scope.generateUnresolvedAnswersList();
   };
-}
-
-StateStatistics.$inject = [
-  '$scope', '$log', 'warningsData', 'explorationData', 'editorContextService'];
+}]);

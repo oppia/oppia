@@ -18,7 +18,10 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function StateEditor(
+oppia.controller('StateEditor', [
+  '$scope', '$filter', 'explorationData', 'warningsData',
+  'editorContextService', 'changeListService', 'validatorsService',
+  'focusService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
     focusService) {
@@ -145,9 +148,4 @@ function StateEditor(
         newValue, oldValue);
     }
   };
-}
-
-StateEditor.$inject = [
-  '$scope', '$filter', 'explorationData', 'warningsData',
-  'editorContextService', 'changeListService', 'validatorsService',
-  'focusService'];
+}]);

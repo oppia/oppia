@@ -5,9 +5,9 @@
   <div ng-show="!imageUploaderIsActive">
 
     <div ng-if="!filepathsLoaded">
-      <center>
-        <img src="/images/loading.gif" alt="Loading..." width="50px">
-      </center>
+      <span class="text-align: center; width: 50px;">
+        Loading...
+      </span>
     </div>
 
     <div ng-repeat="filepath in filepaths track by $index">
@@ -18,7 +18,7 @@
         <[filepath]>
       </label>
     </div>
-    <img ng-src="<[getPreviewUrl(localValue.label)]>"/>
+    <img ng-if="localValue.label" ng-src="<[getPreviewUrl(localValue.label)]>"/>
 
     <br><br>
     <button type="button" class="btn btn-default" ng-click="openImageUploader()">Upload a new image</button>

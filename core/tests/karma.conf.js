@@ -14,6 +14,11 @@ module.exports = function(config) {
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
       'third_party/static/ui-sortable-0.12.6/src/sortable.js',
+      'core/templates/dev/head/*.js',
+      // Note that unexpected errors occur ("Cannot read property 'num' of
+      // undefined" in MusicNotesInput.js) if the order of core/templates/...
+      // and extensions/widgets/... are switched. The test framework may
+      // be flaky.
       'core/templates/dev/head/**/*.js',
       'core/templates/dev/head/**/*.html',
       'extensions/widgets/interactive/**/*.js',
@@ -23,7 +28,29 @@ module.exports = function(config) {
       'core/templates/dev/head/**/*-e2e.js'
     ],
     preprocessors: {
-      'core/templates/dev/head/**/*.js': ['coverage'],
+      'core/templates/dev/head/*.js': ['coverage'],
+      // When all controllers were converted from global functions into the
+      // oppia.controller() format, the syntax 'core/templates/dev/head/*/*.js'
+      // and 'core/templates/dev/head/**/*.js' stopped working, and resulted in
+      // "Uncaught TypeError: Cannot read property '2' of undefined" for all
+      // the JS files. So we enumerate all the directories directly (which,
+      // although it should give an identical result, seems to actually cause
+      // no problems). Note that this only affects which files have coverage
+      // statistics generated for them, and that if a directory is omitted by
+      // accident, that directory will not have coverage statistics generated
+      // for it, which is easily fixed.
+      'core/templates/dev/head/admin/*.js': ['coverage'],
+      'core/templates/dev/head/components/*.js': ['coverage'],
+      'core/templates/dev/head/css/*.js': ['coverage'],
+      'core/templates/dev/head/editor/*.js': ['coverage'],
+      'core/templates/dev/head/error/*.js': ['coverage'],
+      'core/templates/dev/head/galleries/*.js': ['coverage'],
+      'core/templates/dev/head/moderator/*.js': ['coverage'],
+      'core/templates/dev/head/pages/*.js': ['coverage'],
+      'core/templates/dev/head/player/*.js': ['coverage'],
+      'core/templates/dev/head/profile/*.js': ['coverage'],
+      'core/templates/dev/head/services/*.js': ['coverage'],
+      'core/templates/dev/head/tests/*.js': ['coverage'],
       'extensions/widgets/interactive/**/*.js': ['coverage'],
       'core/templates/dev/head/**/*.html': ['ng-html2js'],
       'extensions/widgets/interactive/**/*.html': ['ng-html2js']

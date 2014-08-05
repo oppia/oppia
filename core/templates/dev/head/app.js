@@ -30,7 +30,9 @@ var oppia = angular.module(
 
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
-// Set default headers for POST requests.
+// Set default headers for POST and PUT requests.
+// Add an interceptor to convert requests to strings and to log and show
+// warnings for error responses.
 oppia.config(['$interpolateProvider', '$httpProvider',
     function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
@@ -40,6 +42,31 @@ oppia.config(['$interpolateProvider', '$httpProvider',
     'Content-Type': 'application/x-www-form-urlencoded'};
   $httpProvider.defaults.headers.put = {
     'Content-Type': 'application/x-www-form-urlencoded'};
+
+  $httpProvider.interceptors.push([
+    '$q', '$log', 'warningsData', function($q, $log, warningsData) {
+      return {
+        request: function(config) {
+          // If this request carries data (in the form of a JS object),
+          // JSON-stringify it and store it under 'payload'.
+          if (config.data) {
+            config.data = $.param({
+              csrf_token: GLOBALS.csrf_token,
+              payload: JSON.stringify(config.data),
+              source: document.URL
+            }, true);
+          }
+          return config;
+        },
+        responseError: function(response) {
+          $log.error(response.data);
+          warningsData.addWarning(
+            response.data.error || 'Error communicating with server.');
+          return $q.reject(response);
+        }
+      };
+    }
+  ]);
 }]);
 
 oppia.config(['$provide', function($provide) {
@@ -65,8 +92,7 @@ oppia.config(['$provide', function($provide) {
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', [
-    '$log', 'oppiaRequestCreator', function($log, oppiaRequestCreator) {
+oppia.factory('$exceptionHandler', ['$log', function($log) {
   return function(exception, cause) {
     var messageAndSourceAndStackTrace = [
       '',
@@ -82,9 +108,11 @@ oppia.factory('$exceptionHandler', [
       $.ajax({
         type: 'POST',
         url: '/frontend_errors',
-        data: oppiaRequestCreator.createRequest({
-          error: messageAndSourceAndStackTrace
-        }),
+        data: $.param({
+          csrf_token: GLOBALS.csrf_token,
+          payload: JSON.stringify({error: messageAndSourceAndStackTrace}),
+          source: document.URL
+        }, true),
         contentType: 'application/x-www-form-urlencoded',
         dataType: 'text',
         async: true
@@ -128,24 +156,6 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
     }
   };
   return htmlEscaper;
-}]);
-
-// Service for converting requests to a form that can be sent to the server.
-oppia.factory('oppiaRequestCreator', [function() {
-  return {
-    /**
-     * Creates a request object that can be sent to the server.
-     * @param {object} requestObj The object to be sent to the server. It will
-          be JSON-stringified and stored under 'payload'.
-     */
-    createRequest: function(requestObj) {
-      return $.param({
-        csrf_token: GLOBALS.csrf_token,
-        payload: JSON.stringify(requestObj),
-        source: document.URL
-      }, true);
-    }
-  };
 }]);
 
 // Service for converting dates in milliseconds since the Epoch to
@@ -233,10 +243,29 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
   };
 }]);
 
-// IE8 does not support trim(), so we have to add it manually. See
-//   http://stackoverflow.com/questions/2308134/trim-in-javascript-not-working-in-ie
+// Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {
     return this.replace(/^\s+|\s+$/g, '');
   };
+}
+
+// Add an Object.create() polyfill for IE8.
+if (typeof Object.create !== 'function') {
+  (function() {
+    var F = function() {};
+    Object.create = function(o) {
+      if (arguments.length > 1) {
+        throw Error('Second argument for Object.create() is not supported');
+      }
+      if (o === null) {
+        throw Error('Cannot set a null [[Prototype]]');
+      }
+      if (typeof o !== 'object') {
+        throw TypeError('Argument must be an object');
+      }
+      F.prototype = o;
+      return new F();
+    };
+  })();
 }

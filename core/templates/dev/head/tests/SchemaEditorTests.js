@@ -18,7 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function SchemaEditorTests($scope, parameterSpecsService) {
+oppia.controller('SchemaEditorTests', [
+    '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramBool1', 'bool');
   parameterSpecsService.addParamSpec('paramBool2', 'bool');
   parameterSpecsService.addParamSpec('paramInt1', 'int');
@@ -214,9 +215,4 @@ function SchemaEditorTests($scope, parameterSpecsService) {
     name: 'Composite editors',
     forms: $scope.compositeForms
   }];
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-SchemaEditorTests.$inject = ['$scope', 'parameterSpecsService'];
+}]);

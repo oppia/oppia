@@ -18,9 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ContributeGallery(
-    $scope, $http, $rootScope, $filter, $modal, warningsData,
-    oppiaRequestCreator, validatorsService) {
+oppia.controller('ContributeGallery', [
+    '$scope', '$http', '$rootScope', '$filter', '$modal', 'warningsData', 'validatorsService',
+    function($scope, $http, $rootScope, $filter, $modal, warningsData, validatorsService) {
   $scope.contributeGalleryDataUrl = '/contributehandler/data';
   $scope.categoryList = [];
   $scope.categories = {};
@@ -37,8 +37,6 @@ function ContributeGallery(
     }
 
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
 
   $scope._getCreateModalInstance = function(categoryList, isUploadModal) {
@@ -118,14 +116,11 @@ function ContributeGallery(
       }
 
       $rootScope.loadingMessage = 'Creating exploration';
-      $http.post(
-        '/contributehandler/create_new',
-        oppiaRequestCreator.createRequest({title: title, category: category})
-      ).success(function(data) {
+      $http.post('/contributehandler/create_new', {
+        title: title, category: category
+      }).success(function(data) {
         window.location = '/create/' + data.explorationId;
       }).error(function(data) {
-        warningsData.addWarning(data.error ? data.error :
-          'Error: Could not add new exploration.');
         $rootScope.loadingMessage = '';
       });
     });
@@ -176,11 +171,4 @@ function ContributeGallery(
      });
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ContributeGallery.$inject = [
-  '$scope', '$http', '$rootScope', '$filter', '$modal', 'warningsData',
-  'oppiaRequestCreator', 'validatorsService'];
+}]);

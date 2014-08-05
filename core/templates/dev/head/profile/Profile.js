@@ -18,7 +18,8 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-function Profile($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+oppia.controller('Profile', ['$scope', '$http', '$rootScope', function(
+    $scope, $http, $rootScope) {
   var EXPLORATION_STATUS_PRIVATE = 'private';
   $scope.profileDataUrl = '/profilehandler/data/';
   $rootScope.loadingMessage = 'Loading';
@@ -51,12 +52,5 @@ function Profile($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
     $scope.viewableExplorations = data.viewable;
 
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-Profile.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+}]);

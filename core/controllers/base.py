@@ -313,12 +313,8 @@ class BaseHandler(webapp2.RequestHandler):
             self.render_json(values)
         else:
             self.values.update(values)
-            if error_code == 404:
-                self.render_template(
-                    'error/error_404.html', iframe_restriction=None)
-            else:
-                self.render_template(
-                    'error/error.html', iframe_restriction=None)
+            self.render_template(
+                'error/error.html', iframe_restriction=None)
 
     def handle_exception(self, exception, debug_mode):
         """Overwrites the default exception handler."""
@@ -328,7 +324,8 @@ class BaseHandler(webapp2.RequestHandler):
         if isinstance(exception, self.PageNotFoundException):
             logging.error('Invalid URL requested: %s', self.request.uri)
             self.error(404)
-            self._render_exception(404, {'error': 'Page not found.'})
+            self._render_exception(404, {
+                'error': 'Could not find the page %s.' % self.request.uri})
             return
 
         if isinstance(exception, self.NotLoggedInException):
@@ -368,6 +365,12 @@ class BaseHandler(webapp2.RequestHandler):
 
     class InternalErrorException(Exception):
         """Error class for an internal server side error (error code 500)."""
+
+
+class Error404Handler(BaseHandler):
+    """Handles 404 errors."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
 
 
 class CsrfTokenManager(object):

@@ -19,6 +19,7 @@
  */
 
 describe('Gallery controller', function() {
+  beforeEach(module('oppia'));
 
   describe('ContributeGallery', function() {
     var scope, ctrl, $httpBackend;
@@ -64,10 +65,9 @@ describe('Gallery controller', function() {
         }
       });
       scope = $rootScope.$new();
-      ctrl = $controller(ContributeGallery, {
+      ctrl = $controller('ContributeGallery', {
         $scope: scope,
         warningsData: null,
-        oppiaRequestCreator: null,
         validatorsService: null
       });
     }));
