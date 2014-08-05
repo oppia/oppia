@@ -31,7 +31,8 @@ var oppia = angular.module(
 // Set the AngularJS interpolators as <[ and ]>, to not conflict with Jinja2
 // templates.
 // Set default headers for POST and PUT requests.
-// Add an interceptor to log and show warnings for error responses.
+// Add an interceptor to convert requests to strings and to log and show
+// warnings for error responses.
 oppia.config(['$interpolateProvider', '$httpProvider',
     function($interpolateProvider, $httpProvider) {
   $interpolateProvider.startSymbol('<[');
@@ -45,6 +46,18 @@ oppia.config(['$interpolateProvider', '$httpProvider',
   $httpProvider.interceptors.push([
     '$q', '$log', 'warningsData', function($q, $log, warningsData) {
       return {
+        request: function(config) {
+          // If this request carries data (in the form of a JS object),
+          // JSON-stringify it and store it under 'payload'.
+          if (config.data) {
+            config.data = $.param({
+              csrf_token: GLOBALS.csrf_token,
+              payload: JSON.stringify(config.data),
+              source: document.URL
+            }, true);
+          }
+          return config;
+        },
         responseError: function(response) {
           $log.error(response.data);
           warningsData.addWarning(
@@ -79,8 +92,7 @@ oppia.config(['$provide', function($provide) {
 
 // Overwrite the built-in exceptionHandler service to log errors to the backend
 // (so that they can be fixed).
-oppia.factory('$exceptionHandler', [
-    '$log', 'oppiaRequestCreator', function($log, oppiaRequestCreator) {
+oppia.factory('$exceptionHandler', ['$log', function($log) {
   return function(exception, cause) {
     var messageAndSourceAndStackTrace = [
       '',
@@ -96,9 +108,11 @@ oppia.factory('$exceptionHandler', [
       $.ajax({
         type: 'POST',
         url: '/frontend_errors',
-        data: oppiaRequestCreator.createRequest({
-          error: messageAndSourceAndStackTrace
-        }),
+        data: $.param({
+          csrf_token: GLOBALS.csrf_token,
+          payload: JSON.stringify({error: messageAndSourceAndStackTrace}),
+          source: document.URL
+        }, true),
         contentType: 'application/x-www-form-urlencoded',
         dataType: 'text',
         async: true
@@ -142,24 +156,6 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
     }
   };
   return htmlEscaper;
-}]);
-
-// Service for converting requests to a form that can be sent to the server.
-oppia.factory('oppiaRequestCreator', [function() {
-  return {
-    /**
-     * Creates a request object that can be sent to the server.
-     * @param {object} requestObj The object to be sent to the server. It will
-          be JSON-stringified and stored under 'payload'.
-     */
-    createRequest: function(requestObj) {
-      return $.param({
-        csrf_token: GLOBALS.csrf_token,
-        payload: JSON.stringify(requestObj),
-        source: document.URL
-      }, true);
-    }
-  };
 }]);
 
 // Service for converting dates in milliseconds since the Epoch to

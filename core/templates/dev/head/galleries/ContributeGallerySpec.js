@@ -68,7 +68,6 @@ describe('Gallery controller', function() {
       ctrl = $controller('ContributeGallery', {
         $scope: scope,
         warningsData: null,
-        oppiaRequestCreator: null,
         validatorsService: null
       });
     }));

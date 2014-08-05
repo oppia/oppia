@@ -19,16 +19,13 @@
 */
 
 oppia.controller('Moderator', [
-    '$scope', '$http', '$rootScope', 'oppiaRequestCreator', 'oppiaDateFormatter',
-    function($scope, $http, $rootScope, oppiaRequestCreator, oppiaDateFormatter) {
+    '$scope', '$http', '$rootScope', 'oppiaDateFormatter',
+    function($scope, $http, $rootScope, oppiaDateFormatter) {
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
     $scope.lastSubmittedUsername = username;
     $http.post(
-      '/moderatorhandler/user_services',
-      oppiaRequestCreator.createRequest({
-        username: username
-      })
+      '/moderatorhandler/user_services', {username: username}
     ).success(function(data) {
       $scope.userEmail = data.user_email;
     });

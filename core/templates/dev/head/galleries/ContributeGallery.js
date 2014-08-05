@@ -19,10 +19,8 @@
  */
 
 oppia.controller('ContributeGallery', [
-    '$scope', '$http', '$rootScope', '$filter', '$modal', 'warningsData',
-    'oppiaRequestCreator', 'validatorsService', function(
-      $scope, $http, $rootScope, $filter, $modal, warningsData,
-      oppiaRequestCreator, validatorsService) {
+    '$scope', '$http', '$rootScope', '$filter', '$modal', 'warningsData', 'validatorsService',
+    function($scope, $http, $rootScope, $filter, $modal, warningsData, validatorsService) {
   $scope.contributeGalleryDataUrl = '/contributehandler/data';
   $scope.categoryList = [];
   $scope.categories = {};
@@ -118,10 +116,9 @@ oppia.controller('ContributeGallery', [
       }
 
       $rootScope.loadingMessage = 'Creating exploration';
-      $http.post(
-        '/contributehandler/create_new',
-        oppiaRequestCreator.createRequest({title: title, category: category})
-      ).success(function(data) {
+      $http.post('/contributehandler/create_new', {
+        title: title, category: category
+      }).success(function(data) {
         window.location = '/create/' + data.explorationId;
       }).error(function(data) {
         $rootScope.loadingMessage = '';

@@ -19,8 +19,8 @@
  */
 
 oppia.controller('EditorPrerequisites', [
-    '$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator',
-    function($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+    '$scope', '$http', '$rootScope', 'warningsData',
+    function($scope, $http, $rootScope, warningsData) {
   $scope.editorPrerequisitesDataUrl = '/editor_prerequisites_handler/data/';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
@@ -46,12 +46,9 @@ oppia.controller('EditorPrerequisites', [
     $scope.blurredAtLeastOnce = true;
     $scope.updateWarningText(username);
     if (!$scope.warningText) {
-      $http.post(
-        'usernamehandler/data',
-        oppiaRequestCreator.createRequest({
-          username: $scope.username
-        })
-      ).success(function(data) {
+      $http.post('usernamehandler/data', {
+        username: $scope.username
+      }).success(function(data) {
         if (data.username_is_taken) {
           $scope.warningText = 'Sorry, this username is already taken.'
         }
@@ -99,10 +96,7 @@ oppia.controller('EditorPrerequisites', [
       requestParams.username = username;
     }
 
-    $http.post(
-      '/editor_prerequisites_handler/data',
-      oppiaRequestCreator.createRequest(requestParams)
-    ).success(function(data) {
+    $http.post('/editor_prerequisites_handler/data', requestParams).success(function(data) {
       window.location = window.decodeURIComponent($scope.getUrlParams().return_url);
     });
   };

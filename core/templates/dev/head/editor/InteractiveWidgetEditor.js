@@ -19,10 +19,8 @@
  */
 
 oppia.controller('InteractiveWidgetEditor', [
-    '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
-    'editorContextService', 'changeListService', function(
-      $scope, $http, $modal, warningsData, oppiaRequestCreator,
-      editorContextService, changeListService) {
+    '$scope', '$http', '$modal', 'warningsData', 'editorContextService', 'changeListService',
+    function($scope, $http, $modal, warningsData, editorContextService, changeListService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -34,10 +32,9 @@ oppia.controller('InteractiveWidgetEditor', [
   $scope.adjustPageHeight = function(scroll) {};
 
   $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
-    $http.post(
-      '/widgets/interactive/' + widgetId,
-      oppiaRequestCreator.createRequest({customization_args: customizationArgs})
-    ).success(function(data) {
+    $http.post('/widgets/interactive/' + widgetId, {
+      customization_args: customizationArgs
+    }).success(function(data) {
       $scope.widgetHandlerSpecs = data.widget.handlers;
 
       $scope.widgetId = data.widget.widget_id;
@@ -170,12 +167,9 @@ oppia.controller('InteractiveWidgetEditor', [
 
   $scope.generateTmpWidgetPreview = function() {
     $scope.tmpWidget.tag = 'Loading...';
-    $http.post(
-      '/widgets/interactive/' + $scope.tmpWidget.widget_id,
-      oppiaRequestCreator.createRequest({
-        customization_args: $scope.tmpWidget.customization_args
-      })
-    ).success(function(data) {
+    $http.post('/widgets/interactive/' + $scope.tmpWidget.widget_id, {
+      customization_args: $scope.tmpWidget.customization_args
+    }).success(function(data) {
       $scope.tmpWidget.tag = data.widget.tag;
     });
   };

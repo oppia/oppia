@@ -50,8 +50,7 @@ describe('Editor prerequisites controller', function() {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,
-        warningsData: mockWarningsData,
-        oppiaRequestCreator: null
+        warningsData: mockWarningsData
       });
     }));
 

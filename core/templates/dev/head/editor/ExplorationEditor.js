@@ -22,14 +22,14 @@
 var END_DEST = 'END';
 
 oppia.controller('ExplorationEditor', [
-  '$scope', '$http', '$location', '$modal', '$window',
-  '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
-  'activeInputData', 'oppiaRequestCreator', 'editorContextService',
-  'changeListService', 'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
-  'editabilityService', 'oppiaDateFormatter', function(
+  '$scope', '$http', '$location', '$modal', '$window', '$filter', '$rootScope',
+  '$log', 'explorationData', 'warningsData', 'activeInputData',
+  'editorContextService', 'changeListService', 'explorationTitleService',
+  'explorationCategoryService', 'explorationObjectiveService',
+  'explorationRightsService', 'validatorsService', 'editabilityService',
+  'oppiaDateFormatter', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
-    $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
+    $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
     explorationRightsService, validatorsService, editabilityService,
@@ -114,13 +114,10 @@ oppia.controller('ExplorationEditor', [
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
-    $http.post(
-      $scope.changeListSummaryUrl,
-      oppiaRequestCreator.createRequest({
-        change_list: changeListService.getChangeList(),
-        version: explorationData.data.version
-      })
-    ).success(function(data) {
+    $http.post($scope.changeListSummaryUrl, {
+      change_list: changeListService.getChangeList(),
+      version: explorationData.data.version
+    }).success(function(data) {
       if (data.error) {
         warningsData.addWarning(data.error);
         return;
@@ -592,13 +589,10 @@ oppia.controller('ExplorationEditor', [
         }
       ]
     }).result.then(function(version) {
-      $http.post(
-        $scope.revertExplorationUrl,
-        oppiaRequestCreator.createRequest({
-          current_version: explorationData.data.version,
-          revert_to_version: version
-        })
-      ).success(function(response) {
+      $http.post($scope.revertExplorationUrl, {
+        current_version: explorationData.data.version,
+        revert_to_version: version
+      }).success(function(response) {
         location.reload();
       });
     });
@@ -811,12 +805,7 @@ oppia.controller('ExplorationEditor', [
     warningsData.clear();
 
     $scope.newStateTemplateUrl = '/createhandler/new_state_template/' + $scope.explorationId;
-    $http.post(
-      $scope.newStateTemplateUrl,
-      oppiaRequestCreator.createRequest({
-        state_name: newStateName
-      })
-    ).success(function(data) {
+    $http.post($scope.newStateTemplateUrl, {state_name: newStateName}).success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
       changeListService.addState(newStateName);

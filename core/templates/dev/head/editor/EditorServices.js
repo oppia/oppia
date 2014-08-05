@@ -20,8 +20,8 @@
 
 // Service for handling all interactions with the exploration editor backend.
 oppia.factory('explorationData', [
-  '$http', '$log', 'warningsData', '$q', 'oppiaRequestCreator',
-  function($http, $log, warningsData, $q, oppiaRequestCreator) {
+  '$http', '$log', 'warningsData', '$q',
+  function($http, $log, warningsData, $q) {
     // The pathname (without the hash) should be: .../create/{exploration_id}
     var explorationId = '';
     var pathnameArray = window.location.pathname.split('/');
@@ -79,14 +79,11 @@ oppia.factory('explorationData', [
        */
       save: function(
           explorationChangeList, commitMessage, successCallback, errorCallback) {
-        $http.put(
-          explorationDataUrl,
-          oppiaRequestCreator.createRequest({
-            change_list: explorationChangeList,
-            commit_message: commitMessage,
-            version: explorationData.data.version,
-          })
-        ).success(function(data) {
+        $http.put(explorationDataUrl, {
+          change_list: explorationChangeList,
+          commit_message: commitMessage,
+          version: explorationData.data.version,
+        }).success(function(data) {
           warningsData.clear();
           $log.info('Changes to this exploration were saved successfully.');
           explorationData.data = data;
@@ -102,12 +99,9 @@ oppia.factory('explorationData', [
 
       resolveAnswers: function(stateName, resolvedAnswersList) {
         warningsData.clear();
-        $http.put(
-          resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName),
-          oppiaRequestCreator.createRequest({
-            resolved_answers: resolvedAnswersList
-          })
-        );
+        $http.put(resolvedAnswersUrlPrefix + '/' + encodeURIComponent(stateName), {
+          resolved_answers: resolvedAnswersList
+        });
       }
     };
 
@@ -430,8 +424,8 @@ oppia.factory('explorationObjectiveService', [
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
-    '$http', 'explorationData', 'oppiaRequestCreator', 'warningsData',
-    function($http, explorationData, oppiaRequestCreator, warningsData) {
+    '$http', 'explorationData', 'warningsData',
+    function($http, explorationData, warningsData) {
   return {
     init: function(
         ownerNames, editorNames, viewerNames, status, clonedFrom,
@@ -468,10 +462,7 @@ oppia.factory('explorationRightsService', [
 
       requestParameters.version = explorationData.data.version;
       var explorationRightsUrl = '/createhandler/rights/' + explorationData.explorationId;
-      $http.put(
-        explorationRightsUrl,
-        oppiaRequestCreator.createRequest(requestParameters)
-      ).success(function(data) {
+      $http.put(explorationRightsUrl, requestParameters).success(function(data) {
         warningsData.clear();
         that.init(
           data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,

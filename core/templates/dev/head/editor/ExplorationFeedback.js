@@ -19,10 +19,8 @@
  */
 
 oppia.controller('ExplorationFeedback', [
-  '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
-  'explorationData', 'oppiaDateFormatter', function(
-    $scope, $http, $modal, warningsData, oppiaRequestCreator,
-    explorationData, oppiaDateFormatter) {
+    '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaDateFormatter',
+    function($scope, $http, $modal, warningsData, explorationData, oppiaDateFormatter) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
@@ -48,14 +46,11 @@ oppia.controller('ExplorationFeedback', [
   };
 
   $scope._createThread = function(newThreadSubject, newThreadText) {
-    $http.post(
-      THREAD_LIST_HANDLER_URL,
-      oppiaRequestCreator.createRequest({
-        state_name: null,
-        subject: newThreadSubject,
-        text: newThreadText,
-      })
-    ).success(function() {
+    $http.post(THREAD_LIST_HANDLER_URL, {
+      state_name: null,
+      subject: newThreadSubject,
+      text: newThreadText
+    }).success(function() {
       $scope._getThreadList();
       $scope.setCurrentThread(null);
       $scope.$parent.refreshFeedbackTabHeader();
@@ -133,16 +128,12 @@ oppia.controller('ExplorationFeedback', [
       return;
     }
     $scope.messageSendingInProgress = true;
-    $http.post(
-      THREAD_HANDLER_PREFIX + threadId,
-      oppiaRequestCreator.createRequest({
-        updated_status: (
-          updatedStatus !== $scope.currentThreadData.status ?
-          updatedStatus : null),
-        updated_subject: null,
-        text: newMessageText,
-      })
-    ).success(function() {
+    $http.post(THREAD_HANDLER_PREFIX + threadId, {
+      updated_status: (
+        updatedStatus !== $scope.currentThreadData.status ? updatedStatus : null),
+      updated_subject: null,
+      text: newMessageText
+    }).success(function() {
       $scope.currentThreadData.status = updatedStatus;
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
