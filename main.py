@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main package for URL routing and the index page."""
+"""URL routing definitions, and some basic error/warmup handlers."""
 
 __author__ = 'Sean Lip'
 
@@ -21,10 +21,10 @@ import logging
 
 from core.controllers import admin
 from core.controllers import base
-from core.controllers import dashboard
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
+from core.controllers import home
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
@@ -153,15 +153,12 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
+    webapp2.Route(
+        r'%s' % feconf.HOMEPAGE_URL, home.HomePage, 'home_page'),
     get_redirect_route(
-        r'%s' % feconf.DASHBOARD_URL, dashboard.DashboardPage,
-        'dashboard_page'),
-    get_redirect_route(
-        r'/dashboardhandler/data', dashboard.DashboardHandler,
+        r'/dashboardhandler/data', home.DashboardHandler,
         'dashboard_handler'),
 
-    webapp2.Route(
-        r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
         r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),

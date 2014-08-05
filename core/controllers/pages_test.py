@@ -20,42 +20,6 @@ from core.tests import test_utils
 import feconf
 
 
-class SplashPageTest(test_utils.GenericTestBase):
-
-    def test_splash_page(self):
-        """Test the main splash page."""
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Bite-sized learning journeys',
-            'Browse the explorations gallery', '100% free!',
-            'Learn', 'About', 'Contact',
-            # No navbar tabs should be highlighted.
-            no=['class="active"'])
-
-    def test_login_and_logout_on_splash_page(self):
-        """Test that the splash page redirects to the dashboard on login."""
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Login', 'Create an Oppia account', 'Contribute',
-            self.get_expected_login_url('/'),
-            no=['Profile', 'Logout', 'Create an exploration',
-                self.get_expected_logout_url('/')])
-
-        self.login('reader@example.com')
-
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Contribute', 'Profile', 'Logout', 'Create an exploration',
-            self.get_expected_logout_url('/'),
-            no=['Login', 'Create an Oppia account',
-                self.get_expected_login_url('/')])
-
-        self.logout()
-
-
 class NoninteractivePagesTest(test_utils.GenericTestBase):
 
     def test_about_page(self):
