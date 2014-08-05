@@ -170,6 +170,12 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           return editorContextService.getActiveStateName();
         };
 
+        $scope.getCssClassForSortHandle = function() {
+          return 'oppia-rule-sort-handle ' +
+            ($scope.isRuleConfusing() ? 'oppia-rule-sort-handle-warning'
+                                      : 'oppia-rule-sort-handle-no-warning');
+        };
+
         $scope.getCssClassForRule = function() {
           var ruleClass = (
             $scope.isRuleConfusing() ? 'oppia-rule-bubble-warning'

@@ -762,7 +762,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 
 .oppia-rule-sort-handle {
-  background-color: #F7E49B;
   border-bottom-left-radius: 8px;
   border-top-left-radius: 8px;
   height: 34px;
@@ -770,6 +769,12 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   position: absolute;
   top: 0px;
   width: 25px;
+}
+.oppia-rule-sort-handle-warning {
+  background-color: #F7E49B;
+}
+.oppia-rule-sort-handle-no-warning {
+  background-color: #2E5A93;
 }
 
 .oppia-rule-bubble {

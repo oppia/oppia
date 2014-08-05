@@ -1,7 +1,7 @@
 <div>
   <div ng-if="activeEditor !== 'ruleDescription'" ng-class="getCssClassForRule()" class="oppia-rule-header-bubble">
     <span ng-if="!isDefaultRule() && isEditable" class="pull-left">
-      <div class="oppia-rule-sort-handle">
+      <div ng-class="getCssClassForSortHandle()">
         <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
       </div>
     </span>
