@@ -292,12 +292,15 @@ download_and_unzip_files(
 # MathJax is too big. Remove many unneeded files by following these
 # instructions:
 #   https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
-print 'Removing unnecessary MathJax folders'
-shutil.rmtree(os.path.join(
-    THIRD_PARTY_STATIC_DIR, MATHJAX_TARGET_ROOT_NAME, 'unpacked'))
-shutil.rmtree(os.path.join(
-    THIRD_PARTY_STATIC_DIR, MATHJAX_TARGET_ROOT_NAME,
-    'fonts', 'HTML-CSS', 'TeX', 'png'))
+MATHJAX_DIR_PREFIX = os.path.join(
+    THIRD_PARTY_STATIC_DIR, MATHJAX_TARGET_ROOT_NAME)
+MATHJAX_SUBDIRS_TO_REMOVE = [
+    'unpacked', os.path.join('fonts', 'HTML-CSS', 'TeX', 'png')]
+for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
+    full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
+    if os.path.isdir(full_dir):
+        print 'Removing unnecessary MathJax directory \'%s\'' % subdir
+        shutil.rmtree(full_dir)
 
 
 # Download all the backend (Python) library zip files.
