@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main package for URL routing and the index page."""
+"""URL routing definitions, and some basic error/warmup handlers."""
 
 __author__ = 'Sean Lip'
 
@@ -25,6 +25,7 @@ from core.controllers import base
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
+from core.controllers import home
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
@@ -142,7 +143,11 @@ urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
     webapp2.Route(
-        r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),
+        r'%s' % feconf.HOMEPAGE_URL, home.HomePage, 'home_page'),
+    get_redirect_route(
+        r'/dashboardhandler/data', home.DashboardHandler,
+        'dashboard_handler'),
+
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
         r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),

@@ -68,7 +68,10 @@ describe('Gallery controller', function() {
       ctrl = $controller('ContributeGallery', {
         $scope: scope,
         warningsData: null,
-        validatorsService: null
+        createExplorationButtonService: {
+          showCreateExplorationModal: null,
+          showUploadExplorationModal: null
+        }
       });
     }));
 
