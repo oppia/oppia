@@ -65,8 +65,6 @@ sys.path.insert(0, root_dir)
 
 import feconf
 
-EXPECTED_TEST_COUNT = 320
-
 _PARSER = argparse.ArgumentParser()
 _PARSER.add_argument(
     '--test_target',
@@ -199,12 +197,6 @@ def main():
 
     if tests_run == 0:
         raise Exception('No tests were run.')
-
-    if (parsed_args.test_path is None and parsed_args.test_target is None
-            and not parsed_args.omit_slow_tests
-            and tests_run != EXPECTED_TEST_COUNT):
-        raise Exception('Expected %s tests to be run, not %s.' %
-                        (EXPECTED_TEST_COUNT, tests_run))
 
 
 if __name__ == '__main__':
