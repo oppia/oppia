@@ -20,7 +20,7 @@
  * followed by the name of the arg.
  */
 
-oppia.directive('oppiaInteractiveGraphInput',[
+oppia.directive('oppiaInteractiveGraphInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
       restrict: 'E',
@@ -28,33 +28,55 @@ oppia.directive('oppiaInteractiveGraphInput',[
       templateUrl: 'interactiveWidget/GraphInput',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         $scope.errorMessage = '';
-        $scope.graph = {'vertices':[], 'edges':[], 'isDirected':[], 'isWeighted':[], 'isLabeled':[]};
+        $scope.graph = {'vertices': [], 'edges': [], 'isDirected': [], 'isWeighted': [], 'isLabeled': []};
 
-        var testGraph = {"vertices":[{"x":50,"y":50},{"x":100,"y":50},{"x":50,"y":100}],"edges":[{"src":0,"dst":1},{"src":0,"dst":2}]}
-
+        var testGraph = {
+          "vertices":  [
+            {"x": 50, "y": 50},
+            {"x": 100, "y": 50},
+            {"x": 50, "y": 100}
+          ],
+          "edges":  [
+            {"src": 0, "dst": 1}, 
+            {"src": 0, "dst": 2}
+          ]
+        };
+        
         $scope.modes = {
           SELECT: 0,
           ADD_EDGE: 1,
           ADD_VERTEX: 2,
           DELETE: 3
         };
-        $scope.currentMode = $scope.modes.SELECT;
 
-        //Current vertex being hovered over
-        $scope.currentVertex = null;
-        //If in add edge mode, contains the currently selected vertex, if there is one
-        $scope.addEdgeVertex = null;
+        //The current state of the UI and stuff like that
+        $scope.state = {
+          modes: $scope.modes,
+          currentMode: $scope.modes.SELECT,
+          //Vertex currently being hovered over
+          hoverVertex: null,
+          //If in ADD_EDGE mode, source vertex of the new edge, if it exists
+          addEdgeVertex: null,
+          //Currently dragged vertex
+          dragVertex: null,
+          //Mouse position in SVG coordinates
+          mouseX: 0,
+          mouseY: 0,
+          vertexEditPermissions: true,
+          movePermissions: true
+        };
 
-        //Mouse positions in svg coordinates
-        $scope.mouseX = 0;
-        $scope.mouseY = 0;
+        //TODO(czxcjx): Find better way of getting offset()
         var vizContainer = $($element).find(".oppia-graph-svg");
-        vizContainer.on('mousemove', function(event) {
-          $scope.mouseX = event.pageX-vizContainer.offset().left;
-          $scope.mouseY = event.pageY-vizContainer.offset().top;
-          $scope.$apply();
-        });
-        
+        $scope.mousemoveGraphSVG = function(event) {
+          $scope.state.mouseX = event.pageX - vizContainer.offset().left;
+          $scope.state.mouseY = event.pageY - vizContainer.offset().top;
+          if ($scope.state.dragVertex !== null) {
+            $scope.graph.vertices[$scope.state.dragVertex].x = $scope.state.mouseX;
+            $scope.graph.vertices[$scope.state.dragVertex].y = $scope.state.mouseY;
+          }
+        };
+                
         //Updates graph using json in input field
         $scope.updateGraphFromInput = function() {
           updateGraphFromJSON($($element).find('.json-graph-input').val());
@@ -72,8 +94,8 @@ oppia.directive('oppiaInteractiveGraphInput',[
         
         $scope.init = function() {
           updateGraphFromJSON($attrs.graphWithValue);
-          $scope.movePermissions = ($attrs.movePermissionsWithValue=="true")?true:false;
-          $scope.vertexEditPermissions = ($attrs.vertexEditPermissionsWithValue=="true")?true:false;
+          $scope.state.movePermissions = ($attrs.movePermissionsWithValue == "true") ? true : false;
+          $scope.state.vertexEditPermissions = ($attrs.vertexEditPermissionsWithValue == "true") ? true : false;
           initButtons();
         };
         $scope.init();
@@ -93,125 +115,79 @@ oppia.directive('oppiaInteractiveGraphInput',[
         }
 
         function initButtons() {
-          $scope.buttons = [$scope.modes.SELECT,$scope.modes.ADD_EDGE];
+          $scope.buttons = [$scope.modes.SELECT, $scope.modes.ADD_EDGE];
           //Hmm, is it supposed to be a string?
-          if ($attrs.vertexEditPermissionsWithValue=="true") {
+          if ($attrs.vertexEditPermissionsWithValue == "true") {
             $scope.buttons.push($scope.modes.ADD_VERTEX);
           }
           $scope.buttons.push($scope.modes.DELETE);
         }
         $scope.setMode = function(mode) {
-          $scope.currentMode = mode;
-          $scope.addEdgeVertex = null;
+          $scope.state.currentMode = mode;
+          $scope.state.addEdgeVertex = null;
         };
       }]
     };
   }
 ]);
 
-oppia.directive('graphInputVertex', ['$document', function($document){
-  return function($scope,$element,$attrs) {
-    //Starting event.pageX and event.pageY coordinates for mousemove
-    var startX = 0;
-    var startY = 0;
-    //Starting cx and cy coordinates for svg element
-    var startCX = 0;
-    var startCY = 0;
-    //TODO(czxcjx): Figure out a better way to pass the parent scope to the vertex
-    // Tried replacing it with a different way, but for some reason ng-attr- stops
-    // evaluating correctly. Probably should take a look again some other day
-    var graph = $scope.$parent.graph;
-    var vertex = graph.vertices[$scope.$index];
-    
-    $element.on('mousedown', function(event){
-      event.preventDefault();
-
-      //Dragging a vertex around
-      if ($scope.$parent.currentMode == $scope.$parent.modes.SELECT &&
-          $scope.$parent.movePermissions) {
-        startX = event.pageX;
-        startY = event.pageY;
-        startCX = parseInt($attrs.cx);
-        startCY = parseInt($attrs.cy);
-
-        $document.on('mousemove', dragMouseMove);
-        $document.on('mouseup', dragMouseUp);
-
-      //Adding a new edge
-      } else if ($scope.$parent.currentMode == $scope.$parent.modes.ADD_EDGE) { 
-        if ($scope.$parent.addEdgeVertex === null) {
-          $scope.$parent.addEdgeVertex = $scope.$index;
-          $document.on('mouseup', tryAddEdge);
-        }
-        $scope.$parent.$apply();
-        
-      //Deleting a vertex (and associated edges)
-      } else if ($scope.$parent.currentMode == $scope.$parent.modes.DELETE &&
-                 $scope.$parent.vertexEditPermissions) {
-        graph.edges = $.map(graph.edges,function(edge){
+oppia.directive('graphInputVertex', ['$document', function($document) {
+  return function($scope, $element, $attrs) {
+    $scope.clickGraphVertex = function(graph, state) {
+      if (state.currentMode == state.modes.DELETE && state.vertexEditPermissions) {
+        graph.edges = $.map(graph.edges, function(edge) {
           if (edge.src == $scope.$index || edge.dst == $scope.$index) return null;
           if (edge.src > $scope.$index) edge.src--;
           if (edge.dst > $scope.$index) edge.dst--;
           return edge;
         });
-        graph.vertices.splice($scope.$index,1);
-        $scope.$parent.$apply();
+        graph.vertices.splice($scope.$index, 1);
       }
-    });
+    };
 
-    $($element).mouseenter(function(){
-      $scope.$parent.currentVertex = $scope.$index;
-    }).mouseleave(function(){
-      if ($scope.$parent.currentVertex === $scope.$index) {
-        $scope.$parent.currentVertex = null;
+    $scope.mousedownGraphVertex = function(graph, state) {
+      if (state.currentMode == state.modes.ADD_EDGE) {
+        state.addEdgeVertex = $scope.$index;
+        $document.on("mouseup", clearAddEdgeVertex);
+        function clearAddEdgeVertex() {
+          if (state.hoverVertex !== null) {
+            state.addEdgeVertex = null;
+          }
+          $document.off("mouseup", clearAddEdgeVertex);
+        }
+      } else if (state.currentMode == state.modes.SELECT && state.movePermissions) {
+        state.dragVertex = $scope.$index;
       }
-    });
+    };
 
-    //TODO(czxcjx): Prevent vertices from leaving boundaries of svg element
-    function dragMouseMove(event) {
-      vertex.x = event.pageX - startX + startCX;
-      vertex.y = event.pageY - startY + startCY;
-      $scope.$parent.$apply();
-    }
-
-    function dragMouseUp(event) {
-      $document.off('mousemove', dragMouseMove);
-      $document.off('mouseup', dragMouseUp);
-    }
-
-    function checkValidEdge(src, dst) {
+    $scope.mouseupGraphVertex = function(graph, state) {
+      if (state.currentMode == state.modes.ADD_EDGE) {
+        if (checkValidEdge(graph, state.addEdgeVertex, state.hoverVertex)) {
+          graph.edges.push({
+            src: state.addEdgeVertex,
+            dst: state.hoverVertex,
+            weight: 1
+          });
+        }
+      }
+      state.dragVertex = null;
+      state.addEdgeVertex = null;
+    };
+    
+    function checkValidEdge(graph, src, dst) {
       if (src === null || dst === null) return false;
       if (src == dst) return false;
       return true;
-    }
-
-    function tryAddEdge(event) {
-      var srcIndex = $scope.$parent.addEdgeVertex;
-      var dstIndex = $scope.$parent.currentVertex;
-
-      if (checkValidEdge(srcIndex, dstIndex)) {
-        graph.edges.push({
-          src: srcIndex,
-          dst: dstIndex,
-          weight: 1
-        });
-      }
-      
-      $scope.$parent.addEdgeVertex = null;
-      $scope.$parent.$apply();
-      $document.off('mouseup', tryAddEdge);
     }
   };
 }]);
 
 oppia.directive('graphInputEdge', ['$document', function($document){
-  return function($scope,$element,$attrs) {
-    var graph = $scope.$parent.graph;
-    $element.on('click',function(event){
-      if ($scope.$parent.currentMode == $scope.$parent.modes.DELETE) {
-        graph.edges.splice($scope.$index,1);
-        $scope.$parent.$apply();
+  return function($scope, $element, $attrs) {
+    $scope.clickGraphEdge = function(graph, state) {
+      if (state.currentMode == state.modes.DELETE) {
+        graph.edges.splice($scope.$index, 1);
       }
-    });
+    }
   };
 }]);

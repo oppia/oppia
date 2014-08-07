@@ -8,7 +8,7 @@
   <button class="btn" ng-click="updateGraphFromInput()">Update Graph</button>
   <button class="btn" ng-click="updateTestGraph()">Use test graph</button>
   <div class='oppia-graph-input-viz-container'>
-    <svg class='oppia-graph-svg' width="100%" height="350">
+    <svg class='oppia-graph-svg' width="100%" height="350" ng-mousemove="mousemoveGraphSVG($event)">
       <svg viewBox="0 0 50 350" width="100%" height="350" preserveAspectRatio="xMaxYMin meet">
         <rect ng-repeat="button in buttons"
           width="30"
@@ -18,18 +18,19 @@
           rx="5"
           ry="5"
           ng-click="setMode(<[button]>)"
-          ng-attr-style="fill: white; stroke: black; stroke-width: <[(currentMode==button)?3:1]>;">
+          ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode==button)?3:1]>;">
         </rect>
       </svg>
-      <line ng-if="addEdgeVertex!=null"
-        ng-attr-x1="<[graph.vertices[addEdgeVertex].x]>"
-        ng-attr-y1="<[graph.vertices[addEdgeVertex].y]>"
-        ng-attr-x2="<[mouseX]>"
-        ng-attr-y2="<[mouseY]>"
+      <line ng-if="state.addEdgeVertex!=null"
+        ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
+        ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
+        ng-attr-x2="<[state.mouseX]>"
+        ng-attr-y2="<[state.mouseY]>"
         style="stroke: black; stroke-width: 2;">
       </line>
       <line graph-input-edge 
         ng-repeat="edge in graph.edges"
+        ng-click="clickGraphEdge(graph, state)"
         ng-attr-x1="<[graph.vertices[edge.src].x]>"
         ng-attr-y1="<[graph.vertices[edge.src].y]>"
         ng-attr-x2="<[graph.vertices[edge.dst].x]>"
@@ -38,6 +39,11 @@
       </line>
       <circle graph-input-vertex
         ng-repeat="vertex in graph.vertices" 
+        ng-mouseenter="state.hoverVertex = $index"
+        ng-mouseleave="state.hoverVertex = ($index == state.hoverVertex) ? null : state.hoverVertex"
+        ng-click="clickGraphVertex(graph, state)"
+        ng-mousedown="mousedownGraphVertex(graph, state)"
+        ng-mouseup="mouseupGraphVertex(graph,state)"
         ng-attr-cx="<[vertex.x]>"
         ng-attr-cy="<[vertex.y]>"
         r="5">
