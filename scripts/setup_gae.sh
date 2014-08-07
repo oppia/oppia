@@ -29,5 +29,5 @@ export COVERAGE_HOME=$TOOLS_DIR/coverage-3.6
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.
 export PYTHONPATH=.:$COVERAGE_HOME:$GOOGLE_APP_ENGINE_HOME:$GOOGLE_APP_ENGINE_HOME/lib/webob_0_9:$TOOLS_DIR/webtest-1.4.2:$PYTHONPATH
 
-echo Deleting old *.pyc files
+# Delete old *.pyc files
 find . -iname "*.pyc" -exec rm -f {} \;

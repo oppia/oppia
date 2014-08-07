@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Common utilities for test classes."""
+
 import contextlib
 import os
 import re
@@ -19,7 +21,6 @@ import unittest
 import webtest
 
 from core.domain import config_domain
-from core.domain import event_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -44,20 +45,10 @@ def empty_environ():
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
 
-class TestTags(object):
-    """Tags for labelling particular tests."""
-
-    # Tag that is used to flag tests which take a long time to run, so that
-    # they can be excluded via a command-line argument.
-    SLOW_TEST = 1
-
-
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
     maxDiff = 2500
-
-    TAGS = []
 
     DEFAULT_USERNAME = 'defaultusername'
 

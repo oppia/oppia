@@ -354,8 +354,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
-
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
         self.assertEqual(exp_services.count_explorations(), 0)

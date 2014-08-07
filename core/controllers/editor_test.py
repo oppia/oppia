@@ -24,7 +24,6 @@ from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
-from core.domain import stats_jobs
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
@@ -48,8 +47,6 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
 
 
 class EditorTest(BaseEditorControllerTest):
-
-    TAGS = [test_utils.TestTags.SLOW_TEST]
 
     def test_editor_page(self):
         """Test access to editor pages for the sample exploration."""

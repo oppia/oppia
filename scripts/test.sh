@@ -23,8 +23,35 @@
 #
 # It runs all the tests, in parallel.
 #
-# You can get a coverage report by adding the argument --generate_coverage_report
-# but note that this will slow down the tests quite a bit.
+# =====================
+# CUSTOMIZATION OPTIONS
+# =====================
+#
+# (1) Generate a coverage report by adding the argument
+#
+#   --generate_coverage_report
+#
+# but note that this will slow down the tests by a factor of 1.5 or more.
+#
+# (2) Append a test target to make the script run all tests in a given module
+# or class, or run a particular test. For example, appending
+#
+#   --test_target='foo.bar.Baz'
+#
+# runs all tests in test class Baz in the foo/bar.py module, and appending
+#
+#   --test_target='foo.bar.Baz.quux'
+#
+# runs the test method quux in the test class Baz in the foo/bar.py module.
+#
+# (3) Append a test path to make the script run all tests in a given
+# subdirectory. For example, appending
+#
+#   --test_path='core/controllers'
+#
+# runs all tests in the core/controllers/ directory.
+#
+# IMPORTANT: Only one of --test_path and --test_target should be specified.
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -63,5 +90,5 @@ for arg in "$@"; do
 done
 
 echo ''
-echo 'SUCCESS!   All tests pass.'
+echo 'Done!'
 echo ''

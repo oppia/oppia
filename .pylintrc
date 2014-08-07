@@ -14,7 +14,7 @@ function-rgx=^[_a-z][a-z0-9_]*$
 method-rgx=^([_a-z][a-z0-9_]*|__[a-z0-9]+__)$
 
 # Good variable names which should always be accepted, separated by a comma
-good-names=e,_,f,fs,id,setUp,tearDown,longMessage
+good-names=e,_,f,p,fs,id,setUp,tearDown,longMessage
 
 [DESIGN]
 
