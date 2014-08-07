@@ -20,8 +20,6 @@ it from the command line by running
     bash scripts/test.sh
 
 from the oppia/ root folder.
-
-
 """
 
 __author__ = 'Sean Lip'

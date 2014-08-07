@@ -31,6 +31,8 @@ import json
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+# Prefix to append to all lines printed by tests to the console.
+LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
 
 def empty_environ():
@@ -57,6 +59,12 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         raise NotImplementedError
+
+    def log_line(self, line):
+        """Print the line with a prefix that can be identified by the
+        script that calls the test.
+        """
+        print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
         raise NotImplementedError

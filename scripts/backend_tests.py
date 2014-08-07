@@ -40,6 +40,8 @@ COVERAGE_PATH = os.path.join(
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')
 LOG_LOCK = threading.Lock()
 ALL_ERRORS = []
+# This should be the same as core.test_utils.LOG_LINE_PREFIX.
+LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
 
 _PARSER = argparse.ArgumentParser()
@@ -57,7 +59,7 @@ _PARSER.add_argument(
     type=str)
 
 
-def log(message, show_time=True):
+def log(message, show_time=False):
     """Logs a message to the terminal.
 
     If show_time is True, prefixes the message with the current time.
@@ -76,8 +78,17 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     stdout and stderr logs.
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
-    last_stdout, last_stderr = p.communicate()
-    result = ''.join(list(last_stdout) + list(last_stderr))
+    last_stdout_str, last_stderr_str = p.communicate()
+    last_stdout = last_stdout_str.split('\n')
+
+    if LOG_LINE_PREFIX in last_stdout_str:
+        log('')
+        for line in last_stdout:
+            if line.startswith(LOG_LINE_PREFIX):
+                log('INFO: %s' % line[len(LOG_LINE_PREFIX): ])
+        log('')
+
+    result = '%s%s' % (last_stdout_str, last_stderr_str)
 
     if p.returncode != 0:
         raise Exception('Error %s\n%s' % (p.returncode, result))
@@ -99,13 +110,13 @@ class TaskThread(threading.Thread):
         try:
             _, self.output = self.func()
             log('FINISHED %s: %.1f secs' %
-                (self.name, time.time() - self.start_time))
+                (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
         except Exception as e:
             self.exception = e
             if 'KeyboardInterrupt' not in str(self.exception):
                 log('ERROR %s: %.1f secs' %
-                    (self.name, time.time() - self.start_time))
+                    (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
 
 
@@ -204,12 +215,11 @@ def main():
     if parsed_args.test_target and '/' in parsed_args.test_target:
         raise Exception('The delimiter in test_target should be a dot (.)')
 
-    all_test_targets = _get_all_test_targets(test_path=parsed_args.test_path)
     if parsed_args.test_target:
-        if parsed_args.test_target in all_test_targets:
-            all_test_targets = [parsed_args.test_target]
-        else:
-            all_test_targets = []
+        all_test_targets = [parsed_args.test_target]
+    else:
+        all_test_targets = _get_all_test_targets(
+            test_path=parsed_args.test_path)
 
     # Prepare tasks.
     task_to_taskspec = {}
@@ -229,8 +239,7 @@ def main():
         for task in tasks:
             if task.exception:
                 exc_str = str(task.exception)
-                log(exc_str[exc_str.find('=') : exc_str.rfind('-')],
-                    show_time=False)
+                log(exc_str[exc_str.find('=') : exc_str.rfind('-')])
 
     print ''
     print '+------------------+'
@@ -251,8 +260,7 @@ def main():
             test_count = 0
         elif task.exception:
             exc_str = unicode(task.exception)
-            log(exc_str[exc_str.find('=') : exc_str.rfind('-')],
-                show_time=False)
+            print exc_str[exc_str.find('=') : exc_str.rfind('-')]
 
             tests_failed_regex_match = re.search(
                 r'Test suite failed: ([0-9]+) tests run, ([0-9]+) errors, '
@@ -281,9 +289,9 @@ def main():
         print ('ERROR: Expected %s tests to be run, not %s.' %
                (EXPECTED_TEST_COUNT, total_count))
     else:
-        print 'Successfully ran %s tests in %s test %s.' % (
-            total_count, len(tasks),
-            'class' if len(tasks) == 1 else 'classes')
+        print 'Successfully ran %s test%s in %s test class%s.' % (
+            total_count, '' if total_count == 1 else 's',
+            len(tasks), '' if len(tasks) == 1 else 'es')
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
