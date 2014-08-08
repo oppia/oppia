@@ -38,6 +38,7 @@ from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
+import json
 
 import jinja2
 
@@ -227,7 +228,7 @@ class ExplorationPage(EditorHandler):
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),            
+            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 
@@ -458,7 +459,7 @@ class ResolvedAnswersHandler(EditorHandler):
 
 
 class ExplorationDownloadHandler(EditorHandler):
-    """Downloads an exploration as a YAML file."""
+    """Downloads an exploration as a zip file or JSON object."""
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -468,17 +469,23 @@ class ExplorationDownloadHandler(EditorHandler):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
+        output_format = self.request.get('output_format', default_value='zip')
 
         # If the title of the exploration has changed, we use the new title
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s.zip' % str(filename))
+        if output_format == 'zip':
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.headers['Content-Disposition'] = (
+                'attachment; filename=%s.zip' % str(filename))
+            self.response.write(
+                exp_services.export_to_zip_file(exploration_id, version))
 
-        self.response.write(
-            exp_services.export_to_zip_file(exploration_id, version))
+        elif output_format == 'json':
+            self.response.headers['Content-Type'] = 'application/json'
+            self.response.write(
+                exp_services.export_to_json_obj(exploration_id, version))
 
 
 class ExplorationResourcesHandler(EditorHandler):

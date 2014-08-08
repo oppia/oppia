@@ -32,6 +32,10 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
+    $scope.currentVersion = explorationData.data.version;
+    $scope.compareVersion1 = $scope.currentVersion;
+    $scope.compareVersion2 = $scope.currentVersion;
+
     $http.get($scope.explorationSnapshotsUrl).then(function(response) {
       var data = response.data;
 
@@ -46,5 +50,24 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
         });
       }
     });
+  };
+
+  // Downloads the zip file for an exploration.
+  $scope.downloadExplorationWithVersion = function(versionNumber) {
+    // Note that this opens (and then immediately closes) a new tab. If we do
+    // this in the same tab, the beforeunload handler is triggered.
+    window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '&output_format=zip');
+  };
+
+  // Downloads the json object for an exploration.
+  $scope.compareExplorations = function() {
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion1 +
+        '&output_format=json').then(function(response) {
+      $scope.yamlStrV1 = response.data.yaml;
+    })
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion2 +
+        '&output_format=json').then(function(response) {
+      $scope.yamlStrV2 = response.data.yaml;
+    })
   };
 }]);

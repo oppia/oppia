@@ -29,6 +29,7 @@ import logging
 import os
 import StringIO
 import zipfile
+import json
 
 from core.domain import exp_domain
 from core.domain import fs_domain
@@ -285,6 +286,14 @@ def export_to_zip_file(exploration_id, version=None):
 
     return o.getvalue()
 
+def export_to_json_obj(exploration_id, version=None):
+    """Returns a JSON object of the exploration."""
+    exploration = get_exploration_by_id(exploration_id, version=version)
+    yaml_repr = exploration.to_yaml()
+    json_obj = {
+        'yaml': yaml_repr
+    }
+    return json.dumps(json_obj)
 
 # Repository SAVE and DELETE methods.
 def apply_change_list(exploration_id, change_list):

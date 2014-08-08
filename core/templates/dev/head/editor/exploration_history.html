@@ -8,7 +8,13 @@
     <span class="oppia-loading-dot-three">.</span>
   </div>
 
+  <div>
+    <button class="btn btn-default" ng-click="compareExplorations()">Get diff</button>
+  </div>
+
   <div ng-repeat="snapshot in explorationSnapshots">
+    <input type="radio" name="compareVer1" ng-model="$parent.compareVersion1" ng-value="snapshot.versionNumber">
+    <input type="radio" name="compareVer2" ng-model="$parent.compareVersion2" ng-value="snapshot.versionNumber">
     [<[snapshot.versionNumber]>]
     <strong><[snapshot.committerId]></strong>
     <[snapshot.commitMessage]>
@@ -21,6 +27,13 @@
         | <a href="#" ng-click="downloadExplorationWithVersion(snapshot.versionNumber)" title="Download exploration as a zip file.">Download</a>
       </span>
     </span>
+  </div>
+
+  <div>
+    <span ng-bind=yamlStrV1></span>
+  </div>
+  <div>
+    <span ng-bind=yamlStrV2></span>
   </div>
 
   <script type="text/ng-template" id="modals/revertExploration">

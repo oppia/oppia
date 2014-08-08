@@ -732,15 +732,6 @@ oppia.controller('ExplorationEditor', [
       'param_specs', angular.copy($scope.paramSpecs), oldParamSpecs);
   };
 
-  /**
-   * Downloads the zip file for an exploration.
-   */
-  $scope.downloadExplorationWithVersion = function(versionNumber) {
-    // Note that this opens (and then immediately closes) a new tab. If we do
-    // this in the same tab, the beforeunload handler is triggered.
-    window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '_blank');
-  };
-
   $scope.showPublishExplorationModal = function() {
     warningsData.clear();
     $modal.open({
