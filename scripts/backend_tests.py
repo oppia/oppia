@@ -74,8 +74,8 @@ def log(message, show_time=False):
 def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
     """Runs a shell command and captures the stdout and stderr output.
 
-    Returns a 2-tuple consisting of the return code and the combined
-    stdout and stderr logs.
+    If the cmd fails, raises Exception. Otherwise, returns a string containing
+    the concatenation of the stdout and stderr logs.
     """
     p = subprocess.Popen(exe, stdout=stdout, stderr=stderr)
     last_stdout_str, last_stderr_str = p.communicate()
@@ -92,7 +92,8 @@ def run_shell_cmd(exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE):
 
     if p.returncode != 0:
         raise Exception('Error %s\n%s' % (p.returncode, result))
-    return p.returncode, result
+
+    return result
 
 
 class TaskThread(threading.Thread):
@@ -108,7 +109,7 @@ class TaskThread(threading.Thread):
 
     def run(self):
         try:
-            _, self.output = self.func()
+            self.output = self.func()
             log('FINISHED %s: %.1f secs' %
                 (self.name, time.time() - self.start_time), show_time=True)
             self.finished = True
