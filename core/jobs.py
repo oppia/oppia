@@ -707,7 +707,8 @@ class BaseContinuousComputationManager(object):
     is cleared. Note that a realtime layer is cleared as part of the post-
     processing that happens when a batch job completes, which explains why the
     termination of each batch interval and one of the realtime intervals
-    always coincides.
+    always coincides. Having two realtime layers allows the inactive layer to
+    be cleared whilst not affecting incoming queries to the active layer.
 
     Batch layer         <----->  <------->  <-------> <-------> <-------->
     Realtime layer R0   <----->  <------------------> <------------------>
