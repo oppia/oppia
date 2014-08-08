@@ -26,7 +26,8 @@ import traceback
 import utils
 
 from core.platform import models
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(base_models, job_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.job])
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -626,6 +627,64 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         cls._get_continuous_computation_class().on_batch_job_failure()
 
 
+class BaseRealtimeDatastoreClassForContinuousComputations(
+        base_models.BaseModel):
+    """Storage class for entities in the realtime layer.
+
+    Instances of this class represent individual entities that are stored in
+    the realtime datastore. Note that the realtime datastore may be formatted
+    differently from the datastores that are iterated over by the MapReduce
+    job.
+
+    The IDs for instances of this class are of the form 0:... or 1:..., where
+    the 0 or 1 indicates the realtime layer that the entity is in.
+
+    NOTE TO DEVELOPERS: Ensure that you wrap the id with get_realtime_id()
+    when doing creations, gets, puts and queries, in order to ensure that the
+    relevant layer prefix gets appended.
+    """
+    realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
+
+    @classmethod
+    def get_realtime_id(cls, layer_index, raw_entity_id):
+        """Returns an ID used to identify the element with the given entity id
+        in the currently active realtime datastore layer.
+        """
+        return '%s:%s' % (layer_index, raw_entity_id)
+
+    @classmethod
+    def delete_layer(cls, layer_index, latest_created_on_datetime):
+        """Deletes all entities in the given layer which were created before
+        the given datetime.
+        """
+        query = cls.query().filter(cls.realtime_layer == layer_index).filter(
+            cls.created_on < latest_created_on_datetime)
+        ndb.delete_multi(query.iter(keys_only=True))
+
+    @classmethod
+    def _is_valid_realtime_id(cls, realtime_id):
+        return realtime_id.startswith('0:') or realtime_id.startswith('1:')
+
+    @classmethod
+    def get(cls, entity_id, strict=True):
+        if not cls._is_valid_realtime_id(entity_id):
+            raise ValueError('Invalid realtime id: %s' % entity_id)
+
+        return super(
+            BaseRealtimeDatastoreClassForContinuousComputations, cls
+        ).get(entity_id, strict=strict)
+
+    def put(self):
+        if (self.realtime_layer is None or
+                str(self.realtime_layer) != self.id[0]):
+            raise Exception(
+                'Realtime layer %s does not match realtime id %s' %
+                (self.realtime_layer, self.id))
+
+        return super(
+            BaseRealtimeDatastoreClassForContinuousComputations, self).put()
+
+
 class BaseContinuousComputationManager(object):
     """This class represents a manager for a continuously-running computation.
     Such computations consist of two parts: a batch job to compute summary
@@ -648,11 +707,12 @@ class BaseContinuousComputationManager(object):
     is cleared. Note that a realtime layer is cleared as part of the post-
     processing that happens when a batch job completes, which explains why the
     termination of each batch interval and one of the realtime intervals
-    always coincides.
+    always coincides. Having two realtime layers allows the inactive layer to
+    be cleared whilst not affecting incoming queries to the active layer.
 
     Batch layer         <----->  <------->  <-------> <-------> <-------->
-    Realtime layer 0    <----->  <------------------> <------------------>
-    Realtime layer 1    <---------------->  <-----------------> <------ ...
+    Realtime layer R0   <----->  <------------------> <------------------>
+    Realtime layer R1   <---------------->  <-----------------> <------ ...
                                  <-- A -->  <-- B -->
 
     For example, queries arising during the time interval A will use the
@@ -668,25 +728,21 @@ class BaseContinuousComputationManager(object):
         """Returns a list of event types that this class subscribes to."""
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
-            '_get_event_types_listened_to(). This method should return a list '
+            'get_event_types_listened_to(). This method should return a list '
             'of strings, each representing an event type that this class '
             'subscribes to.')
 
     @classmethod
-    def _get_realtime_datastore_classes(cls):
-        """Returns a 2-element list with datastore classes used by the
-        realtime layers. These two classes should be subclasses of
-        base_models.BaseModel, and should be defined with exactly the
-        same attributes and methods so that, regardless of which one is used,
-        the logic remains the same. See StartExplorationRealtimeModel0 and
-        StartExplorationRealtimeModel1 in core/jobs_test.py for an example
+    def _get_realtime_datastore_class(cls):
+        """Returns the datastore class used by the realtime layer, which should
+        subclass BaseRealtimeDatastoreClassForContinuousComputations. See
+        StartExplorationRealtimeModel in core/jobs_test.py for an example
         of how to do this.
         """
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
-            '_get_realtime_datastore_classes(). This method should return '
-            'a 2-element list specifying the datastore classes to be used by '
-            'the realtime layers.')
+            '_get_realtime_datastore_class(). This method should return '
+            'the datastore class to be used by the realtime layer.')
 
     @classmethod
     def _get_batch_job_manager_class(cls):
@@ -700,8 +756,8 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _handle_incoming_event(
-            cls, datastore_class, event_type, *args, **kwargs):
-        """Records incoming events in the given realtime datastore_class.
+            cls, active_realtime_layer, event_type, *args, **kwargs):
+        """Records incoming events in the given realtime layer.
 
         This method should be implemented by subclasses. The args are the
         same as those sent to the event handler corresponding to the event
@@ -742,14 +798,12 @@ class BaseContinuousComputationManager(object):
             _get_active_realtime_index_transactional)
 
     @classmethod
-    def _get_active_realtime_datastore_class(cls):
-        return cls._get_realtime_datastore_classes()[
-            cls._get_active_realtime_index()]
-
-    @classmethod
-    def _get_inactive_realtime_datastore_class(cls):
-        return cls._get_realtime_datastore_classes()[
-            1 - cls._get_active_realtime_index()]
+    def get_active_realtime_layer_id(cls, entity_id):
+        """Returns an ID used to identify the element with the given entity id
+        in the currently active realtime datastore layer.
+        """
+        return cls._get_realtime_datastore_class().get_realtime_id(
+            cls._get_active_realtime_index(), entity_id)
 
     @classmethod
     def _switch_active_realtime_class(cls):
@@ -764,14 +818,14 @@ class BaseContinuousComputationManager(object):
             _switch_active_realtime_class_transactional)
 
     @classmethod
-    def _clear_realtime_datastore_class(
-            cls, datastore_class, latest_created_on_datetime):
+    def _clear_inactive_realtime_layer(
+            cls, latest_created_on_datetime):
         """Deletes all entries in the given realtime datastore class whose
         created_on date is before latest_timestamp.
         """
-        query = datastore_class.query(
-            datastore_class.created_on < latest_created_on_datetime)
-        ndb.delete_multi(query.iter(keys_only=True))
+        inactive_realtime_index = 1 - cls._get_active_realtime_index()
+        cls._get_realtime_datastore_class().delete_layer(
+            inactive_realtime_index, latest_created_on_datetime)
 
     @classmethod
     def _kickoff_batch_job(cls):
@@ -847,10 +901,7 @@ class BaseContinuousComputationManager(object):
         transaction_services.run_in_transaction(
             _start_computation_transactional)
 
-        # Clear the inactive realtime layer.
-        cls._clear_realtime_datastore_class(
-            cls._get_inactive_realtime_datastore_class(),
-            datetime.datetime.utcnow())
+        cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
         cls._kickoff_batch_job()
 
@@ -894,14 +945,15 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
-        """Handle an incoming event.
+        """Handle an incoming event by recording it in both realtime datastore
+        layers.
 
         The *args and **kwargs match those passed to the _handle_event() method
         of the corresponding EventHandler subclass.
         """
-        for datastore_class in cls._get_realtime_datastore_classes():
-            cls._handle_incoming_event(
-                datastore_class, event_type, *args, **kwargs)
+        REALTIME_LAYERS = [0, 1]
+        for layer in REALTIME_LAYERS:
+            cls._handle_incoming_event(layer, event_type, *args, **kwargs)
 
     @classmethod
     def _process_job_completion_and_return_status(cls):
@@ -912,10 +964,8 @@ class BaseContinuousComputationManager(object):
         on_batch_job_completion() to avoid kicking off the next job
         immediately.
         """
-        cls._clear_realtime_datastore_class(
-            cls._get_active_realtime_datastore_class(),
-            datetime.datetime.utcnow())
         cls._switch_active_realtime_class()
+        cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
         def _update_last_finished_time_transactional():
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)

@@ -30,12 +30,8 @@ from google.appengine.ext import ndb
 
 
 
-class StatisticsRealtimeModel0(base_models.BaseModel):
-    num_starts = ndb.IntegerProperty(default=0)
-    num_completions = ndb.IntegerProperty(default=0)
-
-
-class StatisticsRealtimeModel1(base_models.BaseModel):
+class StatisticsRealtimeModel(
+        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     num_starts = ndb.IntegerProperty(default=0)
     num_completions = ndb.IntegerProperty(default=0)
 
@@ -51,30 +47,41 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
             feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION]
 
     @classmethod
-    def _get_realtime_datastore_classes(cls):
-        return [
-            StatisticsRealtimeModel0, StatisticsRealtimeModel1]
+    def _get_realtime_datastore_class(cls):
+        return StatisticsRealtimeModel
 
     @classmethod
     def _get_batch_job_manager_class(cls):
         return StatisticsMRJobManager
 
     @classmethod
-    def _handle_incoming_event(cls, datastore_class, event_type, *args):
+    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
         exp_id = args[0]
 
         def _increment_visit_counter():
-            model = datastore_class.get(exp_id, strict=False)
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, exp_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
             if model is None:
-                datastore_class(id=exp_id, num_starts=1).put()
+                realtime_class(
+                    id=realtime_model_id, num_starts=1,
+                    realtime_layer=active_realtime_layer).put()
             else:
                 model.num_starts += 1
                 model.put()
 
         def _increment_completion_counter():
-            model = datastore_class.get(exp_id, strict=False)
+            realtime_class = cls._get_realtime_datastore_class()
+            realtime_model_id = realtime_class.get_realtime_id(
+                active_realtime_layer, exp_id)
+
+            model = realtime_class.get(realtime_model_id, strict=False)
             if model is None:
-                datastore_class(id=exp_id, num_completions=1).put()
+                realtime_class(
+                    id=realtime_model_id, num_completions=1,
+                    realtime_layer=active_realtime_layer).put()
             else:
                 model.num_completions += 1
                 model.put()
@@ -96,8 +103,8 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
         """
         mr_model = stats_models.ExplorationAnnotationsModel.get(
             exploration_id, strict=False)
-        realtime_model = cls._get_active_realtime_datastore_class().get(
-            exploration_id, strict=False)
+        realtime_model = cls._get_realtime_datastore_class().get(
+            cls.get_active_realtime_layer_id(exploration_id), strict=False)
 
         num_starts = 0
         if mr_model is not None:
