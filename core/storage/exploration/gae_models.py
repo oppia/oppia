@@ -177,11 +177,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ]
     )
 
-    def get_all_viewer_ids(self):
-        return list(set(self.owner_ids + self.editor_ids + self.viewer_ids))
-
-    all_viewer_ids = ndb.ComputedProperty(get_all_viewer_ids, repeated=True)
-
     def save(self, committer_id, commit_message, commit_cmds):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
@@ -230,7 +225,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status == EXPLORATION_STATUS_PRIVATE
         ).filter(
-            ExplorationRightsModel.all_viewer_ids == user_id
+            ndb.OR(ExplorationRightsModel.owner_ids == user_id,
+                   ExplorationRightsModel.editor_ids == user_id,
+                   ExplorationRightsModel.viewer_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)
