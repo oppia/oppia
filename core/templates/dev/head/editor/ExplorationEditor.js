@@ -21,9 +21,15 @@
 // TODO(sll): Move all hardcoded strings to the top of the file.
 var END_DEST = 'END';
 
-function ExplorationEditor(
+oppia.controller('ExplorationEditor', [
+  '$scope', '$http', '$location', '$modal', '$window', '$filter', '$rootScope',
+  '$log', 'explorationData', 'warningsData', 'activeInputData',
+  'editorContextService', 'changeListService', 'explorationTitleService',
+  'explorationCategoryService', 'explorationObjectiveService',
+  'explorationRightsService', 'validatorsService', 'editabilityService',
+  'oppiaDateFormatter', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
-    $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
+    $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
     explorationRightsService, validatorsService, editabilityService,
@@ -108,13 +114,10 @@ function ExplorationEditor(
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
-    $http.post(
-      $scope.changeListSummaryUrl,
-      oppiaRequestCreator.createRequest({
-        change_list: changeListService.getChangeList(),
-        version: explorationData.data.version
-      })
-    ).success(function(data) {
+    $http.post($scope.changeListSummaryUrl, {
+      change_list: changeListService.getChangeList(),
+      version: explorationData.data.version
+    }).success(function(data) {
       if (data.error) {
         warningsData.addWarning(data.error);
         return;
@@ -273,16 +276,12 @@ function ExplorationEditor(
         explorationData.save(changeList, commitMessage, function() {
           changeListService.discardAllChanges();
           $scope.initExplorationPage();
-          $scope.refreshVersionHistory();
+          $scope.$broadcast('refreshVersionHistory', {forceRefresh: true});
           $scope.isSaveInProgress = false;
         }, function() {
           $scope.isSaveInProgress = false;
         });
       });
-    }).error(function(data) {
-      $log.error(data);
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.');
     });
   };
 
@@ -365,11 +364,8 @@ function ExplorationEditor(
       $scope.saveActiveState();
       resetActiveTags();
       $scope.historyTabActive = true;
-
-      if ($scope.explorationSnapshots === null) {
-        // TODO(sll): Do this on-hover rather than on-click.
-        $scope.refreshVersionHistory();
-      }
+      // TODO(sll): Do this on-hover rather than on-click.
+      $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
     } else if (path === FEEDBACK_URL) {
       $scope.saveActiveState();
       resetActiveTags();
@@ -538,28 +534,7 @@ function ExplorationEditor(
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
-  $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
-
-  $scope.explorationSnapshots = null;
-
-  // Refreshes the displayed version history log.
-  $scope.refreshVersionHistory = function() {
-    $http.get($scope.explorationSnapshotsUrl).then(function(response) {
-      var data = response.data;
-
-      $scope.explorationSnapshots = [];
-      for (var i = 0; i < data.snapshots.length; i++) {
-        $scope.explorationSnapshots.push({
-          'committerId': data.snapshots[i].committer_id,
-          'createdOn': data.snapshots[i].created_on,
-          'commitMessage': data.snapshots[i].commit_message,
-          'versionNumber': data.snapshots[i].version_number,
-          'autoSummary': data.snapshots[i].auto_summary
-        });
-      }
-    });
-  };
 
   $scope.showEmbedExplorationModal = function() {
     warningsData.clear();
@@ -614,18 +589,11 @@ function ExplorationEditor(
         }
       ]
     }).result.then(function(version) {
-      $http.post(
-        $scope.revertExplorationUrl,
-        oppiaRequestCreator.createRequest({
-          current_version: explorationData.data.version,
-          revert_to_version: version
-        })
-      ).success(function(response) {
+      $http.post($scope.revertExplorationUrl, {
+        current_version: explorationData.data.version,
+        revert_to_version: version
+      }).success(function(response) {
         location.reload();
-      }).error(function(data) {
-        $log.error(data);
-        warningsData.addWarning(
-          data.error || 'Error communicating with server.');
       });
     });
   };
@@ -837,12 +805,7 @@ function ExplorationEditor(
     warningsData.clear();
 
     $scope.newStateTemplateUrl = '/createhandler/new_state_template/' + $scope.explorationId;
-    $http.post(
-      $scope.newStateTemplateUrl,
-      oppiaRequestCreator.createRequest({
-        state_name: newStateName
-      })
-    ).success(function(data) {
+    $http.post($scope.newStateTemplateUrl, {state_name: newStateName}).success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
       changeListService.addState(newStateName);
@@ -853,9 +816,6 @@ function ExplorationEditor(
       if (successCallback) {
         successCallback(newStateName);
       }
-    }).error(function(data) {
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.');
     });
   };
 
@@ -1003,23 +963,11 @@ function ExplorationEditor(
       if (data.last_updated) {
         $scope.feedbackTabHeader = (
           'Feedback (updated ' +
-          oppiaDateFormatter.getLocaleDateString(data.last_updated) +
+          oppiaDateFormatter.getLocaleAbbreviatedDatetimeString(data.last_updated) +
           ')');
       } else {
         $scope.feedbackTabHeader = 'Feedback';
       }
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ExplorationEditor.$inject = [
-  '$scope', '$http', '$location', '$modal', '$window',
-  '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
-  'activeInputData', 'oppiaRequestCreator', 'editorContextService',
-  'changeListService', 'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
-  'editabilityService', 'oppiaDateFormatter'
-];
+}]);

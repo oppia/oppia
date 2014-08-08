@@ -22,9 +22,9 @@ __author__ = 'Sean Lip'
 from google.appengine.ext import deferred
 
 
-def defer(fn, *args):
+def defer(fn, *args, **kwargs):
     """Adds a new task to the deferred queue."""
-    deferred.defer(fn, *args)
+    deferred.defer(fn, *args, **kwargs)
 
 
 # A special exception that ensures that the task is not tried again, if it

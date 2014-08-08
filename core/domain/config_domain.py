@@ -153,6 +153,7 @@ class Registry(object):
 
 
 def update_admin_ids():
+    """Refresh the list of admin user_ids based on the emails entered."""
     admin_emails_config = Registry.get_config_property(
         'admin_emails')
     if not admin_emails_config:
@@ -169,6 +170,7 @@ def update_admin_ids():
 
 
 def update_moderator_ids():
+    """Refresh the list of moderator user_ids based on the emails entered."""
     moderator_emails_config = Registry.get_config_property(
         'moderator_emails')
     if not moderator_emails_config:

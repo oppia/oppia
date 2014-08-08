@@ -20,8 +20,38 @@
 #
 # Run this script from the oppia root folder:
 #   bash scripts/test.sh
-# The root folder MUST be named 'oppia'.
-# It runs tests.
+#
+# It runs all the tests, in parallel.
+#
+# =====================
+# CUSTOMIZATION OPTIONS
+# =====================
+#
+# (1) Generate a coverage report by adding the argument
+#
+#   --generate_coverage_report
+#
+# but note that this will slow down the tests by a factor of 1.5 or more.
+#
+# (2) Append a test target to make the script run all tests in a given module
+# or class, or run a particular test. For example, appending
+#
+#   --test_target='foo.bar.Baz'
+#
+# runs all tests in test class Baz in the foo/bar.py module, and appending
+#
+#   --test_target='foo.bar.Baz.quux'
+#
+# runs the test method quux in the test class Baz in the foo/bar.py module.
+#
+# (3) Append a test path to make the script run all tests in a given
+# subdirectory. For example, appending
+#
+#   --test_path='core/controllers'
+#
+# runs all tests in the core/controllers/ directory.
+#
+# IMPORTANT: Only one of --test_path and --test_target should be specified.
 
 if [ -z "$BASH_VERSION" ]
 then
@@ -37,19 +67,28 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 source $(dirname $0)/setup_gae.sh || exit 1
 
+for arg in "$@"; do
+  if [ "$arg" == "--generate_coverage_report" ]; then
+    echo Checking whether coverage is installed in $TOOLS_DIR
+    if [ ! -d "$TOOLS_DIR/coverage-3.6" ]; then
+      echo Installing coverage
+      rm -rf $TOOLS_DIR/coverage
+      wget --no-check-certificate http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
+      tar xvzf coverage.tar.gz -C $TOOLS_DIR
+      rm coverage.tar.gz
+    fi
+  fi
+done
 
-echo Checking whether coverage is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/coverage-3.6" ]; then
-  echo Installing coverage
-  rm -rf $TOOLS_DIR/coverage
-  wget --no-check-certificate http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
-  tar xvzf coverage.tar.gz -C $TOOLS_DIR
-  rm coverage.tar.gz
-fi
+python scripts/backend_tests.py $@
 
-python $COVERAGE_HOME/coverage run ./core/tests/gae_suite.py $@
-python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/*" --show-missing
+for arg in "$@"; do
+  if [ "$arg" == "--generate_coverage_report" ]; then
+    python $COVERAGE_HOME/coverage -c
+    python $COVERAGE_HOME/coverage report --omit="$TOOLS_DIR/*","$THIRD_PARTY_DIR/*","/usr/*" --show-missing
+  fi
+done
 
 echo ''
-echo 'SUCCESS!   All tests pass.'
+echo 'Done!'
 echo ''

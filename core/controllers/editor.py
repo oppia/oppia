@@ -23,6 +23,8 @@ import logging
 
 from core.controllers import base
 from core.domain import config_domain
+from core.domain import dependency_registry
+from core.domain import event_services
 from core.domain import exp_services
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -44,10 +46,11 @@ DEFAULT_NUM_SNAPSHOTS = 30
 
 
 def get_value_generators_js():
+    """Return a string that concatenates the JS for all value generators."""
     all_value_generators = (
         value_generators_domain.Registry.get_all_generator_classes())
     value_generators_js = ''
-    for gid, generator_cls in all_value_generators.iteritems():
+    for _, generator_cls in all_value_generators.iteritems():
         value_generators_js += generator_cls.get_js_template()
     return value_generators_js
 
@@ -71,6 +74,7 @@ MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
 
 
 def _require_valid_version(version_from_payload, exploration_version):
+    """Check that the payload version matches the given exploration version."""
     if version_from_payload is None:
         raise base.BaseHandler.InvalidInputException(
             'Invalid POST request: a version must be specified.')
@@ -151,7 +155,9 @@ class EditorHandler(base.BaseHandler):
 
 
 class ExplorationPage(EditorHandler):
-    """Page describing a single exploration."""
+    """The editor page for a single exploration."""
+
+    EDITOR_PAGE_DEPENDENCY_IDS = ['codemirror']
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -184,9 +190,14 @@ class ExplorationPage(EditorHandler):
         all_interactive_widget_ids = (
             widget_registry.Registry.get_widget_ids_of_type(
                 feconf.INTERACTIVE_PREFIX))
-        widget_dependencies_html, additional_angular_modules = (
-            widget_registry.Registry.get_dependencies_html_and_angular_modules(
+
+        widget_dependency_ids = (
+            widget_registry.Registry.get_deduplicated_dependency_ids(
                 all_interactive_widget_ids))
+        dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                widget_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
+
         widget_js_directives = (
             widget_registry.Registry.get_noninteractive_widget_js() +
             widget_registry.Registry.get_interactive_widget_js(
@@ -211,13 +222,12 @@ class ExplorationPage(EditorHandler):
                 self.user_id).can_unpublicize(exploration_id),
             'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
                 exploration_id),
+            'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
-            'widget_dependencies_html': jinja2.utils.Markup(
-                widget_dependencies_html),
+            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),            
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 
@@ -441,7 +451,7 @@ class ResolvedAnswersHandler(EditorHandler):
                 resolved_answers)
 
         if 'resolved_answers' in self.payload:
-            stats_services.EventHandler.resolve_answers_for_default_rule(
+            event_services.DefaultRuleAnswerResolutionEventHandler.record(
                 exploration_id, state_name, 'submit', resolved_answers)
 
         self.render_json({})
@@ -545,7 +555,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json({
-            'num_visits': stats_services.get_exploration_visit_count(
+            'num_starts': stats_services.get_exploration_start_count(
                 exploration_id),
             'num_completions': stats_services.get_exploration_completed_count(
                 exploration_id),

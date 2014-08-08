@@ -18,6 +18,63 @@
  * @author sll@google.com (Sean Lip)
  */
 
+describe('HTML to text', function() {
+  beforeEach(module('oppia'));
+
+  var htmlUnicodeHtmlPairings = [
+    ['abc', 'abc', 'abc'],
+    ['&lt;a&copy;&deg;', '<a©°', '&lt;a&#169;&#176;'],
+    ['<b>a</b>', 'a', 'a'],
+    ['<br>a', 'a', 'a'],
+    ['<br/>a', 'a', 'a'],
+    ['<br></br>a', 'a', 'a'],
+    ['abc  a', 'abc  a', 'abc  a'],
+  ];
+
+  it('should convert HTML to and from raw text correctly', inject(function($filter) {
+    htmlUnicodeHtmlPairings.forEach(function(pairing) {
+      expect($filter('convertHtmlToUnicode')(pairing[0])).toEqual(pairing[1]);
+      expect($filter('convertUnicodeToHtml')(pairing[1])).toEqual(pairing[2]);
+    });
+  }));
+
+  var htmlUnicodeHtmlPairingsWithParams = [
+    ['abc <oppia-parameter>name</oppia-parameter>  a', 'abc {{name}}  a', 'abc <oppia-parameter>name</oppia-parameter>  a'],
+    ['{{{<oppia-parameter>name</oppia-parameter>', '\\\{\\\{\\\{{{name}}', '{{{<oppia-parameter>name</oppia-parameter>'],
+    ['\\{\\{', '\\\\\\{\\\\\\{', '\\{\\{'],
+    ['\\}}\\{\\{', '\\\\\\}\\}\\\\\\{\\\\\\{', '\\}}\\{\\{']
+  ];
+
+  it('should convert HTML-with-params to and from raw text correctly', inject(function($filter) {
+    htmlUnicodeHtmlPairings.forEach(function(pairing) {
+      expect($filter('convertHtmlWithParamsToUnicode')(pairing[0])).toEqual(pairing[1]);
+      expect($filter('convertUnicodeWithParamsToHtml')(pairing[1])).toEqual(pairing[2]);
+    });
+
+    htmlUnicodeHtmlPairingsWithParams.forEach(function(pairing) {
+      expect($filter('convertHtmlWithParamsToUnicode')(pairing[0])).toEqual(pairing[1]);
+      expect($filter('convertUnicodeWithParamsToHtml')(pairing[1])).toEqual(pairing[2]);
+    });
+  }));
+
+  var invalidUnicodeStrings = [
+    '{}',
+    '}}abc{{',
+    '\\{{a}}',
+    '{{a\\}}',
+    '{{a}\\}'
+  ];
+
+  it('should detect invalid unicode strings', inject(function($filter) {
+    invalidUnicodeStrings.forEach(function(s) {
+      var fn = function() {
+        return $filter('convertUnicodeWithParamsToHtml')(s);
+      };
+      expect(fn).toThrow();
+    });
+  }));
+});
+
 describe('Normalizer tests', function() {
   var filterNames = [
     'requireIsFloat',

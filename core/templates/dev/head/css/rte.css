@@ -21,16 +21,35 @@ html {
 }
 
 body {
+  color: #222;
   font-family: Helvetica, Arial, sans-serif;
   font-size: 14px;
-  height: 100%;
   line-height: 20px;
   margin: 0 auto;
   padding: 0;
-  width: 100%;
-  color: #222;
+  /* Hides the horizontal scrollbar if the text is too long. */
+  overflow-x: hidden;
+  white-space: nowrap;
+  width: 98%;
 }
 
 h1, h2 {
   color: #000;
+}
+
+oppia-parameter {
+  background-color: #18447E;
+  border-radius: .25em;
+  color: white;
+  /* Note: this is added only for edit mode. */
+  cursor: pointer;
+  display: inline;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  margin: auto 4px;
+  padding: .2em .6em .3em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
 }

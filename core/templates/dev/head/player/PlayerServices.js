@@ -52,10 +52,8 @@ oppia.factory('stopwatchProviderService', ['$log', function($log) {
 // A service that provides a number of utility functions for JS used by
 // individual skins.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', 'oppiaRequestCreator',
-    'messengerService', 'stopwatchProviderService', function(
-      $http, $rootScope, $modal, oppiaRequestCreator, messengerService,
-      stopwatchProviderService) {
+    '$http', '$rootScope', '$modal', 'messengerService', 'stopwatchProviderService',
+    function($http, $rootScope, $modal, messengerService, stopwatchProviderService) {
 
   var explorationId = null;
   // The pathname should be: .../explore/{exploration_id}
@@ -114,15 +112,12 @@ oppia.factory('oppiaPlayerService', [
 
   var _feedbackModalCallback = function(result) {
     if (result.feedback) {
-      $http.post(
-        '/explorehandler/give_feedback/' + explorationId,
-        oppiaRequestCreator.createRequest({
-          subject: result.subject,
-          feedback: result.feedback,
-          include_author: !result.isSubmitterAnonymized && isLoggedIn,
-          state_name: result.isStateRelated ? stateName : null
-        })
-      );
+      $http.post('/explorehandler/give_feedback/' + explorationId, {
+        subject: result.subject,
+        feedback: result.feedback,
+        include_author: !result.isSubmitterAnonymized && isLoggedIn,
+        state_name: result.isStateRelated ? stateName : null
+      });
 
       $modal.open({
         templateUrl: 'modals/playerFeedbackConfirmation',
@@ -154,18 +149,17 @@ oppia.factory('oppiaPlayerService', [
       }
 
       answerIsBeingProcessed = true;
-      $http.post(
-        '/explorehandler/transition/' + explorationId + '/' + encodeURIComponent(stateName),
-        oppiaRequestCreator.createRequest({
-          answer: answer,
-          handler: handler,
-          params: $rootScope.currentParams,
-          state_history: stateHistory,
-          version: version,
-          session_id: sessionId,
-          client_time_spent_in_secs: stopwatch.getTimeInSecs()
-        })
-      ).success(function(data) {
+
+      var stateTransitionUrl = '/explorehandler/transition/' + explorationId + '/' + encodeURIComponent(stateName);
+      $http.post(stateTransitionUrl, {
+        answer: answer,
+        handler: handler,
+        params: $rootScope.currentParams,
+        state_history: stateHistory,
+        version: version,
+        session_id: sessionId,
+        client_time_spent_in_secs: stopwatch.getTimeInSecs()
+      }).success(function(data) {
         answerIsBeingProcessed = false;
         messengerService.sendMessage(messengerService.STATE_TRANSITION, {
           oldStateName: stateName,

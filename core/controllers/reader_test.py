@@ -12,20 +12,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Sean Lip'
+"""Tests for the page that allows learners to play through an exploration."""
 
-import unittest
+__author__ = 'Sean Lip'
 
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
 class ReaderPermissionsTest(test_utils.GenericTestBase):
     """Test permissions for readers to view explorations."""
+
+    EXP_ID = 'eid'
 
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
@@ -36,8 +38,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             self.first_editor_email)
 
         self.register_editor(self.first_editor_email)
-
-        self.EXP_ID = 'eid'
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, 'A title', 'A category')
@@ -104,8 +104,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
-
-    TAGS = [test_utils.TestTags.SLOW_TEST]
 
     def setUp(self):
         super(ReaderControllerEndToEndTests, self).setUp()
@@ -216,8 +214,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
 
     def test_give_feedback_handler(self):
         """Test giving feedback handler."""
-        self.viewer_email = 'viewer@example.com'
-        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+        viewer_email = 'viewer@example.com'
 
         # Load demo exploration
         EXP_ID = '0'
@@ -225,7 +222,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Viewer opens exploration
-        self.login(self.viewer_email)
+        self.login(viewer_email)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
         state_name_1 = exploration_dict['state_name']

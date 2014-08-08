@@ -31,51 +31,7 @@ IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 SUBMIT_HANDLER_NAME = 'submit'
 
 
-class EventHandler(object):
-    """Records analytics events."""
-
-    @classmethod
-    def record_state_hit(cls, exploration_id, state_name, first_time):
-        """Record an event when a state is encountered by the reader."""
-        stats_models.StateCounterModel.inc(
-            exploration_id, state_name, first_time)
-
-    @classmethod
-    def record_answer_submitted(
-            cls, exploration_id, exploration_version, state_name,
-            handler_name, rule, answer):
-        """Records an event when an answer triggers a rule."""
-        # TODO(sll): Escape these args?
-        stats_models.process_submitted_answer(
-            exploration_id, exploration_version, state_name,
-            handler_name, rule, answer)
-
-    @classmethod
-    def resolve_answers_for_default_rule(
-            cls, exploration_id, state_name, handler_name, answers):
-        """Resolves a list of answers for the default rule of this state."""
-        # TODO(sll): Escape these args?
-        stats_models.resolve_answers(
-            exploration_id, state_name, handler_name,
-            exp_domain.DEFAULT_RULESPEC_STR, answers)
-
-    @classmethod
-    def start_exploration(cls, exp_id, exp_version, state_name, session_id,
-                          params, play_type):
-        stats_models.StartExplorationEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id, params,
-            play_type)
-
-    @classmethod
-    def maybe_leave_exploration(
-            cls, exp_id, exp_version, state_name, session_id, time_spent,
-            params, play_type):
-        stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id, time_spent,
-            params, play_type)
-
-
-def get_exploration_visit_count(exploration_id):
+def get_exploration_start_count(exploration_id):
     """Returns the number of times this exploration has been accessed."""
     # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
     exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -132,20 +88,6 @@ def get_state_rules_stats(exploration_id, state_name):
         }
 
     return results
-
-
-def get_exploration_annotations(exp_id):
-    """Gets exploration annotations.
-
-    NB: Currently unused.
-    """
-    # TODO(sll): This should return a domain object, not an ndb.Model instance.
-    exp_annotations = stats_models.ExplorationAnnotationsModel.get(
-        exp_id, strict=False)
-    if not exp_annotations:
-        exp_annotations = stats_models.ExplorationAnnotationsModel(
-            id=exp_id, num_visits=0, num_completions=0)
-    return exp_annotations
 
 
 def get_state_stats_for_exploration(exploration_id):
@@ -206,7 +148,6 @@ def get_state_improvements(exploration_id):
                 'rank': no_answer_submitted_count,
                 'improve_type': IMPROVE_TYPE_INCOMPLETE})
 
-        state_rank, improve_type = 0, ''
         if eligible_flags:
             eligible_flags = sorted(
                 eligible_flags, key=lambda flag: flag['rank'],

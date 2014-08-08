@@ -18,7 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ExplorationStatistics($scope, $http, $location, $modal, warningsData) {
+oppia.controller('ExplorationStatistics', [
+    '$scope', '$http', '$location', '$modal', 'warningsData',
+    function($scope, $http, $location, $modal, warningsData) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -37,7 +39,7 @@ function ExplorationStatistics($scope, $http, $location, $modal, warningsData) {
     $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.$parent.explorationId;
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
       var data = response.data;
-      var numVisits = data.num_visits;
+      var numVisits = data.num_starts;
       var numCompletions = data.num_completions;
       var improvements = data.improvements;
       $scope.stateStats = data.state_stats;
@@ -156,11 +158,4 @@ function ExplorationStatistics($scope, $http, $location, $modal, warningsData) {
       });
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ExplorationStatistics.$inject = [
-  '$scope', '$http', '$location', '$modal', 'warningsData'
-];
+}]);

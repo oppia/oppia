@@ -28,12 +28,12 @@ class Math(widget_domain.BaseWidget):
         'description': 'The raw string to be displayed as LaTeX.',
         'generator': generators.Copier,
         'init_args': {
-            'disallow_parse_with_jinja': True
+            'disallow_parse_with_jinja': True,
         },
         'customization_args': {
-            'value': ''
+            'value': '\\frac{x}{y}'
         },
-        'obj_type': 'UnicodeString',
+        'obj_type': 'MathLatexString',
     }]
 
     # The HTML tag name for this non-interactive widget.

@@ -16,6 +16,7 @@
 
 import itertools
 import os
+import shutil
 import tarfile
 import urllib
 import zipfile
@@ -179,7 +180,7 @@ download_files(ANGULAR_TEST_URL, ANGULAR_DST, ANGULAR_TEST_FILES)
 download_files(D3_URL, D3_DST, D3_FILES)
 
 
-# Download all the zip files.
+# Download all the frontend library zip files.
 
 SELECT2_REV = '3.4.1'
 SELECT2_ZIP_URL = (
@@ -232,6 +233,13 @@ UI_UTILS_ZIP_URL = (
 UI_UTILS_ZIP_ROOT_NAME = UI_UTILS_ROOT_NAME
 UI_UTILS_TARGET_ROOT_NAME = UI_UTILS_ROOT_NAME
 
+UI_SORTABLE_REV = '0.12.6'
+UI_SORTABLE_ZIP_URL = (
+    'https://github.com/angular-ui/ui-sortable/archive/src%s.zip'
+    % UI_SORTABLE_REV)
+UI_SORTABLE_ZIP_ROOT_NAME = 'ui-sortable-src%s' % UI_SORTABLE_REV
+UI_SORTABLE_TARGET_ROOT_NAME = 'ui-sortable-%s' % UI_SORTABLE_REV
+
 BOOTSTRAP_REV = '3.1.1'
 BOOTSTRAP_ROOT_NAME = 'bootstrap-%s-dist' % BOOTSTRAP_REV
 BOOTSTRAP_ZIP_URL = (
@@ -240,20 +248,12 @@ BOOTSTRAP_ZIP_URL = (
 BOOTSTRAP_ZIP_ROOT_NAME = BOOTSTRAP_ROOT_NAME
 BOOTSTRAP_TARGET_ROOT_NAME = 'bootstrap-%s' % BOOTSTRAP_REV
 
-BLEACH_REV = '1.2.2'
-BLEACH_ROOT_NAME = 'bleach-%s' % BLEACH_REV
-BLEACH_ZIP_URL = (
-    'https://github.com/jsocol/bleach/archive/v%s.zip' % BLEACH_REV)
-BLEACH_ZIP_ROOT_NAME = BLEACH_ROOT_NAME
-BLEACH_TARGET_ROOT_NAME = BLEACH_ROOT_NAME
-
-HTML5LIB_REV = '0.95'
-HTML5LIB_ROOT_NAME = 'html5lib-python-%s' % HTML5LIB_REV
-HTML5LIB_ZIP_URL = (
-    'https://github.com/html5lib/html5lib-python/archive/%s.zip'
-    % HTML5LIB_REV)
-HTML5LIB_ZIP_ROOT_NAME = HTML5LIB_ROOT_NAME
-HTML5LIB_TARGET_ROOT_NAME = HTML5LIB_ROOT_NAME
+MATHJAX_REV = '2.4-latest'
+MATHJAX_ROOT_NAME = 'MathJax-%s' % MATHJAX_REV
+MATHJAX_ZIP_URL = (
+    'https://github.com/mathjax/MathJax/archive/v%s.zip' % MATHJAX_REV)
+MATHJAX_ZIP_ROOT_NAME = MATHJAX_ROOT_NAME
+MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
 
 download_and_unzip_files(
     SELECT2_ZIP_URL, THIRD_PARTY_STATIC_DIR,
@@ -281,8 +281,44 @@ download_and_unzip_files(
     UI_UTILS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     UI_UTILS_ZIP_ROOT_NAME, UI_UTILS_TARGET_ROOT_NAME)
 download_and_unzip_files(
+    UI_SORTABLE_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    UI_SORTABLE_ZIP_ROOT_NAME, UI_SORTABLE_TARGET_ROOT_NAME)
+download_and_unzip_files(
     BOOTSTRAP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOOTSTRAP_ZIP_ROOT_NAME, BOOTSTRAP_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    MATHJAX_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    MATHJAX_ZIP_ROOT_NAME, MATHJAX_TARGET_ROOT_NAME)
+# MathJax is too big. Remove many unneeded files by following these
+# instructions:
+#   https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation
+MATHJAX_DIR_PREFIX = os.path.join(
+    THIRD_PARTY_STATIC_DIR, MATHJAX_TARGET_ROOT_NAME)
+MATHJAX_SUBDIRS_TO_REMOVE = [
+    'unpacked', os.path.join('fonts', 'HTML-CSS', 'TeX', 'png')]
+for subdir in MATHJAX_SUBDIRS_TO_REMOVE:
+    full_dir = os.path.join(MATHJAX_DIR_PREFIX, subdir)
+    if os.path.isdir(full_dir):
+        print 'Removing unnecessary MathJax directory \'%s\'' % subdir
+        shutil.rmtree(full_dir)
+
+
+# Download all the backend (Python) library zip files.
+
+BLEACH_REV = '1.2.2'
+BLEACH_ROOT_NAME = 'bleach-%s' % BLEACH_REV
+BLEACH_ZIP_URL = (
+    'https://github.com/jsocol/bleach/archive/v%s.zip' % BLEACH_REV)
+BLEACH_ZIP_ROOT_NAME = BLEACH_ROOT_NAME
+BLEACH_TARGET_ROOT_NAME = BLEACH_ROOT_NAME
+
+HTML5LIB_REV = '0.95'
+HTML5LIB_ROOT_NAME = 'html5lib-python-%s' % HTML5LIB_REV
+HTML5LIB_ZIP_URL = (
+    'https://github.com/html5lib/html5lib-python/archive/%s.zip'
+    % HTML5LIB_REV)
+HTML5LIB_ZIP_ROOT_NAME = HTML5LIB_ROOT_NAME
+HTML5LIB_TARGET_ROOT_NAME = HTML5LIB_ROOT_NAME
 
 download_and_unzip_files(
     BLEACH_ZIP_URL, THIRD_PARTY_DIR,
@@ -291,6 +327,8 @@ download_and_unzip_files(
     HTML5LIB_ZIP_URL, THIRD_PARTY_DIR,
     HTML5LIB_ZIP_ROOT_NAME, HTML5LIB_TARGET_ROOT_NAME)
 
+
+# Download all the tar files.
 
 GAE_MAPREDUCE_REV = '1.9.0.0'
 GAE_MAPREDUCE_ROOT_NAME = 'gae-mapreduce-%s' % GAE_MAPREDUCE_REV

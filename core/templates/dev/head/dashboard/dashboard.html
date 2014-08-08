@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Dashboard
+{% endblock subtitle %}
+
+{% block content %}
+  <div class="container" ng-controller="Dashboard">
+    <div class="row">
+      <div class="col-lg-8 col-md-8 col-sm-8">
+        <div class="oppia-main-content">
+          <h3 class="oppia-page-title">
+            Dashboard
+          </h3>
+
+          <h4>Private explorations</h4>
+            <ul>
+              <li ng-repeat="expId in privateExplorationIds">
+                <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
+              </li>
+            </ul>
+
+            <div>
+              <a class="btn btn-success" ng-click="showCreateExplorationModal()">
+                Create New Exploration
+              </a>
+            </div>
+          </h4>
+
+          <div ng-if="!isEmpty(betaExplorationIds)">
+            <hr>
+            <h4>Beta explorations</h4>
+            <ul>
+              <li ng-repeat="expId in betaExplorationIds">
+                <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-if="!isEmpty(releasedExplorationIds)">
+            <hr>
+            <h4>Released explorations</h4>
+            <ul>
+              <li ng-repeat="expId in releasedExplorationIds">
+                <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
+              </li>
+            </ul>
+          </div>
+
+          <div ng-if="isEmpty(privateExplorationIds) && isEmpty(betaExplorationIds) && isEmpty(releasedExplorationIds)">
+            <p>
+              <em>You currently aren't managing or collaborating on any explorations.</em>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% include 'components/exploration_creation_button.html' %}
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('components/explorationCreationButton.js') }}
+    {{ include_js_file('/dashboard/Dashboard.js') }}
+  </script>
+{% endblock footer_js %}

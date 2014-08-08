@@ -16,72 +16,101 @@
 
 __author__ = 'Stephanie Federwisch'
 
-"""Tests for statistics MapReduce jobs."""
+"""Tests for statistics continuous computations."""
 
 from datetime import datetime
 
-from core import jobs
+from core import jobs_registry
+from core.domain import event_services
 from core.domain import stats_jobs
-from core.domain import stats_services
 from core.platform import models
-(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
+(job_models, stats_models,) = models.Registry.import_models([
+    models.NAMES.job, models.NAMES.statistics])
+from core.tests import test_utils
 import feconf
-import test_utils
 
 
-class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
+class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
+    """A modified StatisticsAggregator that does not start a new batch
+    job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return ModifiedStatisticsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class ModifiedStatisticsMRJobManager(stats_jobs.StatisticsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return ModifiedStatisticsAggregator
+
+
+class StatsPageJobUnitTests(test_utils.GenericTestBase):
     """Tests for exploration annotations."""
 
-    def test_no_completion(self):
-        exp_id = 'eid'
-        version = 1
-        state = 'sid'
-        stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        job_id = (
-           stats_jobs.StatisticsPageJobManager.create_new())
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
+        ModifiedStatisticsAggregator]
 
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id), 
-            jobs.STATUS_CODE_COMPLETED)
-        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
-        self.assertEqual(output_model.num_completions, 0)
+    def test_no_completion(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            version = 1
+            state = 'sid'
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session1', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.process_and_flush_pending_tasks()
+
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            self.assertEqual(output_model.num_starts, 2)
+            self.assertEqual(output_model.num_completions, 0)
 
     def test_all_complete(self):
-        exp_id = 'eid'
-        version = 1
-        state = 'sid'
-        stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.maybe_leave_exploration(
-            exp_id, version, feconf.END_DEST, 'session1', 27, {},
-            feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        stats_services.EventHandler.maybe_leave_exploration(
-            exp_id, version, feconf.END_DEST, 'session2', 27, {},
-            feconf.PLAY_TYPE_NORMAL)
-        job_id = stats_jobs.StatisticsPageJobManager.create_new()
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            version = 1
+            state = 'sid'
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session1', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.MaybeLeaveExplorationEventHandler.record(
+                exp_id, version, feconf.END_DEST, 'session1', 27, {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.MaybeLeaveExplorationEventHandler.record(
+                exp_id, version, feconf.END_DEST, 'session2', 27, {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.process_and_flush_pending_tasks()
 
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
-        self.assertEqual(output_model.num_completions, 2)
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
 
-    def create_leave_event(self, exp_id, version, state, session, created_on):
+            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            self.assertEqual(output_model.num_starts, 2)
+            self.assertEqual(output_model.num_completions, 2)
+
+    def _create_leave_event(self, exp_id, version, state, session, created_on):
         leave = stats_models.MaybeLeaveExplorationEventLogEntryModel(
-            event_type=feconf.EVENT_TYPE_LEAVE,
+            event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
             exploration_id=exp_id,
             exploration_version=version,
             state_name=state,
@@ -93,29 +122,31 @@ class StatsPageJobIntegrationTests(test_utils.GenericTestBase):
         leave.created_on = datetime.fromtimestamp(created_on)
         leave.put()
 
-
     def test_multiple_maybe_leaves_same_session(self):
-        exp_id = 'eid'
-        version = 1
-        state = 'sid'
-        stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session1', {}, feconf.PLAY_TYPE_NORMAL)
-        self.create_leave_event(exp_id, version, state, 'session1', 0)
-        self.create_leave_event(exp_id, version, state, 'session1', 1)
-        self.create_leave_event(exp_id, version, feconf.END_DEST, 'session1', 2)
-        stats_services.EventHandler.start_exploration(
-            exp_id, version, state, 'session2', {}, feconf.PLAY_TYPE_NORMAL)
-        self.create_leave_event(exp_id, version, state, 'session2', 3)
-        self.create_leave_event(exp_id, version, state, 'session2', 4)
-        job_id = stats_jobs.StatisticsPageJobManager.create_new()
-        stats_jobs.StatisticsPageJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            exp_id = 'eid'
+            version = 1
+            state = 'sid'
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session1', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self._create_leave_event(exp_id, version, state, 'session1', 0)
+            self._create_leave_event(exp_id, version, state, 'session1', 1)
+            self._create_leave_event(
+                exp_id, version, feconf.END_DEST, 'session1', 2)
+            event_services.StartExplorationEventHandler.record(
+                exp_id, version, state, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self._create_leave_event(exp_id, version, state, 'session2', 3)
+            self._create_leave_event(exp_id, version, state, 'session2', 4)
+            self.process_and_flush_pending_tasks()
 
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(
-            stats_jobs.StatisticsPageJobManager.get_status_code(job_id),
-            jobs.STATUS_CODE_COMPLETED)
-        output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
-        self.assertEqual(output_model.num_visits, 2)
-        self.assertEqual(output_model.num_completions, 1)
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
 
+            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            self.assertEqual(output_model.num_starts, 2)
+            self.assertEqual(output_model.num_completions, 1)

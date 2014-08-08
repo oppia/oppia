@@ -19,7 +19,9 @@
  */
 
 // Global utility methods.
-function Base($scope, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
+oppia.controller('Base', [
+    '$scope', '$rootScope', '$window', '$log', 'warningsData', 'activeInputData', 'messengerService',
+    function($scope, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
@@ -84,11 +86,4 @@ function Base($scope, $rootScope, $window, $log, warningsData, activeInputData, 
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-Base.$inject = [
-  '$scope', '$rootScope', '$window', '$log', 'warningsData',
-  'activeInputData', 'messengerService'];
+}]);

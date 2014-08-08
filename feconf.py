@@ -245,6 +245,7 @@ EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
+HOMEPAGE_URL = '/'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -254,7 +255,6 @@ RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-SPLASH_PAGE_URL = '/'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CONTACT = 'contact'
@@ -265,10 +265,14 @@ NAV_MODE_LEARN = 'learn'
 NAV_MODE_PLAYTEST = 'playtest'
 NAV_MODE_PROFILE = 'profile'
 
-# Event types
-EVENT_TYPE_LEAVE = 'leave'
-EVENT_TYPE_START = 'start'
-EVENT_TYPE_COMPLETE = 'complete'
+# Event types.
+EVENT_TYPE_STATE_HIT = 'state_hit'
+EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
+EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
+# The values for these two event types should be left as-is for backwards
+# compatibility.
+EVENT_TYPE_START_EXPLORATION = 'start'
+EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'

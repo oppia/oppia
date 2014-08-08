@@ -18,7 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreator) {
+ oppia.controller('LearnGallery', ['$scope', '$http', '$rootScope', function(
+    $scope, $http, $rootScope) {
   $scope.learnGalleryDataUrl = '/learnhandler/data';
   $scope.categoryList = [];
   $scope.categories = {};
@@ -41,12 +42,5 @@ function LearnGallery($scope, $http, $rootScope, warningsData, oppiaRequestCreat
     $scope.displayedCategories = angular.copy($scope.categories);
 
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-LearnGallery.$inject = ['$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator'];
+}]);

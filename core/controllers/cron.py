@@ -14,27 +14,4 @@
 
 """Controllers for the cron jobs."""
 
-from core.controllers import base
-from core.domain import exp_services
-from core import jobs_registry
-
-
-class StatisticsHandler(base.BaseHandler):
-    """Handler for statistics cron job."""
-
-    def get(self):
-        """Handles GET requests."""
-        for klass in jobs_registry.JOB_MANAGER_CLASSES:
-             if klass.__name__ == 'StatisticsPageJobManager':
-                 klass.enqueue(klass.create_new())
-                 break
-
-
-class SearchUpdateIndexHandler(base.BaseHandler):
-    def get(self):
-        exp_services.update_search_index()
-
-
-class SearchRebuildIndexHandler(base.BaseHandler):
-    def get(self):
-        exp_services.rebuild_index()
+pass

@@ -12,18 +12,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Main package for URL routing and the index page."""
+"""URL routing definitions, and some basic error/warmup handlers."""
 
 __author__ = 'Sean Lip'
 
 import feconf
 import logging
 
+from core import jobs_registry
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
+from core.controllers import home
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
@@ -32,6 +34,7 @@ from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import services
 from core.controllers import widgets
+from core.domain import event_services
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
@@ -39,19 +42,6 @@ from mapreduce import main as mapreduce_main
 from mapreduce import parameters as mapreduce_parameters
 import webapp2
 from webapp2_extras.routes import RedirectRoute
-
-
-class Error404Handler(base.BaseHandler):
-    """Handles 404 errors."""
-
-    def get(self):
-        """Raises a PageNotFoundException if an invalid URL is entered.
-
-        For robots.txt requests, returns an empty response so that the error
-        does not show up in the logs.
-        """
-        if not self.request.uri.endswith('robots.txt'):
-            raise self.PageNotFoundException
 
 
 class FrontendErrorHandler(base.BaseHandler):
@@ -153,7 +143,11 @@ urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
     webapp2.Route(
-        r'%s' % feconf.SPLASH_PAGE_URL, pages.SplashPage, 'splash_page'),
+        r'%s' % feconf.HOMEPAGE_URL, home.HomePage, 'home_page'),
+    get_redirect_route(
+        r'/dashboardhandler/data', home.DashboardHandler,
+        'dashboard_handler'),
+
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
     get_redirect_route(
         r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
@@ -305,13 +299,12 @@ urls = [
 
     get_redirect_route(
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
+
+    # 404 error handler.
+    get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),
 ]
 
-# 404 error handler.
-error404_handler = [webapp2.Route(r'/.*', Error404Handler)]
-
-urls = mapreduce_handlers + urls + error404_handler
-
+urls = mapreduce_handlers + urls
 
 app = transaction_services.toplevel_wrapper(
     webapp2.WSGIApplication(urls, debug=feconf.DEBUG))

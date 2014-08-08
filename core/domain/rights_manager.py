@@ -214,6 +214,21 @@ def get_community_owned_exploration_rights():
             exp_models.ExplorationRightsModel.get_community_owned()]
 
 
+def get_at_least_editable_exploration_rights(user_id):
+    """Returns rights objects for all explorations that this user edits or
+    owns."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_at_least_editable(user_id)]
+
+
+def get_private_at_least_viewable_exploration_rights(user_id):
+    """Returns rights objects for all private explorations that this user can
+    view, edit or own."""
+    return [_get_exploration_rights_from_model(model) for model in
+            exp_models.ExplorationRightsModel.get_private_at_least_viewable(
+                user_id)]
+
+
 def get_viewable_exploration_rights(user_id):
     """Returns rights objects for some explorations viewable by this user.
 
@@ -227,37 +242,6 @@ def get_viewable_exploration_rights(user_id):
     """
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_viewable(user_id)]
-
-
-def get_editable_exploration_rights(user_id):
-    """Returns rights objects for some explorations editable by this user.
-
-    These explorations have the user explicitly listed in the editor_ids field.
-    This means that the user can edit and view this exploration, but does not
-    own it.
-
-    There may be other explorations that this user can edit -- namely, those
-    that he/she owns -- that are not returned by this query.
-    """
-    return [_get_exploration_rights_from_model(model) for model in
-            exp_models.ExplorationRightsModel.get_editable(user_id)]
-
-
-def get_private_at_least_viewable_exploration_rights(user_id):
-    """Returns rights objects for all private explorations that this user can
-    view, edit or own."""
-    return [_get_exploration_rights_from_model(model) for model in
-            exp_models.ExplorationRightsModel.get_private_at_least_viewable(
-                user_id)]
-
-
-def get_owned_exploration_rights(user_id):
-    """Returns rights objects for explorations owned by this user.
-
-    Such a user can also view and edit these explorations.
-    """
-    return [_get_exploration_rights_from_model(model) for model in
-            exp_models.ExplorationRightsModel.get_owned(user_id)]
 
 
 def is_exploration_private(exploration_id):

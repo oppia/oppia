@@ -18,18 +18,24 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function SchemaEditorTests($scope, parameterSpecsService) {
+oppia.controller('SchemaEditorTests', [
+    '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramBool1', 'bool');
   parameterSpecsService.addParamSpec('paramBool2', 'bool');
   parameterSpecsService.addParamSpec('paramInt1', 'int');
   parameterSpecsService.addParamSpec('paramFloat1', 'float');
   parameterSpecsService.addParamSpec('paramFloat2', 'float');
+  parameterSpecsService.addParamSpec('paramUnicode1', 'unicode');
+  parameterSpecsService.addParamSpec('paramUnicode2', 'unicode');
+  parameterSpecsService.addParamSpec('paramUnicode3', 'unicode');
+
+  $scope.testText = 'abc{{paramUnicode1}}';
 
   $scope.unicodeForm = {
     schema: {
       type: 'unicode'
     },
-    value: 'aab'
+    value: 'aab{{paramUnicode1}}'
   };
 
   $scope.booleanForms = [{
@@ -127,7 +133,7 @@ function SchemaEditorTests($scope, parameterSpecsService) {
     schema: {
       type: 'html'
     },
-    value: 'Some <b>HTML</b>' 
+    value: 'Some <b>HTML</b>'
   }];
 
   $scope.compositeForms = [{
@@ -209,9 +215,4 @@ function SchemaEditorTests($scope, parameterSpecsService) {
     name: 'Composite editors',
     forms: $scope.compositeForms
   }];
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-SchemaEditorTests.$inject = ['$scope', 'parameterSpecsService'];
+}]);
