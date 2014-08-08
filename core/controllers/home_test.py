@@ -12,12 +12,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for various static pages (like About, Contact, etc.)."""
+"""Tests for the home page (i.e. the splash page and user dashboard)."""
 
 __author__ = 'Sean Lip'
 
+from core.domain import rights_manager
 from core.tests import test_utils
-import feconf
 
 
 class HomePageTest(test_utils.GenericTestBase):
@@ -73,4 +73,115 @@ class HomePageTest(test_utils.GenericTestBase):
             no=['Login', 'Create an Oppia account',
                 'Bite-sized learning journeys',
                 self.get_expected_login_url('/')])
+        self.logout()
+
+
+class DashboardHandlerTest(test_utils.GenericTestBase):
+
+    OWNER_EMAIL = 'editor@example.com'
+    COLLABORATOR_EMAIL = 'collaborator@example.com'
+    VIEWER_EMAIL = 'viewer@example.com'
+    EXP_ID = 'exp_id'
+    EXP_TITLE = 'Exploration title'
+
+    def setUp(self):
+        super(DashboardHandlerTest, self).setUp()
+        self.register_editor(self.OWNER_EMAIL, username='owner')
+        self.register_editor(
+            self.COLLABORATOR_EMAIL, username='collaborator')
+        self.register_editor(self.VIEWER_EMAIL, username='viewer')
+        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.COLLABORATOR_ID = self.get_user_id_from_email(
+            self.COLLABORATOR_EMAIL)
+        self.VIEWER_ID = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+    def test_no_explorations(self):
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(response['explorations'], {})
+        self.logout()
+
+    def test_managers_can_see_explorations_on_dashboard(self):
+        self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID, title=self.EXP_TITLE)
+        self.set_admins([self.OWNER_EMAIL])
+
+        self.login(self.OWNER_EMAIL)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(len(response['explorations']), 1)
+        self.assertIn(self.EXP_ID, response['explorations'])
+        self.assertEqual(
+            response['explorations'][self.EXP_ID]['rights']['status'],
+            rights_manager.EXPLORATION_STATUS_PRIVATE)
+
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(len(response['explorations']), 1)
+        self.assertIn(self.EXP_ID, response['explorations'])
+        self.assertEqual(
+            response['explorations'][self.EXP_ID]['rights']['status'],
+            rights_manager.EXPLORATION_STATUS_PUBLIC)
+
+        rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(len(response['explorations']), 1)
+        self.assertIn(self.EXP_ID, response['explorations'])
+        self.assertEqual(
+            response['explorations'][self.EXP_ID]['rights']['status'],
+            rights_manager.EXPLORATION_STATUS_PUBLICIZED)
+        self.logout()
+
+    def test_collaborators_can_see_explorations_on_dashboard(self):
+        self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID, title=self.EXP_TITLE)
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.COLLABORATOR_ID,
+            rights_manager.ROLE_EDITOR)
+        self.set_admins([self.OWNER_EMAIL])
+
+        self.login(self.COLLABORATOR_EMAIL)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(len(response['explorations']), 1)
+        self.assertIn(self.EXP_ID, response['explorations'])
+        self.assertEqual(
+            response['explorations'][self.EXP_ID]['rights']['status'],
+            rights_manager.EXPLORATION_STATUS_PRIVATE)
+
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(len(response['explorations']), 1)
+        self.assertIn(self.EXP_ID, response['explorations'])
+        self.assertEqual(
+            response['explorations'][self.EXP_ID]['rights']['status'],
+            rights_manager.EXPLORATION_STATUS_PUBLIC)
+
+        rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(len(response['explorations']), 1)
+        self.assertIn(self.EXP_ID, response['explorations'])
+        self.assertEqual(
+            response['explorations'][self.EXP_ID]['rights']['status'],
+            rights_manager.EXPLORATION_STATUS_PUBLICIZED)
+
+        self.logout()
+
+    def test_viewer_cannot_see_explorations_on_dashboard(self):
+        self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID, title=self.EXP_TITLE)
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
+
+        self.login(self.VIEWER_EMAIL)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(response['explorations'], {})
+
+        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(response['explorations'], {})
+
+        self.set_admins([self.OWNER_EMAIL])
+        rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
+        response = self.get_json('/dashboardhandler/data')
+        self.assertEqual(response['explorations'], {})
         self.logout()

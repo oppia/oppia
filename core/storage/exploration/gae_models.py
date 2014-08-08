@@ -223,20 +223,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).fetch(QUERY_LIMIT)
 
     @classmethod
-    def get_viewable(cls, user_id):
-        """Returns an iterable with exp rights viewable by the given user.
-
-        All such explorations will have a status of 'private'.
-        """
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.viewer_ids == user_id
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
-
-    @classmethod
     def get_private_at_least_viewable(cls, user_id):
-        """Returns an iterable with private exps that are at least viewable."""
+        """Returns an iterable with private exps that are at least viewable
+        by the given user.
+        """
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status == EXPLORATION_STATUS_PRIVATE
         ).filter(
@@ -246,25 +236,25 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).fetch(QUERY_LIMIT)
 
     @classmethod
-    def get_editable(cls, user_id):
-        """Returns an iterable with exp rights editable by the given user.
-
-        This includes both private and public explorations.
+    def get_at_least_editable(cls, user_id):
+        """Returns an iterable with all exps that are at least editable by the
+        given user.
         """
         return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.editor_ids == user_id
+            ndb.OR(ExplorationRightsModel.owner_ids == user_id,
+                   ExplorationRightsModel.editor_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)
 
     @classmethod
-    def get_owned(cls, user_id):
-        """Returns an iterable with exp rights owned by the given user.
+    def get_viewable(cls, user_id):
+        """Returns an iterable with exp rights viewable by the given user.
 
-        This includes both private and public explorations.
+        All such explorations will have a status of 'private'.
         """
         return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.owner_ids == user_id
+            ExplorationRightsModel.viewer_ids == user_id
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)

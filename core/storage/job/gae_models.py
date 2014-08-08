@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 import random
-import time
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])

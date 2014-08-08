@@ -19,7 +19,8 @@ import unittest
 import webtest
 
 from core.domain import config_domain
-from core.domain import event_services
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -195,6 +196,31 @@ class TestBase(unittest.TestCase):
 
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
+
+    def save_new_default_exploration(self,
+            exploration_id, owner_id, title='A title'):
+        """Saves a new default exploration written by owner_id.
+
+        Returns the exploration domain object.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title, 'A category')
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
+
+    def save_new_valid_exploration(
+            self, exploration_id, owner_id, title='A title'):
+        """Saves a new strictly-validated exploration.
+
+        Returns the exploration domain object.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title, 'A category')
+        exploration.states[exploration.init_state_name].widget.handlers[
+            0].rule_specs[0].dest = feconf.END_DEST
+        exploration.objective = 'An objective'
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):
