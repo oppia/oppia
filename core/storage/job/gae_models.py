@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 import random
-import time
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
@@ -76,12 +75,10 @@ class JobModel(base_models.BaseModel):
     # code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
     error = ndb.TextProperty(indexed=False)
 
-    def can_be_canceled(self):
+    @property
+    def is_cancelable(self):
+        # Whether the job is currently in 'queued' or 'started' status.
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
-
-    # A computed property stating whether the job is currently in queued or
-    # started status.
-    is_cancelable = ndb.ComputedProperty(can_be_canceled)
 
     @classmethod
     def get_recent_jobs(cls, recency_msec):
@@ -98,7 +95,7 @@ class JobModel(base_models.BaseModel):
     @classmethod
     def get_unfinished_jobs(cls, job_type):
         return cls.query().filter(cls.job_type == job_type).filter(
-            cls.is_cancelable == True)
+            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED]))
 
     @classmethod
     def do_unfinished_jobs_exist(cls, job_type):

@@ -220,29 +220,6 @@ def get_explicit_viewer_explorations_summary_dict(
         include_timestamps=include_timestamps)
 
 
-def get_explicit_editor_explorations_summary_dict(user_id):
-    """Returns a summary of some editable explorations for this user.
-
-    These explorations have the user explicitly listed in the editor_ids field.
-    This means that the user can edit and view this exploration, but does not
-    own it.
-
-    There may be other explorations that this user can edit -- namely, those
-    that he/she owns -- that are not returned by this query.
-    """
-    return _get_explorations_summary_dict(
-        rights_manager.get_editable_exploration_rights(user_id))
-
-
-def get_owned_explorations_summary_dict(user_id):
-    """Returns a summary of explorations owned by this user.
-
-    Such a user can also view and edit these explorations.
-    """
-    return _get_explorations_summary_dict(
-        rights_manager.get_owned_exploration_rights(user_id))
-
-
 def get_private_at_least_viewable_summary_dict(user_id):
     """Returns a summary of private explorations that are at least viewable by
     this user.
@@ -250,6 +227,14 @@ def get_private_at_least_viewable_summary_dict(user_id):
     return  _get_explorations_summary_dict(
         rights_manager.get_private_at_least_viewable_exploration_rights(
             user_id))
+
+
+def get_at_least_editable_summary_dict(user_id):
+    """Returns a summary of explorations that are at least editable by this
+    user.
+    """
+    return  _get_explorations_summary_dict(
+        rights_manager.get_at_least_editable_exploration_rights(user_id))
 
 
 def get_viewable_explorations_summary_dict(user_id):
