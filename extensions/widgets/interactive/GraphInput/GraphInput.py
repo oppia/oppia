@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-__author__ = 'Chin Zhan Xiong'
+__author__ = 'Zhan Xiong Chin'
 
 from core.domain import widget_domain
 from extensions.value_generators.models import generators
