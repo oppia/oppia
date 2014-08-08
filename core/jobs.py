@@ -629,13 +629,19 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
 
 class BaseRealtimeDatastoreClassForContinuousComputations(
         base_models.BaseModel):
-    """Storage class for processing of entities in the realtime layer.
+    """Storage class for entities in the realtime layer.
 
-    IDs for instances of this class are of the form 0:... or 1:..., where
+    Instances of this class represent individual entities that are stored in
+    the realtime datastore. Note that the realtime datastore may be formatted
+    differently from the datastores that are iterated over by the MapReduce
+    job.
+
+    The IDs for instances of this class are of the form 0:... or 1:..., where
     the 0 or 1 indicates the realtime layer that the entity is in.
 
     NOTE TO DEVELOPERS: Ensure that you wrap the id with get_realtime_id()
-    when doing creations, gets, puts and queries.
+    when doing creations, gets, puts and queries, in order to ensure that the
+    relevant layer prefix gets appended.
     """
     realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
 
@@ -662,7 +668,7 @@ class BaseRealtimeDatastoreClassForContinuousComputations(
     @classmethod
     def get(cls, entity_id, strict=True):
         if not cls._is_valid_realtime_id(entity_id):
-            raise Exception('Invalid realtime id: %s' % entity_id)
+            raise ValueError('Invalid realtime id: %s' % entity_id)
 
         return super(
             BaseRealtimeDatastoreClassForContinuousComputations, cls
