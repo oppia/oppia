@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Common utilities for test classes."""
+
 import contextlib
 import os
 import re
@@ -31,6 +33,8 @@ import json
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+# Prefix to append to all lines printed by tests to the console.
+LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
 
 def empty_environ():
@@ -45,20 +49,10 @@ def empty_environ():
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
 
-class TestTags(object):
-    """Tags for labelling particular tests."""
-
-    # Tag that is used to flag tests which take a long time to run, so that
-    # they can be excluded via a command-line argument.
-    SLOW_TEST = 1
-
-
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
     maxDiff = 2500
-
-    TAGS = []
 
     DEFAULT_USERNAME = 'defaultusername'
 
@@ -67,6 +61,12 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         raise NotImplementedError
+
+    def log_line(self, line):
+        """Print the line with a prefix that can be identified by the
+        script that calls the test.
+        """
+        print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
         raise NotImplementedError

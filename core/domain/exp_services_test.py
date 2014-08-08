@@ -330,8 +330,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
-
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
         self.assertEqual(exp_services.count_explorations(), 0)
@@ -352,8 +350,9 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
             duration = datetime.datetime.utcnow() - start_time
             processing_time = duration.seconds + duration.microseconds / 1E6
-            print 'Loaded and validated exploration %s (%.2f seconds)' % (
-                exploration.title.encode('utf-8'), processing_time)
+            self.log_line(
+                'Loaded and validated exploration %s (%.2f seconds)' % (
+                exploration.title.encode('utf-8'), processing_time))
 
         self.assertEqual(
             exp_services.count_explorations(), len(feconf.DEMO_EXPLORATIONS))

@@ -46,7 +46,6 @@ done
 export NO_JSREPL
 export remaining_params
 
-echo Checking name of current directory
 EXPECTED_PWD='oppia'
 if [ ${PWD##*/} != $EXPECTED_PWD ]; then
   echo This script should be run from the oppia/ root folder.
