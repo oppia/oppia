@@ -21,6 +21,7 @@ __author__ = 'Zhan Xiong Chin'
 from extensions.rules import base
 import itertools
 
+# TODO(czx): Speed up the isomorphism checker?
 class IsIsomorphic(base.GraphRule):
     description = 'is isomorphic to {{g|Graph}}'
     is_generic = False
@@ -33,14 +34,21 @@ class IsIsomorphic(base.GraphRule):
         # Construct adjacency matrix
         adj = [[0 for v in subject['vertices']] for v in subject['vertices']]
         for edge in subject['edges']:
-            adj[edge['src']][edge['dst']] = edge['weight']
+            weight = 1
+            if subject['isWeighted']:
+                weight = edge['weight']
+            adj[edge['src']][edge['dst']] = weight
             if not subject['isDirected']:
-                adj[edge['dst']][edge['src']] = edge['weight']
+                adj[edge['dst']][edge['src']] = weight
+        # Check against every permutation of vertices
         numVertices = len(subject['vertices'])
         for perm in itertools.permutations(range(numVertices)):
             foundIsomorphism = True
             for edge in self.g['edges']:
-                if adj[perm[edge['src']]][perm[edge['dst']]] != edge['weight']:
+                weight = 1
+                if self.g['isWeighted']:
+                    weight = edge['weight']
+                if adj[perm[edge['src']]][perm[edge['dst']]] != weight:
                     foundIsomorphism = False
                     break
             if foundIsomorphism:
