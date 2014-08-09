@@ -68,7 +68,7 @@ def get_user_id_from_email(email):
         raise utils.InvalidInputException(
             'User with email address %s not found' % email)
 
-    key = _FakeUser(user=u).put()
+    key = _FakeUser(id=email, user=u).put()
     obj = _FakeUser.get_by_id(key.id())
     user_id = obj.user.user_id()
     if user_id:
