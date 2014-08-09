@@ -28,8 +28,6 @@ import subprocess
 import threading
 import time
 
-import common
-
 # DEVELOPERS: Please change this number accordingly when new tests are added
 # or removed.
 EXPECTED_TEST_COUNT = 325
@@ -206,7 +204,6 @@ def _get_all_test_targets(test_path=None):
 
 def main():
     """Run the tests."""
-    common.require_cwd_to_be_oppia()
     parsed_args = _PARSER.parse_args()
     if parsed_args.test_target and parsed_args.test_path:
         raise Exception('At most one of test_path and test_target '
@@ -284,11 +281,12 @@ def main():
 
     print ''
     if total_count == 0:
-        print 'WARNING: No tests were run.'
+        raise Exception('WARNING: No tests were run.')
     elif (parsed_args.test_path is None and parsed_args.test_target is None
             and total_count != EXPECTED_TEST_COUNT):
-        print ('ERROR: Expected %s tests to be run, not %s.' %
-               (EXPECTED_TEST_COUNT, total_count))
+        raise Exception(
+            'ERROR: Expected %s tests to be run, not %s.' %
+            (EXPECTED_TEST_COUNT, total_count))
     else:
         print 'Successfully ran %s test%s in %s test class%s.' % (
             total_count, '' if total_count == 1 else 's',
