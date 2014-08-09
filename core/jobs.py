@@ -492,11 +492,6 @@ class BaseMapReduceJobManager(BaseJobManager):
             root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
             pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
-    @classmethod
-    def _require_correct_job_type(cls, job_type):
-        # Suppress check for correct job type since we cannot pass the specific
-        # entity class in the kwargs.
-        pass
 
 
 ABSTRACT_BASE_CLASSES = frozenset([
