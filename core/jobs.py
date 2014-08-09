@@ -429,6 +429,10 @@ class BaseMapReduceJobManager(BaseJobManager):
           times as appropriate (including zero) to return key/value 2-tuples.
           For example, to get a count of all explorations, one might yield
           (exploration.id, 1).
+
+          WARNING: The OutputWriter converts mapper output keys to type str.
+          So, if you have keys that are of type unicode, you must yield
+          "key.encode('utf-8')", rather than "key".
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement map '

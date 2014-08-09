@@ -192,9 +192,11 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                 # Note that some explorations may have been deleted since their
                 # corresponding StateCounterModel entry was created.
                 return
-            if state_name in [feconf.END_DEST, exploration.init_state_name]:
-                item_key = TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
-                    exp_id, state_name)
+
+            unicode_state_name = state_name.decode('utf-8')
+            if unicode_state_name in [feconf.END_DEST, exploration.init_state_name]:
+                item_key = (TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
+                    exp_id, unicode_state_name)).encode('utf-8')
 
                 yield (item_key, {
                     'type': (
@@ -206,8 +208,8 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                 })
         elif isinstance(item, stats_models.StartExplorationEventLogEntryModel):
             if item.state_name != feconf.END_DEST:
-                item_key = TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
-                    item.exploration_id, item.state_name)
+                item_key = (TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
+                    item.exploration_id, item.state_name)).encode('utf-8')
 
                 yield (item_key, {
                     'type': (
@@ -219,8 +221,8 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
         elif isinstance(
                 item, stats_models.MaybeLeaveExplorationEventLogEntryModel):
             if item.state_name == feconf.END_DEST:
-                item_key = TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
-                    item.exploration_id, item.state_name)
+                item_key = (TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
+                    item.exploration_id, item.state_name)).encode('utf-8')
 
                 yield (item_key, {
                     'type': TranslateStartAndCompleteEventsJobManager.TYPE_END,

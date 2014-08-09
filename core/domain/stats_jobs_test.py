@@ -164,9 +164,8 @@ class OneOffTranslationTest(test_utils.GenericTestBase):
         super(OneOffTranslationTest, self).setUp()
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, 'title', 'A category')
-        # TODO(sll): Change this to u'éíớệм' in order to test that unicode
-        # characters are handled correctly.
-        exploration.rename_state(exploration.init_state_name,  'abcde')
+        # Convert the state name into unicode.
+        exploration.rename_state(exploration.init_state_name,  u'éíớệм')
         exp_services.save_new_exploration('owner_id', exploration)
 
         # Record two StateCounter events and one StartExploration event.
