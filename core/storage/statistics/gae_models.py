@@ -76,7 +76,8 @@ class StateCounterModel(base_models.BaseModel):
         counter.put()
 
     def get_exploration_id_and_state_name(self):
-        return self.id.split('.')
+        first_dot_loc = self.id.find('.')
+        return self.id[:first_dot_loc], self.id[first_dot_loc + 1:]
 
 
 class StateRuleAnswerLogModel(base_models.BaseModel):

@@ -187,10 +187,15 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
 
         if isinstance(item, stats_models.StateCounterModel):
             exp_id, state_name = item.get_exploration_id_and_state_name()
-            exploration = exp_services.get_exploration_by_id(exp_id)
+            exploration = exp_services.get_exploration_by_id(exp_id, strict=False)
+            if exploration is None:
+                # Note that some explorations may have been deleted since their
+                # corresponding StateCounterModel entry was created.
+                return
             if state_name in [feconf.END_DEST, exploration.init_state_name]:
                 item_key = TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
                     exp_id, state_name)
+
                 yield (item_key, {
                     'type': (
                         TranslateStartAndCompleteEventsJobManager.TYPE_COUNTER),
@@ -203,6 +208,7 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
             if item.state_name != feconf.END_DEST:
                 item_key = TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
                     item.exploration_id, item.state_name)
+
                 yield (item_key, {
                     'type': (
                         TranslateStartAndCompleteEventsJobManager.TYPE_START),
@@ -215,6 +221,7 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
             if item.state_name == feconf.END_DEST:
                 item_key = TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
                     item.exploration_id, item.state_name)
+
                 yield (item_key, {
                     'type': TranslateStartAndCompleteEventsJobManager.TYPE_END,
                     'exp_id': item.exploration_id,
