@@ -87,9 +87,9 @@ class ExplorationModel(base_models.VersionedModel):
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
 
     @classmethod
-    def get_multi(cls, exp_ids):
+    def get_multi(cls, exp_ids, strict=False):
         """Returns a list of exploration models, given a list of ids."""
-        return super(ExplorationModel, cls).get_multi(exp_ids)
+        return super(ExplorationModel, cls).get_multi(exp_ids, strict)
 
     @classmethod
     def get_exploration_count(cls):
@@ -211,7 +211,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).fetch(QUERY_LIMIT)
 
     @classmethod
-    def get_page_of_non_privatecls, page_size=QUERY_LIMIT,
+    def get_page_of_non_private(cls, page_size=QUERY_LIMIT,
                                                    urlsafe_start_cursor=None):
         """Returns a page of non-private exp rights models."""
         return ExplorationRightsModel.query().filter(

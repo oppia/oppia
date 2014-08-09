@@ -43,7 +43,7 @@ import utils
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
 
-    EXP_ID = 'An exploration_id'
+    EXP_ID = 'An_exploration_id'
 
     OWNER_EMAIL = 'owner@example.com'
     EDITOR_EMAIL = 'editor@example.com'
@@ -72,6 +72,8 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         config_services.set_property(
             feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
         self.user_id_admin = self.get_user_id_from_email('admin@example.com')
+
+
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
@@ -1484,89 +1486,6 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 class SearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
-    def test_update_index(self):
-        indexed_doc_ids = []
-        indexed_titles = []
-
-        def mock_add_docs_to_index(docs, index):
-            for doc in docs:
-                indexed_doc_ids.append(doc['id'])
-                indexed_titles.append(doc['title'])
-
-        def mock_defer(f, *args):
-            f(*args)
-
-        mock_add_docs_to_index_counter = test_utils.CallCounter(mock_add_docs_to_index)
-        mock_defer_counter = test_utils.CallCounter(mock_defer)
-
-        search_mock_swap = self.swap(
-            search_services,
-            'add_documents_to_index',
-            mock_add_docs_to_index_counter)
-
-        defer_mock_swap = self.swap(
-            taskqueue_services,
-            'defer',
-            mock_defer_counter
-        )
-
-        page_size_swap = self.swap(
-            feconf,
-            'DEFAULT_PAGE_SIZE',
-            2
-        )
-
-        self.save_new_default_exploration('id1', self.OWNER_ID, title='title1')
-        self.save_new_default_exploration('id2', self.OWNER_ID, title='title2')
-        self.save_new_default_exploration('id3', self.OWNER_ID, title='title4')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id1')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id2')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id3')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id4')
-        rights_manager.publicize_exploration(self.user_id_admin, 'id2')
-
-        with search_mock_swap, defer_mock_swap, page_size_swap:
-            exp_services.update_search_index()
-
-        self.assertEqual(set(indexed_doc_ids), {'id%s' % i for i in xrange(1,5)})
-        self.assertEqual(set(indexed_doc_ids), {'title%s' % i for i in xrange(1, 5) })
-
-        self.assertEqual(mock_add_docs_to_index_counter.times_called , 2)
-
-    def test_rebuild_index(self):
-        self.save_new_default_exploration('id1', self.OWNER_ID, title='title1')
-        self.save_new_default_exploration('id2', self.OWNER_ID, title='title2')
-        self.save_new_default_exploration('id3', self.OWNER_ID, title='title3')
-        self.save_new_default_exploration('id4', self.OWNER_ID, title='title4')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id1')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id2')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id3')
-        rights_manager.publish_exploration(self.OWNER_ID, 'id4')
-        rights_manager.publicize_exploration(self.user_id_admin, 'id2')
-
-        def mock_add_docs_to_index(docs, index):
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            for doc in docs:
-                self.assertIn(doc.get('id'), ['id1', 'id2', 'id3', 'id4'])
-                self.assertIn(doc.get('title'), ['title1', 'title2', 'title3', 'title4'])
-
-        def mock_defer(f, *args):
-            f(*args)
-
-        mock_defer_counter = test_utils.CallCounter(mock_defer)
-
-        add_docs_mock_counter = test_utils.CallCounter(mock_add_docs_to_index)
-
-        swap_page_size = self.swap(feconf, 'DEFAULT_PAGE_SIZE', 2)
-        swap_add_docs = self.swap(search_services, 'add_documents_to_index',
-                                  add_docs_mock_counter)
-        swap_defer_mock = self.swap(taskqueue_services, 'defer', mock_defer_counter)
-
-        with swap_page_size, swap_add_docs, swap_defer_mock:
-            exp_services.rebuild_index()
-
-        self.assertEqual(add_docs_mock_counter.times_called, 2)
-
     def test_search_explorations(self):
         expected_query_string = 'a query string'
         expected_cursor = 'cursor'
@@ -1598,7 +1517,7 @@ class SearchTests(ExplorationServicesUnitTests):
                 cursor=expected_cursor,
             )
 
-        def test_exploration_list_equality(l1, l2):
+        def check_exploration_list_equality(l1, l2):
             if len(l1) != len(l2):
                 return False
 
@@ -1609,4 +1528,4 @@ class SearchTests(ExplorationServicesUnitTests):
             return True
 
         self.assertEqual(cursor, expected_result_cursor)
-        self.assertTrue(test_exploration_list_equality(result, explorations))
+        self.assertTrue(check_exploration_list_equality(result, explorations))

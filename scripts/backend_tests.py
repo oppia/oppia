@@ -32,7 +32,7 @@ import common
 
 # DEVELOPERS: Please change this number accordingly when new tests are added
 # or removed.
-EXPECTED_TEST_COUNT = 325
+EXPECTED_TEST_COUNT = 365
 
 
 COVERAGE_PATH = os.path.join(
@@ -260,7 +260,7 @@ def main():
             print 'ERROR     %s: No tests found.' % spec.test_target
             test_count = 0
         elif task.exception:
-            exc_str = unicode(task.exception)
+            exc_str = str(task.exception)
             print exc_str[exc_str.find('=') : exc_str.rfind('-')]
 
             tests_failed_regex_match = re.search(

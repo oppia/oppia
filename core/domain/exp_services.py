@@ -48,12 +48,8 @@ CMD_CREATE_NEW = 'create_new'
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
 
-# TODO(frederikcreemers@gmail.com) Posibly read this directly from cron.yml to
-# have a single source of truth for this
-SEARCH_INDEXING_FREQUENCY = datetime.timedelta(seconds=3600) #every hour
-
 #Name for the exploration search index
-EXPLORATION_SEARCH_INDEX_NAME = "explorations"
+SEARCH_INDEX_EXPLORATIONS = "explorations"
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -112,11 +108,15 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         if _id not in result:
             uncached.append(_id)
 
-    db_exp_models = exp_models.ExplorationModel.get_multi(uncached)
+    db_exp_models = exp_models.ExplorationModel.get_multi(uncached, strict)
     cache_update = {}
-    for model in db_exp_models:
-        exploration = get_exploration_from_model(model)
-        cache_update[exploration.id] = exploration
+    for i in xrange(len(uncached)):
+        model = db_exp_models[i]
+        if model:
+            exploration = get_exploration_from_model(model)
+        else:
+            exploration = None
+        cache_update[uncached[i]] = exploration
 
     if cache_update:
         memcache_services.set_multi(cache_update)
@@ -636,7 +636,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
 
     #delete the exploration from search.
     search_services.delete_documents_from_index([exploration_id],
-                                                EXPLORATION_SEARCH_INDEX_NAME)
+                                                SEARCH_INDEX_EXPLORATIONS)
 
 
 # Operations on exploration snapshots.
@@ -942,33 +942,17 @@ def get_next_page_of_all_commits_by_user_id(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
-#search
-def _get_unindexed_exploration_ids():
-    """Returns a list of unindexed exploration's ideas. Note that this is based
-    on the time interval between indexing tasks. If changes about the implementation of search,
-    all public explorations will need to be reindexed."""
-    entries = []
-    more = True
-    while more:
-        log_entries, cursor, more = get_next_page_of_all_non_private_commits(
-            max_age=SEARCH_INDEXING_FREQUENCY*2) #We take 2 indexing periods to account for delays.
-        entries.extend(log_entries)
-
-    return set([entry.exploration_id for entry in entries])
-
-
-def _exp_to_search_dict(model):
-    rights = rights_manager.get_exploration_rights(model.id)
+def _exp_to_search_dict(exp):
+    rights = rights_manager.get_exploration_rights(exp.id)
     doc = {
-        'id': model.id,
-        'language_code': model.language_code,
-        #rank = last_updated as unix timestamp.
-        'title': model.title,
-        'category': model.category,
-        'skills': model.skill_tags,
-        'blurb': model.blurb,
-        'objective': model.objective,
-        'author_notes': model.author_notes,
+        'id': exp.id,
+        'language_code': exp.language_code,
+        'title': exp.title,
+        'category': exp.category,
+        'skills': exp.skill_tags,
+        'blurb': exp.blurb,
+        'objective': exp.objective,
+        'author_notes': exp.author_notes,
     }
     # Allow searches like "is:beta" or "is:publicized".
     if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
@@ -979,30 +963,12 @@ def _exp_to_search_dict(model):
     return doc
 
 
-def _index_explorations_given_ids(exp_ids):
+def index_explorations_given_ids(exp_ids):
     exploration_models = get_multiple_explorations_by_id(exp_ids)
     search_docs = [_exp_to_search_dict(exploration_models[model])
                    for model in exploration_models]
     search_services.add_documents_to_index(search_docs, EXPLORATION_SEARCH_INDEX_NAME)
 
-
-def update_search_index():
-    """Reindexes any explorations that have been created or updated since the
-    last run of this job.
-     """
-    exp_ids = _get_unindexed_exploration_ids()
-    _index_explorations_given_ids(exp_ids)
-
-
-def rebuild_index(cursor=None):
-    """(re)indexes all non-private explorations"""
-    page, new_cursor, more = rights_manager.get_page_of_non_private_exploration_rights(
-        cursor=cursor, page_size=feconf.DEFAULT_PAGE_SIZE)
-    if more:
-        taskqueue_services.defer(rebuild_index, new_cursor)
-
-    exp_ids = [rights.id for rights in page]
-    _index_explorations_given_ids(exp_ids)
 
 def search_explorations(
     query, sort, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
@@ -1026,7 +992,7 @@ def search_explorations(
       - a cursor if there are more matching exploration to fetch, None otherwise.
         If a cursor is returned, it will be a web-safe string that can be used in URLs.
     """
-    results, cursor = search_services.search(query, EXPLORATION_SEARCH_INDEX_NAME,
+    results, cursor = search_services.search(query, SEARCH_INDEX_EXPLORATIONS,
                                              cursor, limit, sort, ids_only=True)
     ids = [result.get('id') for result in results]
     explorations = get_multiple_explorations_by_id(ids)
