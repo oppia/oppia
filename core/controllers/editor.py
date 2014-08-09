@@ -38,13 +38,15 @@ from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
-import json
 
 import jinja2
 
 # The maximum number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 30
 
+# Output formats of downloaded explorations.
+OUTPUT_FORMAT_JSON = 'json'
+OUTPUT_FORMAT_ZIP = 'zip'
 
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
@@ -459,7 +461,7 @@ class ResolvedAnswersHandler(EditorHandler):
 
 
 class ExplorationDownloadHandler(EditorHandler):
-    """Downloads an exploration as a zip file or JSON object."""
+    """Downloads an exploration as a zip file or JSON."""
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -475,17 +477,18 @@ class ExplorationDownloadHandler(EditorHandler):
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 
-        if output_format == 'zip':
+        if output_format == OUTPUT_FORMAT_ZIP:
             self.response.headers['Content-Type'] = 'text/plain'
             self.response.headers['Content-Disposition'] = (
                 'attachment; filename=%s.zip' % str(filename))
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
-
-        elif output_format == 'json':
-            self.response.headers['Content-Type'] = 'application/json'
-            self.response.write(
-                exp_services.export_to_json_obj(exploration_id, version))
+        elif output_format == OUTPUT_FORMAT_JSON:
+            self.render_json(
+                exp_services.export_to_dict(exploration_id,version))
+        else:
+            raise self.InvalidInputException(
+                'Unrecognized output format %s' % output_format)
 
 
 class ExplorationResourcesHandler(EditorHandler):
