@@ -27,13 +27,13 @@ oppia.controller('ExplorationEditor', [
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationRightsService', 'validatorsService', 'editabilityService',
-  'oppiaDateFormatter', function(
+  'oppiaDatetimeFormatter', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
     explorationRightsService, validatorsService, editabilityService,
-    oppiaDateFormatter) {
+    oppiaDatetimeFormatter) {
 
   $scope.editabilityService = editabilityService;
 
@@ -963,7 +963,7 @@ oppia.controller('ExplorationEditor', [
       if (data.last_updated) {
         $scope.feedbackTabHeader = (
           'Feedback (updated ' +
-          oppiaDateFormatter.getLocaleAbbreviatedDatetimeString(data.last_updated) +
+          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(data.last_updated) +
           ')');
       } else {
         $scope.feedbackTabHeader = 'Feedback';

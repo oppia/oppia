@@ -1,4 +1,3 @@
-// Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,14 +18,14 @@
  */
 
 oppia.controller('ExplorationFeedback', [
-    '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaDateFormatter',
-    function($scope, $http, $modal, warningsData, explorationData, oppiaDateFormatter) {
+    '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaDatetimeFormatter',
+    function($scope, $http, $modal, warningsData, explorationData, oppiaDatetimeFormatter) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
   $scope.getLocaleStringForDateWithoutSeconds = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getLocaleAbbreviatedDatetimeString(
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
   };
 
