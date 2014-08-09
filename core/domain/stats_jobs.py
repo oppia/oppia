@@ -268,7 +268,7 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                             client_time_spent_in_secs=0.0,
                             params=None,
                             play_type=feconf.PLAY_TYPE_NORMAL,
-                            version=0))
+                            event_schema_version=0))
                     start_event_entity.created_on = created_on
                     start_event_entity.put()
                 else:
@@ -283,6 +283,6 @@ class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
                             client_time_spent_in_secs=None,
                             params=None,
                             play_type=feconf.PLAY_TYPE_NORMAL,
-                            version=0))
+                            event_schema_version=0))
                     leave_event_entity.created_on = created_on
                     leave_event_entity.put()

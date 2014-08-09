@@ -20,8 +20,11 @@ __author__ = 'Stephanie Federwisch'
 
 from datetime import datetime
 
+from core import jobs
 from core import jobs_registry
 from core.domain import event_services
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.domain import stats_jobs
 from core.platform import models
 (job_models, stats_models,) = models.Registry.import_models([
@@ -150,3 +153,60 @@ class StatsPageJobUnitTests(test_utils.GenericTestBase):
             output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 1)
+
+
+class OneOffTranslationTest(test_utils.GenericTestBase):
+    """Tests for migration job to new stats models."""
+
+    EXP_ID = 'exp_id'
+
+    def setUp(self):
+        super(OneOffTranslationTest, self).setUp()
+        exploration = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'title', 'A category')
+        # TODO(sll): Change this to u'éíớệм' in order to test that unicode
+        # characters are handled correctly.
+        exploration.rename_state(exploration.init_state_name,  'abcde')
+        exp_services.save_new_exploration('owner_id', exploration)
+
+        # Record two StateCounter events and one StartExploration event.
+        event_services.StateHitEventHandler.record(
+            self.EXP_ID, exploration.init_state_name, True)
+        event_services.StateHitEventHandler.record(
+            self.EXP_ID, exploration.init_state_name, True)
+        event_services.StartExplorationEventHandler.record(
+            self.EXP_ID, 1, exploration.init_state_name, 'session_id', {},
+            feconf.PLAY_TYPE_NORMAL)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 3)
+        self.process_and_flush_pending_tasks()
+
+    def test_standard_operation(self):
+        self.assertEqual(
+            stats_models.StartExplorationEventLogEntryModel.get_all().count(),
+            1)
+
+        job_id = (
+            stats_jobs.TranslateStartAndCompleteEventsJobManager.create_new())
+        stats_jobs.TranslateStartAndCompleteEventsJobManager.enqueue(job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
+        job_output = stats_jobs.TranslateStartAndCompleteEventsJobManager.get_output(
+            job_id)
+
+        self.assertEqual(
+            stats_models.StartExplorationEventLogEntryModel.get_all().count(),
+            2)
+        log_entries = stats_models.StartExplorationEventLogEntryModel.get_all()
+        for entry in log_entries:
+            self.assertEqual(entry.exploration_id, self.EXP_ID)
+            self.assertEqual(entry.exploration_version, 1)
+            self.assertEqual(
+                entry.state_name,
+                exp_services.get_exploration_by_id(self.EXP_ID).init_state_name)
+
+        self.assertEqual(job_output, [])
+        self.assertEqual(
+            stats_jobs.TranslateStartAndCompleteEventsJobManager.get_status_code(
+                job_id),
+            jobs.STATUS_CODE_COMPLETED)

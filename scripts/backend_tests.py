@@ -30,7 +30,7 @@ import time
 
 # DEVELOPERS: Please change this number accordingly when new tests are added
 # or removed.
-EXPECTED_TEST_COUNT = 325
+EXPECTED_TEST_COUNT = 326
 
 
 COVERAGE_PATH = os.path.join(
@@ -247,6 +247,8 @@ def main():
 
     # Check we ran all tests as expected.
     total_count = 0
+    total_errors = 0
+    total_failures = 0
     for task in tasks:
         spec = task_to_taskspec[task]
 
@@ -267,6 +269,8 @@ def main():
             test_count = int(tests_failed_regex_match.group(1))
             errors = int(tests_failed_regex_match.group(2))
             failures = int(tests_failed_regex_match.group(3))
+            total_errors += errors
+            total_failures += failures
             print 'FAILED    %s: %s errors, %s failures' % (
                 spec.test_target, errors, failures)
         else:
@@ -288,9 +292,14 @@ def main():
             'ERROR: Expected %s tests to be run, not %s.' %
             (EXPECTED_TEST_COUNT, total_count))
     else:
-        print 'Successfully ran %s test%s in %s test class%s.' % (
+        print 'Ran %s test%s in %s test class%s.' % (
             total_count, '' if total_count == 1 else 's',
             len(tasks), '' if len(tasks) == 1 else 'es')
+
+        if total_errors or total_failures:
+            print '(%s ERRORS, %s FAILURES)' % (total_errors, total_failures)
+        else:
+            print 'All tests passed.'
 
     if task_execution_failed:
         raise Exception('Task execution failed.')
