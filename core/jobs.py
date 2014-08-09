@@ -564,13 +564,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
         return job_queued_msecs >= created_on_msecs
 
-    @staticmethod
-    def map(item):
-        """Implements the map function.  Must be declared @staticmethod."""
-        raise NotImplementedError(
-            'Classes derived from BaseMapReduceJobManager must implement map '
-            'as a @staticmethod.')
-
     @classmethod
     def _post_completed_hook(cls, job_id):
         cls._get_continuous_computation_class().on_batch_job_completion()

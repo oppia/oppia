@@ -237,10 +237,10 @@ def main():
         _execute_tasks(tasks)
     except:
         task_execution_failed = True
-        for task in tasks:
-            if task.exception:
-                exc_str = str(task.exception)
-                log(exc_str[exc_str.find('=') : exc_str.rfind('-')])
+
+    for task in tasks:
+        if task.exception:
+            log(str(task.exception))
 
     print ''
     print '+------------------+'
