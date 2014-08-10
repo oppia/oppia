@@ -13,8 +13,8 @@
   </div>
 
   <div ng-repeat="snapshot in explorationSnapshots">
-    <input type="radio" name="compareVer1" ng-model="compareVersion.V1" ng-value="snapshot.versionNumber">
-    <input type="radio" name="compareVer2" ng-model="compareVersion.V2" ng-value="snapshot.versionNumber">
+    <input type="radio" name="compareVer1" ng-model="compareVersion.v1" ng-value="snapshot.versionNumber">
+    <input type="radio" name="compareVer2" ng-model="compareVersion.v2" ng-value="snapshot.versionNumber">
     [<[snapshot.versionNumber]>]
     <strong><[snapshot.committerId]></strong>
     <[snapshot.commitMessage]>

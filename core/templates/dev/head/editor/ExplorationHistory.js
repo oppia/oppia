@@ -34,9 +34,9 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
   $scope.refreshVersionHistory = function() {
     $scope.currentVersion = explorationData.data.version;
     $scope.compareVersion = {
-      V1: $scope.currentVersion,
-      V2: $scope.currentVersion
-    }
+      v1: $scope.currentVersion,
+      v2: $scope.currentVersion
+    };
 
     $http.get($scope.explorationSnapshotsUrl).then(function(response) {
       var data = response.data;
@@ -63,11 +63,11 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
 
   // Downloads the json string for an exploration.
   $scope.compareExplorations = function() {
-    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.V1 +
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v1 +
         '&output_format=json').then(function(response) {
       $scope.yamlStrV1 = response.data.yaml;
     });
-    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.V2 +
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v2 +
         '&output_format=json').then(function(response) {
       $scope.yamlStrV2 = response.data.yaml;
     });

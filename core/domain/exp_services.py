@@ -275,10 +275,10 @@ def export_to_dict(exploration_id, version=None):
     """Returns a python dictionary of the exploration."""
     exploration = get_exploration_by_id(exploration_id, version=version)
     yaml_repr = exploration.to_yaml()
-    json_str = {
+    exploration_dict = {
         'yaml': yaml_repr
     }
-    return json_str
+    return exploration_dict
 
 
 # Repository SAVE and DELETE methods.

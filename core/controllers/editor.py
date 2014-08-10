@@ -485,7 +485,7 @@ class ExplorationDownloadHandler(EditorHandler):
                 exp_services.export_to_zip_file(exploration_id, version))
         elif output_format == OUTPUT_FORMAT_JSON:
             self.render_json(
-                exp_services.export_to_dict(exploration_id,version))
+                exp_services.export_to_dict(exploration_id, version))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
