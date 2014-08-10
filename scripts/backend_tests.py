@@ -32,7 +32,7 @@ import common
 
 # DEVELOPERS: Please change this number accordingly when new tests are added
 # or removed.
-EXPECTED_TEST_COUNT = 325
+EXPECTED_TEST_COUNT = 327
 
 
 COVERAGE_PATH = os.path.join(

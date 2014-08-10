@@ -531,6 +531,153 @@ states:
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
 
 
+class DictExportUnitTests(ExplorationServicesUnitTests):
+    """Test export methods for explorations represented as zip files."""
+
+    SAMPLE_YAML_CONTENT = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: The objective
+param_changes: []
+param_specs: {}
+schema_version: 3
+skill_tags: []
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  New state:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+""")
+
+    UPDATED_YAML_CONTENT = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: The objective
+param_changes: []
+param_specs: {}
+schema_version: 3
+skill_tags: []
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  Renamed state:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Renamed state
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+""")
+
+    def test_export_to_dict(self):
+        """Test the export_to_dict() method."""
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
+        exploration.add_states(['New state'])
+        exploration.objective = 'The objective'
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+
+        dict_output = exp_services.export_to_dict(self.EXP_ID)
+
+        self.assertTrue('yaml' in dict_output)
+        self.assertEqual(
+            dict_output['yaml'].decode('string_escape'),
+            self.SAMPLE_YAML_CONTENT)
+
+    def test_export_by_versions(self):
+        """Test export_to_dict() for different versions."""
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
+        self.assertEqual(exploration.version, 1)
+
+        exploration.add_states(['New state'])
+        exploration.objective = 'The objective'
+        with open(os.path.join(feconf.TESTS_DATA_DIR, 'img.png')) as f:
+            raw_image = f.read()
+        fs = fs_domain.AbstractFileSystem(
+            fs_domain.ExplorationFileSystem(self.EXP_ID))
+        fs.commit(self.OWNER_ID, 'abc.png', raw_image)
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        self.assertEqual(exploration.version, 2)
+
+        exploration.rename_state('New state', 'Renamed state')
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        self.assertEqual(exploration.version, 3)
+
+        # Download version 2
+        dict_output = exp_services.export_to_dict(self.EXP_ID, 2)
+        self.assertTrue('yaml' in dict_output)
+        self.assertEqual(
+            dict_output['yaml'], self.SAMPLE_YAML_CONTENT)
+
+        # Download version 3
+        dict_output = exp_services.export_to_dict(self.EXP_ID, 3)
+        self.assertTrue('yaml' in dict_output)
+        self.assertEqual(
+            dict_output['yaml'], self.UPDATED_YAML_CONTENT)
+
+
 def _get_change_list(state_name, property_name, new_value):
     """Generates a change list for a single state change."""
     return [{

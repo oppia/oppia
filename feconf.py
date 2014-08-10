@@ -280,3 +280,7 @@ PLAY_TYPE_NORMAL = 'normal'
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
+
+# Output formats of downloaded explorations.
+OUTPUT_FORMAT_JSON = 'json'
+OUTPUT_FORMAT_ZIP = 'zip'

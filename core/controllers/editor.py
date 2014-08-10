@@ -44,10 +44,6 @@ import jinja2
 # The maximum number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 30
 
-# Output formats of downloaded explorations.
-OUTPUT_FORMAT_JSON = 'json'
-OUTPUT_FORMAT_ZIP = 'zip'
-
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
     all_value_generators = (
@@ -477,13 +473,13 @@ class ExplorationDownloadHandler(EditorHandler):
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 
-        if output_format == OUTPUT_FORMAT_ZIP:
+        if output_format == feconf.OUTPUT_FORMAT_ZIP:
             self.response.headers['Content-Type'] = 'text/plain'
             self.response.headers['Content-Disposition'] = (
                 'attachment; filename=%s.zip' % str(filename))
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
-        elif output_format == OUTPUT_FORMAT_JSON:
+        elif output_format == feconf.OUTPUT_FORMAT_JSON:
             self.render_json(
                 exp_services.export_to_dict(exploration_id, version))
         else:
