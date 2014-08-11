@@ -967,7 +967,7 @@ def index_explorations_given_ids(exp_ids):
     exploration_models = get_multiple_explorations_by_id(exp_ids)
     search_docs = [_exp_to_search_dict(exploration_models[model])
                    for model in exploration_models]
-    search_services.add_documents_to_index(search_docs, EXPLORATION_SEARCH_INDEX_NAME)
+    search_services.add_documents_to_index(search_docs, SEARCH_INDEX_EXPLORATIONS)
 
 
 def search_explorations(
