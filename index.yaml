@@ -33,6 +33,12 @@ indexes:
   - name: deleted
   - name: status
 
+- kind: JobModel
+  properties:
+  - name: status_code
+  - name: time_queued_msec
+    direction: desc
+
 - kind: StatisticsRealtimeModel
   properties:
   - name: realtime_layer
