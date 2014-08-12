@@ -2,6 +2,46 @@ This file contains a summary of changes to the Oppia code base. For a full chang
 
     https://code.google.com/p/oppia/source/list
 
+
+v1.2.8 (12 Aug 2014)
+--------------------
+General features:
+* Add a user dashboard page that shows private, beta and released explorations.
+* Make Oppia installable on Windows, with all tests passing.
+* Speed up the 'Contribute' gallery.
+* Add a friendlier 404 error page.
+* Add a robots.txt file.
+* Download a local copy of MathJax, so that we have a backup if the MathJax CDN goes down.
+* Show navbar dropdowns on-hover.
+
+Widget improvements:
+* Make the input field in the non-interactive math widget larger, and add a preview.
+* In the LogicProof widget, stop converting spaces into tabs as the user types.
+
+Editor features:
+* Add a draggable handle to the rule tiles.
+* When the date is today's date, show only the time in the UI.
+* Use a help icon throughout the editor, instead of sometimes using a help icon and sometimes using 'More info'.
+* Make 'preview' and 'customize' links in the interactive widget accordion look clickable.
+* Reduce the left padding in the list of widget types.
+* Move the 'Use this widget / Cancel' buttons to the bottom of the widget editor.
+* Replace the empty content placeholder message with a more positive one.
+* Fix a bug where the state name display in the exploration editor is not updated.
+* Fix a bug that caused errors to arise due to IE8 not supporting String.prototype.trim() or Object.create().
+
+Infrastructure changes:
+* Implement an infrastructure for continuously-running computations, together with event listeners and an admin dashboard.
+* Add dependency management for widgets that make use of modules that need to be registered with Angular.
+* Change frontend controller syntax to the one recommended by the Angular team.
+* Use ndb.OR instead of ComputedProperty in datastore queries.
+
+Setup and testing scripts:
+* Rewrite install_third_party.sh to exit gracefully if the installation of jsrepl and node.js on the given OS is not supported.
+* Add a check to the integration test script to ensure that no local server is running.
+* Speed up the backend tests significantly by running them in parallel.
+* Use Chrome as the browser for the frontend tests, due to PhantomJS's installation being buggy.
+
+
 v1.2.7 (19 June 2014)
 ---------------------
 UI changes:
