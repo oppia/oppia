@@ -1503,6 +1503,39 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 class SearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
+    def test_index_explorations_given_domain_objects(self):
+
+        expected_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
+        expected_exp_titles = ['title 0', 'title 1', 'title 2', 'title 3', 'title 4']
+        expected_exp_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
+
+        def mock_add_documents_to_index(docs, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            ids = [doc['id'] for doc in docs]
+            titles = [doc['title'] for doc in docs]
+            categories = [doc['category'] for doc in docs]
+            self.assertEqual(set(ids), set(expected_exp_ids))
+            self.assertEqual(set(titles), set(expected_exp_titles))
+            self.assertEqual(set(categories), set(expected_exp_categories))
+            return ids
+
+        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
+        add_docs_swap = self.swap(search_services,
+                                  'add_documents_to_index',
+                                  add_docs_counter)
+
+        exp_objs = [exp_domain.Exploration.create_default_exploration(
+            'id%d' % i, 'title %d' % i, 'cat%d' % i) for i in xrange(5)]
+
+        for exp in exp_objs:
+            exp_services.save_new_exploration(self.OWNER_ID, exp)
+
+        with add_docs_swap:
+            exp_services.index_explorations_given_domain_objects(exp_objs)
+
+        self.assertEqual(add_docs_counter.times_called, 1)
+
+
     def test_index_explorations_given_ids(self):
 
         expected_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
@@ -1528,6 +1561,30 @@ class SearchTests(ExplorationServicesUnitTests):
 
         with add_docs_swap:
             exp_services.index_explorations_given_ids(expected_exp_ids)
+
+        self.assertEqual(add_docs_counter.times_called, 1)
+
+    def test_patch_exploration_search_document(self):
+
+        def mock_get_doc(doc_id, index):
+            self.assertEqual(doc_id, self.EXP_ID)
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            return {'a': 'b', 'c': 'd'}
+
+        def mock_add_docs(docs, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            self.assertEqual(docs, [{'a': 'b', 'c': 'e', 'f': 'g'}])
+
+        get_doc_swap = self.swap(
+            search_services, 'get_document_from_index', mock_get_doc)
+
+        add_docs_counter = test_utils.CallCounter(mock_add_docs)
+        add_docs_swap = self.swap(
+            search_services, 'add_documents_to_index', add_docs_counter)
+
+        with get_doc_swap, add_docs_swap:
+            patch = {'c': 'e', 'f': 'g'}
+            exp_services.patch_explortion_search_document(self.EXP_ID, **patch)
 
         self.assertEqual(add_docs_counter.times_called, 1)
 

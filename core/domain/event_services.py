@@ -22,6 +22,7 @@ import inspect
 
 from core import jobs_registry
 from core.domain import exp_domain
+from core.domain import exp_services
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
@@ -135,6 +136,29 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
+
+
+class ExplorationChangeEventListener(BaseEventHandler):
+    """Event handler for receiving exploration change events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_CHANGE
+
+    @classmethod
+    def _handle_event(cls, exploration):
+        """Indexes the changed exploration."""
+        exp_services.index_explorations_given_domain_objects([exploration])
+
+
+class ExplorationStatusChangeEventListener(BaseEventHandler):
+    """Event handler for receiving exploration status change events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_STATUS_CHANGE
+
+    @classmethod
+    def _handle_event(cls, exp_rights):
+        """Indexes the changed exploration."""
+        exp_services.patch_exploration_search_document(
+            **exp_services._exp_rights_to_search_dict(exp_rights))
 
 
 class Registry(object):

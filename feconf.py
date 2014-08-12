@@ -269,6 +269,8 @@ NAV_MODE_PROFILE = 'profile'
 EVENT_TYPE_STATE_HIT = 'state_hit'
 EVENT_TYPE_ANSWER_SUBMITTED = 'answer_submitted'
 EVENT_TYPE_DEFAULT_ANSWER_RESOLVED = 'default_answer_resolved'
+EVENT_TYPE_EXPLORATION_CHANGE = 'exploration_change'
+EVENT_TYPE_EXPLORATION_STATUS_CHANGE = 'exploration_status_change'
 # The values for these two event types should be left as-is for backwards
 # compatibility.
 EVENT_TYPE_START_EXPLORATION = 'start'

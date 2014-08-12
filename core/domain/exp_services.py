@@ -947,6 +947,17 @@ def get_next_page_of_all_commits_by_user_id(
     ) for entry in results], new_urlsafe_start_cursor, more)
 
 
+def _exp_rights_to_search_dict(rights):
+    # Allow searches like "is:beta" or "is:publicized".
+    doc = {}
+    if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+        doc['is'] = 'publicized'
+    else:
+        doc['is'] = 'beta'
+
+    return doc
+
+
 def _exp_to_search_dict(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
     doc = {
@@ -959,20 +970,28 @@ def _exp_to_search_dict(exp):
         'objective': exp.objective,
         'author_notes': exp.author_notes,
     }
-    # Allow searches like "is:beta" or "is:publicized".
-    if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
-        doc['is'] = 'publicized'
-    else:
-        doc['is'] = 'beta'
-
+    doc.update(_exp_rights_to_search_dict(rights))
     return doc
 
 
-def index_explorations_given_ids(exp_ids):
-    exploration_models = get_multiple_explorations_by_id(exp_ids)
-    search_docs = [_exp_to_search_dict(exploration_models[model])
-                   for model in exploration_models]
+def index_explorations_given_domain_objects(exp_objects):
+    search_docs = [_exp_to_search_dict(exp) for exp in exp_objects]
     search_services.add_documents_to_index(search_docs, SEARCH_INDEX_EXPLORATIONS)
+
+
+def index_explorations_given_ids(exp_ids):
+    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=True)
+    index_explorations_given_domain_objects(exploration_models.values())
+
+
+def patch_explortion_search_document(exp_id, **kwargs):
+    """Patches an exploration's current search document, with the values
+    passed in as keyword arguments."""
+
+    doc = search_services.get_document_from_index(
+        exp_id, SEARCH_INDEX_EXPLORATIONS)
+    doc.update(kwargs)
+    search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
 
 
 def search_explorations(
