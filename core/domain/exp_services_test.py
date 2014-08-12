@@ -329,6 +329,23 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 include_deleted_entities=True)]
         )
 
+    def test_explorations_are_removed_from_index_when_deleted(self):
+        """Tests that explorations are removed from the search index when deleted."""
+
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+
+        def mock_delete_docs(doc_ids, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            self.assertEqual(doc_ids, [self.EXP_ID])
+
+        delete_docs_swap = self.swap(
+            search_services, 'delete_documents_from_index', mock_delete_docs)
+
+        with delete_docs_swap:
+            exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
+
+
+
     def test_create_new_exploration_error_cases(self):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, '', '')
