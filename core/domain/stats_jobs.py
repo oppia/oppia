@@ -15,19 +15,15 @@
 """Jobs for statistics views."""
 
 import ast
-import datetime
 
 from core import jobs
-from core.domain import exp_services
 from core.platform import models
 (base_models, stats_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics])
 transaction_services = models.Registry.import_transaction_services()
 import feconf
-import utils
 
 from google.appengine.ext import ndb
-
 
 
 class StatisticsRealtimeModel(
@@ -163,128 +159,3 @@ class StatisticsMRJobManager(
             id=key,
             num_starts=started_count,
             num_completions=complete_count).put()
-
-
-class TranslateStartAndCompleteEventsJobManager(jobs.BaseMapReduceJobManager):
-    """Job that finds old versions of feedback events and translates them."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.StateCounterModel,
-                stats_models.StartExplorationEventLogEntryModel,
-                stats_models.MaybeLeaveExplorationEventLogEntryModel]
-
-    TYPE_COUNTER = 'StateCounterModel'
-    TYPE_START = 'StartExploration'
-    TYPE_END = 'EndExploration'
-    KEY_FORMAT = '%s:%s'
-
-    @staticmethod
-    def map(item):
-        """Aggregates existing datastore items for a state in an exploration."""
-        # A key representing the (exploration, state) pair.
-        created_on_msec = int(utils.get_time_in_millisecs(item.created_on))
-
-        if isinstance(item, stats_models.StateCounterModel):
-            exp_id, state_name = item.get_exploration_id_and_state_name()
-            exploration = exp_services.get_exploration_by_id(exp_id, strict=False)
-            if exploration is None:
-                # Note that some explorations may have been deleted since their
-                # corresponding StateCounterModel entry was created.
-                return
-
-            unicode_state_name = state_name.decode('utf-8')
-            if unicode_state_name in [feconf.END_DEST, exploration.init_state_name]:
-                item_key = (TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
-                    exp_id, unicode_state_name)).encode('utf-8')
-
-                yield (item_key, {
-                    'type': (
-                        TranslateStartAndCompleteEventsJobManager.TYPE_COUNTER),
-                    'exp_id': exp_id,
-                    'state_name': state_name,
-                    'created_on': created_on_msec,
-                    'count': item.first_entry_count
-                })
-        elif isinstance(item, stats_models.StartExplorationEventLogEntryModel):
-            if item.state_name != feconf.END_DEST:
-                item_key = (TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
-                    item.exploration_id, item.state_name)).encode('utf-8')
-
-                yield (item_key, {
-                    'type': (
-                        TranslateStartAndCompleteEventsJobManager.TYPE_START),
-                    'exp_id': item.exploration_id,
-                    'created_on': created_on_msec,
-                    'state_name': item.state_name
-                })
-        elif isinstance(
-                item, stats_models.MaybeLeaveExplorationEventLogEntryModel):
-            if item.state_name == feconf.END_DEST:
-                item_key = (TranslateStartAndCompleteEventsJobManager.KEY_FORMAT % (
-                    item.exploration_id, item.state_name)).encode('utf-8')
-
-                yield (item_key, {
-                    'type': TranslateStartAndCompleteEventsJobManager.TYPE_END,
-                    'exp_id': item.exploration_id,
-                    'created_on': created_on_msec,
-                    'state_name': item.state_name
-                })
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        _, state_name = key.split(':')
-        if state_name == feconf.END_DEST:
-            expected_new_event_type = (
-                TranslateStartAndCompleteEventsJobManager.TYPE_END)
-        else:
-            expected_new_event_type = (
-                TranslateStartAndCompleteEventsJobManager.TYPE_START)
-
-        events_count = sum([
-            1 if ast.literal_eval(v)['type'] == expected_new_event_type else 0
-            for v in stringified_values])
-
-        for value_str in stringified_values:
-            value = ast.literal_eval(value_str)
-            if value['type'] != (
-                    TranslateStartAndCompleteEventsJobManager.TYPE_COUNTER):
-                continue
-
-            # Create additional events in the new classes so that the counts
-            # for the new events match those given by StateCounterModel.
-            missing_events_count = value['count'] - events_count
-            for _ in range(missing_events_count):
-                version = exp_services.get_exploration_by_id(
-                    value['exp_id']).version
-                created_on = datetime.datetime.fromtimestamp(
-                    value['created_on'] / 1000)
-                if state_name != feconf.END_DEST:
-                    start_event_entity = (
-                        stats_models.StartExplorationEventLogEntryModel(
-                            event_type=feconf.EVENT_TYPE_START_EXPLORATION,
-                            exploration_id=value['exp_id'],
-                            exploration_version=version,
-                            state_name=value['state_name'],
-                            session_id=None,
-                            client_time_spent_in_secs=0.0,
-                            params=None,
-                            play_type=feconf.PLAY_TYPE_NORMAL,
-                            event_schema_version=0))
-                    start_event_entity.created_on = created_on
-                    start_event_entity.put()
-                else:
-                    leave_event_entity = (
-                        stats_models.MaybeLeaveExplorationEventLogEntryModel(
-                            event_type=(
-                                feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION),
-                            exploration_id=value['exp_id'],
-                            exploration_version=version,
-                            state_name=state_name,
-                            session_id=None,
-                            client_time_spent_in_secs=None,
-                            params=None,
-                            play_type=feconf.PLAY_TYPE_NORMAL,
-                            event_schema_version=0))
-                    leave_event_entity.created_on = created_on
-                    leave_event_entity.put()

@@ -20,11 +20,8 @@ __author__ = 'Stephanie Federwisch'
 
 from datetime import datetime
 
-from core import jobs
 from core import jobs_registry
 from core.domain import event_services
-from core.domain import exp_domain
-from core.domain import exp_services
 from core.domain import stats_jobs
 from core.platform import models
 (job_models, stats_models,) = models.Registry.import_models([
@@ -53,8 +50,8 @@ class ModifiedStatisticsMRJobManager(stats_jobs.StatisticsMRJobManager):
         return ModifiedStatisticsAggregator
 
 
-class StatsPageJobUnitTests(test_utils.GenericTestBase):
-    """Tests for exploration annotations."""
+class StatsAggregatorUnitTests(test_utils.GenericTestBase):
+    """Tests for statistics aggregations."""
 
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         ModifiedStatisticsAggregator]
@@ -154,58 +151,61 @@ class StatsPageJobUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 1)
 
+    def test_multiple_explorations(self):
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+            version = 1
+            exp_id_1 = 'eid1'
+            state_1_1 = 'sid1'
+            exp_id_2 = 'eid2'
+            state_2_1 = 'sid1'
 
-class OneOffTranslationTest(test_utils.GenericTestBase):
-    """Tests for migration job to new stats models."""
+            # Record 2 start events for exp_id_1 and 1 start event for
+            # exp_id_2.
+            event_services.StartExplorationEventHandler.record(
+                exp_id_1, version, state_1_1, 'session1', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StartExplorationEventHandler.record(
+                exp_id_1, version, state_1_1, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StartExplorationEventHandler.record(
+                exp_id_2, version, state_2_1, 'session3', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.process_and_flush_pending_tasks()
 
-    EXP_ID = 'exp_id'
+            ModifiedStatisticsAggregator.start_computation()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
 
-    def setUp(self):
-        super(OneOffTranslationTest, self).setUp()
-        exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'title', 'A category')
-        # Convert the state name into unicode.
-        exploration.rename_state(exploration.init_state_name,  u'éíớệм')
-        exp_services.save_new_exploration('owner_id', exploration)
-
-        # Record two StateCounter events and one StartExploration event.
-        event_services.StateHitEventHandler.record(
-            self.EXP_ID, exploration.init_state_name, True)
-        event_services.StateHitEventHandler.record(
-            self.EXP_ID, exploration.init_state_name, True)
-        event_services.StartExplorationEventHandler.record(
-            self.EXP_ID, 1, exploration.init_state_name, 'session_id', {},
-            feconf.PLAY_TYPE_NORMAL)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 3)
-        self.process_and_flush_pending_tasks()
-
-    def test_standard_operation(self):
-        self.assertEqual(
-            stats_models.StartExplorationEventLogEntryModel.get_all().count(),
-            1)
-
-        job_id = (
-            stats_jobs.TranslateStartAndCompleteEventsJobManager.create_new())
-        stats_jobs.TranslateStartAndCompleteEventsJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
-
-        job_output = stats_jobs.TranslateStartAndCompleteEventsJobManager.get_output(
-            job_id)
-
-        self.assertEqual(
-            stats_models.StartExplorationEventLogEntryModel.get_all().count(),
-            2)
-        log_entries = stats_models.StartExplorationEventLogEntryModel.get_all()
-        for entry in log_entries:
-            self.assertEqual(entry.exploration_id, self.EXP_ID)
-            self.assertEqual(entry.exploration_version, 1)
             self.assertEqual(
-                entry.state_name,
-                exp_services.get_exploration_by_id(self.EXP_ID).init_state_name)
+                ModifiedStatisticsAggregator.get_statistics(exp_id_1), {
+                    'start_exploration_count': 2,
+                    'complete_exploration_count': 0
+                })
+            self.assertEqual(
+                ModifiedStatisticsAggregator.get_statistics(exp_id_2), {
+                    'start_exploration_count': 1,
+                    'complete_exploration_count': 0
+                })
 
-        self.assertEqual(job_output, [])
-        self.assertEqual(
-            stats_jobs.TranslateStartAndCompleteEventsJobManager.get_status_code(
-                job_id),
-            jobs.STATUS_CODE_COMPLETED)
+            # Record 1 more start event for exp_id_1 and 1 more start event
+            # for exp_id_2.
+            event_services.StartExplorationEventHandler.record(
+                exp_id_1, version, state_1_1, 'session2', {},
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.StartExplorationEventHandler.record(
+                exp_id_2, version, state_2_1, 'session3', {},
+                feconf.PLAY_TYPE_NORMAL)
+            self.process_and_flush_pending_tasks()
+
+            self.assertEqual(
+                ModifiedStatisticsAggregator.get_statistics(exp_id_1), {
+                    'start_exploration_count': 3,
+                    'complete_exploration_count': 0
+                })
+            self.assertEqual(
+                ModifiedStatisticsAggregator.get_statistics(exp_id_2), {
+                    'start_exploration_count': 2,
+                    'complete_exploration_count': 0
+                })
