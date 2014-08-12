@@ -103,12 +103,12 @@ class BaseModel(ndb.Model):
         not_found = []
         for i in xrange(len(entity_ids)):
             entity = entities[i]
-            if entity == None or entity.deleted:
+            if entity is None or entity.deleted:
                 not_found.append(str(entity_ids[i]))
                 # Ensure that entities that are marked as deleted are not returned.
                 entities[i] = None
 
-        if strict and len(not_found) > 0:
+        if strict and not_found :
             not_found_str = "\n".join(not_found)
             raise cls.EntityNotFoundError('Entities of class %s with these '
                                           'id(s) could not be found:\n%s'

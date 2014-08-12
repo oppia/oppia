@@ -89,7 +89,7 @@ class ExplorationModel(base_models.VersionedModel):
     @classmethod
     def get_multi(cls, exp_ids, strict=False):
         """Returns a list of exploration models, given a list of ids."""
-        return super(ExplorationModel, cls).get_multi(exp_ids, strict)
+        return super(ExplorationModel, cls).get_multi(exp_ids, strict=strict)
 
     @classmethod
     def get_exploration_count(cls):
@@ -211,8 +211,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
         ).fetch(QUERY_LIMIT)
 
     @classmethod
-    def get_page_of_non_private(cls, page_size=QUERY_LIMIT,
-                                                   urlsafe_start_cursor=None):
+    def get_page_of_non_private(cls, page_size=QUERY_LIMIT, urlsafe_start_cursor=None):
         """Returns a page of non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE

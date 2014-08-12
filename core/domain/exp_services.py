@@ -49,7 +49,7 @@ CMD_CREATE_NEW = 'create_new'
 SUBMIT_HANDLER_NAME = 'submit'
 
 #Name for the exploration search index
-SEARCH_INDEX_EXPLORATIONS = "explorations"
+SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -108,20 +108,25 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         if _id not in result:
             uncached.append(_id)
 
-    db_exp_models = exp_models.ExplorationModel.get_multi(uncached, strict)
-    cache_update = {}
-    for i in xrange(len(uncached)):
+    db_exp_models = exp_models.ExplorationModel.get_multi(uncached, strict=strict)
+    db_results_dict = {}
+    for i, eid in enumerate(uncached):
         model = db_exp_models[i]
         if model:
             exploration = get_exploration_from_model(model)
         else:
+            logging.info('Tried to fetch exploration with id %s, but no such'
+                         'exploration exists in the datastore' % eid)
             exploration = None
-        cache_update[uncached[i]] = exploration
+        db_results_dict[eid] = exploration
+
+    cache_update = {eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
+                    if db_results_dict[eid] is not None}
 
     if cache_update:
         memcache_services.set_multi(cache_update)
 
-    result.update(cache_update)
+    result.update(db_results_dict)
     return result
 
 
@@ -995,5 +1000,5 @@ def search_explorations(
     results, cursor = search_services.search(query, SEARCH_INDEX_EXPLORATIONS,
                                              cursor, limit, sort, ids_only=True)
     ids = [result.get('id') for result in results]
-    explorations = get_multiple_explorations_by_id(ids)
+    explorations = get_multiple_explorations_by_id(ids, strict=True)
     return [explorations[_id] for _id in ids ], cursor

@@ -34,7 +34,7 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
         super(OneOffReindexExplorationsJobTest, self).setUp()
 
         explorations = [exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID + str(i), 'title %d' % i, 'category%d' % i)
+            '%s%s' % (self.EXP_ID, i), 'title %d' % i, 'category%d' % i)
             for i in xrange(5)]
 
         for exp in explorations:
@@ -62,6 +62,6 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
         categories = [doc['category'] for doc in indexed_docs]
 
         for i in xrange(5):
-            self.assertIn(self.EXP_ID + str(i), ids)
+            self.assertIn("%s%s" % (self.EXP_ID, i), ids)
             self.assertIn('title %d' % i, titles)
             self.assertIn('category%d' % i, categories)
