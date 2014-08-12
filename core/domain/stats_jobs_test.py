@@ -18,7 +18,7 @@ __author__ = 'Stephanie Federwisch'
 
 """Tests for statistics continuous computations."""
 
-from datetime import datetime
+import datetime
 
 from core import jobs_registry
 from core.domain import event_services
@@ -108,7 +108,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 2)
 
-    def _create_leave_event(self, exp_id, version, state, session, created_on):
+    def _create_leave_event(self, exp_id, version, state, session):
         leave = stats_models.MaybeLeaveExplorationEventLogEntryModel(
             event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
             exploration_id=exp_id,
@@ -117,9 +117,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             session_id=session,
             client_time_spent_in_secs=27.0,
             params={},
-            play_type=feconf.PLAY_TYPE_NORMAL)
-        leave.put()
-        leave.created_on = datetime.fromtimestamp(created_on)
+            play_type=feconf.PLAY_TYPE_NORMAL,
+            created_on=datetime.datetime.now())
         leave.put()
 
     def test_multiple_maybe_leaves_same_session(self):
@@ -132,15 +131,15 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             event_services.StartExplorationEventHandler.record(
                 exp_id, version, state, 'session1', {},
                 feconf.PLAY_TYPE_NORMAL)
-            self._create_leave_event(exp_id, version, state, 'session1', 0)
-            self._create_leave_event(exp_id, version, state, 'session1', 1)
+            self._create_leave_event(exp_id, version, state, 'session1')
+            self._create_leave_event(exp_id, version, state, 'session1')
             self._create_leave_event(
-                exp_id, version, feconf.END_DEST, 'session1', 2)
+                exp_id, version, feconf.END_DEST, 'session1')
             event_services.StartExplorationEventHandler.record(
                 exp_id, version, state, 'session2', {},
                 feconf.PLAY_TYPE_NORMAL)
-            self._create_leave_event(exp_id, version, state, 'session2', 3)
-            self._create_leave_event(exp_id, version, state, 'session2', 4)
+            self._create_leave_event(exp_id, version, state, 'session2')
+            self._create_leave_event(exp_id, version, state, 'session2')
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()

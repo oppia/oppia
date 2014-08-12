@@ -17,6 +17,7 @@
 import ast
 
 from core import jobs
+from core.domain import stats_services
 from core.platform import models
 (base_models, stats_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics])
@@ -145,17 +146,33 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
-        started_count = 0
-        complete_count = 0
+        # TODO(sll): Get this from
+        # stats_services.get_exploration_start_count(key) if the exp_id
+        # exists. (An exception will be thrown if it doesn't.)
+        old_models_start_count = 0
+
+        # TODO(sll): Get this from
+        # stats_services.get_exploration_completed_count(key) if the exp_id
+        # exists. (An exception will be thrown if it doesn't.)
+        old_models_complete_count = 0
+
+        new_models_start_count = 0
+        new_models_complete_count = 0
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
             if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                started_count += 1
+                new_models_start_count += 1
             elif (value['event_type'] ==
                   feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION):
                 if value['state_name'] == feconf.END_DEST:
-                    complete_count += 1
+                    new_models_complete_count += 1
+
+        num_starts = (
+            old_models_start_count + new_models_start_count)
+        num_completes = (
+            old_models_complete_count + new_models_complete_count)
+
         stats_models.ExplorationAnnotationsModel(
             id=key,
-            num_starts=started_count,
-            num_completions=complete_count).put()
+            num_starts=num_starts,
+            num_completions=num_completes).put()
