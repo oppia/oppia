@@ -158,9 +158,6 @@ ALLOWED_WIDGETS = {
         'Math': {
             'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Math')
         },
-        'Parameter': {
-            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Parameter')
-        },
         'Tabs': {
             'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Tabs')
         },
@@ -248,6 +245,7 @@ EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
+HOMEPAGE_URL = '/'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -257,7 +255,6 @@ RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
-SPLASH_PAGE_URL = '/'
 
 NAV_MODE_ABOUT = 'about'
 NAV_MODE_CONTACT = 'contact'

@@ -25,15 +25,16 @@ oppia.directive('playtestQueueSection', [function() {
       explorations: '='
     },
     templateUrl: 'playtestQueue/main',
-    controller: ['$scope', 'oppiaDateFormatter', function($scope, oppiaDateFormatter) {
+    controller: ['$scope', 'oppiaDatetimeFormatter', function($scope, oppiaDatetimeFormatter) {
       $scope.getLocaleStringForDate = function(millisSinceEpoch) {
-        return oppiaDateFormatter.getLocaleString(millisSinceEpoch);
+        return oppiaDatetimeFormatter.getLocaleString(millisSinceEpoch);
       };
     }]
   };
 }]);
 
-function PlaytestQueue($scope, $http, $rootScope, warningsData) {
+oppia.controller('PlaytestQueue', ['$scope', '$http', '$rootScope', function(
+    $scope, $http, $rootScope) {
   $scope.playtestQueueDataUrl = '/playtesthandler/data';
 
   $rootScope.loadingMessage = 'Loading';
@@ -43,13 +44,5 @@ function PlaytestQueue($scope, $http, $rootScope, warningsData) {
     $scope.publicExplorations = data.public_explorations_list;
     $scope.privateExplorations = data.private_explorations_list;
     $rootScope.loadingMessage = '';
-  }).error(function(data) {
-    warningsData.addWarning(data.error || 'Error communicating with server.');
   });
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-PlaytestQueue.$inject = [
-  '$scope', '$http', '$rootScope', 'warningsData'];
+}]);

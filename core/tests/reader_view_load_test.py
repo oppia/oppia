@@ -323,6 +323,8 @@ def run_all(args):
     """Runs test scenario in multiple threads."""
     if args.thread_count < 1 or args.thread_count > 256:
         raise Exception('Please use between 1 and 256 threads.')
+    if not args.base_url:
+        raise Exception('Please specify a base URL to load-test against.')
 
     start_time = time.time()
     logging.info('Started testing: %s', args.base_url)

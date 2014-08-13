@@ -157,7 +157,7 @@ with common.CD(RELEASE_DIR_PATH):
 
     # Run the tests; ensure there are no errors.
     print 'Running tests...'
-    subprocess.check_output(['python', 'core/tests/gae_suite.py'])
+    subprocess.check_output(['python', 'scripts/backend_tests.py'])
 
     # Deploy to GAE.
     subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])

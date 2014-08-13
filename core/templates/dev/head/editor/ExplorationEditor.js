@@ -21,13 +21,19 @@
 // TODO(sll): Move all hardcoded strings to the top of the file.
 var END_DEST = 'END';
 
-function ExplorationEditor(
+oppia.controller('ExplorationEditor', [
+  '$scope', '$http', '$location', '$modal', '$window', '$filter', '$rootScope',
+  '$log', 'explorationData', 'warningsData', 'activeInputData',
+  'editorContextService', 'changeListService', 'explorationTitleService',
+  'explorationCategoryService', 'explorationObjectiveService',
+  'explorationRightsService', 'validatorsService', 'editabilityService',
+  'oppiaDatetimeFormatter', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
-    $log, explorationData, warningsData, activeInputData, oppiaRequestCreator,
+    $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
     explorationRightsService, validatorsService, editabilityService,
-    oppiaDateFormatter) {
+    oppiaDatetimeFormatter) {
 
   $scope.editabilityService = editabilityService;
 
@@ -108,13 +114,10 @@ function ExplorationEditor(
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
-    $http.post(
-      $scope.changeListSummaryUrl,
-      oppiaRequestCreator.createRequest({
-        change_list: changeListService.getChangeList(),
-        version: explorationData.data.version
-      })
-    ).success(function(data) {
+    $http.post($scope.changeListSummaryUrl, {
+      change_list: changeListService.getChangeList(),
+      version: explorationData.data.version
+    }).success(function(data) {
       if (data.error) {
         warningsData.addWarning(data.error);
         return;
@@ -279,10 +282,6 @@ function ExplorationEditor(
           $scope.isSaveInProgress = false;
         });
       });
-    }).error(function(data) {
-      $log.error(data);
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.');
     });
   };
 
@@ -590,18 +589,11 @@ function ExplorationEditor(
         }
       ]
     }).result.then(function(version) {
-      $http.post(
-        $scope.revertExplorationUrl,
-        oppiaRequestCreator.createRequest({
-          current_version: explorationData.data.version,
-          revert_to_version: version
-        })
-      ).success(function(response) {
+      $http.post($scope.revertExplorationUrl, {
+        current_version: explorationData.data.version,
+        revert_to_version: version
+      }).success(function(response) {
         location.reload();
-      }).error(function(data) {
-        $log.error(data);
-        warningsData.addWarning(
-          data.error || 'Error communicating with server.');
       });
     });
   };
@@ -813,12 +805,7 @@ function ExplorationEditor(
     warningsData.clear();
 
     $scope.newStateTemplateUrl = '/createhandler/new_state_template/' + $scope.explorationId;
-    $http.post(
-      $scope.newStateTemplateUrl,
-      oppiaRequestCreator.createRequest({
-        state_name: newStateName
-      })
-    ).success(function(data) {
+    $http.post($scope.newStateTemplateUrl, {state_name: newStateName}).success(function(data) {
       $scope.states[newStateName] = data.new_state;
 
       changeListService.addState(newStateName);
@@ -829,9 +816,6 @@ function ExplorationEditor(
       if (successCallback) {
         successCallback(newStateName);
       }
-    }).error(function(data) {
-      warningsData.addWarning(
-        data.error || 'Error communicating with server.');
     });
   };
 
@@ -979,23 +963,11 @@ function ExplorationEditor(
       if (data.last_updated) {
         $scope.feedbackTabHeader = (
           'Feedback (updated ' +
-          oppiaDateFormatter.getLocaleAbbreviatedDatetimeString(data.last_updated) +
+          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(data.last_updated) +
           ')');
       } else {
         $scope.feedbackTabHeader = 'Feedback';
       }
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ExplorationEditor.$inject = [
-  '$scope', '$http', '$location', '$modal', '$window',
-  '$filter', '$rootScope', '$log', 'explorationData', 'warningsData',
-  'activeInputData', 'oppiaRequestCreator', 'editorContextService',
-  'changeListService', 'explorationTitleService', 'explorationCategoryService',
-  'explorationObjectiveService', 'explorationRightsService', 'validatorsService',
-  'editabilityService', 'oppiaDateFormatter'
-];
+}]);

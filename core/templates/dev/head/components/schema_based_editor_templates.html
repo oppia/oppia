@@ -98,8 +98,17 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/unicode">
-  <input ng-if="isEditable()" type="text" ng-model="$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
-  <span ng-if="!isEditable()"><[localValue]></span>
+  <span ng-if="isEditable()">
+    <span ng-if="doUnicodeParamsExist">
+      <unicode-with-parameters-editor local-value="$parent.$parent.localValue" allowed-parameter-names="allowedParameterNames">
+      </unicode-with-parameters-editor>
+    </span>
+    <span ng-if="!doUnicodeParamsExist">
+      <input type="text" ng-model="$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
+    </span>
+  </span>
+
+  <span ng-if="!isEditable()" ng-bind-html="getDisplayedValue()"></span>
 </script>
 
 
@@ -142,4 +151,21 @@
   <button ng-if="isEditable()" type="button" class="btn btn-default" ng-click="addElement()">
     Add element
   </button>
+</script>
+
+
+<script type="text/ng-template" id="modals/editParamName">
+  <div class="modal-header">
+    <h3>Edit parameter name</h3>
+  </div>
+
+  <div class="modal-body">
+    <strong>Parameter name</strong>
+    <select class="form-control" ng-model="currentParamName" ng-options="option.value as option.name for option in paramOptions"></select>
+  </div>
+
+  <div class="modal-footer">
+    <input type="submit" class="btn btn-default" value="Cancel" ng-click="cancel()">
+    <input type="submit" class="btn btn-success" value="Done" ng-click="save(currentParamName)" ng-disabled="!currentParamName">
+  </div>
 </script>

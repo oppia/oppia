@@ -18,27 +18,21 @@
 * @author yanamal@google.com (Yana Malysheva)
 */
 
-function Moderator(
-    $scope, $http, $rootScope, warningsData, oppiaRequestCreator,
-    oppiaDateFormatter) {
-
+oppia.controller('Moderator', [
+    '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+    function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
     $scope.lastSubmittedUsername = username;
     $http.post(
-      '/moderatorhandler/user_services',
-      oppiaRequestCreator.createRequest({
-        username: username
-      })
+      '/moderatorhandler/user_services', {username: username}
     ).success(function(data) {
       $scope.userEmail = data.user_email;
-    }).error(function(data) {
-      warningsData.addWarning(data.error);
     });
   };
 
-  $scope.getHumanReadableDate = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getHumanReadableDate(millisSinceEpoch);
+  $scope.getHumanReadableDatetime = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getHumanReadableDatetime(millisSinceEpoch);
   };
 
   $scope.getExplorationCreateUrl = function(explorationId) {
@@ -82,8 +76,6 @@ function Moderator(
       if (!data.more) {
         $scope.reachedEndOfCommits = true;
       }
-    }).error(function(data) {
-      warningsData.addWarning(data.error);
     });
   };
 
@@ -112,17 +104,8 @@ function Moderator(
       if (!data.more) {
         $scope.reachedEndOfFeedbackMessages = true;
       }
-    }).error(function(data) {
-      warningsData.addWarning(data.error);
     });
   };
 
   $scope.loadMoreFeedbackMessages();
-}
-
-/**
-* Injects dependencies in a way that is preserved by minification.
-*/
-Moderator.$inject = [
-  '$scope', '$http', '$rootScope', 'warningsData', 'oppiaRequestCreator',
-  'oppiaDateFormatter'];
+}]);

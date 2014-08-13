@@ -25,8 +25,6 @@ import feconf
 
 class ImageHandlerTest(test_utils.GenericTestBase):
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
-
     EDITOR_EMAIL = 'editor@example.com'
 
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'

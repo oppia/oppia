@@ -170,12 +170,25 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           return editorContextService.getActiveStateName();
         };
 
-        $scope.getCssClassForRule = function() {
-          return ($scope.isRuleConfusing() ? 'oppia-rule-bubble-warning'
-                                           : 'oppia-rule-bubble');
+        $scope.getCssClassForSortHandle = function() {
+          return 'oppia-rule-sort-handle ' +
+            ($scope.isRuleConfusing() ? 'oppia-rule-sort-handle-warning'
+                                      : 'oppia-rule-sort-handle-no-warning');
         };
 
-        $scope.getEditableCssClassForRule = function() {
+        $scope.getCssClassForRule = function() {
+          var ruleClass = (
+            $scope.isRuleConfusing() ? 'oppia-rule-bubble-warning'
+                                     : 'oppia-rule-bubble');
+          if ($scope.isDefaultRule()) {
+            ruleClass += ' oppia-default-rule-header-bubble';
+          } else {
+            ruleClass += ' oppia-non-default-rule-header-bubble';
+          }
+          return ruleClass;
+        };
+
+        $scope.getEditableCssClassForRuleDescription = function() {
           return $scope.isDefaultRule() ? '' : ' oppia-editable';
         };
 

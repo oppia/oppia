@@ -26,7 +26,8 @@ import traceback
 import utils
 
 from core.platform import models
-(job_models,) = models.Registry.import_models([models.NAMES.job])
+(base_models, job_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.job])
 taskqueue_services = models.Registry.import_taskqueue_services()
 transaction_services = models.Registry.import_transaction_services()
 
@@ -63,6 +64,8 @@ VALID_STATUS_CODE_TRANSITIONS = {
 # queued more recently than this number of milliseconds ago are considered
 # 'recent'.
 DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
+# The maximum number of previously-run jobs to show in the admin dashboard.
+NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
 class BaseJobManager(object):
@@ -426,6 +429,10 @@ class BaseMapReduceJobManager(BaseJobManager):
           times as appropriate (including zero) to return key/value 2-tuples.
           For example, to get a count of all explorations, one might yield
           (exploration.id, 1).
+
+          WARNING: The OutputWriter converts mapper output keys to type str.
+          So, if you have keys that are of type unicode, you must yield
+          "key.encode('utf-8')", rather than "key".
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement map '
@@ -487,54 +494,8 @@ class BaseMapReduceJobManager(BaseJobManager):
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):
         metadata = cls.get_metadata(job_id)
-        if metadata:
-            root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
-            pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
-
-    @classmethod
-    def _require_correct_job_type(cls, job_type):
-        # Suppress check for correct job type since we cannot pass the specific
-        # entity class in the kwargs.
-        pass
-
-
-ABSTRACT_BASE_CLASSES = frozenset([
-    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager])
-
-
-def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
-    """Get a list containing data about all jobs.
-
-    This list is arranged in descending order based on the time the job
-    was enqueued.
-
-    Args:
-    - recency_secs: the threshold for a recent job, in seconds.
-
-    Each element of this list is a dict that represents a job. The dict has the
-    following keys:
-    - 'id': the job id
-    - 'time_started_msec': when the job was started, in milliseconds since the
-          epoch
-    - 'time_finished_msec': when the job was finished, in milliseconds since
-          the epoch
-    - 'status_code': the current status of the job
-    - 'job_type': the type of this job
-    - 'is_cancelable': whether the job can be canceled
-    - 'error': any errors pertaining to this job
-    """
-    recent_job_models = job_models.JobModel.get_recent_jobs(
-        recency_msec=recency_msec)
-    result = [{
-        'id': model.id,
-        'time_started_msec': model.time_started_msec,
-        'time_finished_msec': model.time_finished_msec,
-        'status_code': model.status_code,
-        'job_type': model.job_type,
-        'is_cancelable': model.is_cancelable,
-        'error': model.error,
-    } for model in recent_job_models]
-    return result
+        root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
+        pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
@@ -606,13 +567,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
         return job_queued_msecs >= created_on_msecs
 
-    @staticmethod
-    def map(item):
-        """Implements the map function.  Must be declared @staticmethod."""
-        raise NotImplementedError(
-            'Classes derived from BaseMapReduceJobManager must implement map '
-            'as a @staticmethod.')
-
     @classmethod
     def _post_completed_hook(cls, job_id):
         cls._get_continuous_computation_class().on_batch_job_completion()
@@ -624,6 +578,64 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
     @classmethod
     def _post_failure_hook(cls, job_id):
         cls._get_continuous_computation_class().on_batch_job_failure()
+
+
+class BaseRealtimeDatastoreClassForContinuousComputations(
+        base_models.BaseModel):
+    """Storage class for entities in the realtime layer.
+
+    Instances of this class represent individual entities that are stored in
+    the realtime datastore. Note that the realtime datastore may be formatted
+    differently from the datastores that are iterated over by the MapReduce
+    job.
+
+    The IDs for instances of this class are of the form 0:... or 1:..., where
+    the 0 or 1 indicates the realtime layer that the entity is in.
+
+    NOTE TO DEVELOPERS: Ensure that you wrap the id with get_realtime_id()
+    when doing creations, gets, puts and queries, in order to ensure that the
+    relevant layer prefix gets appended.
+    """
+    realtime_layer = ndb.IntegerProperty(required=True, choices=[0, 1])
+
+    @classmethod
+    def get_realtime_id(cls, layer_index, raw_entity_id):
+        """Returns an ID used to identify the element with the given entity id
+        in the currently active realtime datastore layer.
+        """
+        return '%s:%s' % (layer_index, raw_entity_id)
+
+    @classmethod
+    def delete_layer(cls, layer_index, latest_created_on_datetime):
+        """Deletes all entities in the given layer which were created before
+        the given datetime.
+        """
+        query = cls.query().filter(cls.realtime_layer == layer_index).filter(
+            cls.created_on < latest_created_on_datetime)
+        ndb.delete_multi(query.iter(keys_only=True))
+
+    @classmethod
+    def _is_valid_realtime_id(cls, realtime_id):
+        return realtime_id.startswith('0:') or realtime_id.startswith('1:')
+
+    @classmethod
+    def get(cls, entity_id, strict=True):
+        if not cls._is_valid_realtime_id(entity_id):
+            raise ValueError('Invalid realtime id: %s' % entity_id)
+
+        return super(
+            BaseRealtimeDatastoreClassForContinuousComputations, cls
+        ).get(entity_id, strict=strict)
+
+    def put(self):
+        if (self.realtime_layer is None or
+                str(self.realtime_layer) != self.id[0]):
+            raise Exception(
+                'Realtime layer %s does not match realtime id %s' %
+                (self.realtime_layer, self.id))
+
+        return super(
+            BaseRealtimeDatastoreClassForContinuousComputations, self).put()
 
 
 class BaseContinuousComputationManager(object):
@@ -648,11 +660,12 @@ class BaseContinuousComputationManager(object):
     is cleared. Note that a realtime layer is cleared as part of the post-
     processing that happens when a batch job completes, which explains why the
     termination of each batch interval and one of the realtime intervals
-    always coincides.
+    always coincides. Having two realtime layers allows the inactive layer to
+    be cleared whilst not affecting incoming queries to the active layer.
 
     Batch layer         <----->  <------->  <-------> <-------> <-------->
-    Realtime layer 0    <----->  <------------------> <------------------>
-    Realtime layer 1    <---------------->  <-----------------> <------ ...
+    Realtime layer R0   <----->  <------------------> <------------------>
+    Realtime layer R1   <---------------->  <-----------------> <------ ...
                                  <-- A -->  <-- B -->
 
     For example, queries arising during the time interval A will use the
@@ -668,25 +681,21 @@ class BaseContinuousComputationManager(object):
         """Returns a list of event types that this class subscribes to."""
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
-            '_get_event_types_listened_to(). This method should return a list '
+            'get_event_types_listened_to(). This method should return a list '
             'of strings, each representing an event type that this class '
             'subscribes to.')
 
     @classmethod
-    def _get_realtime_datastore_classes(cls):
-        """Returns a 2-element list with datastore classes used by the
-        realtime layers. These two classes should be subclasses of
-        base_models.BaseModel, and should be defined with exactly the
-        same attributes and methods so that, regardless of which one is used,
-        the logic remains the same. See StartExplorationRealtimeModel0 and
-        StartExplorationRealtimeModel1 in core/jobs_test.py for an example
+    def _get_realtime_datastore_class(cls):
+        """Returns the datastore class used by the realtime layer, which should
+        subclass BaseRealtimeDatastoreClassForContinuousComputations. See
+        StartExplorationRealtimeModel in core/jobs_test.py for an example
         of how to do this.
         """
         raise NotImplementedError(
             'Subclasses of BaseContinuousComputationManager must implement '
-            '_get_realtime_datastore_classes(). This method should return '
-            'a 2-element list specifying the datastore classes to be used by '
-            'the realtime layers.')
+            '_get_realtime_datastore_class(). This method should return '
+            'the datastore class to be used by the realtime layer.')
 
     @classmethod
     def _get_batch_job_manager_class(cls):
@@ -700,8 +709,8 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def _handle_incoming_event(
-            cls, datastore_class, event_type, *args, **kwargs):
-        """Records incoming events in the given realtime datastore_class.
+            cls, active_realtime_layer, event_type, *args, **kwargs):
+        """Records incoming events in the given realtime layer.
 
         This method should be implemented by subclasses. The args are the
         same as those sent to the event handler corresponding to the event
@@ -742,14 +751,12 @@ class BaseContinuousComputationManager(object):
             _get_active_realtime_index_transactional)
 
     @classmethod
-    def _get_active_realtime_datastore_class(cls):
-        return cls._get_realtime_datastore_classes()[
-            cls._get_active_realtime_index()]
-
-    @classmethod
-    def _get_inactive_realtime_datastore_class(cls):
-        return cls._get_realtime_datastore_classes()[
-            1 - cls._get_active_realtime_index()]
+    def get_active_realtime_layer_id(cls, entity_id):
+        """Returns an ID used to identify the element with the given entity id
+        in the currently active realtime datastore layer.
+        """
+        return cls._get_realtime_datastore_class().get_realtime_id(
+            cls._get_active_realtime_index(), entity_id)
 
     @classmethod
     def _switch_active_realtime_class(cls):
@@ -764,14 +771,14 @@ class BaseContinuousComputationManager(object):
             _switch_active_realtime_class_transactional)
 
     @classmethod
-    def _clear_realtime_datastore_class(
-            cls, datastore_class, latest_created_on_datetime):
+    def _clear_inactive_realtime_layer(
+            cls, latest_created_on_datetime):
         """Deletes all entries in the given realtime datastore class whose
         created_on date is before latest_timestamp.
         """
-        query = datastore_class.query(
-            datastore_class.created_on < latest_created_on_datetime)
-        ndb.delete_multi(query.iter(keys_only=True))
+        inactive_realtime_index = 1 - cls._get_active_realtime_index()
+        cls._get_realtime_datastore_class().delete_layer(
+            inactive_realtime_index, latest_created_on_datetime)
 
     @classmethod
     def _kickoff_batch_job(cls):
@@ -847,10 +854,7 @@ class BaseContinuousComputationManager(object):
         transaction_services.run_in_transaction(
             _start_computation_transactional)
 
-        # Clear the inactive realtime layer.
-        cls._clear_realtime_datastore_class(
-            cls._get_inactive_realtime_datastore_class(),
-            datetime.datetime.utcnow())
+        cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
         cls._kickoff_batch_job()
 
@@ -894,14 +898,15 @@ class BaseContinuousComputationManager(object):
 
     @classmethod
     def on_incoming_event(cls, event_type, *args, **kwargs):
-        """Handle an incoming event.
+        """Handle an incoming event by recording it in both realtime datastore
+        layers.
 
         The *args and **kwargs match those passed to the _handle_event() method
         of the corresponding EventHandler subclass.
         """
-        for datastore_class in cls._get_realtime_datastore_classes():
-            cls._handle_incoming_event(
-                datastore_class, event_type, *args, **kwargs)
+        REALTIME_LAYERS = [0, 1]
+        for layer in REALTIME_LAYERS:
+            cls._handle_incoming_event(layer, event_type, *args, **kwargs)
 
     @classmethod
     def _process_job_completion_and_return_status(cls):
@@ -912,10 +917,8 @@ class BaseContinuousComputationManager(object):
         on_batch_job_completion() to avoid kicking off the next job
         immediately.
         """
-        cls._clear_realtime_datastore_class(
-            cls._get_active_realtime_datastore_class(),
-            datetime.datetime.utcnow())
         cls._switch_active_realtime_class()
+        cls._clear_inactive_realtime_layer(datetime.datetime.utcnow())
 
         def _update_last_finished_time_transactional():
             cc_model = job_models.ContinuousComputationModel.get(cls.__name__)
@@ -957,6 +960,65 @@ class BaseContinuousComputationManager(object):
         job_status = cls._register_end_of_batch_job_and_return_status()
         if job_status == job_models.CONTINUOUS_COMPUTATION_STATUS_CODE_RUNNING:
             cls._kickoff_batch_job_after_previous_one_ends()
+
+
+def _get_job_dict_from_job_model(model):
+    """Converts an ndb.Model representing a job to a dict.
+
+    The dict contains the following keys:
+    - 'id': the job id
+    - 'time_started_msec': when the job was started, in milliseconds since the
+          epoch
+    - 'time_finished_msec': when the job was finished, in milliseconds since
+          the epoch
+    - 'status_code': the current status of the job
+    - 'job_type': the type of this job
+    - 'is_cancelable': whether the job can be canceled
+    - 'error': any errors pertaining to this job
+    - 'human_readable_time_started': a human-readable string representing the
+          time the job started, or None if time_started_msec is None.
+    - 'human_readable_time_finished': a human-readable string representing the
+          time the job finished, or None if time_finished_msec is None.
+    """
+    return {
+        'id': model.id,
+        'time_started_msec': model.time_started_msec,
+        'time_finished_msec': model.time_finished_msec,
+        'status_code': model.status_code,
+        'job_type': model.job_type,
+        'is_cancelable': model.is_cancelable,
+        'error': model.error,
+        'human_readable_time_started': (
+            '' if model.time_started_msec is None
+            else utils.get_human_readable_time_string(model.time_started_msec)),
+        'human_readable_time_finished': (
+            '' if model.time_finished_msec is None
+            else utils.get_human_readable_time_string(
+                model.time_finished_msec)),
+    }
+
+
+def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
+    """Get a list containing data about recent jobs.
+
+    This list is arranged in descending order based on the time the job
+    was enqueued. At most NUM_JOBS_IN_DASHBOARD_LIMIT job descriptions are
+    returned.
+
+    Args:
+    - recency_secs: the threshold for a recent job, in seconds.
+    """
+    recent_job_models = job_models.JobModel.get_recent_jobs(
+        NUM_JOBS_IN_DASHBOARD_LIMIT, recency_msec)
+    return [_get_job_dict_from_job_model(model) for model in recent_job_models]
+
+
+def get_data_for_unfinished_jobs():
+    """Get a list containing data about all unfinished jobs."""
+    unfinished_job_models = job_models.JobModel.get_all_unfinished_jobs(
+        NUM_JOBS_IN_DASHBOARD_LIMIT)
+    return [_get_job_dict_from_job_model(model)
+            for model in unfinished_job_models]
 
 
 def get_continuous_computations_info(cc_classes):
@@ -1018,3 +1080,8 @@ def get_continuous_computations_info(cc_classes):
         result.append(cc_dict)
 
     return result
+
+
+ABSTRACT_BASE_CLASSES = frozenset([
+    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseMapReduceJobManagerForContinuousComputations])

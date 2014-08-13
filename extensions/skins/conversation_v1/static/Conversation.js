@@ -163,8 +163,7 @@ function ConversationSkin(
           messengerService.EXPLORATION_COMPLETED, null);
       }
     }, function(data) {
-      warningsData.addWarning(
-        data.error || 'There was an error processing your input.');
+      warningsData.addWarning('There was an error processing your input.');
     });
   };
 

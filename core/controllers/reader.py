@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import base
+from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import feedback_services
@@ -68,9 +69,13 @@ class ExplorationPage(base.BaseHandler):
 
         # TODO(sll): Cache these computations.
         interactive_widget_ids = exploration.get_interactive_widget_ids()
-        widget_dependencies_html, additional_angular_modules = (
-            widget_registry.Registry.get_dependencies_html_and_angular_modules(
+        widget_dependency_ids = (
+            widget_registry.Registry.get_deduplicated_dependency_ids(
                 interactive_widget_ids))
+        widget_dependencies_html, additional_angular_modules = (
+            dependency_registry.Registry.get_deps_html_and_angular_modules(
+                widget_dependency_ids))
+
         widget_js_directives = (
             widget_registry.Registry.get_noninteractive_widget_js() +
             widget_registry.Registry.get_interactive_widget_js(

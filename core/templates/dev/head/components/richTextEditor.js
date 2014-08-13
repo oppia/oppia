@@ -19,8 +19,8 @@
  */
 
 oppia.directive('richTextEditor', [
-  '$modal', '$http', '$log', '$timeout', 'oppiaHtmlEscaper', 'oppiaRequestCreator',
-  function($modal, $http, $log, $timeout, oppiaHtmlEscaper, oppiaRequestCreator) {
+  '$modal', '$http', '$log', '$timeout', 'oppiaHtmlEscaper',
+  function($modal, $http, $log, $timeout, oppiaHtmlEscaper) {
     return {
       restrict: 'E',
       scope: {htmlContent: '=', disallowOppiaWidgets: '@'},
@@ -126,12 +126,9 @@ oppia.directive('richTextEditor', [
         };
 
         $scope.getRteCustomizationModal = function(widgetDefinition, customizationArgs) {
-          return $http.post(
-            '/widgets/noninteractive/' + widgetDefinition.backendName,
-            oppiaRequestCreator.createRequest({
-              customization_args: customizationArgs
-            })
-          ).then(function(response) {
+          return $http.post('/widgets/noninteractive/' + widgetDefinition.backendName, {
+            customization_args: customizationArgs
+          }).then(function(response) {
             var modalInstance = $modal.open({
               templateUrl: 'modals/customizeWidget',
               backdrop: 'static',
@@ -160,7 +157,7 @@ oppia.directive('richTextEditor', [
                         $scope.widgetParamSpecs[paramName].description);
                   }
 
-                  $scope.cancel = function(){
+                  $scope.cancel = function() {
                     $modalInstance.dismiss('cancel');
                   };
 

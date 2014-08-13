@@ -42,23 +42,23 @@ import utils
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
 
+    EXP_ID = 'An exploration_id'
+
+    OWNER_EMAIL = 'owner@example.com'
+    EDITOR_EMAIL = 'editor@example.com'
+    VIEWER_EMAIL = 'viewer@example.com'
+
+    OWNER_NAME = 'owner'
+    EDITOR_NAME = 'editor'
+    VIEWER_NAME = 'viewer'
+
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
         super(ExplorationServicesUnitTests, self).setUp()
 
-        self.EXP_ID = 'An exploration_id'
-
-        self.OWNER_EMAIL = 'owner@example.com'
-        self.EDITOR_EMAIL = 'editor@example.com'
-        self.VIEWER_EMAIL = 'viewer@example.com'
-
         self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
         self.VIEWER_ID = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        self.OWNER_NAME = 'owner'
-        self.EDITOR_NAME = 'editor'
-        self.VIEWER_NAME = 'viewer'
 
         user_services.get_or_create_user(self.OWNER_ID, self.OWNER_EMAIL)
         user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
@@ -71,30 +71,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         config_services.set_property(
             feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
         self.user_id_admin = self.get_user_id_from_email('admin@example.com')
-
-    def save_new_default_exploration(self,
-            exploration_id, owner_id, title='A title'):
-        """Saves a new default exploration written by owner_id.
-
-        Returns the exploration domain object.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, 'A category')
-        exp_services.save_new_exploration(owner_id, exploration)
-        return exploration
-
-    def save_new_valid_exploration(self, exploration_id, owner_id):
-        """Saves a new strictly-validated exploration.
-
-        Returns the exploration domain object.
-        """
-        exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, 'A title', 'A category')
-        exploration.states[exploration.init_state_name].widget.handlers[
-            0].rule_specs[0].dest = feconf.END_DEST
-        exploration.objective = 'An objective'
-        exp_services.save_new_exploration(owner_id, exploration)
-        return exploration
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
@@ -294,7 +270,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            exp_services.get_owned_explorations_summary_dict(self.OWNER_ID),
+            exp_services.get_at_least_editable_summary_dict(self.OWNER_ID),
             {})
 
         # But the models still exist in the backend.
@@ -315,7 +291,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            exp_services.get_owned_explorations_summary_dict(self.OWNER_ID),
+            exp_services.get_at_least_editable_summary_dict(self.OWNER_ID),
             {})
 
         # The exploration model has been purged from the backend.
@@ -354,8 +330,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
-    TAGS = [test_utils.TestTags.SLOW_TEST]
-
     def test_loading_and_validation_and_deletion_of_demo_explorations(self):
         """Test loading, validation and deletion of the demo explorations."""
         self.assertEqual(exp_services.count_explorations(), 0)
@@ -376,8 +350,9 @@ class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
 
             duration = datetime.datetime.utcnow() - start_time
             processing_time = duration.seconds + duration.microseconds / 1E6
-            print 'Loaded and validated exploration %s (%.2f seconds)' % (
-                exploration.title.encode('utf-8'), processing_time)
+            self.log_line(
+                'Loaded and validated exploration %s (%.2f seconds)' % (
+                exploration.title.encode('utf-8'), processing_time))
 
         self.assertEqual(
             exp_services.count_explorations(), len(feconf.DEMO_EXPLORATIONS))

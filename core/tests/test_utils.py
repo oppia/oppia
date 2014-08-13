@@ -12,6 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+"""Common utilities for test classes."""
+
 import contextlib
 import os
 import re
@@ -19,7 +21,8 @@ import unittest
 import webtest
 
 from core.domain import config_domain
-from core.domain import event_services
+from core.domain import exp_domain
+from core.domain import exp_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -30,6 +33,8 @@ import json
 
 CSRF_REGEX = (
     r'csrf_token: JSON\.parse\(\'\\\"([A-Za-z0-9/=_-]+)\\\"\'\)')
+# Prefix to append to all lines printed by tests to the console.
+LOG_LINE_PREFIX = 'LOG_INFO_TEST: '
 
 
 def empty_environ():
@@ -44,20 +49,10 @@ def empty_environ():
         os.environ['HTTP_HOST'], os.environ['SERVER_PORT'])
 
 
-class TestTags(object):
-    """Tags for labelling particular tests."""
-
-    # Tag that is used to flag tests which take a long time to run, so that
-    # they can be excluded via a command-line argument.
-    SLOW_TEST = 1
-
-
 class TestBase(unittest.TestCase):
     """Base class for all tests."""
 
     maxDiff = 2500
-
-    TAGS = []
 
     DEFAULT_USERNAME = 'defaultusername'
 
@@ -66,6 +61,12 @@ class TestBase(unittest.TestCase):
 
     def tearDown(self):
         raise NotImplementedError
+
+    def log_line(self, line):
+        """Print the line with a prefix that can be identified by the
+        script that calls the test.
+        """
+        print '%s%s' % (LOG_LINE_PREFIX, line)
 
     def _delete_all_models(self):
         raise NotImplementedError
@@ -195,6 +196,31 @@ class TestBase(unittest.TestCase):
 
     def get_user_id_from_email(self, email):
         return current_user_services.get_user_id_from_email(email)
+
+    def save_new_default_exploration(self,
+            exploration_id, owner_id, title='A title'):
+        """Saves a new default exploration written by owner_id.
+
+        Returns the exploration domain object.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title, 'A category')
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
+
+    def save_new_valid_exploration(
+            self, exploration_id, owner_id, title='A title'):
+        """Saves a new strictly-validated exploration.
+
+        Returns the exploration domain object.
+        """
+        exploration = exp_domain.Exploration.create_default_exploration(
+            exploration_id, title, 'A category')
+        exploration.states[exploration.init_state_name].widget.handlers[
+            0].rule_specs[0].dest = feconf.END_DEST
+        exploration.objective = 'An objective'
+        exp_services.save_new_exploration(owner_id, exploration)
+        return exploration
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):

@@ -342,6 +342,13 @@ def get_current_time_in_millisecs():
     return get_time_in_millisecs(datetime.datetime.utcnow())
 
 
+def get_human_readable_time_string(time_msec):
+    """Given a time in milliseconds since the epoch, get a human-readable
+    time string for the admin dashboard.
+    """
+    return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
+
+
 def generate_random_string(length):
     return base64.urlsafe_b64encode(os.urandom(length))
 

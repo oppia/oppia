@@ -18,15 +18,15 @@
  * @author kashida@google.com (Koji Ashida)
  */
 
-function ExplorationFeedback($scope, $http, $modal,
-    warningsData, oppiaRequestCreator, explorationData, oppiaDateFormatter,
-    editabilityService) {
+oppia.controller('ExplorationFeedback', [
+    '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaDatetimeFormatter',
+    function($scope, $http, $modal, warningsData, explorationData, oppiaDatetimeFormatter) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
   $scope.getLocaleStringForDateWithoutSeconds = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getLocaleAbbreviatedDatetimeString(
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
   };
 
@@ -42,25 +42,18 @@ function ExplorationFeedback($scope, $http, $modal,
   $scope._getThreadList = function() {
     $http.get(THREAD_LIST_HANDLER_URL).success(function(data) {
       $scope.threads = data.threads;
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error getting thread list.');
     });
   };
 
   $scope._createThread = function(newThreadSubject, newThreadText) {
-    $http.post(
-      THREAD_LIST_HANDLER_URL,
-      oppiaRequestCreator.createRequest({
-        state_name: null,
-        subject: newThreadSubject,
-        text: newThreadText,
-      })
-    ).success(function() {
+    $http.post(THREAD_LIST_HANDLER_URL, {
+      state_name: null,
+      subject: newThreadSubject,
+      text: newThreadText
+    }).success(function() {
       $scope._getThreadList();
       $scope.setCurrentThread(null);
       $scope.$parent.refreshFeedbackTabHeader();
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error creating a thread.');
     });
   };
 
@@ -78,8 +71,6 @@ function ExplorationFeedback($scope, $http, $modal,
       $scope.currentThreadData = $scope._getThreadById(threadId);
       $scope.currentThreadMessages = data.messages;
       $scope.updatedStatus = $scope.currentThreadData.status;
-    }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error getting thread messages.');
     });
   };
 
@@ -137,22 +128,17 @@ function ExplorationFeedback($scope, $http, $modal,
       return;
     }
     $scope.messageSendingInProgress = true;
-    $http.post(
-      THREAD_HANDLER_PREFIX + threadId,
-      oppiaRequestCreator.createRequest({
-        updated_status: (
-          updatedStatus !== $scope.currentThreadData.status ?
-          updatedStatus : null),
-        updated_subject: null,
-        text: newMessageText,
-      })
-    ).success(function() {
+    $http.post(THREAD_HANDLER_PREFIX + threadId, {
+      updated_status: (
+        updatedStatus !== $scope.currentThreadData.status ? updatedStatus : null),
+      updated_subject: null,
+      text: newMessageText
+    }).success(function() {
       $scope.currentThreadData.status = updatedStatus;
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
       $scope.$parent.refreshFeedbackTabHeader();
     }).error(function(data) {
-      warningsData.addWarning(data.error || 'Error creating a thread message.');
       $scope.messageSendingInProgress = false;
     });
   };
@@ -182,8 +168,4 @@ function ExplorationFeedback($scope, $http, $modal,
   $scope.currentThreadMessages = null;
   $scope.updatedStatus = null;
   $scope._getThreadList();
-}
-
-ExplorationFeedback.$inject = [
-  '$scope', '$http', '$modal', 'warningsData', 'oppiaRequestCreator',
-  'explorationData', 'oppiaDateFormatter', 'editabilityService'];
+}]);

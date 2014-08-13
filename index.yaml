@@ -33,6 +33,17 @@ indexes:
   - name: deleted
   - name: status
 
+- kind: JobModel
+  properties:
+  - name: status_code
+  - name: time_queued_msec
+    direction: desc
+
+- kind: StatisticsRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: _AE_Pipeline_Record
   properties:
   - name: is_root_pipeline

@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function Admin($scope, $http) {
+oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
   $scope.configProperties = {};
@@ -45,15 +45,10 @@ function Admin($scope, $http) {
       return;
     }
 
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
-        action: 'revert_config_property',
-        config_property_id: configPropertyId
-      })
-    }, true);
-
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    $http.post($scope.adminHandlerUrl, {
+      action: 'revert_config_property',
+      config_property_id: configPropertyId
+    }).success(function(data) {
       $scope.message = 'Config property reverted successfully.';
       $scope.reloadConfigProperties();
     }).error(function(errorResponse) {
@@ -65,14 +60,7 @@ function Admin($scope, $http) {
   $scope.migrateFeedback = function() {
     $scope.migrationInProcess = true;
 
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
-        action: 'migrate_feedback'
-      })
-    }, true);
-
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    $http.post($scope.adminHandlerUrl, {action: 'migrate_feedback'}).success(function(data) {
       $scope.message = 'Feedback migrated successfully.';
       $scope.migrationInProcess = false;
       window.reload();
@@ -83,15 +71,10 @@ function Admin($scope, $http) {
   };
 
   $scope.refreshComputedProperty = function(computedPropertyId) {
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
-        action: 'refresh_computed_property',
-        computed_property_name: computedPropertyId
-      })
-    }, true);
-
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    $http.post($scope.adminHandlerUrl, {
+      action: 'refresh_computed_property',
+      computed_property_name: computedPropertyId
+    }).success(function(data) {
       $scope.message = 'Computed property reloaded successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -114,15 +97,10 @@ function Admin($scope, $http) {
       newConfigPropertyValues[property] = $scope.configProperties[property].value;
     }
 
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
+    $http.post($scope.adminHandlerUrl, {
         action: 'save_config_properties',
         new_config_property_values: newConfigPropertyValues
-      })
-    }, true);
-
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    }).success(function(data) {
       $scope.message = 'Data saved successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -139,15 +117,11 @@ function Admin($scope, $http) {
     }
 
     $scope.message = 'Processing...';
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
-        action: 'reload_exploration',
-        exploration_id: String(explorationId)
-      })
-    }, true);
 
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    $http.post($scope.adminHandlerUrl, {
+      action: 'reload_exploration',
+      exploration_id: String(explorationId)
+    }).success(function(data) {
       $scope.message = 'Data reloaded successfully.';
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
@@ -156,15 +130,11 @@ function Admin($scope, $http) {
 
   $scope.startNewJob = function(jobType) {
     $scope.message = 'Starting new job...';
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
+
+    $http.post($scope.adminHandlerUrl, {
         action: 'start_new_job',
         job_type: jobType
-      })
-    }, true);
-
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    }).success(function(data) {
       $scope.message = 'Job started successfully.';
       window.location.reload();
     }).error(function(errorResponse) {
@@ -174,16 +144,12 @@ function Admin($scope, $http) {
 
   $scope.cancelJob = function(jobId, jobType) {
     $scope.message = 'Cancelling job...';
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
+
+    $http.post($scope.adminHandlerUrl, {
         action: 'cancel_job',
         job_id: jobId,
         job_type: jobType
-      })
-    }, true);
-
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    }).success(function(data) {
       $scope.message = 'Abort signal sent to job.';
       window.location.reload();
     }).error(function(errorResponse) {
@@ -193,15 +159,11 @@ function Admin($scope, $http) {
 
   $scope.startComputation = function(computationType) {
     $scope.message = 'Starting computation...';
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
-        action: 'start_computation',
-        computation_type: computationType
-      })
-    }, true);
 
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    $http.post($scope.adminHandlerUrl, {
+      action: 'start_computation',
+      computation_type: computationType
+    }).success(function(data) {
       $scope.message = 'Computation started successfully.';
       window.location.reload();
     }).error(function(errorResponse) {
@@ -211,24 +173,15 @@ function Admin($scope, $http) {
 
   $scope.stopComputation = function(computationType) {
     $scope.message = 'Stopping computation...';
-    var requestParams = $.param({
-      csrf_token: GLOBALS.csrf_token,
-      payload: JSON.stringify({
-        action: 'stop_computation',
-        computation_type: computationType
-      })
-    }, true);
 
-    $http.post($scope.adminHandlerUrl, requestParams).success(function(data) {
+    $http.post($scope.adminHandlerUrl, {
+      action: 'stop_computation',
+      computation_type: computationType
+    }).success(function(data) {
       $scope.message = 'Abort signal sent to computation.';
       window.location.reload();
     }).error(function(errorResponse) {
       $scope.message = 'Server error: ' + errorResponse.error;
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-Admin.$inject = ['$scope', '$http'];
+}]);

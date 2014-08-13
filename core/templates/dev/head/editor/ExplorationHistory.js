@@ -18,7 +18,8 @@
  * @author sll@google.com (Sean Lip)
  */
 
-function ExplorationHistory($scope, $http, $modal, explorationData, warningsData) {
+oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', function(
+    $scope, $http, explorationData) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.$parent.explorationId;
   $scope.explorationSnapshots = null;
@@ -46,9 +47,4 @@ function ExplorationHistory($scope, $http, $modal, explorationData, warningsData
       }
     });
   };
-}
-
-/**
- * Injects dependencies in a way that is preserved by minification.
- */
-ExplorationHistory.$inject = ['$scope', '$http', '$modal', 'explorationData', 'warningsData'];
+}]);

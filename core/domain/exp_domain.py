@@ -646,7 +646,8 @@ class Exploration(object):
     def __init__(self, exploration_id, title, category, objective,
                  language_code, skill_tags, blurb, author_notes, default_skin,
                  init_state_name, states_dict, param_specs_dict,
-                 param_changes_list, version):
+                 param_changes_list, version, created_on=None,
+                 last_updated=None):
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -671,6 +672,8 @@ class Exploration(object):
             for param_change_dict in param_changes_list]
 
         self.version = version
+        self.created_on = created_on
+        self.last_updated = last_updated
 
     @classmethod
     def create_default_exploration(
