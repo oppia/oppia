@@ -18,10 +18,23 @@
 
 oppia.directive('graphEditor', function($compile, warningsData) {
   return {
-    link: function(scope, element, attrs) {},
+    link: function(scope, element, attrs) {
+      scope.getTemplateUrl = function() {
+        return OBJECT_EDITOR_TEMPLATES_URL + scope.$parent.objType;
+      };
+      $compile(element.contents())(scope);
+    },
     restrict: 'E',
     scope: true,
-    template: '',
+    template: '<div ng-include"=getTemplateUrl()"></div>',
     controller: function($scope, $element, $attrs) {}
   };
 });
+
+oppia.directive('graphEditorViz', {
+  restrict: 'E',
+  templateUrl: OBJECT_EDITOR_TEMPLATES_URL + 'graph_editor_viz',
+  controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+    console.log($scope.graph);
+  }]
+}); 
