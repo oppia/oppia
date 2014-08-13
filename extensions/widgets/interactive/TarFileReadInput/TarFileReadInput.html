@@ -1,11 +1,16 @@
-<div>
-  <input onchange= "angular.element(this).scope().submitAnswer(this)"
-         type="file" required>
+<script type="text/ng-template" id="interactiveWidget/TarFileReadInput">
+  <div>
+    <input onchange= "angular.element(this).scope().submitAnswer(this)"
+           type="file" required>
 
-  <div id="processing-modal" class="modal hide" data-backdrop="false">
-    <div class="modal-body">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <p>Processing uploaded file: <[filename]></p>
+    <div id="processing-modal" class="modal hide" data-backdrop="false">
+      <div class="modal-body">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <p>Processing uploaded file: <[filename]></p>
+      </div>
     </div>
   </div>
-</div>
+</script>
+
+<script type="text/ng-template" id="response/TarFileReadInput">
+</script>

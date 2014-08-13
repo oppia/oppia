@@ -181,11 +181,11 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should only be a config .py file, an
-            # html file, a JS file, a response.html file, (optionally) a
-            # directory named 'static', (optionally) a widget JS test file, and
-            # (optionally) a stats_response.html file.
+            # html file, a JS file, (optionally) a directory named 'static',
+            # (optionally) a widget JS test file, and (optionally) a
+            # stats_response.html file.
             dir_contents = os.listdir(widget_dir)
-            self.assertLessEqual(len(dir_contents), 8)
+            self.assertLessEqual(len(dir_contents), 7)
 
             optional_dirs_and_files_count = 0
 
@@ -219,19 +219,31 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 pass
 
             self.assertEqual(
-                optional_dirs_and_files_count + 4, len(dir_contents),
+                optional_dirs_and_files_count + 3, len(dir_contents),
                 dir_contents
             )
 
             py_file = os.path.join(widget_dir, '%s.py' % widget_id)
-            html_entry_point = os.path.join(widget_dir, '%s.html' % widget_id)
+            html_file = os.path.join(widget_dir, '%s.html' % widget_id)
             js_file = os.path.join(widget_dir, '%s.js' % widget_id)
-            response_template = os.path.join(widget_dir, 'response.html')
 
             self.assertTrue(os.path.isfile(py_file))
-            self.assertTrue(os.path.isfile(html_entry_point))
+            self.assertTrue(os.path.isfile(html_file))
             self.assertTrue(os.path.isfile(js_file))
-            self.assertTrue(os.path.isfile(response_template))
+
+            js_file_content = utils.get_file_contents(js_file)
+            html_file_content = utils.get_file_contents(html_file)
+            self.assertIn('oppiaInteractive%s' % widget_id, js_file_content)
+            self.assertIn('oppiaResponse%s' % widget_id, js_file_content)
+            self.assertIn(
+                '<script type="text/ng-template" '
+                'id="interactiveWidget/%s"' % widget_id,
+                html_file_content)
+            self.assertIn(
+                '<script type="text/ng-template" id="response/%s"' % widget_id,
+                html_file_content)
+            self.assertNotIn('<script>', js_file_content)
+            self.assertNotIn('</script>', js_file_content)
 
             WIDGET_CONFIG_SCHEMA = [
                 ('name', basestring), ('category', basestring),

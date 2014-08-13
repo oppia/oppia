@@ -1,6 +1,14 @@
-<div>
-  <div id="map_canvas" ui-map="map" ui-options="mapOptions"
-  style="width: 600px; height: 400px; max-width: 600px; max-height: 400px; margin: auto"
-  ui-event="{'map-click': 'registerClick($event, $params)'}">
+<script type="text/ng-template" id="interactiveWidget/InteractiveMap">
+  <div>
+    <div id="map_canvas" ui-map="map" ui-options="mapOptions"
+         style="width: 600px; height: 400px; max-width: 600px; max-height: 400px; margin: auto"
+         ui-event="{'map-click': 'registerClick($event, $params)'}">
+    </div>
   </div>
-</div>
+</script>
+
+<script type="text/ng-template" id="response/InteractiveMap">
+  <div ng-if="!stateSticky" class="oppia-reader-response-container">
+    <img src="<[staticMapUrl]>" style="margin: 3px auto; display: block;">
+  </div>
+</script>

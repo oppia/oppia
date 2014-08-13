@@ -1,14 +1,22 @@
 <link rel="stylesheet" type="text/css" href="/extensions/widgets/interactive/MusicNotesInput/static/css/musicNotesInput.css">
 
+<script type="text/ng-template" id="interactiveWidget/MusicNotesInput">
+  <div class="oppia-music-input-valid-note-area">
+    <div class="oppia-music-input-note-choices"></div>
+    <div class="oppia-music-input-staff"></div>
+  </div>
+  <div class="oppia-music-input-control-buttons">
+    <button type="button" class="btn btn-default" ng-click="submitAnswer(noteSequence)">Submit</button>
+    <button type="button" class="btn btn-default" ng-click="clearSequence()">Clear Staff</button>
+    <button type="button" class="btn btn-default" ng-click="playSequenceToGuess()">Play Desired Sequence</button>
+    <button type="button" class="btn btn-default" ng-click="playCurrentSequence()">Play Current Sequence</button>
+  </div>
+</script>
 
-<div class="oppia-music-input-valid-note-area">
-  <div class="oppia-music-input-note-choices"></div>
-  <div class="oppia-music-input-staff"></div>
-</div>
-<div class="oppia-music-input-control-buttons">
-  <button type="button" class="btn btn-default" ng-click="submitAnswer(noteSequence)">Submit</button>
-  <button type="button" class="btn btn-default" ng-click="clearSequence()">Clear Staff</button>
-  <button type="button" class="btn btn-default" ng-click="playSequenceToGuess()">Play Desired Sequence</button>
-  <button type="button" class="btn btn-default" ng-click="playCurrentSequence()">Play Current Sequence</button>
-</div>
-
+<script type="text/ng-template" id="response/MusicNotesInput">
+  <div class="oppia-reader-response-container">
+    <span class="oppia-reader-response">
+      <[displayedAnswer]>
+    </span>
+  </div>
+</script>
