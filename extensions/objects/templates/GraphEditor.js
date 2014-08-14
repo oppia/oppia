@@ -26,15 +26,39 @@ oppia.directive('graphEditor', function($compile, warningsData) {
     },
     restrict: 'E',
     scope: true,
-    template: '<div ng-include"=getTemplateUrl()"></div>',
-    controller: function($scope, $element, $attrs) {}
+    template: '<div ng-include="getTemplateUrl()"></div>',
+    controller: function($scope, $element, $attrs) {
+      $scope.alwaysEditable = true;
+      $scope.graph = $scope.$parent.value; 
+      $scope.vertexEditPermissions = true;
+      $scope.movePermissions = true;
+
+      var testGraph = {
+        "vertices":  [
+          {"x": 50, "y": 50, label: ""},
+          {"x": 100, "y": 50, label: ""},
+          {"x": 50, "y": 100, label: ""}
+        ],
+        "edges":  [
+          {"src": 0, "dst": 1, weight: 1}, 
+          {"src": 0, "dst": 2, weight: 1}
+        ],
+        "isLabeled": false,
+        "isDirected": false,
+        "isWeighted": false
+      };
+
+      $scope.useTestGraph = function() {
+        try {
+          var newGraph = angular.copy(testGraph);
+          $scope.$parent.value = newGraph;
+          $scope.graph = $scope.$parent.value;
+        } catch (err) {
+          console.log(err.message);
+        }
+      }
+    }
   };
 });
 
-oppia.directive('graphEditorViz', {
-  restrict: 'E',
-  templateUrl: OBJECT_EDITOR_TEMPLATES_URL + 'graph_editor_viz',
-  controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-    console.log($scope.graph);
-  }]
-}); 
+

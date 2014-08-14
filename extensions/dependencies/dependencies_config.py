@@ -27,4 +27,5 @@ DEPENDENCIES_TO_ANGULAR_MODULES_DICT = {
     'jsrepl': [],
     'logic_proof': [],
     'midijs': [],
+    'graph_viz': [],
 }
