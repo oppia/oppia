@@ -31,6 +31,7 @@ import os
 import StringIO
 import zipfile
 
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
@@ -573,6 +574,7 @@ def _save_exploration(
     exploration_model.commit(
         committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
+    event_services.ExplorationChangeEventListener.record(exploration)
 
     exploration.version += 1
 
@@ -606,6 +608,7 @@ def _create_exploration(
         param_changes=exploration.param_change_dicts,
     )
     model.commit(committer_id, commit_message, commit_cmds)
+    event_services.ExplorationChangeEventListener.record(exploration)
     exploration.version += 1
 
 

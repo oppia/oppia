@@ -22,6 +22,7 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.domain import config_domain
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import user_services
 from core.platform import models
@@ -577,6 +578,7 @@ def _change_exploration_status(
 
     _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds)
+    event_services.ExplorationStatusChangeEventListener.record(exploration_rights)
 
 
 def publish_exploration(committer_id, exploration_id):
