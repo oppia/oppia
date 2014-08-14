@@ -224,7 +224,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exp_services.count_explorations(), 1)
 
         self.save_new_default_exploration(
-            'A new exploration id', self.OWNER_ID)
+            'A_new_exploration_id', self.OWNER_ID)
         self.assertEqual(exp_services.count_explorations(), 2)
 
     def test_get_exploration_titles(self):

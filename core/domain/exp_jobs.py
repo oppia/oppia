@@ -17,7 +17,6 @@
 __author__ = 'Frederik Creemers'
 
 from core import jobs
-from core.domain import exp_services
 from core.platform import models
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 
@@ -31,4 +30,5 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        from core.domain import exp_services
         exp_services.index_explorations_given_ids([item.id])

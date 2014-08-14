@@ -17,7 +17,6 @@
 import ast
 
 from core import jobs
-from core.domain import stats_services
 from core.platform import models
 (base_models, stats_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.statistics])
@@ -146,6 +145,7 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        from core.domain import stats_services
         # TODO(sll): Get this from
         # stats_services.get_exploration_start_count(key) if the exp_id
         # exists. (An exception will be thrown if it doesn't.)

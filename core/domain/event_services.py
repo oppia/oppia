@@ -22,7 +22,6 @@ import inspect
 
 from core import jobs_registry
 from core.domain import exp_domain
-from core.domain import exp_services
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 taskqueue_services = models.Registry.import_taskqueue_services()
@@ -148,6 +147,7 @@ class ExplorationChangeEventListener(BaseEventHandler):
     @classmethod
     def _handle_event(cls, exploration):
         """Indexes the changed exploration."""
+        from core.domain import exp_services
         exp_services.index_explorations_given_domain_objects([exploration])
 
 
@@ -161,6 +161,7 @@ class ExplorationStatusChangeEventListener(BaseEventHandler):
     @classmethod
     def _handle_event(cls, exp_rights):
         """Indexes the changed exploration."""
+        from core.domain import exp_services
         exp_services.update_exploration_status_in_search(exp_rights)
 
 
