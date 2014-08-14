@@ -23,7 +23,7 @@ import schema_utils
 
 
 SCHEMA_KEY_ITEMS = schema_utils.SCHEMA_KEY_ITEMS
-SCHEMA_KEY_LENGTH = schema_utils.SCHEMA_KEY_LENGTH
+SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
 SCHEMA_KEY_PROPERTIES = schema_utils.SCHEMA_KEY_PROPERTIES
 SCHEMA_KEY_TYPE = schema_utils.SCHEMA_KEY_TYPE
 SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
@@ -63,8 +63,8 @@ def _validate_schema(schema):
     take one of the SCHEMA_TYPE_* values declared above. In addition, there
     may be additional keys for specific types:
     - 'list' requires an additional 'items' property, which specifies the type
-      of the elements in the list. It also allows for an optional 'length'
-      property which specifies the length of the list.
+      of the elements in the list. It also allows for an optional 'len'
+      property which specifies the len of the list.
     - 'dict' requires an additional 'properties' property, which specifies the
       names of the keys in the dict, and schema definitions for their values.
     There may also be an optional 'post_normalizers' key whose value is a list
@@ -80,12 +80,12 @@ def _validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_ITEMS, SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_LENGTH, SCHEMA_KEY_POST_NORMALIZERS])
+            [SCHEMA_KEY_LEN, SCHEMA_KEY_POST_NORMALIZERS])
 
         _validate_schema(schema[SCHEMA_KEY_ITEMS])
-        if SCHEMA_KEY_LENGTH in schema:
-            assert isinstance(schema[SCHEMA_KEY_LENGTH], int)
-            assert schema[SCHEMA_KEY_LENGTH] > 0
+        if SCHEMA_KEY_LEN in schema:
+            assert isinstance(schema[SCHEMA_KEY_LEN], int)
+            assert schema[SCHEMA_KEY_LEN] > 0
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         _validate_dict_keys(
             schema,
@@ -130,14 +130,14 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                 'items': {
                     'type': 'unicode'
                 },
-                'length': -1
+                'len': -1
             },
             {
                 'type': 'list',
                 'items': {
                     'type': 'unicode'
                 },
-                'length': 0
+                'len': 0
             },
             {
                 'type': 'dict',
@@ -175,7 +175,7 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'items': {
                         'type': 'bool'
                     },
-                    'length': 100
+                    'len': 100
                 }
             }
         }]
@@ -218,13 +218,13 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
         invalid_vals = [[13], 'abc', None]
         self.check_normalization(schema, mappings, invalid_vals)
 
-    def test_list_schema_with_length(self):
+    def test_list_schema_with_len(self):
         schema = {
             'type': schema_utils.SCHEMA_TYPE_LIST,
             'items': {
                 'type': schema_utils.SCHEMA_TYPE_UNICODE,
             },
-            'length': 2,
+            'len': 2,
         }
         mappings = [
             (['a', 'b'], ['a', 'b']),

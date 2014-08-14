@@ -86,6 +86,13 @@ input.ng-dirty.ng-invalid {
   padding: 2px 3px;
 }
 
+.oppia-disabled-contenteditable {
+  background-color: #eee;
+  cursor: not-allowed;
+  padding: 10px 5px;
+  opacity: 1;
+}
+
 p {
   line-height: 1.5;
   /* The following should be the same as the line-height (1.5). */
