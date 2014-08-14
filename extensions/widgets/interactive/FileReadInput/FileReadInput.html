@@ -1,4 +1,14 @@
-<div>
-  <input onchange="angular.element(this).scope().submitAnswer(this)"
-         type="file" required>
-</div>
+<script type="text/ng-template" id="interactiveWidget/FileReadInput">
+  <div>
+    <input onchange="angular.element(this).scope().submitAnswer(this)"
+           type="file" required>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/FileReadInput">
+  <div class="oppia-reader-response-container">
+    <span class="oppia-reader-response">
+      <[answer]>
+    </span>
+  </div>
+</script>

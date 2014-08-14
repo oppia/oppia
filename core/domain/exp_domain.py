@@ -399,7 +399,9 @@ class WidgetInstance(object):
 
     @classmethod
     def _get_obj_type(cls, widget_class_name):
-	return widget_registry.Registry.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_class_name)._handlers[0]['obj_type']
+        return widget_registry.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, widget_class_name
+        )._handlers[0]['obj_type']
 
     @classmethod
     def from_dict(cls, widget_dict):

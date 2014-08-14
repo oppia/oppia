@@ -1,5 +1,3 @@
-<link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
-
 <style>
   .mistake-message {
     color: red;
@@ -9,12 +7,30 @@
   }
 </style>
 
-<div>
-  <[questionString]>
-  <div ui-codemirror="{onLoad: codeEditor}">
-    <textarea ng-trim="false" rows="10"></textarea>
+<script type="text/ng-template" id="interactiveWidget/LogicProof">
+  <div>
+    <[questionString]>
+    <div ui-codemirror="{onLoad: codeEditor}">
+      <textarea ng-trim="false" rows="10"></textarea>
+    </div>
+    <button class="btn btn-default" ng-click="submitProof()">Submit</button>
+    <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
+    <p class="mistake-message"> <[proofError]>  </p>
   </div>
-  <button class="btn btn-default" ng-click="submitProof()">Submit</button>
-  <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
-  <p class="mistake-message"> <[proofError]>  </p>
-</div>
+</script>
+
+<script type="text/ng-template" id="response/LogicProof">
+  <div>
+    <[answer.displayed_question]>
+    <div ng-if="answer.correct">
+      <pre><[answer.displayed_proof[0]]></pre>
+    </div>
+
+    <div ng-if="!answer.correct">
+      <div>
+        <pre><[answer.displayed_proof[0]]><div class="erroneous-line"><[answer.displayed_proof[1]]></div><[answer.displayed_proof[2]]></pre>
+      </div>
+      <p class="mistake-message"><[answer.displayed_message]></p>
+    div>
+  </div>
+</script>

@@ -55,3 +55,25 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
     };
   }
 ]);
+
+
+oppia.directive('oppiaResponseInteractiveMap', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/InteractiveMap',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.stateSticky = oppiaHtmlEscaper.escapedJsonToObj($attrs.stateSticky);
+
+        var latLongPair = $scope.answer[0] + ',' + $scope.answer[1];
+        $scope.staticMapUrl = 
+          'https://maps.googleapis.com/maps/api/staticmap?' + 
+          'center=' + latLongPair + '&zoom=4&size=500x400' +
+          '&maptype=roadmap&visual_refresh=true&markers=color:red|' +
+          latLongPair + '&sensor=false';
+      }]
+    };
+  }
+]);

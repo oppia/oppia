@@ -57,3 +57,18 @@ oppia.directive('oppiaInteractiveMultipleChoiceInput', [
     };
   }
 ]);
+
+oppia.directive('oppiaResponseMultipleChoiceInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/MultipleChoiceInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.choices = oppiaHtmlEscaper.escapedJsonToObj($attrs.choices);
+        $scope.response = $scope.choices[$scope.answer];
+      }]
+    };
+  }
+]);
