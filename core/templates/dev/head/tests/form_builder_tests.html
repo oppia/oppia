@@ -13,32 +13,37 @@
       <tr>
         <th>Form name</th>
         <th>Read-only version</th>
+        <th>Preview version</th>
         <th>Editable version</th>
       </tr>
       <tr>
-        <td class="col-sm-4 col-md-4 col-lg-4">
+        <td class="col-sm-3 col-md-3 col-lg-3">
           <h5>Unicode form (copy 1)</h5>
           <em>Saved value:</em> <[unicodeForm.value]>
         </td>
-        <td class="col-sm-4 col-md-4 col-lg-4">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.READONLY">
           </schema-based-editor>
         </td>
-        <td class="col-sm-4 col-md-4 col-lg-4">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
+        <td class="col-sm-3 col-md-3 col-lg-3">
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.ENABLED">
           </schema-based-editor>
         </td>
       </tr>
       <tr>
-        <td class="col-sm-4 col-md-4 col-lg-4">
+        <td class="col-sm-3 col-md-3 col-lg-3">
           <h5>Unicode form (copy 2)</h5>
           <em>Saved value:</em> <[unicodeForm.value]>
-        <td class="col-sm-4 col-md-4 col-lg-4">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="false">
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.READONLY">
           </schema-based-editor>
         </td>
-        <td class="col-sm-4 col-md-4 col-lg-4">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" is-editable="true">
+        <td class="col-sm-3 col-md-3 col-lg-3">
+        </td>
+        <td class="col-sm-3 col-md-3 col-lg-3">
+          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.ENABLED">
           </schema-based-editor>
         </td>
       </tr>
@@ -50,19 +55,24 @@
         <tr>
           <th>Form name</th>
           <th>Read-only version</th>
+          <th>Preview version</th>
           <th>Editable version</th>
         </tr>
         <tr ng-repeat="form in formset.forms">
-          <td class="col-sm-4 col-md-4 col-lg-4">
+          <td class="col-sm-3 col-md-3 col-lg-3">
             <h5><[form.name]></h5>
             <em>Saved value:</em> <[form.value]>
           </td>
-          <td class="col-sm-4 col-md-4 col-lg-4">
-            <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="false">
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <schema-based-editor definition="form.schema" saved-value="form.value" mode="FORM_BUILDER_MODES.READONLY">
             </schema-based-editor>
           </td>
-          <td class="col-sm-4 col-md-4 col-lg-4">
-            <schema-based-editor definition="form.schema" saved-value="form.value" is-editable="true">
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <schema-based-editor definition="form.schema" saved-value="form.value" mode="FORM_BUILDER_MODES.DISABLED">
+            </schema-based-editor>
+          </td>
+          <td class="col-sm-3 col-md-3 col-lg-3">
+            <schema-based-editor definition="form.schema" saved-value="form.value" mode="FORM_BUILDER_MODES.ENABLED">
             </schema-based-editor>
           </td>
         </tr>

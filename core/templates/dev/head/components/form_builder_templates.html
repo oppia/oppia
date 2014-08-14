@@ -1,10 +1,10 @@
 <script type="text/ng-template" id="schemaBasedEditor/entryPoint">
   <ng-form name="schemaForm">
-    <schema-builder local-value="localValue" schema="definition" is-editable="isEditable()">
+    <schema-builder local-value="localValue" schema="definition" mode="mode">
     </schema-builder>
   </ng-form>
 
-  <div ng-if="isEditable()">
+  <div ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED">
     <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
     <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
   </div>
@@ -12,33 +12,38 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/master">
-  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" is-editable="isEditable()" allow-parameters="schema().allow_parameters">
+  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
   </schema-based-bool-editor>
 
-  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" is-editable="isEditable()" allow-parameters="schema().allow_parameters">
+  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
   </schema-based-int-editor>
 
-  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" is-editable="isEditable()" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
+  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
   </schema-based-float-editor>
 
-  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" is-editable="isEditable()" post-normalizers="schema().post_normalizers">
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers">
   </schema-based-unicode-editor>
 
-  <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" is-editable="isEditable()">
+  <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" mode="mode">
   </schema-based-html-editor>
 
-  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" is-editable="isEditable()" item-schema="schema().items">
+  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" mode="mode" item-schema="schema().items">
   </schema-based-list-editor>
 
-  <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" is-editable="isEditable()" property-schemas="schema().properties">
+  <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
   </schema-based-dict-editor>
 </script>
 
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">
-  <select class="form-control" ng-if="isEditable()" ng-model="$parent.localValue" ng-options="option.value as option.name for option in boolEditorOptions"></select>
+  <select class="form-control"
+          ng-if="mode != $root.FORM_BUILDER_MODES.READONLY"
+          ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"
+          ng-model="$parent.localValue"
+          ng-options="option.value as option.name for option in boolEditorOptions">
+  </select>
 
-  <span ng-if="!isEditable()">
+  <span ng-if="mode === $root.FORM_BUILDER_MODES.READONLY">
     <span ng-if="localValue.type === 'raw'">
       <[localValue.data]>
     </span>
@@ -50,19 +55,19 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/int">
-  <span ng-if="isEditable()">
+  <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
     <div class="input-group">
-      <input ng-if="!editAsParameter" type="number" ng-model="$parent.localValue.data" class="form-control">
-      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions"></select>
+      <input ng-if="!editAsParameter" type="number" ng-model="$parent.localValue.data" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
 
       <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
-        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><b>P</b></button>
-        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><del><b>P</b></del></button>
+        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><b>P</b></button>
+        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><del><b>P</b></del></button>
       </span>
     </div>
   </span>
 
-  <span ng-if="!isEditable()">
+  <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
     <span ng-if="localValue.type === 'raw'">
       <[localValue.data]>
     </span>
@@ -74,19 +79,19 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
-  <span ng-if="isEditable()">
+  <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
     <div class="input-group">
-      <input ng-if="!editAsParameter" type="text" ng-model="$parent.localValue.data" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation>
-      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions"></select>
+      <input ng-if="!editAsParameter" type="text" ng-model="$parent.localValue.data" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
 
       <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
-        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><b>P</b></button>
-        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()"><del><b>P</b></del></button>
+        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><b>P</b></button>
+        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><del><b>P</b></del></button>
       </span>
     </div>
   </span>
 
-  <span ng-if="!isEditable()">
+  <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
     <span ng-if="localValue.type === 'raw'">
       <[localValue.data]>
     </span>
@@ -98,9 +103,9 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/unicode">
-  <span ng-if="isEditable()">
+  <span ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED">
     <span ng-if="doUnicodeParamsExist">
-      <unicode-with-parameters-editor local-value="$parent.$parent.localValue" allowed-parameter-names="allowedParameterNames">
+      <unicode-with-parameters-editor local-value="$parent.$parent.localValue" allowed-parameter-names="allowedParameterNames" mode="mode">
       </unicode-with-parameters-editor>
     </span>
     <span ng-if="!doUnicodeParamsExist">
@@ -108,13 +113,19 @@
     </span>
   </span>
 
-  <span ng-if="!isEditable()" ng-bind-html="getDisplayedValue()"></span>
+  <span ng-if="mode != $root.FORM_BUILDER_MODES.ENABLED"
+        ng-class="{'oppia-disabled-contenteditable': mode == $root.FORM_BUILDER_MODES.DISABLED}"
+        ng-bind-html="getDisplayedValue()">
+  </span>
 </script>
 
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <rich-text-editor ng-if="isEditable()" html-content="$parent.localValue"></rich-text-editor>
-  <span ng-if="!isEditable()" angular-html-bind="localValue"></span>
+  <rich-text-editor ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED" html-content="$parent.localValue"></rich-text-editor>
+  <span ng-if="mode != $root.FORM_BUILDER_MODES.ENABLED"
+        ng-class="{'oppia-disabled-contenteditable': mode == $root.FORM_BUILDER_MODES.DISABLED}"
+        ng-bind-html="localValue">
+  </span>
 </script>
 
 
@@ -122,9 +133,9 @@
   <form role="form">
     <div ng-repeat="(key, schema) in propertySchemas()">
       <div class="form-group">
-        <!-- TODO(sll): Add a 'for' attribute here. -->
+        <!-- TODO(sll): Add a 'for' attribute to the label tag. -->
         <label><[key]></label>
-        <schema-builder schema="schema" is-editable="isEditable()" local-value="localValue[key]">
+        <schema-builder schema="schema" mode="mode" local-value="localValue[key]">
         </schema-builder>
       </div>
     </div>
@@ -136,11 +147,11 @@
   <table class="table">
     <tr ng-repeat="item in localValue track by $index">
       <td>
-        <schema-builder schema="itemSchema()" is-editable="isEditable()" local-value="localValue[$index]">
+        <schema-builder schema="itemSchema()" mode="mode" local-value="localValue[$index]">
         </schema-builder>
       </td>
-      <td ng-if="isEditable()">
-        <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)">
+      <td ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
+        <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>
         </button>
@@ -148,7 +159,7 @@
     </tr>
   </table>
 
-  <button ng-if="isEditable()" type="button" class="btn btn-default" ng-click="addElement()">
+  <button ng-if="mode != $root.FORM_BUILDER_MODES.READONLY" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
     Add element
   </button>
 </script>
