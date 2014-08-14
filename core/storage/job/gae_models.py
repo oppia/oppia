@@ -81,12 +81,18 @@ class JobModel(base_models.BaseModel):
         return self.status_code in [STATUS_CODE_QUEUED, STATUS_CODE_STARTED]
 
     @classmethod
-    def get_recent_jobs(cls, recency_msec):
+    def get_recent_jobs(cls, limit, recency_msec):
         earliest_time_msec = (
             utils.get_current_time_in_millisecs() - recency_msec)
         return cls.query().filter(
             cls.time_queued_msec > earliest_time_msec
-        ).order(-cls.time_queued_msec)
+        ).order(-cls.time_queued_msec).fetch(limit)
+
+    @classmethod
+    def get_all_unfinished_jobs(cls, limit):
+        return cls.query().filter(
+            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
+        ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
     def get_jobs(cls, job_type):

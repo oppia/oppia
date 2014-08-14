@@ -25,27 +25,24 @@ describe('MusicNotesInput interactive widget', function() {
     var elt, scope, ctrlScope;
 
     beforeEach(module('oppia'));
-    // Load the templates.
-    beforeEach(module(
-      'extensions/widgets/interactive/MusicNotesInput/MusicNotesInput.html'));
+    beforeEach(module('directiveTemplates'));
+    beforeEach(inject(function($compile, _$templateCache_, $rootScope) {
+      $templateCache = _$templateCache_;
+      var templatesHtml = $templateCache.get(
+        'extensions/widgets/interactive/MusicNotesInput/MusicNotesInput.html');
+      $compile(templatesHtml)($rootScope);
+      $rootScope.$digest();
+    }));
 
-    beforeEach(inject(function($compile, $rootScope, _$templateCache_, _$httpBackend_) {
+    beforeEach(inject(function($compile, $rootScope, _$httpBackend_) {
+      $httpBackend = _$httpBackend_;
+
       var TAG_NAME = 'oppia-interactive-music-notes-input';
-
       scope = $rootScope.$new();
       elt = angular.element('<' + TAG_NAME + '></' + TAG_NAME + '>');
-      $httpBackend = _$httpBackend_;
-      $templateCache = _$templateCache_;
-
-      $templateCache.put(
-        'interactiveWidget/MusicNotesInput',
-        $templateCache.get(
-          'extensions/widgets/interactive/MusicNotesInput/MusicNotesInput.html'));
-
       $compile(elt)(scope);
-      scope.$digest();
-
       ctrlScope = elt.scope();
+      scope.$digest();
     }));
 
     afterEach(function() {

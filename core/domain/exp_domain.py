@@ -399,7 +399,9 @@ class WidgetInstance(object):
 
     @classmethod
     def _get_obj_type(cls, widget_class_name):
-	return widget_registry.Registry.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_class_name)._handlers[0]['obj_type']
+        return widget_registry.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, widget_class_name
+        )._handlers[0]['obj_type']
 
     @classmethod
     def from_dict(cls, widget_dict):
@@ -646,7 +648,8 @@ class Exploration(object):
     def __init__(self, exploration_id, title, category, objective,
                  language_code, skill_tags, blurb, author_notes, default_skin,
                  init_state_name, states_dict, param_specs_dict,
-                 param_changes_list, version):
+                 param_changes_list, version, created_on=None,
+                 last_updated=None):
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -671,6 +674,8 @@ class Exploration(object):
             for param_change_dict in param_changes_list]
 
         self.version = version
+        self.created_on = created_on
+        self.last_updated = last_updated
 
     def is_equal_to(self, other):
         simple_props = ['id', 'title', 'category', 'objective', 'language_code',

@@ -69,7 +69,8 @@ def get_exploration_from_model(exploration_model):
         exploration_model.blurb, exploration_model.author_notes,
         exploration_model.default_skin, exploration_model.init_state_name,
         exploration_model.states, exploration_model.param_specs,
-        exploration_model.param_changes, exploration_model.version)
+        exploration_model.param_changes, exploration_model.version,
+        exploration_model.created_on, exploration_model.last_updated)
 
 
 def get_exploration_by_id(exploration_id, strict=True, version=None):
@@ -151,28 +152,41 @@ def _get_explorations_summary_dict(
     with the following keys: title, category and rights. The value for 'rights'
     is the rights object, represented as a dict.
     """
+    id_to_rights = {rights.id: rights for rights in exploration_rights}
     exp_ids = [rights.id for rights in exploration_rights]
-    exploration_models = exp_models.ExplorationModel.get_multi(exp_ids)
-    explorations = [
-        (get_exploration_from_model(e) if e else None)
-        for e in exploration_models]
+    memcached_keys = [
+        _get_exploration_memcache_key(exp_id) for exp_id in exp_ids]
+    memcached_explorations = memcache_services.get_multi(memcached_keys)
+
+    uncached_exp_ids = []
+    for ind, key in enumerate(memcached_keys):
+        if key not in memcached_explorations:
+            uncached_exp_ids.append(exp_ids[ind])
+    exploration_models = exp_models.ExplorationModel.get_multi(
+        uncached_exp_ids)
+
+    exps_to_cache = {}
+    for ind, model in enumerate(exploration_models):
+        if model:
+            exps_to_cache[_get_exploration_memcache_key(model.id)] = (
+                get_exploration_from_model(model))
+        else:
+            logging.error(
+                'Could not find exploration %s' % uncached_exp_ids[ind])
+    memcache_services.set_multi(exps_to_cache)
 
     result = {}
-    for ind, exploration in enumerate(explorations):
-        if exploration is None:
-            logging.error(
-                'Could not find exploration corresponding to exploration '
-                'rights object with id %s' % exploration_rights[ind].id)
-        else:
-            result[exploration.id] = {
-                'title': exploration.title,
-                'category': exploration.category,
-                'rights': exploration_rights[ind].to_dict(),
-            }
-            if include_timestamps:
-                result[exploration.id]['last_updated'] = (
-                    utils.get_time_in_millisecs(
-                        exploration_models[ind].last_updated))
+    for exploration in (
+            memcached_explorations.values() + exps_to_cache.values()):
+        result[exploration.id] = {
+            'title': exploration.title,
+            'category': exploration.category,
+            'rights': id_to_rights[exploration.id].to_dict(),
+        }
+        if include_timestamps:
+            result[exploration.id]['last_updated'] = (
+                utils.get_time_in_millisecs(
+                    exploration.last_updated))
     return result
 
 

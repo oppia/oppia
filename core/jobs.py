@@ -64,6 +64,8 @@ VALID_STATUS_CODE_TRANSITIONS = {
 # queued more recently than this number of milliseconds ago are considered
 # 'recent'.
 DEFAULT_RECENCY_MSEC = 14 * 24 * 60 * 60 * 1000
+# The maximum number of previously-run jobs to show in the admin dashboard.
+NUM_JOBS_IN_DASHBOARD_LIMIT = 100
 
 
 class BaseJobManager(object):
@@ -427,6 +429,10 @@ class BaseMapReduceJobManager(BaseJobManager):
           times as appropriate (including zero) to return key/value 2-tuples.
           For example, to get a count of all explorations, one might yield
           (exploration.id, 1).
+
+          WARNING: The OutputWriter converts mapper output keys to type str.
+          So, if you have keys that are of type unicode, you must yield
+          "key.encode('utf-8')", rather than "key".
         """
         raise NotImplementedError(
             'Classes derived from BaseMapReduceJobManager must implement map '
@@ -488,54 +494,8 @@ class BaseMapReduceJobManager(BaseJobManager):
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):
         metadata = cls.get_metadata(job_id)
-        if metadata:
-            root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
-            pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
-
-    @classmethod
-    def _require_correct_job_type(cls, job_type):
-        # Suppress check for correct job type since we cannot pass the specific
-        # entity class in the kwargs.
-        pass
-
-
-ABSTRACT_BASE_CLASSES = frozenset([
-    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager])
-
-
-def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
-    """Get a list containing data about all jobs.
-
-    This list is arranged in descending order based on the time the job
-    was enqueued.
-
-    Args:
-    - recency_secs: the threshold for a recent job, in seconds.
-
-    Each element of this list is a dict that represents a job. The dict has the
-    following keys:
-    - 'id': the job id
-    - 'time_started_msec': when the job was started, in milliseconds since the
-          epoch
-    - 'time_finished_msec': when the job was finished, in milliseconds since
-          the epoch
-    - 'status_code': the current status of the job
-    - 'job_type': the type of this job
-    - 'is_cancelable': whether the job can be canceled
-    - 'error': any errors pertaining to this job
-    """
-    recent_job_models = job_models.JobModel.get_recent_jobs(
-        recency_msec=recency_msec)
-    result = [{
-        'id': model.id,
-        'time_started_msec': model.time_started_msec,
-        'time_finished_msec': model.time_finished_msec,
-        'status_code': model.status_code,
-        'job_type': model.job_type,
-        'is_cancelable': model.is_cancelable,
-        'error': model.error,
-    } for model in recent_job_models]
-    return result
+        root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
+        pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
@@ -606,13 +566,6 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         job_queued_msecs = float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
         return job_queued_msecs >= created_on_msecs
-
-    @staticmethod
-    def map(item):
-        """Implements the map function.  Must be declared @staticmethod."""
-        raise NotImplementedError(
-            'Classes derived from BaseMapReduceJobManager must implement map '
-            'as a @staticmethod.')
 
     @classmethod
     def _post_completed_hook(cls, job_id):
@@ -1009,6 +962,65 @@ class BaseContinuousComputationManager(object):
             cls._kickoff_batch_job_after_previous_one_ends()
 
 
+def _get_job_dict_from_job_model(model):
+    """Converts an ndb.Model representing a job to a dict.
+
+    The dict contains the following keys:
+    - 'id': the job id
+    - 'time_started_msec': when the job was started, in milliseconds since the
+          epoch
+    - 'time_finished_msec': when the job was finished, in milliseconds since
+          the epoch
+    - 'status_code': the current status of the job
+    - 'job_type': the type of this job
+    - 'is_cancelable': whether the job can be canceled
+    - 'error': any errors pertaining to this job
+    - 'human_readable_time_started': a human-readable string representing the
+          time the job started, or None if time_started_msec is None.
+    - 'human_readable_time_finished': a human-readable string representing the
+          time the job finished, or None if time_finished_msec is None.
+    """
+    return {
+        'id': model.id,
+        'time_started_msec': model.time_started_msec,
+        'time_finished_msec': model.time_finished_msec,
+        'status_code': model.status_code,
+        'job_type': model.job_type,
+        'is_cancelable': model.is_cancelable,
+        'error': model.error,
+        'human_readable_time_started': (
+            '' if model.time_started_msec is None
+            else utils.get_human_readable_time_string(model.time_started_msec)),
+        'human_readable_time_finished': (
+            '' if model.time_finished_msec is None
+            else utils.get_human_readable_time_string(
+                model.time_finished_msec)),
+    }
+
+
+def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
+    """Get a list containing data about recent jobs.
+
+    This list is arranged in descending order based on the time the job
+    was enqueued. At most NUM_JOBS_IN_DASHBOARD_LIMIT job descriptions are
+    returned.
+
+    Args:
+    - recency_secs: the threshold for a recent job, in seconds.
+    """
+    recent_job_models = job_models.JobModel.get_recent_jobs(
+        NUM_JOBS_IN_DASHBOARD_LIMIT, recency_msec)
+    return [_get_job_dict_from_job_model(model) for model in recent_job_models]
+
+
+def get_data_for_unfinished_jobs():
+    """Get a list containing data about all unfinished jobs."""
+    unfinished_job_models = job_models.JobModel.get_all_unfinished_jobs(
+        NUM_JOBS_IN_DASHBOARD_LIMIT)
+    return [_get_job_dict_from_job_model(model)
+            for model in unfinished_job_models]
+
+
 def get_continuous_computations_info(cc_classes):
     """Returns data about the given computations.
 
@@ -1068,3 +1080,8 @@ def get_continuous_computations_info(cc_classes):
         result.append(cc_dict)
 
     return result
+
+
+ABSTRACT_BASE_CLASSES = frozenset([
+    BaseJobManager, BaseDeferredJobManager, BaseMapReduceJobManager,
+    BaseMapReduceJobManagerForContinuousComputations])

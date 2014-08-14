@@ -25,9 +25,9 @@ oppia.directive('playtestQueueSection', [function() {
       explorations: '='
     },
     templateUrl: 'playtestQueue/main',
-    controller: ['$scope', 'oppiaDateFormatter', function($scope, oppiaDateFormatter) {
+    controller: ['$scope', 'oppiaDatetimeFormatter', function($scope, oppiaDatetimeFormatter) {
       $scope.getLocaleStringForDate = function(millisSinceEpoch) {
-        return oppiaDateFormatter.getLocaleString(millisSinceEpoch);
+        return oppiaDatetimeFormatter.getLocaleString(millisSinceEpoch);
       };
     }]
   };
