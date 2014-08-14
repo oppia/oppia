@@ -82,6 +82,19 @@ oppia.directive('oppiaInteractiveGraphInput', [
   }
 ]);
 
+oppia.directive('oppiaResponseGraphInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/GraphInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        
+      }]
+    };
+  }
+]);
+
 /*
  * Directive for graph-viz.
  * Template is in extensions/dependencies/graph_viz.html
