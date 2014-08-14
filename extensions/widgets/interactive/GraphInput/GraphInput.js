@@ -97,9 +97,7 @@ oppia.directive('oppiaResponseGraphInput', [
 
 /*
  * Directive for graph-viz.
- * Template is in extensions/dependencies/graph_viz.html
  * Requires $scope to have a $scope.graph object
- * TODO(czxcjx): Is there a better place to put this code than in this file?
  */
 oppia.directive('graphViz', function() {
   return {
