@@ -840,20 +840,32 @@ oppia.directive('schemaBasedListEditor', [
       // The mode in which to display the form. Should be treated as read-only.
       mode: '=',
       // Read-only property. The schema definition for each item in the list.
-      itemSchema: '&'
+      itemSchema: '&',
+      // The length of the list. If not specified, the list is of arbitrary length.
+      len: '='
     },
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
-      $scope.addElement = function() {
-        $scope.localValue.push(
-          schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-      };
+      if ($scope.len === undefined) {
+        $scope.addElement = function() {
+          $scope.localValue.push(
+            schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+        };
 
-      $scope.deleteElement = function(index) {
-        $scope.localValue.splice(index, 1);
-      };
+        $scope.deleteElement = function(index) {
+          $scope.localValue.splice(index, 1);
+        };
+      } else {
+        if ($scope.len <= 0) {
+          throw 'Invalid length for list editor: ' + $scope.len;
+        }
+        if ($scope.len != $scope.localValue.length) {
+          throw 'List editor length does not match length of input value: ' +
+            $scope.len + ' ' + $scope.localValue;
+        }
+      }
     }]
   };
 }]);

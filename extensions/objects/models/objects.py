@@ -204,7 +204,7 @@ class CoordTwoDim(BaseObject):
 
     SCHEMA = {
         'type': 'list',
-        'length': 2,
+        'len': 2,
         'items': Real.SCHEMA,
     }
 

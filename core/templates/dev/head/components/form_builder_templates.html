@@ -27,7 +27,7 @@
   <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" mode="mode">
   </schema-based-html-editor>
 
-  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" mode="mode" item-schema="schema().items">
+  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len">
   </schema-based-list-editor>
 
   <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
@@ -150,7 +150,7 @@
         <schema-builder schema="itemSchema()" mode="mode" local-value="localValue[$index]">
         </schema-builder>
       </td>
-      <td ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
+      <td ng-if="mode != $root.FORM_BUILDER_MODES.READONLY && !len">
         <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>
@@ -159,7 +159,7 @@
     </tr>
   </table>
 
-  <button ng-if="mode != $root.FORM_BUILDER_MODES.READONLY" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+  <button ng-if="mode != $root.FORM_BUILDER_MODES.READONLY && !len" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
     Add element
   </button>
 </script>

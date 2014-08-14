@@ -183,6 +183,22 @@ oppia.controller('FormBuilderTests', [
     },
     value: ['abc', 'def', 'ghi']
   }, {
+    name: 'Fixed-length list of 2 floats',
+    schema: {
+      type: 'list',
+      items: {
+        type: 'float'
+      },
+      len: 2
+    },
+    value: [{
+      type: 'raw',
+      data: 1.0
+    }, {
+      type: 'raw',
+      data: -3.0
+    }]
+  }, {
     name: 'Nested lists',
     schema: {
       type: 'list',
