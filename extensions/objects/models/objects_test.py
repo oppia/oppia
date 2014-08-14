@@ -292,8 +292,8 @@ class SchemaValidityTests(test_utils.GenericTestBase):
         count = 0
         for _, member in inspect.getmembers(objects):
             if inspect.isclass(member):
-                if hasattr(member, '_schema'):
-                    schema_utils_test._validate_schema(member._schema)
+                if hasattr(member, 'SCHEMA'):
+                    schema_utils_test._validate_schema(member.SCHEMA)
                     count += 1
 
         self.assertEquals(count, 19)

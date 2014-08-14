@@ -57,7 +57,7 @@ class BaseObject(object):
         Raises:
           TypeError: if the Python object cannot be normalized.
         """
-        return schema_utils.normalize_against_schema(raw, cls._schema)
+        return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
     @classmethod
     def has_editor_js_template(cls):
@@ -102,7 +102,7 @@ class Boolean(BaseObject):
     edit_html_filename = 'boolean_editor'
     edit_js_filename = 'BooleanEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'bool'
     }
 
@@ -112,7 +112,7 @@ class Boolean(BaseObject):
         if raw is None or raw == '':
             raw = False
 
-        return schema_utils.normalize_against_schema(raw, cls._schema)
+        return schema_utils.normalize_against_schema(raw, cls.SCHEMA)
 
 
 class Real(BaseObject):
@@ -122,7 +122,7 @@ class Real(BaseObject):
     edit_html_filename = 'real_editor'
     edit_js_filename = 'RealEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'float'
     }
 
@@ -134,8 +134,32 @@ class Int(BaseObject):
     edit_html_filename = 'int_editor'
     edit_js_filename = 'IntEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'int'
+    }
+
+
+class UnicodeString(BaseObject):
+    """Unicode string class."""
+
+    description = 'A unicode string.'
+    edit_html_filename = 'unicode_string_editor'
+    edit_js_filename = 'UnicodeStringEditor'
+
+    SCHEMA = {
+        'type': 'unicode',
+    }
+
+
+class Html(BaseObject):
+    """HTML string class."""
+
+    description = 'An HTML string.'
+    edit_html_filename = 'html_editor'
+    edit_js_filename = 'HtmlEditor'
+
+    SCHEMA = {
+        'type': 'html',
     }
 
 
@@ -146,7 +170,7 @@ class NonnegativeInt(BaseObject):
     edit_html_filename = 'nonnegative_int_editor'
     edit_js_filename = 'NonnegativeIntEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'int',
         'post_normalizers': [{
             'id': 'require_at_least',
@@ -160,21 +184,13 @@ class CodeEvaluation(BaseObject):
 
     description = 'Code and its evaluation results.'
 
-    _schema = {
+    SCHEMA = {
         'type': 'dict',
         'properties': {
-            'code': {
-                'type': 'unicode'
-            },
-            'output': {
-                'type': 'unicode'
-            },
-            'evaluation': {
-                'type': 'unicode'
-            },
-            'error': {
-                'type': 'unicode'
-            }
+            'code': UnicodeString.SCHEMA,
+            'output': UnicodeString.SCHEMA,
+            'evaluation': UnicodeString.SCHEMA,
+            'error': UnicodeString.SCHEMA,
         }
     }
 
@@ -186,12 +202,10 @@ class CoordTwoDim(BaseObject):
     edit_html_filename = 'coord_two_dim_editor'
     edit_js_filename = 'CoordTwoDimEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'list',
         'length': 2,
-        'items': {
-            'type': 'float'
-        }
+        'items': Real.SCHEMA,
     }
 
 
@@ -202,11 +216,9 @@ class ListOfUnicodeString(BaseObject):
     edit_html_filename = 'list_editor'
     edit_js_filename = 'ListOfUnicodeStringEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'list',
-        'items': {
-            'type': 'unicode'
-        }
+        'items': UnicodeString.SCHEMA
     }
 
 
@@ -217,26 +229,12 @@ class SetOfUnicodeString(BaseObject):
     edit_html_filename = 'list_editor'
     edit_js_filename = 'SetOfUnicodeStringEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'list',
-        'items': {
-            'type': 'unicode'
-        },
+        'items': UnicodeString.SCHEMA,
         'post_normalizers': [{
             'id': 'uniquify'
         }]
-    }
-
-
-class UnicodeString(BaseObject):
-    """Unicode string class."""
-
-    description = 'A unicode string.'
-    edit_html_filename = 'unicode_string_editor'
-    edit_js_filename = 'UnicodeStringEditor'
-
-    _schema = {
-        'type': 'unicode',
     }
 
 
@@ -247,7 +245,7 @@ class NormalizedString(BaseObject):
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'NormalizedStringEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'unicode',
         'post_normalizers': [{
             'id': 'normalize_spaces'
@@ -262,21 +260,7 @@ class MathLatexString(BaseObject):
     edit_html_filename = 'math_latex_string_editor'
     edit_js_filename = 'MathLatexStringEditor'
 
-    _schema = {
-        'type': 'unicode',
-    }
-
-
-class Html(BaseObject):
-    """HTML string class."""
-
-    description = 'An HTML string.'
-    edit_html_filename = 'html_editor'
-    edit_js_filename = 'HtmlEditor'
-
-    _schema = {
-        'type': 'html',
-    }
+    SCHEMA = UnicodeString.SCHEMA
 
 
 class TabContent(BaseObject):
@@ -290,7 +274,7 @@ class TabContent(BaseObject):
     edit_html_filename = 'tab_content_editor'
     edit_js_filename = 'TabContentEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'dict',
         'properties': {
             'title': {
@@ -299,9 +283,7 @@ class TabContent(BaseObject):
                     'id': 'require_nonempty'
                 }]
             },
-            'content': {
-                'type': 'html',
-            }
+            'content': Html.SCHEMA,
         }
     }
 
@@ -317,22 +299,9 @@ class ListOfTabContent(BaseObject):
     edit_html_filename = 'list_editor'
     edit_js_filename = 'ListOfTabContentEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'list',
-        'items': {
-            'type': 'dict',
-            'properties': {
-                'title': {
-                    'type': 'unicode',
-                    'post_normalizers': [{
-                        'id': 'require_nonempty'
-                    }]
-                },
-                'content': {
-                    'type': 'html'
-                }
-            }
-        }
+        'items': TabContent.SCHEMA,
     }
 
 
@@ -343,7 +312,7 @@ class SanitizedUrl(BaseObject):
     edit_html_filename = 'unicode_string_editor'
     edit_js_filename = 'SanitizedUrlEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'unicode',
         'post_normalizers': [{
             'id': 'sanitize_url'
@@ -359,7 +328,7 @@ class MusicPhrase(BaseObject):
     edit_html_filename = 'music_phrase_editor'
     edit_js_filename = 'MusicPhraseEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'list',
         'items': {
             'type': 'dict',
@@ -404,15 +373,13 @@ class TarFileString(BaseObject):
 
     description = 'A string with base64-encoded content of a tar file'
 
-    _schema = {
-        'type': 'unicode',
-    }
+    SCHEMA = UnicodeString.SCHEMA
 
     @classmethod
     def normalize(cls, raw):
         """Reads `raw` as a unicode string representing a tar file and returns
         the base64-encoded contents."""
-        raw = schema_utils.normalize_against_schema(raw, cls._schema)
+        raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
         raw = base64.b64decode(raw)
         return tarfile.open(fileobj=StringIO.StringIO(raw), mode='r:gz')
 
@@ -427,9 +394,7 @@ class Filepath(BaseObject):
     edit_html_filename = 'filepath_editor'
     edit_js_filename = 'FilepathEditor'
 
-    _schema = {
-        'type': 'unicode',
-    }
+    SCHEMA = UnicodeString.SCHEMA
 
 
 class CheckedProof(BaseObject):
@@ -497,7 +462,7 @@ class LogicErrorCategory(BaseObject):
     edit_html_filename = 'logic_error_category_editor'
     edit_js_filename = 'LogicErrorCategoryEditor'
 
-    _schema = {
+    SCHEMA = {
         'type': 'unicode',
         'post_normalizers': [{
             'id': 'require_is_one_of',
