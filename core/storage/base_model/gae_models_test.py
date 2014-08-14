@@ -74,33 +74,9 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         model1_id = model1.id
         model2_id = model2.id
 
-        result = base_models.BaseModel.get_multi([model1_id, model2_id])
+        result = base_models.BaseModel.get_multi([model1_id, model2_id, 'none'])
 
-        self.assertEqual(result, [model1, model2])
-
-        # Testing the case where a non-existent id is given.
-
-        result = base_models.BaseModel.get_multi(
-            [model1_id, model2_id, 'unknown'], strict=False)
         self.assertEqual(result, [model1, model2, None])
-
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
-            result = base_models.BaseModel.get_multi(
-                [model1_id, model2_id, 'unknown'], strict=True)
-
-        # Testing the case where a model is marked as deleted
-
-        model3 = base_models.BaseModel()
-        model3.deleted = True
-        model3.put()
-
-        result = base_models.BaseModel.get_multi(
-            [model1_id, model2_id, model3.id], strict=False)
-        self.assertEqual(result, [model1, model2, None])
-
-        with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
-            result = base_models.BaseModel.get_multi(
-                [model1_id, model2_id, model3.id], strict=True)
 
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])

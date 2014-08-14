@@ -85,37 +85,8 @@ class BaseModel(ndb.Model):
 
     @classmethod
     def get_multi(cls, entity_ids, strict=False):
-        """Gets multiple entities by id. Fails noisily if strict == True..
-
-        args:
-         entity_ids: [str, ...]. A list of entity ids.
-         strict: bool. Whether to fail noisily if any of the given ids does not
-                 have an undeleted entity in the datastore.
-
-        returns:
-         A list of entities, corresponding to the entity_ids list argument.
-         If strict == False, list elements corresponding to entity_ids with no undeleted
-         entities will be None.
-        """
         entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
-        entities = ndb.get_multi(entity_keys)
-
-        not_found = []
-        for i in xrange(len(entity_ids)):
-            entity = entities[i]
-            if entity is None or entity.deleted:
-                not_found.append(str(entity_ids[i]))
-                # Ensure that entities that are marked as deleted are not returned.
-                entities[i] = None
-
-        if strict and not_found :
-            not_found_str = "\n".join(not_found)
-            raise cls.EntityNotFoundError('Entities of class %s with these '
-                                          'id(s) could not be found:\n%s'
-                                          % (cls.__name__, not_found_str))
-
-        return entities
-
+        return ndb.get_multi(entity_keys)
 
     @classmethod
     def put_multi(cls, entities):

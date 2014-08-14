@@ -108,8 +108,9 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         if _id not in result:
             uncached.append(_id)
 
-    db_exp_models = exp_models.ExplorationModel.get_multi(uncached, strict=strict)
+    db_exp_models = exp_models.ExplorationModel.get_multi(uncached)
     db_results_dict = {}
+    not_found = []
     for i, eid in enumerate(uncached):
         model = db_exp_models[i]
         if model:
@@ -118,7 +119,12 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
             logging.info('Tried to fetch exploration with id %s, but no such'
                          'exploration exists in the datastore' % eid)
             exploration = None
+            not_found.append(eid)
         db_results_dict[eid] = exploration
+
+    if strict and not_found:
+        raise ValueError('Couldn\'t find explorations with the following ids:\n%s'
+                        % '\n'.join(not_found))
 
     cache_update = {eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
                     if db_results_dict[eid] is not None}
@@ -984,18 +990,21 @@ def index_explorations_given_ids(exp_ids):
     index_explorations_given_domain_objects(exploration_models.values())
 
 
-def patch_explortion_search_document(exp_id, **kwargs):
+def patch_exploration_search_document(exp_id, update):
     """Patches an exploration's current search document, with the values
-    passed in as keyword arguments."""
+    from the 'update' dictionary."""
 
     doc = search_services.get_document_from_index(
         exp_id, SEARCH_INDEX_EXPLORATIONS)
-    doc.update(kwargs)
+    doc.update(update)
     search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
 
+def update_exploration_status_in_search(rights):
+    patch_exploration_search_document(
+        rights.id, _exp_rights_to_search_dict(rights))
 
 def search_explorations(
-    query, sort, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    query, sort=None, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
     """Searcher through the exploration
 
     args:

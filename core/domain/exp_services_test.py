@@ -1506,7 +1506,8 @@ class SearchTests(ExplorationServicesUnitTests):
     def test_index_explorations_given_domain_objects(self):
 
         expected_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_exp_titles = ['title 0', 'title 1', 'title 2', 'title 3', 'title 4']
+        expected_exp_titles = ['title 0','title 1', 'title 2',
+                               'title 3', 'title 4']
         expected_exp_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
 
         def mock_add_documents_to_index(docs, index):
@@ -1584,9 +1585,35 @@ class SearchTests(ExplorationServicesUnitTests):
 
         with get_doc_swap, add_docs_swap:
             patch = {'c': 'e', 'f': 'g'}
-            exp_services.patch_explortion_search_document(self.EXP_ID, **patch)
+            exp_services.patch_exploration_search_document(self.EXP_ID, patch)
 
         self.assertEqual(add_docs_counter.times_called, 1)
+
+    def test_update_exploration_status_in_search(self):
+
+        def mock_get_doc(doc_id, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            self.assertEqual(doc_id, self.EXP_ID)
+            return {}
+
+        def mock_add_docs(docs, index):
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+            self.assertEqual(docs, [{'is':'beta'}])
+
+        get_doc_counter = test_utils.CallCounter(mock_get_doc)
+        add_docs_counter = test_utils.CallCounter(mock_add_docs)
+
+        get_doc_swap = self.swap(
+            search_services, 'get_document_from_index', get_doc_counter)
+        add_docs_swap = self.swap(
+            search_services, 'add_documents_to_index', add_docs_counter)
+
+        with get_doc_swap, add_docs_swap:
+            rights = rights_manager.ExplorationRights(
+                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                status=rights_manager.EXPLORATION_STATUS_PUBLIC
+            )
+            exp_services.update_exploration_status_in_search(rights)
 
     def test_search_explorations(self):
         expected_query_string = 'a query string'

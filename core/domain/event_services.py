@@ -139,7 +139,9 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
 
 
 class ExplorationChangeEventListener(BaseEventHandler):
-    """Event handler for receiving exploration change events."""
+    """Event handler for receiving exploration change events. This event is
+    triggered wheneve an explorations contents or metadata (title, blurb etc.)
+    This includes when a a new exploration is created."""
 
     EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_CHANGE
 
@@ -150,15 +152,16 @@ class ExplorationChangeEventListener(BaseEventHandler):
 
 
 class ExplorationStatusChangeEventListener(BaseEventHandler):
-    """Event handler for receiving exploration status change events."""
+    """Event handler for receiving exploration status change events.
+    These events are triggered whenever an exploration is published, publicized,
+    unpublished or unpublicized."""
 
     EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_STATUS_CHANGE
 
     @classmethod
     def _handle_event(cls, exp_rights):
         """Indexes the changed exploration."""
-        exp_services.patch_exploration_search_document(
-            **exp_services._exp_rights_to_search_dict(exp_rights))
+        exp_services.update_exploration_status_in_search(exp_rights)
 
 
 class Registry(object):
