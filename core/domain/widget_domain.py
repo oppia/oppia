@@ -134,17 +134,6 @@ class BaseWidget(object):
         return answer
 
     @property
-    def _response_template(self):
-        """The template that generates the html to display reader responses."""
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
-        return utils.get_file_contents(os.path.join(
-            feconf.WIDGETS_DIR, feconf.INTERACTIVE_PREFIX,
-            self.id, 'response.html'))
-
-    @property
     def _stats_log_template(self):
         """The template for reader responses in the stats log."""
         if not self.is_interactive:
@@ -160,26 +149,19 @@ class BaseWidget(object):
 
     @property
     def js_code(self):
-        """The JS code containing directives and templates for the widget."""
+        """The JS code containing directives and templates for the widget.
+
+        For noninteractive widgets, there is one directive/template pair.
+        For interactive widgets, there are two (the additional one is for
+        displaying the learner's response).
+        """
         js_directives = utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.js' % self.id))
 
-        html_template = utils.get_file_contents(os.path.join(
+        html_templates = utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
-        if '<script>' in html_template or '</script>' in html_template:
-            raise Exception(
-                'Unexpected script tag in HTML template for widget %s' %
-                self.id)
 
-        widget_type = (
-            'interactiveWidget' if self.is_interactive
-            else 'noninteractiveWidget')
-        js_template = ("""
-            <script type="text/ng-template" id="%s/%s">
-              %s
-            </script>""" % (widget_type, self.id, html_template))
-
-        return '<script>%s</script>\n%s' % (js_directives, js_template)
+        return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
     def _get_widget_param_instances(self, state_customization_args,
                                     context_params, preview_mode=False):
@@ -273,6 +255,8 @@ class BaseWidget(object):
             for arg in param.customization_args:
                 arg_name = '%s%s' % (
                     prefix, utils.camelcase_to_hyphenated(arg))
+                # Note that the use of jinja here applies autoescaping,
+                # resulting in a string that is safe to pass to the frontend.
                 attr_strings.append(
                     jinja_utils.parse_string(
                         '{{arg_name}}="{{arg_value}}"', {
@@ -286,20 +270,39 @@ class BaseWidget(object):
 
     def get_reader_response_html(self, state_customization_args,
                                  context_params, answer, sticky):
-        """Gets the parameterized HTML and iframes for a reader response."""
+        """Gets the parameterized HTML tag for a reader response."""
         if not self.is_interactive:
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        parameters = self._get_widget_param_instances(
+        parameters = {}
+        # Special case for multiple-choice input. In the future we should
+        # make the answer into the actual multiple-choice string, and remove
+        # this special case.
+        widget_params = self._get_widget_param_instances(
             state_customization_args, context_params)
-        parameters['answer'] = answer
+        if 'choices' in widget_params:
+            parameters['choices'] = widget_params['choices']
 
+        parameters['answer'] = answer
         # The widget stays through the state transition because it is marked
         # sticky in the exploration and the new state uses the same widget.
         parameters['stateSticky'] = sticky
 
-        return jinja_utils.parse_string(self._response_template, parameters)
+        attr_strings = []
+        for param_name, param_value in parameters.iteritems():
+            attr_strings.append(
+                jinja_utils.parse_string(
+                    '{{arg_name}}="{{arg_value}}"', {
+                        'arg_name': param_name,
+                        'arg_value': json.dumps(param_value),
+                    }
+                )
+            )
+
+        tag_name = ('oppia-response-%s' %
+                    utils.camelcase_to_hyphenated(self.id))
+        return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
 
     def get_stats_log_html(self, state_customization_args,
                            context_params, answer):

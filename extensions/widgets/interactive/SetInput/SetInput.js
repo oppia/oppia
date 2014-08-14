@@ -48,3 +48,16 @@ oppia.directive('oppiaInteractiveSetInput', [
     };
   }
 ]);
+
+oppia.directive('oppiaResponseSetInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/SetInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);

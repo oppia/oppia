@@ -1,20 +1,38 @@
-<div>
+<script type="text/ng-template" id="interactiveWidget/SetInput">
+  <div>
+    <ul>
+      <li ng-repeat="element in answer track by $index">
+        <[element]>
+        <button type="button" class="btn btn-default btn-xs" ng-click="deleteElement($index)">
+          Delete
+        </button>
+      </li>
+    </ul>
 
-  <ul>
-    <li ng-repeat="element in answer track by $index">
-      <[element]>
-      <button type="button" class="btn btn-default btn-xs" ng-click="deleteElement($index)">
-        Delete
-      </button>
-    </li>
-  </ul>
+    <form class="form-horizontal" ng-submit="addElement(newElement)">
+      <input type="text" ng-model="newElement" placeholder="Add Element" autofocus required>
+      <button type="submit" class="btn btn-default"><b>+</b></button>
+    </form>
 
-  <form class="form-horizontal" ng-submit="addElement(newElement)">
-    <input type="text" ng-model="newElement" placeholder="Add Element" autofocus required>
-    <button type="submit" class="btn btn-default"><b>+</b></button>
-  </form>
+    <br>
 
-  <br>
+    <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)">Submit</button>
+  </div>
+</script>
 
-  <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)">Submit</button>
-</div>
+<script type="text/ng-template" id="response/SetInput">
+  <div class="oppia-reader-response-container">
+    <span class="oppia-reader-response">
+      <span ng-if="answer.length === 0">
+        No answer given.
+      </span>
+      <span ng-if="answer.length > 0">
+        <ul style="padding-left: 40px">
+          <li ng-repeat="item in answer">
+            <[item]>
+          </li>
+        </ul>
+      </span>
+    </span>
+  </div>
+</script>
