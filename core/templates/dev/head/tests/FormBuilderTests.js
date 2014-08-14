@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the schema editor test page.
+ * @fileoverview Controllers for the form builder test page.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.controller('SchemaEditorTests', [
+oppia.controller('FormBuilderTests', [
     '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramBool1', 'bool');
   parameterSpecsService.addParamSpec('paramBool2', 'bool');

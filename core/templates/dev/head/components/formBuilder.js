@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for schema-based object editors.
+ * @fileoverview Directives for schema-based form builders.
  *
  * @author sll@google.com (Sean Lip)
  */
