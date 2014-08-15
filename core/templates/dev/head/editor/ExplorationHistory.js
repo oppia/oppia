@@ -38,6 +38,10 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
       v2: $scope.currentVersion
     };
 
+    // Note: if initial strings are empty CodeMirror won't initallize correctly
+    $scope.yamlStrV1 = ' ';
+    $scope.yamlStrV2 = ' ';
+
     $http.get($scope.explorationSnapshotsUrl).then(function(response) {
       var data = response.data;
 
@@ -61,7 +65,7 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
     window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '&output_format=zip');
   };
 
-  // Downloads the json string for an exploration.
+  // Downloads the JSON strings for explorations to be compared.
   $scope.compareExplorations = function() {
     $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v1 +
         '&output_format=json').then(function(response) {
@@ -72,4 +76,49 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
       $scope.yamlStrV2 = response.data.yaml;
     });
   };
+
+  $scope.initCompareExplorations = {
+    // Options for the ui-codemirror display.
+    lineNumbers: true,
+    readOnly: true,
+    mode: 'yaml'
+  };
 }]);
+
+oppia.directive('codemirrorMergeview', function () {
+  return {
+    restrict: 'AE',
+    link: function (scope, element, attrs) {
+      // Require CodeMirror
+      if (angular.isUndefined(window.CodeMirror)) {
+        throw new Error('CodeMirror not found.');
+      }
+
+      var options, codeMirror;
+
+      options = angular.extend({}, scope.$eval(attrs.codemirrorMergeview));
+
+      codeMirror = new window.CodeMirror.MergeView(element[0],
+        angular.extend({value: '',orig: ''}, options));
+
+      if (!attrs.leftValue) {
+        throw new Error('Left pane value is not defined.');
+      }
+      if (!attrs.rightValue) {
+        throw new Error('Right pane value is not defined.');
+      }
+
+      // Watch for changes and set value in left pane
+      scope.$watch(attrs.leftValue, function (newValue) {
+        if (typeof newValue == 'string')
+          codeMirror.edit.setValue(newValue);
+      });
+
+      // Watch for changes and set value in right pane
+      scope.$watch(attrs.rightValue, function (newValue) {
+        if (typeof newValue == 'string')
+          codeMirror.right.orig.setValue(newValue);
+      });
+    }
+  };
+});
