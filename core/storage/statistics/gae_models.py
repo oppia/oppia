@@ -76,7 +76,8 @@ class StateCounterModel(base_models.BaseModel):
         counter.put()
 
     def get_exploration_id_and_state_name(self):
-        return self.id.split('.')
+        first_dot_loc = self.id.find('.')
+        return self.id[:first_dot_loc], self.id[first_dot_loc + 1:]
 
 
 class StateRuleAnswerLogModel(base_models.BaseModel):
@@ -160,7 +161,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
         state_name: Name of current state
         play_type: 'normal'
         approximate_created_on date (probably not useful)
-        version: 0
+        event_schema_version: 0
 
     V1: As in V0 with the following modifications:
       - The exploration_version and created_on dates are exact.
@@ -170,7 +171,7 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
             to value
           client_time_spent_in_secs: time spent in this state before the event was
             triggered
-      - version: 1
+      - event_schema_version: 1
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -237,7 +238,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         client_time_spent_in_secs: 0
         play_type: 'normal'
         approximate_created_on date (probably not useful)
-        version: 0
+        event_schema_version: 0
 
     V1: As in V0 with the following modifications:
       - The exploration_version and created_on dates are exact.
@@ -245,7 +246,7 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
           session_id: ID of current student's session
           params: current parameter values, in the form of a map of parameter name
             to value
-      - version: 1
+      - event_schema_version: 1
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1

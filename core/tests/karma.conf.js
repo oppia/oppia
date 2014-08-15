@@ -20,7 +20,6 @@ module.exports = function(config) {
       // and extensions/widgets/... are switched. The test framework may
       // be flaky.
       'core/templates/dev/head/**/*.js',
-      'core/templates/dev/head/**/*.html',
       'extensions/widgets/interactive/**/*.js',
       'extensions/widgets/interactive/**/*.html'
     ],
@@ -65,6 +64,18 @@ module.exports = function(config) {
     // Kill the browser if it does not capture in the given timeout [ms].
     captureTimeout: 60000,
     // Continue running in the background after running tests.
-    singleRun: false
+    singleRun: false,
+    plugins: [
+      'karma-jasmine',
+      'karma-chrome-launcher',
+      'karma-ng-html2js-preprocessor',
+      'karma-coverage'
+    ],
+    ngHtml2JsPreprocessor: {
+      cacheIdFromPath: function(filepath) {
+        return filepath;
+      },
+      moduleName: 'directiveTemplates'
+    }
   });
 };

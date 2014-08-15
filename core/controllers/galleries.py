@@ -167,6 +167,14 @@ class ContributeHandler(base.BaseHandler):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
 
+        # Get the exp ids for which this user is an owner or an editor.
+        editable_exp_ids = [
+            rights.id for rights in
+            rights_manager.get_at_least_editable_exploration_rights(
+                self.user_id)]
+        current_user_is_moderator = rights_manager.Actor(
+            self.user_id).is_moderator()
+
         explorations_dict = (
             exp_services.get_viewable_explorations_summary_dict(
                 self.user_id))
@@ -176,7 +184,12 @@ class ContributeHandler(base.BaseHandler):
             categories[exploration_data['category']].append({
                 'id': eid,
                 'title': exploration_data['title'],
-                'can_edit': rights_manager.Actor(self.user_id).can_edit(eid),
+                'can_edit': (
+                    exploration_data['rights']['community_owned'] or
+                    eid in editable_exp_ids or (
+                        current_user_is_moderator and
+                        exploration_data['rights']['status'] !=
+                            rights_manager.EXPLORATION_STATUS_PRIVATE)),
                 'is_private': (
                     exploration_data['rights']['status'] ==
                     rights_manager.EXPLORATION_STATUS_PRIVATE),

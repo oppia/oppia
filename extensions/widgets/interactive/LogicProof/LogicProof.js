@@ -200,3 +200,17 @@ oppia.directive('oppiaInteractiveLogicProof', [
     };
   }
 ]);
+
+
+oppia.directive('oppiaResponseLogicProof', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/LogicProof',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);

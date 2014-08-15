@@ -72,3 +72,11 @@ oppia.directive('oppiaInteractiveTarFileReadInput', [
   }
 ]);
 
+
+oppia.directive('oppiaResponseTarFileReadInput', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'response/TarFileReadInput'
+  };
+}]);

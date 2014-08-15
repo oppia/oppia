@@ -160,9 +160,9 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
 
 // Service for converting dates in milliseconds since the Epoch to
 // human-readable dates.
-oppia.factory('oppiaDateFormatter', [function() {
+oppia.factory('oppiaDatetimeFormatter', [function() {
   return {
-    getHumanReadableDate: function(millisSinceEpoch) {
+    getHumanReadableDatetime: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       return date.toUTCString();
     },

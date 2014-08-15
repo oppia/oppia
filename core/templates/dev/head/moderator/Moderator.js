@@ -19,8 +19,8 @@
 */
 
 oppia.controller('Moderator', [
-    '$scope', '$http', '$rootScope', 'oppiaDateFormatter',
-    function($scope, $http, $rootScope, oppiaDateFormatter) {
+    '$scope', '$http', '$rootScope', 'oppiaDatetimeFormatter',
+    function($scope, $http, $rootScope, oppiaDatetimeFormatter) {
   $scope.submitUserEmailRequest = function(username) {
     $scope.username = username;
     $scope.lastSubmittedUsername = username;
@@ -31,8 +31,8 @@ oppia.controller('Moderator', [
     });
   };
 
-  $scope.getHumanReadableDate = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getHumanReadableDate(millisSinceEpoch);
+  $scope.getHumanReadableDatetime = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getHumanReadableDatetime(millisSinceEpoch);
   };
 
   $scope.getExplorationCreateUrl = function(explorationId) {

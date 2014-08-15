@@ -13,12 +13,12 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the schema editor test page.
+ * @fileoverview Controllers for the form builder test page.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.controller('SchemaEditorTests', [
+oppia.controller('FormBuilderTests', [
     '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramBool1', 'bool');
   parameterSpecsService.addParamSpec('paramBool2', 'bool');
@@ -182,6 +182,22 @@ oppia.controller('SchemaEditorTests', [
       }
     },
     value: ['abc', 'def', 'ghi']
+  }, {
+    name: 'Fixed-length list of 2 floats',
+    schema: {
+      type: 'list',
+      items: {
+        type: 'float'
+      },
+      len: 2
+    },
+    value: [{
+      type: 'raw',
+      data: 1.0
+    }, {
+      type: 'raw',
+      data: -3.0
+    }]
   }, {
     name: 'Nested lists',
     schema: {

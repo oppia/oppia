@@ -19,14 +19,14 @@
  */
 
 oppia.controller('ExplorationFeedback', [
-    '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaDateFormatter',
-    function($scope, $http, $modal, warningsData, explorationData, oppiaDateFormatter) {
+    '$scope', '$http', '$modal', 'warningsData', 'explorationData', 'oppiaDatetimeFormatter',
+    function($scope, $http, $modal, warningsData, explorationData, oppiaDatetimeFormatter) {
   var expId = explorationData.explorationId;
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
   $scope.getLocaleStringForDateWithoutSeconds = function(millisSinceEpoch) {
-    return oppiaDateFormatter.getLocaleAbbreviatedDatetimeString(
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
   };
 
