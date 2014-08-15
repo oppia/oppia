@@ -26,6 +26,8 @@ from core.domain import widget_domain
 from core.domain import widget_registry
 from core.tests import test_utils
 import feconf
+import schema_utils
+import schema_utils_test
 import utils
 
 
@@ -301,7 +303,20 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 self.assertFalse(
                     'schema' in ca_spec and 'custom_editor' in ca_spec)
 
-                # TODO(sll): Check that the schema/custom_editor is valid.
+                if 'schema' in ca_spec:
+                    schema_utils_test.validate_schema(ca_spec['schema'])
+                    self.assertEqual(
+                        ca_spec['default_value'],
+                        schema_utils.normalize_against_schema(
+                            ca_spec['default_value'], ca_spec['schema']))
+                else:
+                    obj_class = obj_services.Registry.get_object_class_by_type(
+                        ca_spec['custom_editor'])
+                    self.assertIsNotNone(obj_class.edit_html_filename)
+                    self.assertIsNotNone(obj_class.edit_js_filename)
+                    self.assertEqual(
+                        ca_spec['default_value'],
+                        obj_class.normalize(ca_spec['default_value']))
 
             # Check that the default customization args result in
             # parameters with the correct types.

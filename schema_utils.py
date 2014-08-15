@@ -39,6 +39,7 @@ SCHEMA_KEY_LEN = 'len'
 SCHEMA_KEY_PROPERTIES = 'properties'
 SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
+SCHEMA_KEY_CHOICES = 'choices'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_DICT = 'dict'
@@ -109,6 +110,11 @@ def normalize_against_schema(obj, schema):
         normalized_obj = obj
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
+
+    if SCHEMA_KEY_CHOICES in schema:
+        assert normalized_obj in schema[SCHEMA_KEY_CHOICES], (
+            'Received %s which is not in the allowed range of choices: %s' %
+            (normalized_obj, schema[SCHEMA_KEY_CHOICES]))
 
     # When type normalization is finished, apply the post-normalizers in the
     # given order.

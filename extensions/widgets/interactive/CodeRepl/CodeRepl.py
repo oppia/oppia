@@ -33,7 +33,6 @@ class CodeRepl(widget_domain.BaseWidget):
         'description': 'The initial code displayed in the code input field.',
         'schema': {
             'type': 'unicode',
-            'largeInput': True,
         },
         'default_value': '[Type your code here.]'
     }, {
@@ -41,7 +40,6 @@ class CodeRepl(widget_domain.BaseWidget):
         'description': 'Code to prepend to the reader\'s submission.',
         'schema': {
             'type': 'unicode',
-            'largeInput': True,
         },
         'default_value': ''
     }, {
@@ -49,7 +47,6 @@ class CodeRepl(widget_domain.BaseWidget):
         'description': 'Code to append after the reader\'s submission.',
         'schema': {
             'type': 'unicode',
-            'largeInput': True,
         },
         'default_value': ''
     }]
