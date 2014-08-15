@@ -643,18 +643,14 @@ oppia.directive('schemaBasedBoolEditor', [function() {
     templateUrl: 'schemaBasedEditor/bool',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      $scope.editAsParameter = angular.isString($scope.localValue);
+
       $scope.boolEditorOptions = [{
         name: 'True',
-        value: {
-          type: 'raw',
-          data: true
-        }
+        value: true
       }, {
         name: 'False',
-        value: {
-          type: 'raw',
-          data: false
-        }
+        value: false
       }];
 
       if ($scope.allowParameters()) {
@@ -662,10 +658,7 @@ oppia.directive('schemaBasedBoolEditor', [function() {
         paramNames.forEach(function(paramName) {
           $scope.boolEditorOptions.push({
             name: '[Parameter] ' + paramName,
-            value: {
-              type: 'parameter',
-              data: paramName
-            }
+            value: paramName
           });
         });
       }
@@ -676,6 +669,7 @@ oppia.directive('schemaBasedBoolEditor', [function() {
         $scope.boolEditorOptions.forEach(function(option) {
           if (angular.equals(option.value, newValue)) {
             $scope.localValue = option.value;
+            $scope.editAsParameter = angular.isString($scope.localValue);
           }
         });
       });
@@ -703,18 +697,15 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           $scope.paramNameOptions = paramNames.map(function(paramName) {
             return {
               name: paramName,
-              value: {
-                type: 'parameter',
-                data: paramName
-              }
+              value: paramName
             };
           });
 
           $scope.$watch('localValue', function(newValue, oldValue) {
-            $scope.editAsParameter = (newValue.type === 'parameter');
+            $scope.editAsParameter = angular.isString(newValue);
             // Because JS objects are passed by reference, the current value needs
             // to be set manually to an object in the list of options.
-            if ($scope.localValue.type === 'parameter') {
+            if ($scope.editAsParameter) {
               $scope.paramNameOptions.forEach(function(option) {
                 if (angular.equals(option.value, newValue)) {
                   $scope.localValue = option.value;
@@ -725,13 +716,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
 
           $scope.toggleEditMode = function() {
             $scope.editAsParameter = !$scope.editAsParameter;
-            $scope.localValue = $scope.editAsParameter ? {
-              type: 'parameter',
-              data: paramNames[0]
-            } : {
-              type: 'raw',
-              data: 0.0
-            };
+            $scope.localValue = $scope.editAsParameter ? paramNames[0] : 0.0;
           };
         }
       }
@@ -758,18 +743,15 @@ oppia.directive('schemaBasedIntEditor', [function() {
           $scope.paramNameOptions = paramNames.map(function(paramName) {
             return {
               name: paramName,
-              value: {
-                type: 'parameter',
-                data: paramName
-              }
+              value: paramName
             };
           });
 
           $scope.$watch('localValue', function(newValue, oldValue) {
-            $scope.editAsParameter = (newValue.type === 'parameter');
+            $scope.editAsParameter = angular.isString(newValue);
             // Because JS objects are passed by reference, the current value needs
             // to be set manually to an object in the list of options.
-            if ($scope.localValue.type === 'parameter') {
+            if ($scope.editAsParameter) {
               $scope.paramNameOptions.forEach(function(option) {
                 if (angular.equals(option.value, newValue)) {
                   $scope.localValue = option.value;
@@ -780,13 +762,7 @@ oppia.directive('schemaBasedIntEditor', [function() {
 
           $scope.toggleEditMode = function() {
             $scope.editAsParameter = !$scope.editAsParameter;
-            $scope.localValue = $scope.editAsParameter ? {
-              type: 'parameter',
-              data: paramNames[0]
-            } : {
-              type: 'raw',
-              data: 0
-            };
+            $scope.localValue = $scope.editAsParameter ? paramNames[0] : 0;
           };
         }
       }

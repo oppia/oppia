@@ -44,11 +44,11 @@
   </select>
 
   <span ng-if="mode === $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="localValue.type === 'raw'">
-      <[localValue.data]>
+    <span ng-if="!editAsParameter">
+      <[localValue]>
     </span>
-    <span class="label label-info" ng-if="localValue.type === 'parameter'">
-      <[localValue.data]>
+    <span class="label label-info" ng-if="editAsParameter">
+      <[localValue]>
     </span>
   </span>
 </script>
@@ -57,7 +57,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
     <div class="input-group">
-      <input ng-if="!editAsParameter" type="number" ng-model="$parent.localValue.data" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <input ng-if="!editAsParameter" type="number" ng-model="$parent.$parent.localValue" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
       <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
 
       <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
@@ -68,11 +68,11 @@
   </span>
 
   <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="localValue.type === 'raw'">
-      <[localValue.data]>
+    <span ng-if="!editAsParameter">
+      <[localValue]>
     </span>
-    <span class="label label-info" ng-if="localValue.type === 'parameter'">
-      <[localValue.data]>
+    <span class="label label-info" ng-if="editAsParameter">
+      <[localValue]>
     </span>
   </span>
 </script>
@@ -81,7 +81,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/float">
   <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
     <div class="input-group">
-      <input ng-if="!editAsParameter" type="text" ng-model="$parent.localValue.data" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <input ng-if="!editAsParameter" type="text" ng-model="$parent.$parent.localValue" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
       <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
 
       <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
@@ -92,11 +92,11 @@
   </span>
 
   <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="localValue.type === 'raw'">
-      <[localValue.data]>
+    <span ng-if="!editAsParameter">
+      <[localValue]>
     </span>
-    <span class="label label-info" ng-if="localValue.type === 'parameter'">
-      <[localValue.data]>
+    <span class="label label-info" ng-if="editAsParameter">
+      <[localValue]>
     </span>
   </span>
 </script>

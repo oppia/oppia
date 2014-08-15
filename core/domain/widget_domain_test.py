@@ -68,7 +68,9 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'rows-with-value="1">'
             '</oppia-interactive-text-input>', tag)
 
-        tag = widget.get_interactive_widget_tag({'placeholder': 'F4'})
+        tag = widget.get_interactive_widget_tag({
+            'placeholder': {'value': 'F4'}
+        })
         self.assertEqual(
             '<oppia-interactive-text-input '
             'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
@@ -77,32 +79,33 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         parameterized_widget_dict = widget.get_widget_instance_dict(
             {'placeholder': 'F4'})
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
-            'widget_id', 'name', 'category', 'description', 'params',
-            'handlers', 'customization_args', 'tag'])
+            'widget_id', 'name', 'category', 'description',
+            'handler_specs', 'customization_args', 'tag'])
         self.assertEqual(
             parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
 
-        self.assertEqual({
-            'placeholder': {
-                'value': 'F4',
-                'description': 'The placeholder for the text input field.',
-                'schema': {'type': 'unicode'},
-                'custom_editor': None,
-                'default_value': 'Type your answer here.',
+        self.assertEqual([{
+            'name': 'placeholder',
+            'value': 'F4',
+            'description': 'The placeholder for the text input field.',
+            'schema': {'type': 'unicode'},
+            'custom_editor': None,
+            'default_value': 'Type your answer here.',
+        }, {
+            'name': 'rows',
+            'value': 1,
+            'description': 'The number of rows for the text input field.',
+            'schema': {
+                'type': 'int',
+                'post_normalizers': [{
+                    'id': 'require_at_least', 'min_value': 1
+                }, {
+                    'id': 'require_at_most', 'max_value': 200
+                }]
             },
-            'rows': {
-                'value': 1,
-                'description': 'The number of rows for the text input field.',
-                'schema': {'type': 'int'},
-                'custom_editor': None,
-                'default_value': 1,
-            }
-        }, parameterized_widget_dict['params'])
-
-        self.assertEqual({
-            'placeholder': 'F4',
-            'rows': 1,
-        }, parameterized_widget_dict['customization_args'])
+            'custom_editor': None,
+            'default_value': 1,
+        }], parameterized_widget_dict['customization_args'])
 
 
 class WidgetDataUnitTests(test_utils.GenericTestBase):

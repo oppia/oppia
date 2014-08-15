@@ -23,10 +23,10 @@ class InteractiveMap(widget_domain.BaseWidget):
         'schema': {
             'type': 'float',
             'post_normalizers': [{
-                'type': 'require_at_least',
+                'id': 'require_at_least',
                 'min_value': -90.0,
             }, {
-                'type': 'require_at_most',
+                'id': 'require_at_most',
                 'max_value': 90.0,
             }]
         },
@@ -37,10 +37,10 @@ class InteractiveMap(widget_domain.BaseWidget):
         'schema': {
             'type': 'float',
             'post_normalizers': [{
-                'type': 'require_at_least',
+                'id': 'require_at_least',
                 'min_value': -180.0,
             }, {
-                'type': 'require_at_most',
+                'id': 'require_at_most',
                 'max_value': 180.0,
             }]
         },

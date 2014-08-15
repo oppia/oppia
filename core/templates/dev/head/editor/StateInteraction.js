@@ -18,7 +18,7 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.controller('InteractiveWidgetEditor', [
+oppia.controller('StateInteraction', [
     '$scope', '$http', '$modal', 'warningsData', 'editorContextService', 'changeListService',
     function($scope, $http, $modal, warningsData, editorContextService, changeListService) {
   // Variables storing specifications for the widget parameters and possible
@@ -31,16 +31,14 @@ oppia.controller('InteractiveWidgetEditor', [
   $scope.submitAnswer = function(answer, handler) {};
   $scope.adjustPageHeight = function(scroll) {};
 
-  $scope.generateWidgetPreview = function(widgetId, customizationArgs, successCallback) {
+  $scope.generateWidgetPreview = function(widgetId, customizationArgValues, successCallback) {
     $http.post('/widgets/interactive/' + widgetId, {
-      customization_args: customizationArgs
+      customization_args: customizationArgValues
     }).success(function(data) {
-      $scope.widgetHandlerSpecs = data.widget.handlers;
-
-      $scope.widgetId = data.widget.widget_id;
-      $scope.widgetCustomizationArgs = data.widget.customization_args;
-
-      $scope.widgetPreviewHtml = data.widget.tag;
+      $scope.widgetId = data.widget_id;
+      $scope.widgetCustomizationArgs = data.customization_args;
+      $scope.widgetHandlerSpecs = data.handler_specs;
+      $scope.widgetPreviewHtml = data.tag;
       if (successCallback) {
         successCallback();
       }
@@ -60,20 +58,25 @@ oppia.controller('InteractiveWidgetEditor', [
     // - 'feedback' (list of feedback given for this rule)
     // - 'param_changes' (parameter changes associated with this rule)
     $scope.widgetHandlers = {};
-    for (var i = 0; i < data.widget.handlers.length; i++) {
-      $scope.widgetHandlers[data.widget.handlers[i].name] = (
-          data.widget.handlers[i].rule_specs);
+    for (var i = 0; i < data.handlers.length; i++) {
+      $scope.widgetHandlers[data.handlers[i].name] = (
+          data.handlers[i].rule_specs);
     }
-    $scope.widgetSticky = data.widget.sticky;
+    $scope.widgetSticky = data.sticky;
 
-    $scope.generateWidgetPreview(data.widget.widget_id, data.widget.customization_args);
+    var customizationArgValues = {};
+    for (var key in data.customization_args) {
+      customizationArgValues[key] = data.customization_args[key].value;
+    }
+
+    $scope.generateWidgetPreview(data.widget_id, customizationArgValues);
 
     $scope.tmpRule = null;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    $scope.initInteractiveWidget(stateData);
+    $scope.initInteractiveWidget(stateData.widget);
   });
 
   $scope.toggleWidgetSticky = function() {
@@ -85,6 +88,16 @@ oppia.controller('InteractiveWidgetEditor', [
   };
 
   $scope.interactiveWidgetRepository = null;
+
+  $scope._getStateCustArgsFromWidgetCustArgs = function(widgetCustomizationArgs) {
+    var result = {};
+    for (var i = 0; i < widgetCustomizationArgs.length; i++) {
+      result[widgetCustomizationArgs[i].name] = {
+        value: angular.copy(widgetCustomizationArgs[i].value)
+      };
+    }
+    return result;
+  };
 
   $scope.showInteractiveWidgetEditor = function() {
     warningsData.clear();
@@ -108,7 +121,8 @@ oppia.controller('InteractiveWidgetEditor', [
 
     $scope.interactiveWidgetEditorIsShown = true;
     $scope.widgetIdMemento = $scope.widgetId;
-    $scope.widgetCustomizationArgsMemento = angular.copy($scope.widgetCustomizationArgs);
+    $scope.stateCustomizationArgsMemento = $scope._getStateCustArgsFromWidgetCustArgs(
+      $scope.widgetCustomizationArgs);
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
 
     for (var category in $scope.interactiveWidgetRepository) {
@@ -146,14 +160,27 @@ oppia.controller('InteractiveWidgetEditor', [
         $scope.widgetHandlersMemento);
     }
 
-    if (!angular.equals(newWidget.customization_args, $scope.widgetCustomizationArgsMemento)) {
-      $scope.widgetCustomizationArgs = angular.copy(newWidget.customization_args);
+    if (!angular.equals(
+        $scope._getStateCustArgsFromWidgetCustArgs(newWidget.customization_args),
+        $scope.stateCustomizationArgsMemento)) {
+      $scope.widgetCustomizationArgs = newWidget.customization_args;
+
       changeListService.editStateProperty(
-        activeStateName, 'widget_customization_args',
-        $scope.widgetCustomizationArgs, $scope.widgetCustomizationArgsMemento);
+        activeStateName,
+        'widget_customization_args',
+        $scope._getStateCustArgsFromWidgetCustArgs(newWidget.customization_args),
+        $scope.stateCustomizationArgsMemento);
     }
 
-    $scope.generateWidgetPreview($scope.widgetId, $scope.widgetCustomizationArgs);
+    var customizationArgValues = {};
+    for (var i = 0; i < $scope.widgetCustomizationArgs.length; i++) {
+      var cArg = $scope.widgetCustomizationArgs[i];
+      customizationArgValues[cArg.name] = cArg.value;
+    }
+
+    console.log(customizationArgValues);
+
+    $scope.generateWidgetPreview($scope.widgetId, customizationArgValues);
     $scope.updateStatesData();
     $scope.refreshGraph();
 
@@ -170,7 +197,7 @@ oppia.controller('InteractiveWidgetEditor', [
     $http.post('/widgets/interactive/' + $scope.tmpWidget.widget_id, {
       customization_args: $scope.tmpWidget.customization_args
     }).success(function(data) {
-      $scope.tmpWidget.tag = data.widget.tag;
+      $scope.tmpWidget.tag = data.tag;
     });
   };
 
@@ -182,7 +209,7 @@ oppia.controller('InteractiveWidgetEditor', [
     $scope.interactiveWidgetEditorIsShown = false;
     $scope.tmpWidget = null;
     $scope.widgetIdMemento = null;
-    $scope.widgetCustomizationArgsMemento = null;
+    $scope.stateCustomizationArgsMemento = null;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
   };
 

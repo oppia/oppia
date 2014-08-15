@@ -43,20 +43,14 @@ oppia.controller('FormBuilderTests', [
     schema: {
       type: 'bool'
     },
-    value: {
-      type: 'raw',
-      data: true
-    }
+    value: true
   }, {
     name: 'Boolean form with parameters',
     schema: {
       type: 'bool',
       allow_parameters: true
     },
-    value: {
-      type: 'parameter',
-      data: 'paramBool1'
-    }
+    value: 'paramBool1'
   }];
 
   $scope.intForms = [{
@@ -64,10 +58,7 @@ oppia.controller('FormBuilderTests', [
     schema: {
       type: 'int'
     },
-    value: {
-      type: 'raw',
-      data: 3
-    }
+    value: 3
   }, {
     // TODO(sll): Add test for bad initialization.
     name: 'Integer form with parameters',
@@ -75,10 +66,7 @@ oppia.controller('FormBuilderTests', [
       type: 'int',
       allow_parameters: true
     },
-    value: {
-      type: 'parameter',
-      data: 'paramInt1'
-    }
+    value: 'paramInt1'
   }];
 
   $scope.floatForms = [{
@@ -93,10 +81,7 @@ oppia.controller('FormBuilderTests', [
         max_value: 6.0
       }]
     },
-    value: {
-      type: 'raw',
-      data: 3.14
-    }
+    value: 3.14
   }, {
     name: 'Float form with parameters (value must be between -3 and 6)',
     schema: {
@@ -110,10 +95,7 @@ oppia.controller('FormBuilderTests', [
         max_value: 6.0
       }]
     },
-    value: {
-      type: 'raw',
-      data: 3.14
-    }
+    value: 3.14
   }];
 
   $scope.unicodeForms = [{

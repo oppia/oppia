@@ -418,6 +418,9 @@ class WidgetInstance(object):
         self.widget_id = widget_id
         # Customization args for the interactive widget view. Parts of these
         # args may be Jinja templates that refer to state parameters.
+        # This is a dict: the keys are names of customization_args and the values
+        # are dicts with a single key, 'value', whose corresponding value is the
+        # value of the customization arg.
         self.customization_args = customization_args
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)

@@ -202,7 +202,7 @@ class BaseWidget(object):
         for ca_spec in self.customization_arg_specs:
 
             ca_value = (
-                state_customization_args[ca_spec.name]
+                state_customization_args[ca_spec.name]['value']
                 if ca_spec.name in state_customization_args
                 else ca_spec.default_value)
 
@@ -266,13 +266,14 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        parameters = self._get_customization_args(state_customization_args)
-        parameters['answer'] = answer
+        customization_args = self._get_customization_args(
+            state_customization_args)
+        customization_args['answer'] = answer
 
         return jinja_utils.parse_string(
-            self._stats_log_template, parameters, autoescape=False)
+            self._stats_log_template, customization_args, autoescape=False)
 
-    def get_widget_instance_dict(self, customization_args):
+    def get_widget_instance_dict(self, customization_arg_values):
         """Gets a dict representing a parameterized widget.
 
         The value for params in the result is a dict, formatted as:
@@ -283,46 +284,38 @@ class BaseWidget(object):
         'schema', 'custom_editor', 'default_value', 'tag'].
         """
 
+        resolved_customization_arg_values = self._get_customization_args(
+            customization_arg_values)
+
         result = {
+            'widget_id': self.id,
             'name': self.name,
             'category': self.category,
             'description': self.description,
-            'widget_id': self.id,
-        }
-
-        param_instances = self._get_customization_args(customization_args)
-
-        param_dict = {}
-        ca_values_dict = {}
-        for ca_spec in self.customization_arg_specs:
-            value = (
-                customization_args[ca_spec.name]
-                if ca_spec.name in customization_args
-                else ca_spec.default_value)
-
-            param_dict[ca_spec.name] = {
-                'value': param_instances[ca_spec.name],
+            'customization_args': [{
+                'name': ca_spec.name,
+                'value': resolved_customization_arg_values[ca_spec.name],
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
                 'custom_editor': ca_spec.custom_editor,
-            }
-
-            ca_values_dict[ca_spec.name] = value
-
-        result['params'] = param_dict
-        result['customization_args'] = ca_values_dict
+            } for ca_spec in self.customization_arg_specs]
+        }
 
         # Add widget handler information for interactive widgets.
         if self.type == feconf.INTERACTIVE_PREFIX:
-            result['handlers'] = [h.to_dict() for h in self.handlers]
+            result['handler_specs'] = [h.to_dict() for h in self.handlers]
             for idx, handler in enumerate(self.handlers):
-                result['handlers'][idx]['rules'] = dict((
+                result['handler_specs'][idx]['rules'] = dict((
                     rule_cls.description,
                     {'classifier': rule_cls.__name__}
                 ) for rule_cls in handler.rules)
 
-            result['tag'] = self.get_interactive_widget_tag(customization_args)
+            state_customization_args = {}
+            for ca_name, ca_value in customization_arg_values.iteritems():
+                state_customization_args[ca_name] = {'value': ca_value}
+            result['tag'] = self.get_interactive_widget_tag(
+                state_customization_args)
 
         # Add RTE toolbar information for noninteractive widgets.
         if self.type == feconf.NONINTERACTIVE_PREFIX:

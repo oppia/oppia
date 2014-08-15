@@ -55,10 +55,6 @@ class WidgetHandler(base.BaseHandler):
         """Handles POST requests for parameterized widgets."""
 
         customization_args = self.payload.get('customization_args', {})
-
         widget = widget_registry.Registry.get_widget_by_id(
             widget_type, widget_id)
-
-        self.render_json({
-            'widget': widget.get_widget_instance_dict(customization_args),
-        })
+        self.render_json(widget.get_widget_instance_dict(customization_args))
