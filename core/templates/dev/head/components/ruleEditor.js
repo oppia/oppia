@@ -23,7 +23,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       rule: '=',
-      choices: '=',
+      widgetCustomizationArgs: '=',
       explorationId: '=',
       states: '=',
       addState: '=',
@@ -238,6 +238,19 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
           $scope.closeRuleDescriptionPicker();
         };
+
+
+        // TODO(sll): Remove the need for this.
+        $scope.choices = [];
+        $scope.$watch('widgetCustomizationArgs', function(newValue, oldValue) {
+          if (newValue) {
+            for (var i = 0; i < newValue.length; i++) {
+              if (newValue[i].name == 'choices') {
+                $scope.choices = angular.copy(newValue[i].value);
+              }
+            }
+          }
+        }, true);
 
 
         $scope.$watch('rule.description', function() {
