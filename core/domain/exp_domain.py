@@ -438,7 +438,8 @@ class WidgetInstance(object):
             raise utils.ValidationError(
                 'Invalid widget name: %s' % self.widget_id)
 
-        widget_customization_arg_names = [wp.name for wp in widget.params]
+        widget_customization_arg_names = [
+            ca_spec.name for ca_spec in widget.customization_arg_specs]
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(

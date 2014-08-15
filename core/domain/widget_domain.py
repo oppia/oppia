@@ -51,19 +51,16 @@ class AnswerHandler(object):
         }
 
 
-class WidgetParamSpec(object):
-    """Value object for a widget parameter specification."""
+class CustomizationArgSpec(object):
+    """Value object for a widget customization arg specification."""
 
-    def __init__(self, name, description, generator, init_args,
-                 customization_args, obj_type):
+    def __init__(self, name, description, default_value,
+                 custom_editor=None, schema=None):
         self.name = name
         self.description = description
-        self.generator = generator
-        # TODO(sll): init_args and customization_args should be JSONifiable;
-        # need to check this.
-        self.init_args = init_args
-        self.customization_args = customization_args
-        self.obj_type = obj_type
+        self.custom_editor = custom_editor
+        self.schema = schema
+        self.default_value = default_value
 
 
 class BaseWidget(object):
@@ -90,10 +87,10 @@ class BaseWidget(object):
     category = ''
     # The description of the widget. Overridden in subclasses.
     description = ''
-    # Parameter specifications for this widget. The default parameters can be
-    # overridden when the widget is used within a State. Overridden in
+    # Customization arg specifications for this widget. The default values
+    # can be overridden when the widget is used within a State. Overridden in
     # subclasses.
-    _params = []
+    _customization_arg_specs = []
 
     # Answer handlers. Overridden in subclasses.
     _handlers = []
@@ -102,8 +99,10 @@ class BaseWidget(object):
     _dependency_ids = []
 
     @property
-    def params(self):
-        return [WidgetParamSpec(**param) for param in self._params]
+    def customization_arg_specs(self):
+        return [
+            CustomizationArgSpec(**cas)
+            for cas in self._customization_arg_specs]
 
     @property
     def handlers(self):
@@ -163,8 +162,7 @@ class BaseWidget(object):
 
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
-    def _get_widget_param_instances(self, state_customization_args,
-                                    context_params, preview_mode=False):
+    def _get_customization_args(self, state_customization_args):
         """Returns a dict of parameter names and values for the widget.
 
         This dict is used to evaluate widget templates. The parameter values
@@ -174,14 +172,8 @@ class BaseWidget(object):
 
         Args:
           - state_customization_args: dict that maps parameter names to
-              custom customization args that are defined in the exploration.
-          - context_params: dict with state parameters that is used to
-              evaluate any values in state_customization_args that are of the
-              form {{STATE_PARAM_NAME}}.
-          - preview_mode: if True, default values are generated if the
-              customization_args do not permit the generation of an acceptable
-              parameter value. Otherwise, this method fails noisily if the
-              customization_args are not valid.
+              customization args that are defined in the exploration.
+              These values may be raw types or expression strings.
 
         Returns:
           A dict of key-value pairs; the keys are parameter names and the
@@ -190,36 +182,16 @@ class BaseWidget(object):
         if state_customization_args is None:
             state_customization_args = {}
 
-        parameters = {}
-        for param in self.params:
-            value_generator = param.generator(**param.init_args)
-            # Use the given customization args. If they do not exist, use the
-            # default customization args for the parameter.
-            args_to_use = (
-                state_customization_args[param.name]
-                if param.name in state_customization_args
-                else param.customization_args
-            )
+        return {
+            ca_spec.name: (
+                state_customization_args[ca_spec.name]
+                if ca_spec.name in state_customization_args
+                else ca_spec.default_value
+            ) for ca_spec in self.customization_arg_specs
+        }
 
-            try:
-                generated_value = value_generator.generate_value(
-                    context_params, **args_to_use)
-            except Exception:
-                if preview_mode:
-                    generated_value = value_generator.default_value
-                else:
-                    raise
-
-            # Normalize the generated values to the correct obj_type.
-            parameters[param.name] = (
-                obj_services.Registry.get_object_class_by_type(
-                    param.obj_type).normalize(generated_value))
-
-        return parameters
-
-    def get_interactive_widget_tag(self, state_customization_args,
-                                   context_params, preview_mode=False):
-        """Gets the widgetParams attribute value for an interactive widget."""
+    def get_interactive_widget_tag(self, state_customization_args):
+        """Gets the HTML tag used to display an interactive widget."""
         if state_customization_args is None:
             state_customization_args = {}
 
@@ -227,49 +199,30 @@ class BaseWidget(object):
                     utils.camelcase_to_hyphenated(self.id))
 
         attr_strings = []
-        for param in self.params:
-            value_generator = param.generator(**param.init_args)
-            # Use the given customization args. If they do not exist, use the
-            # default customization args for the parameter.
-            args_to_use = (
-                state_customization_args[param.name]
-                if param.name in state_customization_args
-                else param.customization_args
-            )
+        for ca_spec in self.customization_arg_specs:
 
-            try:
-                generated_value = value_generator.generate_value(
-                    context_params, **args_to_use)
-            except Exception:
-                if preview_mode:
-                    generated_value = value_generator.default_value
-                else:
-                    raise
+            ca_value = (
+                state_customization_args[ca_spec.name]
+                if ca_spec.name in state_customization_args
+                else ca_spec.default_value)
 
-            # Normalize the generated values to the correct obj_type.
-            param_value = (
-                obj_services.Registry.get_object_class_by_type(
-                    param.obj_type).normalize(generated_value))
-
-            prefix = '%s-with-' % utils.camelcase_to_hyphenated(param.name)
-            for arg in param.customization_args:
-                arg_name = '%s%s' % (
-                    prefix, utils.camelcase_to_hyphenated(arg))
-                # Note that the use of jinja here applies autoescaping,
-                # resulting in a string that is safe to pass to the frontend.
-                attr_strings.append(
-                    jinja_utils.parse_string(
-                        '{{arg_name}}="{{arg_value}}"', {
-                            'arg_name': arg_name,
-                            'arg_value': json.dumps(param_value),
-                        }
-                    )
+            arg_name = '%s-with-value' % utils.camelcase_to_hyphenated(
+                ca_spec.name)
+            # Note that the use of jinja here applies autoescaping,
+            # resulting in a string that is safe to pass to the frontend.
+            attr_strings.append(
+                jinja_utils.parse_string(
+                    '{{arg_name}}="{{arg_value}}"', {
+                        'arg_name': arg_name,
+                        'arg_value': json.dumps(ca_value),
+                    }
                 )
+            )
 
         return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
 
-    def get_reader_response_html(self, state_customization_args,
-                                 context_params, answer, sticky):
+    def get_reader_response_html(self, state_customization_args, answer,
+                                 sticky):
         """Gets the parameterized HTML tag for a reader response."""
         if not self.is_interactive:
             raise Exception(
@@ -279,10 +232,10 @@ class BaseWidget(object):
         # Special case for multiple-choice input. In the future we should
         # make the answer into the actual multiple-choice string, and remove
         # this special case.
-        widget_params = self._get_widget_param_instances(
-            state_customization_args, context_params)
-        if 'choices' in widget_params:
-            parameters['choices'] = widget_params['choices']
+        customization_args = self._get_customization_args(
+            state_customization_args)
+        if 'choices' in customization_args:
+            parameters['choices'] = customization_args['choices']
 
         parameters['answer'] = answer
         # The widget stays through the state transition because it is marked
@@ -304,8 +257,7 @@ class BaseWidget(object):
                     utils.camelcase_to_hyphenated(self.id))
         return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
 
-    def get_stats_log_html(self, state_customization_args,
-                           context_params, answer):
+    def get_stats_log_html(self, state_customization_args, answer):
         """Gets the HTML for recording a reader response for the stats log.
 
         Returns an HTML string.
@@ -314,15 +266,13 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        parameters = self._get_widget_param_instances(
-            state_customization_args, context_params)
+        parameters = self._get_customization_args(state_customization_args)
         parameters['answer'] = answer
 
         return jinja_utils.parse_string(
             self._stats_log_template, parameters, autoescape=False)
 
-    def get_widget_instance_dict(self, customization_args, context_params,
-                                 preview_mode=True):
+    def get_widget_instance_dict(self, customization_args):
         """Gets a dict representing a parameterized widget.
 
         The value for params in the result is a dict, formatted as:
@@ -330,12 +280,7 @@ class BaseWidget(object):
             {PARAM_NAME: PARAM_DESCRIPTION_DICT}
 
         where PARAM_DESCRIPTION_DICT has the keys ['value', 'generator_id',
-        'init_args', 'customization_args', 'obj_type', 'tag'].
-
-        If preview_mode is True then a default parameter value is used when the
-        customization_args are invalid. This is necessary if, for example, a
-        widget parameter depends on a state parameter which has not been set,
-        as would be the case in the editor preview mode.
+        'schema', 'custom_editor', 'default_value', 'tag'].
         """
 
         result = {
@@ -345,30 +290,28 @@ class BaseWidget(object):
             'widget_id': self.id,
         }
 
-        param_instances = self._get_widget_param_instances(
-            customization_args, context_params, preview_mode=preview_mode)
+        param_instances = self._get_customization_args(customization_args)
 
         param_dict = {}
-        customization_args_dict = {}
-        for param in self.params:
-            param_customization_args = (
-                customization_args[param.name]
-                if param.name in customization_args
-                else param.customization_args)
+        ca_values_dict = {}
+        for ca_spec in self.customization_arg_specs:
+            value = (
+                customization_args[ca_spec.name]
+                if ca_spec.name in customization_args
+                else ca_spec.default_value)
 
-            param_dict[param.name] = {
-                'value': param_instances[param.name],
-                'generator_id': param.generator.__name__,
-                'description': param.description,
-                'init_args': param.init_args,
-                'customization_args': param_customization_args,
-                'obj_type': param.obj_type,
+            param_dict[ca_spec.name] = {
+                'value': param_instances[ca_spec.name],
+                'description': ca_spec.description,
+                'default_value': ca_spec.default_value,
+                'schema': ca_spec.schema,
+                'custom_editor': ca_spec.custom_editor,
             }
 
-            customization_args_dict[param.name] = param_customization_args
+            ca_values_dict[ca_spec.name] = value
 
         result['params'] = param_dict
-        result['customization_args'] = customization_args_dict
+        result['customization_args'] = ca_values_dict
 
         # Add widget handler information for interactive widgets.
         if self.type == feconf.INTERACTIVE_PREFIX:
@@ -379,8 +322,7 @@ class BaseWidget(object):
                     {'classifier': rule_cls.__name__}
                 ) for rule_cls in handler.rules)
 
-            result['tag'] = self.get_interactive_widget_tag(
-                customization_args, {}, preview_mode=preview_mode)
+            result['tag'] = self.get_interactive_widget_tag(customization_args)
 
         # Add RTE toolbar information for noninteractive widgets.
         if self.type == feconf.NONINTERACTIVE_PREFIX:

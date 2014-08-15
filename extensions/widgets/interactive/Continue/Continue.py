@@ -1,16 +1,8 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class Continue(widget_domain.BaseWidget):
-    """Definition of a widget.
-
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered when the default widgets are refreshed.
-    """
+    """Interactive widget that takes the form of a simple 'Continue' button."""
 
     # The human-readable name of the widget.
     name = 'Continue'
@@ -21,17 +13,15 @@ class Continue(widget_domain.BaseWidget):
     # A description of the widget.
     description = 'A simple \'go to next state\' button.'
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'buttonText',
         'description': 'The text to display on the button.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 'Continue'
+        'schema': {
+            'type': 'unicode',
         },
-        'obj_type': 'UnicodeString'
+        'default_value': 'Continue',
     }]
 
     # Actions that the reader can perform on this widget which trigger a

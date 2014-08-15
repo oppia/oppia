@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class Image(widget_domain.BaseWidget):
@@ -23,19 +22,15 @@ class Image(widget_domain.BaseWidget):
         'Image widget.'
     )
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'filepath',
         'description': (
             'The name of the image file. (Allowed extensions: gif, jpeg, jpg, '
             'png.)'),
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': ''
-        },
-        'obj_type': 'Filepath',
+        'custom_editor': 'Filepath',
+        'default_value': '',
     }]
 
     # The HTML tag name for this non-interactive widget.

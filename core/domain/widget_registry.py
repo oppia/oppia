@@ -120,13 +120,9 @@ class Registry(object):
             tag_name = 'oppia-%s-%s' % (
                 widget_type, utils.camelcase_to_hyphenated(widget.name))
 
-            attr_list = []
-            for param in widget.params:
-                prefix = '%s-with-' % param.name
-                for arg in param.customization_args:
-                    attr_list.append('%s%s' % (prefix, arg))
-
-            widget_tags[tag_name] = attr_list
+            widget_tags[tag_name] = [
+                '%s-with-value' % ca_spec.name
+                for ca_spec in widget.customization_arg_specs]
 
         return widget_tags
 

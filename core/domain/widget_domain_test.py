@@ -24,8 +24,8 @@ from core.domain import dependency_registry
 from core.domain import obj_services
 from core.domain import widget_domain
 from core.domain import widget_registry
+from core.tests import test_utils
 import feconf
-import test_utils
 import utils
 
 
@@ -61,54 +61,47 @@ class WidgetUnitTests(test_utils.GenericTestBase):
 
         self.assertIn('input ng-if="rows == 1"', widget.js_code)
 
-        tag = widget.get_interactive_widget_tag({}, {})
+        tag = widget.get_interactive_widget_tag({})
         self.assertEqual(
             '<oppia-interactive-text-input '
             'placeholder-with-value="&#34;Type your answer here.&#34;" '
             'rows-with-value="1">'
             '</oppia-interactive-text-input>', tag)
 
-        tag = widget.get_interactive_widget_tag(
-            {'placeholder': {'value': 'F4'}}, {})
-        self.assertEqual(
-            '<oppia-interactive-text-input '
-            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
-            '</oppia-interactive-text-input>', tag)
-
-        tag = widget.get_interactive_widget_tag(
-            {'placeholder': {'value': '{{ntg}}', 'parse_with_jinja': True}},
-            {'ntg': 'F4'})
+        tag = widget.get_interactive_widget_tag({'placeholder': 'F4'})
         self.assertEqual(
             '<oppia-interactive-text-input '
             'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
             '</oppia-interactive-text-input>', tag)
 
         parameterized_widget_dict = widget.get_widget_instance_dict(
-            {'placeholder': {'value': 'F4'}}, {}
-        )
+            {'placeholder': 'F4'})
         self.assertItemsEqual(parameterized_widget_dict.keys(), [
             'widget_id', 'name', 'category', 'description', 'params',
             'handlers', 'customization_args', 'tag'])
         self.assertEqual(
             parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
 
-        self.assertDictContainsSubset({
+        self.assertEqual({
             'placeholder': {
                 'value': 'F4',
                 'description': 'The placeholder for the text input field.',
-                'obj_type': 'UnicodeString',
-                'generator_id': 'Copier',
-                'init_args': {},
-                'customization_args': {
-                    'value': 'F4',
-                }
+                'schema': {'type': 'unicode'},
+                'custom_editor': None,
+                'default_value': 'Type your answer here.',
+            },
+            'rows': {
+                'value': 1,
+                'description': 'The number of rows for the text input field.',
+                'schema': {'type': 'int'},
+                'custom_editor': None,
+                'default_value': 1,
             }
         }, parameterized_widget_dict['params'])
 
-        self.assertDictContainsSubset({
-            'placeholder': {
-                'value': 'F4',
-            }
+        self.assertEqual({
+            'placeholder': 'F4',
+            'rows': 1,
         }, parameterized_widget_dict['customization_args'])
 
 
@@ -248,7 +241,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             WIDGET_CONFIG_SCHEMA = [
                 ('name', basestring), ('category', basestring),
                 ('description', basestring), ('_handlers', list),
-                ('_params', list)
+                ('_customization_arg_specs', list)
             ]
 
             widget = bindings[widget_id]
@@ -288,34 +281,28 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 'Widget %s has duplicate handler names' % widget_id
             )
 
-            for param in widget._params:
-                PARAM_KEYS = ['name', 'description', 'generator', 'init_args',
-                              'customization_args', 'obj_type']
-                for p in param:
-                    self.assertIn(p, PARAM_KEYS)
+            for ca_spec in widget._customization_arg_specs:
+                CA_SPEC_KEYS = ['name', 'description', 'default_value',
+                                'schema', 'custom_editor']
+                for key in ca_spec:
+                    self.assertIn(key, CA_SPEC_KEYS)
 
-                self.assertTrue(isinstance(param['name'], basestring))
-                self.assertTrue(self._is_alphanumeric_string(param['name']))
-                self.assertTrue(isinstance(param['description'], basestring))
+                self.assertTrue(isinstance(ca_spec['name'], basestring))
+                self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
+                self.assertTrue(isinstance(ca_spec['description'], basestring))
+                self.assertGreater(len(ca_spec['description']), 0)
 
-                # Check that the parmaeter description is non-empty.
-                self.assertTrue(param['description'])
+                # Exactly one of 'schema' or 'custom_editor' should be present.
+                self.assertTrue(
+                    'schema' in ca_spec or 'custom_editor' in ca_spec)
+                self.assertFalse(
+                    'schema' in ca_spec and 'custom_editor' in ca_spec)
 
-                # TODO(sll): Check that the generator is a subclass of
-                # BaseValueGenerator.
-
-                self.assertTrue(isinstance(param['init_args'], dict))
-                self.assertTrue(isinstance(param['customization_args'], dict))
-                self.assertTrue(isinstance(param['obj_type'], basestring))
-
-                # Ensure that this object type exists.
-                obj_services.Registry.get_object_class_by_type(
-                    param['obj_type'])
+                # TODO(sll): Check that the schema/custom_editor is valid.
 
             # Check that the default customization args result in
             # parameters with the correct types.
-            for param in widget.params:
-                widget._get_widget_param_instances({}, {})
+            widget._get_customization_args({})
 
             # Check that all dependency ids are valid.
             for dependency_id in widget.dependency_ids:

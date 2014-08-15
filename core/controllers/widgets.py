@@ -36,14 +36,14 @@ class WidgetRepositoryHandler(base.BaseHandler):
         widgets = collections.defaultdict(list)
         for widget in widget_list:
             widgets[widget.category].append(
-                widget.get_widget_instance_dict({}, {}))
+                widget.get_widget_instance_dict({}))
 
         for category in widgets:
             widgets[category].sort()
 
-        response = {'widgetRepository': widgets}
-
-        self.render_json(response)
+        self.render_json({
+            'widgetRepository': widgets
+        })
 
 
 class WidgetHandler(base.BaseHandler):
@@ -59,9 +59,6 @@ class WidgetHandler(base.BaseHandler):
         widget = widget_registry.Registry.get_widget_by_id(
             widget_type, widget_id)
 
-        result = {
-            'widget': widget.get_widget_instance_dict(
-                customization_args, {}, preview_mode=True),
-        }
-
-        self.render_json(result)
+        self.render_json({
+            'widget': widget.get_widget_instance_dict(customization_args),
+        })

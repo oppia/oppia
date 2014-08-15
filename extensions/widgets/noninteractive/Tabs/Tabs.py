@@ -1,16 +1,24 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
+
+
+TAB_CONTENT_SCHEMA = {
+    'type': 'dict',
+    'properties': {
+        'title': {
+            'type': 'unicode',
+            'post_normalizers': [{
+                'id': 'require_nonempty'
+            }]
+        },
+        'content': {
+            'type': 'html',
+        }
+    }
+}
 
 
 class Tabs(widget_domain.BaseWidget):
-    """Definition of a widget.
-
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered when the default widgets are refreshed.
-    """
+    """Non-interactive widget for displaying a series of tabs."""
 
     # The human-readable name of the widget.
     name = 'Tabs'
@@ -21,29 +29,23 @@ class Tabs(widget_domain.BaseWidget):
     # A description of the widget.
     description = 'Tabs widget.'
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'tab_contents',
         'description': 'The tab titles and contents.',
-        'generator': generators.Copier,
-        'init_args': {
-            'disallow_parse_with_jinja': True,
+        'schema': {
+            'type': 'list',
+            'items': TAB_CONTENT_SCHEMA,
         },
-        'customization_args': {
-            'value': [{
-                'title': 'Hint introduction',
-                'content': ('This set of tabs shows some hints. Click on the '
-                            'other tabs to display the relevant hints.')
-            }, {
-                'title': 'Hint 1',
-                'content': 'This is a first hint.'
-            }, {
-                'title': 'Hint 2',
-                'content': 'This is a second hint.'
-            }]
-        },
-        'obj_type': 'ListOfTabContent',
+        'default_value': [{
+            'title': 'Hint introduction',
+            'content': ('This set of tabs shows some hints. Click on the '
+                        'other tabs to display the relevant hints.')
+        }, {
+            'title': 'Hint 1',
+            'content': 'This is a first hint.'
+        }],
     }]
 
     # The HTML tag name for this non-interactive widget.

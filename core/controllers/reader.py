@@ -127,7 +127,7 @@ class ExplorationHandler(base.BaseHandler):
         interactive_widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
         interactive_html = interactive_widget.get_interactive_widget_tag(
-            init_state.widget.customization_args, reader_params)
+            init_state.widget.customization_args)
         session_id = utils.generate_random_string(24)
 
         self.values.update({
@@ -161,8 +161,9 @@ class FeedbackHandler(base.BaseHandler):
         widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
 
+        # TODO(sll): Should this also depend on old_params?
         recorded_answer = widget.get_stats_log_html(
-            old_state.widget.customization_args, old_params, answer)
+            old_state.widget.customization_args, answer)
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, 1, old_state_name, handler, rule,
             recorded_answer)
@@ -187,8 +188,7 @@ class FeedbackHandler(base.BaseHandler):
             '' if sticky else
             widget_registry.Registry.get_widget_by_id(
                 feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
-            ).get_interactive_widget_tag(
-                new_state.widget.customization_args, new_params)
+            ).get_interactive_widget_tag(new_state.widget.customization_args)
         )
 
         return (new_params, question_html, interactive_html)
@@ -262,7 +262,7 @@ class FeedbackHandler(base.BaseHandler):
 
         # Append the reader's answer to the response HTML.
         reader_response_html = old_widget.get_reader_response_html(
-            old_state.widget.customization_args, old_params, answer, sticky)
+            old_state.widget.customization_args, answer, sticky)
         values['reader_response_html'] = reader_response_html
 
         # Add Oppia's feedback to the response HTML.
