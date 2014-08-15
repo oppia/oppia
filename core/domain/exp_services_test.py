@@ -642,8 +642,7 @@ states:
 
         self.assertTrue('yaml' in dict_output)
         self.assertEqual(
-            dict_output['yaml'].decode('string_escape'),
-            self.SAMPLE_YAML_CONTENT)
+            dict_output['yaml'], self.SAMPLE_YAML_CONTENT)
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
