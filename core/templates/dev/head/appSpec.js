@@ -21,7 +21,7 @@
 describe('Validators service', function() {
   beforeEach(module('oppia'));
 
-  describe('validators service', function() {
+  describe('validatorservice', function() {
     var vs = null;
 
     beforeEach(inject(function($injector) {
@@ -52,4 +52,41 @@ describe('Validators service', function() {
       expect(vs.isNonempty(undefined)).toBe(false);
     });
   });
+});
+
+describe('Datetime Formatter', function() {
+  beforeEach(module('oppia'));
+
+  describe('datetimeformatter', function() {
+    var vs = null;
+
+    beforeEach(inject(function($injector) {
+      vs = $injector.get('oppiaDatetimeFormatter');
+    }));
+
+      it('should correctly return date time string', function() {
+
+	expect(vs.getHumanReadableDatetime(1408124298786)).toBe('Fri, 15 Aug 2014 17:38:18 GMT');
+      });
+
+      it('should correctly return local date time string', function() {
+
+        expect(vs.getLocaleString(1408124298786).toBe('8/15/2014 11:08:18 PM'));
+      });
+	
+      it('should correctly return local date time string', function() {
+		
+        var d = new Date();
+	var millis = d.getTime();
+        var currentTime = new Date(millis).toLocaleTimeString().replace(/:\d\d /, ' ');
+        // Get yesterday's date.
+	d.setDate(date.getDate() - 1);
+        var yesterdayMillis = d.getTime();
+	var yesterdayDate =  new Date(millis).toLocaleDateString();
+		
+        expect(vs.getLocaleString(millis).toBe(currentTime));
+	
+	expect(vs.getLocaleString(yesterdayMillis).toBe(yesterdayDate));
+      });	
+    });
 });
