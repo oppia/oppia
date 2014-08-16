@@ -42,6 +42,8 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
     $scope.yamlStrV1 = ' ';
     $scope.yamlStrV2 = ' ';
 
+    $scope.hideCodemirror = true;
+
     $http.get($scope.explorationSnapshotsUrl).then(function(response) {
       var data = response.data;
 
@@ -67,6 +69,11 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
 
   // Downloads the JSON strings for explorations to be compared.
   $scope.compareExplorations = function() {
+    $scope.hideCodemirror = false;
+    $scope.compareSnapshot = {
+      v1: $scope.explorationSnapshots[$scope.explorationSnapshots.length - $scope.compareVersion.v1],
+      v2: $scope.explorationSnapshots[$scope.explorationSnapshots.length - $scope.compareVersion.v2]
+    };
     $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v1 +
         '&output_format=json').then(function(response) {
       $scope.yamlStrV1 = response.data.yaml;
