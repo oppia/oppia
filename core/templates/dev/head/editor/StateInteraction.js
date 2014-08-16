@@ -45,7 +45,7 @@ oppia.controller('StateInteraction', [
     });
   };
 
-  $scope.initInteractiveWidget = function(data) {
+  $scope.initInteractiveWidget = function(stateWidgetData) {
     $scope.resetInteractiveWidgetEditor();
 
     $scope.stateName = editorContextService.getActiveStateName();
@@ -58,18 +58,18 @@ oppia.controller('StateInteraction', [
     // - 'feedback' (list of feedback given for this rule)
     // - 'param_changes' (parameter changes associated with this rule)
     $scope.widgetHandlers = {};
-    for (var i = 0; i < data.handlers.length; i++) {
-      $scope.widgetHandlers[data.handlers[i].name] = (
-          data.handlers[i].rule_specs);
+    for (var i = 0; i < stateWidgetData.handlers.length; i++) {
+      $scope.widgetHandlers[stateWidgetData.handlers[i].name] = (
+          stateWidgetData.handlers[i].rule_specs);
     }
-    $scope.widgetSticky = data.sticky;
+    $scope.widgetSticky = stateWidgetData.sticky;
 
     var customizationArgValues = {};
-    for (var key in data.customization_args) {
-      customizationArgValues[key] = data.customization_args[key].value;
+    for (var key in stateWidgetData.customization_args) {
+      customizationArgValues[key] = stateWidgetData.customization_args[key].value;
     }
 
-    $scope.generateWidgetPreview(data.widget_id, customizationArgValues);
+    $scope.generateWidgetPreview(stateWidgetData.widget_id, customizationArgValues);
 
     $scope.tmpRule = null;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
@@ -178,8 +178,6 @@ oppia.controller('StateInteraction', [
       customizationArgValues[cArg.name] = cArg.value;
     }
 
-    console.log(customizationArgValues);
-
     $scope.generateWidgetPreview($scope.widgetId, customizationArgValues);
     $scope.updateStatesData();
     $scope.refreshGraph();
@@ -194,8 +192,13 @@ oppia.controller('StateInteraction', [
 
   $scope.generateTmpWidgetPreview = function() {
     $scope.tmpWidget.tag = 'Loading...';
+    var argsForPost = {};
+    for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
+      argsForPost[$scope.tmpWidget.customization_args[i].name] =
+        $scope.tmpWidget.customization_args[i].value;
+    }
     $http.post('/widgets/interactive/' + $scope.tmpWidget.widget_id, {
-      customization_args: $scope.tmpWidget.customization_args
+      customization_args: argsForPost
     }).success(function(data) {
       $scope.tmpWidget.tag = data.tag;
     });

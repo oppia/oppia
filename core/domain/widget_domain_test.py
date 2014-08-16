@@ -61,7 +61,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text input')
 
-        self.assertIn('input ng-if="rows == 1"', widget.js_code)
+        self.assertIn('input ng-if="rows == 1"', widget.html_body)
 
         tag = widget.get_interactive_widget_tag({})
         self.assertEqual(
@@ -317,10 +317,6 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                     self.assertEqual(
                         ca_spec['default_value'],
                         obj_class.normalize(ca_spec['default_value']))
-
-            # Check that the default customization args result in
-            # parameters with the correct types.
-            widget._get_customization_args({})
 
             # Check that all dependency ids are valid.
             for dependency_id in widget.dependency_ids:

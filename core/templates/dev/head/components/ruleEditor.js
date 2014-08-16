@@ -240,13 +240,21 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
 
-        // TODO(sll): Remove the need for this.
-        $scope.choices = [];
+        // TODO(sll): Remove the need for this special case for multiple-choice
+        // input.
+        $scope.choices = null;
+        var isMultipleChoice = false;
         $scope.$watch('widgetCustomizationArgs', function(newValue, oldValue) {
           if (newValue) {
             for (var i = 0; i < newValue.length; i++) {
               if (newValue[i].name == 'choices') {
-                $scope.choices = angular.copy(newValue[i].value);
+                if (newValue[i].value.length > 0) {
+                  $scope.choices = angular.copy(newValue[i].value);
+                  isMultipleChoice = true;
+                } else {
+                  $scope.choices = null;
+                  isMultipleChoice = false;
+                }
               }
             }
           }
@@ -272,8 +280,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
 
           var result = [];
-          // TODO(sll): Remove this special-casing.
-          var isMultipleChoice = Boolean($scope.choices);
           for (var i = 0; i < finalInputArray.length; i += 3) {
             result.push({'type': 'noneditable', 'text': finalInputArray[i]});
             if (i == finalInputArray.length - 1) {

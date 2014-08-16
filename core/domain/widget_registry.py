@@ -127,20 +127,19 @@ class Registry(object):
         return widget_tags
 
     @classmethod
-    def get_interactive_widget_js(cls, widget_ids):
-        """Returns the JS for the given list of widget ids."""
-        widget_js_codes = []
-        for widget_id in widget_ids:
-            widget = cls.get_widget_by_id(feconf.INTERACTIVE_PREFIX, widget_id)
-            widget_js_codes.append(widget.js_code)
-
-        return ' \n'.join(widget_js_codes)
+    def get_interactive_widget_html(cls, widget_ids):
+        """Returns the HTML bodies for the given list of widget ids."""
+        return ' \n'.join([
+            cls.get_widget_by_id(
+                feconf.INTERACTIVE_PREFIX, widget_id).html_body
+            for widget_id in widget_ids
+        ])
 
     @classmethod
-    def get_noninteractive_widget_js(cls):
-        """Returns the JS for all noninteractive widgets."""
+    def get_noninteractive_widget_html(cls):
+        """Returns the HTML bodies for all noninteractive widgets."""
         return ' \n'.join([
-            widget.js_code for widget in cls.get_widgets_of_type(
+            widget.html_body for widget in cls.get_widgets_of_type(
                 feconf.NONINTERACTIVE_PREFIX)
         ])
 

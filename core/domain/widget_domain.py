@@ -14,7 +14,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Classes relating to widgets."""
+"""Classes relating to widgets.
+
+A note on terminology: state_customization_args refers to the values of
+customization args that are provided by an exploration editor. They are
+formatted as
+
+    {ca_name: {value: ca_value}}
+
+On the other hand, widget_customization_args refers to a combination of
+the widget customization arg spec and the value used. It is a list of
+dicts, each representing a customization arg -- viz.:
+
+    [{
+        'name': ca_name,
+        'value': ca_value,
+        'default_value': ...,
+        ...
+    }]
+"""
 
 __author__ = 'Sean Lip'
 
@@ -87,14 +105,12 @@ class BaseWidget(object):
     category = ''
     # The description of the widget. Overridden in subclasses.
     description = ''
-    # Customization arg specifications for this widget. The default values
-    # can be overridden when the widget is used within a State. Overridden in
-    # subclasses.
+    # Customization arg specifications for displaying this widget. The default
+    # values for these can be overridden when the widget is used within a
+    # state. Overridden in subclasses.
     _customization_arg_specs = []
-
     # Answer handlers. Overridden in subclasses.
     _handlers = []
-
     # JS library dependency ids. Overridden in subclasses.
     _dependency_ids = []
 
@@ -127,10 +143,9 @@ class BaseWidget(object):
             if handler.name == handler_name:
                 return handler.obj_class.normalize(answer)
 
-        logging.error(
+        raise Exception(
             'Could not find handler in widget %s with name %s' %
             (self.name, handler_name))
-        return answer
 
     @property
     def _stats_log_template(self):
@@ -147,8 +162,11 @@ class BaseWidget(object):
             return '{{answer}}'
 
     @property
-    def js_code(self):
-        """The JS code containing directives and templates for the widget.
+    def html_body(self):
+        """The HTML code containing directives and templates for the widget.
+
+        This contains everything needed to display the widget once the
+        necessary attributes are supplied.
 
         For noninteractive widgets, there is one directive/template pair.
         For interactive widgets, there are two (the additional one is for
@@ -156,39 +174,9 @@ class BaseWidget(object):
         """
         js_directives = utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.js' % self.id))
-
         html_templates = utils.get_file_contents(os.path.join(
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
-
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
-
-    def _get_customization_args(self, state_customization_args):
-        """Returns a dict of parameter names and values for the widget.
-
-        This dict is used to evaluate widget templates. The parameter values
-        are generated based on the widget customizations that are defined by
-        the exploration creator. These customizations may also make use of the
-        state parameters.
-
-        Args:
-          - state_customization_args: dict that maps parameter names to
-              customization args that are defined in the exploration.
-              These values may be raw types or expression strings.
-
-        Returns:
-          A dict of key-value pairs; the keys are parameter names and the
-          values are the generated values for the parameter instance.
-        """
-        if state_customization_args is None:
-            state_customization_args = {}
-
-        return {
-            ca_spec.name: (
-                state_customization_args[ca_spec.name]
-                if ca_spec.name in state_customization_args
-                else ca_spec.default_value
-            ) for ca_spec in self.customization_arg_specs
-        }
 
     def get_interactive_widget_tag(self, state_customization_args):
         """Gets the HTML tag used to display an interactive widget."""
@@ -200,7 +188,6 @@ class BaseWidget(object):
 
         attr_strings = []
         for ca_spec in self.customization_arg_specs:
-
             ca_value = (
                 state_customization_args[ca_spec.name]['value']
                 if ca_spec.name in state_customization_args
@@ -228,19 +215,22 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        parameters = {}
-        # Special case for multiple-choice input. In the future we should
-        # make the answer into the actual multiple-choice string, and remove
-        # this special case.
-        customization_args = self._get_customization_args(
-            state_customization_args)
-        if 'choices' in customization_args:
-            parameters['choices'] = customization_args['choices']
+        parameters = {
+            'answer': answer,
+            # The widget stays through the state transition because it is marked
+            # sticky in the exploration and the new state uses the same widget.
+            'stateSticky': sticky,
+        }
 
-        parameters['answer'] = answer
-        # The widget stays through the state transition because it is marked
-        # sticky in the exploration and the new state uses the same widget.
-        parameters['stateSticky'] = sticky
+        # Special case for multiple-choice input. 
+        # TODO(sll): Turn the answer into the actual multiple-choice string, and
+        # remove this special case.
+        for ca_spec in self.customization_arg_specs:
+            if ca_spec.name == 'choices':
+                parameters['choices'] = (
+                    state_customization_args['choices']['value']
+                    if 'choices' in state_customization_args
+                    else ca_spec.default_value)
 
         attr_strings = []
         for param_name, param_value in parameters.iteritems():
@@ -266,26 +256,21 @@ class BaseWidget(object):
             raise Exception(
                 'This method should only be called for interactive widgets.')
 
-        customization_args = self._get_customization_args(
-            state_customization_args)
+        customization_args = {
+            ca_spec.name: (
+                state_customization_args[ca_spec.name]['value']
+                if ca_spec.name in state_customization_args
+                else ca_spec.default_value
+            ) for ca_spec in self.customization_arg_specs
+        }
         customization_args['answer'] = answer
 
         return jinja_utils.parse_string(
             self._stats_log_template, customization_args, autoescape=False)
 
-    def get_widget_instance_dict(self, customization_arg_values):
-        """Gets a dict representing a parameterized widget.
-
-        The value for params in the result is a dict, formatted as:
-
-            {PARAM_NAME: PARAM_DESCRIPTION_DICT}
-
-        where PARAM_DESCRIPTION_DICT has the keys ['value', 'generator_id',
-        'schema', 'custom_editor', 'default_value', 'tag'].
-        """
-
-        resolved_customization_arg_values = self._get_customization_args(
-            customization_arg_values)
+    def get_widget_instance_dict(self, widget_cust_args):
+        """Gets a dict representing a widget parameterized by the customization
+        arg values in the given dict."""
 
         result = {
             'widget_id': self.id,
@@ -294,7 +279,8 @@ class BaseWidget(object):
             'description': self.description,
             'customization_args': [{
                 'name': ca_spec.name,
-                'value': resolved_customization_arg_values[ca_spec.name],
+                'value': widget_cust_args.get(
+                    ca_spec.name, ca_spec.default_value),
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
@@ -302,8 +288,8 @@ class BaseWidget(object):
             } for ca_spec in self.customization_arg_specs]
         }
 
-        # Add widget handler information for interactive widgets.
         if self.type == feconf.INTERACTIVE_PREFIX:
+            # Add widget handler information for interactive widgets.
             result['handler_specs'] = [h.to_dict() for h in self.handlers]
             for idx, handler in enumerate(self.handlers):
                 result['handler_specs'][idx]['rules'] = dict((
@@ -311,17 +297,17 @@ class BaseWidget(object):
                     {'classifier': rule_cls.__name__}
                 ) for rule_cls in handler.rules)
 
-            state_customization_args = {}
-            for ca_name, ca_value in customization_arg_values.iteritems():
-                state_customization_args[ca_name] = {'value': ca_value}
-            result['tag'] = self.get_interactive_widget_tag(
-                state_customization_args)
-
-        # Add RTE toolbar information for noninteractive widgets.
-        if self.type == feconf.NONINTERACTIVE_PREFIX:
-            result['frontend_name'] = self.frontend_name
-            result['tooltip'] = self.tooltip
-            result['icon_data_url'] = self.icon_data_url
+            result['tag'] = self.get_interactive_widget_tag({
+                ca_name: {'value': ca_value}
+                for ca_name, ca_value in widget_cust_args.iteritems()
+            })
+        elif self.type == feconf.NONINTERACTIVE_PREFIX:
+            # Add RTE toolbar information for noninteractive widgets.
+            result.update({
+                'frontend_name': self.frontend_name,
+                'tooltip': self.tooltip,
+                'icon_data_url': self.icon_data_url,
+            })
 
         return result
 
