@@ -38,7 +38,7 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
       v2: $scope.currentVersion
     };
 
-    // Note: if initial strings are empty CodeMirror won't initallize correctly
+    // Note: if initial strings are empty CodeMirror won't initalize correctly
     $scope.yamlStrV1 = ' ';
     $scope.yamlStrV2 = ' ';
 
@@ -77,29 +77,30 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
     });
   };
 
-  $scope.initCompareExplorations = {
-    // Options for the ui-codemirror display.
+  // Options for the ui-codemirror display.
+  $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
     lineNumbers: true,
     readOnly: true,
     mode: 'yaml'
   };
 }]);
 
-oppia.directive('codemirrorMergeview', function () {
+oppia.directive('codemirrorMergeview', function() {
   return {
-    restrict: 'AE',
-    link: function (scope, element, attrs) {
+    restrict: 'E',
+    link: function(scope, element, attrs) {
       // Require CodeMirror
       if (angular.isUndefined(window.CodeMirror)) {
         throw new Error('CodeMirror not found.');
       }
 
-      var options, codeMirror;
+      var options, codeMirrorInstance;
 
-      options = angular.extend({}, scope.$eval(attrs.codemirrorMergeview));
+      options = scope.$eval(attrs.codemirrorMergeviewOptions);
 
-      codeMirror = new window.CodeMirror.MergeView(element[0],
-        angular.extend({value: '',orig: ''}, options));
+      // 'value', 'orig' are initial values of left and right pane respectively
+      codeMirrorInstance = new window.CodeMirror.MergeView(
+        element[0], angular.extend({value: ' ', orig: ' '}, options));
 
       if (!attrs.leftValue) {
         throw new Error('Left pane value is not defined.');
@@ -109,15 +110,17 @@ oppia.directive('codemirrorMergeview', function () {
       }
 
       // Watch for changes and set value in left pane
-      scope.$watch(attrs.leftValue, function (newValue) {
-        if (typeof newValue == 'string')
-          codeMirror.edit.setValue(newValue);
+      scope.$watch(attrs.leftValue, function(newValue) {
+        if (angular.isString(newValue)) {
+          codeMirrorInstance.edit.setValue(newValue);
+        }
       });
 
       // Watch for changes and set value in right pane
-      scope.$watch(attrs.rightValue, function (newValue) {
-        if (typeof newValue == 'string')
-          codeMirror.right.orig.setValue(newValue);
+      scope.$watch(attrs.rightValue, function(newValue) {
+        if (angular.isString(newValue)) {
+          codeMirrorInstance.right.orig.setValue(newValue);
+        }
       });
     }
   };

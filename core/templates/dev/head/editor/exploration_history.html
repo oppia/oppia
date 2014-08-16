@@ -1,6 +1,4 @@
 <div ng-controller="ExplorationHistory">
-  <link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
-  <link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/addon/merge/merge.css">
 
   <h4>Version History</h4>
 
@@ -32,7 +30,7 @@
     </span>
   </div>
 
-  <div codemirror-mergeview="initCompareExplorations" left-value="yamlStrV1" right-value="yamlStrV2"></div>
+  <codemirror-mergeview left-value="yamlStrV1" right-value="yamlStrV2"></codemirror-mergeview>
 
   <script type="text/ng-template" id="modals/revertExploration">
     <div class="modal-header">
