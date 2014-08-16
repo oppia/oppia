@@ -23,7 +23,7 @@ import itertools
 
 # TODO(czx): Speed up the isomorphism checker?
 class IsIsomorphic(base.GraphRule):
-    description = 'is isomorphic to {{g|Graph}}'
+    description = 'is isomorphic to {{g|Graph}}, including matching labels'
     is_generic = False
 
     def _evaluate(self, subject):
@@ -40,9 +40,20 @@ class IsIsomorphic(base.GraphRule):
             adj[edge['src']][edge['dst']] = weight
             if not subject['isDirected']:
                 adj[edge['dst']][edge['src']] = weight
-        # Check against every permutation of vertices
-        numVertices = len(subject['vertices'])
+        # Check against every permutation of vertices. 
+        # The new index of vertex i in self.g is perm[i].
+        numVertices = len(self.g['vertices'])
         for perm in itertools.permutations(range(numVertices)):
+            # Test matching labels
+            if subject['isLabeled']:
+                labelMismatch = False
+                for i in xrange(numVertices):
+                    if self.g['vertices'][perm[i]]['label'] != subject['vertices'][i]['label']:
+                        labelMismatch = True
+                        break
+                if labelMismatch:
+                    continue
+            # Test isomorphism
             foundIsomorphism = True
             for edge in self.g['edges']:
                 weight = 1

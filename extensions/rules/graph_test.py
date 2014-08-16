@@ -77,8 +77,34 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': False,
             'isLabeled': False
         }))
+        self.assertTrue(graph.IsIsomorphic({
+            'vertices': [{'label': 'a', 'x': 1.0, 'y': 1.0}, {'label': 'b', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
+            'edges': [{'src': 0, 'dst': 1, 'weight': 2}, {'src': 1, 'dst': 2, 'weight': 1}],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }).eval({
+            'vertices': [{'label': 'b', 'x': 1.0, 'y': 1.0}, {'label': 'a', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
+            'edges': [{'src': 2, 'dst': 0, 'weight': 1}, {'src': 1, 'dst': 0, 'weight': 2}],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
         self.assertFalse(graph.IsIsomorphic(_cycleGraph(5)).eval(_nullGraph(5)))
         self.assertFalse(graph.IsIsomorphic(_nullGraph(5)).eval(_cycleGraph(5)))
         self.assertFalse(graph.IsIsomorphic(_nullGraph(5)).eval(_nullGraph(6)))
         self.assertFalse(graph.IsIsomorphic(_completeGraph(5)).eval(_cycleGraph(5)))
         self.assertFalse(graph.IsIsomorphic(_cycleGraph(5)).eval(_completeGraph(5)))
+        self.assertFalse(graph.IsIsomorphic({
+            'vertices': [{'label': 'a', 'x': 1.0, 'y': 1.0}, {'label': 'b', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
+            'edges': [{'src': 0, 'dst': 1, 'weight': 1}, {'src': 1, 'dst': 2, 'weight': 2}],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }).eval({
+            'vertices': [{'label': 'b', 'x': 1.0, 'y': 1.0}, {'label': 'a', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
+            'edges': [{'src': 0, 'dst': 1, 'weight': 1}, {'src': 1, 'dst': 2, 'weight': 2}],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
