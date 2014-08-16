@@ -735,3 +735,29 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
     };
   }
 ]);
+
+
+oppia.directive('oppiaResponseMusicNotesInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/MusicNotesInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        $scope.notes = [];
+        for (var note in $scope.answer) {
+          if (note.readableNoteName) {
+            $scope.notes.push(note.readableNodeName);
+          }
+        }
+
+        if ($scope.notes.length > 0) {
+          $scope.displayedAnswer = $scope.notes.join(', ');
+        } else {
+          $scope.displayedAnswer = 'No answer given.';
+        }
+      }]
+    };
+  }
+]);

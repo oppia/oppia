@@ -35,7 +35,7 @@ from core.domain import html_cleaner
 
 
 SCHEMA_KEY_ITEMS = 'items'
-SCHEMA_KEY_LENGTH = 'length'
+SCHEMA_KEY_LEN = 'len'
 SCHEMA_KEY_PROPERTIES = 'properties'
 SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
@@ -50,75 +50,6 @@ SCHEMA_TYPE_UNICODE = 'unicode'
 ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT, SCHEMA_TYPE_HTML,
     SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
-
-
-def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
-    """Checks that all of the required keys, and possibly some of the optional
-    keys, are in the given dict.
-
-    Raises:
-      AssertionError: if the validation fails.
-    """
-    assert set(required_keys) <= set(dict_to_check.keys()), (
-        'Missing keys: %s' % dict_to_check)
-    assert set(dict_to_check.keys()) <= set(required_keys + optional_keys), (
-        'Extra keys: %s' % dict_to_check)
-
-
-def validate_schema(schema):
-    """Validates a schema.
-
-    This is meant to be a utility function that should be used by tests to
-    ensure that all schema definitions in the codebase are valid.
-
-    Each schema is a dict with at least a key called 'type'. The 'type' can
-    take one of the SCHEMA_TYPE_* values declared above. In addition, there
-    may be additional keys for specific types:
-    - 'list' requires an additional 'items' property, which specifies the type
-      of the elements in the list. It also allows for an optional 'length'
-      property which specifies the length of the list.
-    - 'dict' requires an additional 'properties' property, which specifies the
-      names of the keys in the dict, and schema definitions for their values.
-    There may also be an optional 'post_normalizers' key whose value is a list
-    of normalizers.
-
-    Raises:
-      AssertionError: if the schema is not valid.
-    """
-    assert isinstance(schema, dict)
-    assert SCHEMA_KEY_TYPE in schema
-    assert schema[SCHEMA_KEY_TYPE] in ALLOWED_SCHEMA_TYPES
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
-        _validate_dict_keys(
-            schema,
-            [SCHEMA_KEY_ITEMS, SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_LENGTH, SCHEMA_KEY_POST_NORMALIZERS])
-
-        validate_schema(schema[SCHEMA_KEY_ITEMS])
-        if SCHEMA_KEY_LENGTH in schema:
-            assert isinstance(schema[SCHEMA_KEY_LENGTH], int)
-            assert schema[SCHEMA_KEY_LENGTH] > 0
-    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
-        _validate_dict_keys(
-            schema,
-            [SCHEMA_KEY_PROPERTIES, SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_POST_NORMALIZERS])
-
-        for prop in schema[SCHEMA_KEY_PROPERTIES]:
-            assert isinstance(prop, basestring)
-            validate_schema(schema[SCHEMA_KEY_PROPERTIES][prop])
-    else:
-        _validate_dict_keys(
-            schema, [SCHEMA_KEY_TYPE], [SCHEMA_KEY_POST_NORMALIZERS])
-
-    if SCHEMA_KEY_POST_NORMALIZERS in schema:
-        assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list)
-        for post_normalizer in schema[SCHEMA_KEY_POST_NORMALIZERS]:
-            assert isinstance(post_normalizer, dict)
-            assert 'id' in post_normalizer
-            # Check that the id corresponds to a valid normalizer function.
-            Normalizers.get(post_normalizer['id'])
-            # TODO(sll): Check the arguments too.
 
 
 def normalize_against_schema(obj, schema):
@@ -164,8 +95,8 @@ def normalize_against_schema(obj, schema):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
-        if SCHEMA_KEY_LENGTH in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LENGTH]
+        if SCHEMA_KEY_LEN in schema:
+            assert len(obj) == schema[SCHEMA_KEY_LEN]
         normalized_obj = [
             normalize_against_schema(item, item_schema) for item in obj
         ]

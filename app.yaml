@@ -6,7 +6,7 @@ threadsafe: false
 
 env_variables:
   DJANGO_SETTINGS_MODULE: 'oppiaserver.settings'
-  OPPIA_VERSION: '1.2.7'
+  OPPIA_VERSION: '1.2.8'
 
 builtins:
 - appstats: on

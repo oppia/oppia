@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import logging
-import time
 
 from core import counters
 from core import jobs
@@ -32,15 +31,9 @@ from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import utils
 
 import jinja2
-
-
-def get_human_readable_time_string(time_msec):
-    """Given a time in milliseconds since the epoch, get a human-readable
-    time string for the admin dashboard.
-    """
-    return time.strftime('%B %d %H:%M:%S', time.gmtime(time_msec / 1000.0))
 
 
 def require_super_admin(handler):
@@ -97,21 +90,15 @@ class AdminPage(base.BaseHandler):
             (unicode(ind), exp[0]) for ind, exp in
             enumerate(feconf.DEMO_EXPLORATIONS)]
 
-        job_data = jobs.get_data_for_recent_jobs()
-        for job in job_data:
-            if job['time_started_msec']:
-                job['human_readable_time_started'] = (
-                    get_human_readable_time_string(job['time_started_msec']))
-            if job['time_finished_msec']:
-                job['human_readable_time_finished'] = (
-                    get_human_readable_time_string(job['time_finished_msec']))
+        recent_job_data = jobs.get_data_for_recent_jobs()
+        unfinished_job_data = jobs.get_data_for_unfinished_jobs()
+        for job in unfinished_job_data:
             job['can_be_canceled'] = job['is_cancelable'] and any([
                 klass.__name__ == job['job_type']
                 for klass in jobs_registry.ONE_OFF_JOB_MANAGERS])
 
         queued_or_running_job_types = set([
-            job['job_type'] for job in job_data if job['status_code'] in [
-                jobs.STATUS_CODE_QUEUED, jobs.STATUS_CODE_STARTED]])
+            job['job_type'] for job in unfinished_job_data])
         one_off_job_specs = [{
             'job_type': klass.__name__,
             'is_queued_or_running': (
@@ -123,15 +110,15 @@ class AdminPage(base.BaseHandler):
         for computation in continuous_computations_data:
             if computation['last_started_msec']:
                 computation['human_readable_last_started'] = (
-                    get_human_readable_time_string(
+                    utils.get_human_readable_time_string(
                         computation['last_started_msec']))
             if computation['last_stopped_msec']:
                 computation['human_readable_last_stopped'] = (
-                    get_human_readable_time_string(
+                    utils.get_human_readable_time_string(
                         computation['last_stopped_msec']))
             if computation['last_finished_msec']:
                 computation['human_readable_last_finished'] = (
-                    get_human_readable_time_string(
+                    utils.get_human_readable_time_string(
                         computation['last_finished_msec']))
 
         self.values.update({
@@ -143,7 +130,8 @@ class AdminPage(base.BaseHandler):
             'widget_js_directives': jinja2.utils.Markup(
                 widget_registry.Registry.get_noninteractive_widget_js()),
             'one_off_job_specs': one_off_job_specs,
-            'job_data': job_data,
+            'recent_job_data': recent_job_data,
+            'unfinished_job_data': unfinished_job_data,
             'continuous_computations_data': continuous_computations_data,
         })
 

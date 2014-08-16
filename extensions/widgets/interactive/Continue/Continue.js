@@ -36,3 +36,12 @@ oppia.directive('oppiaInteractiveContinue', [
     };
   }
 ]);
+
+
+oppia.directive('oppiaResponseContinue', [function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    templateUrl: 'response/Continue'
+  };
+}]);

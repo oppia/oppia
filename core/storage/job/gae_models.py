@@ -89,6 +89,12 @@ class JobModel(base_models.BaseModel):
         ).order(-cls.time_queued_msec).fetch(limit)
 
     @classmethod
+    def get_all_unfinished_jobs(cls, limit):
+        return cls.query().filter(
+            JobModel.status_code.IN([STATUS_CODE_QUEUED, STATUS_CODE_STARTED])
+        ).order(-cls.time_queued_msec).fetch(limit)
+
+    @classmethod
     def get_jobs(cls, job_type):
         return cls.query().filter(cls.job_type == job_type)
 

@@ -87,3 +87,16 @@ oppia.directive('validateAsRealNumber', function() {
     }
   };
 });
+
+oppia.directive('oppiaResponseNumericInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/NumericInput',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);

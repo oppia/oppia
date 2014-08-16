@@ -494,9 +494,8 @@ class BaseMapReduceJobManager(BaseJobManager):
     @classmethod
     def _pre_cancel_hook(cls, job_id, cancel_message):
         metadata = cls.get_metadata(job_id)
-        if metadata:
-            root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
-            pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
+        root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
+        pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
@@ -963,18 +962,10 @@ class BaseContinuousComputationManager(object):
             cls._kickoff_batch_job_after_previous_one_ends()
 
 
-def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
-    """Get a list containing data about all jobs.
+def _get_job_dict_from_job_model(model):
+    """Converts an ndb.Model representing a job to a dict.
 
-    This list is arranged in descending order based on the time the job
-    was enqueued. At most NUM_JOBS_IN_DASHBOARD_LIMIT job descriptions are
-    returned.
-
-    Args:
-    - recency_secs: the threshold for a recent job, in seconds.
-
-    Each element of this list is a dict that represents a job. The dict has the
-    following keys:
+    The dict contains the following keys:
     - 'id': the job id
     - 'time_started_msec': when the job was started, in milliseconds since the
           epoch
@@ -984,10 +975,12 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
     - 'job_type': the type of this job
     - 'is_cancelable': whether the job can be canceled
     - 'error': any errors pertaining to this job
+    - 'human_readable_time_started': a human-readable string representing the
+          time the job started, or None if time_started_msec is None.
+    - 'human_readable_time_finished': a human-readable string representing the
+          time the job finished, or None if time_finished_msec is None.
     """
-    recent_job_models = job_models.JobModel.get_recent_jobs(
-        NUM_JOBS_IN_DASHBOARD_LIMIT, recency_msec)
-    result = [{
+    return {
         'id': model.id,
         'time_started_msec': model.time_started_msec,
         'time_finished_msec': model.time_finished_msec,
@@ -995,8 +988,37 @@ def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
         'job_type': model.job_type,
         'is_cancelable': model.is_cancelable,
         'error': model.error,
-    } for model in recent_job_models]
-    return result
+        'human_readable_time_started': (
+            '' if model.time_started_msec is None
+            else utils.get_human_readable_time_string(model.time_started_msec)),
+        'human_readable_time_finished': (
+            '' if model.time_finished_msec is None
+            else utils.get_human_readable_time_string(
+                model.time_finished_msec)),
+    }
+
+
+def get_data_for_recent_jobs(recency_msec=DEFAULT_RECENCY_MSEC):
+    """Get a list containing data about recent jobs.
+
+    This list is arranged in descending order based on the time the job
+    was enqueued. At most NUM_JOBS_IN_DASHBOARD_LIMIT job descriptions are
+    returned.
+
+    Args:
+    - recency_secs: the threshold for a recent job, in seconds.
+    """
+    recent_job_models = job_models.JobModel.get_recent_jobs(
+        NUM_JOBS_IN_DASHBOARD_LIMIT, recency_msec)
+    return [_get_job_dict_from_job_model(model) for model in recent_job_models]
+
+
+def get_data_for_unfinished_jobs():
+    """Get a list containing data about all unfinished jobs."""
+    unfinished_job_models = job_models.JobModel.get_all_unfinished_jobs(
+        NUM_JOBS_IN_DASHBOARD_LIMIT)
+    return [_get_job_dict_from_job_model(model)
+            for model in unfinished_job_models]
 
 
 def get_continuous_computations_info(cc_classes):

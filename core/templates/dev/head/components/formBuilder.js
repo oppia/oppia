@@ -13,10 +13,18 @@
 // limitations under the License.
 
 /**
- * @fileoverview Directives for schema-based object editors.
+ * @fileoverview Directives for schema-based form builders.
  *
  * @author sll@google.com (Sean Lip)
  */
+
+oppia.run(function($rootScope) {
+  $rootScope.FORM_BUILDER_MODES = {
+    READONLY: 'readonly',
+    DISABLED: 'disabled',
+    ENABLED: 'enabled'
+  };
+});
 
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {
@@ -160,7 +168,8 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
     restrict: 'E',
     scope: {
       allowedParameterNames: '&',
-      localValue: '='
+      localValue: '=',
+      mode: '='
     },
     template: (
       '<div class="input-group">' +
@@ -589,7 +598,7 @@ oppia.directive('schemaBasedEditor', ['recursionHelper', function(recursionHelpe
   return {
     scope: {
       definition: '=',
-      isEditable: '&',
+      mode: '=',
       savedValue: '='
     },
     templateUrl: 'schemaBasedEditor/entryPoint',
@@ -615,7 +624,7 @@ oppia.directive('schemaBuilder', [function() {
   return {
     scope: {
       schema: '&',
-      isEditable: '&',
+      mode: '=',
       localValue: '='
     },
     templateUrl: 'schemaBasedEditor/master',
@@ -628,7 +637,7 @@ oppia.directive('schemaBasedBoolEditor', [function() {
     scope: {
       localValue: '=',
       // Read-only property. Whether the item is editable.
-      isEditable: '&',
+      mode: '=',
       allowParameters: '&'
     },
     templateUrl: 'schemaBasedEditor/bool',
@@ -678,8 +687,8 @@ oppia.directive('schemaBasedFloatEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&',
+      // The mode in which to display the form. Should be treated as read-only.
+      mode: '=',
       allowParameters: '&',
       postNormalizers: '&'
     },
@@ -734,8 +743,8 @@ oppia.directive('schemaBasedIntEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&',
+      // The mode in which to display the form. Should be treated as read-only.
+      mode: '=',
       allowParameters: '&'
     },
     templateUrl: 'schemaBasedEditor/int',
@@ -789,8 +798,8 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&',
+      // The mode in which to display the form. Should be treated as read-only.
+      mode: '=',
       postNormalizers: '&'
     },
     templateUrl: 'schemaBasedEditor/unicode',
@@ -814,8 +823,8 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&'
+      // The mode in which to display the form. Should be treated as read-only.
+      mode: '='
     },
     templateUrl: 'schemaBasedEditor/html',
     restrict: 'E'
@@ -828,23 +837,35 @@ oppia.directive('schemaBasedListEditor', [
   return {
     scope: {
       localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&',
+      // The mode in which to display the form. Should be treated as read-only.
+      mode: '=',
       // Read-only property. The schema definition for each item in the list.
-      itemSchema: '&'
+      itemSchema: '&',
+      // The length of the list. If not specified, the list is of arbitrary length.
+      len: '='
     },
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
-      $scope.addElement = function() {
-        $scope.localValue.push(
-          schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
-      };
+      if ($scope.len === undefined) {
+        $scope.addElement = function() {
+          $scope.localValue.push(
+            schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+        };
 
-      $scope.deleteElement = function(index) {
-        $scope.localValue.splice(index, 1);
-      };
+        $scope.deleteElement = function(index) {
+          $scope.localValue.splice(index, 1);
+        };
+      } else {
+        if ($scope.len <= 0) {
+          throw 'Invalid length for list editor: ' + $scope.len;
+        }
+        if ($scope.len != $scope.localValue.length) {
+          throw 'List editor length does not match length of input value: ' +
+            $scope.len + ' ' + $scope.localValue;
+        }
+      }
     }]
   };
 }]);
@@ -853,8 +874,8 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
   return {
     scope: {
       localValue: '=',
-      // Read-only property. Whether the item is editable.
-      isEditable: '&',
+      // The mode in which to display the form. Should be treated as read-only.
+      mode: '=',
       // Read-only property. An object whose keys and values are the dict
       // properties and the corresponding schemas.
       propertySchemas: '&'

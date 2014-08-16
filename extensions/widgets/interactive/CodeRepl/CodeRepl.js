@@ -118,3 +118,17 @@ oppia.directive('oppiaInteractiveCodeRepl', [
     };
   }
 ]);
+
+
+oppia.directive('oppiaResponseCodeRepl', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/CodeRepl',
+      controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Tests for the schema based editors.
+ * @fileoverview Tests for the form builders.
  *
  * @author sll@google.com (Sean Lip)
  */

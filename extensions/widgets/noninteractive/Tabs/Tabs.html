@@ -1,7 +1,9 @@
-<tabset>
-  <tab ng-repeat="tabContent in tabContents" heading="<[tabContent.title]>">
-    <span ng-bind-html="tabContent.content"></span>
-  </tab>
-</tabset>
+<script type="text/ng-template" id="noninteractiveWidget/Tabs">
+  <tabset>
+    <tab ng-repeat="tabContent in tabContents" heading="<[tabContent.title]>">
+      <span ng-bind-html="tabContent.content"></span>
+    </tab>
+  </tabset>
 
-<hr/>
+  <hr/>
+</script>

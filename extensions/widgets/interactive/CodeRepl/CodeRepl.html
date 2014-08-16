@@ -1,14 +1,38 @@
-<div>
-  <link rel="stylesheet" type="text/css" href="/third_party/static/code-mirror-3.19.0/lib/codemirror.css">
-
+<script type="text/ng-template" id="interactiveWidget/CodeRepl">
   <div>
-    <em>Language: <[language]></em>
-  </div>
-  <br>
-  <form ng-submit="runCode(code)">
-    <div ui-codemirror="{onLoad: initCodeEditor}" style="border: 1px solid black;">
-      <textarea required autofocus></textarea>
+    <div>
+      <em>Language: <[language]></em>
     </div>
-    <button type="submit" class="btn btn-default" ng-disabled="!hasLoaded">Run</button>
-  </form>
-</div>
+    <br>
+    <form ng-submit="runCode(code)">
+      <div ui-codemirror="{onLoad: initCodeEditor}" style="border: 1px solid black;">
+        <textarea required autofocus></textarea>
+      </div>
+      <button type="submit" class="btn btn-default" ng-disabled="!hasLoaded">Run</button>
+    </form>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/CodeRepl">
+  <div class="oppia-reader-response-container">
+    <span class="oppia-reader-response">
+      <br>
+
+      <h5>Code</h5>
+      <pre><[answer.code]></pre>
+
+      <span ng-if="answer.output">
+        <h5>Output</h5>
+        <pre><[answer.output]></pre>
+      </span>
+
+      <span ng-if="answer.error">
+        <font color=red>Error: <[answer.error]></font><br>
+      </span>
+
+      <span ng-if="answer.evaluation">
+        &gt;&gt; <[answer.evaluation]>
+      </span>
+    </span>
+  </div>
+</script>

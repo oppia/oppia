@@ -20,9 +20,9 @@ __author__ = 'Sean Lip'
 
 import inspect
 
+from core.tests import test_utils
 from extensions.objects.models import objects
-import schema_utils
-import test_utils
+import schema_utils_test
 
 
 class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
@@ -290,10 +290,10 @@ class SchemaValidityTests(test_utils.GenericTestBase):
 
     def test_schemas_used_to_define_objects_are_valid(self):
         count = 0
-        for unused_name, member in inspect.getmembers(objects):
+        for _, member in inspect.getmembers(objects):
             if inspect.isclass(member):
-                if hasattr(member, '_schema'):
-                    schema_utils.validate_schema(member._schema)
+                if hasattr(member, 'SCHEMA'):
+                    schema_utils_test._validate_schema(member.SCHEMA)
                     count += 1
 
         self.assertEquals(count, 19)
