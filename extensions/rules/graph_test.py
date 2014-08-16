@@ -18,7 +18,7 @@
 
 __author__ = 'Zhan Xiong Chin'
 
-from extension.rules import graph
+from extensions.rules import graph
 import test_utils
 import random
 
@@ -76,7 +76,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': False,
             'isLabeled': False
-        })
+        }))
         self.assertFalse(graph.IsIsomorphic(_cycleGraph(5)).eval(_nullGraph(5)))
         self.assertFalse(graph.IsIsomorphic(_nullGraph(5)).eval(_cycleGraph(5)))
         self.assertFalse(graph.IsIsomorphic(_nullGraph(5)).eval(_nullGraph(6)))

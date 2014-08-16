@@ -285,6 +285,44 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.LogicErrorCategory, mappings, invalid_values)
 
+    def test_graph(self):
+        """Tests objects of type Graph"""
+        empty_graph = {
+            'vertices': [],
+            'edges': [],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }
+        cycle_5_graph = {
+            'vertices': [
+                {'x': 0, 'y': 10, 'label': ''}, 
+                {'x': 50, 'y': 10, 'label': ''}, 
+                {'x': 23, 'y': 31, 'label': ''}, 
+                {'x': 14, 'y': 5, 'label': ''}, 
+                {'x': 200, 'y': 1000, 'label': ''}, 
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 2, 'weight': 1},
+                {'src': 2, 'dst': 3, 'weight': 1},
+                {'src': 3, 'dst': 4, 'weight': 1},
+                {'src': 4, 'dst': 0, 'weight': 1},
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }
+        mappings = [
+            (empty_graph, empty_graph),
+            (cycle_5_graph, cycle_5_graph)
+        ]
+        
+        invalid_values = [None, 1, {}, 'string', ]
+
+        self.check_normalization(
+            objects.Graph, mappings, invalid_values)
+
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
@@ -296,4 +334,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test._validate_schema(member._schema)
                     count += 1
 
-        self.assertEquals(count, 19)
+        self.assertEquals(count, 20)
