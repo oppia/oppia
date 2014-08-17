@@ -188,12 +188,16 @@ oppia.directive('richTextEditor', [
           widgetDefinitionsService.getNoninteractiveDefinitions().then(function(widgetDefns) {
             $scope._NONINTERACTIVE_WIDGETS = [];
             if (!$scope.disallowOppiaWidgets) {
+              var widgetIds = [];
               for (var widgetId in widgetDefns) {
+                widgetIds.push(widgetId);
+              }
+              widgetIds.sort().forEach(function(widgetId) {
                 widgetDefns[widgetId].backendName = widgetDefns[widgetId].name;
                 widgetDefns[widgetId].name = widgetDefns[widgetId].frontend_name;
                 widgetDefns[widgetId].iconDataUrl = widgetDefns[widgetId].icon_data_url;
                 $scope._NONINTERACTIVE_WIDGETS.push(widgetDefns[widgetId]);
-              }
+              });
             }
 
             $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);

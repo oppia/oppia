@@ -22,15 +22,15 @@ class Collapsible(widget_domain.BaseWidget):
         'A collapsible block of HTML.'
     )
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'heading',
         'description': 'The heading for the collapsible block',
         'schema': {
             'type': 'unicode',
         },
-        'default_value': '',
+        'default_value': 'More information...',
     }, {
         'name': 'content',
         'description': 'The content of the collapsible block',

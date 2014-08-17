@@ -23,7 +23,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       rule: '=',
-      widgetCustomizationArgs: '=',
+      answerChoices: '=',
       explorationId: '=',
       states: '=',
       addState: '=',
@@ -244,19 +244,13 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         // input.
         $scope.choices = null;
         var isMultipleChoice = false;
-        $scope.$watch('widgetCustomizationArgs', function(newValue, oldValue) {
+        $scope.$watch('answerChoices', function(newValue, oldValue) {
           if (newValue) {
-            for (var i = 0; i < newValue.length; i++) {
-              if (newValue[i].name == 'choices') {
-                if (newValue[i].value.length > 0) {
-                  $scope.choices = angular.copy(newValue[i].value);
-                  isMultipleChoice = true;
-                } else {
-                  $scope.choices = null;
-                  isMultipleChoice = false;
-                }
-              }
-            }
+            $scope.choices = angular.copy(newValue);
+            isMultipleChoice = true;
+          } else {
+            $scope.choices = null;
+            isMultipleChoice = false;
           }
         }, true);
 

@@ -28,6 +28,10 @@ oppia.controller('StateInteraction', [
   $scope.widgetHandlerSpecs = [];
   $scope.widgetHandlers = {};
 
+  $scope.accordionStatus = {
+    isPreviewOpen: true
+  };
+
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.
   $scope.submitAnswer = function(answer, handler) {};
@@ -75,6 +79,16 @@ oppia.controller('StateInteraction', [
         stateCustomizationArgs[caName].value :
         widgetTemplate.customization_args[i].default_value
       );
+    }
+
+    // Special-case for multiple choice input.
+    $scope.answerChoices = null;
+    if (widgetId == 'MultipleChoiceInput') {
+      for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
+        if (widgetTemplate.customization_args[i].name == 'choices') {
+          $scope.answerChoices = widgetTemplate.customization_args[i].value;
+        }
+      }
     }
 
     $scope.widgetHandlerSpecs = widgetTemplate.handler_specs;
@@ -154,6 +168,7 @@ oppia.controller('StateInteraction', [
 
     $scope.interactiveWidgetEditorIsShown = true;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+    $scope.accordionStatus.isPreviewOpen = true;
 
     for (var category in $scope.interactiveWidgetRepository) {
       for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
@@ -209,10 +224,6 @@ oppia.controller('StateInteraction', [
     $scope.updateStateWidgetHandlerData();
     $scope.refreshGraph();
     $scope.resetInteractiveWidgetEditor();
-  };
-
-  $scope.accordionStatus = {
-    isPreviewOpen: true
   };
 
   $scope.setNewTmpWidget = function(widget) {
