@@ -20,9 +20,9 @@
 
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
-    'oppiaHtmlEscaper', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
+    'oppiaHtmlEscaper', 'widgetDefinitionsService', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
     function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
-      oppiaHtmlEscaper, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService) {
+      oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -54,16 +54,13 @@ oppia.controller('StateInteraction', [
   };
 
   $scope._getWidgetPreviewTag = function(widgetId, widgetCustomizationArgsList) {
-    // TODO(sll): Better to use jquery.
-    var elt = document.createElement(
-      'oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId));
+    var el = $('<oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId) + '/>');
     for (var i = 0; i < widgetCustomizationArgsList.length; i++) {
-      var argName = $filter('camelCaseToHyphens')(widgetCustomizationArgsList[i].name) + '-with-value';
-      var argVal = oppiaHtmlEscaper.unescapedStrToEscapedStr(
-        JSON.stringify(widgetCustomizationArgsList[i].value));
-      elt.setAttribute(argName, argVal);
+      el.attr(
+        $filter('camelCaseToHyphens')(widgetCustomizationArgsList[i].name) + '-with-value',
+        oppiaHtmlEscaper.objToEscapedJson(widgetCustomizationArgsList[i].value));
     }
-    return elt.outerHTML;
+    return el.get(0).outerHTML;
   };
 
   $scope.resetInteractiveWidgetEditor = function() {
@@ -112,12 +109,11 @@ oppia.controller('StateInteraction', [
 
     // TODO(sll): Build a file containing this data and serve it statically,
     // since it rarely changes. (But don't cache it, since it does change.)
-    $http.get('/widgetrepository/data/interactive').success(function(data) {
+    widgetDefinitionsService.getInteractiveDefinitions().then(function(widgetDefinitions) {
       $scope.tmpRule = null;
       $scope.stateName = editorContextService.getActiveStateName();
-      $scope.allInteractiveWidgets = data.widgetRepository;
-      $scope.interactiveWidgetRepository = $scope._generateRepository(
-        data.widgetRepository);
+      $scope.allInteractiveWidgets = widgetDefinitions;
+      $scope.interactiveWidgetRepository = $scope._generateRepository(widgetDefinitions);
 
       stateWidgetIdService.init(
         $scope.stateName, stateData.widget.widget_id, $scope.states[$scope.stateName].widget,
@@ -163,7 +159,18 @@ oppia.controller('StateInteraction', [
       for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
         if ($scope.interactiveWidgetRepository[category][i].widget_id == stateWidgetIdService.displayed) {
           $scope.tmpWidget = angular.copy($scope.interactiveWidgetRepository[category][i]);
-          $scope.tmpWidget.customization_args = angular.copy(stateCustomizationArgsService.displayed);
+       
+          var widgetTemplate = angular.copy($scope.allInteractiveWidgets[stateWidgetIdService.displayed]);
+          for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
+            var caName = widgetTemplate.customization_args[i].name;
+            widgetTemplate.customization_args[i].value = (
+              stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
+              angular.copy(stateCustomizationArgsService.displayed[caName].value) :
+              widgetTemplate.customization_args[i].default_value
+            );
+          }
+          $scope.tmpWidget.customization_args = angular.copy(widgetTemplate.customization_args);
+
           $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
           return;
         }

@@ -243,6 +243,41 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
   };
 }]);
 
+// Service for noninteractive widget definitions.
+oppia.factory('widgetDefinitionsService', ['$http', '$log', '$q', function($http, $log, $q) {
+  var _definitions = {
+    noninteractive: null,
+    interactive: null
+  };
+
+  return {
+    _getDefinitions: function(widgetType) {
+      if (_definitions[widgetType]) {
+        $log.info('Found ' + widgetType + ' widget definitions in cache.');
+        var deferred = $q.defer();
+        deferred.resolve(angular.copy(_definitions[widgetType]));
+        return deferred.promise;
+      } else {
+        // Retrieve data from the server.
+        return $http.get('/widgetrepository/data/' + widgetType).then(function(response) {
+          $log.info('Retrieved ' + widgetType + ' widget data.');
+          _definitions[widgetType] = response.data.widgetRepository;
+          return angular.copy(_definitions[widgetType]);
+        });
+      }
+    },
+    // Returns a promise, caching the results.
+    getNoninteractiveDefinitions: function() {
+      return this._getDefinitions('noninteractive');
+    },
+    // Returns a promise, caching the results.
+    getInteractiveDefinitions: function() {
+      return this._getDefinitions('interactive');
+    }
+  };
+}]);
+
+
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
   String.prototype.trim = function() {

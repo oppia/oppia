@@ -21,19 +21,22 @@
   </div>
 
   <div class="modal-body">
-    <div ng-repeat="(paramName, paramSpecDict) in widgetParamSpecs">
-      <strong><[paramDescriptions[paramName]]></strong>
-      <value-generator-editor generator-id="paramSpecDict.generator_id"
-                              init-args="paramSpecDict.init_args"
-                              customization-args="widgetCustomizationArgs[paramName]"
-                              obj-type="paramSpecDict.obj_type">
-      </value-generator-editor>
+    <div ng-repeat="customizationArg in customizationArgsList">
+      <strong><[customizationArg.description]></strong>
+      <div ng-if="customizationArg.schema">
+        <schema-builder local-value="customizationArg.value" schema="customizationArg.schema" mode="FORM_BUILDER_MODES.ENABLED">
+        </schema-builder>
+      </div>
+      <div ng-if="!customizationArg.schema">
+        <object-editor obj-type="<[customizationArg.custom_editor]>" value="customizationArg.value" always-editable="true">
+        </object-editor>
+      </div>
       <br>
     </div>
   </div>
 
   <div class="modal-footer">
-    <input type="submit" class="btn btn-default" value="Cancel" ng-click="cancel()"/>
-    <input type="submit" class="btn btn-success" value="Done" ng-click="save(widgetCustomizationArgs)"/>
+    <input type="submit" class="btn btn-default" value="Cancel" ng-click="cancel()">
+    <input type="submit" class="btn btn-success" value="Done" ng-click="save(customizationArgsList)">
   </div>
 </script>

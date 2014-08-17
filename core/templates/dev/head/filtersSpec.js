@@ -67,6 +67,7 @@ describe('Testing filters', function() {
     expect(filter('testTest')).toEqual('test-test');
     expect(filter('testTestTest')).toEqual('test-test-test');
     expect(filter('aBaBCa')).toEqual('a-ba-b-ca');
+    expect(filter('AbcDefGhi')).toEqual('abc-def-ghi');
   }));
 
   it('should round numbers to 1 decimal place', inject(function($filter) {

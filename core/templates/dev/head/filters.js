@@ -34,7 +34,11 @@ oppia.filter('underscoresToCamelCase', [function() {
 
 oppia.filter('camelCaseToHyphens', [function() {
   return function(input) {
-    return input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
+    var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
+    if (result[0] == '-') {
+      result = result.substring(1);
+    }
+    return result;
   };
 }]);
 
