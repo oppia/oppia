@@ -18,8 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', function(
-    $scope, $http, explorationData) {
+oppia.controller('ExplorationHistory', [
+    '$scope', '$http', '$location', '$anchorScroll', 'explorationData', function(
+    $scope, $http, $location, $anchorScroll, explorationData) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.$parent.explorationId;
   $scope.explorationSnapshots = null;
@@ -32,17 +33,15 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
-    $scope.currentVersion = explorationData.data.version;
-    $scope.compareVersion = {
-      v1: $scope.currentVersion,
-      v2: $scope.currentVersion
-    };
+    $scope.compareVersion = {};
+    $scope.compareSnapshot = {};
 
     // Note: if initial strings are empty CodeMirror won't initialize correctly
     $scope.yamlStrV1 = ' ';
     $scope.yamlStrV2 = ' ';
 
     $scope.hideCodemirror = true;
+    $scope.hideCompareVersionsButton = false;
 
     $http.get($scope.explorationSnapshotsUrl).then(function(response) {
       var data = response.data;
@@ -60,6 +59,51 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
     });
   };
 
+  // Functions to set snapshot and download YAML when selection is changed
+  $scope.changeCompareVersion1 = function(versionNumber) {
+    $scope.compareSnapshot.v1 = $scope.explorationSnapshots[
+        $scope.currentVersion - $scope.compareVersion.v1];
+
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v1 +
+        '&output_format=json').then(function(response) {
+      $scope.yamlStrV1 = response.data.yaml;
+    });
+
+    if (!$scope.hideCodemirror) {
+      $location.hash('codemirrorMergeviewInstance');
+      $anchorScroll();
+    }
+  };
+
+  $scope.changeCompareVersion2 = function(versionNumber) {
+    $scope.compareSnapshot.v2 = $scope.explorationSnapshots[
+        $scope.currentVersion - $scope.compareVersion.v2];
+
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v2 +
+        '&output_format=json').then(function(response) {
+      $scope.yamlStrV2 = response.data.yaml;
+    });
+
+    if (!$scope.hideCodemirror) {
+      $location.hash('codemirrorMergeviewInstance');
+      $anchorScroll();
+    }
+  };
+
+  // Check if valid versions were selected
+  $scope.compareVersionsSelected = function() {
+    if (!$scope.compareVersion) {
+      return true;
+    }
+    if (!$scope.compareVersion.hasOwnProperty('v1')) {
+      return true;
+    }
+    if (!$scope.compareVersion.hasOwnProperty('v2')) {
+      return true;
+    }
+    return false;
+  };
+
   // Downloads the zip file for an exploration.
   $scope.downloadExplorationWithVersion = function(versionNumber) {
     // Note that this opens (and then immediately closes) a new tab. If we do
@@ -67,13 +111,14 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
     window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '&output_format=zip');
   };
 
-  // Downloads the JSON strings for explorations to be compared.
-  $scope.compareExplorations = function() {
+  // Function to show the CodeMirror MergeView instance
+  $scope.showMergeview = function() {
     $scope.hideCodemirror = false;
-    $scope.compareSnapshot = {
-      v1: $scope.explorationSnapshots[$scope.explorationSnapshots.length - $scope.compareVersion.v1],
-      v2: $scope.explorationSnapshots[$scope.explorationSnapshots.length - $scope.compareVersion.v2]
-    };
+    $scope.hideCompareVersionsButton = true;
+
+    // Force refresh of codemirror
+    $scope.yamlStrV1 = ' ';
+    $scope.yamlStrV2 = ' ';
     $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v1 +
         '&output_format=json').then(function(response) {
       $scope.yamlStrV1 = response.data.yaml;
@@ -82,13 +127,18 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
         '&output_format=json').then(function(response) {
       $scope.yamlStrV2 = response.data.yaml;
     });
+
+    // Scroll to CodeMirror MergeView instance
+    $location.hash('codemirrorMergeviewInstance');
+    $anchorScroll();
   };
 
   // Options for the ui-codemirror display.
   $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
     lineNumbers: true,
     readOnly: true,
-    mode: 'yaml'
+    mode: 'yaml',
+    viewportMargin: 20
   };
 }]);
 
