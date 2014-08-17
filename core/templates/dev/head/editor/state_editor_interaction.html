@@ -43,7 +43,7 @@
         <div class="col-lg-8 col-md-8 col-sm-8">
           <div ng-show="tmpWidget">
             <accordion close-others="true">
-              <accordion-group is-open="true">
+              <accordion-group is-open="accordionStatus.isPreviewOpen">
                 <accordion-heading>
                   <!-- Due to how ui.bootstrap.accordion is set up, the manipulation of margin and padding is (unfortunately) necessary for the click target to cover the whole heading. -->
                   <a style="width: 100%; margin: -8px -15px; padding: 8px 15px;" ng-click="generateTmpWidgetPreview()" href="#">

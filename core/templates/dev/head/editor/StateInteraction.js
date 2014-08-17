@@ -211,11 +211,16 @@ oppia.controller('StateInteraction', [
     $scope.resetInteractiveWidgetEditor();
   };
 
+  $scope.accordionStatus = {
+    isPreviewOpen: true
+  };
+
   $scope.setNewTmpWidget = function(widget) {
     $scope.tmpWidget = angular.copy(widget);
     for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
       $scope.tmpWidget.customization_args[i].value = $scope.tmpWidget.customization_args[i].default_value;
     }
+    $scope.accordionStatus.isPreviewOpen = true;
   };
 
   $scope.createTmpRule = function() {

@@ -273,6 +273,11 @@ oppia.factory('widgetDefinitionsService', ['$http', '$log', '$q', function($http
     // Returns a promise, caching the results.
     getInteractiveDefinitions: function() {
       return this._getDefinitions('interactive');
+    },
+    // This is used in the ExplorationEditor in order to prevent a second
+    // RPC to the backend.
+    setInteractiveDefinitions: function(interactiveDefinitions) {
+      _definitions['interactive'] = interactiveDefinitions;
     }
   };
 }]);

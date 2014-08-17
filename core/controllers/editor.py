@@ -267,6 +267,11 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
+            'ALL_INTERACTIVE_WIDGETS': {
+                widget.id: widget.to_dict()
+                for widget in widget_registry.Registry.get_widgets_of_type(
+                    feconf.INTERACTIVE_PREFIX)
+            }
         }
 
         if feconf.SHOW_SKIN_CHOOSER:

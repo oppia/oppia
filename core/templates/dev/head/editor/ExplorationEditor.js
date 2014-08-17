@@ -27,13 +27,13 @@ oppia.controller('ExplorationEditor', [
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationRightsService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', function(
+  'oppiaDatetimeFormatter', 'widgetDefinitionsService', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
     explorationRightsService, validatorsService, editabilityService,
-    oppiaDatetimeFormatter) {
+    oppiaDatetimeFormatter, widgetDefinitionsService) {
 
   $scope.editabilityService = editabilityService;
 
@@ -623,6 +623,8 @@ oppia.controller('ExplorationEditor', [
   // page load.
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
+      widgetDefinitionsService.setInteractiveDefinitions(data.ALL_INTERACTIVE_WIDGETS);
+
       explorationTitleService.init(data.title);
       explorationCategoryService.init(data.category);
       explorationObjectiveService.init(data.objective);
