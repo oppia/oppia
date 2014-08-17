@@ -38,7 +38,7 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
       v2: $scope.currentVersion
     };
 
-    // Note: if initial strings are empty CodeMirror won't initalize correctly
+    // Note: if initial strings are empty CodeMirror won't initialize correctly
     $scope.yamlStrV1 = ' ';
     $scope.yamlStrV2 = ' ';
 

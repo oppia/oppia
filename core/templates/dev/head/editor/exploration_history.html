@@ -32,26 +32,26 @@
 
   <div ng-hide="hideCodemirror">
     <table class="table">
-        <td style="width:50%">
-          <div>
-            <strong>Revision #<[compareSnapshot.v1.versionNumber]></strong>
-             by
-            <strong><[compareSnapshot.v1.committerId]></strong>
-             on
-            <strong><[compareSnapshot.v1.createdOn]></strong>
-          </div>
-          <[compareSnapshot.v1.commitMessage]>
-        </td>
-        <td style="width:50%">
-          <div>
-            <strong>Revision #<[compareSnapshot.v2.versionNumber]></strong>
-             by
-            <strong><[compareSnapshot.v2.committerId]></strong>
-             on
-            <strong><[compareSnapshot.v2.createdOn]></strong>
-          </div>
-          <[compareSnapshot.v2.commitMessage]>
-        </td>
+      <td style="width: 50%">
+        <div>
+          <strong>Revision #<[compareSnapshot.v1.versionNumber]></strong>
+          by
+          <strong><[compareSnapshot.v1.committerId]></strong>
+          on
+          <strong><[compareSnapshot.v1.createdOn]></strong>
+        </div>
+        <[compareSnapshot.v1.commitMessage]>
+      </td>
+      <td style="width: 50%">
+        <div>
+          <strong>Revision #<[compareSnapshot.v2.versionNumber]></strong>
+          by
+          <strong><[compareSnapshot.v2.committerId]></strong>
+          on
+          <strong><[compareSnapshot.v2.createdOn]></strong>
+        </div>
+        <[compareSnapshot.v2.commitMessage]>
+      </td>
     </table>
     <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrV1" right-value="yamlStrV2"></codemirror-mergeview><br>
   </div>
