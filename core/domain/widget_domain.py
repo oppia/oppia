@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Classes relating to widgets.
+"""Classes relating to widget definitions.
 
 A note on terminology: state_customization_args refers to the values of
 customization args that are provided by an exploration editor. They are
@@ -22,7 +22,7 @@ formatted as
 
     {ca_name: {value: ca_value}}
 
-On the other hand, widget_customization_args refers to a combination of
+On the other hand, widget.customization_args refers to a combination of
 the widget customization arg spec and the value used. It is a list of
 dicts, each representing a customization arg -- viz.:
 
@@ -178,6 +178,62 @@ class BaseWidget(object):
             feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
+    def to_dict(self):
+        """Gets a dict representing this widget. Only default values are provided."""
+
+        result = {
+            'widget_id': self.id,
+            'name': self.name,
+            'category': self.category,
+            'description': self.description,
+            'customization_args': [{
+                'name': ca_spec.name,
+                'description': ca_spec.description,
+                'default_value': ca_spec.default_value,
+                'schema': ca_spec.schema,
+                'custom_editor': ca_spec.custom_editor,
+            } for ca_spec in self.customization_arg_specs]
+        }
+
+        if self.type == feconf.INTERACTIVE_PREFIX:
+            # Add widget handler information for interactive widgets.
+            result['handler_specs'] = [h.to_dict() for h in self.handlers]
+            for idx, handler in enumerate(self.handlers):
+                result['handler_specs'][idx]['rules'] = dict((
+                    rule_cls.description,
+                    {'classifier': rule_cls.__name__}
+                ) for rule_cls in handler.rules)
+
+            result['tag'] = self.get_interactive_widget_tag({})
+        elif self.type == feconf.NONINTERACTIVE_PREFIX:
+            # Add RTE toolbar information for noninteractive widgets.
+            result.update({
+                'frontend_name': self.frontend_name,
+                'tooltip': self.tooltip,
+                'icon_data_url': self.icon_data_url,
+            })
+
+        return result
+
+    def get_handler_by_name(self, handler_name):
+        """Get the handler for a widget, given the name of the handler."""
+        try:
+            return next(h for h in self.handlers if h.name == handler_name)
+        except StopIteration:
+            raise Exception(
+                'Could not find handler with name %s' % handler_name)
+
+    def get_rule_by_name(self, handler_name, rule_name):
+        """Gets a rule, given its name and ancestors."""
+        handler = self.get_handler_by_name(handler_name)
+        try:
+            return next(
+                r for r in handler.rules if r.__name__ == rule_name)
+        except StopIteration:
+            raise Exception(
+                'Could not find rule with name %s for handler %s'
+                % (rule_name, handler_name))
+
     def get_interactive_widget_tag(self, state_customization_args):
         """Gets the HTML tag used to display an interactive widget."""
         if state_customization_args is None:
@@ -267,65 +323,3 @@ class BaseWidget(object):
 
         return jinja_utils.parse_string(
             self._stats_log_template, customization_args, autoescape=False)
-
-    def get_widget_instance_dict(self, widget_cust_args):
-        """Gets a dict representing a widget parameterized by the customization
-        arg values in the given dict."""
-
-        result = {
-            'widget_id': self.id,
-            'name': self.name,
-            'category': self.category,
-            'description': self.description,
-            'customization_args': [{
-                'name': ca_spec.name,
-                'value': widget_cust_args.get(
-                    ca_spec.name, ca_spec.default_value),
-                'description': ca_spec.description,
-                'default_value': ca_spec.default_value,
-                'schema': ca_spec.schema,
-                'custom_editor': ca_spec.custom_editor,
-            } for ca_spec in self.customization_arg_specs]
-        }
-
-        if self.type == feconf.INTERACTIVE_PREFIX:
-            # Add widget handler information for interactive widgets.
-            result['handler_specs'] = [h.to_dict() for h in self.handlers]
-            for idx, handler in enumerate(self.handlers):
-                result['handler_specs'][idx]['rules'] = dict((
-                    rule_cls.description,
-                    {'classifier': rule_cls.__name__}
-                ) for rule_cls in handler.rules)
-
-            result['tag'] = self.get_interactive_widget_tag({
-                ca_name: {'value': ca_value}
-                for ca_name, ca_value in widget_cust_args.iteritems()
-            })
-        elif self.type == feconf.NONINTERACTIVE_PREFIX:
-            # Add RTE toolbar information for noninteractive widgets.
-            result.update({
-                'frontend_name': self.frontend_name,
-                'tooltip': self.tooltip,
-                'icon_data_url': self.icon_data_url,
-            })
-
-        return result
-
-    def get_handler_by_name(self, handler_name):
-        """Get the handler for a widget, given the name of the handler."""
-        try:
-            return next(h for h in self.handlers if h.name == handler_name)
-        except StopIteration:
-            raise Exception(
-                'Could not find handler with name %s' % handler_name)
-
-    def get_rule_by_name(self, handler_name, rule_name):
-        """Gets a rule, given its name and ancestors."""
-        handler = self.get_handler_by_name(handler_name)
-        try:
-            return next(
-                r for r in handler.rules if r.__name__ == rule_name)
-        except StopIteration:
-            raise Exception(
-                'Could not find rule with name %s for handler %s'
-                % (rule_name, handler_name))

@@ -3,7 +3,14 @@
 {% block cls %}oppia-interactive-widget-display{% endblock %}
 
 {% block center %}
-  <div>
+  <div ng-if="!hasLoaded" class="oppia-align-center">
+    Loading
+    <span class="oppia-loading-dot-one">.</span>
+    <span class="oppia-loading-dot-two">.</span>
+    <span class="oppia-loading-dot-three">.</span>
+  </div>
+
+  <div ng-if="hasLoaded">
     <div ng-if="!interactiveWidgetEditorIsShown">
       <div class="row">
         <div class="col-lg-11 col-md-11 col-sm-11">
@@ -26,7 +33,7 @@
         <div class="col-lg-4 col-md-4 col-sm-4">
           <accordion close-others="true">
             <accordion-group heading="<[category]>" ng-repeat="(category, widgetList) in interactiveWidgetRepository" is-open="category === 'Basic Input'">
-              <div ng-repeat="widget in widgetList" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'">
+              <div ng-repeat="widget in widgetList | orderBy: 'widget_id'" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'">
                 <[widget.name]>
               </div>
             </accordion-group>

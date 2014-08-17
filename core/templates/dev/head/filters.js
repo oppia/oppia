@@ -32,6 +32,12 @@ oppia.filter('underscoresToCamelCase', [function() {
   };
 }]);
 
+oppia.filter('camelCaseToHyphens', [function() {
+  return function(input) {
+    return input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
+  };
+}]);
+
 // Filter that truncates long descriptors.
 // TODO(sll): Strip out HTML tags before truncating.
 oppia.filter('truncate', [function() {

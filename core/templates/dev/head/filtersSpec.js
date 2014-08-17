@@ -25,7 +25,8 @@ describe('Testing filters', function() {
     'truncate',
     'round1',
     'bracesToText',
-    'parameterizeRuleDescription'
+    'parameterizeRuleDescription',
+    'camelCaseToHyphens'
   ];
 
   beforeEach(angular.mock.module('oppia'));
@@ -58,6 +59,14 @@ describe('Testing filters', function() {
     // they will give weird results.
     expect(filter('_test_App')).toEqual('TestApp');
     expect(filter('__Test_ App_')).toEqual('Test App_');
+  }));
+
+  it('should convert camelCase to hyphens properly', inject(function($filter) {
+    var filter = $filter('camelCaseToHyphens');
+    expect(filter('test')).toEqual('test');
+    expect(filter('testTest')).toEqual('test-test');
+    expect(filter('testTestTest')).toEqual('test-test-test');
+    expect(filter('aBaBCa')).toEqual('a-ba-b-ca');
   }));
 
   it('should round numbers to 1 decimal place', inject(function($filter) {

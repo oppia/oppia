@@ -78,24 +78,19 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
             '</oppia-interactive-text-input>', tag)
 
-        parameterized_widget_dict = widget.get_widget_instance_dict(
-            {'placeholder': 'F4'})
-        self.assertItemsEqual(parameterized_widget_dict.keys(), [
+        widget_dict = widget.to_dict()
+        self.assertItemsEqual(widget_dict.keys(), [
             'widget_id', 'name', 'category', 'description',
             'handler_specs', 'customization_args', 'tag'])
-        self.assertEqual(
-            parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
-
-        self.assertEqual([{
+        self.assertEqual(widget_dict['widget_id'], TEXT_INPUT_ID)
+        self.assertEqual(widget_dict['customization_args'], [{
             'name': 'placeholder',
-            'value': 'F4',
             'description': 'The placeholder for the text input field.',
             'schema': {'type': 'unicode'},
             'custom_editor': None,
             'default_value': 'Type your answer here.',
         }, {
             'name': 'rows',
-            'value': 1,
             'description': 'The number of rows for the text input field.',
             'schema': {
                 'type': 'int',
@@ -107,7 +102,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             },
             'custom_editor': None,
             'default_value': 1,
-        }], parameterized_widget_dict['customization_args'])
+        }])
 
 
 class WidgetDataUnitTests(test_utils.GenericTestBase):

@@ -19,8 +19,10 @@
  */
 
 oppia.controller('StateInteraction', [
-    '$scope', '$http', '$modal', 'warningsData', 'editorContextService', 'changeListService',
-    function($scope, $http, $modal, warningsData, editorContextService, changeListService) {
+    '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
+    'oppiaHtmlEscaper', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
+    function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
+      oppiaHtmlEscaper, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -31,63 +33,7 @@ oppia.controller('StateInteraction', [
   $scope.submitAnswer = function(answer, handler) {};
   $scope.adjustPageHeight = function(scroll) {};
 
-  $scope.generateWidgetPreview = function(widgetId, customizationArgValues, successCallback) {
-    $http.post('/widgets/interactive/' + widgetId, {
-      customization_args: customizationArgValues
-    }).success(function(data) {
-      $scope.widgetId = data.widget_id;
-      $scope.widgetCustomizationArgs = data.customization_args;
-      $scope.widgetHandlerSpecs = data.handler_specs;
-      $scope.widgetPreviewHtml = data.tag;
-      if (successCallback) {
-        successCallback();
-      }
-    });
-  };
-
-  $scope.initInteractiveWidget = function(stateWidgetData) {
-    $scope.resetInteractiveWidgetEditor();
-
-    $scope.stateName = editorContextService.getActiveStateName();
-
-    // Stores rules in the form of key-value pairs. For each pair, the key is
-    // the corresponding handler name and the value has several keys:
-    // - 'definition' (the rule definition)
-    // - 'description' (the rule description string)
-    // - 'dest' (the destination for this rule)
-    // - 'feedback' (list of feedback given for this rule)
-    // - 'param_changes' (parameter changes associated with this rule)
-    $scope.widgetHandlers = {};
-    for (var i = 0; i < stateWidgetData.handlers.length; i++) {
-      $scope.widgetHandlers[stateWidgetData.handlers[i].name] = (
-          stateWidgetData.handlers[i].rule_specs);
-    }
-    $scope.widgetSticky = stateWidgetData.sticky;
-
-    var customizationArgValues = {};
-    for (var key in stateWidgetData.customization_args) {
-      customizationArgValues[key] = stateWidgetData.customization_args[key].value;
-    }
-
-    $scope.generateWidgetPreview(stateWidgetData.widget_id, customizationArgValues);
-
-    $scope.tmpRule = null;
-    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
-  };
-
-  $scope.$on('stateEditorInitialized', function(evt, stateData) {
-    $scope.initInteractiveWidget(stateData.widget);
-  });
-
-  $scope.toggleWidgetSticky = function() {
-    var activeStateName = editorContextService.getActiveStateName();
-    changeListService.editStateProperty(
-      activeStateName, 'widget_sticky', $scope.widgetSticky,
-      !$scope.widgetSticky);
-    $scope.states[activeStateName].widget.sticky = $scope.widgetSticky;
-  };
-
-  $scope.interactiveWidgetRepository = null;
+  $scope.hasLoaded = false;
 
   $scope._getStateCustArgsFromWidgetCustArgs = function(widgetCustomizationArgs) {
     var result = {};
@@ -99,121 +45,170 @@ oppia.controller('StateInteraction', [
     return result;
   };
 
+  $scope.getCurrentWidgetId = function() {
+    return stateWidgetIdService.displayed;
+  };
+
+  $scope.getCurrentWidgetSticky = function() {
+    return stateWidgetStickyService.displayed;
+  };
+
+  $scope._getWidgetPreviewTag = function(widgetId, widgetCustomizationArgsList) {
+    // TODO(sll): Better to use jquery.
+    var elt = document.createElement(
+      'oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId));
+    for (var i = 0; i < widgetCustomizationArgsList.length; i++) {
+      var argName = $filter('camelCaseToHyphens')(widgetCustomizationArgsList[i].name) + '-with-value';
+      var argVal = oppiaHtmlEscaper.unescapedStrToEscapedStr(
+        JSON.stringify(widgetCustomizationArgsList[i].value));
+      elt.setAttribute(argName, argVal);
+    }
+    return elt.outerHTML;
+  };
+
+  $scope.resetInteractiveWidgetEditor = function() {
+    var widgetId = stateWidgetIdService.displayed;
+    var stateCustomizationArgs = stateCustomizationArgsService.displayed;
+
+    var widgetTemplate = angular.copy($scope.allInteractiveWidgets[widgetId]);
+    for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
+      var caName = widgetTemplate.customization_args[i].name;
+      widgetTemplate.customization_args[i].value = (
+        stateCustomizationArgs.hasOwnProperty(caName) ?
+        stateCustomizationArgs[caName].value :
+        widgetTemplate.customization_args[i].default_value
+      );
+    }
+
+    $scope.widgetHandlerSpecs = widgetTemplate.handler_specs;
+    $scope.widgetPreviewHtml = $scope._getWidgetPreviewTag(
+      widgetId, widgetTemplate.customization_args);
+    $scope.interactiveWidgetEditorIsShown = false;
+    $scope.tmpWidget = null;
+    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+  };
+
+  $scope.generateTmpWidgetPreview = function() {
+    $scope.tmpWidget.tag = $scope._getWidgetPreviewTag(
+      $scope.tmpWidget.widget_id, $scope.tmpWidget.customization_args);
+  };
+
+  // Group widgets into categories.
+  $scope._generateRepository = function(allWidgets) {
+    var repository = {};
+    for (var widget_id in allWidgets) {
+      var category = allWidgets[widget_id].category;
+      if (!repository.hasOwnProperty(category)) {
+        repository[category] = [];
+      }
+      repository[category].push(allWidgets[widget_id]);
+    }
+
+    return repository;
+  };
+
+  $scope.$on('stateEditorInitialized', function(evt, stateData) {
+    $scope.hasLoaded = false;
+
+    // TODO(sll): Build a file containing this data and serve it statically,
+    // since it rarely changes. (But don't cache it, since it does change.)
+    $http.get('/widgetrepository/data/interactive').success(function(data) {
+      $scope.tmpRule = null;
+      $scope.stateName = editorContextService.getActiveStateName();
+      $scope.allInteractiveWidgets = data.widgetRepository;
+      $scope.interactiveWidgetRepository = $scope._generateRepository(
+        data.widgetRepository);
+
+      stateWidgetIdService.init(
+        $scope.stateName, stateData.widget.widget_id, $scope.states[$scope.stateName].widget,
+        'widget_id');
+      stateCustomizationArgsService.init(
+        $scope.stateName, stateData.widget.customization_args, $scope.states[$scope.stateName].widget,
+        'widget_customization_args');
+      stateWidgetStickyService.init(
+        $scope.stateName, stateData.widget.sticky, $scope.states[$scope.stateName].widget,
+        'widget_sticky');
+
+      $scope.stateWidgetStickyService = stateWidgetStickyService;
+
+      // Stores rules as key-value pairs. For each pair, the key is the
+      // corresponding handler name and the value has several keys:
+      // - 'definition' (the rule definition)
+      // - 'description' (the rule description string)
+      // - 'dest' (the destination for this rule)
+      // - 'feedback' (list of feedback given for this rule)
+      // - 'param_changes' (parameter changes associated with this rule)
+      $scope.widgetHandlers = {};
+      for (var i = 0; i < stateData.widget.handlers.length; i++) {
+        $scope.widgetHandlers[stateData.widget.handlers[i].name] = (
+          stateData.widget.handlers[i].rule_specs);
+      }
+
+      $scope.resetInteractiveWidgetEditor(stateData.widget);
+      $scope.hasLoaded = true;
+    });
+  });
+
+  $scope.saveWidgetSticky = function() {
+    stateWidgetStickyService.saveDisplayedValue();    
+  };
+
   $scope.showInteractiveWidgetEditor = function() {
     warningsData.clear();
 
-    if (!$scope.interactiveWidgetRepository) {
-      // Initializes the widget list using data from the server.
-      $http.get('/widgetrepository/data/interactive').success(function(data) {
-        $scope.interactiveWidgetRepository = data.widgetRepository;
-        for (var category in $scope.interactiveWidgetRepository) {
-          for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
-            if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
-              $scope.tmpWidget = angular.copy($scope.interactiveWidgetRepository[category][i]);
-              $scope.tmpWidget.customization_args = angular.copy($scope.widgetCustomizationArgs);
-              $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
-              break;
-            }
-          }
-        }
-      });
-    }
-
     $scope.interactiveWidgetEditorIsShown = true;
-    $scope.widgetIdMemento = $scope.widgetId;
-    $scope.stateCustomizationArgsMemento = $scope._getStateCustArgsFromWidgetCustArgs(
-      $scope.widgetCustomizationArgs);
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
 
     for (var category in $scope.interactiveWidgetRepository) {
       for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
-        if ($scope.interactiveWidgetRepository[category][i].widget_id == $scope.widgetId) {
+        if ($scope.interactiveWidgetRepository[category][i].widget_id == stateWidgetIdService.displayed) {
           $scope.tmpWidget = angular.copy($scope.interactiveWidgetRepository[category][i]);
-          $scope.tmpWidget.customization_args = angular.copy($scope.widgetCustomizationArgs);
+          $scope.tmpWidget.customization_args = angular.copy(stateCustomizationArgsService.displayed);
           $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
-          break;
+          return;
         }
       }
     }
+
+    throw 'Could not find current widget in the repository.'
   };
 
   $scope.selectInteractiveWidget = function(tmpWidget) {
     $scope.$broadcast('externalSave');
 
     var newWidget = angular.copy(tmpWidget);
-    var activeStateName = editorContextService.getActiveStateName();
+    if (!angular.equals(newWidget.widget_id, stateWidgetIdService.displayed)) {
+      if (!$window.confirm('This will reset all existing rules. Continue?')) {
+        return;
+      };
 
-    $scope.tmpRule = null;
-
-    if (!angular.equals(newWidget.widget_id, $scope.widgetIdMemento)) {
-      $scope.widgetId = angular.copy(newWidget.widget_id);
-
-      changeListService.editStateProperty(
-        activeStateName, 'widget_id', $scope.widgetId, $scope.widgetIdMemento);
+      stateWidgetIdService.displayed = angular.copy(newWidget.widget_id);
+      stateWidgetIdService.saveDisplayedValue();
 
       // Change the widget handlers, but preserve the old default rule.
       $scope.widgetHandlers = {
         'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
       };
       changeListService.editStateProperty(
-        activeStateName, 'widget_handlers', $scope.widgetHandlers,
+        editorContextService.getActiveStateName(), 'widget_handlers', $scope.widgetHandlers,
         $scope.widgetHandlersMemento);
     }
 
-    if (!angular.equals(
-        $scope._getStateCustArgsFromWidgetCustArgs(newWidget.customization_args),
-        $scope.stateCustomizationArgsMemento)) {
-      $scope.widgetCustomizationArgs = newWidget.customization_args;
+    stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromWidgetCustArgs(
+      newWidget.customization_args);
+    stateCustomizationArgsService.saveDisplayedValue();
 
-      changeListService.editStateProperty(
-        activeStateName,
-        'widget_customization_args',
-        $scope._getStateCustArgsFromWidgetCustArgs(newWidget.customization_args),
-        $scope.stateCustomizationArgsMemento);
-    }
-
-    var customizationArgValues = {};
-    for (var i = 0; i < $scope.widgetCustomizationArgs.length; i++) {
-      var cArg = $scope.widgetCustomizationArgs[i];
-      customizationArgValues[cArg.name] = cArg.value;
-    }
-
-    $scope.generateWidgetPreview($scope.widgetId, customizationArgValues);
-    $scope.updateStatesData();
+    $scope.tmpRule = null;
+    $scope.updateStateWidgetHandlerData();
     $scope.refreshGraph();
-
-    var activeStateName = editorContextService.getActiveStateName();
-    $scope.states[activeStateName].widget.widget_id = $scope.widgetId;
-    $scope.states[activeStateName].widget.customization_args = angular.copy(
-      $scope.widgetCustomizationArgs);
-
     $scope.resetInteractiveWidgetEditor();
-  };
-
-  $scope.generateTmpWidgetPreview = function() {
-    $scope.tmpWidget.tag = 'Loading...';
-    var argsForPost = {};
-    for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
-      argsForPost[$scope.tmpWidget.customization_args[i].name] =
-        $scope.tmpWidget.customization_args[i].value;
-    }
-    $http.post('/widgets/interactive/' + $scope.tmpWidget.widget_id, {
-      customization_args: argsForPost
-    }).success(function(data) {
-      $scope.tmpWidget.tag = data.tag;
-    });
   };
 
   $scope.setNewTmpWidget = function(widget) {
     $scope.tmpWidget = angular.copy(widget);
-  };
-
-  $scope.resetInteractiveWidgetEditor = function() {
-    $scope.interactiveWidgetEditorIsShown = false;
-    $scope.tmpWidget = null;
-    $scope.widgetIdMemento = null;
-    $scope.stateCustomizationArgsMemento = null;
-    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+    for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
+      $scope.tmpWidget.customization_args[i].value = $scope.tmpWidget.customization_args[i].default_value;
+    }
   };
 
   $scope.createTmpRule = function() {
@@ -286,13 +281,13 @@ oppia.controller('StateInteraction', [
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'widget_handlers',
         angular.copy(newHandlers), angular.copy(oldHandlers));
-      $scope.updateStatesData();
+      $scope.updateStateWidgetHandlerData();
       $scope.refreshGraph();
       $scope.widgetHandlersMemento = angular.copy(newHandlers);
     }
   };
 
-  $scope.updateStatesData = function() {
+  $scope.updateStateWidgetHandlerData = function() {
     // Updates $scope.states from $scope.widgetHandlers.
     var activeStateName = editorContextService.getActiveStateName();
     var stateDict = $scope.states[activeStateName];

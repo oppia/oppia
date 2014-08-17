@@ -27,7 +27,7 @@
 {% endblock %}
 
 {% block line2 %}
-  <div class="row" ng-if="widgetId != 'Continue' && editabilityService.isEditable()">
+  <div class="row" ng-if="getCurrentWidgetId() != 'Continue' && editabilityService.isEditable()">
     <div class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
       <div ng-if="!tmpRule">
         <button type="button" class="btn btn-default oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
