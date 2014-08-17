@@ -142,18 +142,9 @@ oppia.controller('FormBuilderTests', [
       }
     },
     value: {
-      a_boolean: {
-        type: 'raw',
-        data: false
-      },
+      a_boolean: false,
       a_unicode_string: 'abc',
-      a_list: [{
-        type: 'raw',
-        data: 2
-      }, {
-        type: 'raw',
-        data: 3
-      }]
+      a_list: [2, 3]
     }
   }, {
     name: 'List of unicode strings',
@@ -173,12 +164,26 @@ oppia.controller('FormBuilderTests', [
       },
       len: 2
     },
+    value: [1.0, -3.0]
+  }, {
+    name: 'List of complex items',
+    schema: {
+      type: 'list',
+      items: {
+        type: 'dict',
+        properties: {
+          intField: {
+            type: 'int',
+          },
+          htmlField: {
+            type: 'html'
+          }
+        }
+      }
+    },
     value: [{
-      type: 'raw',
-      data: 1.0
-    }, {
-      type: 'raw',
-      data: -3.0
+      intField: 5,
+      htmlField: '<span><b>d</b>ef</span>'
     }]
   }, {
     name: 'Nested lists',

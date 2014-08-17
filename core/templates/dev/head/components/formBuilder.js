@@ -301,6 +301,14 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       };
 
       var rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
+      $scope.currentlyEditing = false;
+      $scope.$watch('localValue', function(newValue, oldValue) {
+        if (!$scope.currentlyEditing) {
+          // This is an external change.
+          rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
+          $(rteNode).wysiwyg('setContent', rteContentMemento);
+        }
+      }, true);
 
       $scope._normalizeRteContent = function(content) {
         // TODO(sll): Write this method to validate rather than just normalize.
@@ -379,7 +387,12 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
               // progress' errors which get triggered if a parameter was edited.
               $timeout(function() {
                 $scope.$apply(function() {
+                  $scope.currentlyEditing = true;
                   $scope.localValue = $scope._convertRteToUnicode(normalizedContent);
+                  // TODO(sll): This is a somewhat hacky solution. Can it be cleaned up?
+                  $timeout(function() {
+                    $scope.currentlyEditing = false;
+                  }, 5000);
                 });
               });
 
@@ -437,7 +450,13 @@ oppia.factory('schemaDefaultValueService', [function() {
       } else if (schema.type === 'list') {
         return [];
       } else if (schema.type === 'dict') {
-        return {};
+        var result = {};
+        for (var key in schema.properties) {
+          result[key] = this.getDefaultValue(schema.properties[key]);
+        }
+        return result;
+      } else if (schema.type === 'int' || schema.type === 'float') {
+        return 0;
       } else {
         console.error('Invalid schema type: ' + schema.type);
       }
