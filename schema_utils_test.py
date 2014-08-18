@@ -47,6 +47,40 @@ ALLOWED_SCHEMA_TYPES = [
     SCHEMA_TYPE_BOOL, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT, SCHEMA_TYPE_HTML,
     SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 
+# Schemas for the UI config for the various types.
+# Note to developers: please keep this in sync with
+#     https://code.google.com/p/oppia/wiki/SchemaBasedFormsDesignDoc
+UI_CONFIG_SPECS = {
+    SCHEMA_TYPE_BOOL: {},
+    SCHEMA_TYPE_DICT: {},
+    SCHEMA_TYPE_FLOAT: {},
+    SCHEMA_TYPE_HTML: {},
+    SCHEMA_TYPE_INT: {},
+    SCHEMA_TYPE_LIST: {
+        'add_element_text': {
+            'type': SCHEMA_TYPE_UNICODE
+        }
+    },
+    SCHEMA_TYPE_UNICODE: {
+        'rows': {
+            'type': SCHEMA_TYPE_INT,
+            'post_normalizers': [{
+                'id': 'require_at_least',
+                'min_value': 1,
+            }]
+        }
+    },
+}
+
+
+def _validate_ui_config(obj_type, ui_config):
+    """Validates the value of a UI configuration."""
+    reference_dict = UI_CONFIG_SPECS[obj_type]
+    assert set(reference_dict.keys()) <= set(ui_config.keys())
+    for key, value in ui_config.iteritems():
+        schema_utils.normalize_against_schema(
+            value, reference_dict[key])
+
 
 def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
     """Checks that all of the required keys, and possibly some of the optional
@@ -113,9 +147,14 @@ def validate_schema(schema):
     else:
         _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
+    if SCHEMA_KEY_UI_CONFIG in schema:
+        _validate_ui_config(
+            schema[SCHEMA_KEY_TYPE], schema[SCHEMA_KEY_UI_CONFIG])
+
     if SCHEMA_KEY_CHOICES in schema and SCHEMA_KEY_POST_NORMALIZERS in schema:
         raise AssertionError(
-            'Schema cannot contain both a \'choices\' and a \'post_normalizers\' key.')
+            'Schema cannot contain both a \'choices\' and a '
+            '\'post_normalizers\' key.')
 
     if SCHEMA_KEY_POST_NORMALIZERS in schema:
         assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list)
