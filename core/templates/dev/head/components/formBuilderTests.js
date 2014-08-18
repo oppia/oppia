@@ -124,6 +124,7 @@ oppia.controller('FormBuilderTests', [
       type: 'dict',
       properties: [{
         name: 'a_unicode_string_appearing_first',
+        description: 'First field.',
         schema: {
           type: 'unicode',
           post_normalizers: [{
@@ -133,6 +134,7 @@ oppia.controller('FormBuilderTests', [
         }
       }, {
         name: 'a_list_appearing_second',
+        description: 'Second field.',
         schema: {
           type: 'list',
           items: {
@@ -141,6 +143,7 @@ oppia.controller('FormBuilderTests', [
         }
       }, {
         name: 'a_boolean_appearing_last',
+        description: 'Third field.',
         schema: {
           type: 'bool'
         }
@@ -152,11 +155,17 @@ oppia.controller('FormBuilderTests', [
       a_list_appearing_second: [2, 3]
     }
   }, {
-    name: 'List of unicode strings',
+    name: 'List of unicode textareas with custom \'add element\' text',
     schema: {
       type: 'list',
       items: {
-        type: 'unicode'
+        type: 'unicode',
+        ui_config: {
+          rows: 5
+        }
+      },
+      ui_config: {
+        add_element_text: '[Custom \'add element\' text]'
       }
     },
     value: ['abc', 'def', 'ghi']
@@ -171,7 +180,7 @@ oppia.controller('FormBuilderTests', [
     },
     value: [1.0, -3.0]
   }, {
-    name: 'List of complex items',
+    name: 'List of complex items (no descriptions in the dicts)',
     schema: {
       type: 'list',
       items: {

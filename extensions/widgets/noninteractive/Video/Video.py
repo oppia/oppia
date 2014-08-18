@@ -32,7 +32,10 @@ class Video(widget_domain.BaseWidget):
             'The YouTube id for this video. This is the 11-character string '
             'after \'v=\' in the video URL.'),
         'schema': {
-            'type': 'unicode'
+            'type': 'unicode',
+            'post_normalizers': [{
+                'id': 'require_nonempty',
+            }]
         },
         'default_value': '',
     }, {

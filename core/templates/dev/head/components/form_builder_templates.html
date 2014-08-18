@@ -21,13 +21,13 @@
   <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
   </schema-based-float-editor>
 
-  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers">
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers" ui-config="schema().ui_config">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" mode="mode">
   </schema-based-html-editor>
 
-  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len">
+  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config">
   </schema-based-list-editor>
 
   <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
@@ -109,7 +109,9 @@
       </unicode-with-parameters-editor>
     </span>
     <span ng-if="!doUnicodeParamsExist">
-      <input type="text" ng-model="$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
+      <textarea ng-if="getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()"></textarea>
+
+      <input ng-if="!getRows()" type="text" ng-model="$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
     </span>
   </span>
 
@@ -134,9 +136,11 @@
     <div ng-repeat="property in propertySchemas()">
       <div class="form-group">
         <!-- TODO(sll): Add a 'for' attribute to the label tag. -->
-        <label><[property.name]></label>
-        <schema-builder schema="property.schema" mode="mode" local-value="localValue[property.name]">
-        </schema-builder>
+        <label><[getHumanReadablePropertyDescription(property)]></label>
+        <div>
+          <schema-builder schema="property.schema" mode="mode" local-value="localValue[property.name]">
+          </schema-builder>
+        </div>
       </div>
     </div>
   </form>
@@ -160,7 +164,7 @@
   </table>
 
   <button ng-if="mode != $root.FORM_BUILDER_MODES.READONLY && !len" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
-    Add element
+    <[addElementText]>
   </button>
 </script>
 

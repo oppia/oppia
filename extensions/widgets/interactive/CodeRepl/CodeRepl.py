@@ -40,6 +40,9 @@ class CodeRepl(widget_domain.BaseWidget):
         'description': 'Code to prepend to the reader\'s submission.',
         'schema': {
             'type': 'unicode',
+            'ui_config': {
+                'rows': 6,
+            }
         },
         'default_value': ''
     }, {
@@ -47,6 +50,9 @@ class CodeRepl(widget_domain.BaseWidget):
         'description': 'Code to append after the reader\'s submission.',
         'schema': {
             'type': 'unicode',
+            'ui_config': {
+                'rows': 6,
+            }
         },
         'default_value': ''
     }]

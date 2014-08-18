@@ -22,6 +22,9 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
             'type': 'list',
             'items': {
                 'type': 'html',
+            },
+            'ui_config': {
+                'add_element_text': 'Add multiple choice option',
             }
         },
         'default_value': ['Default choice'],

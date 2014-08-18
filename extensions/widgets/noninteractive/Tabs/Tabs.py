@@ -5,6 +5,7 @@ TAB_CONTENT_SCHEMA = {
     'type': 'dict',
     'properties': [{
         'name': 'title',
+        'description': 'Tab title',
         'schema': {
             'type': 'unicode',
             'post_normalizers': [{
@@ -13,6 +14,7 @@ TAB_CONTENT_SCHEMA = {
         }
     }, {
         'name': 'content',
+        'description': 'Tab content',
         'schema': {
             'type': 'html',
         }

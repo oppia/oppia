@@ -795,7 +795,8 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
       localValue: '=',
       // The mode in which to display the form. Should be treated as read-only.
       mode: '=',
-      postNormalizers: '&'
+      postNormalizers: '&',
+      uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
@@ -803,6 +804,19 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
         function($scope, $filter, $sce, parameterSpecsService) {
       $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType('unicode');
       $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
+
+      if ($scope.uiConfig() && $scope.uiConfig().rows && $scope.doUnicodeParamsExist) {
+        $scope.doUnicodeParamsExist = false;
+        console.log('Multi-row unicode fields with parameters are not currently supported.');
+      }
+
+      $scope.getRows = function() {
+        if (!$scope.uiConfig()) {
+          return null;
+        } else {
+          return $scope.uiConfig().rows;
+        }
+      };
 
       $scope.getDisplayedValue = function() {
         return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')($scope.localValue));
@@ -837,12 +851,19 @@ oppia.directive('schemaBasedListEditor', [
       // Read-only property. The schema definition for each item in the list.
       itemSchema: '&',
       // The length of the list. If not specified, the list is of arbitrary length.
-      len: '='
+      len: '=',
+      // UI configuration. May be undefined.
+      uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
+      $scope.addElementText = 'Add element';
+      if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
+        $scope.addElementText = $scope.uiConfig().add_element_text;
+      }
+
       if ($scope.len === undefined) {
         $scope.addElement = function() {
           $scope.localValue.push(
@@ -877,6 +898,11 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
     },
     templateUrl: 'schemaBasedEditor/dict',
     restrict: 'E',
-    compile: recursionHelper.compile
+    compile: recursionHelper.compile,
+    controller: ['$scope', function($scope) {
+      $scope.getHumanReadablePropertyDescription = function(property) {
+        return property.description || '[' + property.name + ']';
+      };
+    }]
   };
 }]);

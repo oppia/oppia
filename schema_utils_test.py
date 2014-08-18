@@ -30,6 +30,11 @@ SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
 SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
 SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
 SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
+SCHEMA_KEY_DESCRIPTION = 'description'
+SCHEMA_KEY_UI_CONFIG = 'ui_config'
+# The following keys are always accepted as optional keys in any schema.
+OPTIONAL_SCHEMA_KEYS = [
+    SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG]
 
 SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
@@ -83,7 +88,7 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_ITEMS, SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_LEN, SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS])
+            OPTIONAL_SCHEMA_KEYS + [SCHEMA_KEY_LEN])
 
         validate_schema(schema[SCHEMA_KEY_ITEMS])
         if SCHEMA_KEY_LEN in schema:
@@ -93,17 +98,20 @@ def validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_PROPERTIES, SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS])
+            OPTIONAL_SCHEMA_KEYS)
 
         assert isinstance(schema[SCHEMA_KEY_PROPERTIES], list)
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
-            _validate_dict_keys(prop, [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA], [])
+            _validate_dict_keys(
+                prop,
+                [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
+                [SCHEMA_KEY_DESCRIPTION])
             assert isinstance(prop[SCHEMA_KEY_NAME], basestring)
             validate_schema(prop[SCHEMA_KEY_SCHEMA])
+            if SCHEMA_KEY_DESCRIPTION in prop:
+                assert isinstance(prop[SCHEMA_KEY_DESCRIPTION], basestring)
     else:
-        _validate_dict_keys(
-            schema, [SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS])
+        _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
 
     if SCHEMA_KEY_CHOICES in schema and SCHEMA_KEY_POST_NORMALIZERS in schema:
         raise AssertionError(
