@@ -32,14 +32,17 @@ oppia.directive('oppiaInteractiveGraphInput', [
 
         var testGraph = {
           "vertices":  [
-            {"x": 50, "y": 50},
-            {"x": 100, "y": 50},
-            {"x": 50, "y": 100}
+            {"x": 50, "y": 50, "label": ""},
+            {"x": 100, "y": 50, "label": ""},
+            {"x": 50, "y": 100, "label": ""}
           ],
           "edges":  [
-            {"src": 0, "dst": 1}, 
-            {"src": 0, "dst": 2}
-          ]
+            {"src": 0, "dst": 1, "weight": 1}, 
+            {"src": 0, "dst": 2, "weight": 1}
+          ],
+          "isLabeled": false,
+          "isDirected": false,
+          "isWeighted": false
         };
         
         //Updates graph using json in input field
