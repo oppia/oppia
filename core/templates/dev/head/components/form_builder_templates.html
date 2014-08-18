@@ -131,11 +131,11 @@
 
 <script type="text/ng-template" id="schemaBasedEditor/dict">
   <form role="form">
-    <div ng-repeat="(key, schema) in propertySchemas()">
+    <div ng-repeat="property in propertySchemas()">
       <div class="form-group">
         <!-- TODO(sll): Add a 'for' attribute to the label tag. -->
-        <label><[key]></label>
-        <schema-builder schema="schema" mode="mode" local-value="localValue[key]">
+        <label><[property.name]></label>
+        <schema-builder schema="property.schema" mode="mode" local-value="localValue[property.name]">
         </schema-builder>
       </div>
     </div>

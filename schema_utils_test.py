@@ -28,6 +28,8 @@ SCHEMA_KEY_PROPERTIES = schema_utils.SCHEMA_KEY_PROPERTIES
 SCHEMA_KEY_TYPE = schema_utils.SCHEMA_KEY_TYPE
 SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
 SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
+SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
+SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
 
 SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
@@ -93,9 +95,11 @@ def validate_schema(schema):
             [SCHEMA_KEY_PROPERTIES, SCHEMA_KEY_TYPE],
             [SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS])
 
+        assert isinstance(schema[SCHEMA_KEY_PROPERTIES], list)
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
-            assert isinstance(prop, basestring)
-            validate_schema(schema[SCHEMA_KEY_PROPERTIES][prop])
+            _validate_dict_keys(prop, [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA], [])
+            assert isinstance(prop[SCHEMA_KEY_NAME], basestring)
+            validate_schema(prop[SCHEMA_KEY_SCHEMA])
     else:
         _validate_dict_keys(
             schema, [SCHEMA_KEY_TYPE],
@@ -167,11 +171,12 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'type': 'bool'
         }, {
             'type': 'dict',
-            'properties': {
-                'str_property': {
+            'properties': [{
+                'name': 'str_property',
+                'schema': {
                     'type': 'unicode'
                 }
-            }
+            }]
         }, {
             'type': 'list',
             'items': {
@@ -258,25 +263,31 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     def test_dict_schema(self):
         schema = {
             'type': schema_utils.SCHEMA_TYPE_DICT,
-            'properties': {
-                'unicodeListProp': {
+            'properties': [{
+                'name': 'unicodeListProp',
+                'schema': {
                     'type': schema_utils.SCHEMA_TYPE_LIST,
                     'items': {
                         'type': schema_utils.SCHEMA_TYPE_UNICODE
                     }
                 },
-                'intProp': {
+            }, {
+                'name': 'intProp',
+                'schema': {
                     'type': schema_utils.SCHEMA_TYPE_INT
                 },
-                'dictProp': {
+            }, {
+                'name': 'dictProp',
+                'schema': {
                     'type': schema_utils.SCHEMA_TYPE_DICT,
-                    'properties': {
-                        'floatProp': {
+                    'properties': [{
+                        'name': 'floatProp',
+                        'schema': {
                             'type': schema_utils.SCHEMA_TYPE_FLOAT
                         }
-                    }
+                    }]
                 }
-            }
+            }]
         }
 
         mappings = [({

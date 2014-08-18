@@ -167,13 +167,29 @@ oppia.directive('richTextEditor', [
           });
         };
 
+        $scope.currentlyEditing = false;
+        $scope.$watch('htmlContent', function(newValue, oldValue) {
+          if ($scope.hasFullyLoaded && !$scope.currentlyEditing) {
+            // This is an external change.
+            console.log($scope.htmlContent);
+            $scope.rteContent = $scope._convertHtmlToRte(newValue);
+            $(rteNode).wysiwyg('setContent', $scope.rteContent);
+          }
+        });
+
         $scope._saveContent = function() {
           var content = $(rteNode).wysiwyg('getContent');
           if (content !== null && content !== undefined) {
-            $scope.htmlContent = $scope._convertRteToHtml(content);
             // The following $timeout removes the '$apply in progress' errors.
             $timeout(function() {
-              $scope.$apply();
+              $scope.$apply(function() {
+                $scope.currentlyEditing = true;
+                $scope.htmlContent = $scope._convertRteToHtml(content);
+                // TODO(sll): This is a somewhat hacky solution. Can it be cleaned up?
+                $timeout(function() {
+                  $scope.currentlyEditing = false;
+                }, 50);
+              });
             });
           }
         };

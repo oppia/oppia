@@ -3,17 +3,20 @@ from core.domain import widget_domain
 
 TAB_CONTENT_SCHEMA = {
     'type': 'dict',
-    'properties': {
-        'title': {
+    'properties': [{
+        'name': 'title',
+        'schema': {
             'type': 'unicode',
             'post_normalizers': [{
                 'id': 'require_nonempty'
             }]
-        },
-        'content': {
+        }
+    }, {
+        'name': 'content',
+        'schema': {
             'type': 'html',
         }
-    }
+    }]
 }
 
 

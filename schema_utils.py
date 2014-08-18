@@ -40,6 +40,8 @@ SCHEMA_KEY_PROPERTIES = 'properties'
 SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
 SCHEMA_KEY_CHOICES = 'choices'
+SCHEMA_KEY_NAME = 'name'
+SCHEMA_KEY_SCHEMA = 'schema'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_DICT = 'dict'
@@ -69,12 +71,15 @@ def normalize_against_schema(obj, schema):
         normalized_obj = obj
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
-        assert set(obj.keys()) == set(schema[SCHEMA_KEY_PROPERTIES].keys())
-        normalized_obj = {
-            key: normalize_against_schema(
-                obj[key], schema[SCHEMA_KEY_PROPERTIES][key])
-            for key in schema[SCHEMA_KEY_PROPERTIES]
-        }
+        expected_dict_keys = [
+            p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
+        assert set(obj.keys()) == set(expected_dict_keys)
+
+        normalized_obj = {}
+        for prop in schema[SCHEMA_KEY_PROPERTIES]:
+            key = prop[SCHEMA_KEY_NAME]
+            normalized_obj[key] = normalize_against_schema(
+                obj[key], prop[SCHEMA_KEY_SCHEMA])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         obj = float(obj)
         assert isinstance(obj, numbers.Real), (

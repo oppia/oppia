@@ -122,29 +122,34 @@ oppia.controller('FormBuilderTests', [
     name: 'Dict with a bool, a unicode string and a list of ints. The string must be either \'abc\' or \'def\'.',
     schema: {
       type: 'dict',
-      properties: {
-        a_boolean: {
-          type: 'bool'
-        },
-        a_unicode_string: {
+      properties: [{
+        name: 'a_unicode_string_appearing_first',
+        schema: {
           type: 'unicode',
           post_normalizers: [{
             id: 'require_is_one_of',
             choices: ['abc', 'def']
           }]
-        },
-        a_list: {
+        }
+      }, {
+        name: 'a_list_appearing_second',
+        schema: {
           type: 'list',
           items: {
             type: 'int'
           }
         }
-      }
+      }, {
+        name: 'a_boolean_appearing_last',
+        schema: {
+          type: 'bool'
+        }
+      }]
     },
     value: {
-      a_boolean: false,
-      a_unicode_string: 'abc',
-      a_list: [2, 3]
+      a_boolean_appearing_last: false,
+      a_unicode_string_appearing_first: 'abc',
+      a_list_appearing_second: [2, 3]
     }
   }, {
     name: 'List of unicode strings',
@@ -171,14 +176,17 @@ oppia.controller('FormBuilderTests', [
       type: 'list',
       items: {
         type: 'dict',
-        properties: {
-          intField: {
+        properties: [{
+          name: 'intField',
+          schema: {
             type: 'int',
-          },
-          htmlField: {
+          }
+        }, {
+          name: 'htmlField',
+          schema: {
             type: 'html'
           }
-        }
+        }]
       }
     },
     value: [{

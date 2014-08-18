@@ -392,7 +392,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
                   // TODO(sll): This is a somewhat hacky solution. Can it be cleaned up?
                   $timeout(function() {
                     $scope.currentlyEditing = false;
-                  }, 5000);
+                  }, 50);
                 });
               });
 
@@ -451,8 +451,8 @@ oppia.factory('schemaDefaultValueService', [function() {
         return [];
       } else if (schema.type === 'dict') {
         var result = {};
-        for (var key in schema.properties) {
-          result[key] = this.getDefaultValue(schema.properties[key]);
+        for (var i = 0; i < schema.properties.length; i++) {
+          result[schema.properties[i].name] = this.getDefaultValue(schema.properties[i].schema);
         }
         return result;
       } else if (schema.type === 'int' || schema.type === 'float') {
