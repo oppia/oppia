@@ -87,7 +87,6 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'name': 'placeholder',
             'description': 'The placeholder for the text input field.',
             'schema': {'type': 'unicode'},
-            'custom_editor': None,
             'default_value': 'Type your answer here.',
         }, {
             'name': 'rows',
@@ -100,7 +99,6 @@ class WidgetUnitTests(test_utils.GenericTestBase):
                     'id': 'require_at_most', 'max_value': 200
                 }]
             },
-            'custom_editor': None,
             'default_value': 1,
         }])
 
@@ -157,12 +155,116 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 widget_list[widget_name].icon_data_url
             )
 
-    def test_default_widgets_are_valid(self):
-        """Test the default widgets."""
-        bindings = widget_registry.Registry.interactive_widgets
+    def _validate_customization_arg_specs(self, customization_args):
+        for ca_spec in customization_args:
+            self.assertEqual(set(ca_spec.keys()), set([
+                'name', 'description', 'schema', 'default_value']))
 
-        # TODO(sll): These tests ought to include non-interactive widgets as
-        # well.
+            self.assertTrue(isinstance(ca_spec['name'], basestring))
+            self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
+            self.assertTrue(isinstance(ca_spec['description'], basestring))
+            self.assertGreater(len(ca_spec['description']), 0)
+
+            schema_utils_test.validate_schema(ca_spec['schema'])
+            self.assertEqual(
+                ca_spec['default_value'],
+                schema_utils.normalize_against_schema(
+                    ca_spec['default_value'], ca_spec['schema']))
+
+            if ca_spec['schema']['type'] == 'custom':
+                obj_class = obj_services.Registry.get_object_class_by_type(
+                    ca_spec['schema']['obj_type'])
+                self.assertIsNotNone(obj_class.edit_html_filename)
+                self.assertIsNotNone(obj_class.edit_js_filename)
+                self.assertEqual(
+                    ca_spec['default_value'],
+                    obj_class.normalize(ca_spec['default_value']))
+
+    def _validate_widget_dependencies(self, dependency_ids):
+        # Check that all dependency ids are valid.
+        for dependency_id in dependency_ids:
+            dependency_registry.Registry.get_dependency_html(dependency_id)
+
+    def test_default_noninteractive_widgets_are_valid(self):
+        """Test that the default noninteractive widgets are valid."""
+        noninteractive_bindings = (
+            widget_registry.Registry.noninteractive_widgets)
+
+        for widget_id in feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX]:
+            # Check that the widget_id name is valid.
+            self.assertTrue(self._is_camel_cased(widget_id))
+
+            # Check that the widget directory exists.
+            widget_dir = os.path.join(
+                feconf.NONINTERACTIVE_WIDGETS_DIR, widget_id)
+            self.assertTrue(os.path.isdir(widget_dir))
+
+            # In this directory there should be a config .py file, an
+            # html file, a JS file, and a .png file.
+            dir_contents = os.listdir(widget_dir)
+            self.assertLessEqual(len(dir_contents), 5)
+
+            optional_dirs_and_files_count = 0
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    widget_dir, '%s.pyc' % widget_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            self.assertEqual(
+                optional_dirs_and_files_count + 4, len(dir_contents),
+                dir_contents
+            )
+
+            py_file = os.path.join(widget_dir, '%s.py' % widget_id)
+            html_file = os.path.join(widget_dir, '%s.html' % widget_id)
+            js_file = os.path.join(widget_dir, '%s.js' % widget_id)
+            png_file = os.path.join(widget_dir, '%s.png' % widget_id)
+
+            self.assertTrue(os.path.isfile(py_file))
+            self.assertTrue(os.path.isfile(html_file))
+            self.assertTrue(os.path.isfile(js_file))
+            self.assertTrue(os.path.isfile(png_file))
+
+            js_file_content = utils.get_file_contents(js_file)
+            html_file_content = utils.get_file_contents(html_file)
+            self.assertIn('oppiaNoninteractive%s' % widget_id, js_file_content)
+            self.assertIn(
+                '<script type="text/ng-template" '
+                'id="noninteractiveWidget/%s"' % widget_id,
+                html_file_content)
+            self.assertNotIn('<script>', js_file_content)
+            self.assertNotIn('</script>', js_file_content)
+
+            WIDGET_CONFIG_SCHEMA = [
+                ('name', basestring), ('category', basestring),
+                ('description', basestring), ('_customization_arg_specs', list)
+            ]
+
+            widget = noninteractive_bindings[widget_id]
+
+            # Check that the specified widget id is the same as the class name.
+            self.assertTrue(widget_id, widget.__class__.__name__)
+
+            # Check that the configuration file contains the correct
+            # top-level keys, and that these keys have the correct types.
+            for item, item_type in WIDGET_CONFIG_SCHEMA:
+                self.assertTrue(isinstance(
+                    getattr(widget, item), item_type
+                ))
+                # The string attributes should be non-empty.
+                if item_type == basestring:
+                    self.assertTrue(getattr(widget, item))
+
+            self._validate_customization_arg_specs(
+                widget._customization_arg_specs)
+
+            self._validate_widget_dependencies(widget.dependency_ids)
+
+    def test_default_interactive_widgets_are_valid(self):
+        """Test that the default interactive widgets are valid."""
+        interactive_bindings = widget_registry.Registry.interactive_widgets
 
         for widget_id in feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]:
             # Check that the widget_id name is valid.
@@ -244,7 +346,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 ('_customization_arg_specs', list)
             ]
 
-            widget = bindings[widget_id]
+            widget = interactive_bindings[widget_id]
 
             # Check that the specified widget id is the same as the class name.
             self.assertTrue(widget_id, widget.__class__.__name__)
@@ -281,38 +383,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 'Widget %s has duplicate handler names' % widget_id
             )
 
-            for ca_spec in widget._customization_arg_specs:
-                CA_SPEC_KEYS = ['name', 'description', 'default_value',
-                                'schema', 'custom_editor']
-                for key in ca_spec:
-                    self.assertIn(key, CA_SPEC_KEYS)
+            self._validate_customization_arg_specs(
+                widget._customization_arg_specs)
 
-                self.assertTrue(isinstance(ca_spec['name'], basestring))
-                self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
-                self.assertTrue(isinstance(ca_spec['description'], basestring))
-                self.assertGreater(len(ca_spec['description']), 0)
-
-                # Exactly one of 'schema' or 'custom_editor' should be present.
-                self.assertTrue(
-                    'schema' in ca_spec or 'custom_editor' in ca_spec)
-                self.assertFalse(
-                    'schema' in ca_spec and 'custom_editor' in ca_spec)
-
-                if 'schema' in ca_spec:
-                    schema_utils_test.validate_schema(ca_spec['schema'])
-                    self.assertEqual(
-                        ca_spec['default_value'],
-                        schema_utils.normalize_against_schema(
-                            ca_spec['default_value'], ca_spec['schema']))
-                else:
-                    obj_class = obj_services.Registry.get_object_class_by_type(
-                        ca_spec['custom_editor'])
-                    self.assertIsNotNone(obj_class.edit_html_filename)
-                    self.assertIsNotNone(obj_class.edit_js_filename)
-                    self.assertEqual(
-                        ca_spec['default_value'],
-                        obj_class.normalize(ca_spec['default_value']))
-
-            # Check that all dependency ids are valid.
-            for dependency_id in widget.dependency_ids:
-                dependency_registry.Registry.get_dependency_html(dependency_id)
+            self._validate_widget_dependencies(widget.dependency_ids)

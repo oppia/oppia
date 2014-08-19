@@ -25,7 +25,10 @@ class Math(widget_domain.BaseWidget):
     _customization_arg_specs = [{
         'name': 'raw_latex',
         'description': 'The raw string to be displayed as LaTeX.',
-        'custom_editor': 'MathLatexString',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'MathLatexString',
+        },
         'default_value': '\\frac{x}{y}'
     }]
 

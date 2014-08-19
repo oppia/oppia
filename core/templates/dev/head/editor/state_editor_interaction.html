@@ -62,13 +62,9 @@
                   </accordion-heading>
                   <div ng-repeat="customizationArg in tmpWidget.customization_args">
                     <strong><[customizationArg.description]></strong>
-                    <div ng-if="customizationArg.schema">
+                    <div>
                       <schema-builder local-value="customizationArg.value" schema="customizationArg.schema" mode="FORM_BUILDER_MODES.ENABLED">
                       </schema-builder>
-                    </div>
-                    <div ng-if="!customizationArg.schema">
-                      <object-editor obj-type="<[customizationArg.custom_editor]>" value="customizationArg.value" always-editable="true">
-                      </object-editor>
                     </div>
                     <br>
                   </div>

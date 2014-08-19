@@ -21,7 +21,10 @@ class MusicNotesInput(widget_domain.BaseWidget):
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
         'description': 'The sequence of notes that the reader should guess.',
-        'custom_editor': 'MusicPhrase',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'MusicPhrase',
+        },
         'default_value': [],
     }]
 

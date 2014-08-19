@@ -906,3 +906,16 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
     }]
   };
 }]);
+
+oppia.directive('schemaBasedCustomEditor', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // The class of the object being edited.
+      objType: '&'
+    },
+    templateUrl: 'schemaBasedEditor/custom',
+    restrict: 'E',
+    compile: recursionHelper.compile
+  };
+}]);

@@ -32,6 +32,9 @@
 
   <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
   </schema-based-dict-editor>
+
+  <schema-based-custom-editor ng-if="schema().type === 'custom'" obj-type="schema().obj_type" local-value="$parent.localValue" mode="mode">
+  </schema-based-custom-editor>
 </script>
 
 
@@ -166,6 +169,12 @@
   <button ng-if="mode != $root.FORM_BUILDER_MODES.READONLY && !len" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
     <[addElementText]>
   </button>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/custom">
+  <object-editor obj-type="<[objType()]>" value="localValue" always-editable="true">
+  </object-editor>
 </script>
 
 

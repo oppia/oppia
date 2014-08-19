@@ -37,7 +37,7 @@ class Video(widget_domain.BaseWidget):
                 'id': 'require_nonempty',
             }]
         },
-        'default_value': '',
+        'default_value': 'dQw4w9WgXcQ',
     }, {
         'name': 'start',
         'description': (

@@ -42,17 +42,16 @@ SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
 SCHEMA_KEY_CHOICES = 'choices'
 SCHEMA_KEY_NAME = 'name'
 SCHEMA_KEY_SCHEMA = 'schema'
+SCHEMA_KEY_OBJ_TYPE = 'obj_type'
 
 SCHEMA_TYPE_BOOL = 'bool'
+SCHEMA_TYPE_CUSTOM = 'custom'
 SCHEMA_TYPE_DICT = 'dict'
 SCHEMA_TYPE_FLOAT = 'float'
 SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
-ALLOWED_SCHEMA_TYPES = [
-    SCHEMA_TYPE_BOOL, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT, SCHEMA_TYPE_HTML,
-    SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 
 
 def normalize_against_schema(obj, schema):
@@ -69,6 +68,14 @@ def normalize_against_schema(obj, schema):
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
+        # Importing this at the top of the file causes a circular dependency.
+        # TODO(sll): Either get rid of custom objects or find a way to merge
+        # them into the schema framework -- probably the latter.
+        from core.domain import obj_services
+        obj_class = obj_services.Registry.get_object_class_by_type(
+            schema[SCHEMA_KEY_OBJ_TYPE])
+        normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
         expected_dict_keys = [

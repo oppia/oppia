@@ -29,7 +29,10 @@ class Image(widget_domain.BaseWidget):
         'description': (
             'The name of the image file. (Allowed extensions: gif, jpeg, jpg, '
             'png.)'),
-        'custom_editor': 'Filepath',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'Filepath',
+        },
         'default_value': '',
     }]
 

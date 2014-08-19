@@ -37,7 +37,10 @@ class LogicProof(widget_domain.BaseWidget):
     _customization_arg_specs = [{
         'name': 'question',
         'description': 'Question to ask.',
-        'custom_editor': 'LogicQuestion',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'LogicQuestion',
+        },
         'default_value': {
             'assumptions': [{
                 'top_kind_name': 'variable',

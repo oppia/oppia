@@ -72,11 +72,9 @@ class AnswerHandler(object):
 class CustomizationArgSpec(object):
     """Value object for a widget customization arg specification."""
 
-    def __init__(self, name, description, default_value,
-                 custom_editor=None, schema=None):
+    def __init__(self, name, description, schema, default_value):
         self.name = name
         self.description = description
-        self.custom_editor = custom_editor
         self.schema = schema
         self.default_value = default_value
 
@@ -191,7 +189,6 @@ class BaseWidget(object):
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
-                'custom_editor': ca_spec.custom_editor,
             } for ca_spec in self.customization_arg_specs]
         }
 

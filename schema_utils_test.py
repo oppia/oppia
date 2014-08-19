@@ -30,6 +30,7 @@ SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
 SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
 SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
 SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
+SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
 # The following keys are always accepted as optional keys in any schema.
@@ -37,6 +38,7 @@ OPTIONAL_SCHEMA_KEYS = [
     SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG]
 
 SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
+SCHEMA_TYPE_CUSTOM = schema_utils.SCHEMA_TYPE_CUSTOM
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
 SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
@@ -44,8 +46,11 @@ SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
 ALLOWED_SCHEMA_TYPES = [
-    SCHEMA_TYPE_BOOL, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT, SCHEMA_TYPE_HTML,
-    SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
+    SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
+    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
+ALLOWED_CUSTOM_OBJ_TYPES = [
+    'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
+    'SanitizedUrl']
 
 # Schemas for the UI config for the various types.
 # Note to developers: please keep this in sync with
@@ -118,7 +123,13 @@ def validate_schema(schema):
     assert isinstance(schema, dict)
     assert SCHEMA_KEY_TYPE in schema
     assert schema[SCHEMA_KEY_TYPE] in ALLOWED_SCHEMA_TYPES
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
+    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
+        _validate_dict_keys(
+            schema,
+            [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
+            [])
+        assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_ITEMS, SCHEMA_KEY_TYPE],

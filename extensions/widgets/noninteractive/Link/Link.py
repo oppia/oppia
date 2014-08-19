@@ -21,7 +21,10 @@ class Link(widget_domain.BaseWidget):
         'name': 'url',
         'description': (
             'The URL for this link. It must start with http:// or https://'),
-        'custom_editor': 'SanitizedUrl',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'SanitizedUrl',
+        },
         'default_value': 'https://www.example.com',
     }, {
         'name': 'open_link_in_same_window',
