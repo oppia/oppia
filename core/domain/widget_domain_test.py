@@ -24,8 +24,10 @@ from core.domain import dependency_registry
 from core.domain import obj_services
 from core.domain import widget_domain
 from core.domain import widget_registry
+from core.tests import test_utils
 import feconf
-import test_utils
+import schema_utils
+import schema_utils_test
 import utils
 
 
@@ -59,57 +61,46 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text input')
 
-        self.assertIn('input ng-if="rows == 1"', widget.js_code)
+        self.assertIn('input ng-if="rows == 1"', widget.html_body)
 
-        tag = widget.get_interactive_widget_tag({}, {})
+        tag = widget.get_interactive_widget_tag({})
         self.assertEqual(
             '<oppia-interactive-text-input '
             'placeholder-with-value="&#34;Type your answer here.&#34;" '
             'rows-with-value="1">'
             '</oppia-interactive-text-input>', tag)
 
-        tag = widget.get_interactive_widget_tag(
-            {'placeholder': {'value': 'F4'}}, {})
+        tag = widget.get_interactive_widget_tag({
+            'placeholder': {'value': 'F4'}
+        })
         self.assertEqual(
             '<oppia-interactive-text-input '
             'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
             '</oppia-interactive-text-input>', tag)
 
-        tag = widget.get_interactive_widget_tag(
-            {'placeholder': {'value': '{{ntg}}', 'parse_with_jinja': True}},
-            {'ntg': 'F4'})
-        self.assertEqual(
-            '<oppia-interactive-text-input '
-            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
-            '</oppia-interactive-text-input>', tag)
-
-        parameterized_widget_dict = widget.get_widget_instance_dict(
-            {'placeholder': {'value': 'F4'}}, {}
-        )
-        self.assertItemsEqual(parameterized_widget_dict.keys(), [
-            'widget_id', 'name', 'category', 'description', 'params',
-            'handlers', 'customization_args', 'tag'])
-        self.assertEqual(
-            parameterized_widget_dict['widget_id'], TEXT_INPUT_ID)
-
-        self.assertDictContainsSubset({
-            'placeholder': {
-                'value': 'F4',
-                'description': 'The placeholder for the text input field.',
-                'obj_type': 'UnicodeString',
-                'generator_id': 'Copier',
-                'init_args': {},
-                'customization_args': {
-                    'value': 'F4',
-                }
-            }
-        }, parameterized_widget_dict['params'])
-
-        self.assertDictContainsSubset({
-            'placeholder': {
-                'value': 'F4',
-            }
-        }, parameterized_widget_dict['customization_args'])
+        widget_dict = widget.to_dict()
+        self.assertItemsEqual(widget_dict.keys(), [
+            'widget_id', 'name', 'category', 'description',
+            'handler_specs', 'customization_args', 'tag'])
+        self.assertEqual(widget_dict['widget_id'], TEXT_INPUT_ID)
+        self.assertEqual(widget_dict['customization_args'], [{
+            'name': 'placeholder',
+            'description': 'The placeholder for the text input field.',
+            'schema': {'type': 'unicode'},
+            'default_value': 'Type your answer here.',
+        }, {
+            'name': 'rows',
+            'description': 'The number of rows for the text input field.',
+            'schema': {
+                'type': 'int',
+                'post_normalizers': [{
+                    'id': 'require_at_least', 'min_value': 1
+                }, {
+                    'id': 'require_at_most', 'max_value': 200
+                }]
+            },
+            'default_value': 1,
+        }])
 
 
 class WidgetDataUnitTests(test_utils.GenericTestBase):
@@ -164,12 +155,116 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 widget_list[widget_name].icon_data_url
             )
 
-    def test_default_widgets_are_valid(self):
-        """Test the default widgets."""
-        bindings = widget_registry.Registry.interactive_widgets
+    def _validate_customization_arg_specs(self, customization_args):
+        for ca_spec in customization_args:
+            self.assertEqual(set(ca_spec.keys()), set([
+                'name', 'description', 'schema', 'default_value']))
 
-        # TODO(sll): These tests ought to include non-interactive widgets as
-        # well.
+            self.assertTrue(isinstance(ca_spec['name'], basestring))
+            self.assertTrue(self._is_alphanumeric_string(ca_spec['name']))
+            self.assertTrue(isinstance(ca_spec['description'], basestring))
+            self.assertGreater(len(ca_spec['description']), 0)
+
+            schema_utils_test.validate_schema(ca_spec['schema'])
+            self.assertEqual(
+                ca_spec['default_value'],
+                schema_utils.normalize_against_schema(
+                    ca_spec['default_value'], ca_spec['schema']))
+
+            if ca_spec['schema']['type'] == 'custom':
+                obj_class = obj_services.Registry.get_object_class_by_type(
+                    ca_spec['schema']['obj_type'])
+                self.assertIsNotNone(obj_class.edit_html_filename)
+                self.assertIsNotNone(obj_class.edit_js_filename)
+                self.assertEqual(
+                    ca_spec['default_value'],
+                    obj_class.normalize(ca_spec['default_value']))
+
+    def _validate_widget_dependencies(self, dependency_ids):
+        # Check that all dependency ids are valid.
+        for dependency_id in dependency_ids:
+            dependency_registry.Registry.get_dependency_html(dependency_id)
+
+    def test_default_noninteractive_widgets_are_valid(self):
+        """Test that the default noninteractive widgets are valid."""
+        noninteractive_bindings = (
+            widget_registry.Registry.noninteractive_widgets)
+
+        for widget_id in feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX]:
+            # Check that the widget_id name is valid.
+            self.assertTrue(self._is_camel_cased(widget_id))
+
+            # Check that the widget directory exists.
+            widget_dir = os.path.join(
+                feconf.NONINTERACTIVE_WIDGETS_DIR, widget_id)
+            self.assertTrue(os.path.isdir(widget_dir))
+
+            # In this directory there should be a config .py file, an
+            # html file, a JS file, and a .png file.
+            dir_contents = os.listdir(widget_dir)
+            self.assertLessEqual(len(dir_contents), 5)
+
+            optional_dirs_and_files_count = 0
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    widget_dir, '%s.pyc' % widget_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            self.assertEqual(
+                optional_dirs_and_files_count + 4, len(dir_contents),
+                dir_contents
+            )
+
+            py_file = os.path.join(widget_dir, '%s.py' % widget_id)
+            html_file = os.path.join(widget_dir, '%s.html' % widget_id)
+            js_file = os.path.join(widget_dir, '%s.js' % widget_id)
+            png_file = os.path.join(widget_dir, '%s.png' % widget_id)
+
+            self.assertTrue(os.path.isfile(py_file))
+            self.assertTrue(os.path.isfile(html_file))
+            self.assertTrue(os.path.isfile(js_file))
+            self.assertTrue(os.path.isfile(png_file))
+
+            js_file_content = utils.get_file_contents(js_file)
+            html_file_content = utils.get_file_contents(html_file)
+            self.assertIn('oppiaNoninteractive%s' % widget_id, js_file_content)
+            self.assertIn(
+                '<script type="text/ng-template" '
+                'id="noninteractiveWidget/%s"' % widget_id,
+                html_file_content)
+            self.assertNotIn('<script>', js_file_content)
+            self.assertNotIn('</script>', js_file_content)
+
+            WIDGET_CONFIG_SCHEMA = [
+                ('name', basestring), ('category', basestring),
+                ('description', basestring), ('_customization_arg_specs', list)
+            ]
+
+            widget = noninteractive_bindings[widget_id]
+
+            # Check that the specified widget id is the same as the class name.
+            self.assertTrue(widget_id, widget.__class__.__name__)
+
+            # Check that the configuration file contains the correct
+            # top-level keys, and that these keys have the correct types.
+            for item, item_type in WIDGET_CONFIG_SCHEMA:
+                self.assertTrue(isinstance(
+                    getattr(widget, item), item_type
+                ))
+                # The string attributes should be non-empty.
+                if item_type == basestring:
+                    self.assertTrue(getattr(widget, item))
+
+            self._validate_customization_arg_specs(
+                widget._customization_arg_specs)
+
+            self._validate_widget_dependencies(widget.dependency_ids)
+
+    def test_default_interactive_widgets_are_valid(self):
+        """Test that the default interactive widgets are valid."""
+        interactive_bindings = widget_registry.Registry.interactive_widgets
 
         for widget_id in feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]:
             # Check that the widget_id name is valid.
@@ -248,10 +343,10 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             WIDGET_CONFIG_SCHEMA = [
                 ('name', basestring), ('category', basestring),
                 ('description', basestring), ('_handlers', list),
-                ('_params', list)
+                ('_customization_arg_specs', list)
             ]
 
-            widget = bindings[widget_id]
+            widget = interactive_bindings[widget_id]
 
             # Check that the specified widget id is the same as the class name.
             self.assertTrue(widget_id, widget.__class__.__name__)
@@ -288,35 +383,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 'Widget %s has duplicate handler names' % widget_id
             )
 
-            for param in widget._params:
-                PARAM_KEYS = ['name', 'description', 'generator', 'init_args',
-                              'customization_args', 'obj_type']
-                for p in param:
-                    self.assertIn(p, PARAM_KEYS)
+            self._validate_customization_arg_specs(
+                widget._customization_arg_specs)
 
-                self.assertTrue(isinstance(param['name'], basestring))
-                self.assertTrue(self._is_alphanumeric_string(param['name']))
-                self.assertTrue(isinstance(param['description'], basestring))
-
-                # Check that the parmaeter description is non-empty.
-                self.assertTrue(param['description'])
-
-                # TODO(sll): Check that the generator is a subclass of
-                # BaseValueGenerator.
-
-                self.assertTrue(isinstance(param['init_args'], dict))
-                self.assertTrue(isinstance(param['customization_args'], dict))
-                self.assertTrue(isinstance(param['obj_type'], basestring))
-
-                # Ensure that this object type exists.
-                obj_services.Registry.get_object_class_by_type(
-                    param['obj_type'])
-
-            # Check that the default customization args result in
-            # parameters with the correct types.
-            for param in widget.params:
-                widget._get_widget_param_instances({}, {})
-
-            # Check that all dependency ids are valid.
-            for dependency_id in widget.dependency_ids:
-                dependency_registry.Registry.get_dependency_html(dependency_id)
+            self._validate_widget_dependencies(widget.dependency_ids)

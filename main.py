@@ -290,9 +290,6 @@ urls = [
     get_redirect_route(
         r'/widgetrepository/data/<widget_type>',
         widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
-    get_redirect_route(
-        r'/widgets/<widget_type>/<widget_id>', widgets.WidgetHandler,
-        'widget_handler'),
 
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),

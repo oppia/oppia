@@ -27,8 +27,18 @@ SCHEMA_KEY_LEN = schema_utils.SCHEMA_KEY_LEN
 SCHEMA_KEY_PROPERTIES = schema_utils.SCHEMA_KEY_PROPERTIES
 SCHEMA_KEY_TYPE = schema_utils.SCHEMA_KEY_TYPE
 SCHEMA_KEY_POST_NORMALIZERS = schema_utils.SCHEMA_KEY_POST_NORMALIZERS
+SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
+SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
+SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
+SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
+SCHEMA_KEY_DESCRIPTION = 'description'
+SCHEMA_KEY_UI_CONFIG = 'ui_config'
+# The following keys are always accepted as optional keys in any schema.
+OPTIONAL_SCHEMA_KEYS = [
+    SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG]
 
 SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
+SCHEMA_TYPE_CUSTOM = schema_utils.SCHEMA_TYPE_CUSTOM
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
 SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
 SCHEMA_TYPE_HTML = schema_utils.SCHEMA_TYPE_HTML
@@ -36,8 +46,45 @@ SCHEMA_TYPE_INT = schema_utils.SCHEMA_TYPE_INT
 SCHEMA_TYPE_LIST = schema_utils.SCHEMA_TYPE_LIST
 SCHEMA_TYPE_UNICODE = schema_utils.SCHEMA_TYPE_UNICODE
 ALLOWED_SCHEMA_TYPES = [
-    SCHEMA_TYPE_BOOL, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT, SCHEMA_TYPE_HTML,
-    SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
+    SCHEMA_TYPE_BOOL, SCHEMA_TYPE_CUSTOM, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT,
+    SCHEMA_TYPE_HTML, SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
+ALLOWED_CUSTOM_OBJ_TYPES = [
+    'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
+    'SanitizedUrl']
+
+# Schemas for the UI config for the various types.
+# Note to developers: please keep this in sync with
+#     https://code.google.com/p/oppia/wiki/SchemaBasedFormsDesignDoc
+UI_CONFIG_SPECS = {
+    SCHEMA_TYPE_BOOL: {},
+    SCHEMA_TYPE_DICT: {},
+    SCHEMA_TYPE_FLOAT: {},
+    SCHEMA_TYPE_HTML: {},
+    SCHEMA_TYPE_INT: {},
+    SCHEMA_TYPE_LIST: {
+        'add_element_text': {
+            'type': SCHEMA_TYPE_UNICODE
+        }
+    },
+    SCHEMA_TYPE_UNICODE: {
+        'rows': {
+            'type': SCHEMA_TYPE_INT,
+            'post_normalizers': [{
+                'id': 'require_at_least',
+                'min_value': 1,
+            }]
+        }
+    },
+}
+
+
+def _validate_ui_config(obj_type, ui_config):
+    """Validates the value of a UI configuration."""
+    reference_dict = UI_CONFIG_SPECS[obj_type]
+    assert set(reference_dict.keys()) <= set(ui_config.keys())
+    for key, value in ui_config.iteritems():
+        schema_utils.normalize_against_schema(
+            value, reference_dict[key])
 
 
 def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
@@ -53,7 +100,7 @@ def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
         'Extra keys: %s' % dict_to_check)
 
 
-def _validate_schema(schema):
+def validate_schema(schema):
     """Validates a schema.
 
     This is meant to be a utility function that should be used by tests to
@@ -76,13 +123,19 @@ def _validate_schema(schema):
     assert isinstance(schema, dict)
     assert SCHEMA_KEY_TYPE in schema
     assert schema[SCHEMA_KEY_TYPE] in ALLOWED_SCHEMA_TYPES
-    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
+    if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
+        _validate_dict_keys(
+            schema,
+            [SCHEMA_KEY_TYPE, SCHEMA_KEY_OBJ_TYPE],
+            [])
+        assert schema[SCHEMA_KEY_OBJ_TYPE] in ALLOWED_CUSTOM_OBJ_TYPES, schema
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_ITEMS, SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_LEN, SCHEMA_KEY_POST_NORMALIZERS])
+            OPTIONAL_SCHEMA_KEYS + [SCHEMA_KEY_LEN])
 
-        _validate_schema(schema[SCHEMA_KEY_ITEMS])
+        validate_schema(schema[SCHEMA_KEY_ITEMS])
         if SCHEMA_KEY_LEN in schema:
             assert isinstance(schema[SCHEMA_KEY_LEN], int)
             assert schema[SCHEMA_KEY_LEN] > 0
@@ -90,14 +143,29 @@ def _validate_schema(schema):
         _validate_dict_keys(
             schema,
             [SCHEMA_KEY_PROPERTIES, SCHEMA_KEY_TYPE],
-            [SCHEMA_KEY_POST_NORMALIZERS])
+            OPTIONAL_SCHEMA_KEYS)
 
+        assert isinstance(schema[SCHEMA_KEY_PROPERTIES], list)
         for prop in schema[SCHEMA_KEY_PROPERTIES]:
-            assert isinstance(prop, basestring)
-            _validate_schema(schema[SCHEMA_KEY_PROPERTIES][prop])
+            _validate_dict_keys(
+                prop,
+                [SCHEMA_KEY_NAME, SCHEMA_KEY_SCHEMA],
+                [SCHEMA_KEY_DESCRIPTION])
+            assert isinstance(prop[SCHEMA_KEY_NAME], basestring)
+            validate_schema(prop[SCHEMA_KEY_SCHEMA])
+            if SCHEMA_KEY_DESCRIPTION in prop:
+                assert isinstance(prop[SCHEMA_KEY_DESCRIPTION], basestring)
     else:
-        _validate_dict_keys(
-            schema, [SCHEMA_KEY_TYPE], [SCHEMA_KEY_POST_NORMALIZERS])
+        _validate_dict_keys(schema, [SCHEMA_KEY_TYPE], OPTIONAL_SCHEMA_KEYS)
+
+    if SCHEMA_KEY_UI_CONFIG in schema:
+        _validate_ui_config(
+            schema[SCHEMA_KEY_TYPE], schema[SCHEMA_KEY_UI_CONFIG])
+
+    if SCHEMA_KEY_CHOICES in schema and SCHEMA_KEY_POST_NORMALIZERS in schema:
+        raise AssertionError(
+            'Schema cannot contain both a \'choices\' and a '
+            '\'post_normalizers\' key.')
 
     if SCHEMA_KEY_POST_NORMALIZERS in schema:
         assert isinstance(schema[SCHEMA_KEY_POST_NORMALIZERS], list)
@@ -161,11 +229,12 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'type': 'bool'
         }, {
             'type': 'dict',
-            'properties': {
-                'str_property': {
+            'properties': [{
+                'name': 'str_property',
+                'schema': {
                     'type': 'unicode'
                 }
-            }
+            }]
         }, {
             'type': 'list',
             'items': {
@@ -181,10 +250,10 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
         }]
 
         for schema in VALID_SCHEMAS:
-            _validate_schema(schema)
+            validate_schema(schema)
         for schema in INVALID_SCHEMAS:
             with self.assertRaises((AssertionError, KeyError)):
-                _validate_schema(schema)
+                validate_schema(schema)
 
 
 class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
@@ -200,7 +269,7 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
           invalid_items: a list of values. Each of these is expected to raise
             an AssertionError when normalized.
         """
-        _validate_schema(schema)
+        validate_schema(schema)
 
         for raw_value, expected_value in mappings:
             self.assertEqual(
@@ -252,25 +321,31 @@ class SchemaNormalizationUnitTests(test_utils.GenericTestBase):
     def test_dict_schema(self):
         schema = {
             'type': schema_utils.SCHEMA_TYPE_DICT,
-            'properties': {
-                'unicodeListProp': {
+            'properties': [{
+                'name': 'unicodeListProp',
+                'schema': {
                     'type': schema_utils.SCHEMA_TYPE_LIST,
                     'items': {
                         'type': schema_utils.SCHEMA_TYPE_UNICODE
                     }
                 },
-                'intProp': {
+            }, {
+                'name': 'intProp',
+                'schema': {
                     'type': schema_utils.SCHEMA_TYPE_INT
                 },
-                'dictProp': {
+            }, {
+                'name': 'dictProp',
+                'schema': {
                     'type': schema_utils.SCHEMA_TYPE_DICT,
-                    'properties': {
-                        'floatProp': {
+                    'properties': [{
+                        'name': 'floatProp',
+                        'schema': {
                             'type': schema_utils.SCHEMA_TYPE_FLOAT
                         }
-                    }
+                    }]
                 }
-            }
+            }]
         }
 
         mappings = [({

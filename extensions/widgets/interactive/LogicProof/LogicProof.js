@@ -20,8 +20,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
       scope: {},
       templateUrl: 'interactiveWidget/LogicProof',
       controller: ['$scope', '$attrs', '$modal', function($scope, $attrs, $modal) {
-
-        $scope.localQuestionData = JSON.parse($attrs.questionWithValue);
+        $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj($attrs.questionWithValue);
 
         // This is the information about how to mark a question (e.g. the 
         // permited line templates) that is stored in defaultData.js within

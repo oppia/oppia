@@ -43,20 +43,14 @@ oppia.controller('FormBuilderTests', [
     schema: {
       type: 'bool'
     },
-    value: {
-      type: 'raw',
-      data: true
-    }
+    value: true
   }, {
     name: 'Boolean form with parameters',
     schema: {
       type: 'bool',
       allow_parameters: true
     },
-    value: {
-      type: 'parameter',
-      data: 'paramBool1'
-    }
+    value: 'paramBool1'
   }];
 
   $scope.intForms = [{
@@ -64,10 +58,7 @@ oppia.controller('FormBuilderTests', [
     schema: {
       type: 'int'
     },
-    value: {
-      type: 'raw',
-      data: 3
-    }
+    value: 3
   }, {
     // TODO(sll): Add test for bad initialization.
     name: 'Integer form with parameters',
@@ -75,10 +66,7 @@ oppia.controller('FormBuilderTests', [
       type: 'int',
       allow_parameters: true
     },
-    value: {
-      type: 'parameter',
-      data: 'paramInt1'
-    }
+    value: 'paramInt1'
   }];
 
   $scope.floatForms = [{
@@ -93,10 +81,7 @@ oppia.controller('FormBuilderTests', [
         max_value: 6.0
       }]
     },
-    value: {
-      type: 'raw',
-      data: 3.14
-    }
+    value: 3.14
   }, {
     name: 'Float form with parameters (value must be between -3 and 6)',
     schema: {
@@ -110,20 +95,14 @@ oppia.controller('FormBuilderTests', [
         max_value: 6.0
       }]
     },
-    value: {
-      type: 'raw',
-      data: 3.14
-    }
+    value: 3.14
   }];
 
   $scope.unicodeForms = [{
     name: 'Restricted unicode form; the value must be either a or b.',
     schema: {
       type: 'unicode',
-      post_normalizers: [{
-        id: 'require_is_one_of',
-        choices: ['a', 'b']
-      }]
+      choices: ['a', 'b']
     },
     value: 'a'
   }];
@@ -140,63 +119,83 @@ oppia.controller('FormBuilderTests', [
     name: 'Dict with a bool, a unicode string and a list of ints. The string must be either \'abc\' or \'def\'.',
     schema: {
       type: 'dict',
-      properties: {
-        a_boolean: {
-          type: 'bool'
-        },
-        a_unicode_string: {
+      properties: [{
+        name: 'a_unicode_string_appearing_first',
+        description: 'First field.',
+        schema: {
           type: 'unicode',
-          post_normalizers: [{
-            id: 'require_is_one_of',
-            choices: ['abc', 'def']
-          }]
-        },
-        a_list: {
+          choices: ['abc', 'def']
+        }
+      }, {
+        name: 'a_list_appearing_second',
+        description: 'Second field.',
+        schema: {
           type: 'list',
           items: {
             type: 'int'
           }
         }
-      }
+      }, {
+        name: 'a_boolean_appearing_last',
+        description: 'Third field.',
+        schema: {
+          type: 'bool'
+        }
+      }]
     },
     value: {
-      a_boolean: {
-        type: 'raw',
-        data: false
-      },
-      a_unicode_string: 'abc',
-      a_list: [{
-        type: 'raw',
-        data: 2
-      }, {
-        type: 'raw',
-        data: 3
-      }]
+      a_boolean_appearing_last: false,
+      a_unicode_string_appearing_first: 'abc',
+      a_list_appearing_second: [2, 3]
     }
   }, {
-    name: 'List of unicode strings',
+    name: 'List of unicode textareas with custom \'add element\' text',
     schema: {
       type: 'list',
       items: {
-        type: 'unicode'
+        type: 'unicode',
+        ui_config: {
+          rows: 5
+        }
+      },
+      ui_config: {
+        add_element_text: '[Custom \'add element\' text]'
       }
     },
     value: ['abc', 'def', 'ghi']
   }, {
-    name: 'Fixed-length list of 2 floats',
+    name: 'Fixed-length list of 2 multiple-choice floats',
     schema: {
       type: 'list',
       items: {
-        type: 'float'
+        type: 'float',
+        choices: [1.0, 0.0, -1.0, -2.0, -3.0]
       },
       len: 2
     },
+    value: [1.0, -3.0]
+  }, {
+    name: 'List of complex items (no descriptions in the dicts)',
+    schema: {
+      type: 'list',
+      items: {
+        type: 'dict',
+        properties: [{
+          name: 'intField',
+          schema: {
+            type: 'int',
+          }
+        }, {
+          name: 'htmlField',
+          schema: {
+            type: 'html'
+          }
+        }]
+      }
+    },
     value: [{
-      type: 'raw',
-      data: 1.0
-    }, {
-      type: 'raw',
-      data: -3.0
+      intField: 5,
+      htmlField: '<span><b>d</b>ef</span>'
     }]
   }, {
     name: 'Nested lists',

@@ -199,8 +199,8 @@ class ExplorationPage(EditorHandler):
                 widget_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
         widget_js_directives = (
-            widget_registry.Registry.get_noninteractive_widget_js() +
-            widget_registry.Registry.get_interactive_widget_js(
+            widget_registry.Registry.get_noninteractive_widget_html() +
+            widget_registry.Registry.get_interactive_widget_html(
                 all_interactive_widget_ids))
 
         self.values.update({
@@ -267,6 +267,11 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
+            'ALL_INTERACTIVE_WIDGETS': {
+                widget.id: widget.to_dict()
+                for widget in widget_registry.Registry.get_widgets_of_type(
+                    feconf.INTERACTIVE_PREFIX)
+            }
         }
 
         if feconf.SHOW_SKIN_CHOOSER:

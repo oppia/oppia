@@ -2,14 +2,7 @@ from core.domain import widget_domain
 
 
 class FileReadInput(widget_domain.BaseWidget):
-    """Definition of a widget.
-
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered when the default widgets are refreshed.
-    """
+    """Interactive widget for reading files."""
 
     # The human-readable name of the widget.
     name = 'File upload'
@@ -20,9 +13,9 @@ class FileReadInput(widget_domain.BaseWidget):
     # A description of the widget.
     description = 'A widget for uploading files.'
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = []
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = []
 
     # Actions that the reader can perform on this widget which trigger a
     # feedback interaction, and the associated input types. Interactive widgets

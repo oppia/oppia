@@ -80,7 +80,6 @@ describe('Normalizer tests', function() {
     'requireIsFloat',
     'requireAtLeast',
     'requireAtMost',
-    'requireIsOneOf',
     'requireNonempty'
   ];
 
@@ -128,17 +127,6 @@ describe('Normalizer tests', function() {
     expect(filter(-2, args)).toEqual(-2);
     expect(filter(-2.01, args)).toEqual(-2.01);
     expect(filter(-3, args)).toEqual(-3);
-  }));
-
-  it('should validate list containment', inject(function($filter) {
-    var filter = $filter('requireIsOneOf');
-    var args = {choices: ['abc', 'def']};
-    expect(filter('abc', args)).toEqual('abc');
-    expect(filter('def', args)).toEqual('def');
-    expect(filter('ghi', args)).toBeUndefined();
-    expect(filter('abcdef', args)).toBeUndefined();
-    expect(filter('abc def', args)).toBeUndefined();
-    expect(filter(' ', args)).toBeUndefined();
   }));
 
   it('should validate non-emptiness', inject(function($filter) {

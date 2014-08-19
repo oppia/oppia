@@ -33,35 +33,9 @@ class WidgetRepositoryHandler(base.BaseHandler):
         except Exception:
             raise self.PageNotFoundException
 
-        widgets = collections.defaultdict(list)
-        for widget in widget_list:
-            widgets[widget.category].append(
-                widget.get_widget_instance_dict({}, {}))
-
-        for category in widgets:
-            widgets[category].sort()
-
-        response = {'widgetRepository': widgets}
-
-        self.render_json(response)
-
-
-class WidgetHandler(base.BaseHandler):
-    """Returns instance dicts for individual widgets."""
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    def post(self, widget_type, widget_id):
-        """Handles POST requests for parameterized widgets."""
-
-        customization_args = self.payload.get('customization_args', {})
-
-        widget = widget_registry.Registry.get_widget_by_id(
-            widget_type, widget_id)
-
-        result = {
-            'widget': widget.get_widget_instance_dict(
-                customization_args, {}, preview_mode=True),
-        }
-
-        self.render_json(result)
+        self.render_json({
+            'widgetRepository': {
+                widget.id: widget.to_dict()
+                for widget in widget_list
+            }
+        })

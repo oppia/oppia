@@ -146,15 +146,16 @@ class ContributePage(base.BaseHandler):
     @base.require_registered_as_editor
     def get(self):
         """Handles GET requests."""
-        widget_js_directives = (
-            widget_registry.Registry.get_noninteractive_widget_js())
+        noninteractive_widget_html = (
+            widget_registry.Registry.get_noninteractive_widget_html())
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_CONTRIBUTE,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             'announcement': jinja2.utils.Markup(
                 CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT.value),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
+            'noninteractive_widget_html': jinja2.utils.Markup(
+                noninteractive_widget_html),
         })
         self.render_template('galleries/contribute.html')
 

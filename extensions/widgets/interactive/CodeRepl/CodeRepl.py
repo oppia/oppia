@@ -3,15 +3,7 @@ from extensions.value_generators.models import generators
 
 
 class CodeRepl(widget_domain.BaseWidget):
-    """Definition of a widget.
-
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered from apps/widget/models.py when the default widgets are
-    refreshed.
-    """
+    """Interactive widget that allows programs to be input."""
 
     # The human-readable name of the widget.
     name = 'Code REPL'
@@ -23,58 +15,46 @@ class CodeRepl(widget_domain.BaseWidget):
     description = (
         'Programming code widget with read-evaluate-print loop.')
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'language',
         'description': 'Programming language to evaluate the code in.',
-        'generator': generators.RestrictedCopier,
-        'init_args': {
+        'schema': {
+            'type': 'unicode',
             'choices': [
                 'coffeescript', 'javascript', 'lua', 'python', 'ruby',
                 'scheme',
-                # 'bloop', 'brainfuck', 'emoticon', 'forth', 'kaffeine',
-                # 'lolcode', 'move', 'qbasic', 'roy', 'traceur', 'unlambda'
             ]
         },
-        # These are the default args.
-        'customization_args': {
-            'value': 'coffeescript'
-        },
-        'obj_type': 'UnicodeString',
+        'default_value': 'python'
     }, {
         'name': 'placeholder',
         'description': 'The initial code displayed in the code input field.',
-        'generator': generators.Copier,
-        'init_args': {
-            'largeInput': True
+        'schema': {
+            'type': 'unicode',
         },
-        'customization_args': {
-            'value': '[Type your code here.]'
-        },
-        'obj_type': 'UnicodeString',
+        'default_value': '[Type your code here.]'
     }, {
         'name': 'preCode',
         'description': 'Code to prepend to the reader\'s submission.',
-        'generator': generators.Copier,
-        'init_args': {
-            'largeInput': True
+        'schema': {
+            'type': 'unicode',
+            'ui_config': {
+                'rows': 6,
+            }
         },
-        'customization_args': {
-            'value': ''
-        },
-        'obj_type': 'UnicodeString'
+        'default_value': ''
     }, {
         'name': 'postCode',
         'description': 'Code to append after the reader\'s submission.',
-        'generator': generators.Copier,
-        'init_args': {
-            'largeInput': True
+        'schema': {
+            'type': 'unicode',
+            'ui_config': {
+                'rows': 6,
+            }
         },
-        'customization_args': {
-            'value': ''
-        },
-        'obj_type': 'UnicodeString'
+        'default_value': ''
     }]
 
     # Actions that the reader can perform on this widget which trigger a

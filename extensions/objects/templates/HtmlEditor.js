@@ -31,6 +31,8 @@ oppia.directive('htmlEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
+      $scope.form = {};
+
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
       $scope.$watch('$parent.value', function(newValue, oldValue) {

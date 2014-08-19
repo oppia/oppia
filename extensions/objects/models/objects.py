@@ -186,12 +186,19 @@ class CodeEvaluation(BaseObject):
 
     SCHEMA = {
         'type': 'dict',
-        'properties': {
-            'code': UnicodeString.SCHEMA,
-            'output': UnicodeString.SCHEMA,
-            'evaluation': UnicodeString.SCHEMA,
-            'error': UnicodeString.SCHEMA,
-        }
+        'properties': [{
+            'name': 'code',
+            'schema': UnicodeString.SCHEMA,
+        }, {
+            'name': 'output',
+            'schema': UnicodeString.SCHEMA,
+        }, {
+            'name': 'evaluation',
+            'schema': UnicodeString.SCHEMA,
+        }, {
+            'name': 'error',
+            'schema': UnicodeString.SCHEMA,
+        }]
     }
 
 
@@ -263,48 +270,6 @@ class MathLatexString(BaseObject):
     SCHEMA = UnicodeString.SCHEMA
 
 
-class TabContent(BaseObject):
-    """Class for editing the content of a single tab.
-
-    The object is described by a dict with two keys: 'title' and 'content'.
-    These have types UnicodeString and Html respectively.
-    """
-
-    description = 'Content for a single tab.'
-    edit_html_filename = 'tab_content_editor'
-    edit_js_filename = 'TabContentEditor'
-
-    SCHEMA = {
-        'type': 'dict',
-        'properties': {
-            'title': {
-                'type': 'unicode',
-                'post_normalizers': [{
-                    'id': 'require_nonempty'
-                }]
-            },
-            'content': Html.SCHEMA,
-        }
-    }
-
-
-class ListOfTabContent(BaseObject):
-    """Class for editing the content of a tabbed view.
-
-    The object is described by a list of dicts, each representing a TabContent
-    object.
-    """
-
-    description = 'Content for a set of tabs.'
-    edit_html_filename = 'list_editor'
-    edit_js_filename = 'ListOfTabContentEditor'
-
-    SCHEMA = {
-        'type': 'list',
-        'items': TabContent.SCHEMA,
-    }
-
-
 class SanitizedUrl(BaseObject):
     """HTTP or HTTPS url string class."""
 
@@ -328,42 +293,40 @@ class MusicPhrase(BaseObject):
     edit_html_filename = 'music_phrase_editor'
     edit_js_filename = 'MusicPhraseEditor'
 
+    _FRACTION_PART_SCHEMA = {
+        'type': 'int',
+        'post_normalizers': [{
+            'id': 'require_at_least',
+            'min_value': 1
+        }]
+    }
+
     SCHEMA = {
         'type': 'list',
         'items': {
             'type': 'dict',
-            'properties': {
-                'readableNoteName': {
+            'properties': [{
+                'name': 'readableNoteName',
+                'schema': {
                     'type': 'unicode',
-                    'post_normalizers': [{
-                        'id': 'require_is_one_of',
-                        'choices': [
-                            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
-                            'D5', 'E5', 'F5', 'G5', 'A5'
-                        ]
-                    }]
-                },
-                'noteDuration': {
+                    'choices': [
+                        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
+                        'D5', 'E5', 'F5', 'G5', 'A5'
+                    ]
+                }
+            }, {
+                'name': 'noteDuration',
+                'schema': {
                     'type': 'dict',
-                    'properties': {
-                        'num': {
-                            'type': 'int',
-                            'post_normalizers': [{
-                                'id': 'require_at_least',
-                                'min_value': 1
-                            }]
-                        },
-                        'den': {
-                            'type': 'int',
-                            'post_normalizers': [{
-                                'id': 'require_at_least',
-                                'min_value': 1
-                            }]
-                        }
-                    }
-                },
-            }
-
+                    'properties': [{
+                        'name': 'num',
+                        'schema': _FRACTION_PART_SCHEMA
+                    }, {
+                        'name': 'den',
+                        'schema': _FRACTION_PART_SCHEMA
+                    }]
+                }
+            }],
         }
     }
 
@@ -464,11 +427,8 @@ class LogicErrorCategory(BaseObject):
 
     SCHEMA = {
         'type': 'unicode',
-        'post_normalizers': [{
-            'id': 'require_is_one_of',
-            'choices': [
-                'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
-                'target', 'mistake'
-            ]
-        }]
+        'choices': [
+            'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
+            'target', 'mistake'
+        ]
     }
