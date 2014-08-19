@@ -72,7 +72,10 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
     <div class="input-group">
-      <input ng-if="!editAsParameter" type="number" ng-model="$parent.$parent.localValue" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <span ng-if="!editAsParameter">
+        <input type="number" ng-model="$parent.$parent.localValue" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED" required>
+      </span>
+
       <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
 
       <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">

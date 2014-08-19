@@ -496,13 +496,6 @@ oppia.filter('requireAtMost', [function() {
 }]);
 
 
-oppia.filter('requireIsOneOf', [function() {
-  return function(input, args) {
-    return args.choices.indexOf(input) !== -1 ? input : undefined;
-  };
-}]);
-
-
 oppia.filter('requireNonempty', [function() {
   return function(input) {
     return input ? input : undefined;

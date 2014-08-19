@@ -60,14 +60,15 @@
                   <accordion-heading>
                     <a href="#">Customize</a>
                   </accordion-heading>
-                  <div ng-repeat="customizationArg in tmpWidget.customization_args">
-                    <strong><[customizationArg.description]></strong>
-                    <div>
-                      <schema-builder local-value="customizationArg.value" schema="customizationArg.schema" mode="FORM_BUILDER_MODES.ENABLED">
-                      </schema-builder>
+                  <form name="form.schemaForm">
+                    <div ng-repeat="customizationArg in tmpWidget.customization_args">
+                      <strong><[customizationArg.description]></strong>
+                      <div>
+                        <schema-builder local-value="customizationArg.value" schema="customizationArg.schema" mode="FORM_BUILDER_MODES.ENABLED">
+                        </schema-builder>
+                      </div>
                     </div>
-                    <br>
-                  </div>
+                  </form>
                 </accordion-group>
               </div>
             </accordion>
@@ -81,7 +82,7 @@
             <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
               Cancel
             </button>
-            <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)">
+            <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
               Use this interaction
             </button>
           </span>

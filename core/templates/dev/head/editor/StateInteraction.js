@@ -31,6 +31,7 @@ oppia.controller('StateInteraction', [
   $scope.accordionStatus = {
     isPreviewOpen: true
   };
+  $scope.form = {};
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.

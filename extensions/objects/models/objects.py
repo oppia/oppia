@@ -309,13 +309,10 @@ class MusicPhrase(BaseObject):
                 'name': 'readableNoteName',
                 'schema': {
                     'type': 'unicode',
-                    'post_normalizers': [{
-                        'id': 'require_is_one_of',
-                        'choices': [
-                            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
-                            'D5', 'E5', 'F5', 'G5', 'A5'
-                        ]
-                    }]
+                    'choices': [
+                        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5',
+                        'D5', 'E5', 'F5', 'G5', 'A5'
+                    ]
                 }
             }, {
                 'name': 'noteDuration',
@@ -430,11 +427,8 @@ class LogicErrorCategory(BaseObject):
 
     SCHEMA = {
         'type': 'unicode',
-        'post_normalizers': [{
-            'id': 'require_is_one_of',
-            'choices': [
-                'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
-                'target', 'mistake'
-            ]
-        }]
+        'choices': [
+            'parsing', 'typing', 'line', 'layout', 'variables', 'logic',
+            'target', 'mistake'
+        ]
     }

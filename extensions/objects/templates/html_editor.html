@@ -21,18 +21,19 @@
   </div>
 
   <div class="modal-body">
-    <div ng-repeat="customizationArg in customizationArgsList">
-      <strong><[customizationArg.description]></strong>
-      <div>
-        <schema-builder local-value="customizationArg.value" schema="customizationArg.schema" mode="FORM_BUILDER_MODES.ENABLED">
-        </schema-builder>
+    <form name="form.schemaForm">
+      <div ng-repeat="customizationArg in customizationArgsList">
+        <strong><[customizationArg.description]></strong>
+        <div>
+          <schema-builder local-value="customizationArg.value" schema="customizationArg.schema" mode="FORM_BUILDER_MODES.ENABLED">
+          </schema-builder>
+        </div>
       </div>
-      <br>
-    </div>
+    </form>
   </div>
 
   <div class="modal-footer">
     <input type="submit" class="btn btn-default" value="Cancel" ng-click="cancel()">
-    <input type="submit" class="btn btn-success" value="Done" ng-click="save(customizationArgsList)">
+    <input type="submit" class="btn btn-success" value="Done" ng-click="save(customizationArgsList)" ng-disabled="form.schemaForm.$invalid">
   </div>
 </script>

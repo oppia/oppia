@@ -102,10 +102,7 @@ oppia.controller('FormBuilderTests', [
     name: 'Restricted unicode form; the value must be either a or b.',
     schema: {
       type: 'unicode',
-      post_normalizers: [{
-        id: 'require_is_one_of',
-        choices: ['a', 'b']
-      }]
+      choices: ['a', 'b']
     },
     value: 'a'
   }];
@@ -127,10 +124,7 @@ oppia.controller('FormBuilderTests', [
         description: 'First field.',
         schema: {
           type: 'unicode',
-          post_normalizers: [{
-            id: 'require_is_one_of',
-            choices: ['abc', 'def']
-          }]
+          choices: ['abc', 'def']
         }
       }, {
         name: 'a_list_appearing_second',

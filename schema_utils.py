@@ -258,20 +258,3 @@ class Normalizers(object):
         """
         assert obj <= max_value
         return obj
-
-    @staticmethod
-    def require_is_one_of(obj, choices):
-        """Ensures that `obj` is an element of `choices`.
-
-        Args:
-          obj: anything.
-          choices: a list of items, of the same type as `obj`.
-
-        Returns:
-          obj, if it is equal to an element of `choices`.
-
-        Raises:
-          AssertionError, if `obj` is not equal to any element of choices.
-        """
-        assert obj in choices
-        return obj
