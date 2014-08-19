@@ -2,19 +2,10 @@
   <div>
     <form ng-submit="submitAnswer(answer)">
       <div ng-repeat="choice in choices track by $index">
-        <div class="radio">
-          <label>
-            <input type="radio" ng-model="$parent.answer"
-                   name="choiceGroup" value="<[$index]>">
-            <span angular-html-bind="choice"></span>
-          </label>
-        </div>
+        <button type="button" class="btn btn-default" ng-click="submitAnswer($index)" style="margin: 5px 0;">
+          <span angular-html-bind="choice"></span>
+        </button>
       </div>
-
-      <input type="submit" class="btn btn-default" value="Submit">
-      <span ng-show="errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
-        <[errorMessage]>
-      </span>
     </form>
   </div>
 </script>
