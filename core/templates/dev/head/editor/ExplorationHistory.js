@@ -91,7 +91,7 @@ oppia.controller('ExplorationHistory', [
   };
 
   // Check if valid versions were selected
-  $scope.compareVersionsSelected = function() {
+  $scope.areCompareVersionsSelected = function() {
     if (!$scope.compareVersion) {
       return true;
     }
