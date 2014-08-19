@@ -507,7 +507,7 @@ oppia.controller('ExplorationEditor', [
     }
 
     if (!explorationObjectiveService.displayed) {
-      $scope.warningsList.push('An objective should be specified.');
+      $scope.warningsList.push('Please specify an objective (in the Settings tab).');
     }
   };
 

@@ -200,10 +200,6 @@ oppia.controller('StateInteraction', [
 
     var newWidget = angular.copy(tmpWidget);
     if (!angular.equals(newWidget.widget_id, stateWidgetIdService.displayed)) {
-      if (!$window.confirm('This will reset all existing rules. Continue?')) {
-        return;
-      };
-
       stateWidgetIdService.displayed = angular.copy(newWidget.widget_id);
       stateWidgetIdService.saveDisplayedValue();
 

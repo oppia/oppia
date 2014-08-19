@@ -124,9 +124,9 @@
       </unicode-with-parameters-editor>
     </span>
     <span ng-if="!doUnicodeParamsExist">
-      <textarea ng-if="getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()"></textarea>
+      <textarea ng-if="getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()"></textarea>
 
-      <input ng-if="!getRows()" type="text" ng-model="$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
+      <input ng-if="!getRows()" type="text" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
     </span>
   </span>
 
@@ -185,7 +185,7 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/custom">
-  <object-editor obj-type="<[objType]>" value="localValue" always-editable="true">
+  <object-editor obj-type="<[objType]>" value="$parent.$parent.localValue" always-editable="true">
   </object-editor>
 </script>
 
