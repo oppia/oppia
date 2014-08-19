@@ -42,6 +42,9 @@ class Tabs(widget_domain.BaseWidget):
         'schema': {
             'type': 'list',
             'items': TAB_CONTENT_SCHEMA,
+            'ui_config': {
+                'add_element_text': 'Add new tab'
+            }
         },
         'default_value': [{
             'title': 'Hint introduction',

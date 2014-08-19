@@ -912,7 +912,7 @@ oppia.directive('schemaBasedCustomEditor', ['recursionHelper', function(recursio
     scope: {
       localValue: '=',
       // The class of the object being edited.
-      objType: '&'
+      objType: '='
     },
     templateUrl: 'schemaBasedEditor/custom',
     restrict: 'E',
