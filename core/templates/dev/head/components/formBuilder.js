@@ -651,6 +651,30 @@ oppia.directive('schemaBuilder', [function() {
   };
 }]);
 
+oppia.directive('schemaBasedChoicesEditor', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // The choices for the object's value.
+      choices: '&',
+      // The schema for this object.
+      // TODO(sll): Validate each choice against the schema.
+      schema: '&',
+      mode: '='
+    },
+    templateUrl: 'schemaBasedEditor/choices',
+    restrict: 'E',
+    compile: recursionHelper.compile,
+    controller: ['$scope', function($scope) {
+      $scope.getReadonlySchema = function() {
+        var readonlySchema = angular.copy($scope.schema());
+        delete readonlySchema['choices'];
+        return readonlySchema;
+      };
+    }]
+  };
+}]);
+
 oppia.directive('schemaBasedBoolEditor', [function() {
   return {
     scope: {

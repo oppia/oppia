@@ -12,29 +12,41 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/master">
-  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
+  <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue" schema="schema()" choices="schema().choices" mode="mode">
+  </schema-based-choices-editor>
+
+  <schema-based-bool-editor ng-if="schema().type === 'bool' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
   </schema-based-bool-editor>
 
-  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
+  <schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
   </schema-based-int-editor>
 
-  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
+  <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
   </schema-based-float-editor>
 
-  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers" ui-config="schema().ui_config">
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers" ui-config="schema().ui_config">
   </schema-based-unicode-editor>
 
-  <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" mode="mode">
+  <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices" local-value="$parent.localValue" mode="mode">
   </schema-based-html-editor>
 
-  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config">
+  <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config">
   </schema-based-list-editor>
 
-  <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
+  <schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
   </schema-based-dict-editor>
 
-  <schema-based-custom-editor ng-if="schema().type === 'custom'" obj-type="schema().obj_type" local-value="$parent.localValue" mode="mode">
+  <schema-based-custom-editor ng-if="schema().type === 'custom' && !schema().choices" obj-type="schema().obj_type" local-value="$parent.localValue" mode="mode">
   </schema-based-custom-editor>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/choices">
+  <select ng-if="mode != $root.FORM_BUILDER_MODES.READONLY" class="form-control" ng-model="$parent.$parent.$parent.localValue" ng-options="choice as choice for choice in choices()" required ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+  </select>
+
+  <schema-builder ng-if="mode == $root.FORM_BUILDER_MODES.READONLY" schema="getReadonlySchema()" local-value="$parent.$parent.localValue" mode="mode">
+  </schema-builder>
 </script>
 
 

@@ -17,7 +17,7 @@
           <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
         </div>
         <div class="col-lg-1 col-md-1 col-sm-1">
-          <button type="button" class="btn btn-default btn-xs pull-right" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()">
+          <button type="button" class="btn btn-default btn-xs pull-right" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
             <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
           </button>
         </div>

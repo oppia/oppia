@@ -170,11 +170,12 @@ oppia.controller('FormBuilderTests', [
     },
     value: ['abc', 'def', 'ghi']
   }, {
-    name: 'Fixed-length list of 2 floats',
+    name: 'Fixed-length list of 2 multiple-choice floats',
     schema: {
       type: 'list',
       items: {
-        type: 'float'
+        type: 'float',
+        choices: [1.0, 0.0, -1.0, -2.0, -3.0]
       },
       len: 2
     },
