@@ -64,6 +64,10 @@ input.ng-dirty.ng-invalid {
    background-color: #f0f0f0;
  }
 
+ .oppia-form-error {
+   color: red;
+ }
+
  .oppia-serious-warning-text {
    color: red;
  }
