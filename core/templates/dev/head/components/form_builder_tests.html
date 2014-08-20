@@ -22,14 +22,16 @@
           <em>Saved value:</em> <[unicodeForm.value]>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.READONLY">
-          </schema-based-editor>
+          <schema-based-viewer schema="unicodeForm.schema" local-value="unicodeForm.value">
+          </schema-based-viewer>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.ENABLED">
-          </schema-based-editor>
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
         </td>
       </tr>
       <tr>
@@ -37,14 +39,16 @@
           <h5>Unicode form (copy 2)</h5>
           <em>Saved value:</em> <[unicodeForm.value]>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.READONLY">
-          </schema-based-editor>
+          <schema-based-viewer schema="unicodeForm.schema" local-value="unicodeForm.value">
+          </schema-based-viewer>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" disabled="true" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
         </td>
         <td class="col-sm-3 col-md-3 col-lg-3">
-          <schema-based-editor definition="unicodeForm.schema" saved-value="unicodeForm.value" mode="FORM_BUILDER_MODES.ENABLED">
-          </schema-based-editor>
+          <form-overlay definition="unicodeForm.schema" saved-value="unicodeForm.value" allow-expressions="unicodeForm.allowExpressions">
+          </form-overlay>
         </td>
       </tr>
     </table>
@@ -61,19 +65,24 @@
         <tr ng-repeat="form in formset.forms">
           <td class="col-sm-3 col-md-3 col-lg-3">
             <h5><[form.name]></h5>
-            <em>Saved value:</em> <[form.value]>
+            <div>
+              <em>Saved value:</em>
+              <div style="max-width: 300px; word-wrap: break-word;">
+                <[form.value]>
+              </span>
+            </div>
           </td>
           <td class="col-sm-3 col-md-3 col-lg-3">
-            <schema-based-editor definition="form.schema" saved-value="form.value" mode="FORM_BUILDER_MODES.READONLY">
-            </schema-based-editor>
+            <schema-based-viewer schema="form.schema" local-value="form.value">
+            </schema-based-viewer>
           </td>
           <td class="col-sm-3 col-md-3 col-lg-3">
-            <schema-based-editor definition="form.schema" saved-value="form.value" mode="FORM_BUILDER_MODES.DISABLED">
-            </schema-based-editor>
+            <form-overlay definition="form.schema" saved-value="form.value" disabled="true" allow-expressions="form.allowExpressions">
+            </form-overlay>
           </td>
           <td class="col-sm-3 col-md-3 col-lg-3">
-            <schema-based-editor definition="form.schema" saved-value="form.value" mode="FORM_BUILDER_MODES.ENABLED">
-            </schema-based-editor>
+            <form-overlay definition="form.schema" saved-value="form.value" allow-expressions="form.allowExpressions">
+            </form-overlay>
           </td>
         </tr>
       </table>
@@ -82,13 +91,13 @@
 
   {% include 'components/form_builder_templates.html' %}
 
-  <script type="text/ng-template" id="schemaBasedEditor/entryPoint">
+  <script type="text/ng-template" id="formOverlay/entryPoint">
     <ng-form name="schemaForm">
-      <schema-builder local-value="localValue" schema="definition" mode="mode">
-      </schema-builder>
+      <schema-based-editor local-value="localValue" schema="definition" disabled="disabled()" allow-expressions="allowExpressions()">
+      </schema-based-editor>
     </ng-form>
 
-    <div ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED">
+    <div ng-if="!disabled()">
       <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
       <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
     </div>

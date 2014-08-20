@@ -25,8 +25,8 @@
       <div ng-repeat="customizationArg in customizationArgsList">
         <strong><[customizationArg.description]></strong>
         <div>
-          <schema-builder local-value="customizationArg.value" schema="customizationArg.schema" mode="FORM_BUILDER_MODES.ENABLED">
-          </schema-builder>
+          <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+          </schema-based-editor>
         </div>
       </div>
     </form>

@@ -1,178 +1,162 @@
+<!-- SCHEMA-BASED EDITOR TEMPLATES -->
+
 <script type="text/ng-template" id="schemaBasedEditor/master">
-  <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue" schema="schema()" choices="schema().choices" mode="mode">
+  <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue" schema="schema()" choices="schema().choices" disabled="disabled()">
   </schema-based-choices-editor>
 
-  <schema-based-bool-editor ng-if="schema().type === 'bool' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
+  <schema-based-bool-editor ng-if="schema().type === 'bool' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()">
   </schema-based-bool-editor>
 
-  <schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
+  <schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()">
   </schema-based-int-editor>
 
-  <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
+  <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()" post-normalizers="schema().post_normalizers">
   </schema-based-float-editor>
 
-  <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers" ui-config="schema().ui_config">
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" post-normalizers="schema().post_normalizers" ui-config="schema().ui_config" allow-expressions="allowExpressions()">
   </schema-based-unicode-editor>
 
-  <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices" local-value="$parent.localValue" mode="mode">
+  <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()">
   </schema-based-html-editor>
 
-  <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config">
+  <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config" allow-expressions="allowExpressions()">
   </schema-based-list-editor>
 
-  <schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
+  <schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" property-schemas="schema().properties" allow-expressions="allowExpressions()">
   </schema-based-dict-editor>
 
-  <schema-based-custom-editor ng-if="schema().type === 'custom' && !schema().choices" obj-type="schema().obj_type" local-value="$parent.localValue" mode="mode">
+  <schema-based-custom-editor ng-if="schema().type === 'custom' && !schema().choices" obj-type="schema().obj_type" local-value="$parent.localValue" disabled="disabled()">
   </schema-based-custom-editor>
 </script>
 
-
 <script type="text/ng-template" id="schemaBasedEditor/choices">
-  <select ng-if="mode != $root.FORM_BUILDER_MODES.READONLY" class="form-control" ng-model="$parent.$parent.$parent.localValue" ng-options="choice as choice for choice in choices()" required ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+  <select class="form-control" ng-model="$parent.$parent.localValue" ng-options="choice as choice for choice in choices()" required ng-disabled="disabled()">
   </select>
-
-  <schema-builder ng-if="mode == $root.FORM_BUILDER_MODES.READONLY" schema="getReadonlySchema()" local-value="$parent.$parent.localValue" mode="mode">
-  </schema-builder>
 </script>
 
+<script type="text/ng-template" id="schemaBasedEditor/expression">
+  <em ng-if="paramNameOptions.length === 0">No parameters to select from.</em>
+
+  <select class="form-control" ng-if="paramNameOptions.length > 0" ng-disabled="disabled()"
+          ng-model="$parent.localValue"
+          ng-options="o.value as o.name for o in paramNameOptions">
+  </select>
+</script>
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">
-  <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="!editAsParameter">
-      <input type="checkbox" ng-model="$parent.$parent.localValue"
-             ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+  <div class="input-group">
+    <span ng-if="!expressionMode">
+      <input type="checkbox" ng-model="$parent.localValue" ng-disabled="disabled()">
     </span>
-    <span ng-if="editAsParameter">
-      <select class="form-control"
-              ng-model="$parent.$parent.localValue"
-              ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"
-              ng-options="option.value as option.name for option in boolEditorOptions">
-      </select>
-    </span>
-  </span>
 
-  <span ng-if="mode === $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="!editAsParameter">
-      <[localValue]>
+    <span ng-if="allowExpressions()">
+      <schema-based-expression-editor ng-if="expressionMode" local-value="$parent.$parent.localValue" param-names="paramNames" output-type="bool">
+      </schema-based-expression-editor>
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="disabled()">
+          <span ng-if="!expressionMode">E</span>
+          <span ng-if="expressionMode"><del>E</del></span>
+        </button>
+      </span>
     </span>
-    <span class="label label-info" ng-if="editAsParameter">
-      <[localValue]>
-    </span>
-  </span>
+  </div>
 </script>
-
 
 <script type="text/ng-template" id="schemaBasedEditor/int">
-  <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
-    <div class="input-group">
-      <span ng-if="!editAsParameter">
-        <input type="number" ng-model="$parent.$parent.localValue" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED" required>
-      </span>
-
-      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
-
-      <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
-        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><b>P</b></button>
-        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><del><b>P</b></del></button>
-      </span>
-    </div>
-  </span>
-
-  <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="!editAsParameter">
-      <[localValue]>
+  <div class="input-group">
+    <span ng-if="!expressionMode">
+      <input type="number" ng-model="$parent.localValue" class="form-control" ng-disabled="disabled()" required>
     </span>
-    <span class="label label-info" ng-if="editAsParameter">
-      <[localValue]>
+
+    <span ng-if="allowExpressions()">
+      <schema-based-expression-editor ng-if="expressionMode" local-value="$parent.$parent.localValue" param-names="paramNames" output-type="int">
+      </schema-based-expression-editor>
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="disabled()">
+          <span ng-if="!expressionMode">E</span>
+          <span ng-if="expressionMode"><del>E</del></span>
+        </button>
+      </span>
     </span>
-  </span>
+  </div>
 </script>
-
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
-  <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY" ng-form="floatForm">
-    <div class="input-group">
-      <span ng-if="!editAsParameter">
-        <input type="text" name="floatValue" ng-model="$parent.$parent.localValue" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
-        <span ng-if="floatForm.floatValue.$error.requireIsFloat" class="oppia-form-error" aria-live="assertive">
-          Please enter a valid decimal number.
-        </span>
+  <div class="input-group">
+    <span ng-if="!expressionMode">
+      <input type="text" name="floatValue" ng-model="$parent.localValue" class="form-control"
+             post-normalizers="postNormalizers()" validate-with-post-normalizers
+             add-float-validation ng-disabled="disabled()">
+      <span ng-if="floatForm.floatValue.$error.requireIsFloat" class="oppia-form-error" aria-live="assertive">
+        Please enter a valid decimal number.
       </span>
-      <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
+    </span>
 
-      <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
-        <button ng-if="!editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><b>P</b></button>
-        <button ng-if="editAsParameter" type="button" class="btn btn-default" ng-click="toggleEditMode()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"><del><b>P</b></del></button>
+    <span ng-if="allowExpressions()">
+      <schema-based-expression-editor ng-if="expressionMode" local-value="$parent.$parent.localValue" param-names="paramNames" output-type="float">
+      </schema-based-expression-editor>
+      <span class="input-group-btn">
+        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="disabled()">
+          <span ng-if="!expressionMode">E</span>
+          <span ng-if="expressionMode"><del>E</del></span>
+        </button>
       </span>
-    </div>
-  </span>
-
-  <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="!editAsParameter">
-      <[localValue]>
     </span>
-    <span class="label label-info" ng-if="editAsParameter">
-      <[localValue]>
-    </span>
-  </span>
+  </div>
 </script>
 
-
 <script type="text/ng-template" id="schemaBasedEditor/unicode">
-  <span ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED">
-    <span ng-if="doUnicodeParamsExist">
-      <unicode-with-parameters-editor local-value="$parent.$parent.localValue" allowed-parameter-names="allowedParameterNames" mode="mode">
+  <span ng-if="!disabled()">
+    <span ng-if="allowExpressions()">
+      <unicode-with-parameters-editor local-value="$parent.$parent.localValue"
+                                      allowed-parameter-names="allowedParameterNames">
       </unicode-with-parameters-editor>
     </span>
-    <span ng-if="!doUnicodeParamsExist">
+    <span ng-if="!allowExpressions()">
       <textarea ng-if="getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()"></textarea>
 
       <input ng-if="!getRows()" type="text" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
     </span>
   </span>
 
-  <span ng-if="mode != $root.FORM_BUILDER_MODES.ENABLED"
-        ng-class="{'oppia-disabled-contenteditable': mode == $root.FORM_BUILDER_MODES.DISABLED}"
+  <span ng-if="disabled()"
+        ng-class="{'oppia-disabled-contenteditable': disabled()}"
         ng-bind-html="getDisplayedValue()">
   </span>
 </script>
 
-
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <rich-text-editor ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED" html-content="$parent.localValue"></rich-text-editor>
-  <span ng-if="mode != $root.FORM_BUILDER_MODES.ENABLED"
-        ng-class="{'oppia-disabled-contenteditable': mode == $root.FORM_BUILDER_MODES.DISABLED}"
+  <rich-text-editor ng-if="!disabled()" html-content="$parent.localValue"></rich-text-editor>
+  <span ng-if="disabled()"
+        ng-class="{'oppia-disabled-contenteditable': disabled()}"
         ng-bind-html="localValue">
   </span>
 </script>
 
-
 <script type="text/ng-template" id="schemaBasedEditor/dict">
-  <form role="form">
+  <div role="form">
     <div ng-repeat="property in propertySchemas()">
       <div class="form-group">
-        <!-- TODO(sll): Add a 'for' attribute to the label tag. -->
-        <label><[getHumanReadablePropertyDescription(property)]></label>
-        <div>
-          <schema-builder schema="property.schema" mode="mode" local-value="localValue[property.name]">
-          </schema-builder>
+        <label for="<[fieldIds[property.name]]>"><[getHumanReadablePropertyDescription(property)]></label>
+        <!-- TODO(sll): This is in the wrong place. It should be on the input field. -->
+        <div id="<[fieldIds[property.name]]>">
+          <schema-based-editor schema="property.schema" disabled="disabled()" local-value="localValue[property.name]" allow-expressions="allowExpressions()">
+          </schema-based-editor>
         </div>
       </div>
     </div>
-  </form>
+  </div>
 </script>
-
 
 <script type="text/ng-template" id="schemaBasedEditor/list">
   <table class="table">
     <tr ng-repeat="item in localValue track by $index">
       <td>
-        <schema-builder schema="itemSchema()" mode="mode" local-value="localValue[$index]">
-        </schema-builder>
+        <schema-based-editor schema="itemSchema()" disabled="disabled()" local-value="localValue[$index]" allow-expressions="allowExpressions()">
+        </schema-based-editor>
       </td>
-      <td ng-if="mode != $root.FORM_BUILDER_MODES.READONLY && !len">
-        <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <td ng-if="!len">
+        <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)" ng-disabled="disabled()">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>
         </button>
@@ -180,17 +164,15 @@
     </tr>
   </table>
 
-  <button ng-if="mode != $root.FORM_BUILDER_MODES.READONLY && !len" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+  <button ng-if="!len" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="disabled()">
     <[addElementText]>
   </button>
 </script>
-
 
 <script type="text/ng-template" id="schemaBasedEditor/custom">
   <object-editor obj-type="<[objType]>" value="$parent.$parent.localValue" always-editable="true">
   </object-editor>
 </script>
-
 
 <script type="text/ng-template" id="modals/editParamName">
   <div class="modal-header">
@@ -206,4 +188,75 @@
     <input type="submit" class="btn btn-default" value="Cancel" ng-click="cancel()">
     <input type="submit" class="btn btn-success" value="Done" ng-click="save(currentParamName)" ng-disabled="!currentParamName">
   </div>
+</script>
+
+
+<!-- SCHEMA-BASED VIEWER TEMPLATES -->
+
+<script type="text/ng-template" id="schemaBasedViewer/master">
+  <schema-based-primitive-viewer ng-if="(schema().type === 'bool' || schema().type === 'int' || schema().type == 'float')" local-value="$parent.localValue">
+  </schema-based-primitive-viewer>
+
+  <schema-based-custom-viewer ng-if="schema().type === 'custom'" obj-type="schema().obj_type"
+                              local-value="$parent.localValue">
+  </schema-based-custom-viewer>
+
+  <schema-based-dict-viewer ng-if="schema().type === 'dict'" property-schemas="schema().properties"
+                            local-value="$parent.localValue">
+  </schema-based-dict-viewer>
+
+  <schema-based-html-viewer ng-if="schema().type === 'html'" local-value="$parent.localValue">
+  </schema-based-html-viewer>
+
+  <schema-based-list-viewer ng-if="schema().type === 'list'" item-schema="schema().items"
+                            local-value="$parent.localValue">
+  </schema-based-list-viewer>
+
+  <schema-based-unicode-viewer ng-if="schema().type === 'unicode'" local-value="$parent.localValue">
+  </schema-based-unicode-viewer>
+</script>
+
+<script type="text/ng-template" id="schemaBasedViewer/primitive">
+  <span ng-class="{'label label-info': isExpression(localValue)}">
+    <[localValue]>
+  </span>
+</script>
+
+<script type="text/ng-template" id="schemaBasedViewer/custom">
+  <[localValue]>
+</script>
+
+<script type="text/ng-template" id="schemaBasedViewer/dict">
+  <div role="form">
+    <div ng-repeat="property in propertySchemas()">
+      <div class="form-group">
+        <label><[getHumanReadablePropertyDescription(property)]></label>
+        <div>
+          <schema-based-viewer schema="property.schema" local-value="localValue[property.name]">
+          </schema-based-viewer>
+        </div>
+      </div>
+    </div>
+  </div>
+</script>
+
+<script type="text/ng-template" id="schemaBasedViewer/html">
+  <span ng-bind-html="localValue">
+  </span>
+</script>
+
+<script type="text/ng-template" id="schemaBasedViewer/list">
+  <table class="table">
+    <tr ng-repeat="item in localValue track by $index">
+      <td>
+        <schema-based-viewer schema="itemSchema()" local-value="localValue[$index]">
+        </schema-based-viewer>
+      </td>
+    </tr>
+  </table>
+</script>
+
+<script type="text/ng-template" id="schemaBasedViewer/unicode">
+  <span ng-bind-html="getDisplayedValue()">
+  </span>
 </script>

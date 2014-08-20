@@ -27,7 +27,6 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: ['$scope', '$rootScope', function($scope, $rootScope) {
-      $scope.mode = $rootScope.FORM_BUILDER_MODES.ENABLED;
       $scope.schema = {
         type: 'list',
         items: {
