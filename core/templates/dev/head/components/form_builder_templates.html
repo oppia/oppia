@@ -1,16 +1,3 @@
-<script type="text/ng-template" id="schemaBasedEditor/entryPoint">
-  <ng-form name="schemaForm">
-    <schema-builder local-value="localValue" schema="definition" mode="mode">
-    </schema-builder>
-  </ng-form>
-
-  <div ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED">
-    <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
-    <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
-  </div>
-</script>
-
-
 <script type="text/ng-template" id="schemaBasedEditor/master">
   <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue" schema="schema()" choices="schema().choices" mode="mode">
   </schema-based-choices-editor>

@@ -18,6 +18,33 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.directive('schemaBasedEditor', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      definition: '=',
+      mode: '=',
+      savedValue: '='
+    },
+    templateUrl: 'schemaBasedEditor/entryPoint',
+    restrict: 'E',
+    compile: recursionHelper.compile,
+    controller: ['$scope', function($scope) {
+      $scope.$watch('savedValue', function(newValue, oldValue) {
+        $scope.localValue = angular.copy($scope.savedValue);
+      });
+
+      $scope.submitValue = function(value) {
+        $scope.savedValue = angular.copy($scope.localValue);
+        alert($scope.savedValue);
+      };
+      $scope.cancelEdit = function() {
+        $scope.localValue = angular.copy($scope.savedValue);
+      };
+    }]
+  };
+}]);
+
+
 oppia.controller('FormBuilderTests', [
     '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramBool1', 'bool');
