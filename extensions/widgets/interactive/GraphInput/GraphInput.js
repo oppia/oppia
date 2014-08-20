@@ -32,15 +32,15 @@ oppia.directive('oppiaInteractiveGraphInput', [
 
         var testGraph = {
           "vertices":  [
-            {"x": 50, "y": 50, "label": ""},
-            {"x": 100, "y": 50, "label": ""},
-            {"x": 50, "y": 100, "label": ""}
+            {"x": 50, "y": 50, "label": "A"},
+            {"x": 100, "y": 50, "label": "B"},
+            {"x": 50, "y": 100, "label": "C"}
           ],
           "edges":  [
             {"src": 0, "dst": 1, "weight": 1}, 
             {"src": 0, "dst": 2, "weight": 1}
           ],
-          "isLabeled": false,
+          "isLabeled": true,
           "isDirected": false,
           "isWeighted": false
         };
@@ -180,62 +180,66 @@ oppia.directive('graphViz', function() {
 }); 
 
 oppia.directive('graphInputVertex', ['$document', function($document) {
-  return function($scope, $element, $attrs) {
-    $scope.clickGraphVertex = function(graph, state) {
-      if (state.currentMode == state.modes.DELETE && state.vertexEditPermissions) {
-        graph.edges = $.map(graph.edges, function(edge) {
-          if (edge.src == $scope.$index || edge.dst == $scope.$index) {
-            return null;
-          }
-          if (edge.src > $scope.$index) {
-            edge.src--;
-          }
-          if (edge.dst > $scope.$index) {
-            edge.dst--;
-          }
-          return edge;
-        });
-        graph.vertices.splice($scope.$index, 1);
-      }
-    };
-
-    $scope.mousedownGraphVertex = function(graph, state) {
-      if (state.currentMode == state.modes.ADD_EDGE) {
-        state.addEdgeVertex = $scope.$index;
-        $document.on("mouseup", clearAddEdgeVertex);
-        function clearAddEdgeVertex() {
-          if (state.hoverVertex !== null) {
-            if (checkValidEdge(graph, state.addEdgeVertex, state.hoverVertex)) {
-              graph.edges.push({
-                src: state.addEdgeVertex,
-                dst: state.hoverVertex,
-                weight: 1
-              });
+  return {
+    restrict: 'A',
+    templateUrl: "graphViz/graphVizVertex",
+    controller: function($scope, $element, $attrs) {
+      $scope.clickGraphVertex = function(graph, state) {
+        if (state.currentMode == state.modes.DELETE && state.vertexEditPermissions) {
+          graph.edges = $.map(graph.edges, function(edge) {
+            if (edge.src == $scope.$index || edge.dst == $scope.$index) {
+              return null;
             }
-          }
-          state.addEdgeVertex = null;
-          $scope.$apply();
-          $document.off("mouseup", clearAddEdgeVertex);
+            if (edge.src > $scope.$index) {
+              edge.src--;
+            }
+            if (edge.dst > $scope.$index) {
+              edge.dst--;
+            }
+            return edge;
+          });
+          graph.vertices.splice($scope.$index, 1);
         }
-      } else if (state.currentMode == state.modes.SELECT && state.movePermissions) {
-        state.dragVertex = $scope.$index;
-      }
-    };
+      };
 
-    $scope.mouseupGraphVertex = function(graph, state) {
-      state.dragVertex = null;
-    };
-    
-    function checkValidEdge(graph, src, dst) {
-      if (src === null || dst === null || src == dst) {
-        return false;
-      }
-      for (var i = 0; i < graph.edges.length; i++) {
-        if (src == graph.edges[i].src && dst == graph.edges[i].dst) {
+      $scope.mousedownGraphVertex = function(graph, state) {
+        if (state.currentMode == state.modes.ADD_EDGE) {
+          state.addEdgeVertex = $scope.$index;
+          $document.on("mouseup", clearAddEdgeVertex);
+          function clearAddEdgeVertex() {
+            if (state.hoverVertex !== null) {
+              if (checkValidEdge(graph, state.addEdgeVertex, state.hoverVertex)) {
+                graph.edges.push({
+                  src: state.addEdgeVertex,
+                  dst: state.hoverVertex,
+                  weight: 1
+                });
+              }
+            }
+            state.addEdgeVertex = null;
+            $scope.$apply();
+            $document.off("mouseup", clearAddEdgeVertex);
+          }
+        } else if (state.currentMode == state.modes.SELECT && state.movePermissions) {
+          state.dragVertex = $scope.$index;
+        }
+      };
+
+      $scope.mouseupGraphVertex = function(graph, state) {
+        state.dragVertex = null;
+      };
+      
+      function checkValidEdge(graph, src, dst) {
+        if (src === null || dst === null || src == dst) {
           return false;
         }
+        for (var i = 0; i < graph.edges.length; i++) {
+          if (src == graph.edges[i].src && dst == graph.edges[i].dst) {
+            return false;
+          }
+        }
+        return true;
       }
-      return true;
     }
   };
 }]);

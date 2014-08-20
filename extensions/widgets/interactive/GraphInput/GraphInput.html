@@ -56,17 +56,27 @@
         ng-attr-y2="<[graph.vertices[edge.dst].y]>"
         style="stroke: black; stroke-width: 2;">
       </line>
-      <circle graph-input-vertex
-        ng-repeat="vertex in graph.vertices" 
-        ng-mouseenter="state.hoverVertex = $index"
-        ng-mouseleave="state.hoverVertex = ($index == state.hoverVertex) ? null : state.hoverVertex"
-        ng-click="clickGraphVertex(graph, state)"
-        ng-mousedown="mousedownGraphVertex(graph, state)"
-        ng-mouseup="mouseupGraphVertex(graph,state)"
-        ng-attr-cx="<[vertex.x]>"
-        ng-attr-cy="<[vertex.y]>"
-        r="5">
-      </circle>
+      <g graph-input-vertex 
+        ng-repeat="vertex in graph.vertices"
+        ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)"
+      </g>
     </svg>
   </div>
+</script>
+
+<script type="text/ng-template" id="graphViz/graphVizVertex">
+<text ng-if="graph.isLabeled" x="0" y="-10">
+  <[vertex.label]>
+</text>
+<circle 
+  ng-mouseenter="state.hoverVertex = $index"
+  ng-mouseleave="state.hoverVertex = ($index == state.hoverVertex) ? null : state.hoverVertex"
+  ng-click="clickGraphVertex(graph, state)"
+  ng-mousedown="mousedownGraphVertex(graph, state)"
+  ng-mouseup="mouseupGraphVertex(graph,state)"
+  ng-attr-index="<[$index]>"
+  cx="0"
+  cy="0"
+  r="5">
+</circle>
 </script>

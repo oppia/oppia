@@ -8,7 +8,7 @@
   {{ super() }}
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
-    if (google && google.load) {
+    if (window.google && window.google.load) {
       google.load("visualization", "1", {packages:["corechart"]});
     }
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
