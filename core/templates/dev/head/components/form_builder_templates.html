@@ -38,12 +38,19 @@
 
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">
-  <select class="form-control"
-          ng-if="mode != $root.FORM_BUILDER_MODES.READONLY"
-          ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"
-          ng-model="$parent.localValue"
-          ng-options="option.value as option.name for option in boolEditorOptions">
-  </select>
+  <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
+    <span ng-if="!editAsParameter">
+      <input type="checkbox" ng-model="$parent.$parent.localValue"
+             ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+    </span>
+    <span ng-if="editAsParameter">
+      <select class="form-control"
+              ng-model="$parent.$parent.localValue"
+              ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"
+              ng-options="option.value as option.name for option in boolEditorOptions">
+      </select>
+    </span>
+  </span>
 
   <span ng-if="mode === $root.FORM_BUILDER_MODES.READONLY">
     <span ng-if="!editAsParameter">
