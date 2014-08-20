@@ -82,7 +82,7 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
-  <div class="input-group">
+  <div class="input-group" ng-form="floatForm">
     <span ng-if="!expressionMode">
       <input type="text" name="floatValue" ng-model="$parent.localValue" class="form-control"
              post-normalizers="postNormalizers()" validate-with-post-normalizers

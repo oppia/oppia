@@ -461,7 +461,7 @@ oppia.factory('schemaDefaultValueService', [function() {
 oppia.filter('requireIsFloat', [function() {
   return function(input) {
     var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
-    if (!FLOAT_REGEXP.test(input)) {
+    if (input === '' || !FLOAT_REGEXP.test(input)) {
       return undefined;
     }
 

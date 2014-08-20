@@ -399,7 +399,7 @@
     {% include 'components/rule_editor.html' %}
   </script>
 
-  {% include 'components/form_builder_templates.html' %}
+  {% include 'forms/form_builder_templates.html' %}
 
 {% endblock content %}
 
@@ -421,7 +421,7 @@
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/StateInteraction.js') }}
-    {{ include_js_file('components/formBuilder.js') }}
+    {{ include_js_file('forms/formBuilder.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
   </script>

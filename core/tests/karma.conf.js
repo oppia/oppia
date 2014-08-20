@@ -43,6 +43,7 @@ module.exports = function(config) {
       'core/templates/dev/head/css/*.js': ['coverage'],
       'core/templates/dev/head/editor/*.js': ['coverage'],
       'core/templates/dev/head/error/*.js': ['coverage'],
+      'core/templates/dev/head/forms/*.js': ['coverage'],
       'core/templates/dev/head/galleries/*.js': ['coverage'],
       'core/templates/dev/head/moderator/*.js': ['coverage'],
       'core/templates/dev/head/pages/*.js': ['coverage'],

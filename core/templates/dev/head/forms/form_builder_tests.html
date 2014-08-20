@@ -89,7 +89,7 @@
     </div>
   </div>
 
-  {% include 'components/form_builder_templates.html' %}
+  {% include 'forms/form_builder_templates.html' %}
 
   <script type="text/ng-template" id="formOverlay/entryPoint">
     <ng-form name="schemaForm">
@@ -108,7 +108,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('filters.js') }}
-    {{ include_js_file('components/formBuilder.js') }}
-    {{ include_js_file('components/formBuilderTests.js') }}
+    {{ include_js_file('forms/formBuilder.js') }}
+    {{ include_js_file('forms/formBuilderTests.js') }}
   </script>
 {% endblock footer_js %}
