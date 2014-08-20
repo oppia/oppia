@@ -443,7 +443,9 @@ oppia.factory('schemaDefaultValueService', [function() {
     // TODO(sll): Rewrite this to take into account post_normalizers, so that
     // we always start with a valid value.
     getDefaultValue: function(schema) {
-      if (schema.type === 'bool') {
+      if (schema.choices) {
+        return schema.choices[0];
+      } else if (schema.type === 'bool') {
         return false;
       } else if (schema.type === 'unicode' || schema.type === 'html') {
         return '';
