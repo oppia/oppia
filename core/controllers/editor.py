@@ -512,7 +512,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
 
         # Patch `snapshots` to use the editor's display name.
         for snapshot in snapshots:
-            if snapshot['committer_id'] != 'admin':
+            if snapshot['committer_id'] != feconf.ADMIN_COMMITTER_ID:
                 snapshot['committer_id'] = user_services.get_username(
                     snapshot['committer_id'])
 
