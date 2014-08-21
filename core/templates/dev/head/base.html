@@ -205,6 +205,8 @@
       </div>
     {% endif %}
 
+    {% include 'forms/form_builder_templates.html' %}
+
     {% include 'footer_js_libs.html' %}
     {% include 'rte_js_libs.html' %}
 
@@ -212,6 +214,7 @@
       {{ include_js_file('app.js') }}
       {{ include_js_file('directives.js') }}
       {{ include_js_file('filters.js') }}
+      {{ include_js_file('forms/formBuilder.js') }}
       {{ include_js_file('services/activeInputData.js') }}
       {{ include_js_file('services/warningsData.js') }}
       {{ include_js_file('services/messengerService.js') }}

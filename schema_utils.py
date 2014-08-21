@@ -170,19 +170,6 @@ class Normalizers(object):
         return getattr(cls, normalizer_id)
 
     @staticmethod
-    def uniquify(obj):
-        """Returns a list, removing duplicates.
-
-        Args:
-          obj: a list.
-
-        Returns:
-          a list containing the elements in `obj` in sorted order and without
-          duplicates.
-        """
-        return sorted(list(set(obj)))
-
-    @staticmethod
     def normalize_spaces(obj):
         """Collapses multiple spaces into single spaces.
 
@@ -242,7 +229,7 @@ class _Validators(object):
     @staticmethod
     def is_uniquified(obj):
         """Returns True iff the given object (a list) has no duplicates."""
-        return sorted(list(set(obj))) == set(obj)
+        return sorted(list(set(obj))) == sorted(obj)
 
     @staticmethod
     def is_at_least(obj, min_value):

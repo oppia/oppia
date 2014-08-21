@@ -441,7 +441,7 @@ oppia.factory('schemaDefaultValueService', [function() {
       } else if (schema.type === 'unicode' || schema.type === 'html') {
         return '';
       } else if (schema.type === 'list') {
-        return [];
+        return [this.getDefaultValue(schema.items)];
       } else if (schema.type === 'dict') {
         var result = {};
         for (var i = 0; i < schema.properties.length; i++) {

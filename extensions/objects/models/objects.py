@@ -239,8 +239,8 @@ class SetOfUnicodeString(BaseObject):
     SCHEMA = {
         'type': 'list',
         'items': UnicodeString.SCHEMA,
-        'post_normalizers': [{
-            'id': 'uniquify'
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }
 
