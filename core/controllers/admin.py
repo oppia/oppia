@@ -212,3 +212,17 @@ class AdminHandler(base.BaseHandler):
         except Exception as e:
             self.render_json({'error': unicode(e)})
             raise
+
+
+class AdminJobOutput(base.BaseHandler):
+    """Retrieves job output to show on the admin page."""
+
+    PAGE_NAME_FOR_CSRF = 'admin'
+
+    @require_super_admin
+    def get(self):
+        """Handles GET requests."""
+        job_id = self.request.get('job_id')
+        self.render_json({
+            'output': jobs.get_job_output(job_id)
+        })
