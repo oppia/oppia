@@ -41,8 +41,7 @@ oppia.controller('ExplorationHistory', ['$scope', '$http', 'explorationData', fu
           'committerId': data.snapshots[i].committer_id,
           'createdOn': data.snapshots[i].created_on,
           'commitMessage': data.snapshots[i].commit_message,
-          'versionNumber': data.snapshots[i].version_number,
-          'autoSummary': data.snapshots[i].auto_summary
+          'versionNumber': data.snapshots[i].version_number
         });
       }
     });
