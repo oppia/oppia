@@ -79,6 +79,10 @@ UI_CONFIG_SPECS = {
                 'id': 'is_at_least',
                 'min_value': 1,
             }]
+        },
+        'coding_mode': {
+            'type': SCHEMA_TYPE_UNICODE,
+            'choices': ['none', 'python'],
         }
     },
 }
@@ -133,7 +137,7 @@ VALIDATOR_SPECS = {
 def _validate_ui_config(obj_type, ui_config):
     """Validates the value of a UI configuration."""
     reference_dict = UI_CONFIG_SPECS[obj_type]
-    assert set(reference_dict.keys()) <= set(ui_config.keys())
+    assert set(ui_config.keys()) <= set(reference_dict.keys())
     for key, value in ui_config.iteritems():
         schema_utils.normalize_against_schema(
             value, reference_dict[key])
@@ -324,6 +328,11 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'ui_config': {
                 'rows': -1,
             }
+        }, {
+            'type': 'unicode',
+            'ui_config': {
+                'coding_mode': 'invalid_mode',
+            }
         }]
 
         valid_schemas = [{
@@ -360,6 +369,11 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             'type': 'unicode',
             'ui_config': {
                 'rows': 5,
+            }
+        }, {
+            'type': 'unicode',
+            'ui_config': {
+                'coding_mode': 'python',
             }
         }]
 

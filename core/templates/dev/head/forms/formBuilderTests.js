@@ -182,13 +182,13 @@ oppia.controller('FormBuilderTests', [
       a_list_appearing_second: [2, 3]
     }
   }, {
-    name: 'List of unicode textareas with custom \'add element\' text',
+    name: 'List of code areas with custom \'add element\' text',
     schema: {
       type: 'list',
       items: {
         type: 'unicode',
         ui_config: {
-          rows: 5
+          coding_mode: 'python'
         }
       },
       ui_config: {

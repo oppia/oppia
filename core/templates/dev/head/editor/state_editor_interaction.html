@@ -58,7 +58,7 @@
               <div ng-if="!isEmpty(tmpWidget.customization_args)">
                 <accordion-group>
                   <accordion-heading>
-                    <a href="#">Customize</a>
+                    <a href="#" ng-click="showCustomizationForm()">Customize</a>
                   </accordion-heading>
                   <form name="form.schemaForm">
                     <div ng-repeat="customizationArg in tmpWidget.customization_args">

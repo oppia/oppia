@@ -119,6 +119,10 @@ oppia.controller('StateInteraction', [
     return repository;
   };
 
+  $scope.showCustomizationForm = function() {
+    $scope.$broadcast('schemaBasedFormsShown');
+  };
+
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
     $scope.hasLoaded = false;
 

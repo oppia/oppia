@@ -18,6 +18,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// NOTE TO DEVELOPERS: This forms framework accepts an external event
+// named 'schemaBasedFormsShown'. This should be called by clients
+// when these forms first come into view.
+
+
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {
   var paramSpecs = {};
@@ -802,11 +807,51 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
         console.log('Multi-row unicode fields with parameters are not currently supported.');
       }
 
+      if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
+        // Flag that is flipped each time the codemirror view is
+        // shown. (The codemirror instance needs to be refreshed
+        // every time it is unhidden.)
+        $scope.codemirrorStatus = false;
+        var CODING_MODE_NONE = 'none';
+
+        $scope.codemirrorOptions = {
+          lineNumbers: true,
+          indentWithTabs: true
+        }
+        // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
+        // 'scheme' have CodeMirror-supported syntax highlighting. For other
+        // languages, syntax highlighting will not happen.
+        if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
+          //$scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
+        }
+
+        setTimeout(function() {
+          $scope.codemirrorStatus = !$scope.codemirrorStatus;
+        }, 200);
+
+        // When the form view is opened, flip the status flag. The
+        // timeout seems to be needed for the line numbers etc. to display
+        // properly.
+        $scope.$on('schemaBasedFormsShown', function() {
+          setTimeout(function() {
+            $scope.codemirrorStatus = !$scope.codemirrorStatus;
+          }, 200);
+        });
+      }
+
       $scope.getRows = function() {
         if (!$scope.uiConfig()) {
           return null;
         } else {
           return $scope.uiConfig().rows;
+        }
+      };
+
+      $scope.getCodingMode = function() {
+        if (!$scope.uiConfig()) {
+          return null;
+        } else {
+          return $scope.uiConfig().coding_mode;
         }
       };
 
