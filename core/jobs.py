@@ -1021,6 +1021,11 @@ def get_data_for_unfinished_jobs():
             for model in unfinished_job_models]
 
 
+def get_job_output(job_id):
+    """Returns the output of a job."""
+    return job_models.JobModel.get_by_id(job_id).output
+
+
 def get_continuous_computations_info(cc_classes):
     """Returns data about the given computations.
 
