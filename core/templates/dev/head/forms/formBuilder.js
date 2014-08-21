@@ -431,7 +431,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
 
 oppia.factory('schemaDefaultValueService', [function() {
   return {
-    // TODO(sll): Rewrite this to take into account post_normalizers, so that
+    // TODO(sll): Rewrite this to take validators into account, so that
     // we always start with a valid value.
     getDefaultValue: function(schema) {
       if (schema.choices) {
@@ -458,56 +458,58 @@ oppia.factory('schemaDefaultValueService', [function() {
 }]);
 
 
-oppia.filter('requireIsFloat', [function() {
-  return function(input) {
-    var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
-    if (input === '' || !FLOAT_REGEXP.test(input)) {
-      return undefined;
-    }
-
-    return (typeof input === 'number') ? input : parseFloat(
-      input.replace(',', '.'));
-  };
-}]);
-
-
-// The names of these filters must correspond to the names of the backend post-
-// normalizers (with underscores converted to camelcase).
+// The names of these filters must correspond to the names of the backend
+// validators (with underscores converted to camelcase).
 // WARNING: These filters do not validate the arguments supplied with the
-// post-normalizer definitions in the schema; these are assumed to be correct.
-oppia.filter('requireAtLeast', [function() {
+// validator definitions in the schema; these are assumed to be correct.
+oppia.filter('isAtLeast', [function() {
   return function(input, args) {
-    return (input >= args.minValue) ? input : undefined;
+    return (input >= args.minValue);
   };
 }]);
 
 
-oppia.filter('requireAtMost', [function() {
+oppia.filter('isAtMost', [function() {
   return function(input, args) {
-    return (input <= args.maxValue) ? input : undefined;
+    return (input <= args.maxValue);
   };
 }]);
 
 
-oppia.filter('requireNonempty', [function() {
+oppia.filter('isNonempty', [function() {
   return function(input) {
-    return input ? input : undefined;
+    return Boolean(input);
   };
 }]);
 
 
-oppia.directive('validateWithPostNormalizers', ['$filter', function($filter) {
+oppia.filter('isFloat', [function() {
+  return function(input) {
+    // TODO(sll): Accept expressions (like '2.') with nothing after the decimal
+    // point.
+    var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+
+    viewValue = input.toString();
+    if (viewValue !== '' && viewValue !== '-' && FLOAT_REGEXP.test(viewValue)) {
+      return parseFloat(viewValue.replace(',', '.'));
+    }
+    return undefined;
+  };
+}]);
+
+
+oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
     link: function(scope, elm, attrs, ctrl) {
-      // Add normalizers in reverse order.
-      if (scope.postNormalizers()) {
-        scope.postNormalizers().forEach(function(normalizerSpec) {
-          var frontendName = $filter('underscoresToCamelCase')(normalizerSpec.id);
+      // Add validators in reverse order.
+      if (scope.validators()) {
+        scope.validators().forEach(function(validatorSpec) {
+          var frontendName = $filter('underscoresToCamelCase')(validatorSpec.id);
 
           // Note that there may not be a corresponding frontend filter for
-          // each backend normalizer.
+          // each backend validator.
           try {
             $filter(frontendName);
           } catch(err) {
@@ -515,17 +517,17 @@ oppia.directive('validateWithPostNormalizers', ['$filter', function($filter) {
           }
 
           var filterArgs = {};
-          for (key in normalizerSpec) {
+          for (key in validatorSpec) {
             if (key !== 'id') {
               filterArgs[$filter('underscoresToCamelCase')(key)] = angular.copy(
-                normalizerSpec[key]);
+                validatorSpec[key]);
             }
           }
 
           var customValidator = function(viewValue) {
-            var filteredValue = $filter(frontendName)(viewValue, filterArgs);
-            ctrl.$setValidity(frontendName, filteredValue !== undefined);
-            return filteredValue;
+            ctrl.$setValidity(
+              frontendName, $filter(frontendName)(viewValue, filterArgs));
+            return viewValue;
           };
 
           ctrl.$parsers.unshift(customValidator);
@@ -536,17 +538,16 @@ oppia.directive('validateWithPostNormalizers', ['$filter', function($filter) {
   };
 }]);
 
-// This should come after validate-with-post-normalizers, if that is defined as
+// This should come before 'apply-validation', if that is defined as
 // an attribute on the HTML tag.
-oppia.directive('addFloatValidation', ['$filter', function($filter) {
-  var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+oppia.directive('requireIsFloat', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
     link: function(scope, elm, attrs, ctrl) {
       var floatValidator = function(viewValue) {
-        var filteredValue = $filter('requireIsFloat')(viewValue);
-        ctrl.$setValidity('requireIsFloat', filteredValue !== undefined);
+        var filteredValue = $filter('isFloat')(viewValue);
+        ctrl.$setValidity('isFloat', filteredValue !== undefined);
         return filteredValue;
       };
 
@@ -706,7 +707,8 @@ oppia.directive('schemaBasedIntEditor', [function() {
     scope: {
       localValue: '=',
       disabled: '&',
-      allowExpressions: '&'
+      allowExpressions: '&',
+      validators: '&'
     },
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
@@ -734,11 +736,28 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       localValue: '=',
       disabled: '&',
       allowExpressions: '&',
-      postNormalizers: '&'
+      validators: '&'
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
+      $scope.getMinValue = function() {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'is_at_least') {
+            return $scope.validators()[i].min_value;
+          }
+        }
+      }
+
+      $scope.getMaxValue = function() {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'is_at_most') {
+            return $scope.validators()[i].max_value;
+          }
+        }
+      }
+
       if ($scope.allowExpressions()) {
         $scope.paramNames = parameterSpecsService.getAllParamsOfType('float');
         $scope.expressionMode = angular.isString($scope.localValue);
@@ -761,7 +780,7 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
     scope: {
       localValue: '=',
       disabled: '&',
-      postNormalizers: '&',
+      validators: '&',
       uiConfig: '&',
       allowExpressions: '&'
     },
@@ -820,7 +839,8 @@ oppia.directive('schemaBasedListEditor', [
       len: '=',
       // UI configuration. May be undefined.
       uiConfig: '&',
-      allowExpressions: '&'
+      allowExpressions: '&',
+      validators: '&'
     },
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',

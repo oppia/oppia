@@ -83,9 +83,13 @@ oppia.controller('FormBuilderTests', [
   }];
 
   $scope.intForms = [{
-    name: 'Integer form',
+    name: 'Integer form (value must be greater than 2)',
     schema: {
-      type: 'int'
+      type: 'int',
+      validators: [{
+        id: 'is_at_least',
+        min_value: 2
+      }]
     },
     value: 3
   }, {
@@ -102,11 +106,11 @@ oppia.controller('FormBuilderTests', [
     name: 'Float form (value must be between -3 and 6)',
     schema: {
       type: 'float',
-      post_normalizers: [{
-        id: 'require_at_least',
+      validators: [{
+        id: 'is_at_least',
         min_value: -3.0
       }, {
-        id: 'require_at_most',
+        id: 'is_at_most',
         max_value: 6.0
       }]
     },
@@ -115,11 +119,11 @@ oppia.controller('FormBuilderTests', [
     name: 'Float form with expressions (value must be between -3 and 6)',
     schema: {
       type: 'float',
-      post_normalizers: [{
-        id: 'require_at_least',
+      validators: [{
+        id: 'is_at_least',
         min_value: -3.0
       }, {
-        id: 'require_at_most',
+        id: 'is_at_most',
         max_value: 6.0
       }]
     },

@@ -172,8 +172,8 @@ class NonnegativeInt(BaseObject):
 
     SCHEMA = {
         'type': 'int',
-        'post_normalizers': [{
-            'id': 'require_at_least',
+        'validators': [{
+            'id': 'is_at_least',
             'min_value': 0
         }]
     }
@@ -295,8 +295,8 @@ class MusicPhrase(BaseObject):
 
     _FRACTION_PART_SCHEMA = {
         'type': 'int',
-        'post_normalizers': [{
-            'id': 'require_at_least',
+        'validators': [{
+            'id': 'is_at_least',
             'min_value': 1
         }]
     }

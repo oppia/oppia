@@ -43,6 +43,7 @@ SCHEMA_KEY_CHOICES = 'choices'
 SCHEMA_KEY_NAME = 'name'
 SCHEMA_KEY_SCHEMA = 'schema'
 SCHEMA_KEY_OBJ_TYPE = 'obj_type'
+SCHEMA_KEY_VALIDATORS = 'validators'
 
 SCHEMA_TYPE_BOOL = 'bool'
 SCHEMA_TYPE_CUSTOM = 'custom'
@@ -137,6 +138,13 @@ def normalize_against_schema(obj, schema):
             normalized_obj = Normalizers.get(normalizer['id'])(
                 normalized_obj, **kwargs)
 
+    # Validate the normalized object.
+    if SCHEMA_KEY_VALIDATORS in schema:
+        for validator in schema[SCHEMA_KEY_VALIDATORS]:
+            kwargs = dict(validator)
+            del kwargs['id']
+            assert _Validators.get(validator['id'])(normalized_obj, **kwargs)
+
     return normalized_obj
 
 
@@ -160,22 +168,6 @@ class Normalizers(object):
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-
-    @staticmethod
-    def require_nonempty(obj):
-        """Checks that the given object is nonempty.
-
-        Args:
-          obj: a string.
-
-        Returns:
-          obj, if it is nonempty.
-
-        Raises:
-          AssertionError: if `obj` is empty.
-        """
-        assert obj != ''
-        return obj
 
     @staticmethod
     def uniquify(obj):
@@ -225,36 +217,49 @@ class Normalizers(object):
             '\'http://\' or \'https://\'; received %s' % raw)
         return raw
 
+
+class _Validators(object):
+    """Various validators.
+
+    A validator is a function that takes an object and returns True if it is
+    valid, and False if it isn't.
+
+    Validators should only be accessed from the checker methods in
+    schema_utils.py and schema_utils_test.py, since these methods do
+    preliminary checks on the arguments passed to the validator.
+    """
+    @classmethod
+    def get(cls, validator_id):
+        if not hasattr(cls, validator_id):
+            raise Exception('Invalid validator id: %s' % validator_id)
+        return getattr(cls, validator_id)
+
     @staticmethod
-    def require_at_least(obj, min_value):
-        """Ensures that `obj` is at least `min_value`.
-
-        Args:
-          obj: an int or a float.
-          min_value: an int or a float.
-
-        Returns:
-          obj, if it is at least `min_value`.
-
-        Raises:
-          AssertionError, if `obj` is less than `min_value`.
-        """
-        assert obj >= min_value
-        return obj
+    def is_nonempty(obj):
+        """Returns True iff the given object (a string) is nonempty."""
+        return bool(obj)
 
     @staticmethod
-    def require_at_most(obj, max_value):
-        """Ensures that `obj` is at most `min_value`.
+    def is_uniquified(obj):
+        """Returns True iff the given object (a list) has no duplicates."""
+        return sorted(list(set(obj))) == set(obj)
 
-        Args:
-          obj: an int or a float.
-          max_value: an int or a float.
+    @staticmethod
+    def is_at_least(obj, min_value):
+        """Ensures that `obj` (an int/float) is at least `min_value`."""
+        return obj >= min_value
 
-        Returns:
-          obj, if it is at most `min_value`.
+    @staticmethod
+    def is_at_most(obj, max_value):
+        """Ensures that `obj` (an int/float) is at most `max_value`."""
+        return obj <= max_value
 
-        Raises:
-          AssertionError, if `obj` is greater than `min_value`.
-        """
-        assert obj <= max_value
-        return obj
+    @staticmethod
+    def is_regex(obj):
+        """Ensures that `obj` (a string) defines a valid regex."""
+        raise NotImplementedError
+
+    @staticmethod
+    def matches_regex(obj, regex):
+        """Ensures that `obj` (a string) matches the given regex."""
+        raise NotImplementedError

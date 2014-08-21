@@ -7,19 +7,19 @@
   <schema-based-bool-editor ng-if="schema().type === 'bool' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()">
   </schema-based-bool-editor>
 
-  <schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()">
+  <schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()" validators="schema().validators">
   </schema-based-int-editor>
 
-  <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()" post-normalizers="schema().post_normalizers">
+  <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()" validators="schema().validators">
   </schema-based-float-editor>
 
-  <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" post-normalizers="schema().post_normalizers" ui-config="schema().ui_config" allow-expressions="allowExpressions()">
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" validators="schema().validators" ui-config="schema().ui_config" allow-expressions="allowExpressions()">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" allow-expressions="allowExpressions()">
   </schema-based-html-editor>
 
-  <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config" allow-expressions="allowExpressions()">
+  <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config" allow-expressions="allowExpressions()" validators="schema().validators">
   </schema-based-list-editor>
 
   <schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices" local-value="$parent.localValue" disabled="disabled()" property-schemas="schema().properties" allow-expressions="allowExpressions()">
@@ -65,7 +65,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <input type="number" ng-model="$parent.localValue" class="form-control" ng-disabled="disabled()" required>
+      <input type="number" ng-model="$parent.localValue" class="form-control" ng-disabled="disabled()" required apply-validation="validators()">
     </span>
 
     <span ng-if="allowExpressions()">
@@ -84,11 +84,16 @@
 <script type="text/ng-template" id="schemaBasedEditor/float">
   <div class="input-group" ng-form="floatForm">
     <span ng-if="!expressionMode">
-      <input type="text" name="floatValue" ng-model="$parent.localValue" class="form-control"
-             post-normalizers="postNormalizers()" validate-with-post-normalizers
-             add-float-validation ng-disabled="disabled()">
-      <span ng-if="floatForm.floatValue.$error.requireIsFloat" class="oppia-form-error" aria-live="assertive">
+      <input type="text" name="floatValue" ng-model="$parent.localValue" class="form-control" require-is-float apply-validation="validators()"
+             ng-disabled="disabled()">
+      <span ng-if="floatForm.floatValue.$error.isFloat" class="oppia-form-error" aria-live="assertive">
         Please enter a valid decimal number.
+      </span>
+      <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast" class="oppia-form-error" aria-live="assertive">
+        Please enter a number that is at least <[getMinValue()]>.
+      </span>
+      <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost" class="oppia-form-error" aria-live="assertive">
+        Please enter a number that is at most <[getMaxValue()]>.
       </span>
     </span>
 
@@ -113,9 +118,9 @@
       </unicode-with-parameters-editor>
     </span>
     <span ng-if="!allowExpressions()">
-      <textarea ng-if="getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()"></textarea>
+      <textarea ng-if="getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.$parent.localValue" class="form-control"></textarea>
 
-      <input ng-if="!getRows()" type="text" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
+      <input ng-if="!getRows()" type="text" ng-model="$parent.$parent.$parent.localValue" class="form-control">
     </span>
   </span>
 

@@ -3,8 +3,8 @@ from core.domain import widget_domain
 
 NONNEGATIVE_INT_SCHEMA = {
     'type': 'int',
-    'post_normalizers': [{
-        'id': 'require_at_least',
+    'validators': [{
+        'id': 'is_at_least',
         'min_value': 0
     }],
 }
@@ -33,8 +33,8 @@ class Video(widget_domain.BaseWidget):
             'after \'v=\' in the video URL.'),
         'schema': {
             'type': 'unicode',
-            'post_normalizers': [{
-                'id': 'require_nonempty',
+            'validators': [{
+                'id': 'is_nonempty',
             }]
         },
         'default_value': 'dQw4w9WgXcQ',

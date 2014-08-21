@@ -93,10 +93,10 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'description': 'The number of rows for the text input field.',
             'schema': {
                 'type': 'int',
-                'post_normalizers': [{
-                    'id': 'require_at_least', 'min_value': 1
+                'validators': [{
+                    'id': 'is_at_least', 'min_value': 1
                 }, {
-                    'id': 'require_at_most', 'max_value': 200
+                    'id': 'is_at_most', 'max_value': 200
                 }]
             },
             'default_value': 1,
