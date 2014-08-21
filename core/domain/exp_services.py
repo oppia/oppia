@@ -285,6 +285,16 @@ def export_to_zip_file(exploration_id, version=None):
     return o.getvalue()
 
 
+def export_to_dict(exploration_id, version=None):
+    """Returns a python dictionary of the exploration."""
+    exploration = get_exploration_by_id(exploration_id, version=version)
+    yaml_repr = exploration.to_yaml()
+    exploration_dict = {
+        'yaml': yaml_repr
+    }
+    return exploration_dict
+
+
 # Repository SAVE and DELETE methods.
 def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
@@ -671,14 +681,8 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
     current_version = exploration.version
     version_nums = range(current_version, oldest_version - 1, -1)
 
-    snapshots_metadata = exp_models.ExplorationModel.get_snapshots_metadata(
+    return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums)
-
-    for ind, item in enumerate(snapshots_metadata):
-        item['auto_summary'] = _get_simple_changelist_summary(
-            exploration_id, item['version_number'] - 1, item['commit_cmds'])
-
-    return snapshots_metadata
 
 
 def update_exploration(
@@ -722,6 +726,16 @@ def revert_exploration(
             'Trying to update version %s of exploration from version %s, '
             'which is too old. Please reload the page and try again.'
             % (exploration_model.version, current_version))
+
+    # Validate the previous version of the exploration before committing the
+    # change.
+    exploration = get_exploration_by_id(
+        exploration_id, version=revert_to_version)
+    exploration_rights = rights_manager.get_exploration_rights(exploration.id)
+    if exploration_rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE:
+        exploration.validate(strict=True)
+    else:
+        exploration.validate()
 
     exploration_model.revert(
         committer_id, 'Reverted exploration to version %s' % revert_to_version,

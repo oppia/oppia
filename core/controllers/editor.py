@@ -44,7 +44,6 @@ import jinja2
 # The maximum number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 30
 
-
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
     all_value_generators = (
@@ -227,7 +226,7 @@ class ExplorationPage(EditorHandler):
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),            
+            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 
@@ -463,7 +462,7 @@ class ResolvedAnswersHandler(EditorHandler):
 
 
 class ExplorationDownloadHandler(EditorHandler):
-    """Downloads an exploration as a YAML file."""
+    """Downloads an exploration as a zip file or JSON."""
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -473,17 +472,24 @@ class ExplorationDownloadHandler(EditorHandler):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=exploration.version)
+        output_format = self.request.get('output_format', default_value='zip')
 
         # If the title of the exploration has changed, we use the new title
         filename = 'oppia-%s-v%s' % (
             utils.to_ascii(exploration.title.replace(' ', '')), version)
 
-        self.response.headers['Content-Type'] = 'text/plain'
-        self.response.headers['Content-Disposition'] = (
-            'attachment; filename=%s.zip' % str(filename))
-
-        self.response.write(
-            exp_services.export_to_zip_file(exploration_id, version))
+        if output_format == feconf.OUTPUT_FORMAT_ZIP:
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.headers['Content-Disposition'] = (
+                'attachment; filename=%s.zip' % str(filename))
+            self.response.write(
+                exp_services.export_to_zip_file(exploration_id, version))
+        elif output_format == feconf.OUTPUT_FORMAT_JSON:
+            self.render_json(
+                exp_services.export_to_dict(exploration_id, version))
+        else:
+            raise self.InvalidInputException(
+                'Unrecognized output format %s' % output_format)
 
 
 class ExplorationResourcesHandler(EditorHandler):
@@ -512,7 +518,7 @@ class ExplorationSnapshotsHandler(EditorHandler):
 
         # Patch `snapshots` to use the editor's display name.
         for snapshot in snapshots:
-            if snapshot['committer_id'] != 'admin':
+            if snapshot['committer_id'] != feconf.ADMIN_COMMITTER_ID:
                 snapshot['committer_id'] = user_services.get_username(
                     snapshot['committer_id'])
 
