@@ -33,7 +33,7 @@ class SetOfUnicodeStringRuleUnitTests(test_utils.GenericTestBase):
         rule = set_rules.IsSubsetOf(['a', 'b'])
 
         self.assertTrue(rule.eval(['a']))
-        self.assertTrue(rule.eval(['b', 'b']))
+        self.assertTrue(rule.eval(['b']))
         self.assertTrue(rule.eval([]))
         self.assertFalse(rule.eval(['a', 'b']))
         self.assertFalse(rule.eval(['c']))
@@ -43,7 +43,7 @@ class SetOfUnicodeStringRuleUnitTests(test_utils.GenericTestBase):
         rule = set_rules.IsSupersetOf(['a', 'b'])
 
         self.assertTrue(rule.eval(['a', 'c', 'b']))
-        self.assertTrue(rule.eval(['a', 'ab', 'b', 'b']))
+        self.assertTrue(rule.eval(['a', 'ab', 'b']))
         self.assertFalse(rule.eval(['a', 'c']))
         self.assertFalse(rule.eval(['a', 'b']))
         self.assertFalse(rule.eval(['a']))

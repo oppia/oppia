@@ -89,8 +89,6 @@
     </div>
   </div>
 
-  {% include 'forms/form_builder_templates.html' %}
-
   <script type="text/ng-template" id="formOverlay/entryPoint">
     <ng-form name="schemaForm">
       <schema-based-editor local-value="localValue" schema="definition" disabled="disabled()" allow-expressions="allowExpressions()">
@@ -108,7 +106,6 @@
   {{ super() }}
   <script>
     {{ include_js_file('filters.js') }}
-    {{ include_js_file('forms/formBuilder.js') }}
     {{ include_js_file('forms/formBuilderTests.js') }}
   </script>
 {% endblock footer_js %}

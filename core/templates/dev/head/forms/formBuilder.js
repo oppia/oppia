@@ -611,7 +611,8 @@ oppia.directive('schemaBasedEditor', [function() {
       schema: '&',
       disabled: '&',
       localValue: '=',
-      allowExpressions: '&'
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'
@@ -650,7 +651,8 @@ oppia.directive('schemaBasedExpressionEditor', [function() {
       paramNames: '&',
       // TODO(sll): Currently only takes a string which is either 'bool', 'int' or 'float'.
       // May need to generalize.
-      outputType: '&'
+      outputType: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/expression',
     restrict: 'E',
@@ -680,7 +682,8 @@ oppia.directive('schemaBasedBoolEditor', [function() {
     scope: {
       localValue: '=',
       disabled: '&',
-      allowExpressions: '&'
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/bool',
     restrict: 'E',
@@ -708,7 +711,8 @@ oppia.directive('schemaBasedIntEditor', [function() {
       localValue: '=',
       disabled: '&',
       allowExpressions: '&',
-      validators: '&'
+      validators: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
@@ -736,7 +740,8 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       localValue: '=',
       disabled: '&',
       allowExpressions: '&',
-      validators: '&'
+      validators: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
@@ -782,7 +787,8 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
       disabled: '&',
       validators: '&',
       uiConfig: '&',
-      allowExpressions: '&'
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
@@ -819,7 +825,8 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
     scope: {
       localValue: '=',
       disabled: '&',
-      allowExpressions: '&'
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/html',
     restrict: 'E'
@@ -827,8 +834,8 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
 }]);
 
 oppia.directive('schemaBasedListEditor', [
-    'schemaDefaultValueService', 'recursionHelper',
-    function(schemaDefaultValueService, recursionHelper) {
+    'schemaDefaultValueService', 'recursionHelper', 'focusService',
+    function(schemaDefaultValueService, recursionHelper, focusService) {
   return {
     scope: {
       localValue: '=',
@@ -840,12 +847,26 @@ oppia.directive('schemaBasedListEditor', [
       // UI configuration. May be undefined.
       uiConfig: '&',
       allowExpressions: '&',
-      validators: '&'
+      validators: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
+      var baseFocusLabel = $scope.labelForFocusTarget() || Math.random().toString(36).slice(2) + '-';
+      $scope.getFocusLabel = function(index) {
+        // Treat the first item in the list as a special case -- if this list is
+        // contained in another list, and the outer list is opened with a desire
+        // to autofocus on the first input field, we can then focus on the given
+        // $scope.labelForFocusTarget().
+        // NOTE: This will cause problems for lists nested within lists, since
+        // sub-element 0 > 1 will have the same label as sub-element 1 > 0. But we
+        // will assume (for now) that nested lists won't be used -- if they are,
+        // this will need to be changed.
+        return index === 0 ? baseFocusLabel : baseFocusLabel + index.toString();
+      }
+
       $scope.addElementText = 'Add element';
       if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
         $scope.addElementText = $scope.uiConfig().add_element_text;
@@ -855,6 +876,7 @@ oppia.directive('schemaBasedListEditor', [
         $scope.addElement = function() {
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+          focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
         };
 
         $scope.deleteElement = function(index) {
@@ -881,7 +903,8 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
       // Read-only property. An object whose keys and values are the dict
       // properties and the corresponding schemas.
       propertySchemas: '&',
-      allowExpressions: '&'
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/dict',
     restrict: 'E',
