@@ -285,6 +285,16 @@ def export_to_zip_file(exploration_id, version=None):
     return o.getvalue()
 
 
+def export_to_dict(exploration_id, version=None):
+    """Returns a python dictionary of the exploration."""
+    exploration = get_exploration_by_id(exploration_id, version=version)
+    yaml_repr = exploration.to_yaml()
+    exploration_dict = {
+        'yaml': yaml_repr
+    }
+    return exploration_dict
+
+
 # Repository SAVE and DELETE methods.
 def apply_change_list(exploration_id, change_list):
     """Applies a changelist to a pristine exploration and returns the result.
