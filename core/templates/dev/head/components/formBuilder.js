@@ -330,7 +330,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
           autoGrow: true,
           autoSave: true,
           controls: {},
-          css: '/css/rte.css',
+          css: '/css/rte_single_line.css',
           debug: true,
           events: {
             // Prevent dragging, since this causes weird things to happen when
