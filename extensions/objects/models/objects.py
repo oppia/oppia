@@ -331,22 +331,6 @@ class MusicPhrase(BaseObject):
     }
 
 
-class TarFileString(BaseObject):
-    """A unicode string with the base64-encoded content of a tar file"""
-
-    description = 'A string with base64-encoded content of a tar file'
-
-    SCHEMA = UnicodeString.SCHEMA
-
-    @classmethod
-    def normalize(cls, raw):
-        """Reads `raw` as a unicode string representing a tar file and returns
-        the base64-encoded contents."""
-        raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
-        raw = base64.b64decode(raw)
-        return tarfile.open(fileobj=StringIO.StringIO(raw), mode='r:gz')
-
-
 class Filepath(BaseObject):
     """A string representing a filepath.
 

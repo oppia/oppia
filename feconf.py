@@ -184,12 +184,6 @@ ALLOWED_WIDGETS = {
         'SetInput': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'SetInput')
         },
-        'FileReadInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'FileReadInput')
-        },
-        'TarFileReadInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'TarFileReadInput')
-        },
         'CodeRepl': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'CodeRepl')
         },
