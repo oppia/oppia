@@ -155,6 +155,8 @@ urls = [
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
+    get_redirect_route(
+        r'/adminjoboutput', admin.AdminJobOutput, 'admin_job_output'),
 
     get_redirect_route(
         r'/imagehandler/<exploration_id>/<encoded_filepath>',
