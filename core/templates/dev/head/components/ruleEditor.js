@@ -38,6 +38,19 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     controller: [
       '$scope', '$attrs', 'editorContextService',
       function($scope, $attrs, editorContextService) {
+        $scope.RULE_FEEDBACK_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'html',
+            ui_config: {
+              size: 'small'
+            }
+          },
+          ui_config: {
+            add_element_text: 'Add Feedback'
+          }
+        };
+
         // This automatically opens the rule description picker if the rule
         // name is null.
         $scope.$watch('rule.definition.name', function(newValue, oldValue) {
@@ -80,14 +93,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         }, true);
 
         $scope.activeEditor = null;
-
-        $scope.FEEDBACK_LIST_INIT_ARGS = {
-          addItemText: '+ Add Feedback',
-          disableControls: Boolean($scope.isTmpRule === 'true'),
-          isEditable: $scope.isEditable,
-          objType: 'Html',
-          messageIfEmpty: 'This rule provides no feedback.'
-        };
 
         $scope.ruleDestMemento = null;
         $scope.openRuleDestEditor = function() {

@@ -471,7 +471,9 @@ oppia.directive('richTextEditor', [
       restrict: 'E',
       scope: {
         htmlContent: '=',
-        disallowOppiaWidgets: '@'
+        disallowOppiaWidgets: '@',
+        // Optional string; allowed values are 'small' or 'large'.
+        size: '@'
       },
       template: '<textarea rows="7" ng-disabled="!hasFullyLoaded"></textarea>',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
@@ -664,23 +666,28 @@ oppia.directive('richTextEditor', [
 
             $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
 
+            var sizeClass = (
+              $scope.size == 'small' ? ' wysiwyg-content-small' :
+              $scope.size == 'large' ? ' wysiwyg-content-large' :
+              '');
+
             $(rteNode).wysiwyg({
               autoGrow: true,
               autoSave: true,
               controls: {
-                createLink: {visible: false},
-                h1: {visible: false},
-                h2: {visible: false},
-                h3: {visible: false},
-                insertImage: {visible: false},
-                justifyCenter: {visible: false},
-                justifyFull: {visible: false},
-                justifyLeft: {visible: false},
-                justifyRight: {visible: false},
-                strikeThrough: {visible: false},
-                subscript: {visible: false},
-                superscript: {visible: false},
-                unLink: {visible: false}
+                bold: {groupIndex: 2, visible: true},
+                italic: {groupIndex: 2, visible: true},
+                underline: {groupIndex: 2, visible: true},
+                undo: {groupIndex: 2, visible: true},
+                redo: {groupIndex: 2, visible: true},
+                indent: {groupIndex: 2, visible: true},
+                outdent: {groupIndex: 2, visible: true},
+                insertOrderedList: {groupIndex: 2, visible: true},
+                insertUnorderedList: {groupIndex: 2, visible: true},
+                insertHorizontalRule: {groupIndex: 2, visible: true},
+                insertTable: {groupIndex: 2, visible: true},
+                code: {groupIndex: 2, visible: true},
+                removeFormat: {groupIndex: 2, visible: true}
               },
               css: '/css/rte_multiline.css',
               debug: true,
@@ -689,16 +696,16 @@ oppia.directive('richTextEditor', [
                   $scope._saveContent();
                 }
               },
-              iFrameClass: 'wysiwyg-content',
+              iFrameClass: 'wysiwyg-content' + sizeClass,
               initialContent: $scope.rteContent,
-              initialMinHeight: '150px',
-              resizeOptions: true
+              resizeOptions: true,
+              rmUnusedControls: true
             });
 
             // Add the non-interactive widget controls to the RTE.
             $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefinition) {
               $(rteNode).wysiwyg('addControl', widgetDefinition.name, {
-                groupIndex: 7,
+                groupIndex: 1,
                 icon: widgetDefinition.iconDataUrl,
                 tooltip: widgetDefinition.tooltip,
                 tags: [],
@@ -1151,10 +1158,20 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
       localValue: '=',
       disabled: '&',
       allowExpressions: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/html',
-    restrict: 'E'
+    restrict: 'E',
+    controller: ['$scope', function($scope) {
+      $scope.getSize = function() {
+        if (!$scope.uiConfig()) {
+          return null;
+        } else {
+          return $scope.uiConfig().size;
+        }
+      };
+    }]
   };
 }]);
 

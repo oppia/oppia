@@ -26,6 +26,13 @@ oppia.controller('StateEditor', [
     editorContextService, changeListService, validatorsService,
     focusService) {
 
+  $scope.STATE_CONTENT_SCHEMA = {
+    type: 'html',
+    ui_config: {
+      size: 'large'
+    }
+  };
+
   $scope.$on('refreshStateEditor', function(evt) {
     $scope.initStateEditor();
   });

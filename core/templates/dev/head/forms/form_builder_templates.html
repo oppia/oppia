@@ -36,7 +36,8 @@
   <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices"
                             local-value="$parent.localValue" disabled="disabled()"
                             allow-expressions="allowExpressions()"
-                            label-for-focus-target="labelForFocusTarget()">
+                            label-for-focus-target="labelForFocusTarget()"
+                            ui-config="schema().ui_config">
   </schema-based-html-editor>
 
   <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices"
@@ -186,7 +187,8 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <rich-text-editor ng-if="!disabled()" html-content="$parent.localValue"></rich-text-editor>
+  <rich-text-editor ng-if="!disabled()" html-content="$parent.localValue" size="<[getSize()]>">
+  </rich-text-editor>
   <span ng-if="disabled()"
         ng-class="{'oppia-disabled-contenteditable': disabled()}"
         ng-bind-html="localValue">

@@ -137,6 +137,12 @@ textarea {
 div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   width: 100%;
 }
+div.wysiwyg iframe.wysiwyg-content-small {
+  height: 50px;
+}
+div.wysiwyg iframe.wysiwyg-content-large {
+  height: 200px;
+}
 
 /*
   This is needed for proper display of tabs. See
