@@ -275,3 +275,11 @@ SHOW_SKIN_CHOOSER = False
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
 OUTPUT_FORMAT_ZIP = 'zip'
+
+# List of supported language codes.
+# TODO(sll): Add more.
+ALL_LANGUAGE_CODES = [{
+    'code': 'en', 'description': 'English'
+}, {
+    'code': 'zh', 'description': 'Chinese'
+}]

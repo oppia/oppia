@@ -169,23 +169,24 @@ oppia.factory('changeListService', [
   var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
   var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
 
-  var EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES = {
-    'title': 'explorationTitle',
-    'category': 'explorationCategory',
-    'objective': 'explorationObjective',
-    'param_specs': 'paramSpecs',
-    'param_changes': 'explorationParamChanges',
-    'default_skin_id': 'defaultSkinId'
+  var ALLOWED_EXPLORATION_BACKEND_NAMES = {
+    'title': true,
+    'category': true,
+    'objective': true,
+    'language_code': true,
+    'param_specs': true,
+    'param_changes': true,
+    'default_skin_id': true
   };
 
-  var STATE_BACKEND_NAMES_TO_FRONTEND_NAMES = {
-    'widget_customization_args': 'widgetCustomizationArgs',
-    'widget_id': 'widgetId',
-    'widget_handlers': 'widgetHandlers',
-    'widget_sticky': 'widgetSticky',
-    'state_name': 'stateName',
-    'content': 'content',
-    'param_changes': 'stateParamChanges'
+  var ALLOWED_STATE_BACKEND_NAMES = {
+    'widget_customization_args': true,
+    'widget_id': true,
+    'widget_handlers': true,
+    'widget_sticky': true,
+    'state_name': true,
+    'content': true,
+    'param_changes': true
   };
 
   return {
@@ -258,7 +259,7 @@ oppia.factory('changeListService', [
      * @param {string} oldValue The previous value of the property
      */
     editExplorationProperty: function(backendName, newValue, oldValue) {
-      if (!EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+      if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
         warningsData.addWarning('Invalid exploration property: ' + backendName);
         return;
       }
@@ -281,7 +282,7 @@ oppia.factory('changeListService', [
      * @param {string} oldValue The previous value of the property
      */
     editStateProperty: function(stateName, backendName, newValue, oldValue) {
-      if (!STATE_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+      if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
         warningsData.addWarning('Invalid state property: ' + backendName);
         return;
       }
@@ -429,6 +430,24 @@ oppia.factory('explorationObjectiveService', [
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
     return validatorsService.isNonempty(value, true);
+  };
+  return child;
+}]);
+
+
+// A data service that stores the exploration language code.
+oppia.factory('explorationLanguageCodeService', [
+    'explorationPropertyService', '$filter', 'validatorsService',
+    function(explorationPropertyService, $filter, validatorsService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'language_code';
+  child.getAllLanguageCodes = function() {
+    return GLOBALS.ALL_LANGUAGE_CODES;
+  };
+  child._isValid = function(value) {
+    return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
+      return elt.code === value;
+    });
   };
   return child;
 }]);

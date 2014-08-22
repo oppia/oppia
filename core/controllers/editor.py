@@ -228,6 +228,7 @@ class ExplorationPage(EditorHandler):
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
+            'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
         })
 
         self.render_template('editor/exploration_editor.html')
@@ -259,6 +260,7 @@ class ExplorationHandler(EditorHandler):
             'init_state_name': exploration.init_state_name,
             'category': exploration.category,
             'objective': exploration.objective,
+            'language_code': exploration.language_code,
             'title': exploration.title,
             'states': states,
             'param_changes': exploration.param_change_dicts,
