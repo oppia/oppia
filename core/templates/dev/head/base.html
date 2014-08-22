@@ -206,9 +206,7 @@
     {% endif %}
 
     {% include 'forms/form_builder_templates.html' %}
-
     {% include 'footer_js_libs.html' %}
-    {% include 'rte_js_libs.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -219,7 +217,6 @@
       {{ include_js_file('services/warningsData.js') }}
       {{ include_js_file('services/messengerService.js') }}
       {{ include_js_file('components/autocomplete.js') }}
-      {{ include_js_file('components/richTextEditor.js') }}
       {{ include_js_file('components/visualizations.js') }}
       {{ include_js_file('base.js') }}
     </script>
