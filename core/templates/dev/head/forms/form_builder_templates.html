@@ -86,7 +86,8 @@
     </span>
 
     <span ng-if="allowExpressions()">
-      <schema-based-expression-editor ng-if="expressionMode" local-value="$parent.$parent.localValue"
+      <schema-based-expression-editor ng-if="expressionMode" disabled="disabled()"
+                                      local-value="$parent.$parent.localValue"
                                       param-names="paramNames" output-type="bool"
                                       label-for-focus-target="labelForFocusTarget()">
       </schema-based-expression-editor>
@@ -108,7 +109,8 @@
     </span>
 
     <span ng-if="allowExpressions()">
-      <schema-based-expression-editor ng-if="expressionMode" local-value="$parent.$parent.localValue"
+      <schema-based-expression-editor ng-if="expressionMode" disabled="disabled()"
+                                      local-value="$parent.$parent.localValue"
                                       param-names="paramNames" output-type="int"
                                       label-for-focus-target="labelForFocusTarget()">
       </schema-based-expression-editor>
@@ -132,7 +134,8 @@
       </span>
 
       <span ng-if="allowExpressions()">
-        <schema-based-expression-editor ng-if="expressionMode" local-value="$parent.$parent.localValue"
+        <schema-based-expression-editor ng-if="expressionMode" disabled="disabled()"
+                                        local-value="$parent.$parent.localValue"
                                         param-names="paramNames" output-type="float"
                                         label-for-focus-target="labelForFocusTarget()">
         </schema-based-expression-editor>
@@ -160,29 +163,39 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/unicode">
-  <span ng-if="!disabled()">
-    <span ng-if="allowExpressions()">
+  <span ng-if="!allowExpressions()">
+    <textarea ng-if="!getCodingMode() && getRows()"
+              ng-model="$parent.$parent.localValue"
+              rows="<[getRows()]>"
+              placeholder="<[getPlaceholder()]>"
+              ng-disabled="disabled()"
+              class="form-control" focus-on="<[labelForFocusTarget()]>">
+    </textarea>
+
+    <input ng-if="!getCodingMode() && !getRows()" type="text"
+           ng-model="$parent.$parent.localValue"
+           placeholder="<[getPlaceholder()]>"
+           ng-disabled="disabled()"
+           class="form-control" focus-on="<[labelForFocusTarget()]>">
+
+    <div ng-if="getCodingMode()" ui-codemirror
+         ng-model="$parent.$parent.localValue"
+         ui-codemirror-opts="codemirrorOptions"
+         ui-refresh="codemirrorStatus" style="border: 1px solid black;">
+    </div>
+  </span>
+
+  <span ng-if="allowExpressions()">
+    <span ng-if="disabled()"
+          ng-class="{'oppia-disabled-contenteditable': disabled()}"
+          ng-bind-html="getDisplayedValue()">
+    </span>
+    <span ng-if="!disabled()">
       <unicode-with-parameters-editor local-value="$parent.$parent.localValue"
                                       allowed-parameter-names="allowedParameterNames"
                                       focus-on="<[labelForFocusTarget()]>">
       </unicode-with-parameters-editor>
     </span>
-    <span ng-if="!allowExpressions()">
-
-      <textarea ng-if="!getCodingMode() && getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.$parent.localValue"
-                class="form-control" focus-on="<[labelForFocusTarget()]>"></textarea>
-
-      <input ng-if="!getCodingMode() && !getRows()" type="text" ng-model="$parent.$parent.$parent.localValue"
-             class="form-control" focus-on="<[labelForFocusTarget()]>">
-
-      <div ng-if="getCodingMode()" ui-codemirror ng-model="$parent.$parent.$parent.localValue" ui-codemirror-opts="codemirrorOptions" ui-refresh="codemirrorStatus" style="border: 1px solid black;">
-      </div>
-    </span>
-  </span>
-
-  <span ng-if="disabled()"
-        ng-class="{'oppia-disabled-contenteditable': disabled()}"
-        ng-bind-html="getDisplayedValue()">
   </span>
 </script>
 

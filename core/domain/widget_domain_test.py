@@ -61,7 +61,8 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text input')
 
-        self.assertIn('input ng-if="rows == 1"', widget.html_body)
+        self.assertIn('id="interactiveWidget/TextInput"', widget.html_body)
+        self.assertIn('id="response/TextInput"', widget.html_body)
 
         tag = widget.get_interactive_widget_tag({})
         self.assertEqual(

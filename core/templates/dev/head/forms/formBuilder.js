@@ -1103,13 +1103,16 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
 
         $scope.codemirrorOptions = {
           lineNumbers: true,
-          indentWithTabs: true
+          indentWithTabs: true,
+        }
+        if ($scope.disabled()) {
+          $scope.codemirrorOptions.readOnly = 'nocursor';
         }
         // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
         // 'scheme' have CodeMirror-supported syntax highlighting. For other
         // languages, syntax highlighting will not happen.
         if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
-          //$scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
+          $scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
         }
 
         setTimeout(function() {
@@ -1125,6 +1128,14 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
           }, 200);
         });
       }
+
+      $scope.getPlaceholder = function() {
+        if (!$scope.uiConfig()) {
+          return '';
+        } else {
+          return $scope.uiConfig().placeholder;
+        }
+      };
 
       $scope.getRows = function() {
         if (!$scope.uiConfig()) {
