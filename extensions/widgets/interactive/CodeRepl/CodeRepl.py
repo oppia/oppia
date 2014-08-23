@@ -43,7 +43,6 @@ class CodeRepl(widget_domain.BaseWidget):
         'schema': {
             'type': 'unicode',
             'ui_config': {
-                'rows': 6,
                 'coding_mode': 'none',
             },
         },
@@ -54,7 +53,6 @@ class CodeRepl(widget_domain.BaseWidget):
         'schema': {
             'type': 'unicode',
             'ui_config': {
-                'rows': 6,
                 'coding_mode': 'none',
             },
         },
