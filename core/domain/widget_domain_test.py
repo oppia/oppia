@@ -30,6 +30,10 @@ import schema_utils
 import schema_utils_test
 import utils
 
+# File names ending in any of these suffixes will be ignored when checking for
+# widget validity.
+IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
+
 
 class AnswerHandlerUnitTests(test_utils.GenericTestBase):
     """Test the AnswerHandler domain object."""
@@ -185,8 +189,13 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
-    def _list_dir_non_hidden(self, dir):
-        return [name for name in os.listdir(dir) if not name.startswith('.')]
+    def _listdir_omit_ignored(self, dir):
+        """List all files and directories within 'dir', omitting the ones whose
+        name ends in one of the IGNORED_FILE_SUFFIXES."""
+        names = os.listdir(dir)
+        for suffix in IGNORED_FILE_SUFFIXES:
+            names = [name for name in names if not name.endswith(suffix)]
+        return names
 
     def test_default_noninteractive_widgets_are_valid(self):
         """Test that the default noninteractive widgets are valid."""
@@ -204,21 +213,8 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
             # In this directory there should be a config .py file, an
             # html file, a JS file, and a .png file.
-            dir_contents = self._list_dir_non_hidden(widget_dir)
-            self.assertLessEqual(len(dir_contents), 5)
-
-            optional_dirs_and_files_count = 0
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    widget_dir, '%s.pyc' % widget_id)))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            self.assertEqual(
-                optional_dirs_and_files_count + 4, len(dir_contents),
-                dir_contents
-            )
+            dir_contents = self._listdir_omit_ignored(widget_dir)
+            self.assertLessEqual(len(dir_contents), 4)
 
             py_file = os.path.join(widget_dir, '%s.py' % widget_id)
             html_file = os.path.join(widget_dir, '%s.html' % widget_id)
@@ -282,8 +278,8 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             # html file, a JS file, (optionally) a directory named 'static',
             # (optionally) a widget JS test file, and (optionally) a
             # stats_response.html file.
-            dir_contents = self._list_dir_non_hidden(widget_dir)
-            self.assertLessEqual(len(dir_contents), 7)
+            dir_contents = self._listdir_omit_ignored(widget_dir)
+            self.assertLessEqual(len(dir_contents), 6)
 
             optional_dirs_and_files_count = 0
 
@@ -298,13 +294,6 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(
                     os.path.join(widget_dir, 'stats_response.html')))
-                optional_dirs_and_files_count += 1
-            except Exception:
-                pass
-
-            try:
-                self.assertTrue(os.path.isfile(os.path.join(
-                    widget_dir, '%s.pyc' % widget_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
