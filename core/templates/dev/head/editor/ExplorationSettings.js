@@ -28,7 +28,7 @@ oppia.controller('ExplorationSettings', [
       explorationObjectiveService, explorationRightsService, changeListService,
       warningsData) {
 
-  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
+  var GALLERY_PAGE_URL = '/gallery';
 
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
@@ -149,7 +149,7 @@ oppia.controller('ExplorationSettings', [
         deleteUrl += ('?role=' + role);
       }
       $http['delete'](deleteUrl).success(function(data) {
-        $window.location = CONTRIBUTE_GALLERY_PAGE;
+        $window.location = GALLERY_PAGE_URL;
       });
     });
   };

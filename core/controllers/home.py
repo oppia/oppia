@@ -44,9 +44,9 @@ class HomePage(base.BaseHandler):
     If the user is logged in and is registered as an editor, we show their
     personal dashboard, otherwise we show the generic splash page.
     """
-    # We use 'contribute' because the createExploration() modal makes a call
+    # We use 'gallery' because the createExploration() modal makes a call
     # there.
-    PAGE_NAME_FOR_CSRF = 'contribute'
+    PAGE_NAME_FOR_CSRF = 'gallery'
 
     def _get_splash_page(self):
         if SPLASH_PAGE_EXPLORATION_ID.value:

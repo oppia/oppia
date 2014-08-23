@@ -169,25 +169,20 @@ urls = [
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
     get_redirect_route(
-        r'%s' % feconf.LEARN_GALLERY_URL, galleries.LearnPage,
+        r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
+    get_redirect_route(
+        r'%s' % feconf.GALLERY_DATA_URL, galleries.GalleryHandler,
+        'gallery_handler'),
+
+    get_redirect_route(
+        r'%s' % feconf.LEARN_GALLERY_URL, galleries.GalleryRedirectPage,
         'learn_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.LEARN_GALLERY_DATA_URL, galleries.LearnHandler,
-        'learn_gallery_handler'),
-
-    get_redirect_route(
-        r'%s' % feconf.PLAYTEST_QUEUE_URL, galleries.PlaytestPage,
+        r'%s' % feconf.PLAYTEST_QUEUE_URL, galleries.GalleryRedirectPage,
         'playtest_queue_page'),
     get_redirect_route(
-        r'%s' % feconf.PLAYTEST_QUEUE_DATA_URL, galleries.PlaytestHandler,
-        'playtest_queue_handler'),
-
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,
+        r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTE_GALLERY_DATA_URL,
-        galleries.ContributeHandler, 'contribute_gallery_handler'),
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),

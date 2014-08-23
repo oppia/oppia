@@ -685,7 +685,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         # Joe logs in.
         self.login('joe@example.com')
 
-        response = self.testapp.get('/contribute', expect_errors=True)
+        response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
@@ -695,9 +695,9 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         config_services.set_property(
             feconf.ADMIN_COMMITTER_ID, 'banned_usernames', ['joe'])
 
-        # Test that Joe is banned.
-        response = self.testapp.get('/contribute', expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        # Test that Joe is banned. (He can still access the gallery.)
+        response = self.testapp.get(feconf.GALLERY_URL, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)

@@ -44,169 +44,67 @@ CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     default_value='')
 
 
-class LearnPage(base.BaseHandler):
-    """The exploration gallery page for learners."""
+class GalleryPage(base.BaseHandler):
+    """The exploration gallery page."""
 
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_LEARN,
-            'contribute_gallery_login_url': (
-                current_user_services.create_login_url(
-                    feconf.CONTRIBUTE_GALLERY_URL))
-        })
-        self.render_template('galleries/learn.html')
+    PAGE_NAME_FOR_CSRF = 'gallery'
 
-
-class LearnHandler(base.BaseHandler):
-    """Provides data for the exploration gallery page for learners."""
-
-    def get(self):
-        """Handles GET requests."""
-        # TODO(sll): Implement paging.
-
-        explorations_dict = (
-            exp_services.get_publicized_explorations_summary_dict())
-
-        categories = collections.defaultdict(list)
-        for (eid, exploration_data) in explorations_dict.iteritems():
-            categories[exploration_data['category']].append({
-                'id': eid,
-                'title': exploration_data['title'],
-            })
-
-        self.values.update({
-            'categories': categories,
-        })
-        self.render_json(self.values)
-
-
-class PlaytestPage(base.BaseHandler):
-    """The page for the playtesters' queue."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_PLAYTEST,
-        })
-        self.render_template('galleries/playtest.html')
-
-
-class PlaytestHandler(base.BaseHandler):
-    """Provides data for the playtest page."""
-
-    def get(self):
-        """Handles GET requests."""
-        # TODO(sll): Implement paging.
-
-        explorations_dict = (
-            exp_services.get_recently_edited_public_explorations_summary_dict()
-        )
-
-        public_explorations_list = [{
-            'id': exp_id,
-            'title': exp_data['title'],
-            'category': exp_data['category'],
-            'last_updated': exp_data['last_updated'],
-            'community_owned': exp_data['rights']['community_owned'],
-            'to_playtest': False,
-        } for (exp_id, exp_data) in explorations_dict.iteritems()]
-
-        # Add private explorations that the user has been specifically invited
-        # to playtest.
-        private_explorations_list = []
-        if self.user_id:
-            playtest_dict = (
-                exp_services.get_explicit_viewer_explorations_summary_dict(
-                    self.user_id, include_timestamps=True))
-            private_explorations_list = [{
-                'id': exp_id,
-                'title': exp_data['title'],
-                'category': exp_data['category'],
-                'last_updated': exp_data['last_updated'],
-                'to_playtest': True,
-            } for (exp_id, exp_data) in playtest_dict.iteritems()]
-
-        self.values.update({
-            'public_explorations_list': sorted(
-                public_explorations_list, key=lambda exp: exp['last_updated'],
-                reverse=True),
-            'private_explorations_list': sorted(
-                private_explorations_list, key=lambda exp: exp['last_updated'],
-                reverse=True)
-        })
-        self.render_json(self.values)
-
-
-class ContributePage(base.BaseHandler):
-    """The exploration gallery page for contributors."""
-
-    PAGE_NAME_FOR_CSRF = 'contribute'
-
-    @base.require_registered_as_editor
     def get(self):
         """Handles GET requests."""
         noninteractive_widget_html = (
             widget_registry.Registry.get_noninteractive_widget_html())
 
         self.values.update({
-            'nav_mode': feconf.NAV_MODE_CONTRIBUTE,
+            'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
-            'announcement': jinja2.utils.Markup(
-                CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT.value),
             'noninteractive_widget_html': jinja2.utils.Markup(
                 noninteractive_widget_html),
         })
-        self.render_template('galleries/contribute.html')
+        self.render_template('galleries/gallery.html')
 
 
-class ContributeHandler(base.BaseHandler):
-    """Provides data for the exploration gallery page for contributors."""
+class GalleryHandler(base.BaseHandler):
+    """Provides data for the exploration gallery page."""
 
-    @base.require_registered_as_editor
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
 
-        # Get the exp ids for which this user is an owner or an editor.
-        editable_exp_ids = [
-            rights.id for rights in
-            rights_manager.get_at_least_editable_exploration_rights(
-                self.user_id)]
-        current_user_is_moderator = rights_manager.Actor(
-            self.user_id).is_moderator()
+        # TODO(sll): Supplement this with ids of private explorations for
+        # which the user is an owner or editor.
+
+        # TODO(sll): Precompute and cache gallery categories. Or have a fixed
+        # list of categories and 'Other', and gradually classify the
+        # explorations in 'Other'.
 
         explorations_dict = (
-            exp_services.get_viewable_explorations_summary_dict(
-                self.user_id))
+            exp_services.get_non_private_explorations_summary_dict())
 
-        categories = collections.defaultdict(list)
-        for (eid, exploration_data) in explorations_dict.iteritems():
-            categories[exploration_data['category']].append({
-                'id': eid,
-                'title': exploration_data['title'],
-                'can_edit': (
-                    exploration_data['rights']['community_owned'] or
-                    eid in editable_exp_ids or (
-                        current_user_is_moderator and
-                        exploration_data['rights']['status'] !=
-                            rights_manager.EXPLORATION_STATUS_PRIVATE)),
-                'is_private': (
-                    exploration_data['rights']['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PRIVATE),
-                'is_public': (
-                    exploration_data['rights']['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLIC),
-                'is_publicized': (
-                    exploration_data['rights']['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLICIZED),
-                'is_cloned': bool(exploration_data['rights']['cloned_from']),
-                'is_community_owned': (
-                    exploration_data['rights']['community_owned']),
-            })
+        explorations_list = [{
+            'id': exp_id,
+            'title': exp_data['title'],
+            'category': exp_data['category'],
+            'objective': exp_data['objective'],
+            'language_code': exp_data['language_code'],
+            'last_updated': exp_data['last_updated'],
+            'status': exp_data['status'],
+            'community_owned': exp_data['community_owned'],
+        } for (exp_id, exp_data) in explorations_dict.iteritems()]
+
+        beta_explorations_list = sorted(
+            [e_dict for e_dict in explorations_list 
+             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC],
+            key=lambda x: x['last_updated'],
+            reverse=True)
+        publicized_explorations_list = sorted(
+            [e_dict for e_dict in explorations_list 
+             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED],
+            key=lambda x: x['last_updated'],
+            reverse=True)
 
         self.values.update({
-            'categories': categories,
+            'released': publicized_explorations_list,
+            'beta': beta_explorations_list,
         })
         self.render_json(self.values)
 
@@ -214,7 +112,7 @@ class ContributeHandler(base.BaseHandler):
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'contribute'
+    PAGE_NAME_FOR_CSRF = 'gallery'
 
     @base.require_registered_as_editor
     def post(self):
@@ -238,7 +136,7 @@ class NewExploration(base.BaseHandler):
 class UploadExploration(base.BaseHandler):
     """Uploads a new exploration."""
 
-    PAGE_NAME_FOR_CSRF = 'contribute'
+    PAGE_NAME_FOR_CSRF = 'gallery'
 
     @base.require_registered_as_editor
     def post(self):
@@ -278,3 +176,11 @@ class RecentCommitsHandler(base.BaseHandler):
             'cursor': new_urlsafe_start_cursor,
             'more': more,
         })
+
+
+class GalleryRedirectPage(base.BaseHandler):
+    """An old exploration gallery page."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.redirect('/gallery')

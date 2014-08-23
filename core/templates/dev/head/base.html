@@ -67,14 +67,8 @@
 
                 <div class="collapse navbar-collapse">
                   <ul class="nav navbar-nav">
-                    <li {% if nav_mode == 'learn' %}class="active"{% endif %}>
-                      <a href="/learn">Learn</a>
-                    </li>
-                    <li {% if nav_mode == 'playtest' %}class="active"{% endif %}>
-                      <a href="/playtest">Playtest</a>
-                    </li>
-                    <li {% if nav_mode == 'contribute' %}class="active"{% endif %}>
-                      <a href="/contribute">Contribute</a>
+                    <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
+                      <a href="/gallery">Gallery</a>
                     </li>
                     <li class="dropdown">
                       <a class="dropdown-toggle" data-toggle="dropdown">
@@ -173,16 +167,8 @@
                 <a href="/">Home</a>
               </li>
               <li>
-                <a href="/learn">Learn</a>
+                <a href="/gallery">Gallery</a>
               </li>
-              <li>
-                <a href="/playtest">Playtest</a>
-              </li>
-              {% if user_email %}
-                <li>
-                  <a href="/contribute">Contribute</a>
-                </li>
-              {% endif %}
               {% for page in ABOUT_PAGES %}
                 <li>
                   <a href="{{page['url']}}">{{page['name']}}</a>

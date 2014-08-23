@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Gallery
+{% endblock subtitle %}
+
+{% block content %}
+
+  <div class="container" ng-controller="Gallery">
+    <div class="oppia-main-content">
+
+      <div class="row">
+        <div class="col-lg-10 col-md-10 col-sm-10">
+          {% if not user_email %}
+            <!-- User must log in. -->
+            <span class="pull-right">
+              <a class="btn btn-success btn-lg" href="{{login_url}}">
+                Create New Exploration
+              </a>
+            </span>
+          {% elif not username %}
+            <!-- User must register. -->
+            <span class="pull-right">
+              <a class="btn btn-success btn-lg" href="/editor_prerequisites?return_url=gallery">
+                Create New Exploration
+              </a>
+            </span>
+          {% else %}
+            <span class="pull-right">
+              <a class="btn btn-success btn-lg" ng-click="showCreateExplorationModal(categoryList)">
+                Create New Exploration
+              </a>
+              {% if allow_yaml_file_upload %}
+                <a class="btn btn-default btn-lg" ng-click="showUploadExplorationModal(categoryList)">
+                  Upload Existing Exploration
+                </a>
+              {% endif %}
+            </span>
+          {% endif %}
+
+          <h3 class="oppia-page-title">
+            Gallery
+          </h3>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-2 col-md-2 col-sm-2">
+          <div class="nav nav-tabs oppia-gallery-nav-tabs oppia-light-border-right">
+            <div class="oppia-gallery-menu">
+              <h4><strong>Categories</strong></h4>
+              <ul class="nav nav-pills nav-stacked" id="navTabs">
+                <li ng-repeat="category in categoryList" class="checkbox">
+                  <label>
+                    <input type="checkbox" ng-model="selectedCategories[category]">
+                    <[category]>
+                  </label>
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          <div class="tab-content oppia-gallery-tiles-container">
+            <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories).length === 0">
+              <em>No explorations selected.</em>
+            </div>
+
+            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories track by $index" class="oppia-gallery-tile">
+              <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
+                <div class="oppia-gallery-tile-top">
+                  <div class="oppia-gallery-tile-description">
+                    <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                  </div>
+                </div>
+
+                <div class="oppia-gallery-tile-middle" style="color: black;">
+                  <[getFormattedObjective(exploration.objective)]>
+                </div>
+              </a>
+
+              <div class="oppia-gallery-tile-bottom">
+                <span class="oppia-gallery-tile-last-updated">
+                  Last update: <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                </span>
+
+                <span class="pull-right">
+                  <span class="label label-info">
+                    <[exploration.category]>
+                  </span>
+                  <span ng-if="exploration.status === 'public'" class="label label-info" style="opacity: 0.5">
+                    Beta
+                  </span>
+                  <a ng-href="/create/<[exploration.id]>">
+                    <!-- TODO(sll): Generalize this to 'is_editable'. -->
+                    <span ng-if="exploration.community_owned">
+                      <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
+                      <span class="oppia-small-font">Edit</span>
+                    </span>
+                    <span ng-if="!exploration.community_owned">
+                      <span class="oppia-small-font">View</span>
+                    </span>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {% include 'components/exploration_creation_button.html' %}
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('components/explorationCreationButton.js') }}
+    {{ include_js_file('galleries/Gallery.js') }}
+  </script>
+  {{ noninteractive_widget_html }}
+{% endblock footer_js %}

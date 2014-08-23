@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for the controller of the 'contribute' gallery page.
+ * @fileoverview Unit tests for the controller of the gallery page.
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -21,7 +21,7 @@
 describe('Gallery controller', function() {
   beforeEach(module('oppia'));
 
-  describe('ContributeGallery', function() {
+  describe('Gallery', function() {
     var scope, ctrl, $httpBackend;
 
     beforeEach(function() {
@@ -30,48 +30,44 @@ describe('Gallery controller', function() {
 
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/contributehandler/data').respond({
+      $httpBackend.expectGET('/galleryhandler/data').respond({
         allow_yaml_file_upload: false,
-        categories: {
-          Geography: [{
-            can_edit: false,
-            id: '5',
-            is_cloned: false,
-            is_community_owned: false,
-            is_private: false,
-            is_public: true,
-            is_publicized: false,
-            title: 'Landmarks'
-          }, {
-            can_edit: false,
-            id: '3',
-            is_cloned: false,
-            is_community_owned: false,
-            is_private: false,
-            is_public: true,
-            is_publicized: false,
-            title: 'Geography 2'
-          }],
-          Personal: [{
-            can_edit: true,
-            id: '6',
-            is_cloned: false,
-            is_community_owned: false,
-            is_private: false,
-            is_public: true,
-            is_publicized: false,
-            title: 'My Exploration'
-          }]
-        }
+        beta: [{
+          id: '5',
+          title: 'Landmarks',
+          category: 'Geography',
+          objective: 'can view maps',
+          last_updated: 12345678911111,
+          community_owned: false,
+          status: 'public'
+        }, {
+          id: '3',
+          title: 'Geography 2',
+          category: 'Geography',
+          objective: 'can view more maps',
+          last_updated: 12345678912345,
+          community_owned: false,
+          status: 'public'
+        }, {
+          id: '6',
+          title: 'My Exploration',
+          category: 'Personal',
+          objective: 'can be for myself',
+          last_updated: 12345678954322,
+          community_owned: false,
+          status: 'public'
+        }],
+        released: []
       });
       scope = $rootScope.$new();
-      ctrl = $controller('ContributeGallery', {
+      ctrl = $controller('Gallery', {
         $scope: scope,
         warningsData: null,
         createExplorationButtonService: {
           showCreateExplorationModal: null,
           showUploadExplorationModal: null
-        }
+        },
+        oppiaDatetimeFormatter: null
       });
     }));
 
