@@ -185,6 +185,9 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
 
+    def _list_dir_non_hidden(self, dir):
+        return [name for name in os.listdir(dir) if not name.startswith('.')]
+
     def test_default_noninteractive_widgets_are_valid(self):
         """Test that the default noninteractive widgets are valid."""
         noninteractive_bindings = (
@@ -201,7 +204,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
             # In this directory there should be a config .py file, an
             # html file, a JS file, and a .png file.
-            dir_contents = os.listdir(widget_dir)
+            dir_contents = self._list_dir_non_hidden(widget_dir)
             self.assertLessEqual(len(dir_contents), 5)
 
             optional_dirs_and_files_count = 0
@@ -279,7 +282,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             # html file, a JS file, (optionally) a directory named 'static',
             # (optionally) a widget JS test file, and (optionally) a
             # stats_response.html file.
-            dir_contents = os.listdir(widget_dir)
+            dir_contents = self._list_dir_non_hidden(widget_dir)
             self.assertLessEqual(len(dir_contents), 7)
 
             optional_dirs_and_files_count = 0
