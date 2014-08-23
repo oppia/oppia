@@ -32,6 +32,7 @@ oppia.directive('graphEditor', function($compile, warningsData) {
       $scope.graph = $scope.$parent.value; 
       $scope.vertexEditPermissions = true;
       $scope.movePermissions = true;
+      $scope.graphEditPermissions = true;
 
       var testGraph = {
         "vertices":  [

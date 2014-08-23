@@ -29,17 +29,35 @@
   <div class='oppia-graph-viz-container'>
     <svg class='oppia-graph-viz-svg' width="100%" height="350" ng-mousemove="mousemoveGraphSVG($event)" ng-click="clickGraphSVG($event)">
       <svg viewBox="0 0 50 350" width="100%" height="350" preserveAspectRatio="xMaxYMin meet">
-        <rect ng-repeat="button in buttons"
-          width="30"
+        <g ng-repeat="button in buttons">
+          <rect width="30"
+            height="30"
+            x="0"
+            ng-attr-y="<[20 + 50 * $index]>"
+            rx="5"
+            ry="5"
+            ng-click="setMode(button.mode, $event)"
+            ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
+          </rect>
+          <text style="pointer-events: none; font-family: 'Glyphicons Halflings';" x="8" ng-attr-y="<[42 + 50 * $index]>">
+            <[button.text]>
+          </text>
+        </g>
+      </svg>
+      <g ng-if="graphEditPermissions" ng-repeat="button in graphOptions">
+        <rect width="70"
           height="30"
-          x="0"
-          ng-attr-y="<[20 + 50 * $index]>"
+          ng-attr-x="<[10 + 110 * $index]>"
+          y="10"
           rx="5"
           ry="5"
-          ng-click="setMode(button, $event)"
-          ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button) ? 3 : 1]>;">
+          ng-attr-style="stroke: black; fill: white; stroke-width: <[(graph[button.option]) ? 3 : 1]>;"
+          ng-click="graph[button.option] = !graph[button.option];">
         </rect>
-      </svg>
+        <text style="pointer-events: none;" ng-attr-x="<[20 + 108 * $index]>" y="30">
+          <[button.text]>
+        </text>
+      </g>
       <line ng-if="state.addEdgeVertex!=null"
         ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
         ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
@@ -58,25 +76,24 @@
       </line>
       <g graph-input-vertex 
         ng-repeat="vertex in graph.vertices"
-        ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)"
+        ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)">
+        <text ng-if="graph.isLabeled" 
+          x="0" 
+          y="-10"
+          ng-dblclick="startEditVertexLabel(graph, state)">
+          <[vertex.label]>
+        </text>
+        <circle ng-mouseenter="state.hoverVertex = $index"
+          ng-mouseleave="state.hoverVertex = ($index == state.hoverVertex) ? null : state.hoverVertex"
+          ng-click="clickGraphVertex(graph, state)"
+          ng-mousedown="mousedownGraphVertex(graph, state)"
+          ng-mouseup="mouseupGraphVertex(graph,state)"
+          ng-dblclick="startEditVertexLabel(graph, state)"
+          cx="0"
+          cy="0"
+          r="5">
+        </circle>
       </g>
     </svg>
   </div>
-</script>
-
-<script type="text/ng-template" id="graphViz/graphVizVertex">
-<text ng-if="graph.isLabeled" x="0" y="-10">
-  <[vertex.label]>
-</text>
-<circle 
-  ng-mouseenter="state.hoverVertex = $index"
-  ng-mouseleave="state.hoverVertex = ($index == state.hoverVertex) ? null : state.hoverVertex"
-  ng-click="clickGraphVertex(graph, state)"
-  ng-mousedown="mousedownGraphVertex(graph, state)"
-  ng-mouseup="mouseupGraphVertex(graph,state)"
-  ng-attr-index="<[$index]>"
-  cx="0"
-  cy="0"
-  r="5">
-</circle>
 </script>

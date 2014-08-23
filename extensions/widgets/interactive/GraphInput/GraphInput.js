@@ -162,12 +162,38 @@ oppia.directive('graphViz', function() {
       $scope.init();
       
       function initButtons() {
-        $scope.buttons = [$scope.modes.SELECT, $scope.modes.ADD_EDGE];
+        $scope.buttons = [{
+          text: "\uE068",
+          mode: $scope.modes.SELECT
+        },
+        {
+          text: "\uE144",
+          mode: $scope.modes.ADD_EDGE
+        }];
         if ($scope.vertexEditPermissions) {
-          $scope.buttons.push($scope.modes.ADD_VERTEX);
+          $scope.buttons.push({
+            text: "\u002B",
+            mode: $scope.modes.ADD_VERTEX
+          });
         }
-        $scope.buttons.push($scope.modes.DELETE);
+        $scope.buttons.push({
+          text: "\u2212",
+          mode: $scope.modes.DELETE
+        });
+
       }
+      $scope.graphOptions = [{
+        text: "Labeled",
+        option: "isLabeled"
+      },
+      {
+        text: "Directed",
+        option: "isDirected"
+      },
+      {
+        text: "Weighted",
+        option: "isWeighted"
+      }];
       $scope.setMode = function(mode, $event) {
         $event.preventDefault();
         $event.stopPropagation();
@@ -182,7 +208,6 @@ oppia.directive('graphViz', function() {
 oppia.directive('graphInputVertex', ['$document', function($document) {
   return {
     restrict: 'A',
-    templateUrl: "graphViz/graphVizVertex",
     controller: function($scope, $element, $attrs) {
       $scope.clickGraphVertex = function(graph, state) {
         if (state.currentMode == state.modes.DELETE && state.vertexEditPermissions) {
@@ -227,6 +252,11 @@ oppia.directive('graphInputVertex', ['$document', function($document) {
 
       $scope.mouseupGraphVertex = function(graph, state) {
         state.dragVertex = null;
+      };
+
+      $scope.startEditVertexLabel = function(graph, state) {
+        if (!graph.isLabeled || state.currentMode != state.modes.SELECT) return;
+        graph.vertices[$scope.$index].label = "TEST";
       };
       
       function checkValidEdge(graph, src, dst) {
