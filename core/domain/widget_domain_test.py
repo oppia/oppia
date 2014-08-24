@@ -65,7 +65,8 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text input')
 
-        self.assertIn('input ng-if="rows == 1"', widget.html_body)
+        self.assertIn('id="interactiveWidget/TextInput"', widget.html_body)
+        self.assertIn('id="response/TextInput"', widget.html_body)
 
         tag = widget.get_interactive_widget_tag({})
         self.assertEqual(
@@ -97,10 +98,10 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'description': 'The number of rows for the text input field.',
             'schema': {
                 'type': 'int',
-                'post_normalizers': [{
-                    'id': 'require_at_least', 'min_value': 1
+                'validators': [{
+                    'id': 'is_at_least', 'min_value': 1
                 }, {
-                    'id': 'require_at_most', 'max_value': 200
+                    'id': 'is_at_most', 'max_value': 200
                 }]
             },
             'default_value': 1,

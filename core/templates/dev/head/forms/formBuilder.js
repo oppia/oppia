@@ -18,13 +18,10 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.run(function($rootScope) {
-  $rootScope.FORM_BUILDER_MODES = {
-    READONLY: 'readonly',
-    DISABLED: 'disabled',
-    ENABLED: 'enabled'
-  };
-});
+// NOTE TO DEVELOPERS: This forms framework accepts an external event
+// named 'schemaBasedFormsShown'. This should be called by clients
+// when these forms first come into view.
+
 
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {
@@ -168,8 +165,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
     restrict: 'E',
     scope: {
       allowedParameterNames: '&',
-      localValue: '=',
-      mode: '='
+      localValue: '='
     },
     template: (
       '<div class="input-group">' +
@@ -440,7 +436,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
 
 oppia.factory('schemaDefaultValueService', [function() {
   return {
-    // TODO(sll): Rewrite this to take into account post_normalizers, so that
+    // TODO(sll): Rewrite this to take validators into account, so that
     // we always start with a valid value.
     getDefaultValue: function(schema) {
       if (schema.choices) {
@@ -450,7 +446,7 @@ oppia.factory('schemaDefaultValueService', [function() {
       } else if (schema.type === 'unicode' || schema.type === 'html') {
         return '';
       } else if (schema.type === 'list') {
-        return [];
+        return [this.getDefaultValue(schema.items)];
       } else if (schema.type === 'dict') {
         var result = {};
         for (var i = 0; i < schema.properties.length; i++) {
@@ -467,56 +463,345 @@ oppia.factory('schemaDefaultValueService', [function() {
 }]);
 
 
-oppia.filter('requireIsFloat', [function() {
-  return function(input) {
-    var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
-    if (!FLOAT_REGEXP.test(input)) {
-      return undefined;
-    }
+// Directive for the rich text editor component.
+oppia.directive('richTextEditor', [
+  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'widgetDefinitionsService',
+  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, widgetDefinitionsService) {
+    return {
+      restrict: 'E',
+      scope: {
+        htmlContent: '=',
+        disallowOppiaWidgets: '@',
+        // Optional string; allowed values are 'small' or 'large'.
+        size: '@'
+      },
+      template: '<textarea rows="7" ng-disabled="!hasFullyLoaded"></textarea>',
+      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
+        $scope.disallowOppiaWidgets = ($scope.disallowOppiaWidgets || false);
 
-    return (typeof input === 'number') ? input : parseFloat(
-      input.replace(',', '.'));
-  };
-}]);
+        var rteNode = $element[0].firstChild;
+        // A pointer to the editorDoc in the RTE iframe. Populated when the RTE is
+        // initialized.
+        $scope.editorDoc = null;
+
+        // Creates a dict.
+        $scope._createCustomizationArgDictFromAttrs = function(attrs) {
+          var customizationArgsDict = {};
+          for (var i = 0; i < attrs.length; i++) {
+            var attr = attrs[i];
+            if (attr.name == 'class' || attr.name == 'src') {
+              continue;
+            }
+            var separatorLocation = attr.name.indexOf('-with-value');
+            if (separatorLocation === -1) {
+              $log.error('RTE Error: invalid customization attribute ' + attr.name);
+              continue;
+            }
+            var argName = attr.name.substring(0, separatorLocation);
+            customizationArgsDict[argName] = oppiaHtmlEscaper.escapedJsonToObj(attr.value);
+          }
+          return customizationArgsDict;
+        };
+
+        $scope._createRteElement = function(widgetDefinition, customizationArgsDict) {
+          var el = $('<img/>');
+          el.attr('src', widgetDefinition.iconDataUrl);
+          el.addClass('oppia-noninteractive-' + widgetDefinition.name);
+
+          for (var attrName in customizationArgsDict) {
+            el.attr(
+              $filter('camelCaseToHyphens')(attrName) + '-with-value',
+              oppiaHtmlEscaper.objToEscapedJson(customizationArgsDict[attrName]));
+          }
+
+          var domNode = el.get(0);
+          // This dblclick handler is stripped in the initial HTML --> RTE conversion,
+          // so it needs to be reinstituted after the jwysiwyg iframe is loaded.
+          domNode.ondblclick = function() {
+            el.addClass('insertionPoint');
+            $scope.openRteCustomizationModal(widgetDefinition, customizationArgsDict);
+          };
+
+          return domNode;
+        };
+
+        // Replace <oppia-noninteractive> tags with <img> tags.
+        $scope._convertHtmlToRte = function(html) {
+          var elt = $('<div>' + html + '</div>');
+
+          $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
+            elt.find('oppia-noninteractive-' + widgetDefn.name).replaceWith(function() {
+              return $scope._createRteElement(
+                widgetDefn, $scope._createCustomizationArgDictFromAttrs(this.attributes));
+            });
+          });
+
+          return elt.html();
+        };
+
+        // Replace <img> tags with <oppia-noninteractive> tags.
+        $scope._convertRteToHtml = function(rte) {
+          var elt = $('<div>' + rte + '</div>');
+
+          $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
+            elt.find('img.oppia-noninteractive-' + widgetDefn.name).replaceWith(function() {
+              var jQueryElt = $('<' + this.className + '/>');
+              for (var i = 0; i < this.attributes.length; i++) {
+                var attr = this.attributes[i];
+                if (attr.name !== 'class' && attr.name !== 'src') {
+                  jQueryElt.attr(attr.name, attr.value);
+                }
+              }
+              return jQueryElt.get(0);
+            });
+          });
+
+          return elt.html();
+        };
+
+        $scope.openRteCustomizationModal = function(widgetDefinition, attrsCustomizationArgsDict) {
+          $modal.open({
+            templateUrl: 'modals/customizeWidget',
+            backdrop: 'static',
+            resolve: {
+              widgetDefinition: function() {
+                return widgetDefinition;
+              },
+              attrsCustomizationArgsDict: function() {
+                return attrsCustomizationArgsDict;
+              }
+            },
+            controller: [
+              '$scope', '$modalInstance', 'widgetDefinition', 'attrsCustomizationArgsDict',
+              function($scope, $modalInstance, widgetDefinition, attrsCustomizationArgsDict) {
+                $scope.widgetDefinition = widgetDefinition;
+
+                $scope.customizationArgsList = angular.copy(widgetDefinition.customization_args);
+                for (var i = 0; i < $scope.customizationArgsList.length; i++) {
+                  var caName = $scope.customizationArgsList[i].name;
+                  if (attrsCustomizationArgsDict.hasOwnProperty(caName)) {
+                    $scope.customizationArgsList[i].value = attrsCustomizationArgsDict[caName];
+                  } else {
+                    $scope.customizationArgsList[i].value = $scope.customizationArgsList[i].default_value;
+                  }
+                }
+
+                $scope.cancel = function() {
+                  $modalInstance.dismiss('cancel');
+                };
+
+                $scope.save = function(customizationArgs) {
+                  var customizationArgsDict = {};
+                  for (var i = 0; i < $scope.customizationArgsList.length; i++) {
+                    var caName = $scope.customizationArgsList[i].name;
+                    customizationArgsDict[caName] = $scope.customizationArgsList[i].value;
+                  }
+
+                  $modalInstance.close({
+                    customizationArgsDict: customizationArgsDict,
+                    widgetDefinition: $scope.widgetDefinition
+                  });
+                };
+              }
+            ]
+          }).result.then(function(result) {
+            var el = $scope._createRteElement(result.widgetDefinition, result.customizationArgsDict);
+            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
+            insertionPoint.parentNode.replaceChild(el, insertionPoint);
+            $(rteNode).wysiwyg('save');
+          }, function () {
+            var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
+            insertionPoint.className = insertionPoint.className.replace(/\binsertionPoint\b/, '');
+          });
+        };
+
+        $scope.currentlyEditing = false;
+        $scope.$watch('htmlContent', function(newValue, oldValue) {
+          if ($scope.hasFullyLoaded && !$scope.currentlyEditing) {
+            // This is an external change.
+            console.log($scope.htmlContent);
+            $scope.rteContent = $scope._convertHtmlToRte(newValue);
+            $(rteNode).wysiwyg('setContent', $scope.rteContent);
+          }
+        });
+
+        $scope._saveContent = function() {
+          var content = $(rteNode).wysiwyg('getContent');
+          if (content !== null && content !== undefined) {
+            // The following $timeout removes the '$apply in progress' errors.
+            $timeout(function() {
+              $scope.$apply(function() {
+                $scope.currentlyEditing = true;
+                $scope.htmlContent = $scope._convertRteToHtml(content);
+                // TODO(sll): This is a somewhat hacky solution. Can it be cleaned up?
+                $timeout(function() {
+                  $scope.currentlyEditing = false;
+                }, 50);
+              });
+            });
+          }
+        };
+
+        $scope.$on('externalSave', function() {
+          $scope._saveContent();
+        });
+
+        $scope.hasFullyLoaded = false;
+
+        $scope.init = function() {
+          widgetDefinitionsService.getNoninteractiveDefinitions().then(function(widgetDefns) {
+            $scope._NONINTERACTIVE_WIDGETS = [];
+            if (!$scope.disallowOppiaWidgets) {
+              var widgetIds = [];
+              for (var widgetId in widgetDefns) {
+                widgetIds.push(widgetId);
+              }
+              widgetIds.sort().forEach(function(widgetId) {
+                widgetDefns[widgetId].backendName = widgetDefns[widgetId].name;
+                widgetDefns[widgetId].name = widgetDefns[widgetId].frontend_name;
+                widgetDefns[widgetId].iconDataUrl = widgetDefns[widgetId].icon_data_url;
+                $scope._NONINTERACTIVE_WIDGETS.push(widgetDefns[widgetId]);
+              });
+            }
+
+            $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
+
+            var sizeClass = (
+              $scope.size == 'small' ? ' wysiwyg-content-small' :
+              $scope.size == 'large' ? ' wysiwyg-content-large' :
+              '');
+
+            $(rteNode).wysiwyg({
+              autoGrow: true,
+              autoSave: true,
+              controls: {
+                bold: {groupIndex: 2, visible: true},
+                italic: {groupIndex: 2, visible: true},
+                underline: {groupIndex: 2, visible: true},
+                undo: {groupIndex: 2, visible: true},
+                redo: {groupIndex: 2, visible: true},
+                indent: {groupIndex: 2, visible: true},
+                outdent: {groupIndex: 2, visible: true},
+                insertOrderedList: {groupIndex: 2, visible: true},
+                insertUnorderedList: {groupIndex: 2, visible: true},
+                insertHorizontalRule: {groupIndex: 2, visible: true},
+                insertTable: {groupIndex: 2, visible: true},
+                code: {groupIndex: 2, visible: true},
+                removeFormat: {groupIndex: 2, visible: true}
+              },
+              css: '/css/rte_multiline.css',
+              debug: true,
+              events: {
+                save: function(event) {
+                  $scope._saveContent();
+                }
+              },
+              iFrameClass: 'wysiwyg-content' + sizeClass,
+              initialContent: $scope.rteContent,
+              resizeOptions: true,
+              rmUnusedControls: true
+            });
+
+            // Add the non-interactive widget controls to the RTE.
+            $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefinition) {
+              $(rteNode).wysiwyg('addControl', widgetDefinition.name, {
+                groupIndex: 1,
+                icon: widgetDefinition.iconDataUrl,
+                tooltip: widgetDefinition.tooltip,
+                tags: [],
+                visible: true,
+                exec: function() {
+                  $(rteNode).wysiwyg(
+                      'insertHtml', '<span class="insertionPoint"></span>');
+                  $scope.openRteCustomizationModal(widgetDefinition, {});
+                }
+              });
+            });
+
+            $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
+
+            // Add dblclick handlers to the various nodes.
+            $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefinition) {
+              var elts = Array.prototype.slice.call(
+                $scope.editorDoc.querySelectorAll(
+                  '.oppia-noninteractive-' + widgetDefinition.name));
+              elts.forEach(function(elt) {
+                elt.ondblclick = function() {
+                  this.className += ' insertionPoint';
+                  $scope.openRteCustomizationModal(
+                    widgetDefinition,
+                    $scope._createCustomizationArgDictFromAttrs(this.attributes)
+                  );
+                };
+              });
+            });
+
+            // Disable jquery.ui.dialog so that the link control works correctly.
+            $.fn.dialog = null;
+
+            $scope.hasFullyLoaded = true;
+          });
+        };
+
+        $scope.init();
+      }]
+    };
+  }
+]);
 
 
-// The names of these filters must correspond to the names of the backend post-
-// normalizers (with underscores converted to camelcase).
+// The names of these filters must correspond to the names of the backend
+// validators (with underscores converted to camelcase).
 // WARNING: These filters do not validate the arguments supplied with the
-// post-normalizer definitions in the schema; these are assumed to be correct.
-oppia.filter('requireAtLeast', [function() {
+// validator definitions in the schema; these are assumed to be correct.
+oppia.filter('isAtLeast', [function() {
   return function(input, args) {
-    return (input >= args.minValue) ? input : undefined;
+    return (input >= args.minValue);
   };
 }]);
 
 
-oppia.filter('requireAtMost', [function() {
+oppia.filter('isAtMost', [function() {
   return function(input, args) {
-    return (input <= args.maxValue) ? input : undefined;
+    return (input <= args.maxValue);
   };
 }]);
 
 
-oppia.filter('requireNonempty', [function() {
+oppia.filter('isNonempty', [function() {
   return function(input) {
-    return input ? input : undefined;
+    return Boolean(input);
   };
 }]);
 
 
-oppia.directive('validateWithPostNormalizers', ['$filter', function($filter) {
+oppia.filter('isFloat', [function() {
+  return function(input) {
+    // TODO(sll): Accept expressions (like '2.') with nothing after the decimal
+    // point.
+    var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+
+    viewValue = input.toString();
+    if (viewValue !== '' && viewValue !== '-' && FLOAT_REGEXP.test(viewValue)) {
+      return parseFloat(viewValue.replace(',', '.'));
+    }
+    return undefined;
+  };
+}]);
+
+
+oppia.directive('applyValidation', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
     link: function(scope, elm, attrs, ctrl) {
-      // Add normalizers in reverse order.
-      if (scope.postNormalizers()) {
-        scope.postNormalizers().forEach(function(normalizerSpec) {
-          var frontendName = $filter('underscoresToCamelCase')(normalizerSpec.id);
+      // Add validators in reverse order.
+      if (scope.validators()) {
+        scope.validators().forEach(function(validatorSpec) {
+          var frontendName = $filter('underscoresToCamelCase')(validatorSpec.id);
 
           // Note that there may not be a corresponding frontend filter for
-          // each backend normalizer.
+          // each backend validator.
           try {
             $filter(frontendName);
           } catch(err) {
@@ -524,17 +809,17 @@ oppia.directive('validateWithPostNormalizers', ['$filter', function($filter) {
           }
 
           var filterArgs = {};
-          for (key in normalizerSpec) {
+          for (key in validatorSpec) {
             if (key !== 'id') {
               filterArgs[$filter('underscoresToCamelCase')(key)] = angular.copy(
-                normalizerSpec[key]);
+                validatorSpec[key]);
             }
           }
 
           var customValidator = function(viewValue) {
-            var filteredValue = $filter(frontendName)(viewValue, filterArgs);
-            ctrl.$setValidity(frontendName, filteredValue !== undefined);
-            return filteredValue;
+            ctrl.$setValidity(
+              frontendName, $filter(frontendName)(viewValue, filterArgs));
+            return viewValue;
           };
 
           ctrl.$parsers.unshift(customValidator);
@@ -545,17 +830,16 @@ oppia.directive('validateWithPostNormalizers', ['$filter', function($filter) {
   };
 }]);
 
-// This should come after validate-with-post-normalizers, if that is defined as
+// This should come before 'apply-validation', if that is defined as
 // an attribute on the HTML tag.
-oppia.directive('addFloatValidation', ['$filter', function($filter) {
-  var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
+oppia.directive('requireIsFloat', ['$filter', function($filter) {
   return {
     require: 'ngModel',
     restrict: 'A',
     link: function(scope, elm, attrs, ctrl) {
       var floatValidator = function(viewValue) {
-        var filteredValue = $filter('requireIsFloat')(viewValue);
-        ctrl.$setValidity('requireIsFloat', filteredValue !== undefined);
+        var filteredValue = $filter('isFloat')(viewValue);
+        ctrl.$setValidity('isFloat', filteredValue !== undefined);
         return filteredValue;
       };
 
@@ -608,12 +892,19 @@ oppia.factory('recursionHelper', ['$compile', function($compile){
   };
 }]);
 
-oppia.directive('schemaBuilder', [function() {
+/*********************************************************************
+ *
+ * DIRECTIVES FOR SCHEMA-BASED EDITORS
+ *
+ *********************************************************************/
+oppia.directive('schemaBasedEditor', [function() {
   return {
     scope: {
       schema: '&',
-      mode: '=',
-      localValue: '='
+      disabled: '&',
+      localValue: '=',
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'
@@ -629,7 +920,7 @@ oppia.directive('schemaBasedChoicesEditor', ['recursionHelper', function(recursi
       // The schema for this object.
       // TODO(sll): Validate each choice against the schema.
       schema: '&',
-      mode: '='
+      disabled: '&'
     },
     templateUrl: 'schemaBasedEditor/choices',
     restrict: 'E',
@@ -644,44 +935,33 @@ oppia.directive('schemaBasedChoicesEditor', ['recursionHelper', function(recursi
   };
 }]);
 
-oppia.directive('schemaBasedBoolEditor', [function() {
+oppia.directive('schemaBasedExpressionEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // Read-only property. Whether the item is editable.
-      mode: '=',
-      allowParameters: '&'
+      disabled: '&',
+      paramNames: '&',
+      // TODO(sll): Currently only takes a string which is either 'bool', 'int' or 'float'.
+      // May need to generalize.
+      outputType: '&',
+      labelForFocusTarget: '&'
     },
-    templateUrl: 'schemaBasedEditor/bool',
+    templateUrl: 'schemaBasedEditor/expression',
     restrict: 'E',
-    controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
-      $scope.editAsParameter = angular.isString($scope.localValue);
-
-      $scope.boolEditorOptions = [{
-        name: 'True',
-        value: true
-      }, {
-        name: 'False',
-        value: false
-      }];
-
-      if ($scope.allowParameters()) {
-        var paramNames = parameterSpecsService.getAllParamsOfType('bool');
-        paramNames.forEach(function(paramName) {
-          $scope.boolEditorOptions.push({
-            name: '[Parameter] ' + paramName,
-            value: paramName
-          });
-        });
-      }
+    controller: ['$scope', function($scope) {
+      $scope.paramNameOptions = $scope.paramNames().map(function(paramName) {
+        return {
+          name: paramName,
+          value: paramName
+        };
+      });
 
       $scope.$watch('localValue', function(newValue, oldValue) {
         // Because JS objects are passed by reference, the current value needs
         // to be set manually to an object in the list of options.
-        $scope.boolEditorOptions.forEach(function(option) {
+        $scope.paramNameOptions.forEach(function(option) {
           if (angular.equals(option.value, newValue)) {
             $scope.localValue = option.value;
-            $scope.editAsParameter = angular.isString($scope.localValue);
           }
         });
       });
@@ -689,48 +969,29 @@ oppia.directive('schemaBasedBoolEditor', [function() {
   };
 }]);
 
-oppia.directive('schemaBasedFloatEditor', [function() {
+oppia.directive('schemaBasedBoolEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // The mode in which to display the form. Should be treated as read-only.
-      mode: '=',
-      allowParameters: '&',
-      postNormalizers: '&'
+      disabled: '&',
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
-    templateUrl: 'schemaBasedEditor/float',
+    templateUrl: 'schemaBasedEditor/bool',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
-      $scope.editAsParameter = false;
+      if ($scope.allowExpressions()) {
+        $scope.paramNames = parameterSpecsService.getAllParamsOfType('bool');
+        $scope.expressionMode = angular.isString($scope.localValue);
 
-      if ($scope.allowParameters()) {
-        var paramNames = parameterSpecsService.getAllParamsOfType('float');
-        if (paramNames.length) {
-          $scope.paramNameOptions = paramNames.map(function(paramName) {
-            return {
-              name: paramName,
-              value: paramName
-            };
-          });
+        $scope.$watch('localValue', function(newValue, oldValue) {
+          $scope.expressionMode = angular.isString(newValue);
+        });
 
-          $scope.$watch('localValue', function(newValue, oldValue) {
-            $scope.editAsParameter = angular.isString(newValue);
-            // Because JS objects are passed by reference, the current value needs
-            // to be set manually to an object in the list of options.
-            if ($scope.editAsParameter) {
-              $scope.paramNameOptions.forEach(function(option) {
-                if (angular.equals(option.value, newValue)) {
-                  $scope.localValue = option.value;
-                }
-              });
-            }
-          });
-
-          $scope.toggleEditMode = function() {
-            $scope.editAsParameter = !$scope.editAsParameter;
-            $scope.localValue = $scope.editAsParameter ? paramNames[0] : 0.0;
-          };
-        }
+        $scope.toggleExpressionMode = function() {
+          $scope.expressionMode = !$scope.expressionMode;
+          $scope.localValue = $scope.expressionMode ? $scope.paramNames[0] : false;
+        };
       }
     }]
   };
@@ -740,43 +1001,72 @@ oppia.directive('schemaBasedIntEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // The mode in which to display the form. Should be treated as read-only.
-      mode: '=',
-      allowParameters: '&'
+      disabled: '&',
+      allowExpressions: '&',
+      validators: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
-      $scope.editAsParameter = false;
+      if ($scope.allowExpressions()) {
+        $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
+        $scope.expressionMode = angular.isString($scope.localValue);
 
-      if ($scope.allowParameters()) {
-        var paramNames = parameterSpecsService.getAllParamsOfType('int');
-        if (paramNames.length) {
-          $scope.paramNameOptions = paramNames.map(function(paramName) {
-            return {
-              name: paramName,
-              value: paramName
-            };
-          });
+        $scope.$watch('localValue', function(newValue, oldValue) {
+          $scope.expressionMode = angular.isString(newValue);
+        });
 
-          $scope.$watch('localValue', function(newValue, oldValue) {
-            $scope.editAsParameter = angular.isString(newValue);
-            // Because JS objects are passed by reference, the current value needs
-            // to be set manually to an object in the list of options.
-            if ($scope.editAsParameter) {
-              $scope.paramNameOptions.forEach(function(option) {
-                if (angular.equals(option.value, newValue)) {
-                  $scope.localValue = option.value;
-                }
-              });
-            }
-          });
+        $scope.toggleExpressionMode = function() {
+          $scope.expressionMode = !$scope.expressionMode;
+          $scope.localValue = $scope.expressionMode ? $scope.paramNames[0] : 0;
+        };
+      }
+    }]
+  };
+}]);
 
-          $scope.toggleEditMode = function() {
-            $scope.editAsParameter = !$scope.editAsParameter;
-            $scope.localValue = $scope.editAsParameter ? paramNames[0] : 0;
-          };
+oppia.directive('schemaBasedFloatEditor', [function() {
+  return {
+    scope: {
+      localValue: '=',
+      disabled: '&',
+      allowExpressions: '&',
+      validators: '&',
+      labelForFocusTarget: '&'
+    },
+    templateUrl: 'schemaBasedEditor/float',
+    restrict: 'E',
+    controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
+      $scope.getMinValue = function() {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'is_at_least') {
+            return $scope.validators()[i].min_value;
+          }
         }
+      }
+
+      $scope.getMaxValue = function() {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'is_at_most') {
+            return $scope.validators()[i].max_value;
+          }
+        }
+      }
+
+      if ($scope.allowExpressions()) {
+        $scope.paramNames = parameterSpecsService.getAllParamsOfType('float');
+        $scope.expressionMode = angular.isString($scope.localValue);
+
+        $scope.$watch('localValue', function(newValue, oldValue) {
+          $scope.expressionMode = angular.isString(newValue);
+        });
+
+        $scope.toggleExpressionMode = function() {
+          $scope.expressionMode = !$scope.expressionMode;
+          $scope.localValue = $scope.expressionMode ? $scope.paramNames[0] : 0.0;
+        };
       }
     }]
   };
@@ -786,10 +1076,11 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // The mode in which to display the form. Should be treated as read-only.
-      mode: '=',
-      postNormalizers: '&',
-      uiConfig: '&'
+      disabled: '&',
+      validators: '&',
+      uiConfig: '&',
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
@@ -803,11 +1094,62 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
         console.log('Multi-row unicode fields with parameters are not currently supported.');
       }
 
+      if ($scope.uiConfig() && $scope.uiConfig().coding_mode) {
+        // Flag that is flipped each time the codemirror view is
+        // shown. (The codemirror instance needs to be refreshed
+        // every time it is unhidden.)
+        $scope.codemirrorStatus = false;
+        var CODING_MODE_NONE = 'none';
+
+        $scope.codemirrorOptions = {
+          lineNumbers: true,
+          indentWithTabs: true,
+        }
+        if ($scope.disabled()) {
+          $scope.codemirrorOptions.readOnly = 'nocursor';
+        }
+        // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
+        // 'scheme' have CodeMirror-supported syntax highlighting. For other
+        // languages, syntax highlighting will not happen.
+        if ($scope.uiConfig().coding_mode !== CODING_MODE_NONE) {
+          $scope.codemirrorOptions.mode = $scope.uiConfig().coding_mode;
+        }
+
+        setTimeout(function() {
+          $scope.codemirrorStatus = !$scope.codemirrorStatus;
+        }, 200);
+
+        // When the form view is opened, flip the status flag. The
+        // timeout seems to be needed for the line numbers etc. to display
+        // properly.
+        $scope.$on('schemaBasedFormsShown', function() {
+          setTimeout(function() {
+            $scope.codemirrorStatus = !$scope.codemirrorStatus;
+          }, 200);
+        });
+      }
+
+      $scope.getPlaceholder = function() {
+        if (!$scope.uiConfig()) {
+          return '';
+        } else {
+          return $scope.uiConfig().placeholder;
+        }
+      };
+
       $scope.getRows = function() {
         if (!$scope.uiConfig()) {
           return null;
         } else {
           return $scope.uiConfig().rows;
+        }
+      };
+
+      $scope.getCodingMode = function() {
+        if (!$scope.uiConfig()) {
+          return null;
+        } else {
+          return $scope.uiConfig().coding_mode;
         }
       };
 
@@ -825,33 +1167,59 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      // The mode in which to display the form. Should be treated as read-only.
-      mode: '='
+      disabled: '&',
+      allowExpressions: '&',
+      labelForFocusTarget: '&',
+      uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/html',
-    restrict: 'E'
+    restrict: 'E',
+    controller: ['$scope', function($scope) {
+      $scope.getSize = function() {
+        if (!$scope.uiConfig()) {
+          return null;
+        } else {
+          return $scope.uiConfig().size;
+        }
+      };
+    }]
   };
 }]);
 
 oppia.directive('schemaBasedListEditor', [
-    'schemaDefaultValueService', 'recursionHelper',
-    function(schemaDefaultValueService, recursionHelper) {
+    'schemaDefaultValueService', 'recursionHelper', 'focusService',
+    function(schemaDefaultValueService, recursionHelper, focusService) {
   return {
     scope: {
       localValue: '=',
-      // The mode in which to display the form. Should be treated as read-only.
-      mode: '=',
+      disabled: '&',
       // Read-only property. The schema definition for each item in the list.
       itemSchema: '&',
       // The length of the list. If not specified, the list is of arbitrary length.
       len: '=',
       // UI configuration. May be undefined.
-      uiConfig: '&'
+      uiConfig: '&',
+      allowExpressions: '&',
+      validators: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
+      var baseFocusLabel = $scope.labelForFocusTarget() || Math.random().toString(36).slice(2) + '-';
+      $scope.getFocusLabel = function(index) {
+        // Treat the first item in the list as a special case -- if this list is
+        // contained in another list, and the outer list is opened with a desire
+        // to autofocus on the first input field, we can then focus on the given
+        // $scope.labelForFocusTarget().
+        // NOTE: This will cause problems for lists nested within lists, since
+        // sub-element 0 > 1 will have the same label as sub-element 1 > 0. But we
+        // will assume (for now) that nested lists won't be used -- if they are,
+        // this will need to be changed.
+        return index === 0 ? baseFocusLabel : baseFocusLabel + index.toString();
+      }
+
       $scope.addElementText = 'Add element';
       if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
         $scope.addElementText = $scope.uiConfig().add_element_text;
@@ -861,6 +1229,7 @@ oppia.directive('schemaBasedListEditor', [
         $scope.addElement = function() {
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
+          focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
         };
 
         $scope.deleteElement = function(index) {
@@ -883,11 +1252,12 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
   return {
     scope: {
       localValue: '=',
-      // The mode in which to display the form. Should be treated as read-only.
-      mode: '=',
+      disabled: '&',
       // Read-only property. An object whose keys and values are the dict
       // properties and the corresponding schemas.
-      propertySchemas: '&'
+      propertySchemas: '&',
+      allowExpressions: '&',
+      labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/dict',
     restrict: 'E',
@@ -896,6 +1266,12 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
       $scope.getHumanReadablePropertyDescription = function(property) {
         return property.description || '[' + property.name + ']';
       };
+
+      $scope.fieldIds = {};
+      for (var i = 0; i < $scope.propertySchemas().length; i++) {
+        // Generate random IDs for each field.
+        $scope.fieldIds[$scope.propertySchemas()[i].name] = Math.random().toString(36).slice(2);
+      }
     }]
   };
 }]);
@@ -908,6 +1284,108 @@ oppia.directive('schemaBasedCustomEditor', ['recursionHelper', function(recursio
       objType: '='
     },
     templateUrl: 'schemaBasedEditor/custom',
+    restrict: 'E',
+    compile: recursionHelper.compile
+  };
+}]);
+
+
+/*********************************************************************
+ *
+ * DIRECTIVES FOR SCHEMA-BASED VIEWERS
+ *
+ *********************************************************************/
+oppia.directive('schemaBasedViewer', [function() {
+  return {
+    scope: {
+      schema: '&',
+      localValue: '='
+    },
+    templateUrl: 'schemaBasedViewer/master',
+    restrict: 'E'
+  };
+}]);
+
+oppia.directive('schemaBasedPrimitiveViewer', [function() {
+  return {
+    scope: {
+      localValue: '='
+    },
+    templateUrl: 'schemaBasedViewer/primitive',
+    restrict: 'E',
+    controller: ['$scope', function($scope) {
+      $scope.isExpression = function(value) {
+        return angular.isString(value);
+      };
+    }]
+  };
+}]);
+
+oppia.directive('schemaBasedUnicodeViewer', [function() {
+  return {
+    scope: {
+      localValue: '='
+    },
+    templateUrl: 'schemaBasedViewer/unicode',
+    restrict: 'E',
+    controller: ['$scope', '$filter', '$sce', function($scope, $filter, $sce) {
+      $scope.getDisplayedValue = function() {
+        return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')($scope.localValue));
+      };
+    }]
+  };
+}]);
+
+oppia.directive('schemaBasedHtmlViewer', [function() {
+  return {
+    scope: {
+      localValue: '='
+    },
+    templateUrl: 'schemaBasedViewer/html',
+    restrict: 'E'
+  };
+}]);
+
+oppia.directive('schemaBasedListViewer', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. The schema definition for each item in the list.
+      itemSchema: '&'
+    },
+    templateUrl: 'schemaBasedViewer/list',
+    restrict: 'E',
+    compile: recursionHelper.compile
+  };
+}]);
+
+oppia.directive('schemaBasedDictViewer', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // Read-only property. An object whose keys and values are the dict
+      // properties and the corresponding schemas.
+      propertySchemas: '&'
+    },
+    templateUrl: 'schemaBasedViewer/dict',
+    restrict: 'E',
+    compile: recursionHelper.compile,
+    controller: ['$scope', function($scope) {
+      $scope.getHumanReadablePropertyDescription = function(property) {
+        return property.description || '[' + property.name + ']';
+      };
+    }]
+  };
+}]);
+
+oppia.directive('schemaBasedCustomViewer', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // The class of the object being edited.
+      objType: '='
+    },
+    templateUrl: 'schemaBasedViewer/custom',
     restrict: 'E',
     compile: recursionHelper.compile
   };

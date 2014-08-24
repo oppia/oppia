@@ -26,7 +26,17 @@ oppia.directive('oppiaInteractiveSetInput', [
       scope: {},
       templateUrl: 'interactiveWidget/SetInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
-        $scope.answer = [];
+        $scope.schema = {
+          type: 'list',
+          items: {
+            type: 'unicode'
+          },
+          ui_config: {
+            add_element_text: 'Add item'
+          }
+        };
+
+        $scope.answer = [''];
 
         $scope.addElement = function(newElement) {
           if (newElement !== 0 && !newElement) {
@@ -41,8 +51,24 @@ oppia.directive('oppiaInteractiveSetInput', [
           $scope.answer.splice(index, 1);
         };
 
+        var hasDuplicates = function(answer) {
+          for (var i = 0; i < answer.length; i++) {
+            for (var j = 0; j < i; j++) {
+              if (angular.equals(answer[i], answer[j], true)) {
+                return true;
+              }
+            }
+          }
+          return false;
+        }
+
         $scope.submitAnswer = function(answer) {
-          $scope.$parent.$parent.submitAnswer(answer, 'submit');
+          if (hasDuplicates(answer)) {
+            $scope.errorMessage = 'Oops, it looks like your list has duplicates!';
+          } else {
+            $scope.errorMessage = '';
+            $scope.$parent.$parent.submitAnswer(answer, 'submit');
+          }
         };
       }]
     };

@@ -18,14 +18,15 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('schemaBasedEditor', ['recursionHelper', function(recursionHelper) {
+oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
   return {
     scope: {
       definition: '=',
-      mode: '=',
-      savedValue: '='
+      disabled: '&',
+      savedValue: '=',
+      allowExpressions: '&'
     },
-    templateUrl: 'schemaBasedEditor/entryPoint',
+    templateUrl: 'formOverlay/entryPoint',
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
@@ -62,7 +63,8 @@ oppia.controller('FormBuilderTests', [
     schema: {
       type: 'unicode'
     },
-    value: 'aab{{paramUnicode1}}'
+    value: 'aab{{paramUnicode1}}',
+    allowExpressions: true
   };
 
   $scope.booleanForms = [{
@@ -72,56 +74,60 @@ oppia.controller('FormBuilderTests', [
     },
     value: true
   }, {
-    name: 'Boolean form with parameters',
+    name: 'Boolean form with expressions',
     schema: {
-      type: 'bool',
-      allow_parameters: true
+      type: 'bool'
     },
-    value: 'paramBool1'
+    value: 'paramBool1',
+    allowExpressions: true
   }];
 
   $scope.intForms = [{
-    name: 'Integer form (no parameters)',
+    name: 'Integer form (value must be greater than 2)',
     schema: {
-      type: 'int'
+      type: 'int',
+      validators: [{
+        id: 'is_at_least',
+        min_value: 2
+      }]
     },
     value: 3
   }, {
     // TODO(sll): Add test for bad initialization.
-    name: 'Integer form with parameters',
+    name: 'Integer form with expressions',
     schema: {
-      type: 'int',
-      allow_parameters: true
+      type: 'int'
     },
-    value: 'paramInt1'
+    value: 'paramInt1',
+    allowExpressions: true
   }];
 
   $scope.floatForms = [{
     name: 'Float form (value must be between -3 and 6)',
     schema: {
       type: 'float',
-      post_normalizers: [{
-        id: 'require_at_least',
+      validators: [{
+        id: 'is_at_least',
         min_value: -3.0
       }, {
-        id: 'require_at_most',
+        id: 'is_at_most',
         max_value: 6.0
       }]
     },
     value: 3.14
   }, {
-    name: 'Float form with parameters (value must be between -3 and 6)',
+    name: 'Float form with expressions (value must be between -3 and 6)',
     schema: {
       type: 'float',
-      allow_parameters: true,
-      post_normalizers: [{
-        id: 'require_at_least',
+      validators: [{
+        id: 'is_at_least',
         min_value: -3.0
       }, {
-        id: 'require_at_most',
+        id: 'is_at_most',
         max_value: 6.0
       }]
     },
+    allowExpressions: true,
     value: 3.14
   }];
 
@@ -176,13 +182,13 @@ oppia.controller('FormBuilderTests', [
       a_list_appearing_second: [2, 3]
     }
   }, {
-    name: 'List of unicode textareas with custom \'add element\' text',
+    name: 'List of code areas with custom \'add element\' text',
     schema: {
       type: 'list',
       items: {
         type: 'unicode',
         ui_config: {
-          rows: 5
+          coding_mode: 'python'
         }
       },
       ui_config: {

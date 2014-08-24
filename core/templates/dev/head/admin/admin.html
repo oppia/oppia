@@ -202,8 +202,8 @@
       </p>
     </div>
 
+    {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
-    {% include 'rte_js_libs.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -212,7 +212,7 @@
       {{ include_js_file('services/warningsData.js') }}
       {{ include_js_file('components/objectEditor.js') }}
       {{ include_js_file('components/valueGeneratorEditor.js') }}
-      {{ include_js_file('components/richTextEditor.js') }}
+      {{ include_js_file('forms/formBuilder.js') }}
       {{ object_editors_js }}
       {{ value_generators_js }}
     </script>

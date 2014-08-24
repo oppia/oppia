@@ -172,8 +172,8 @@ class NonnegativeInt(BaseObject):
 
     SCHEMA = {
         'type': 'int',
-        'post_normalizers': [{
-            'id': 'require_at_least',
+        'validators': [{
+            'id': 'is_at_least',
             'min_value': 0
         }]
     }
@@ -239,8 +239,8 @@ class SetOfUnicodeString(BaseObject):
     SCHEMA = {
         'type': 'list',
         'items': UnicodeString.SCHEMA,
-        'post_normalizers': [{
-            'id': 'uniquify'
+        'validators': [{
+            'id': 'is_uniquified'
         }]
     }
 
@@ -295,8 +295,8 @@ class MusicPhrase(BaseObject):
 
     _FRACTION_PART_SCHEMA = {
         'type': 'int',
-        'post_normalizers': [{
-            'id': 'require_at_least',
+        'validators': [{
+            'id': 'is_at_least',
             'min_value': 1
         }]
     }
@@ -329,22 +329,6 @@ class MusicPhrase(BaseObject):
             }],
         }
     }
-
-
-class TarFileString(BaseObject):
-    """A unicode string with the base64-encoded content of a tar file"""
-
-    description = 'A string with base64-encoded content of a tar file'
-
-    SCHEMA = UnicodeString.SCHEMA
-
-    @classmethod
-    def normalize(cls, raw):
-        """Reads `raw` as a unicode string representing a tar file and returns
-        the base64-encoded contents."""
-        raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
-        raw = base64.b64decode(raw)
-        return tarfile.open(fileobj=StringIO.StringIO(raw), mode='r:gz')
 
 
 class Filepath(BaseObject):

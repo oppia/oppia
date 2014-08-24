@@ -8,8 +8,8 @@ TAB_CONTENT_SCHEMA = {
         'description': 'Tab title',
         'schema': {
             'type': 'unicode',
-            'post_normalizers': [{
-                'id': 'require_nonempty'
+            'validators': [{
+                'id': 'is_nonempty'
             }]
         }
     }, {

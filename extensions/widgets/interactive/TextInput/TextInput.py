@@ -36,11 +36,11 @@ class TextInput(widget_domain.BaseWidget):
         'description': 'The number of rows for the text input field.',
         'schema': {
             'type': 'int',
-            'post_normalizers': [{
-                'id': 'require_at_least',
+            'validators': [{
+                'id': 'is_at_least',
                 'min_value': 1,
             }, {
-                'id': 'require_at_most',
+                'id': 'is_at_most',
                 'max_value': 200,
             }]
         },

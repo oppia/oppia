@@ -23,7 +23,7 @@ from extensions.rules import base
 
 class OutputEquals(base.CodeEvaluationRule):
     description = (
-        'has output equal to {{x|NormalizedString}} (collapsing spaces)')
+        'has output equal to {{x|UnicodeString}} (collapsing spaces)')
     is_generic = False
 
     def _evaluate(self, subject):

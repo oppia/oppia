@@ -22,11 +22,11 @@ class InteractiveMap(widget_domain.BaseWidget):
         'description': 'Starting map center latitude (-90 to 90).',
         'schema': {
             'type': 'float',
-            'post_normalizers': [{
-                'id': 'require_at_least',
+            'validators': [{
+                'id': 'is_at_least',
                 'min_value': -90.0,
             }, {
-                'id': 'require_at_most',
+                'id': 'is_at_most',
                 'max_value': 90.0,
             }]
         },
@@ -36,11 +36,11 @@ class InteractiveMap(widget_domain.BaseWidget):
         'description': 'Starting map center longitude (-180 to 180).',
         'schema': {
             'type': 'float',
-            'post_normalizers': [{
-                'id': 'require_at_least',
+            'validators': [{
+                'id': 'is_at_least',
                 'min_value': -180.0,
             }, {
-                'id': 'require_at_most',
+                'id': 'is_at_most',
                 'max_value': 180.0,
             }]
         },

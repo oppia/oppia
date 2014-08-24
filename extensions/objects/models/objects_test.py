@@ -143,11 +143,13 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
     def test_set_of_unicode_string_validation(self):
         """Tests objects of type SetOfUnicodeString."""
         mappings = [
-            (['ff', 'a', u'¡Hola!'], [u'a', u'ff', u'¡Hola!']),
+            (['ff', 'a', u'¡Hola!'], [u'ff', u'a', u'¡Hola!']),
             ([], []),
-            (['ab', 'cb', 'abc', 'cb'], [u'ab', u'abc', u'cb']),
+            (['ab', 'abc', 'cb'], [u'ab', u'abc', u'cb']),
         ]
-        invalid_values = ['123', {'a': 1}, 3.0, None, [3, 'a']]
+        invalid_values = [
+            '123', {'a': 1}, 3.0, None, [3, 'a'], ['a', 'a', 'b'],
+            ['ab', 'abc', 'ab']]
 
         self.check_normalization(
             objects.SetOfUnicodeString, mappings, invalid_values)
@@ -296,4 +298,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 17)
+        self.assertEquals(count, 16)

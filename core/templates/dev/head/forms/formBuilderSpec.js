@@ -77,10 +77,10 @@ describe('HTML to text', function() {
 
 describe('Normalizer tests', function() {
   var filterNames = [
-    'requireIsFloat',
-    'requireAtLeast',
-    'requireAtMost',
-    'requireNonempty'
+    'isFloat',
+    'isAtLeast',
+    'isAtMost',
+    'isNonempty'
   ];
 
   beforeEach(module('oppia'));
@@ -92,7 +92,7 @@ describe('Normalizer tests', function() {
   }));
 
   it('should validate floats correctly', inject(function($filter) {
-    var filter = $filter('requireIsFloat');
+    var filter = $filter('isFloat');
     expect(filter('1.23')).toEqual(1.23);
     expect(filter('-1.23')).toEqual(-1.23);
     expect(filter('0')).toEqual(0);
@@ -100,6 +100,7 @@ describe('Normalizer tests', function() {
     expect(filter('-1.0')).toEqual(-1);
     expect(filter('1,5')).toEqual(1.5);
 
+    expect(filter('')).toBeUndefined();
     expect(filter('1.23a')).toBeUndefined();
     expect(filter('abc')).toBeUndefined();
     expect(filter('2+3')).toBeUndefined();
@@ -108,30 +109,85 @@ describe('Normalizer tests', function() {
   }));
 
   it('should impose minimum bounds', inject(function($filter) {
-    var filter = $filter('requireAtLeast');
+    var filter = $filter('isAtLeast');
     var args = {minValue: -2.0};
-    expect(filter(1.23, args)).toEqual(1.23);
-    expect(filter(-1.23, args)).toEqual(-1.23);
-    expect(filter(-1.99, args)).toEqual(-1.99);
-    expect(filter(-2, args)).toEqual(-2);
-    expect(filter(-2.01, args)).toBeUndefined();
-    expect(filter(-3, args)).toBeUndefined();
+    expect(filter(1.23, args)).toBe(true);
+    expect(filter(-1.23, args)).toBe(true);
+    expect(filter(-1.99, args)).toBe(true);
+    expect(filter(-2, args)).toBe(true);
+    expect(filter(-2.01, args)).toBe(false);
+    expect(filter(-3, args)).toBe(false);
   }));
 
   it('should impose maximum bounds', inject(function($filter) {
-    var filter = $filter('requireAtMost');
+    var filter = $filter('isAtMost');
     var args = {maxValue: -2.0};
-    expect(filter(1.23, args)).toBeUndefined();
-    expect(filter(-1.23, args)).toBeUndefined();
-    expect(filter(-1.99, args)).toBeUndefined();
-    expect(filter(-2, args)).toEqual(-2);
-    expect(filter(-2.01, args)).toEqual(-2.01);
-    expect(filter(-3, args)).toEqual(-3);
+    expect(filter(-2, args)).toBe(true);
+    expect(filter(-2.01, args)).toBe(true);
+    expect(filter(-3, args)).toBe(true);
+    expect(filter(1.23, args)).toBe(false);
+    expect(filter(-1.23, args)).toBe(false);
+    expect(filter(-1.99, args)).toBe(false);
   }));
 
   it('should validate non-emptiness', inject(function($filter) {
-    var filter = $filter('requireNonempty');
-    expect(filter('a')).toEqual('a');
-    expect(filter('')).toBeUndefined();
+    var filter = $filter('isNonempty');
+    expect(filter('a')).toBe(true);
+    expect(filter('')).toBe(false);
+  }));
+});
+
+describe('RTE directive', function() {
+  var elm, scope, $httpBackend;
+
+  beforeEach(module('oppia'));
+  beforeEach(inject(function($rootScope, $compile, _$httpBackend_) {
+    $httpBackend = _$httpBackend_;
+    $httpBackend.expectGET('/widgetrepository/data/noninteractive').respond({
+      data: {
+        widgetRepository: {
+          'Image': [{
+            frontend_name: 'image',
+            name: 'Image',
+            tooltip: 'Insert image',
+            icon_data_url: 'data:123'
+          }]
+        }
+      }
+    });
+
+    elm = $compile('<rich-text-editor></rich-text-editor>')($rootScope);
+    scope = $rootScope;
+    scope.$digest();
+  }));
+
+  it('should convert correctly between HTML and RTE', inject(function($rootScope, $compile) {
+    var testData = [
+      ['<div></div>', '<div></div>'],
+      ['<div>abc</div>', '<div>abc</div>'],
+      ['<div>abc</div><br>', '<div>abc</div><br>'],
+      ['<div>abc<span>def</span></div><b>ghi</b>', '<div>abc<span>def</span></div><b>ghi</b>'],
+      ['<oppia-noninteractive-image></oppia-noninteractive-image>',
+       '<img src="data:123" class="oppia-noninteractive-image">'],
+      ['<oppia-noninteractive-image image_id-with-value="&amp;quot;T&amp;quot;"></oppia-noninteractive-image>',
+       '<img src="data:123" class="oppia-noninteractive-image" image_id-with-value="&amp;quot;T&amp;quot;">']
+    ];
+
+    var rteControllerScope = elm.scope();
+
+    // TODO(sll): Why isn't this being auto-populated?
+    rteControllerScope._NONINTERACTIVE_WIDGETS = [{
+      name: 'image',
+      backendName: 'Image',
+      tooltip: 'Insert image',
+      iconDataUrl: 'data:123'
+    }];
+
+    for (var i = 0; i < testData.length; i++) {
+      expect(rteControllerScope._convertHtmlToRte(testData[i][0]))
+        .toEqual(testData[i][1]);
+      expect(rteControllerScope._convertRteToHtml(testData[i][1]))
+        .toEqual(testData[i][0]);
+    }
   }));
 });

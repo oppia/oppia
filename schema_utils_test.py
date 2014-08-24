@@ -18,6 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+import inspect
+
 from core.tests import test_utils
 import schema_utils
 
@@ -31,13 +33,17 @@ SCHEMA_KEY_CHOICES = schema_utils.SCHEMA_KEY_CHOICES
 SCHEMA_KEY_NAME = schema_utils.SCHEMA_KEY_NAME
 SCHEMA_KEY_SCHEMA = schema_utils.SCHEMA_KEY_SCHEMA
 SCHEMA_KEY_OBJ_TYPE = schema_utils.SCHEMA_KEY_OBJ_TYPE
+SCHEMA_KEY_VALIDATORS = schema_utils.SCHEMA_KEY_VALIDATORS
 SCHEMA_KEY_DESCRIPTION = 'description'
 SCHEMA_KEY_UI_CONFIG = 'ui_config'
 # The following keys are always accepted as optional keys in any schema.
 OPTIONAL_SCHEMA_KEYS = [
-    SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG]
+    SCHEMA_KEY_CHOICES, SCHEMA_KEY_POST_NORMALIZERS, SCHEMA_KEY_UI_CONFIG,
+    SCHEMA_KEY_VALIDATORS]
 
 SCHEMA_TYPE_BOOL = schema_utils.SCHEMA_TYPE_BOOL
+# 'Custom' objects undergo an entirely separate normalization process, defined
+# in the relevant extensions/objects/models/objects.py class.
 SCHEMA_TYPE_CUSTOM = schema_utils.SCHEMA_TYPE_CUSTOM
 SCHEMA_TYPE_DICT = schema_utils.SCHEMA_TYPE_DICT
 SCHEMA_TYPE_FLOAT = schema_utils.SCHEMA_TYPE_FLOAT
@@ -52,14 +58,21 @@ ALLOWED_CUSTOM_OBJ_TYPES = [
     'Filepath', 'LogicQuestion', 'MathLatexString', 'MusicPhrase',
     'SanitizedUrl']
 
-# Schemas for the UI config for the various types.
+# Schemas for the UI config for the various types. All of these configuration
+# options are optional additions to the schema, and, if omitted, should not
+# result in any errors.
 # Note to developers: please keep this in sync with
 #     https://code.google.com/p/oppia/wiki/SchemaBasedFormsDesignDoc
 UI_CONFIG_SPECS = {
     SCHEMA_TYPE_BOOL: {},
     SCHEMA_TYPE_DICT: {},
     SCHEMA_TYPE_FLOAT: {},
-    SCHEMA_TYPE_HTML: {},
+    SCHEMA_TYPE_HTML: {
+        'size': {
+            'type': SCHEMA_TYPE_UNICODE,
+            'choices': ['small', 'large']
+        }
+    },
     SCHEMA_TYPE_INT: {},
     SCHEMA_TYPE_LIST: {
         'add_element_text': {
@@ -69,11 +82,61 @@ UI_CONFIG_SPECS = {
     SCHEMA_TYPE_UNICODE: {
         'rows': {
             'type': SCHEMA_TYPE_INT,
-            'post_normalizers': [{
-                'id': 'require_at_least',
+            'validators': [{
+                'id': 'is_at_least',
                 'min_value': 1,
             }]
+        },
+        'coding_mode': {
+            'type': SCHEMA_TYPE_UNICODE,
+            'choices': ['none', 'python'],
         }
+    },
+}
+
+# Schemas for validators for the various types.
+VALIDATOR_SPECS = {
+    SCHEMA_TYPE_BOOL: {},
+    SCHEMA_TYPE_DICT: {},
+    SCHEMA_TYPE_FLOAT: {
+        'is_at_least': {
+            'min_value': {
+                'type': SCHEMA_TYPE_FLOAT
+            }
+        },
+        'is_at_most': {
+            'max_value': {
+                'type': SCHEMA_TYPE_FLOAT
+            }
+        },
+    },
+    SCHEMA_TYPE_HTML: {},
+    SCHEMA_TYPE_INT: {
+        'is_at_least': {
+            'min_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        },
+        'is_at_most': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT
+            }
+        },
+    },
+    SCHEMA_TYPE_LIST: {
+        'is_uniquified': {},
+    },
+    SCHEMA_TYPE_UNICODE: {
+        'matches_regex': {
+            'regex': {
+                'type': SCHEMA_TYPE_UNICODE,
+                'validators': [{
+                    'id': 'is_regex',
+                }]
+            }
+        },
+        'is_nonempty': {},
+        'is_regex': {},
     },
 }
 
@@ -81,10 +144,33 @@ UI_CONFIG_SPECS = {
 def _validate_ui_config(obj_type, ui_config):
     """Validates the value of a UI configuration."""
     reference_dict = UI_CONFIG_SPECS[obj_type]
-    assert set(reference_dict.keys()) <= set(ui_config.keys())
+    assert set(ui_config.keys()) <= set(reference_dict.keys())
     for key, value in ui_config.iteritems():
         schema_utils.normalize_against_schema(
             value, reference_dict[key])
+
+
+def _validate_validator(obj_type, validator):
+    """Validates the value of a 'validator' field."""
+    reference_dict = VALIDATOR_SPECS[obj_type]
+    assert 'id' in validator and validator['id'] in reference_dict
+
+    customization_keys = validator.keys()
+    customization_keys.remove('id')
+    assert (set(customization_keys) ==
+            set(reference_dict[validator['id']].keys()))
+    for key in customization_keys:
+        value = validator[key]
+        schema = reference_dict[validator['id']][key]
+        try:
+            schema_utils.normalize_against_schema(value, schema)
+        except Exception as e:
+            raise AssertionError(e)
+
+    # Check that the id corresponds to a valid normalizer function.
+    validator_fn = schema_utils._Validators.get(validator['id'])
+    assert set(inspect.getargspec(validator_fn).args) == set(
+        customization_keys + ['obj'])
 
 
 def _validate_dict_keys(dict_to_check, required_keys, optional_keys):
@@ -176,54 +262,87 @@ def validate_schema(schema):
             schema_utils.Normalizers.get(post_normalizer['id'])
             # TODO(sll): Check the arguments too.
 
+    if SCHEMA_KEY_VALIDATORS in schema:
+        assert isinstance(schema[SCHEMA_KEY_VALIDATORS], list)
+        for validator in schema[SCHEMA_KEY_VALIDATORS]:
+            assert isinstance(validator, dict)
+            assert 'id' in validator
+            _validate_validator(schema[SCHEMA_KEY_TYPE], validator)
+
 
 class SchemaValidationUnitTests(test_utils.GenericTestBase):
     """Test validation of schemas."""
 
     def test_schemas_are_correctly_validated(self):
-        INVALID_SCHEMAS = [
-            ['type'],
-            {
-                'type': 'invalid'
+        """Test validation of schemas."""
+        invalid_schemas = [[
+            'type'
+        ], {
+            'type': 'invalid'
+        }, {
+            'type': 'dict',
+        }, {
+            'type': 'list',
+            'items': {}
+        }, {
+            'type': 'list',
+            'items': {
+                'type': 'unicode'
             },
-            {
-                'type': 'dict',
+            'len': -1
+        }, {
+            'type': 'list',
+            'items': {
+                'type': 'unicode'
             },
-            {
-                'type': 'list',
-                'items': {}
-            },
-            {
-                'type': 'list',
-                'items': {
+            'len': 0
+        }, {
+            'type': 'dict',
+            'items': {
+                'type': 'float'
+            }
+        }, {
+            'type': 'dict',
+            'properties': {
+                123: {
                     'type': 'unicode'
-                },
-                'len': -1
-            },
-            {
-                'type': 'list',
-                'items': {
-                    'type': 'unicode'
-                },
-                'len': 0
-            },
-            {
-                'type': 'dict',
-                'items': {
-                    'type': 'float'
-                }
-            },
-            {
-                'type': 'dict',
-                'properties': {
-                    123: {
-                        'type': 'unicode'
-                    }
                 }
             }
-        ]
+        }, {
+            'type': 'unicode',
+            'validators': [{
+                'id': 'fake_validator',
+            }]
+        }, {
+            'type': 'unicode',
+            'validators': [{
+                'id': 'is_nonempty',
+                'fake_arg': 'unused_value',
+            }]
+        }, {
+            'type': 'unicode',
+            'validators': [{
+                'id': 'matches_regex',
+            }]
+        }, {
+            'type': 'float',
+            'validators': [{
+                'id': 'is_at_least',
+                'min_value': 'value_of_wrong_type',
+            }]
+        }, {
+            'type': 'unicode',
+            'ui_config': {
+                'rows': -1,
+            }
+        }, {
+            'type': 'unicode',
+            'ui_config': {
+                'coding_mode': 'invalid_mode',
+            }
+        }]
 
-        VALID_SCHEMAS = [{
+        valid_schemas = [{
             'type': 'float'
         }, {
             'type': 'bool'
@@ -247,11 +366,27 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'len': 100
                 }
             }
+        }, {
+            'type': 'float',
+            'validators': [{
+                'id': 'is_at_least',
+                'min_value': 3.0,
+            }]
+        }, {
+            'type': 'unicode',
+            'ui_config': {
+                'rows': 5,
+            }
+        }, {
+            'type': 'unicode',
+            'ui_config': {
+                'coding_mode': 'python',
+            }
         }]
 
-        for schema in VALID_SCHEMAS:
+        for schema in valid_schemas:
             validate_schema(schema)
-        for schema in INVALID_SCHEMAS:
+        for schema in invalid_schemas:
             with self.assertRaises((AssertionError, KeyError)):
                 validate_schema(schema)
 

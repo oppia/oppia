@@ -26,7 +26,8 @@
   </div>
 
   <div ng-if="!!contentMemento">
-    <object-editor obj-type="Html" value="content[0].value" always-editable="true"></object-editor>
+    <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
+    </schema-based-editor>
     <button type="button" class="btn btn-default" ng-click="saveTextContent()">Close</button>
   </div>
 {% endblock %}

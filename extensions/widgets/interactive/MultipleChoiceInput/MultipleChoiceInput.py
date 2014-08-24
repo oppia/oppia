@@ -17,11 +17,14 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
     # values.
     _customization_arg_specs = [{
         'name': 'choices',
-        'description': 'The options that the reader can select from.',
+        'description': 'The options that the learner can select from.',
         'schema': {
             'type': 'list',
             'items': {
                 'type': 'html',
+                'ui_config': {
+                    'size': 'small',
+                }
             },
             'ui_config': {
                 'add_element_text': 'Add multiple choice option',

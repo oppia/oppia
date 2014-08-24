@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class CodeRepl(widget_domain.BaseWidget):
@@ -33,6 +32,9 @@ class CodeRepl(widget_domain.BaseWidget):
         'description': 'The initial code displayed in the code input field.',
         'schema': {
             'type': 'unicode',
+            'ui_config': {
+                'coding_mode': 'none',
+            },
         },
         'default_value': '[Type your code here.]'
     }, {
@@ -41,8 +43,8 @@ class CodeRepl(widget_domain.BaseWidget):
         'schema': {
             'type': 'unicode',
             'ui_config': {
-                'rows': 6,
-            }
+                'coding_mode': 'none',
+            },
         },
         'default_value': ''
     }, {
@@ -51,8 +53,8 @@ class CodeRepl(widget_domain.BaseWidget):
         'schema': {
             'type': 'unicode',
             'ui_config': {
-                'rows': 6,
-            }
+                'coding_mode': 'none',
+            },
         },
         'default_value': ''
     }]

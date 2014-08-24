@@ -13,10 +13,6 @@
 // limitations under the License.
 
 
-// Every editor directive should implement an alwaysEditable option. There
-// may be additional customization options for the editor that should be passed
-// in via initArgs.
-
 oppia.directive('coordTwoDimEditor', function($compile, warningsData) {
   return {
     link: function(scope, element, attrs) {
@@ -28,53 +24,31 @@ oppia.directive('coordTwoDimEditor', function($compile, warningsData) {
     restrict: 'E',
     scope: true,
     template: '<span ng-include="getTemplateUrl()"></span>',
-    controller: function($scope, $attrs) {
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: newValue || [0.0, 0.0]};
-      }, true);
+    controller: function($scope) {
+      $scope.schemaLatitude = {
+        type: 'float',
+        validators: [{
+          id: 'is_at_least',
+          min_value: -90.0
+        }, {
+          id: 'is_at_most',
+          max_value: 90.0
+        }]
+      };
 
-      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-      if ($scope.alwaysEditable) {
-        $scope.$watch('localValue.label', function(newValue, oldValue) {
-          if (!angular.isArray(newValue) || newValue.length !== 2 ||
-              !angular.isNumber(newValue[0]) || !angular.isNumber(newValue[1])) {
-            $scope.localValue = {label: (oldValue || [0.0, 0.0])};
-            return;
-          }
-          $scope.$parent.value = newValue;
-        }, true);
-      } else {
-        $scope.openEditor = function() {
-          $scope.active = true;
-        };
+      $scope.schemaLongitude = {
+        type: 'float',
+        validators: [{
+          id: 'is_at_least',
+          min_value: -180.0
+        }, {
+          id: 'is_at_most',
+          max_value: 180.0
+        }]
+      };
 
-        $scope.closeEditor = function() {
-          $scope.active = false;
-        };
-
-        $scope.replaceValue = function(newValue) {
-          if (!angular.isArray(newValue) || newValue.length !== 2 ||
-              !angular.isNumber(newValue[0]) || !angular.isNumber(newValue[1])) {
-            warningsData.addWarning('Please enter a list of two numbers.');
-            return;
-          }
-          warningsData.clear();
-          $scope.localValue = {label: (newValue || [0.0, 0.0])};
-          $scope.$parent.value = newValue;
-          $scope.closeEditor();
-        };
-
-        $scope.$on('externalSave', function() {
-          if ($scope.active) {
-            $scope.replaceValue($scope.localValue.label);
-            // The $scope.$apply() call is needed to propagate the replaced value.
-            $scope.$apply();
-          }
-        });
-
-        $scope.closeEditor();
+      if ($scope.$parent.value === '') {
+        $scope.$parent.value = [0.0, 0.0];
       }
     }
   };
