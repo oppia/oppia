@@ -32,6 +32,7 @@ import time
 # or removed.
 EXPECTED_TEST_COUNT = 370
 
+
 COVERAGE_PATH = os.path.join(
     os.getcwd(), '..', 'oppia_tools', 'coverage-3.6', 'coverage')
 TEST_RUNNER_PATH = os.path.join(os.getcwd(), 'core', 'tests', 'gae_suite.py')

@@ -56,19 +56,26 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
     ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
         ModifiedStatisticsAggregator]
 
+    def _record_start(self, exp_id, exp_version, state, session_id):
+        event_services.StartExplorationEventHandler.record(
+            exp_id, exp_version, state, session_id, {},
+            feconf.PLAY_TYPE_NORMAL)
+
+    def _record_leave(self, exp_id, exp_version, state, session_id):
+        event_services.MaybeLeaveExplorationEventHandler.record(
+            exp_id, exp_version, state, session_id, 27, {},
+            feconf.PLAY_TYPE_NORMAL)
+
     def test_no_completion(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
-            version = 1
+            exp_version = 1
             state = 'sid'
-            event_services.StartExplorationEventHandler.record(
-                exp_id, version, state, 'session1', {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.StartExplorationEventHandler.record(
-                exp_id, version, state, 'session2', {},
-                feconf.PLAY_TYPE_NORMAL)
+
+            self._record_start(exp_id, exp_version, state, 'session1')
+            self._record_start(exp_id, exp_version, state, 'session2')
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -84,20 +91,15 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
-            version = 1
+            exp_version = 1
             state = 'sid'
-            event_services.StartExplorationEventHandler.record(
-                exp_id, version, state, 'session1', {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.MaybeLeaveExplorationEventHandler.record(
-                exp_id, version, feconf.END_DEST, 'session1', 27, {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.StartExplorationEventHandler.record(
-                exp_id, version, state, 'session2', {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.MaybeLeaveExplorationEventHandler.record(
-                exp_id, version, feconf.END_DEST, 'session2', 27, {},
-                feconf.PLAY_TYPE_NORMAL)
+
+            self._record_start(exp_id, exp_version, state, 'session1')
+            self._record_leave(
+                exp_id, exp_version, feconf.END_DEST, 'session1')
+            self._record_start(exp_id, exp_version, state, 'session2')
+            self._record_leave(
+                exp_id, exp_version, feconf.END_DEST, 'session2')
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -108,38 +110,23 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 2)
 
-    def _create_leave_event(self, exp_id, version, state, session):
-        leave = stats_models.MaybeLeaveExplorationEventLogEntryModel(
-            event_type=feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION,
-            exploration_id=exp_id,
-            exploration_version=version,
-            state_name=state,
-            session_id=session,
-            client_time_spent_in_secs=27.0,
-            params={},
-            play_type=feconf.PLAY_TYPE_NORMAL,
-            created_on=datetime.datetime.now())
-        leave.put()
-
     def test_multiple_maybe_leaves_same_session(self):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
-            version = 1
+            exp_version = 1
             state = 'sid'
-            event_services.StartExplorationEventHandler.record(
-                exp_id, version, state, 'session1', {},
-                feconf.PLAY_TYPE_NORMAL)
-            self._create_leave_event(exp_id, version, state, 'session1')
-            self._create_leave_event(exp_id, version, state, 'session1')
-            self._create_leave_event(
-                exp_id, version, feconf.END_DEST, 'session1')
-            event_services.StartExplorationEventHandler.record(
-                exp_id, version, state, 'session2', {},
-                feconf.PLAY_TYPE_NORMAL)
-            self._create_leave_event(exp_id, version, state, 'session2')
-            self._create_leave_event(exp_id, version, state, 'session2')
+
+            self._record_start(exp_id, exp_version, state, 'session1')
+            self._record_leave(exp_id, exp_version, state, 'session1')
+            self._record_leave(exp_id, exp_version, state, 'session1')
+            self._record_leave(
+                exp_id, exp_version, feconf.END_DEST, 'session1')
+
+            self._record_start(exp_id, exp_version, state, 'session2')
+            self._record_leave(exp_id, exp_version, state, 'session2')
+            self._record_leave(exp_id, exp_version, state, 'session2')
             self.process_and_flush_pending_tasks()
 
             ModifiedStatisticsAggregator.start_computation()
@@ -154,7 +141,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
-            version = 1
+            exp_version = 1
             exp_id_1 = 'eid1'
             state_1_1 = 'sid1'
             exp_id_2 = 'eid2'
@@ -162,21 +149,13 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Record 2 start events for exp_id_1 and 1 start event for
             # exp_id_2.
-            event_services.StartExplorationEventHandler.record(
-                exp_id_1, version, state_1_1, 'session1', {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.StartExplorationEventHandler.record(
-                exp_id_1, version, state_1_1, 'session2', {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.StartExplorationEventHandler.record(
-                exp_id_2, version, state_2_1, 'session3', {},
-                feconf.PLAY_TYPE_NORMAL)
+            self._record_start(exp_id_1, exp_version, state_1_1, 'session1')
+            self._record_start(exp_id_1, exp_version, state_1_1, 'session2')
+            self._record_start(exp_id_2, exp_version, state_2_1, 'session3')
             self.process_and_flush_pending_tasks()
-
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
-
             self.assertEqual(
                 ModifiedStatisticsAggregator.get_statistics(exp_id_1), {
                     'start_exploration_count': 2,
@@ -190,14 +169,9 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             # Record 1 more start event for exp_id_1 and 1 more start event
             # for exp_id_2.
-            event_services.StartExplorationEventHandler.record(
-                exp_id_1, version, state_1_1, 'session2', {},
-                feconf.PLAY_TYPE_NORMAL)
-            event_services.StartExplorationEventHandler.record(
-                exp_id_2, version, state_2_1, 'session3', {},
-                feconf.PLAY_TYPE_NORMAL)
+            self._record_start(exp_id_1, exp_version, state_1_1, 'session2')
+            self._record_start(exp_id_2, exp_version, state_2_1, 'session3')
             self.process_and_flush_pending_tasks()
-
             self.assertEqual(
                 ModifiedStatisticsAggregator.get_statistics(exp_id_1), {
                     'start_exploration_count': 3,

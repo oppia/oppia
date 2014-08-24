@@ -27,13 +27,13 @@ oppia.controller('ExplorationEditor', [
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationRightsService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', function(
+  'oppiaDatetimeFormatter', 'widgetDefinitionsService', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService,
     explorationRightsService, validatorsService, editabilityService,
-    oppiaDatetimeFormatter) {
+    oppiaDatetimeFormatter, widgetDefinitionsService) {
 
   $scope.editabilityService = editabilityService;
 
@@ -400,6 +400,9 @@ oppia.controller('ExplorationEditor', [
         $scope.initExplorationPage(callback);
       }
     }
+
+    // Reset location hash
+    $location.url($location.path());
   });
 
   /********************************************
@@ -507,7 +510,7 @@ oppia.controller('ExplorationEditor', [
     }
 
     if (!explorationObjectiveService.displayed) {
-      $scope.warningsList.push('An objective should be specified.');
+      $scope.warningsList.push('Please specify an objective (in the Settings tab).');
     }
   };
 
@@ -623,6 +626,8 @@ oppia.controller('ExplorationEditor', [
   // page load.
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
+      widgetDefinitionsService.setInteractiveDefinitions(data.ALL_INTERACTIVE_WIDGETS);
+
       explorationTitleService.init(data.title);
       explorationCategoryService.init(data.category);
       explorationObjectiveService.init(data.objective);
@@ -730,15 +735,6 @@ oppia.controller('ExplorationEditor', [
     $scope.paramSpecs[name] = {obj_type: type};
     changeListService.editExplorationProperty(
       'param_specs', angular.copy($scope.paramSpecs), oldParamSpecs);
-  };
-
-  /**
-   * Downloads the zip file for an exploration.
-   */
-  $scope.downloadExplorationWithVersion = function(versionNumber) {
-    // Note that this opens (and then immediately closes) a new tab. If we do
-    // this in the same tab, the beforeunload handler is triggered.
-    window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '_blank');
   };
 
   $scope.showPublishExplorationModal = function() {

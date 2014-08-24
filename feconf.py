@@ -184,12 +184,6 @@ ALLOWED_WIDGETS = {
         'SetInput': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'SetInput')
         },
-        'FileReadInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'FileReadInput')
-        },
-        'TarFileReadInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'TarFileReadInput')
-        },
         'CodeRepl': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'CodeRepl')
         },
@@ -279,3 +273,7 @@ PLAY_TYPE_NORMAL = 'normal'
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
+
+# Output formats of downloaded explorations.
+OUTPUT_FORMAT_JSON = 'json'
+OUTPUT_FORMAT_ZIP = 'zip'

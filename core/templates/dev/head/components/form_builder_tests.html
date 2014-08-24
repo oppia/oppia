@@ -82,6 +82,17 @@
 
   {% include 'components/form_builder_templates.html' %}
 
+  <script type="text/ng-template" id="schemaBasedEditor/entryPoint">
+    <ng-form name="schemaForm">
+      <schema-builder local-value="localValue" schema="definition" mode="mode">
+      </schema-builder>
+    </ng-form>
+
+    <div ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED">
+      <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
+      <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
+    </div>
+  </script>
 {% endblock %}
 
 {% block footer_js %}
@@ -89,6 +100,6 @@
   <script>
     {{ include_js_file('filters.js') }}
     {{ include_js_file('components/formBuilder.js') }}
-    {{ include_js_file('tests/FormBuilderTests.js') }}
+    {{ include_js_file('components/formBuilderTests.js') }}
   </script>
 {% endblock footer_js %}

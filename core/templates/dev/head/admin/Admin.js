@@ -21,7 +21,16 @@
 oppia.controller('Admin', ['$scope', '$http', function($scope, $http) {
   $scope.message = '';
   $scope.adminHandlerUrl = '/adminhandler';
+  $scope.adminJobOutputUrl = '/adminjoboutput';
   $scope.configProperties = {};
+
+  $scope.showJobOutput = false;
+  $scope.getJobOutput = function(jobId) {
+    $http.get($scope.adminJobOutputUrl + '?job_id=' + jobId).success(function(data) {
+      $scope.showJobOutput = true;
+      $scope.jobOutput = data.output;
+    });
+  };
 
   $scope.isNonemptyObject = function(object) {
     var hasAtLeastOneElement = false;

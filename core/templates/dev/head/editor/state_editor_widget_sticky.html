@@ -5,13 +5,15 @@
 {% block cls %}{% endblock %}
 
 {% block center %}
-  <div class="checkbox">
-    <label>
-      <input type="checkbox" ng-model="widgetSticky" ng-change="toggleWidgetSticky()" ng-disabled="!editabilityService.isEditable()">
-      Reuse the previous state's interaction, if possible.
-      <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
-        <span class="glyphicon glyphicon-question-sign"></span>
-      </a>
-    </label>
-  </div>
+  <div ng-if="hasLoaded">
+	  <div class="checkbox">
+	    <label>
+	      <input type="checkbox" ng-model="stateWidgetStickyService.displayed" ng-change="saveWidgetSticky()" ng-disabled="!editabilityService.isEditable()">
+	      Reuse the previous state's interaction, if possible.
+	      <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
+	        <span class="glyphicon glyphicon-question-sign"></span>
+	      </a>
+	    </label>
+	  </div>
+	 </div>
 {% endblock %}

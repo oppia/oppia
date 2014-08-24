@@ -1,37 +1,39 @@
-<script type="text/ng-template" id="schemaBasedEditor/entryPoint">
-  <ng-form name="schemaForm">
-    <schema-builder local-value="localValue" schema="definition" mode="mode">
-    </schema-builder>
-  </ng-form>
+<script type="text/ng-template" id="schemaBasedEditor/master">
+  <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue" schema="schema()" choices="schema().choices" mode="mode">
+  </schema-based-choices-editor>
 
-  <div ng-if="mode == $root.FORM_BUILDER_MODES.ENABLED">
-    <button ng-click="submitValue(localValue)" class="btn btn-success" ng-disabled="schemaForm.$invalid">Submit</button>
-    <button ng-click="cancelEdit()" class="btn btn-default">Cancel</button>
-  </div>
+  <schema-based-bool-editor ng-if="schema().type === 'bool' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
+  </schema-based-bool-editor>
+
+  <schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
+  </schema-based-int-editor>
+
+  <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
+  </schema-based-float-editor>
+
+  <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers" ui-config="schema().ui_config">
+  </schema-based-unicode-editor>
+
+  <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices" local-value="$parent.localValue" mode="mode">
+  </schema-based-html-editor>
+
+  <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len" ui-config="schema().ui_config">
+  </schema-based-list-editor>
+
+  <schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
+  </schema-based-dict-editor>
+
+  <schema-based-custom-editor ng-if="schema().type === 'custom' && !schema().choices" obj-type="schema().obj_type" local-value="$parent.localValue" mode="mode">
+  </schema-based-custom-editor>
 </script>
 
 
-<script type="text/ng-template" id="schemaBasedEditor/master">
-  <schema-based-bool-editor ng-if="schema().type === 'bool'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
-  </schema-based-bool-editor>
+<script type="text/ng-template" id="schemaBasedEditor/choices">
+  <select ng-if="mode != $root.FORM_BUILDER_MODES.READONLY" class="form-control" ng-model="$parent.$parent.$parent.localValue" ng-options="choice as choice for choice in choices()" required ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+  </select>
 
-  <schema-based-int-editor ng-if="schema().type === 'int'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters">
-  </schema-based-int-editor>
-
-  <schema-based-float-editor ng-if="schema().type === 'float'" local-value="$parent.localValue" mode="mode" allow-parameters="schema().allow_parameters" post-normalizers="schema().post_normalizers">
-  </schema-based-float-editor>
-
-  <schema-based-unicode-editor ng-if="schema().type === 'unicode'" local-value="$parent.localValue" mode="mode" post-normalizers="schema().post_normalizers">
-  </schema-based-unicode-editor>
-
-  <schema-based-html-editor ng-if="schema().type === 'html'" local-value="$parent.localValue" mode="mode">
-  </schema-based-html-editor>
-
-  <schema-based-list-editor ng-if="schema().type === 'list'" local-value="$parent.localValue" mode="mode" item-schema="schema().items" len="schema().len">
-  </schema-based-list-editor>
-
-  <schema-based-dict-editor ng-if="schema().type === 'dict'" local-value="$parent.localValue" mode="mode" property-schemas="schema().properties">
-  </schema-based-dict-editor>
+  <schema-builder ng-if="mode == $root.FORM_BUILDER_MODES.READONLY" schema="getReadonlySchema()" local-value="$parent.$parent.localValue" mode="mode">
+  </schema-builder>
 </script>
 
 
@@ -44,11 +46,11 @@
   </select>
 
   <span ng-if="mode === $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="localValue.type === 'raw'">
-      <[localValue.data]>
+    <span ng-if="!editAsParameter">
+      <[localValue]>
     </span>
-    <span class="label label-info" ng-if="localValue.type === 'parameter'">
-      <[localValue.data]>
+    <span class="label label-info" ng-if="editAsParameter">
+      <[localValue]>
     </span>
   </span>
 </script>
@@ -57,7 +59,10 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
     <div class="input-group">
-      <input ng-if="!editAsParameter" type="number" ng-model="$parent.localValue.data" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <span ng-if="!editAsParameter">
+        <input type="number" ng-model="$parent.$parent.localValue" class="form-control" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED" required>
+      </span>
+
       <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
 
       <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
@@ -68,11 +73,11 @@
   </span>
 
   <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="localValue.type === 'raw'">
-      <[localValue.data]>
+    <span ng-if="!editAsParameter">
+      <[localValue]>
     </span>
-    <span class="label label-info" ng-if="localValue.type === 'parameter'">
-      <[localValue.data]>
+    <span class="label label-info" ng-if="editAsParameter">
+      <[localValue]>
     </span>
   </span>
 </script>
@@ -81,7 +86,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/float">
   <span ng-if="mode != $root.FORM_BUILDER_MODES.READONLY">
     <div class="input-group">
-      <input ng-if="!editAsParameter" type="text" ng-model="$parent.localValue.data" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
+      <input ng-if="!editAsParameter" type="text" ng-model="$parent.$parent.localValue" class="form-control" post-normalizers="postNormalizers()" validate-with-post-normalizers add-float-validation ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
       <select class="form-control" ng-if="editAsParameter" ng-model="$parent.$parent.localValue" ng-options="option.value as option.name for option in paramNameOptions" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED"></select>
 
       <span class="input-group-btn" ng-if="allowParameters() && paramNameOptions.length">
@@ -92,11 +97,11 @@
   </span>
 
   <span ng-if="mode == $root.FORM_BUILDER_MODES.READONLY">
-    <span ng-if="localValue.type === 'raw'">
-      <[localValue.data]>
+    <span ng-if="!editAsParameter">
+      <[localValue]>
     </span>
-    <span class="label label-info" ng-if="localValue.type === 'parameter'">
-      <[localValue.data]>
+    <span class="label label-info" ng-if="editAsParameter">
+      <[localValue]>
     </span>
   </span>
 </script>
@@ -109,7 +114,9 @@
       </unicode-with-parameters-editor>
     </span>
     <span ng-if="!doUnicodeParamsExist">
-      <input type="text" ng-model="$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
+      <textarea ng-if="getRows()" rows="<[getRows()]>" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()"></textarea>
+
+      <input ng-if="!getRows()" type="text" ng-model="$parent.$parent.$parent.localValue" class="form-control" validate-with-post-normalizers post-normalizers="postNormalizers()">
     </span>
   </span>
 
@@ -131,12 +138,14 @@
 
 <script type="text/ng-template" id="schemaBasedEditor/dict">
   <form role="form">
-    <div ng-repeat="(key, schema) in propertySchemas()">
+    <div ng-repeat="property in propertySchemas()">
       <div class="form-group">
         <!-- TODO(sll): Add a 'for' attribute to the label tag. -->
-        <label><[key]></label>
-        <schema-builder schema="schema" mode="mode" local-value="localValue[key]">
-        </schema-builder>
+        <label><[getHumanReadablePropertyDescription(property)]></label>
+        <div>
+          <schema-builder schema="property.schema" mode="mode" local-value="localValue[property.name]">
+          </schema-builder>
+        </div>
       </div>
     </div>
   </form>
@@ -160,8 +169,14 @@
   </table>
 
   <button ng-if="mode != $root.FORM_BUILDER_MODES.READONLY && !len" type="button" class="btn btn-default" ng-click="addElement()" ng-disabled="mode == $root.FORM_BUILDER_MODES.DISABLED">
-    Add element
+    <[addElementText]>
   </button>
+</script>
+
+
+<script type="text/ng-template" id="schemaBasedEditor/custom">
+  <object-editor obj-type="<[objType]>" value="$parent.$parent.localValue" always-editable="true">
+  </object-editor>
 </script>
 
 

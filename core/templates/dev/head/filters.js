@@ -32,6 +32,16 @@ oppia.filter('underscoresToCamelCase', [function() {
   };
 }]);
 
+oppia.filter('camelCaseToHyphens', [function() {
+  return function(input) {
+    var result = input.replace(/([a-z])?([A-Z])/g, '$1-$2').toLowerCase();
+    if (result[0] == '-') {
+      result = result.substring(1);
+    }
+    return result;
+  };
+}]);
+
 // Filter that truncates long descriptors.
 // TODO(sll): Strip out HTML tags before truncating.
 oppia.filter('truncate', [function() {
@@ -95,7 +105,7 @@ oppia.filter('parameterizeRuleDescription', [function() {
 
       var replacementText = inputs[varName];
       if (choices) {
-        replacementText = '\'' + choices.value[inputs[varName]] + '\'';
+        replacementText = '\'' + choices[inputs[varName]] + '\'';
       }
       // TODO(sll): Generalize this to use the inline string representation of
       // an object type.

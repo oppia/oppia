@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 import os
+import json
 import StringIO
 import zipfile
 
@@ -345,6 +346,72 @@ class StatsIntegrationTest(BaseEditorControllerTest):
 class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration download."""
 
+    SAMPLE_JSON_CONTENT = (
+""")]}'
+{"yaml": "author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: Test JSON download
+param_changes: []
+param_specs: {}
+schema_version: 3
+skill_tags: []
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  State A:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: State A
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+  State B:
+    content:
+    - type: text
+      value: ''
+    param_changes: []
+    widget:
+      customization_args: {}
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: State B
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: TextInput
+"}""")
+
     def test_exploration_download_handler_for_default_exploration(self):
 
         # Register and log in as an editor.
@@ -364,6 +431,7 @@ class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
         response = self.testapp.get('/create/%s' % EXP_ID)
 
+        # Check download to zip file
         # Download to zip file using download handler
         EXPLORATION_DOWNLOAD_URL = '/createhandler/download/%s' % EXP_ID
         response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
@@ -394,6 +462,20 @@ class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
             zf_gold.open(
                 'The title for ZIP download handler test!.yaml'
                 ).read())
+
+        # Check download to JSON
+        exploration.update_objective('Test JSON download')
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+
+        # Download to JSON string using download handler
+        EXPLORATION_DOWNLOAD_URL = (
+            '/createhandler/download/%s?output_format=%s' %
+            (EXP_ID, feconf.OUTPUT_FORMAT_JSON))
+        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+
+        # Check downloaded JSON string
+        self.assertEqual(self.SAMPLE_JSON_CONTENT,
+                         response.body.decode('string_escape'))
 
         self.logout()
 

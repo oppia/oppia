@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class Math(widget_domain.BaseWidget):
@@ -21,19 +20,16 @@ class Math(widget_domain.BaseWidget):
     # A description of the widget.
     description = 'Widget for rendering math formulas as LaTeX.'
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'raw_latex',
         'description': 'The raw string to be displayed as LaTeX.',
-        'generator': generators.Copier,
-        'init_args': {
-            'disallow_parse_with_jinja': True,
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'MathLatexString',
         },
-        'customization_args': {
-            'value': '\\frac{x}{y}'
-        },
-        'obj_type': 'MathLatexString',
+        'default_value': '\\frac{x}{y}'
     }]
 
     # The HTML tag name for this non-interactive widget.

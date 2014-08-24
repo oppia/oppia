@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class Collapsible(widget_domain.BaseWidget):
@@ -23,28 +22,22 @@ class Collapsible(widget_domain.BaseWidget):
         'A collapsible block of HTML.'
     )
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'heading',
         'description': 'The heading for the collapsible block',
-        'generator': generators.Copier,
-        'init_args': {
-            'disallow_parse_with_jinja': True
+        'schema': {
+            'type': 'unicode',
         },
-        'customization_args': {
-            'value': ''
-        },
-        'obj_type': 'UnicodeString',
+        'default_value': 'More information...',
     }, {
         'name': 'content',
         'description': 'The content of the collapsible block',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 'You have opened the collapsible block.'
+        'schema': {
+            'type': 'html',
         },
-        'obj_type': 'Html',
+        'default_value': 'You have opened the collapsible block.'
     }]
 
     # The HTML tag name for this non-interactive widget.

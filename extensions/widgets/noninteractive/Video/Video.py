@@ -1,16 +1,17 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
+
+
+NONNEGATIVE_INT_SCHEMA = {
+    'type': 'int',
+    'post_normalizers': [{
+        'id': 'require_at_least',
+        'min_value': 0
+    }],
+}
 
 
 class Video(widget_domain.BaseWidget):
-    """Definition of a widget.
-
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered when the default widgets are refreshed.
-    """
+    """Non-interactive widget for displaying YouTube videos."""
 
     # The human-readable name of the widget.
     name = 'Video'
@@ -23,46 +24,33 @@ class Video(widget_domain.BaseWidget):
         'Video widget.'
     )
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'video_id',
         'description': (
             'The YouTube id for this video. This is the 11-character string '
             'after \'v=\' in the video URL.'),
-        'generator': generators.Copier,
-        'init_args': {
-            'disallow_parse_with_jinja': True
+        'schema': {
+            'type': 'unicode',
+            'post_normalizers': [{
+                'id': 'require_nonempty',
+            }]
         },
-        'customization_args': {
-            'value': ''
-        },
-        'obj_type': 'UnicodeString',
-    }, {
-        'name': 'end',
-        'description': (
-            'Video end time in seconds: (leave at 0 to play until the end.)'),
-        'generator': generators.Copier,
-        'init_args': {
-            'disallow_parse_with_jinja': True
-        },
-        'customization_args': {
-            'value': 0
-        },
-        'obj_type': 'NonnegativeInt'
+        'default_value': 'dQw4w9WgXcQ',
     }, {
         'name': 'start',
         'description': (
             'Video start time in seconds: (leave at 0 to start at the '
             'beginning.)'),
-        'generator': generators.Copier,
-        'init_args': {
-            'disallow_parse_with_jinja': True
-        },
-        'customization_args': {
-            'value': 0
-        },
-        'obj_type': 'NonnegativeInt'
+        'schema': NONNEGATIVE_INT_SCHEMA,
+        'default_value': 0
+    }, {
+        'name': 'end',
+        'description': (
+            'Video end time in seconds: (leave at 0 to play until the end.)'),
+        'schema': NONNEGATIVE_INT_SCHEMA,
+        'default_value': 0
     }]
 
     # The HTML tag name for this non-interactive widget.

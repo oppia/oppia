@@ -27,7 +27,7 @@ describe('RTE directive', function() {
     $httpBackend.expectGET('/widgetrepository/data/noninteractive').respond({
       data: {
         widgetRepository: {
-          'Basic Input': [{
+          'Image': [{
             frontend_name: 'image',
             name: 'Image',
             tooltip: 'Insert image',
@@ -58,17 +58,17 @@ describe('RTE directive', function() {
 
     // TODO(sll): Why isn't this being auto-populated?
     rteControllerScope._NONINTERACTIVE_WIDGETS = [{
-        name: 'image',
-        backendName: 'Image',
-        tooltip: 'Insert image',
-        iconDataUrl: 'data:123'
+      name: 'image',
+      backendName: 'Image',
+      tooltip: 'Insert image',
+      iconDataUrl: 'data:123'
     }];
 
     for (var i = 0; i < testData.length; i++) {
       expect(rteControllerScope._convertHtmlToRte(testData[i][0]))
-          .toEqual(testData[i][1]);
+        .toEqual(testData[i][1]);
       expect(rteControllerScope._convertRteToHtml(testData[i][1]))
-          .toEqual(testData[i][0]);
+        .toEqual(testData[i][0]);
     }
   }));
 });

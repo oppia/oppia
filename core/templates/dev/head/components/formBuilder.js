@@ -301,6 +301,14 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       };
 
       var rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
+      $scope.currentlyEditing = false;
+      $scope.$watch('localValue', function(newValue, oldValue) {
+        if (!$scope.currentlyEditing) {
+          // This is an external change.
+          rteContentMemento = $scope._convertUnicodeToRte($scope.localValue);
+          $(rteNode).wysiwyg('setContent', rteContentMemento);
+        }
+      }, true);
 
       $scope._normalizeRteContent = function(content) {
         // TODO(sll): Write this method to validate rather than just normalize.
@@ -322,7 +330,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
           autoGrow: true,
           autoSave: true,
           controls: {},
-          css: '/css/rte.css',
+          css: '/css/rte_single_line.css',
           debug: true,
           events: {
             // Prevent dragging, since this causes weird things to happen when
@@ -379,7 +387,12 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
               // progress' errors which get triggered if a parameter was edited.
               $timeout(function() {
                 $scope.$apply(function() {
+                  $scope.currentlyEditing = true;
                   $scope.localValue = $scope._convertRteToUnicode(normalizedContent);
+                  // TODO(sll): This is a somewhat hacky solution. Can it be cleaned up?
+                  $timeout(function() {
+                    $scope.currentlyEditing = false;
+                  }, 50);
                 });
               });
 
@@ -430,14 +443,22 @@ oppia.factory('schemaDefaultValueService', [function() {
     // TODO(sll): Rewrite this to take into account post_normalizers, so that
     // we always start with a valid value.
     getDefaultValue: function(schema) {
-      if (schema.type === 'bool') {
+      if (schema.choices) {
+        return schema.choices[0];
+      } else if (schema.type === 'bool') {
         return false;
       } else if (schema.type === 'unicode' || schema.type === 'html') {
         return '';
       } else if (schema.type === 'list') {
         return [];
       } else if (schema.type === 'dict') {
-        return {};
+        var result = {};
+        for (var i = 0; i < schema.properties.length; i++) {
+          result[schema.properties[i].name] = this.getDefaultValue(schema.properties[i].schema);
+        }
+        return result;
+      } else if (schema.type === 'int' || schema.type === 'float') {
+        return 0;
       } else {
         console.error('Invalid schema type: ' + schema.type);
       }
@@ -473,13 +494,6 @@ oppia.filter('requireAtLeast', [function() {
 oppia.filter('requireAtMost', [function() {
   return function(input, args) {
     return (input <= args.maxValue) ? input : undefined;
-  };
-}]);
-
-
-oppia.filter('requireIsOneOf', [function() {
-  return function(input, args) {
-    return args.choices.indexOf(input) !== -1 ? input : undefined;
   };
 }]);
 
@@ -594,32 +608,6 @@ oppia.factory('recursionHelper', ['$compile', function($compile){
   };
 }]);
 
-oppia.directive('schemaBasedEditor', ['recursionHelper', function(recursionHelper) {
-  return {
-    scope: {
-      definition: '=',
-      mode: '=',
-      savedValue: '='
-    },
-    templateUrl: 'schemaBasedEditor/entryPoint',
-    restrict: 'E',
-    compile: recursionHelper.compile,
-    controller: ['$scope', function($scope) {
-      $scope.$watch('savedValue', function(newValue, oldValue) {
-        $scope.localValue = angular.copy($scope.savedValue);
-      });
-
-      $scope.submitValue = function(value) {
-        $scope.savedValue = angular.copy($scope.localValue);
-        alert($scope.savedValue);
-      };
-      $scope.cancelEdit = function() {
-        $scope.localValue = angular.copy($scope.savedValue);
-      };
-    }]
-  };
-}]);
-
 oppia.directive('schemaBuilder', [function() {
   return {
     scope: {
@@ -629,6 +617,30 @@ oppia.directive('schemaBuilder', [function() {
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'
+  };
+}]);
+
+oppia.directive('schemaBasedChoicesEditor', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // The choices for the object's value.
+      choices: '&',
+      // The schema for this object.
+      // TODO(sll): Validate each choice against the schema.
+      schema: '&',
+      mode: '='
+    },
+    templateUrl: 'schemaBasedEditor/choices',
+    restrict: 'E',
+    compile: recursionHelper.compile,
+    controller: ['$scope', function($scope) {
+      $scope.getReadonlySchema = function() {
+        var readonlySchema = angular.copy($scope.schema());
+        delete readonlySchema['choices'];
+        return readonlySchema;
+      };
+    }]
   };
 }]);
 
@@ -643,18 +655,14 @@ oppia.directive('schemaBasedBoolEditor', [function() {
     templateUrl: 'schemaBasedEditor/bool',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      $scope.editAsParameter = angular.isString($scope.localValue);
+
       $scope.boolEditorOptions = [{
         name: 'True',
-        value: {
-          type: 'raw',
-          data: true
-        }
+        value: true
       }, {
         name: 'False',
-        value: {
-          type: 'raw',
-          data: false
-        }
+        value: false
       }];
 
       if ($scope.allowParameters()) {
@@ -662,10 +670,7 @@ oppia.directive('schemaBasedBoolEditor', [function() {
         paramNames.forEach(function(paramName) {
           $scope.boolEditorOptions.push({
             name: '[Parameter] ' + paramName,
-            value: {
-              type: 'parameter',
-              data: paramName
-            }
+            value: paramName
           });
         });
       }
@@ -676,6 +681,7 @@ oppia.directive('schemaBasedBoolEditor', [function() {
         $scope.boolEditorOptions.forEach(function(option) {
           if (angular.equals(option.value, newValue)) {
             $scope.localValue = option.value;
+            $scope.editAsParameter = angular.isString($scope.localValue);
           }
         });
       });
@@ -703,18 +709,15 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           $scope.paramNameOptions = paramNames.map(function(paramName) {
             return {
               name: paramName,
-              value: {
-                type: 'parameter',
-                data: paramName
-              }
+              value: paramName
             };
           });
 
           $scope.$watch('localValue', function(newValue, oldValue) {
-            $scope.editAsParameter = (newValue.type === 'parameter');
+            $scope.editAsParameter = angular.isString(newValue);
             // Because JS objects are passed by reference, the current value needs
             // to be set manually to an object in the list of options.
-            if ($scope.localValue.type === 'parameter') {
+            if ($scope.editAsParameter) {
               $scope.paramNameOptions.forEach(function(option) {
                 if (angular.equals(option.value, newValue)) {
                   $scope.localValue = option.value;
@@ -725,13 +728,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
 
           $scope.toggleEditMode = function() {
             $scope.editAsParameter = !$scope.editAsParameter;
-            $scope.localValue = $scope.editAsParameter ? {
-              type: 'parameter',
-              data: paramNames[0]
-            } : {
-              type: 'raw',
-              data: 0.0
-            };
+            $scope.localValue = $scope.editAsParameter ? paramNames[0] : 0.0;
           };
         }
       }
@@ -758,18 +755,15 @@ oppia.directive('schemaBasedIntEditor', [function() {
           $scope.paramNameOptions = paramNames.map(function(paramName) {
             return {
               name: paramName,
-              value: {
-                type: 'parameter',
-                data: paramName
-              }
+              value: paramName
             };
           });
 
           $scope.$watch('localValue', function(newValue, oldValue) {
-            $scope.editAsParameter = (newValue.type === 'parameter');
+            $scope.editAsParameter = angular.isString(newValue);
             // Because JS objects are passed by reference, the current value needs
             // to be set manually to an object in the list of options.
-            if ($scope.localValue.type === 'parameter') {
+            if ($scope.editAsParameter) {
               $scope.paramNameOptions.forEach(function(option) {
                 if (angular.equals(option.value, newValue)) {
                   $scope.localValue = option.value;
@@ -780,13 +774,7 @@ oppia.directive('schemaBasedIntEditor', [function() {
 
           $scope.toggleEditMode = function() {
             $scope.editAsParameter = !$scope.editAsParameter;
-            $scope.localValue = $scope.editAsParameter ? {
-              type: 'parameter',
-              data: paramNames[0]
-            } : {
-              type: 'raw',
-              data: 0
-            };
+            $scope.localValue = $scope.editAsParameter ? paramNames[0] : 0;
           };
         }
       }
@@ -800,7 +788,8 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
       localValue: '=',
       // The mode in which to display the form. Should be treated as read-only.
       mode: '=',
-      postNormalizers: '&'
+      postNormalizers: '&',
+      uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
@@ -808,6 +797,19 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
         function($scope, $filter, $sce, parameterSpecsService) {
       $scope.allowedParameterNames = parameterSpecsService.getAllParamsOfType('unicode');
       $scope.doUnicodeParamsExist = ($scope.allowedParameterNames.length > 0);
+
+      if ($scope.uiConfig() && $scope.uiConfig().rows && $scope.doUnicodeParamsExist) {
+        $scope.doUnicodeParamsExist = false;
+        console.log('Multi-row unicode fields with parameters are not currently supported.');
+      }
+
+      $scope.getRows = function() {
+        if (!$scope.uiConfig()) {
+          return null;
+        } else {
+          return $scope.uiConfig().rows;
+        }
+      };
 
       $scope.getDisplayedValue = function() {
         return $sce.trustAsHtml($filter('convertUnicodeWithParamsToHtml')($scope.localValue));
@@ -842,12 +844,19 @@ oppia.directive('schemaBasedListEditor', [
       // Read-only property. The schema definition for each item in the list.
       itemSchema: '&',
       // The length of the list. If not specified, the list is of arbitrary length.
-      len: '='
+      len: '=',
+      // UI configuration. May be undefined.
+      uiConfig: '&'
     },
     templateUrl: 'schemaBasedEditor/list',
     restrict: 'E',
     compile: recursionHelper.compile,
     controller: ['$scope', function($scope) {
+      $scope.addElementText = 'Add element';
+      if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
+        $scope.addElementText = $scope.uiConfig().add_element_text;
+      }
+
       if ($scope.len === undefined) {
         $scope.addElement = function() {
           $scope.localValue.push(
@@ -881,6 +890,24 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
       propertySchemas: '&'
     },
     templateUrl: 'schemaBasedEditor/dict',
+    restrict: 'E',
+    compile: recursionHelper.compile,
+    controller: ['$scope', function($scope) {
+      $scope.getHumanReadablePropertyDescription = function(property) {
+        return property.description || '[' + property.name + ']';
+      };
+    }]
+  };
+}]);
+
+oppia.directive('schemaBasedCustomEditor', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      localValue: '=',
+      // The class of the object being edited.
+      objType: '='
+    },
+    templateUrl: 'schemaBasedEditor/custom',
     restrict: 'E',
     compile: recursionHelper.compile
   };

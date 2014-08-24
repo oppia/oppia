@@ -26,64 +26,46 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
     restrict: 'E',
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
-    controller: function($scope, $attrs) {
-      $scope.toParentValue = function(readableNoteName) {
-        return {
-          readableNoteName: readableNoteName,
-          noteDuration: {'num': 1, 'den': 1}
-        };
-      };
-
-      $scope.fromParentValue = function(parentValue) {
-        return parentValue.readableNoteName;
-      };
-
-      $scope.choices = [
-        'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5', 'G5',
-        'A5'
-      ];
-
-      // Get the text for the 'Add Item' button.
-      $scope.getAddItemText = function() {
-        return 'Add Note';
+    controller: ['$scope', '$rootScope', function($scope, $rootScope) {
+      $scope.mode = $rootScope.FORM_BUILDER_MODES.ENABLED;
+      $scope.schema = {
+        type: 'list',
+        items: {
+          type: 'unicode',
+          choices: [
+            'C4', 'D4', 'E4', 'F4', 'G4', 'A4', 'B4', 'C5', 'D5', 'E5', 'F5',
+            'G5', 'A5'
+          ]
+        },
+        ui_config: {
+          add_element_text: 'Add Note'
+        }
       };
 
       // Reset the component each time the value changes (e.g. if this is part
       // of an editable list).
       $scope.$watch('$parent.value', function(newValue, oldValue) {
-        // Maintain a local copy of 'value'. This is needed because it is not
-        // possible to modify 'item' directly when using "for item in value";
-        // we need a 'constant key'. So we represent each item as {label: ...}
-        // instead, and manipulate item.label.
         // TODO(sll): Check that $scope.$parent.value is a list.
         $scope.localValue = [];
         if (newValue) {
           for (var i = 0; i < newValue.length; i++) {
-            $scope.localValue.push({
-              'label': $scope.fromParentValue(newValue[i])
-            });
+            $scope.localValue.push(newValue[i].readableNoteName);
           }
         }
       }, true);
-
-      $scope.addItem = function() {
-        $scope.localValue.push({label: $scope.choices[0]});
-      };
-
-      $scope.deleteItem = function(index) {
-        $scope.localValue.splice(index, 1);
-        $scope.$parent.value.splice(index, 1);
-      };
 
       $scope.$watch('localValue', function(newValue, oldValue) {
         if (newValue && oldValue) {
           var parentValues = [];
           for (var i = 0; i < newValue.length; i++) {
-            parentValues.push($scope.toParentValue(newValue[i].label));
+            parentValues.push({
+              readableNoteName: newValue[i],
+              noteDuration: {'num': 1, 'den': 1}
+            });
           }
           $scope.$parent.value = parentValues;
         }
       }, true);
-    }
+    }]
   };
 });
