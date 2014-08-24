@@ -919,13 +919,6 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   margin-bottom: 0;
 }
 
-.nav-pills#navTabs > .active > a,
-.nav-pills#navTabs > .active > a:hover,
-.nav-pills#navTabs > .active > a:focus {
-  color: #ffffff;
-  background-color: #18447E;
-}
-
 .oppia-gallery-nav-tabs {
   border-bottom: 0;
 }

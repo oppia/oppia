@@ -37,6 +37,7 @@ describe('Gallery controller', function() {
           title: 'Landmarks',
           category: 'Geography',
           objective: 'can view maps',
+          language_code: 'en',
           last_updated: 12345678911111,
           community_owned: false,
           status: 'public'
@@ -45,6 +46,7 @@ describe('Gallery controller', function() {
           title: 'Geography 2',
           category: 'Geography',
           objective: 'can view more maps',
+          language_code: 'es',
           last_updated: 12345678912345,
           community_owned: false,
           status: 'public'
@@ -53,6 +55,7 @@ describe('Gallery controller', function() {
           title: 'My Exploration',
           category: 'Personal',
           objective: 'can be for myself',
+          language_code: 'en',
           last_updated: 12345678954322,
           community_owned: false,
           status: 'public'
@@ -73,7 +76,18 @@ describe('Gallery controller', function() {
 
     it('should show correct categories', function() {
       $httpBackend.flush();
-      expect(scope.categoryList).toEqual(['Geography', 'Personal']);
+      expect(scope.selectedCategories).toEqual({
+        'Geography': true,
+        'Personal': true
+      });
+      expect(scope.selectedLanguageCodes).toEqual({
+        'en': true,
+        'es': true
+      });
+      expect(scope.selectedStatuses).toEqual({
+        'public': true,
+        'publicized': true
+      });
     });
   });
 });

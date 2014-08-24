@@ -19,14 +19,82 @@
  */
 
 oppia.filter('selectedCategoriesFilter', function() {
-  return function(items, categories) {
+  return function(items, selectedCategories, fieldName) {
     if (!items) {
       return [];
     }
 
     return items.filter(function(item) {
-      return categories[item.category];
+      return selectedCategories[item[fieldName]];
     });
+  };
+});
+
+oppia.directive('checkboxGroup', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      allCategoriesLabel: '@',
+      // Dict where each key is the name of a category, and each
+      // value is true/false according to whether the category is
+      // selected or not. It is assumed that not all categories
+      // are unselected at the outset.
+      model: '='
+    },
+    templateUrl: 'checkboxGroup/master',
+    controller: ['$scope', function($scope) {
+      var someCategoryUnchecked = false;
+      for (var key in $scope.model) {
+        if (!$scope.model[key]) {
+          someCategoryUnchecked = true;
+        }
+      }
+
+      $scope.allCategoriesSelected = !someCategoryUnchecked;
+      $scope.individualCategoryCheckboxStatuses = {};
+      for (var key in $scope.model) {
+        if (someCategoryUnchecked) {
+          $scope.individualCategoryCheckboxStatuses[key] = $scope.model[key];
+        } else {
+          $scope.individualCategoryCheckboxStatuses[key] = false;
+        }
+      }
+
+      $scope.onChangeSelection = function(allCategoriesCheckboxChanged) {
+        if (allCategoriesCheckboxChanged) {
+          if ($scope.allCategoriesSelected) {
+            for (var key in $scope.model) {
+              $scope.model[key] = true;
+              $scope.individualCategoryCheckboxStatuses[key] = false;
+            }
+          } else {
+            $scope.allCategoriesSelected = true;
+          }
+        } else {
+          var someCategoryCheckboxIsChecked = false;
+          var someCategoryCheckboxIsUnchecked = false;
+          for (var key in $scope.model) {
+            if ($scope.individualCategoryCheckboxStatuses[key]) {
+              someCategoryCheckboxIsChecked = true;
+            } else {
+              someCategoryCheckboxIsUnchecked = true;
+            }
+          }
+
+          if (someCategoryCheckboxIsChecked && someCategoryCheckboxIsUnchecked) {
+            $scope.allCategoriesSelected = false;
+            for (var key in $scope.model) {
+              $scope.model[key] = $scope.individualCategoryCheckboxStatuses[key];
+            }
+          } else {
+            for (var key in $scope.model) {
+              $scope.model[key] = true;
+            }
+            $scope.allCategoriesSelected = true;
+          }
+        }
+      };
+    }]
   };
 });
 
@@ -36,9 +104,17 @@ oppia.controller('Gallery', [
     function($scope, $http, $rootScope, createExplorationButtonService,
              oppiaDatetimeFormatter) {
   $scope.galleryDataUrl = '/galleryhandler/data';
-  $scope.categoryList = [];
 
+  $scope.selectedStatuses = {
+    'publicized': true,
+    'public': true
+  };
   $scope.selectedCategories = {};
+  $scope.selectedLanguages = {};
+
+  $scope.getCategoryList = function() {
+    return Object.keys($scope.selectedCategories);
+  };
 
   $scope.getFormattedObjective = function(objective) {
     objective = objective.trim();
@@ -61,26 +137,15 @@ oppia.controller('Gallery', [
     $scope.releasedExplorations = data.released;
     $scope.betaExplorations = data.beta;
 
-    $scope.categoryList = [];
-    $scope.releasedExplorations.map(function(expDict) {
-      if ($scope.categoryList.indexOf(expDict.category) === -1) {
-        $scope.categoryList.push(expDict.category);
-      }
-    });
-    $scope.betaExplorations.map(function(expDict) {
-      if ($scope.categoryList.indexOf(expDict.category) === -1) {
-        $scope.categoryList.push(expDict.category);
-      }
-    });
-    $scope.categoryList.sort();
-
-    $scope.selectedCategories = {};
-    for (var i = 0; i < $scope.categoryList.length; i++) {
-      $scope.selectedCategories[$scope.categoryList[i]] = true;
-    }
-
     $scope.allExplorationsInOrder = (
       $scope.releasedExplorations.concat($scope.betaExplorations));
+
+    $scope.selectedCategories = {};
+    $scope.selectedLanguageCodes = {};
+    $scope.allExplorationsInOrder.map(function(expDict) {
+      $scope.selectedCategories[expDict.category] = true;
+      $scope.selectedLanguageCodes[expDict.language_code] = true;
+    });
 
     $rootScope.loadingMessage = '';
   });
