@@ -43,6 +43,15 @@ oppia.directive('sanitizedUrlEditor', function($compile, warningsData) {
         $scope.localValue = {label: String(newValue) || ''};
       }, true);
 
+      $scope.getWarningText = function() {
+        if ($scope.localValue.label.indexOf('http://') !== 0 &&
+            $scope.localValue.label.indexOf('https://') !== 0) {
+          return 'URLs should start with http:// or https://';
+        } else {
+          return '';
+        }
+      };
+
       $scope.alwaysEditable = $scope.$parent.alwaysEditable;
       if ($scope.alwaysEditable) {
         $scope.$watch('localValue.label', function(newValue, oldValue) {

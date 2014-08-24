@@ -33,11 +33,8 @@ class Video(widget_domain.BaseWidget):
             'after \'v=\' in the video URL.'),
         'schema': {
             'type': 'unicode',
-            'validators': [{
-                'id': 'is_nonempty',
-            }]
         },
-        'default_value': 'dQw4w9WgXcQ',
+        'default_value': '',
     }, {
         'name': 'start',
         'description': (
