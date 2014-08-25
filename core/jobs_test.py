@@ -484,11 +484,15 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             'exp_id', 'title', 'A category')
         exp_services.save_new_exploration('owner_id', exploration)
+        self.process_and_flush_pending_tasks()
 
     def test_count_all_explorations(self):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        try:
+            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        except:
+            raise ValueError(str(self.list_tasks()))
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(
@@ -586,6 +590,7 @@ class TwoClassesMapReduceJobIntegrationTests(test_utils.GenericTestBase):
         # Note that this ends up creating an entry in the
         # ExplorationRightsModel as well.
         exp_services.save_new_exploration('owner_id', exploration)
+        self.process_and_flush_pending_tasks()
 
     def test_count_entities(self):
         self.assertEqual(exp_models.ExplorationModel.query().count(), 1)
@@ -720,6 +725,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, 'title', 'A category')
         exp_services.save_new_exploration('owner_id', exploration)
+        self.process_and_flush_pending_tasks()
 
     def test_continuous_computation_workflow(self):
         """An integration test for continuous computations."""
