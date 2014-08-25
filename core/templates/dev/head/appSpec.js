@@ -58,7 +58,7 @@ describe('Datetime Formatter', function() {
   beforeEach(module('oppia'));
 
   describe('datetimeformatter', function() {
-    // This corresponds to Fri, 21 Nov 2014 9:45:00 GMT.
+    // This corresponds to Fri, 21 Nov 2014 09:45:00 GMT.
     var NOW_MILLIS = 1416563100000;
     var YESTERDAY_MILLIS = NOW_MILLIS - 24 * 60 * 60 * 1000;
     var df = null;
@@ -93,9 +93,11 @@ describe('Datetime Formatter', function() {
     });
 
     it('should show only the date for a datetime occurring before today', function() {
-      // 100 hours ago.
-      expect(df.getLocaleAbbreviatedDatetimeString(
-        NOW_MILLIS - 100 * 60 * 60 * 1000)).toBe('11/16/2014');
+      // 72 hours ago. This is 18 Nov 2014 09:45:00 GMT, which corresponds to
+      // 17 Nov 2014 in some parts of the world, and 18 Nov 2014 in others.
+      expect(['11/18/2014', '11/17/2014']).toContain(
+        df.getLocaleAbbreviatedDatetimeString(
+          NOW_MILLIS - 72 * 60 * 60 * 1000));
     });
   });
 });
