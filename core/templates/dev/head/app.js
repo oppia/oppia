@@ -170,8 +170,8 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
       var date = new Date(millisSinceEpoch);
       return date.toLocaleString();
     },
-    // Returns time of the day if milliseconds since the Epoch
-    // translates to current date otherwise returns the date.
+    // Returns just the time if the local datetime representation has the
+    // same date as the current date. Otherwise, returns just the date.
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() == new Date().toLocaleDateString()) {
