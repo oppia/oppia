@@ -21,12 +21,12 @@
 oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
-    'explorationObjectiveService', 'explorationRightsService',
+    'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
     'changeListService', 'warningsData', function(
       $scope, $http, $window, $modal, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
-      explorationObjectiveService, explorationRightsService, changeListService,
-      warningsData) {
+      explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
+      changeListService, warningsData) {
 
   var CONTRIBUTE_GALLERY_PAGE = '/contribute';
 
@@ -34,6 +34,7 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationTitleService = explorationTitleService;
     $scope.explorationCategoryService = explorationCategoryService;
     $scope.explorationObjectiveService = explorationObjectiveService;
+    $scope.explorationLanguageCodeService = explorationLanguageCodeService;
     $scope.explorationRightsService = explorationRightsService;
 
     explorationData.getData().then(function(data) {
@@ -60,6 +61,10 @@ oppia.controller('ExplorationSettings', [
 
   $scope.saveExplorationObjective = function() {
     explorationObjectiveService.saveDisplayedValue();
+  };
+
+  $scope.saveExplorationLanguageCode = function() {
+    explorationLanguageCodeService.saveDisplayedValue();
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {

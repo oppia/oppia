@@ -93,6 +93,17 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.validate()
 
+        exploration.language_code = 'fake_code'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid language_code'):
+            exploration.validate()
+        exploration.language_code = 'English'
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid language_code'):
+            exploration.validate()
+        exploration.language_code = 'en'
+        exploration.validate()
+
         exploration.param_specs = 'A string'
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'param_specs to be a dict'):

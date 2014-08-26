@@ -31,6 +31,18 @@
                     <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="learn how to multiply two numbers">
                   </div>
                 </div>
+                <div class="form-group">
+                  <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">Language</label>
+                  <div class="col-lg-10 col-md-10 col-sm-10">
+                    <select id="explorationLanguageCode" class="form-control" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
+                    </select>
+                    <span class="help-block" style="font-size: smaller">
+                      <em>
+                        Don't see the language you want? <a href="https://groups.google.com/forum/#!forum/oppia-dev">Tell us.</a>
+                      </em>
+                    </span>
+                  </div>
+                </div>
               </div>
             </div>
 

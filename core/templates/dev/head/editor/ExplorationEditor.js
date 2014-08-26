@@ -25,13 +25,13 @@ oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$location', '$modal', '$window', '$filter', '$rootScope',
   '$log', 'explorationData', 'warningsData', 'activeInputData',
   'editorContextService', 'changeListService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationObjectiveService',
+  'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
-    explorationCategoryService, explorationObjectiveService,
+    explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, validatorsService, editabilityService,
     oppiaDatetimeFormatter, widgetDefinitionsService) {
 
@@ -193,6 +193,7 @@ oppia.controller('ExplorationEditor', [
               'title': 'Title',
               'category': 'Category',
               'objective': 'Objective',
+              'language_code': 'Language',
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes',
               'default_skin_id': 'Default skin'
@@ -631,6 +632,7 @@ oppia.controller('ExplorationEditor', [
       explorationTitleService.init(data.title);
       explorationCategoryService.init(data.category);
       explorationObjectiveService.init(data.objective);
+      explorationLanguageCodeService.init(data.language_code);
 
       $scope.explorationTitleService = explorationTitleService;
       $scope.explorationObjectiveService = explorationObjectiveService;

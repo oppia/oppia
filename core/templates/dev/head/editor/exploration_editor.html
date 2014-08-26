@@ -8,6 +8,7 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.ALL_LANGUAGE_CODES = JSON.parse('{{ALL_LANGUAGE_CODES|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>

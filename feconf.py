@@ -275,3 +275,82 @@ SHOW_SKIN_CHOOSER = False
 # Output formats of downloaded explorations.
 OUTPUT_FORMAT_JSON = 'json'
 OUTPUT_FORMAT_ZIP = 'zip'
+
+# List of supported language codes.
+ALL_LANGUAGE_CODES = [{
+    'code': 'en', 'description': 'English',
+}, {
+    'code': 'ar', 'description': 'Arabic',
+}, {
+    'code': 'bg', 'description': 'Bulgarian',
+}, {
+    'code': 'ca', 'description': 'Catalan',
+}, {
+    'code': 'zh', 'description': 'Chinese',
+}, {
+    'code': 'hr', 'description': 'Croatian',
+}, {
+    'code': 'cs', 'description': 'Czech',
+}, {
+    'code': 'da', 'description': 'Danish',
+}, {
+    'code': 'nl', 'description': 'Dutch',
+}, {
+    'code': 'tl', 'description': 'Filipino',
+}, {
+    'code': 'fi', 'description': 'Finnish',
+}, {
+    'code': 'fr', 'description': 'French',
+}, {
+    'code': 'de', 'description': 'German',
+}, {
+    'code': 'el', 'description': 'Greek',
+}, {
+    'code': 'he', 'description': 'Hebrew',
+}, {
+    'code': 'hi', 'description': 'Hindi',
+}, {
+    'code': 'hu', 'description': 'Hungarian',
+}, {
+    'code': 'id', 'description': 'Indonesian',
+}, {
+    'code': 'it', 'description': 'Italian',
+}, {
+    'code': 'ja', 'description': 'Japanese',
+}, {
+    'code': 'ko', 'description': 'Korean',
+}, {
+    'code': 'lv', 'description': 'Latvian',
+}, {
+    'code': 'lt', 'description': 'Lithuanian',
+}, {
+    'code': 'no', 'description': 'Norwegian',
+}, {
+    'code': 'fa', 'description': 'Persian',
+}, {
+    'code': 'pl', 'description': 'Polish',
+}, {
+    'code': 'pt', 'description': 'Portuguese',
+}, {
+    'code': 'ro', 'description': 'Romanian',
+}, {
+    'code': 'ru', 'description': 'Russian',
+}, {
+    'code': 'sr', 'description': 'Serbian',
+}, {
+    'code': 'sk', 'description': 'Slovak',
+}, {
+    'code': 'sl', 'description': 'Slovenian',
+}, {
+    'code': 'es', 'description': 'Spanish',
+}, {
+    'code': 'sv', 'description': 'Swedish',
+}, {
+    'code': 'th', 'description': 'Thai',
+}, {
+    'code': 'tr', 'description': 'Turkish',
+}, {
+    'code': 'uk', 'description': 'Ukrainian',
+}, {
+    'code': 'vi', 'description': 'Vietnamese',
+}]
