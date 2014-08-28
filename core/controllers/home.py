@@ -20,6 +20,7 @@ from core.controllers import base
 from core.controllers import pages
 from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import user_jobs
 from core.domain import user_services
 
 
@@ -80,8 +81,23 @@ class DashboardHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        if self.user_id is None:
+            raise self.PageNotFoundException
+
+        recent_updates = (
+            user_jobs.DashboardRecentUpdatesAggregator.get_recent_updates(
+                self.user_id))
+
+        # Replace author_ids with their usernames.
+        author_ids = [update['author_id'] for update in recent_updates]
+        author_usernames = user_services.get_usernames(author_ids)
+        for ind, update in enumerate(recent_updates):
+            update['author_username'] = author_usernames[ind]
+            del update['author_id']
+
         self.values.update({
             'explorations': exp_services.get_at_least_editable_summary_dict(
                 self.user_id),
+            'recent_updates': recent_updates,
         })
         self.render_json(self.values)

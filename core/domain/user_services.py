@@ -119,7 +119,11 @@ def get_email_from_username(username):
 
 
 def get_users_settings(user_ids):
-    """Gets domain objects representing the settings for the given user ids."""
+    """Gets domain objects representing the settings for the given user_ids.
+
+    If the given user_id does not exist, the corresponding entry in the
+    returned list is None.
+    """
     user_settings_models = user_models.UserSettingsModel.get_multi(user_ids)
     result = []
     for ind, model in enumerate(user_settings_models):
@@ -188,6 +192,11 @@ def get_or_create_user(user_id, email):
 
 def get_username(user_id):
     return get_user_settings(user_id, strict=True).username
+
+
+def get_usernames(user_ids):
+    users_settings = get_users_settings(user_ids)
+    return [us.username if us else None for us in users_settings]
 
 
 # NB: If we ever allow usernames to change, update the

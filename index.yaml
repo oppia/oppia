@@ -33,11 +33,23 @@ indexes:
   - name: deleted
   - name: status
 
+- kind: FeedbackMessageModel
+  properties:
+  - name: deleted
+  - name: thread_id
+  - name: last_updated
+    direction: desc
+
 - kind: JobModel
   properties:
   - name: status_code
   - name: time_queued_msec
     direction: desc
+
+- kind: RecentUpdatesRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
 
 - kind: StatisticsRealtimeModel
   properties:

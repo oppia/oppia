@@ -23,6 +23,7 @@ import logging
 
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -170,6 +171,9 @@ def create_new_exploration_rights(exploration_id, committer_id):
         community_owned=exploration_rights.community_owned,
         status=exploration_rights.status
     ).commit(committer_id, 'Created new exploration', commit_cmds)
+
+    subscription_services.subscribe_to_activity(
+        committer_id, exploration_id)
 
 
 def get_exploration_rights(exploration_id):
@@ -436,7 +440,8 @@ class Actor(object):
 
 
 def assign_role(committer_id, exploration_id, assignee_id, new_role):
-    """Assign `assignee_id` to the given role.
+    """Assign `assignee_id` to the given role and subscribes the assignee
+    to future exploration updates.
 
     The caller should ensure that assignee_id corresponds to a valid user in
     the system.
@@ -514,6 +519,10 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
 
     _save_exploration_rights(
         committer_id, exp_rights, commit_message, commit_cmds)
+
+    if new_role in [ROLE_OWNER, ROLE_EDITOR]:
+        subscription_services.subscribe_to_activity(
+            assignee_id, exploration_id)
 
 
 def release_ownership(committer_id, exploration_id):

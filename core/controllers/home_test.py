@@ -171,6 +171,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         rights_manager.assign_role(
             self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
             rights_manager.ROLE_VIEWER)
+        self.set_admins([self.OWNER_EMAIL])
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json('/dashboardhandler/data')
@@ -180,7 +181,6 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(response['explorations'], {})
 
-        self.set_admins([self.OWNER_EMAIL])
         rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(response['explorations'], {})

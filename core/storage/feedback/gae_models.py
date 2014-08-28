@@ -157,6 +157,9 @@ class FeedbackMessageModel(base_models.BaseModel):
     def exploration_id(self):
         return self.id.split('.')[0]
 
+    def get_thread_subject(self):
+        return FeedbackThreadModel.get_by_id(self.thread_id).subject
+
     @classmethod
     def create(cls, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
@@ -186,6 +189,11 @@ class FeedbackMessageModel(base_models.BaseModel):
         """
         return cls.get_all().filter(
             cls.thread_id == thread_id).fetch(QUERY_LIMIT)
+
+    @classmethod
+    def get_most_recent_message(cls, thread_id):
+        return cls.get_all().filter(
+            cls.thread_id == thread_id).order(-cls.last_updated).get()
 
     @classmethod
     def get_message_count(cls, thread_id):

@@ -18,6 +18,7 @@
 
 __author__ = 'Koji Ashida'
 
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -78,7 +79,8 @@ def get_messages(thread_id):
 
 def create_message(
         thread_id, author_id, updated_status, updated_subject, text):
-    """Creates a new message for the thread.
+    """Creates a new message for the thread and subscribes the author to the
+    thread.
 
     Returns False if the message with the ID already exists.
     """
@@ -105,6 +107,9 @@ def create_message(
         if updated_subject and updated_subject != thread.subject:
             thread.subject = updated_subject
     thread.put()
+
+    if author_id:
+        subscription_services.subscribe_to_thread(author_id, thread_id)
     return True
 
 
