@@ -1744,7 +1744,7 @@ class SearchTests(ExplorationServicesUnitTests):
 
         def mock_add_docs(docs, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(docs, [{'is':'beta'}])
+            self.assertEqual(docs, [{'is': 'beta'}])
 
         get_doc_counter = test_utils.CallCounter(mock_get_doc)
         add_docs_counter = test_utils.CallCounter(mock_add_docs)
@@ -1760,6 +1760,9 @@ class SearchTests(ExplorationServicesUnitTests):
                 status=rights_manager.EXPLORATION_STATUS_PUBLIC
             )
             exp_services.update_exploration_status_in_search(rights)
+
+        self.assertEqual(get_doc_counter.times_called, 1)
+        self.assertEqual(add_docs_counter.times_called, 1)
 
     def test_search_explorations(self):
         expected_query_string = 'a query string'

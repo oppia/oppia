@@ -67,6 +67,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
     def test_get_multi(self):
         model1 = base_models.BaseModel()
         model2 = base_models.BaseModel()
+        model2.deleted = True
 
         model1.put()
         model2.put()
@@ -76,7 +77,7 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
 
         result = base_models.BaseModel.get_multi([model1_id, model2_id, 'none'])
 
-        self.assertEqual(result, [model1, model2, None])
+        self.assertEqual(result, [model1, None, None])
 
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])

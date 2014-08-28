@@ -86,7 +86,11 @@ class BaseModel(ndb.Model):
     @classmethod
     def get_multi(cls, entity_ids, strict=False):
         entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
-        return ndb.get_multi(entity_keys)
+        entities = ndb.get_multi(entity_keys)
+        for i in xrange(len(entities)):
+            if entities[i] and entities[i].deleted:
+                entities[i] = None
+        return entities
 
     @classmethod
     def put_multi(cls, entities):

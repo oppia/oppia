@@ -1008,6 +1008,11 @@ def _exp_to_search_dict(exp):
         'author_notes': exp.author_notes,
     }
     doc.update(_exp_rights_to_search_dict(rights))
+
+    #TODO(frederik): Calculate an exploration's 'rank' based on statistics.
+    # By default, a document's rank is the time it was indexed, so the most
+    # recently changed explorations would rank higher.
+
     return doc
 
 
@@ -1030,9 +1035,11 @@ def patch_exploration_search_document(exp_id, update):
     doc.update(update)
     search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
 
+
 def update_exploration_status_in_search(rights):
     patch_exploration_search_document(
         rights.id, _exp_rights_to_search_dict(rights))
+
 
 def search_explorations(
     query, sort=None, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
@@ -1045,7 +1052,8 @@ def search_explorations(
         Each value should start with a '+' or a '-' character indicating whether
         to sort in ascending or descending
         order respectively. This character should be followed by a field name to
-        sort on.
+        sort on. When this is None, results are based on 'rank'.
+        See _exp_to_search_dict to see how rank is determined
       - limit: the maximum number of results to return.
       - cursor: A cursor, used to get the next page of results.
         If there are more documents that match the query than

@@ -139,8 +139,8 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
 
 class ExplorationChangeEventListener(BaseEventHandler):
     """Event handler for receiving exploration change events. This event is
-    triggered wheneve an explorations contents or metadata (title, blurb etc.)
-    This includes when a a new exploration is created."""
+    triggered whenever changes to an explorations contents or metadata (title, blurb etc.)
+    are persisted. This includes when a a new exploration is created."""
 
     EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_CHANGE
 
