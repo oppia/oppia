@@ -192,6 +192,15 @@ def get_non_private_explorations_summary_dict():
         rights_manager.get_non_private_exploration_rights())
 
 
+def get_private_at_least_viewable_explorations_summary_dict(user_id):
+    """Returns a summary of private explorations that are at least viewable by
+    the given user.
+    """
+    return _get_explorations_summary_dict(
+        rights_manager.get_private_at_least_viewable_exploration_rights(
+            user_id))
+
+
 def get_explicit_viewer_explorations_summary_dict(user_id):
     """Returns a summary of some viewable explorations for this user.
 

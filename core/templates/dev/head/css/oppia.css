@@ -363,6 +363,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 }
 .oppia-gallery-tile:hover, .oppia-gallery-tile-anchor:hover {
   background-color: #ddd;
+  cursor: pointer;
   text-decoration: none;
 }
 

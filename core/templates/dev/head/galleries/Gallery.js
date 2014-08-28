@@ -107,10 +107,21 @@ oppia.controller('Gallery', [
 
   $scope.selectedStatuses = {
     'publicized': true,
-    'public': true
+    'public': true,
+    'private': true
   };
   $scope.selectedCategories = {};
   $scope.selectedLanguages = {};
+
+  var _navigated = false;
+  // Prevent trying to navigate to two places at once when the user clicks on the
+  // "See inside" button within the main gallery tile.
+  $scope.navigateTo = function(url) {
+    if (!_navigated) {
+      _navigated = true;
+      window.location.href = url;
+    }
+  };
 
   $scope.getCategoryList = function() {
     return Object.keys($scope.selectedCategories);
@@ -136,9 +147,10 @@ oppia.controller('Gallery', [
   $http.get($scope.galleryDataUrl).success(function(data) {
     $scope.releasedExplorations = data.released;
     $scope.betaExplorations = data.beta;
+    $scope.privateExplorations = data['private'];
 
-    $scope.allExplorationsInOrder = (
-      $scope.releasedExplorations.concat($scope.betaExplorations));
+    $scope.allExplorationsInOrder = $scope.releasedExplorations.concat(
+      $scope.betaExplorations).concat($scope.privateExplorations);
 
     $scope.selectedCategories = {};
     $scope.selectedLanguageCodes = {};

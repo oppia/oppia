@@ -64,6 +64,12 @@
                     Beta
                   </label>
                 </li>
+                <li class="checkbox">
+                  <label>
+                    <input type="checkbox" ng-model="selectedStatuses.private">
+                    Private
+                  </label>
+                </li>
               </ul>
 
               <h4><strong>Categories</strong></h4>
@@ -83,16 +89,28 @@
               <em>No explorations selected.</em>
             </div>
 
-            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguageCodes:'language_code' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="oppia-gallery-tile">
-              <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-anchor">
-                <div class="oppia-gallery-tile-top">
-                  <div class="oppia-gallery-tile-description">
-                    <span class="oppia-gallery-tile-title"><[exploration.title]></span>
-                  </div>
-                </div>
+            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguageCodes:'language_code' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="container oppia-gallery-tile">
+              <div class="oppia-gallery-tile-anchor">
+                <div class="row">
+                  <div class="col-lg-10 col-md-10 col-sm-10" ng-click="navigateTo('/explore/<[exploration.id]>')">
+                    <div class="oppia-gallery-tile-top">
+                      <div class="oppia-gallery-tile-description">
+                        <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                      </div>
+                    </div>
 
-                <div class="oppia-gallery-tile-middle" style="color: black;">
-                  <[getFormattedObjective(exploration.objective)]>
+                    <div class="oppia-gallery-tile-middle" style="color: black;">
+                      <span ng-if="exploration.objective"><[getFormattedObjective(exploration.objective)]></span>
+                      <span ng-if="!exploration.objective"><em>No objective specified.</em></span>
+                    </div>
+                  </div>
+
+                  <div class="col-lg-2 col-md-2 col-sm-2">
+                    <button class="btn btn-default pull-right" ng-click="navigateTo('/create/<[exploration.id]>')">
+                      <span class="glyphicon glyphicon-eye-open" title="See inside this exploration"></span>
+                      See inside
+                    </button>
+                  </div>
                 </div>
               </a>
 
@@ -108,16 +126,9 @@
                   <span ng-if="exploration.status === 'public'" class="label label-info" style="opacity: 0.5">
                     Beta
                   </span>
-                  <a ng-href="/create/<[exploration.id]>">
-                    <!-- TODO(sll): Generalize this to 'is_editable'. -->
-                    <span ng-if="exploration.community_owned">
-                      <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
-                      <span class="oppia-small-font">Edit</span>
-                    </span>
-                    <span ng-if="!exploration.community_owned">
-                      <span class="oppia-small-font">View</span>
-                    </span>
-                  </a>
+                  <span ng-if="exploration.status === 'private'" class="label label-info" style="opacity: 0.5">
+                    Private
+                  </span>
                 </div>
               </div>
             </div>

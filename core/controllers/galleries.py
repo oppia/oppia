@@ -70,15 +70,15 @@ class GalleryHandler(base.BaseHandler):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
 
-        # TODO(sll): Supplement this with ids of private explorations for
-        # which the user is an owner or editor.
-
         # TODO(sll): Precompute and cache gallery categories. Or have a fixed
         # list of categories and 'Other', and gradually classify the
         # explorations in 'Other'.
 
         explorations_dict = (
             exp_services.get_non_private_explorations_summary_dict())
+        explorations_dict.update(
+            exp_services.get_private_at_least_viewable_explorations_summary_dict(
+                self.user_id))
 
         explorations_list = [{
             'id': exp_id,
@@ -91,6 +91,12 @@ class GalleryHandler(base.BaseHandler):
             'community_owned': exp_data['community_owned'],
         } for (exp_id, exp_data) in explorations_dict.iteritems()]
 
+
+        private_explorations_list = sorted(
+            [e_dict for e_dict in explorations_list
+             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE],
+            key=lambda x: x['last_updated'],
+            reverse=True)
         beta_explorations_list = sorted(
             [e_dict for e_dict in explorations_list 
              if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC],
@@ -105,6 +111,7 @@ class GalleryHandler(base.BaseHandler):
         self.values.update({
             'released': publicized_explorations_list,
             'beta': beta_explorations_list,
+            'private': private_explorations_list,
         })
         self.render_json(self.values)
 
