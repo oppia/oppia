@@ -26,9 +26,15 @@
       border: 1px solid black;
     }
   </style>
+  <div style="height: 35px;">
+    <div ng-if="state.selectVertex != null && graph.isLabeled && state.vertexEditPermissions">
+      <input class='graph-vertex-label'></input>
+      <button class="btn btn-default" ng-click="updateLabel()">Update Label</button>
+    </div>
+  </div>
   <div class='oppia-graph-viz-container'>
-    <svg class='oppia-graph-viz-svg' width="100%" height="350" ng-mousemove="mousemoveGraphSVG($event)" ng-click="clickGraphSVG($event)">
-      <svg viewBox="0 0 50 350" width="100%" height="350" preserveAspectRatio="xMaxYMin meet">
+    <svg class='oppia-graph-viz-svg' width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="clickGraphSVG($event)">
+      <svg viewBox="0 0 50 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
         <g ng-repeat="button in buttons">
           <rect width="30"
             height="30"
@@ -58,7 +64,13 @@
           <[button.text]>
         </text>
       </g>
-      <line ng-if="state.addEdgeVertex!=null"
+      <circle ng-if="state.selectVertex != null && graph.isLabeled && state.vertexEditPermissions == true"
+        ng-attr-cx="<[graph.vertices[state.selectVertex].x]>"
+        ng-attr-cy="<[graph.vertices[state.selectVertex].y]>"
+        r="8"
+        style="fill: aqua">
+      </circle>
+      <line ng-if="state.addEdgeVertex != null"
         ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
         ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
         ng-attr-x2="<[state.mouseX]>"

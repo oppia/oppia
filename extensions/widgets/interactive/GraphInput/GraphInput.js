@@ -128,6 +128,8 @@ oppia.directive('graphViz', function() {
         addEdgeVertex: null,
         //Currently dragged vertex
         dragVertex: null,
+        //Selected vertex for editing label
+        selectVertex: null,
         //Mouse position in SVG coordinates
         mouseX: 0,
         mouseY: 0,
@@ -153,6 +155,19 @@ oppia.directive('graphViz', function() {
             y: $scope.state.mouseY,
             label: ""
           });
+        }
+        if ($scope.state.currentMode == $scope.modes.SELECT) {
+          if ($scope.state.hoverVertex === null) {
+            $scope.state.selectVertex = null;
+          }
+        }
+      };
+
+      $scope.updateLabel = function() {
+        if ($scope.state.currentMode == $scope.modes.SELECT && $scope.state.selectVertex != null && $scope.state.vertexEditPermissions) {
+          var newLabel = $($element).find(".graph-vertex-label").val();
+          $scope.graph.vertices[$scope.state.selectVertex].label = newLabel;
+          $($element).find(".graph-vertex-label").val("");
         }
       };
 
@@ -199,6 +214,7 @@ oppia.directive('graphViz', function() {
         $event.stopPropagation();
         $scope.state.currentMode = mode;
         $scope.state.addEdgeVertex = null;
+        $scope.state.selectVertex = null;
       };
 
     }]
@@ -247,6 +263,9 @@ oppia.directive('graphInputVertex', ['$document', function($document) {
           }
         } else if (state.currentMode == state.modes.SELECT && state.movePermissions) {
           state.dragVertex = $scope.$index;
+        }
+        if (state.currentMode == state.modes.SELECT) {
+          state.selectVertex = $scope.$index;
         }
       };
 
