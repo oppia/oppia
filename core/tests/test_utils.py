@@ -288,9 +288,6 @@ class AppEngineTestBase(TestBase):
     def count_jobs_in_taskqueue(self):
         return len(self.taskqueue_stub.get_filtered_tasks())
 
-    def list_tasks(self):
-        return self.taskqueue_stub.get_filtered_tasks()
-
     def process_and_flush_pending_tasks(self):
         from google.appengine.ext import deferred
 

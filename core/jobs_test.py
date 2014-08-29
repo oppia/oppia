@@ -489,10 +489,7 @@ class MapReduceJobIntegrationTests(test_utils.GenericTestBase):
     def test_count_all_explorations(self):
         job_id = SampleMapReduceJobManager.create_new()
         SampleMapReduceJobManager.enqueue(job_id)
-        try:
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
-        except:
-            raise ValueError(str(self.list_tasks()))
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
         self.process_and_flush_pending_tasks()
 
         self.assertEqual(

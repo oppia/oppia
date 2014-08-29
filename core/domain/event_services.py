@@ -137,7 +137,7 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
             params, play_type)
 
 
-class ExplorationChangeEventListener(BaseEventHandler):
+class ExplorationContentChangeEventHandler(BaseEventHandler):
     """Event handler for receiving exploration change events. This event is
     triggered whenever changes to an explorations contents or metadata (title, blurb etc.)
     are persisted. This includes when a a new exploration is created."""
@@ -147,11 +147,13 @@ class ExplorationChangeEventListener(BaseEventHandler):
     @classmethod
     def _handle_event(cls, exploration):
         """Indexes the changed exploration."""
+        # We're inline importing here to break import loops like this: (-> means imports)
+        # event_services -> jobs_registry -> exp_jobs -> exp_services -> event_services.
         from core.domain import exp_services
         exp_services.index_explorations_given_domain_objects([exploration])
 
 
-class ExplorationStatusChangeEventListener(BaseEventHandler):
+class ExplorationStatusChangeEventHandler(BaseEventHandler):
     """Event handler for receiving exploration status change events.
     These events are triggered whenever an exploration is published, publicized,
     unpublished or unpublicized."""
@@ -161,6 +163,8 @@ class ExplorationStatusChangeEventListener(BaseEventHandler):
     @classmethod
     def _handle_event(cls, exp_rights):
         """Indexes the changed exploration."""
+        # We're inline importing here to break import loops like this: (-> means imports)
+        # event_services -> jobs_registry -> exp_jobs -> exp_services -> event_services.
         from core.domain import exp_services
         exp_services.update_exploration_status_in_search(exp_rights)
 

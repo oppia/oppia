@@ -145,6 +145,8 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        # We're inline importing here to break import loops like this: (-> means imports)
+        # stats_jobs -> exp_services -> event_services -> jobs_registry -> stats_jobs.
         from core.domain import stats_services
         # TODO(sll): Get this from
         # stats_services.get_exploration_start_count(key) if the exp_id

@@ -40,12 +40,13 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
         for exp in explorations:
             exp_services.save_new_exploration('owner_id', exp)
 
+        self.process_and_flush_pending_tasks()
 
     def test_standard_operation(self):
         job_id = (exp_jobs.IndexAllExplorationsJobManager.create_new())
         exp_jobs.IndexAllExplorationsJobManager.enqueue(job_id)
 
-        #self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
 
         indexed_docs = []
 

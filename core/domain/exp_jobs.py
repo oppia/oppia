@@ -30,5 +30,7 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
+        # We're inline importing here to break import loops like this: (-> means imports)
+        # exp_services -> event_services -> jobs_registry -> exp_jobs -> exp_services.
         from core.domain import exp_services
         exp_services.index_explorations_given_ids([item.id])
