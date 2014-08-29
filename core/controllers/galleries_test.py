@@ -56,6 +56,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
+            'private': [],
             'beta': [],
             'released': [],
         }, response_dict)

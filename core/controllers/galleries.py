@@ -75,10 +75,12 @@ class GalleryHandler(base.BaseHandler):
         # explorations in 'Other'.
 
         explorations_dict = (
-            exp_services.get_non_private_explorations_summary_dict())
-        explorations_dict.update(
-            exp_services.get_private_at_least_viewable_explorations_summary_dict(
-                self.user_id))
+            exp_services.get_non_private_explorations_summary_dict(
+                user_id=self.user_id))
+        if self.user_id:
+            explorations_dict.update(
+                exp_services.get_private_at_least_viewable_explorations_summary_dict(
+                    self.user_id))
 
         explorations_list = [{
             'id': exp_id,
@@ -89,8 +91,8 @@ class GalleryHandler(base.BaseHandler):
             'last_updated': exp_data['last_updated'],
             'status': exp_data['status'],
             'community_owned': exp_data['community_owned'],
+            'is_editable': exp_data['is_editable'],
         } for (exp_id, exp_data) in explorations_dict.iteritems()]
-
 
         private_explorations_list = sorted(
             [e_dict for e_dict in explorations_list

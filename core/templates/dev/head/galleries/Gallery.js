@@ -107,8 +107,8 @@ oppia.controller('Gallery', [
 
   $scope.selectedStatuses = {
     'publicized': true,
-    'public': true,
-    'private': true
+    'public': false,
+    'private': false
   };
   $scope.selectedCategories = {};
   $scope.selectedLanguages = {};

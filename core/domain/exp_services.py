@@ -94,12 +94,14 @@ def get_new_exploration_id():
 
 
 # Query methods.
-def _get_explorations_summary_dict(exploration_rights):
+def _get_explorations_summary_dict(exploration_rights, user_id=None):
     """Returns exploration summaries corresponding to the given rights objects.
 
     The summary is a dict that is keyed by exploration id. Each value is a dict
     with the following keys: title, category, objective, language_code,
-    last_updated, status and community_owned.
+    last_updated, status, community_owned and is_editable. The is_editable
+    field is computed with respect to the given user_id, if it is provided;
+    otherwise it is False.
     """
     id_to_rights = {rights.id: rights for rights in exploration_rights}
     exp_ids = [rights.id for rights in exploration_rights]
@@ -136,6 +138,11 @@ def _get_explorations_summary_dict(exploration_rights):
                 exploration.last_updated),
             'status': id_to_rights[exploration.id].status,
             'community_owned': id_to_rights[exploration.id].community_owned,
+            'is_editable': (
+                user_id is not None and (
+                    user_id in id_to_rights[exploration.id].editor_ids
+                    or user_id in id_to_rights[exploration.id].owner_ids
+                    or id_to_rights[exploration.id].community_owned)),
         }
 
     # TODO(sll): Return a list sorted by last_updated instead, and amend the
@@ -186,10 +193,10 @@ def get_exploration_titles(exp_ids):
     return result
 
 
-def get_non_private_explorations_summary_dict():
+def get_non_private_explorations_summary_dict(user_id=None):
     """Returns a summary of non-private explorations."""
     return _get_explorations_summary_dict(
-        rights_manager.get_non_private_exploration_rights())
+        rights_manager.get_non_private_exploration_rights(), user_id=user_id)
 
 
 def get_private_at_least_viewable_explorations_summary_dict(user_id):
@@ -198,7 +205,7 @@ def get_private_at_least_viewable_explorations_summary_dict(user_id):
     """
     return _get_explorations_summary_dict(
         rights_manager.get_private_at_least_viewable_exploration_rights(
-            user_id))
+            user_id), user_id=user_id)
 
 
 def get_explicit_viewer_explorations_summary_dict(user_id):
@@ -213,7 +220,8 @@ def get_explicit_viewer_explorations_summary_dict(user_id):
     query.
     """
     return _get_explorations_summary_dict(
-        rights_manager.get_viewable_exploration_rights(user_id))
+        rights_manager.get_viewable_exploration_rights(user_id),
+        user_id=user_id)
 
 
 def get_at_least_editable_summary_dict(user_id):
@@ -221,7 +229,8 @@ def get_at_least_editable_summary_dict(user_id):
     user.
     """
     return  _get_explorations_summary_dict(
-        rights_manager.get_at_least_editable_exploration_rights(user_id))
+        rights_manager.get_at_least_editable_exploration_rights(user_id),
+        user_id=user_id)
 
 
 def count_explorations():

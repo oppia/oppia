@@ -379,9 +379,14 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   padding: 5px 10px 0 10px;
 }
 
-.oppia-gallery-see-inside-btn {
+.oppia-gallery-edit-btn {
   font-size: 12px;
   margin-top: 10px;
+}
+.oppia-gallery-edit-btn:hover {
+  background: #5cb85c;
+  border-color: #4cae4c;
+  color: white;
 }
 
 .oppia-gallery-tile-middle {

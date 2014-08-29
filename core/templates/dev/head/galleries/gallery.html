@@ -64,12 +64,14 @@
                     Beta
                   </label>
                 </li>
-                <li class="checkbox">
-                  <label>
-                    <input type="checkbox" ng-model="selectedStatuses.private">
-                    Private
-                  </label>
-                </li>
+                {% if username %}
+                  <li class="checkbox">
+                    <label>
+                      <input type="checkbox" ng-model="selectedStatuses.private">
+                      Private
+                    </label>
+                  </li>
+                {% endif %}
               </ul>
 
               <h4><strong>Categories</strong></h4>
@@ -90,29 +92,28 @@
             </div>
 
             <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguageCodes:'language_code' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="container oppia-gallery-tile">
-              <div class="oppia-gallery-tile-anchor">
-                <div class="row">
-                  <div class="col-lg-10 col-md-10 col-sm-10" ng-click="navigateTo('/explore/<[exploration.id]>')">
-                    <div class="oppia-gallery-tile-top">
-                      <div class="oppia-gallery-tile-description">
-                        <span class="oppia-gallery-tile-title"><[exploration.title]></span>
-                      </div>
-                    </div>
+              <div class="row oppia-gallery-tile-anchor">
 
-                    <div class="oppia-gallery-tile-middle" style="color: black;">
-                      <span ng-if="exploration.objective"><[getFormattedObjective(exploration.objective)]></span>
-                      <span ng-if="!exploration.objective"><em>No objective specified.</em></span>
+                <div class="col-lg-10 col-md-10 col-sm-10" ng-click="navigateTo('/explore/<[exploration.id]>')">
+                  <div class="oppia-gallery-tile-top">
+                    <div class="oppia-gallery-tile-description">
+                      <span class="oppia-gallery-tile-title"><[exploration.title]></span>
                     </div>
                   </div>
 
-                  <div class="col-lg-2 col-md-2 col-sm-2">
-                    <button class="btn btn-default pull-right oppia-gallery-see-inside-btn" ng-click="navigateTo('/create/<[exploration.id]>')">
-                      <span class="glyphicon glyphicon-eye-open" title="See inside this exploration"></span>
-                      See inside
-                    </button>
+                  <div class="oppia-gallery-tile-middle" style="color: black;">
+                    <span ng-if="exploration.objective"><[getFormattedObjective(exploration.objective)]></span>
+                    <span ng-if="!exploration.objective"><em>No objective specified.</em></span>
                   </div>
                 </div>
-              </a>
+
+                <div class="col-lg-2 col-md-2 col-sm-2" ng-if="exploration.is_editable">
+                  <button class="btn btn-default pull-right oppia-gallery-edit-btn" ng-click="navigateTo('/create/<[exploration.id]>')">
+                    <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
+                    Edit
+                  </button>
+                </div>
+              </div>
 
               <div class="oppia-gallery-tile-bottom">
                 <span class="oppia-gallery-tile-last-updated">
@@ -129,7 +130,7 @@
                   <span ng-if="exploration.status === 'private'" class="label label-info" style="opacity: 0.5">
                     Private
                   </span>
-                </div>
+                </span>
               </div>
             </div>
           </div>

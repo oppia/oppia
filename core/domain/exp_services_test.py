@@ -95,6 +95,7 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
                     'language_code': feconf.DEFAULT_LANGUAGE_CODE,
                     'last_updated': utils.get_time_in_millisecs(
                         exp.last_updated),
+                    'is_editable': False,
                     'community_owned': False,
                     'status': rights_manager.EXPLORATION_STATUS_PRIVATE,
                 }
