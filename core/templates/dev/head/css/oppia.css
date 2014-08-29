@@ -379,6 +379,11 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   padding: 5px 10px 0 10px;
 }
 
+.oppia-gallery-see-inside-btn {
+  font-size: 12px;
+  margin-top: 10px;
+}
+
 .oppia-gallery-tile-middle {
   padding: 2px 10px 5px 10px;
 }
@@ -389,7 +394,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
 
 .oppia-gallery-tile-bottom {
   border-top: 1px solid #CCC;
-  padding: 2px 10px 5px 10px;
+  padding: 2px 0 5px 10px;
   white-space: nowrap;
 }
 
