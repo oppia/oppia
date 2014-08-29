@@ -578,7 +578,7 @@ def _change_exploration_status(
 
     _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds)
-    event_services.ExplorationStatusChangeEventHandler.record(exploration_rights)
+    event_services.ExplorationStatusChangeEventHandler.record(exploration_id)
 
 
 def publish_exploration(committer_id, exploration_id):
