@@ -1,16 +1,8 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class TextInput(widget_domain.BaseWidget):
-    """Definition of a widget.
-
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered when the default widgets are refreshed.
-    """
+    """Interactive widget for entering text strings."""
 
     # The human-readable name of the widget.
     name = 'Text input'
@@ -23,8 +15,8 @@ class TextInput(widget_domain.BaseWidget):
         'A text input widget that can accept and classify strings.'
     )
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
+    # Customization args and their descriptions, schemas and default
+    # values.
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text widgets in
     # older explorations may have this customization parameter still set
@@ -32,24 +24,27 @@ class TextInput(widget_domain.BaseWidget):
     # of collisions, do not add a new parameter with this name to this list.
     # TODO(sll): Migrate old definitions which still contain the 'columns'
     # parameter.
-    _params = [{
+    _customization_arg_specs = [{
         'name': 'placeholder',
         'description': 'The placeholder for the text input field.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 'Type your answer here.'
+        'schema': {
+            'type': 'unicode',
         },
-        'obj_type': 'UnicodeString',
+        'default_value': 'Type your answer here.'
     }, {
         'name': 'rows',
         'description': 'The number of rows for the text input field.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': 1
+        'schema': {
+            'type': 'int',
+            'validators': [{
+                'id': 'is_at_least',
+                'min_value': 1,
+            }, {
+                'id': 'is_at_most',
+                'max_value': 200,
+            }]
         },
-        'obj_type': 'Int',
+        'default_value': 1,
     }]
 
     # Actions that the reader can perform on this widget which trigger a

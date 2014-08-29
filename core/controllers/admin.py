@@ -127,8 +127,8 @@ class AdminPage(base.BaseHandler):
                 editor.OBJECT_EDITORS_JS.value),
             'value_generators_js': jinja2.utils.Markup(
                 editor.VALUE_GENERATORS_JS.value),
-            'widget_js_directives': jinja2.utils.Markup(
-                widget_registry.Registry.get_noninteractive_widget_js()),
+            'noninteractive_widget_html': jinja2.utils.Markup(
+                widget_registry.Registry.get_noninteractive_widget_html()),
             'one_off_job_specs': one_off_job_specs,
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
@@ -212,3 +212,17 @@ class AdminHandler(base.BaseHandler):
         except Exception as e:
             self.render_json({'error': unicode(e)})
             raise
+
+
+class AdminJobOutput(base.BaseHandler):
+    """Retrieves job output to show on the admin page."""
+
+    PAGE_NAME_FOR_CSRF = 'admin'
+
+    @require_super_admin
+    def get(self):
+        """Handles GET requests."""
+        job_id = self.request.get('job_id')
+        self.render_json({
+            'output': jobs.get_job_output(job_id)
+        })

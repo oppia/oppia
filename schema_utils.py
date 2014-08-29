@@ -35,21 +35,24 @@ from core.domain import html_cleaner
 
 
 SCHEMA_KEY_ITEMS = 'items'
-SCHEMA_KEY_LENGTH = 'length'
+SCHEMA_KEY_LEN = 'len'
 SCHEMA_KEY_PROPERTIES = 'properties'
 SCHEMA_KEY_TYPE = 'type'
 SCHEMA_KEY_POST_NORMALIZERS = 'post_normalizers'
+SCHEMA_KEY_CHOICES = 'choices'
+SCHEMA_KEY_NAME = 'name'
+SCHEMA_KEY_SCHEMA = 'schema'
+SCHEMA_KEY_OBJ_TYPE = 'obj_type'
+SCHEMA_KEY_VALIDATORS = 'validators'
 
 SCHEMA_TYPE_BOOL = 'bool'
+SCHEMA_TYPE_CUSTOM = 'custom'
 SCHEMA_TYPE_DICT = 'dict'
 SCHEMA_TYPE_FLOAT = 'float'
 SCHEMA_TYPE_HTML = 'html'
 SCHEMA_TYPE_INT = 'int'
 SCHEMA_TYPE_LIST = 'list'
 SCHEMA_TYPE_UNICODE = 'unicode'
-ALLOWED_SCHEMA_TYPES = [
-    SCHEMA_TYPE_BOOL, SCHEMA_TYPE_DICT, SCHEMA_TYPE_FLOAT, SCHEMA_TYPE_HTML,
-    SCHEMA_TYPE_INT, SCHEMA_TYPE_LIST, SCHEMA_TYPE_UNICODE]
 
 
 def normalize_against_schema(obj, schema):
@@ -66,14 +69,25 @@ def normalize_against_schema(obj, schema):
     if schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_BOOL:
         assert isinstance(obj, bool), ('Expected bool, received %s' % obj)
         normalized_obj = obj
+    elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_CUSTOM:
+        # Importing this at the top of the file causes a circular dependency.
+        # TODO(sll): Either get rid of custom objects or find a way to merge
+        # them into the schema framework -- probably the latter.
+        from core.domain import obj_services
+        obj_class = obj_services.Registry.get_object_class_by_type(
+            schema[SCHEMA_KEY_OBJ_TYPE])
+        normalized_obj = obj_class.normalize(obj)
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_DICT:
         assert isinstance(obj, dict), ('Expected dict, received %s' % obj)
-        assert set(obj.keys()) == set(schema[SCHEMA_KEY_PROPERTIES].keys())
-        normalized_obj = {
-            key: normalize_against_schema(
-                obj[key], schema[SCHEMA_KEY_PROPERTIES][key])
-            for key in schema[SCHEMA_KEY_PROPERTIES]
-        }
+        expected_dict_keys = [
+            p[SCHEMA_KEY_NAME] for p in schema[SCHEMA_KEY_PROPERTIES]]
+        assert set(obj.keys()) == set(expected_dict_keys)
+
+        normalized_obj = {}
+        for prop in schema[SCHEMA_KEY_PROPERTIES]:
+            key = prop[SCHEMA_KEY_NAME]
+            normalized_obj[key] = normalize_against_schema(
+                obj[key], prop[SCHEMA_KEY_SCHEMA])
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_FLOAT:
         obj = float(obj)
         assert isinstance(obj, numbers.Real), (
@@ -95,8 +109,8 @@ def normalize_against_schema(obj, schema):
     elif schema[SCHEMA_KEY_TYPE] == SCHEMA_TYPE_LIST:
         assert isinstance(obj, list), ('Expected list, received %s' % obj)
         item_schema = schema[SCHEMA_KEY_ITEMS]
-        if SCHEMA_KEY_LENGTH in schema:
-            assert len(obj) == schema[SCHEMA_KEY_LENGTH]
+        if SCHEMA_KEY_LEN in schema:
+            assert len(obj) == schema[SCHEMA_KEY_LEN]
         normalized_obj = [
             normalize_against_schema(item, item_schema) for item in obj
         ]
@@ -110,6 +124,11 @@ def normalize_against_schema(obj, schema):
     else:
         raise Exception('Invalid schema type: %s' % schema[SCHEMA_KEY_TYPE])
 
+    if SCHEMA_KEY_CHOICES in schema:
+        assert normalized_obj in schema[SCHEMA_KEY_CHOICES], (
+            'Received %s which is not in the allowed range of choices: %s' %
+            (normalized_obj, schema[SCHEMA_KEY_CHOICES]))
+
     # When type normalization is finished, apply the post-normalizers in the
     # given order.
     if SCHEMA_KEY_POST_NORMALIZERS in schema:
@@ -118,6 +137,13 @@ def normalize_against_schema(obj, schema):
             del kwargs['id']
             normalized_obj = Normalizers.get(normalizer['id'])(
                 normalized_obj, **kwargs)
+
+    # Validate the normalized object.
+    if SCHEMA_KEY_VALIDATORS in schema:
+        for validator in schema[SCHEMA_KEY_VALIDATORS]:
+            kwargs = dict(validator)
+            del kwargs['id']
+            assert _Validators.get(validator['id'])(normalized_obj, **kwargs)
 
     return normalized_obj
 
@@ -142,35 +168,6 @@ class Normalizers(object):
         if not hasattr(cls, normalizer_id):
             raise Exception('Invalid normalizer id: %s' % normalizer_id)
         return getattr(cls, normalizer_id)
-
-    @staticmethod
-    def require_nonempty(obj):
-        """Checks that the given object is nonempty.
-
-        Args:
-          obj: a string.
-
-        Returns:
-          obj, if it is nonempty.
-
-        Raises:
-          AssertionError: if `obj` is empty.
-        """
-        assert obj != ''
-        return obj
-
-    @staticmethod
-    def uniquify(obj):
-        """Returns a list, removing duplicates.
-
-        Args:
-          obj: a list.
-
-        Returns:
-          a list containing the elements in `obj` in sorted order and without
-          duplicates.
-        """
-        return sorted(list(set(obj)))
 
     @staticmethod
     def normalize_spaces(obj):
@@ -207,53 +204,49 @@ class Normalizers(object):
             '\'http://\' or \'https://\'; received %s' % raw)
         return raw
 
-    @staticmethod
-    def require_at_least(obj, min_value):
-        """Ensures that `obj` is at least `min_value`.
 
-        Args:
-          obj: an int or a float.
-          min_value: an int or a float.
+class _Validators(object):
+    """Various validators.
 
-        Returns:
-          obj, if it is at least `min_value`.
+    A validator is a function that takes an object and returns True if it is
+    valid, and False if it isn't.
 
-        Raises:
-          AssertionError, if `obj` is less than `min_value`.
-        """
-        assert obj >= min_value
-        return obj
-
-    @staticmethod
-    def require_at_most(obj, max_value):
-        """Ensures that `obj` is at most `min_value`.
-
-        Args:
-          obj: an int or a float.
-          max_value: an int or a float.
-
-        Returns:
-          obj, if it is at most `min_value`.
-
-        Raises:
-          AssertionError, if `obj` is greater than `min_value`.
-        """
-        assert obj <= max_value
-        return obj
+    Validators should only be accessed from the checker methods in
+    schema_utils.py and schema_utils_test.py, since these methods do
+    preliminary checks on the arguments passed to the validator.
+    """
+    @classmethod
+    def get(cls, validator_id):
+        if not hasattr(cls, validator_id):
+            raise Exception('Invalid validator id: %s' % validator_id)
+        return getattr(cls, validator_id)
 
     @staticmethod
-    def require_is_one_of(obj, choices):
-        """Ensures that `obj` is an element of `choices`.
+    def is_nonempty(obj):
+        """Returns True iff the given object (a string) is nonempty."""
+        return bool(obj)
 
-        Args:
-          obj: anything.
-          choices: a list of items, of the same type as `obj`.
+    @staticmethod
+    def is_uniquified(obj):
+        """Returns True iff the given object (a list) has no duplicates."""
+        return sorted(list(set(obj))) == sorted(obj)
 
-        Returns:
-          obj, if it is equal to an element of `choices`.
+    @staticmethod
+    def is_at_least(obj, min_value):
+        """Ensures that `obj` (an int/float) is at least `min_value`."""
+        return obj >= min_value
 
-        Raises:
-          AssertionError, if `obj` is not equal to any element of choices.
-        """
-        assert obj in choices
-        return obj
+    @staticmethod
+    def is_at_most(obj, max_value):
+        """Ensures that `obj` (an int/float) is at most `max_value`."""
+        return obj <= max_value
+
+    @staticmethod
+    def is_regex(obj):
+        """Ensures that `obj` (a string) defines a valid regex."""
+        raise NotImplementedError
+
+    @staticmethod
+    def matches_regex(obj, regex):
+        """Ensures that `obj` (a string) matches the given regex."""
+        raise NotImplementedError

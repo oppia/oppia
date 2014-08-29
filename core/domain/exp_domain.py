@@ -418,6 +418,9 @@ class WidgetInstance(object):
         self.widget_id = widget_id
         # Customization args for the interactive widget view. Parts of these
         # args may be Jinja templates that refer to state parameters.
+        # This is a dict: the keys are names of customization_args and the values
+        # are dicts with a single key, 'value', whose corresponding value is the
+        # value of the customization arg.
         self.customization_args = customization_args
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
@@ -438,7 +441,8 @@ class WidgetInstance(object):
             raise utils.ValidationError(
                 'Invalid widget name: %s' % self.widget_id)
 
-        widget_customization_arg_names = [wp.name for wp in widget.params]
+        widget_customization_arg_names = [
+            ca_spec.name for ca_spec in widget.customization_arg_specs]
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(
@@ -754,7 +758,10 @@ class Exploration(object):
             raise utils.ValidationError(
                 'Expected language_code to be a string, received %s' %
                 self.language_code)
-        # TODO(sll): Check that the language code is valid.
+        if not any([self.language_code == lc['code']
+                    for lc in feconf.ALL_LANGUAGE_CODES]):
+            raise utils.ValidationError(
+                'Invalid language_code: %s' % self.language_code)
 
         if not isinstance(self.skill_tags, list):
             raise utils.ValidationError(

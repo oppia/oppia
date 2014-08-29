@@ -31,42 +31,9 @@ oppia.directive('htmlEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $attrs) {
-      // Reset the component each time the value changes (e.g. if this is part
-      // of an editable list).
-      $scope.$watch('$parent.value', function(newValue, oldValue) {
-        $scope.localValue = {label: $scope.$parent.value || ''};
-      }, true);
-
-      $scope.alwaysEditable = $scope.$parent.alwaysEditable;
-      if ($scope.alwaysEditable) {
-        $scope.$watch('localValue.label', function(newValue, oldValue) {
-          $scope.$parent.value = newValue;
-        });
-      } else {
-        $scope.openEditor = function() {
-          $scope.active = true;
-        };
-
-        $scope.closeEditor = function() {
-          $scope.active = false;
-        };
-
-        $scope.replaceValue = function(newValue) {
-          $scope.localValue = {label: newValue};
-          $scope.$parent.value = newValue;
-          $scope.closeEditor();
-        };
-
-        $scope.$on('externalSave', function() {
-          if ($scope.active) {
-            $scope.replaceValue($scope.localValue.label);
-            // The $scope.$apply() call is needed to propagate the replaced value.
-            $scope.$apply();
-          }
-        });
-
-        $scope.closeEditor();
-      }
+      $scope.schema = {
+        type: 'html',
+      };
     }
   };
 });

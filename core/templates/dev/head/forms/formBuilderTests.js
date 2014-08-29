@@ -13,12 +13,40 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for the schema editor test page.
+ * @fileoverview Controllers for the form builder test page.
  *
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.controller('SchemaEditorTests', [
+oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
+  return {
+    scope: {
+      definition: '=',
+      disabled: '&',
+      savedValue: '=',
+      allowExpressions: '&'
+    },
+    templateUrl: 'formOverlay/entryPoint',
+    restrict: 'E',
+    compile: recursionHelper.compile,
+    controller: ['$scope', function($scope) {
+      $scope.$watch('savedValue', function(newValue, oldValue) {
+        $scope.localValue = angular.copy($scope.savedValue);
+      });
+
+      $scope.submitValue = function(value) {
+        $scope.savedValue = angular.copy($scope.localValue);
+        alert($scope.savedValue);
+      };
+      $scope.cancelEdit = function() {
+        $scope.localValue = angular.copy($scope.savedValue);
+      };
+    }]
+  };
+}]);
+
+
+oppia.controller('FormBuilderTests', [
     '$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
   parameterSpecsService.addParamSpec('paramBool1', 'bool');
   parameterSpecsService.addParamSpec('paramBool2', 'bool');
@@ -35,7 +63,8 @@ oppia.controller('SchemaEditorTests', [
     schema: {
       type: 'unicode'
     },
-    value: 'aab{{paramUnicode1}}'
+    value: 'aab{{paramUnicode1}}',
+    allowExpressions: true
   };
 
   $scope.booleanForms = [{
@@ -43,87 +72,70 @@ oppia.controller('SchemaEditorTests', [
     schema: {
       type: 'bool'
     },
-    value: {
-      type: 'raw',
-      data: true
-    }
+    value: true
   }, {
-    name: 'Boolean form with parameters',
+    name: 'Boolean form with expressions',
     schema: {
-      type: 'bool',
-      allow_parameters: true
+      type: 'bool'
     },
-    value: {
-      type: 'parameter',
-      data: 'paramBool1'
-    }
+    value: 'paramBool1',
+    allowExpressions: true
   }];
 
   $scope.intForms = [{
-    name: 'Integer form (no parameters)',
+    name: 'Integer form (value must be greater than 2)',
+    schema: {
+      type: 'int',
+      validators: [{
+        id: 'is_at_least',
+        min_value: 2
+      }]
+    },
+    value: 3
+  }, {
+    // TODO(sll): Add test for bad initialization.
+    name: 'Integer form with expressions',
     schema: {
       type: 'int'
     },
-    value: {
-      type: 'raw',
-      data: 3
-    }
-  }, {
-    // TODO(sll): Add test for bad initialization.
-    name: 'Integer form with parameters',
-    schema: {
-      type: 'int',
-      allow_parameters: true
-    },
-    value: {
-      type: 'parameter',
-      data: 'paramInt1'
-    }
+    value: 'paramInt1',
+    allowExpressions: true
   }];
 
   $scope.floatForms = [{
     name: 'Float form (value must be between -3 and 6)',
     schema: {
       type: 'float',
-      post_normalizers: [{
-        id: 'require_at_least',
+      validators: [{
+        id: 'is_at_least',
         min_value: -3.0
       }, {
-        id: 'require_at_most',
+        id: 'is_at_most',
         max_value: 6.0
       }]
     },
-    value: {
-      type: 'raw',
-      data: 3.14
-    }
+    value: 3.14
   }, {
-    name: 'Float form with parameters (value must be between -3 and 6)',
+    name: 'Float form with expressions (value must be between -3 and 6)',
     schema: {
       type: 'float',
-      allow_parameters: true,
-      post_normalizers: [{
-        id: 'require_at_least',
+      validators: [{
+        id: 'is_at_least',
         min_value: -3.0
       }, {
-        id: 'require_at_most',
+        id: 'is_at_most',
         max_value: 6.0
       }]
     },
-    value: {
-      type: 'raw',
-      data: 3.14
-    }
+    allowExpressions: true,
+    value: 3.14
   }];
 
   $scope.unicodeForms = [{
     name: 'Restricted unicode form; the value must be either a or b.',
     schema: {
       type: 'unicode',
-      post_normalizers: [{
-        id: 'require_is_one_of',
-        choices: ['a', 'b']
-      }]
+      choices: ['a', 'b']
     },
     value: 'a'
   }];
@@ -140,48 +152,84 @@ oppia.controller('SchemaEditorTests', [
     name: 'Dict with a bool, a unicode string and a list of ints. The string must be either \'abc\' or \'def\'.',
     schema: {
       type: 'dict',
-      properties: {
-        a_boolean: {
-          type: 'bool'
-        },
-        a_unicode_string: {
+      properties: [{
+        name: 'a_unicode_string_appearing_first',
+        description: 'First field.',
+        schema: {
           type: 'unicode',
-          post_normalizers: [{
-            id: 'require_is_one_of',
-            choices: ['abc', 'def']
-          }]
-        },
-        a_list: {
+          choices: ['abc', 'def']
+        }
+      }, {
+        name: 'a_list_appearing_second',
+        description: 'Second field.',
+        schema: {
           type: 'list',
           items: {
             type: 'int'
           }
         }
-      }
+      }, {
+        name: 'a_boolean_appearing_last',
+        description: 'Third field.',
+        schema: {
+          type: 'bool'
+        }
+      }]
     },
     value: {
-      a_boolean: {
-        type: 'raw',
-        data: false
-      },
-      a_unicode_string: 'abc',
-      a_list: [{
-        type: 'raw',
-        data: 2
-      }, {
-        type: 'raw',
-        data: 3
-      }]
+      a_boolean_appearing_last: false,
+      a_unicode_string_appearing_first: 'abc',
+      a_list_appearing_second: [2, 3]
     }
   }, {
-    name: 'List of unicode strings',
+    name: 'List of code areas with custom \'add element\' text',
     schema: {
       type: 'list',
       items: {
-        type: 'unicode'
+        type: 'unicode',
+        ui_config: {
+          coding_mode: 'python'
+        }
+      },
+      ui_config: {
+        add_element_text: '[Custom \'add element\' text]'
       }
     },
     value: ['abc', 'def', 'ghi']
+  }, {
+    name: 'Fixed-length list of 2 multiple-choice floats',
+    schema: {
+      type: 'list',
+      items: {
+        type: 'float',
+        choices: [1.0, 0.0, -1.0, -2.0, -3.0]
+      },
+      len: 2
+    },
+    value: [1.0, -3.0]
+  }, {
+    name: 'List of complex items (no descriptions in the dicts)',
+    schema: {
+      type: 'list',
+      items: {
+        type: 'dict',
+        properties: [{
+          name: 'intField',
+          schema: {
+            type: 'int',
+          }
+        }, {
+          name: 'htmlField',
+          schema: {
+            type: 'html'
+          }
+        }]
+      }
+    },
+    value: [{
+      intField: 5,
+      htmlField: '<span><b>d</b>ef</span>'
+    }]
   }, {
     name: 'Nested lists',
     schema: {

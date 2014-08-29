@@ -178,6 +178,7 @@
         <th>Status</th>
         <th>Time started</th>
         <th>Time finished</th>
+        <th></th>
       </tr>
       {% for job in recent_job_data %}
         <tr>
@@ -185,12 +186,24 @@
           <td>{{job.status_code}}</td>
           <td>{{job.human_readable_time_started}}</td>
           <td>{{job.human_readable_time_finished}}</td>
+          <td>
+            <button ng-click="getJobOutput('{{job['id']}}')">
+              View Output
+            </button>
+          </td>
         </tr>
       {% endfor %}
     </table>
 
+    <div ng-if="showJobOutput">
+      <h4>Job Output</h4>
+      <p>
+        <[jobOutput]>
+      </p>
+    </div>
+
+    {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
-    {% include 'rte_js_libs.html' %}
 
     <script>
       {{ include_js_file('app.js') }}
@@ -199,11 +212,11 @@
       {{ include_js_file('services/warningsData.js') }}
       {{ include_js_file('components/objectEditor.js') }}
       {{ include_js_file('components/valueGeneratorEditor.js') }}
-      {{ include_js_file('components/richTextEditor.js') }}
+      {{ include_js_file('forms/formBuilder.js') }}
       {{ object_editors_js }}
       {{ value_generators_js }}
     </script>
 
-    {{ widget_js_directives }}
+    {{ noninteractive_widget_html }}
   </body>
 </html>

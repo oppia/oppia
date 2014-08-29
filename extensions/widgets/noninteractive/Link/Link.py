@@ -1,16 +1,8 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class Link(widget_domain.BaseWidget):
-    """Definition of a widget.
-
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered when the default widgets are refreshed.
-    """
+    """Non-interactive widget for displaying links."""
 
     # The human-readable name of the widget.
     name = 'Link'
@@ -23,29 +15,24 @@ class Link(widget_domain.BaseWidget):
         'Link widget.'
     )
 
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    # Customization args and their descriptions, schemas and default
+    # values.
+    _customization_arg_specs = [{
         'name': 'url',
         'description': (
             'The URL for this link. It must start with http:// or https://'),
-        'generator': generators.Copier,
-        'init_args': {
-            'disallow_parse_with_jinja': True,
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'SanitizedUrl',
         },
-        'customization_args': {
-            'value': 'https://www.example.com'
-        },
-        'obj_type': 'SanitizedUrl',
+        'default_value': 'https://www.example.com',
     }, {
         'name': 'open_link_in_same_window',
         'description': 'Open the linked page in the same window?',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': False
+        'schema': {
+            'type': 'bool'
         },
-        'obj_type': 'Boolean',
+        'default_value': False,
     }]
 
     # The HTML tag name for this non-interactive widget.

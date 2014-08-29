@@ -1,17 +1,15 @@
 <script type="text/ng-template" id="interactiveWidget/TextInput">
-  <div>
+  <!-- This outer div is needed, otherwise the textarea will overlap the footer of the page. -->
+  <div class="row">
     <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
       <div class="col-lg-10 col-md-10 col-sm-10">
-        <input ng-if="rows == 1" ng-model="$parent.answer"
-               placeholder="<[placeholder]>" required autofocus class="form-control">
-
-        <!-- The 'width: auto' is necessary to get around auto-resizing by Twitter Bootstrap. -->
-        <textarea ng-if="rows != 1" ng-model="$parent.answer"
-                  placeholder="<[placeholder]>" required autofocus rows="<[rows]>" class="form-control">
-        </textarea>
+        <schema-based-editor schema="schema" local-value="answer">
+        </schema-based-editor>
       </div>
       <div class="col-lg-2 col-md-2 col-sm-2">
-        <button type="submit" class="btn btn-default">Submit</button>
+        <button type="submit" class="btn btn-default">
+          Submit
+        </button>
       </div>
     </form>
   </div>

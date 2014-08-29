@@ -28,8 +28,18 @@ oppia.directive('oppiaInteractiveTextInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
-
         $scope.answer = '';
+
+        $scope.schema = {
+          type: 'unicode',
+          ui_config: {}
+        };
+        if ($scope.placeholder) {
+          $scope.schema.ui_config.placeholder = $scope.placeholder;
+        }
+        if ($scope.rows && $scope.rows !== 1) {
+          $scope.schema.ui_config.rows = $scope.rows;
+        }
 
         $scope.submitAnswer = function(answer) {
           if (!answer) {

@@ -64,6 +64,10 @@ input.ng-dirty.ng-invalid {
    background-color: #f0f0f0;
  }
 
+ .oppia-form-error {
+   color: red;
+ }
+
  .oppia-serious-warning-text {
    color: red;
  }
@@ -84,6 +88,13 @@ input.ng-dirty.ng-invalid {
 
 .oppia-rule-ctrl {
   padding: 2px 3px;
+}
+
+.oppia-disabled-contenteditable {
+  background-color: #eee;
+  cursor: not-allowed;
+  padding: 10px 5px;
+  opacity: 1;
 }
 
 p {
@@ -125,6 +136,12 @@ textarea {
 */
 div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   width: 100%;
+}
+div.wysiwyg iframe.wysiwyg-content-small {
+  height: 50px;
+}
+div.wysiwyg iframe.wysiwyg-content-large {
+  height: 200px;
 }
 
 /*

@@ -1,27 +1,4 @@
 <div class="container-fluid">
-  <br>
-  <span ng-show="localValue.length == 0">
-    <em>This music phrase is currently empty.</em>
-  </span>
-
-  <div class="row-fluid" ng-repeat="item in localValue track by $index">
-    <div class="span1">
-      <[$index + 1]>
-    </div>
-
-    <div class="span8">
-      <select ng-model="localValue[$index].label" ng-options="readableNoteName as readableNoteName for readableNoteName in choices" required>
-      </select>
-    </div>
-
-    <div class="span3">
-      <button type="button" class="btn btn-default btn-xs pull-right" ng-click="deleteItem($index)">Delete</button>
-    </div>
-  </div>
-
-  <div class="row-fluid">
-    <button type="button" class="btn btn-default pull-right" ng-click="addItem()">
-      <[getAddItemText()]>
-    </button>
-  </div>
+  <schema-based-editor local-value="localValue" schema="schema">
+  </schema-based-editor>
 </div>

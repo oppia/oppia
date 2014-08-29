@@ -6,13 +6,20 @@
 
 {% block header_js %}
   {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.ALL_LANGUAGE_CODES = JSON.parse('{{ALL_LANGUAGE_CODES|js_string}}');
+  </script>
+
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
   <script type="text/javascript">
     if (window.google && window.google.load) {
-      google.load("visualization", "1", {packages:["corechart"]});
+      google.load('visualization', '1', {packages: ['corechart']});
+    } else {
+      throw 'error: Could not load google visualization library. Are you offline?';
     }
-    GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
   </script>
+
   {{dependencies_html}}
 {% endblock header_js %}
 
@@ -274,8 +281,8 @@
             <span ng-if="explorationObjectiveService.displayed">
               <strong>Aim of the exploration:</strong> to help learners <[explorationObjectiveService.displayed]>.
             </span>
-            <span ng-if="!explorationObjectiveService.displayed" class="oppia-missing-objective-error">
-              Please specify this exploration's objective (in the Settings tab).
+            <span ng-if="!explorationObjectiveService.displayed">
+              <em>No objective specified.</em>
             </span>
           </div>
         </div>
@@ -420,7 +427,7 @@
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
-    {{ include_js_file('editor/InteractiveWidgetEditor.js') }}
+    {{ include_js_file('editor/StateInteraction.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
   </script>

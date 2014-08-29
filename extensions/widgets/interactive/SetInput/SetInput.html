@@ -1,23 +1,26 @@
 <script type="text/ng-template" id="interactiveWidget/SetInput">
-  <div>
-    <ul>
-      <li ng-repeat="element in answer track by $index">
-        <[element]>
-        <button type="button" class="btn btn-default btn-xs" ng-click="deleteElement($index)">
-          Delete
-        </button>
-      </li>
-    </ul>
-
-    <form class="form-horizontal" ng-submit="addElement(newElement)">
-      <input type="text" ng-model="newElement" placeholder="Add Element" autofocus required>
-      <button type="submit" class="btn btn-default"><b>+</b></button>
-    </form>
-
-    <br>
-
-    <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)">Submit</button>
+  <div ng-if="answer.length === 0">
+    <em>(This list is empty.)</em>
   </div>
+
+  <div>
+    <schema-based-editor schema="schema" local-value="answer">
+    </schema-based-editor>
+  </div>
+
+  <br>
+
+  <div ng-if="errorMessage" class="oppia-form-error" aria-live="assertive">
+    <[errorMessage]>
+  </div>
+
+  <br>
+
+  <div>
+    <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)">
+      Submit
+    </button>
+  </div>  
 </script>
 
 <script type="text/ng-template" id="response/SetInput">

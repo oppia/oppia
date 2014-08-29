@@ -170,8 +170,8 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
       var date = new Date(millisSinceEpoch);
       return date.toLocaleString();
     },
-    // Returns time of the day if milliseconds since the Epoch
-    // translates to current date otherwise returns the date.
+    // Returns just the time if the local datetime representation has the
+    // same date as the current date. Otherwise, returns just the date.
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       if (date.toLocaleDateString() == new Date().toLocaleDateString()) {
@@ -242,6 +242,46 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
     }
   };
 }]);
+
+// Service for noninteractive widget definitions.
+oppia.factory('widgetDefinitionsService', ['$http', '$log', '$q', function($http, $log, $q) {
+  var _definitions = {
+    noninteractive: null,
+    interactive: null
+  };
+
+  return {
+    _getDefinitions: function(widgetType) {
+      if (_definitions[widgetType]) {
+        $log.info('Found ' + widgetType + ' widget definitions in cache.');
+        var deferred = $q.defer();
+        deferred.resolve(angular.copy(_definitions[widgetType]));
+        return deferred.promise;
+      } else {
+        // Retrieve data from the server.
+        return $http.get('/widgetrepository/data/' + widgetType).then(function(response) {
+          $log.info('Retrieved ' + widgetType + ' widget data.');
+          _definitions[widgetType] = response.data.widgetRepository;
+          return angular.copy(_definitions[widgetType]);
+        });
+      }
+    },
+    // Returns a promise, caching the results.
+    getNoninteractiveDefinitions: function() {
+      return this._getDefinitions('noninteractive');
+    },
+    // Returns a promise, caching the results.
+    getInteractiveDefinitions: function() {
+      return this._getDefinitions('interactive');
+    },
+    // This is used in the ExplorationEditor in order to prevent a second
+    // RPC to the backend.
+    setInteractiveDefinitions: function(interactiveDefinitions) {
+      _definitions['interactive'] = interactiveDefinitions;
+    }
+  };
+}]);
+
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {

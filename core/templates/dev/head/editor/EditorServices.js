@@ -169,23 +169,24 @@ oppia.factory('changeListService', [
   var CMD_EDIT_STATE_PROPERTY = 'edit_state_property';
   var CMD_EDIT_EXPLORATION_PROPERTY = 'edit_exploration_property';
 
-  var EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES = {
-    'title': 'explorationTitle',
-    'category': 'explorationCategory',
-    'objective': 'explorationObjective',
-    'param_specs': 'paramSpecs',
-    'param_changes': 'explorationParamChanges',
-    'default_skin_id': 'defaultSkinId'
+  var ALLOWED_EXPLORATION_BACKEND_NAMES = {
+    'title': true,
+    'category': true,
+    'objective': true,
+    'language_code': true,
+    'param_specs': true,
+    'param_changes': true,
+    'default_skin_id': true
   };
 
-  var STATE_BACKEND_NAMES_TO_FRONTEND_NAMES = {
-    'widget_customization_args': 'widgetCustomizationArgs',
-    'widget_id': 'widgetId',
-    'widget_handlers': 'widgetHandlers',
-    'widget_sticky': 'widgetSticky',
-    'state_name': 'stateName',
-    'content': 'content',
-    'param_changes': 'stateParamChanges'
+  var ALLOWED_STATE_BACKEND_NAMES = {
+    'widget_customization_args': true,
+    'widget_id': true,
+    'widget_handlers': true,
+    'widget_sticky': true,
+    'state_name': true,
+    'content': true,
+    'param_changes': true
   };
 
   return {
@@ -258,7 +259,7 @@ oppia.factory('changeListService', [
      * @param {string} oldValue The previous value of the property
      */
     editExplorationProperty: function(backendName, newValue, oldValue) {
-      if (!EXPLORATION_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+      if (!ALLOWED_EXPLORATION_BACKEND_NAMES.hasOwnProperty(backendName)) {
         warningsData.addWarning('Invalid exploration property: ' + backendName);
         return;
       }
@@ -281,7 +282,7 @@ oppia.factory('changeListService', [
      * @param {string} oldValue The previous value of the property
      */
     editStateProperty: function(stateName, backendName, newValue, oldValue) {
-      if (!STATE_BACKEND_NAMES_TO_FRONTEND_NAMES.hasOwnProperty(backendName)) {
+      if (!ALLOWED_STATE_BACKEND_NAMES.hasOwnProperty(backendName)) {
         warningsData.addWarning('Invalid state property: ' + backendName);
         return;
       }
@@ -323,22 +324,30 @@ oppia.factory('changeListService', [
 
 
 oppia.factory('explorationPropertyService', [
-    'changeListService', 'warningsData', function(changeListService, warningsData) {
+    '$log', 'changeListService', 'warningsData',
+    function($log, changeListService, warningsData) {
   // Public base API for data services corresponding to exploration properties
   // (title, category, etc.)
   return {
     init: function(value) {
+      if (this.propertyName === null) {
+        throw 'Exploration property name cannot be null.';
+      }
+
+      $log.info('Initializing exploration property: ' + this.propertyName);
+      $log.info(value);
+
       // The current value of the property (which may not have been saved to the
       // frontend yet). In general, this will be bound directly to the UI.
-      this.displayed = value;
+      this.displayed = angular.copy(value);
       // The previous (saved-in-the-frontend) value of the property. Here, 'saved'
       // means that this is the latest value of the property as determined by the
       // frontend change list.
-      this.savedMemento = value;
+      this.savedMemento = angular.copy(value);
     },
     // Returns whether the current value has changed from the memento.
     hasChanged: function() {
-      return (this.savedMemento !== this.displayed);
+      return !angular.equals(this.savedMemento, this.displayed);
     },
     // The backend name for this property. THIS MUST BE SPECIFIED BY SUBCLASSES.
     propertyName: null,
@@ -353,12 +362,12 @@ oppia.factory('explorationPropertyService', [
     _isValid: function(value) {
       return true;
     },
-    // Creates a new entry in the change list, and updates the memento to the
-    // displayed value.
+    // Normalizes the displayed value. Then, if the memento and the displayed
+    // value are the same, does nothing. Otherwise, creates a new entry in the
+    // change list, and updates the memento to the displayed value.
     saveDisplayedValue: function() {
       if (this.propertyName === null) {
-        console.error('Property name cannot be null.');
-        return;
+        throw 'Exploration property name cannot be null.';
       }
 
       this.displayed = this._normalize(this.displayed);
@@ -367,14 +376,18 @@ oppia.factory('explorationPropertyService', [
         return;
       }
 
+      if (angular.equals(this.displayed, this.savedMemento)) {
+        return;
+      }
+
       warningsData.clear();
       changeListService.editExplorationProperty(
         this.propertyName, this.displayed, this.savedMemento);
-      this.savedMemento = this.displayed;
+      this.savedMemento = angular.copy(this.displayed);
     },
     // Reverts the displayed value to the saved memento.
     restoreFromMemento: function() {
-      this.displayed = this.savedMemento;
+      this.displayed = angular.copy(this.savedMemento);
     }
   };
 }]);
@@ -417,6 +430,24 @@ oppia.factory('explorationObjectiveService', [
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
     return validatorsService.isNonempty(value, true);
+  };
+  return child;
+}]);
+
+
+// A data service that stores the exploration language code.
+oppia.factory('explorationLanguageCodeService', [
+    'explorationPropertyService', '$filter', 'validatorsService',
+    function(explorationPropertyService, $filter, validatorsService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'language_code';
+  child.getAllLanguageCodes = function() {
+    return GLOBALS.ALL_LANGUAGE_CODES;
+  };
+  child._isValid = function(value) {
+    return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
+      return elt.code === value;
+    });
   };
   return child;
 }]);
@@ -470,4 +501,117 @@ oppia.factory('explorationRightsService', [
       });
     }
   };
+}]);
+
+
+oppia.factory('statePropertyService', [
+    '$log', 'changeListService', 'warningsData', function($log, changeListService, warningsData) {
+  // Public base API for data services corresponding to state properties
+  // (widget id, content, etc.)
+  // WARNING: This should be initialized only in the context of the state editor, and
+  // every time the state is loaded, so that proper behavior is maintained if e.g.
+  // the state is renamed.
+  return {
+    init: function(stateName, value, statesAccessorDict, statesAccessorKey) {
+      if (!statesAccessorDict || !statesAccessorKey) {
+        throw 'Not enough args passed into statePropertyService.init().';
+      }
+
+      if (this.propertyName === null) {
+        throw 'State property name cannot be null.';
+      }
+
+      $log.info('Initializing state property: ' + this.propertyName);
+      $log.info(value);
+
+      // A reference to the dict in $scope.states that should be updated.
+      this.statesAccessorDict = statesAccessorDict;
+      // The name of the key in statesAccessorDict whose value should be updated.
+      this.statesAccessorKey = statesAccessorKey;
+      // The name of the state.
+      this.stateName = stateName;
+      // The current value of the property (which may not have been saved to the
+      // frontend yet). In general, this will be bound directly to the UI.
+      this.displayed = angular.copy(value);
+      // The previous (saved-in-the-frontend) value of the property. Here, 'saved'
+      // means that this is the latest value of the property as determined by the
+      // frontend change list.
+      this.savedMemento = angular.copy(value);
+    },
+    // Returns whether the current value has changed from the memento.
+    hasChanged: function() {
+      return !angular.equals(this.savedMemento, this.displayed);
+    },
+    // The backend name for this property. THIS MUST BE SPECIFIED BY SUBCLASSES.
+    propertyName: null,
+    // Transforms the given value into a normalized form. THIS CAN BE
+    // OVERRIDDEN BY SUBCLASSES. The default behavior is to do nothing.
+    _normalize: function(value) {
+      return value;
+    },
+    // Validates the given value and returns a boolean stating whether it
+    // is valid or not. THIS CAN BE OVERRIDDEN BY SUBCLASSES. The default
+    // behavior is to always return true.
+    _isValid: function(value) {
+      return true;
+    },
+    // Creates a new entry in the change list, and updates the memento to the
+    // displayed value.
+    saveDisplayedValue: function() {
+      if (this.propertyName === null) {
+        throw 'State property name cannot be null.';
+      }
+
+      this.displayed = this._normalize(this.displayed);
+      if (!this._isValid(this.displayed) || !this.hasChanged()) {
+        this.restoreFromMemento();
+        return;
+      }
+
+      if (angular.equals(this.displayed, this.savedMemento)) {
+        return;
+      }
+
+      warningsData.clear();
+      changeListService.editStateProperty(
+        this.stateName, this.propertyName, this.displayed, this.savedMemento);
+
+      // Update $scope.states.
+      this.statesAccessorDict[this.statesAccessorKey] = angular.copy(this.displayed);
+      this.savedMemento = angular.copy(this.displayed);
+    },
+    // Reverts the displayed value to the saved memento.
+    restoreFromMemento: function() {
+      this.displayed = angular.copy(this.savedMemento);
+    }
+  };
+}]);
+
+// A data service that stores the current widget id.
+// TODO(sll): Add validation.
+oppia.factory('stateWidgetIdService', [
+    'statePropertyService', function(statePropertyService) {
+  var child = Object.create(statePropertyService);
+  child.propertyName = 'widget_id';
+  return child;
+}]);
+
+// A data service that stores the current state customization args for the
+// widget. This is a dict mapping customization arg names to dicts of the
+// form {value: customization_arg_value}.
+// TODO(sll): Add validation.
+oppia.factory('stateCustomizationArgsService', [
+    'statePropertyService', function(statePropertyService) {
+  var child = Object.create(statePropertyService);
+  child.propertyName = 'widget_customization_args';
+  return child;
+}]);
+
+// A data service that stores the current sticky status for the widget.
+// TODO(sll): Add validation.
+oppia.factory('stateWidgetStickyService', [
+    'statePropertyService', function(statePropertyService) {
+  var child = Object.create(statePropertyService);
+  child.propertyName = 'widget_sticky';
+  return child;
 }]);

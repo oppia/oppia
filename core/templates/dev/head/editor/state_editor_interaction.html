@@ -3,14 +3,21 @@
 {% block cls %}oppia-interactive-widget-display{% endblock %}
 
 {% block center %}
-  <div>
+  <div ng-if="!hasLoaded" class="oppia-align-center">
+    Loading
+    <span class="oppia-loading-dot-one">.</span>
+    <span class="oppia-loading-dot-two">.</span>
+    <span class="oppia-loading-dot-three">.</span>
+  </div>
+
+  <div ng-if="hasLoaded">
     <div ng-if="!interactiveWidgetEditorIsShown">
       <div class="row">
         <div class="col-lg-11 col-md-11 col-sm-11">
           <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
         </div>
         <div class="col-lg-1 col-md-1 col-sm-1">
-          <button type="button" class="btn btn-default btn-xs pull-right" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()">
+          <button type="button" class="btn btn-default btn-xs pull-right" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
             <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
           </button>
         </div>
@@ -26,7 +33,7 @@
         <div class="col-lg-4 col-md-4 col-sm-4">
           <accordion close-others="true">
             <accordion-group heading="<[category]>" ng-repeat="(category, widgetList) in interactiveWidgetRepository" is-open="category === 'Basic Input'">
-              <div ng-repeat="widget in widgetList" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'">
+              <div ng-repeat="widget in widgetList | orderBy: 'widget_id'" ng-click="setNewTmpWidget(widget)" ng-class="widget.widget_id != tmpWidget.widget_id ? 'oppia-unselected-accordion-item': 'oppia-selected-accordion-item'">
                 <[widget.name]>
               </div>
             </accordion-group>
@@ -36,7 +43,7 @@
         <div class="col-lg-8 col-md-8 col-sm-8">
           <div ng-show="tmpWidget">
             <accordion close-others="true">
-              <accordion-group is-open="true">
+              <accordion-group is-open="accordionStatus.isPreviewOpen">
                 <accordion-heading>
                   <!-- Due to how ui.bootstrap.accordion is set up, the manipulation of margin and padding is (unfortunately) necessary for the click target to cover the whole heading. -->
                   <a style="width: 100%; margin: -8px -15px; padding: 8px 15px;" ng-click="generateTmpWidgetPreview()" href="#">
@@ -48,20 +55,20 @@
                 </div>
               </accordion-group>
 
-              <div ng-if="!isEmpty(tmpWidget.params)">
+              <div ng-if="!isEmpty(tmpWidget.customization_args)">
                 <accordion-group>
                   <accordion-heading>
-                    <a href="#">Customize</a>
+                    <a href="#" ng-click="showCustomizationForm()">Customize</a>
                   </accordion-heading>
-                  <div ng-repeat="(paramName, paramSpecDict) in tmpWidget.params">
-                    <strong><[tmpWidget.params[paramName].description]></strong>
-                    <value-generator-editor generator-id="paramSpecDict.generator_id"
-                                            init-args="paramSpecDict.init_args"
-                                            customization-args="tmpWidget.customization_args[paramName]"
-                                            obj-type="paramSpecDict.obj_type">
-                    </value-generator-editor>
-                    <br>
-                  </div>
+                  <form name="form.schemaForm">
+                    <div ng-repeat="customizationArg in tmpWidget.customization_args">
+                      <strong><[customizationArg.description]></strong>
+                      <div>
+                        <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+                        </schema-based-editor>
+                      </div>
+                    </div>
+                  </form>
                 </accordion-group>
               </div>
             </accordion>
@@ -75,7 +82,7 @@
             <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
               Cancel
             </button>
-            <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)">
+            <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
               Use this interaction
             </button>
           </span>
