@@ -78,7 +78,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('This is a preview', response.body)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
@@ -89,7 +88,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
-        self.assertIn('This is a preview', response.body)
         self.logout()
 
     def test_published_explorations_are_visible_to_anyone(self):
@@ -99,7 +97,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
-        self.assertNotIn('This is a preview', response.body)
 
 
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
