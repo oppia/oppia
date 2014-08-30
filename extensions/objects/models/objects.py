@@ -425,52 +425,55 @@ class Graph(BaseObject):
     edit_html_filename = 'graph_editor'
     edit_js_filename = 'GraphEditor'
 
-    _schema = {
+    VERTEX_SCHEMA = {
         'type': 'dict',
-        'properties': {
-           'vertices': {
-               'type': 'list',
-               'items': {
-                   'type': 'dict',
-                   'properties': {
-                       'label': {
-                           'type': 'unicode'
-                       },
-                       'x': {
-                           'type': 'float'
-                       },
-                       'y': {
-                           'type': 'float'
-                       }
-                   }
-               }
-           },
-           'edges': {
-               'type': 'list',
-               'items': {
-                   'type': 'dict',
-                   'properties': {
-                       'src': {
-                           'type': 'int'
-                       },
-                       'dst': {
-                           'type': 'int'
-                       },
-                       'weight': {
-                           'type': 'int'
-                       }
-                   }
-               }
-           },
-           'isDirected': {
-               'type': 'bool'
-           },
-           'isWeighted': {
-               'type': 'bool'
-           },
-           'isLabeled': {
-               'type': 'bool'
-           }
-        }
-     }
+        'properties': [{
+            'name': 'x',
+            'schema': Real.SCHEMA
+        }, {
+            'name': 'y',
+            'schema': Real.SCHEMA
+        }, {
+            'name': 'label',
+            'schema': UnicodeString.SCHEMA
+        }]
+    }
+    EDGE_SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'src',
+            'schema': Int.SCHEMA
+        }, {
+            'name': 'dst',
+            'schema': Int.SCHEMA
+        }, {
+            'name': 'weight',
+            'schema': Real.SCHEMA 
+        }]
+    }
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'vertices',
+            'schema': {
+                'type': 'list',
+                'items': VERTEX_SCHEMA
+            }
+        }, {
+            'name': 'edges',
+            'schema': {
+                'type': 'list',
+                'items': EDGE_SCHEMA
+            }
+        }, {
+            'name': 'isLabeled',
+            'schema': Boolean.SCHEMA
+        }, {
+            'name': 'isDirected',
+            'schema': Boolean.SCHEMA
+        }, {
+            'name': 'isWeighted',
+            'schema': Boolean.SCHEMA
+        }]
+    }
 

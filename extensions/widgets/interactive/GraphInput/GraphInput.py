@@ -41,39 +41,34 @@ class GraphInput(widget_domain.BaseWidget):
     
     # Customization parameters and their descriptions, types and default
     # values. This attribute name MUST be prefixed by '_'.
-    _params = [{
+    _customization_arg_specs = [{
         'name': 'graph',
         'description': 'The initial graph.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': {
-                'vertices': [],
-                'edges': [],
-                'isDirected': False,
-                'isWeighted': False,
-                'isLabeled': False
-            }
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'Graph',
         },
-        'obj_type': 'Graph'
+        'default_value': {
+            'vertices': [],
+            'edges': [],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False,
+        }
     }, {
         'name': 'movePermissions',
         'description': 'Whether the learner is allowed to move the vertices around.',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': True
+        'schema': {
+            'type': 'bool',
         },
-        'obj_type': 'Boolean'
+        'default_value': False 
     }, {
         'name': 'vertexEditPermissions',
         'description': 'Whether the learner is allowed to edit the vertex set (i.e. add/remove vertices, change vertex names).',
-        'generator': generators.Copier,
-        'init_args': {},
-        'customization_args': {
-            'value': False
+        'schema': {
+            'type': 'bool',
         },
-        'obj_type': 'Boolean'
+        'default_value': False
     }]
 
     # Actions that the reader can perform on this widget which trigger a

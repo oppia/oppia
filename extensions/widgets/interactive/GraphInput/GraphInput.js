@@ -61,6 +61,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
         };
         
         $scope.init = function() {
+          console.log($attrs.graphWithValue);
           updateGraphFromJSON($attrs.graphWithValue);
           $scope.movePermissions = ($attrs.movePermissionsWithValue == "true") ? true : false;
           $scope.vertexEditPermissions = ($attrs.vertexEditPermissionsWithValue == "true") ? true : false;
@@ -73,7 +74,9 @@ oppia.directive('oppiaInteractiveGraphInput', [
         }
 
         function updateGraphFromJSON (jsonGraph) {
-          var newGraph = JSON.parse(jsonGraph);
+          console.log(jsonGraph);
+          //var newGraph = JSON.parse(jsonGraph);
+          var newGraph = oppiaHtmlEscaper.escapedJsonToObj(jsonGraph);
           if (checkValidGraph(newGraph)) {
             $scope.graph = newGraph;
           } else {
