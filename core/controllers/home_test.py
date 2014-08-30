@@ -29,8 +29,8 @@ class HomePageTest(test_utils.GenericTestBase):
         response.mustcontain(
             'Bite-sized learning journeys',
             'Browse the explorations gallery', '100% free!',
-            'Learn', 'About', 'Contact',
-            'Login', 'Create an Oppia account', 'Contribute',
+            'Gallery', 'About', 'Contact',
+            'Login', 'Create an Oppia account',
             # No navbar tabs should be highlighted.
             no=['class="active"',
                 'Profile', 'Logout', 'Create an exploration', 'Dashboard'])
@@ -48,7 +48,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'Bite-sized learning journeys',
-            'Contribute', 'Profile', 'Logout', 'Create an exploration',
+            'Gallery', 'Profile', 'Logout', 'Create an exploration',
             self.get_expected_logout_url('/'),
             no=['Login', 'Create an Oppia account', 'Dashboard',
                 self.get_expected_login_url('/')])
@@ -68,7 +68,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Dashboard', 'Contribute', 'Profile', 'Logout',
+            'Dashboard', 'Gallery', 'Profile', 'Logout',
             self.get_expected_logout_url('/'),
             no=['Login', 'Create an Oppia account',
                 'Bite-sized learning journeys',
@@ -111,7 +111,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
@@ -119,7 +119,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
@@ -127,7 +127,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLICIZED)
         self.logout()
 
@@ -144,7 +144,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PRIVATE)
 
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
@@ -152,7 +152,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLIC)
 
         rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
@@ -160,7 +160,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLICIZED)
 
         self.logout()

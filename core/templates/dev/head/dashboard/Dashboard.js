@@ -45,7 +45,7 @@ oppia.controller('Dashboard', [
     'Philosophy',
     'Physics',
     'Programming',
-    'Statistics',
+    'Statistics'
   ];
 
   $scope.dashboardDataUrl = '/dashboardhandler/data';
@@ -63,7 +63,7 @@ oppia.controller('Dashboard', [
     $scope.explorations = data.explorations;
 
     for (var expId in $scope.explorations) {
-      var status = $scope.explorations[expId].rights.status;
+      var status = $scope.explorations[expId].status;
       if (status == EXPLORATION_STATUS_PRIVATE) {
         $scope.privateExplorationIds.push(expId);
       } else if (status == EXPLORATION_STATUS_BETA) {
