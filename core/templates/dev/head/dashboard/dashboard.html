@@ -33,16 +33,18 @@
                     <tr ng-repeat="update in recentUpdates">
                       <td>
                         <span ng-if="update.type === 'exploration_commit'"
-                              class="glyphicon glyphicon-flag"></span>
+                              class="glyphicon glyphicon-flag"
+                              title="Exploration commit"></span>
                         <span ng-if="update.type === 'feedback_thread'"
-                              class="glyphicon glyphicon-comment"></span>
+                              class="glyphicon glyphicon-comment"
+                              title="Feedback thread"></span>
                       </td>
                       <td>
                         <a href="/create/<[update.activity_id]>">
                           <[update.activity_title]>
                         </a>
                       </td>
-                      <td><[getLocaleStringForDate(update.timestamp)]></td>
+                      <td><[getLocaleStringForDatetime(update.last_updated_ms)]></td>
                       <td><[update.author_username]></td>
                       <td><[update.subject]></td>
                     </tr>

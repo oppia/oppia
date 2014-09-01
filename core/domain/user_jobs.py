@@ -17,6 +17,7 @@
 import ast
 
 from core import jobs
+from core.domain import feedback_services
 from core.platform import models
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user])
@@ -62,7 +63,12 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     def get_recent_updates(cls, user_id):
         """Returns a list of recent updates to explorations and feedback
         threads. Each entry is a dict with keys 'type', 'activity_id',
-        'activity_title', 'timestamp', 'author_id' and 'subject'.
+        'activity_title', 'last_updated_ms', 'author_id' and 'subject'.
+
+        The 'type' is either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
+        feconf.UPDATE_TYPE_FEEDBACK_MESSAGE. The 'activity_id' is the id of the
+        exploration being committed to or to which the feedback thread belongs,
+        and the 'activity_title' is its title.
         """
         user_model = user_models.UserRecentChangesBatchModel.get(
             user_id, strict=False)
@@ -84,6 +90,7 @@ class RecentUpdatesMRJobManager(
 
     @staticmethod
     def map(item):
+        user_id = item.id
         activity_ids_list = item.activity_ids
         feedback_thread_ids_list = item.feedback_thread_ids
 
@@ -94,28 +101,35 @@ class RecentUpdatesMRJobManager(
             last_commit = (
                 exp_models.ExplorationCommitLogEntryModel.get_commit(
                     activity.id, activity.version))
-            yield (item.id, {
+            yield (user_id, {
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'activity_id': activity.id,
                 'activity_title': activity.title,
-                'timestamp': utils.get_time_in_millisecs(
+                'last_updated_ms': utils.get_time_in_millisecs(
                     activity.last_updated),
                 'author_id': last_commit.user_id,
                 'subject': last_commit.commit_message,
             })
+
+            # If the user subscribes to this activity, he/she is automatically
+            # subscribed to all feedback threads for this activity.
+            threads = feedback_services.get_threadlist(activity.id)
+            for thread in threads:
+                if thread['thread_id'] not in feedback_thread_ids_list:
+                    feedback_thread_ids_list.append(thread['thread_id'])
 
         for feedback_thread_id in feedback_thread_ids_list:
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     feedback_thread_id))
 
-            yield (item.id, {
+            yield (user_id, {
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
                 'activity_id': last_message.exploration_id,
                 'activity_title': exp_models.ExplorationModel.get_by_id(
                     last_message.exploration_id).title,
-                'timestamp': utils.get_time_in_millisecs(
-                    last_message.last_updated),
+                'last_updated_ms': utils.get_time_in_millisecs(
+                    last_message.created_on),
                 'author_id': last_message.author_id,
                 'subject': last_message.get_thread_subject(),
             })
@@ -124,7 +138,7 @@ class RecentUpdatesMRJobManager(
     def reduce(key, stringified_values):
         values = [ast.literal_eval(sv) for sv in stringified_values]
         sorted_values = sorted(
-            values, key=lambda x: x['timestamp'], reverse=True)
+            values, key=lambda x: x['last_updated_ms'], reverse=True)
 
         user_models.UserRecentChangesBatchModel(
             id=key, output=sorted_values[: DEFAULT_QUERY_LIMIT]).put()

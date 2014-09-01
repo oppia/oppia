@@ -108,14 +108,6 @@ class FeedbackThreadModel(base_models.BaseModel):
         return cls.get_by_id(cls._generate_id(exploration_id, thread_id))
 
     @classmethod
-    def get(cls, instance_id):
-        """Gets the FeedbackThreadModel entry for the given ID.
-
-        Returns None if the thread is not found or is already deleted.
-        """
-        return super(FeedbackThreadModel, cls).get(instance_id, strict=False)
-
-    @classmethod
     def get_threads(cls, exploration_id):
         """Returns an array of threads associated to the exploration.
 
@@ -173,13 +165,16 @@ class FeedbackMessageModel(base_models.BaseModel):
         return cls(id=instance_id)
 
     @classmethod
-    def get(cls, thread_id, message_id):
+    def get(cls, thread_id, message_id, strict=True):
         """Gets the FeedbackMessageModel entry for the given ID.
 
-        Returns None if the message is not found or is already deleted.
+        If the message id is valid and it is not marked as deleted, returns the
+        message instance. Otherwise:
+        - if strict is True, raises EntityNotFoundError
+        - if strict is False, returns None.
         """
         instance_id = cls._generate_id(thread_id, message_id)
-        return super(FeedbackMessageModel, cls).get(instance_id, strict=False)
+        return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
 
     @classmethod
     def get_messages(cls, thread_id):

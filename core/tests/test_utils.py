@@ -71,31 +71,31 @@ class TestBase(unittest.TestCase):
     def _delete_all_models(self):
         raise NotImplementedError
 
-    def _stash_current_session(self):
-        """Stashes the current session, to be retrieved later.
+    def _stash_current_user_env(self):
+        """Stashes the current user-specific env variables for later retrieval.
 
         Developers: please don't use this method outside this class -- it makes
         the individual tests harder to follow.
         """
-        self.stashed_session = {
+        self.stashed_user_env = {
             'USER_EMAIL': os.environ['USER_EMAIL'],
             'USER_ID': os.environ['USER_ID'],
             'USER_IS_ADMIN': os.environ['USER_IS_ADMIN']
         }
 
-    def _restore_stashed_session(self):
-        """Restores a stashed session.
+    def _restore_stashed_user_env(self):
+        """Restores a stashed set of user-specific env variables.
 
         Developers: please don't use this method outside this class -- it makes
         the individual tests harder to follow.
         """
-        if not self.stashed_session:
-            raise Exception('No stashed session to restore.')
+        if not self.stashed_user_env:
+            raise Exception('No stashed user env to restore.')
 
-        for key in self.stashed_session:
-            os.environ[key] = self.stashed_session[key]
+        for key in self.stashed_user_env:
+            os.environ[key] = self.stashed_user_env[key]
 
-        self.stashed_session = None
+        self.stashed_user_env = None
 
     def login(self, email, is_super_admin=False):
         os.environ['USER_EMAIL'] = email
@@ -193,7 +193,7 @@ class TestBase(unittest.TestCase):
 
     def set_admins(self, admin_emails):
         """Set the ADMIN_EMAILS property."""
-        self._stash_current_session()
+        self._stash_current_user_env()
 
         self.login('superadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -206,11 +206,11 @@ class TestBase(unittest.TestCase):
         }, csrf_token)
         self.logout()
 
-        self._restore_stashed_session()
+        self._restore_stashed_user_env()
 
     def set_moderators(self, moderator_emails):
         """Set the MODERATOR_EMAILS property."""
-        self._stash_current_session()
+        self._stash_current_user_env()
 
         self.login('superadmin@example.com', is_super_admin=True)
         response = self.testapp.get('/admin')
@@ -223,7 +223,7 @@ class TestBase(unittest.TestCase):
         }, csrf_token)
         self.logout()
 
-        self._restore_stashed_session()
+        self._restore_stashed_user_env()
 
     def get_current_logged_in_user_id(self):
         return os.environ['USER_ID']

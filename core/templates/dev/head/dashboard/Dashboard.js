@@ -50,7 +50,7 @@ oppia.controller('Dashboard', [
     'Statistics',
   ];
 
-  $scope.getLocaleStringForDate = function(millisSinceEpoch) {
+  $scope.getLocaleStringForDatetime = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleString(millisSinceEpoch);
   };
 
