@@ -40,6 +40,7 @@ In order to update generatedDefaultData.js:
   - ∀ (for all) \u2200
   - ∃ (exists) \u2203
   - ∈ (membership) \u2208
+Note that ^ is currently being automatically converted into ∧; this will have to stop if ^ starts being used for actual exponentiation.
 
 This widget adds the following objects to the global javascript namespace, 
 which should not be overwritten:
