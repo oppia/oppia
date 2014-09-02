@@ -22,6 +22,7 @@ import StringIO
 import zipfile
 
 from core.domain import config_services
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
@@ -1746,19 +1747,26 @@ class SearchTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(docs, [{'is': 'beta'}])
 
+        def mock_get_rights(exp_id):
+            return rights_manager.ExplorationRights(
+                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                status=rights_manager.EXPLORATION_STATUS_PUBLIC
+            )
+
         get_doc_counter = test_utils.CallCounter(mock_get_doc)
         add_docs_counter = test_utils.CallCounter(mock_add_docs)
+
 
         get_doc_swap = self.swap(
             search_services, 'get_document_from_index', get_doc_counter)
         add_docs_swap = self.swap(
             search_services, 'add_documents_to_index', add_docs_counter)
+        get_rights_swap = self.swap(
+            rights_manager, 'get_exploration_rights', mock_get_rights)
+        )
 
         with get_doc_swap, add_docs_swap:
-            rights = rights_manager.ExplorationRights(
-                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.EXPLORATION_STATUS_PUBLIC
-            )
+
             exp_services.update_exploration_status_in_search(rights)
 
         self.assertEqual(get_doc_counter.times_called, 1)
@@ -1807,3 +1815,27 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertTrue(check_exploration_list_equality(result, explorations))
+
+
+class ExplorationContentChangedEventsTests(ExplorationServicesUnitTests):
+
+    def test_exploration_contents_change_event_triggers(self):
+        recorded_ids = []
+        def mock_record(exp_id):
+            recorded_ids.append(exp_id)
+
+        record_event_swap = self.swap(
+            event_services.ExplorationContentChangeEventHandler,
+            'trigger',
+            mock_record)
+
+        with record_event_swap:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.EXP_ID, 'title', 'category'
+            )
+            exp_services.save_new_exploration(self.OWNER_ID, exploration)
+            exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
+
+        self.assertEqual(recorded_ids, [self.EXP_ID] * 2)
+
+    def test_exploration_contents_change_event_reindexes_exploration(self):

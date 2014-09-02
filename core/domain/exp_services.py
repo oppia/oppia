@@ -1036,7 +1036,8 @@ def patch_exploration_search_document(exp_id, update):
     search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
 
 
-def update_exploration_status_in_search(rights):
+def update_exploration_status_in_search(exp_id):
+    rights = rights_manager.get_exploration_rights(exp_id)
     patch_exploration_search_document(
         rights.id, _exp_rights_to_search_dict(rights))
 
