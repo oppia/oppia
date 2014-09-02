@@ -599,6 +599,7 @@ def _save_exploration(
         committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
+    _handle_exp_change_event(exploration.id)
 
     exploration.version += 1
 
@@ -633,6 +634,7 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
+    _handle_exp_change_event(exploration.id)
     exploration.version += 1
 
 
@@ -1070,3 +1072,9 @@ def search_explorations(
     ids = [result.get('id') for result in results]
     explorations = get_multiple_explorations_by_id(ids, strict=True)
     return [explorations[_id] for _id in ids ], cursor
+
+# Temporary event handlers
+
+def _handle_exp_change_event(exp_id):
+        """Indexes the changed exploration."""
+        index_explorations_given_ids([exp_id])

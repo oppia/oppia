@@ -1762,7 +1762,7 @@ class SearchTests(ExplorationServicesUnitTests):
         add_docs_swap = self.swap(
             search_services, 'add_documents_to_index', add_docs_counter)
         get_rights_swap = self.swap(
-            rights_manager, 'get_exploration_rights', mock_get_rights)
+            rights_manager, 'get_exploration_rights', mock_get_rights
         )
 
         with get_doc_swap, add_docs_swap:
@@ -1815,27 +1815,3 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertTrue(check_exploration_list_equality(result, explorations))
-
-
-class ExplorationContentChangedEventsTests(ExplorationServicesUnitTests):
-
-    def test_exploration_contents_change_event_triggers(self):
-        recorded_ids = []
-        def mock_record(exp_id):
-            recorded_ids.append(exp_id)
-
-        record_event_swap = self.swap(
-            event_services.ExplorationContentChangeEventHandler,
-            'trigger',
-            mock_record)
-
-        with record_event_swap:
-            exploration = exp_domain.Exploration.create_default_exploration(
-                self.EXP_ID, 'title', 'category'
-            )
-            exp_services.save_new_exploration(self.OWNER_ID, exploration)
-            exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
-
-        self.assertEqual(recorded_ids, [self.EXP_ID] * 2)
-
-    def test_exploration_contents_change_event_reindexes_exploration(self):

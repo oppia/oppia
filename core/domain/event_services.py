@@ -145,12 +145,8 @@ class ExplorationContentChangeEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_CHANGE
 
     @classmethod
-    def _handle_event(cls, exp_id):
-        """Indexes the changed exploration."""
-        # We're inline importing here to break import loops like this: (-> means imports)
-        # event_services -> jobs_registry -> exp_jobs -> exp_services -> event_services.
-        from core.domain import exp_services
-        exp_services.index_explorations_given_ids([exp_id])
+    def _handle_event(cls, *args, **kwargs):
+        pass
 
 
 class ExplorationStatusChangeEventHandler(BaseEventHandler):
@@ -161,14 +157,8 @@ class ExplorationStatusChangeEventHandler(BaseEventHandler):
     EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_STATUS_CHANGE
 
     @classmethod
-    def _handle_event(cls, exp_id):
-        """Indexes the changed exploration."""
-        # We're inline importing here to break import loops like this: (-> means imports)
-        # event_services -> jobs_registry -> exp_jobs -> exp_services -> event_services.
-        from core.domain import exp_services
-        from core.domain import rights_manager
-        exp_rights = rights_manager.get_exploration_rights(exp_id)
-        exp_services.update_exploration_status_in_search(exp_rights)
+    def _handle_event(cls, *args, **kwargs):
+        pass
 
 
 class Registry(object):
