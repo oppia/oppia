@@ -68,43 +68,144 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Graph objects."""
     
     def test_isisomorphic_rule(self):
-        self.assertTrue(graph.IsIsomorphic(_emptyGraph()).eval(_emptyGraph()))
-        self.assertTrue(graph.IsIsomorphic(_cycleGraph(5)).eval(_cycleGraph(5)))
-        self.assertTrue(graph.IsIsomorphic(_cycleGraph(5)).eval({
+        self.assertTrue(graph.IsIsomorphicTo(_emptyGraph()).eval(_emptyGraph()))
+        self.assertTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_cycleGraph(5)))
+        self.assertTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval({
             'vertices': [{'label': '', 'x': 1.0, 'y': 1.0} for i in xrange(5)],
-            'edges': [{'src': i, 'dst': j, 'weight': 1} for i,j in [(0, 2), (2, 4), (4, 1), (1, 3), (3, 0)]],
+            'edges': [
+                {'src': i, 'dst': j, 'weight': 1} for i, j in 
+                [(0, 2), (2, 4), (4, 1), (1, 3), (3, 0)]
+            ],
             'isDirected': False,
             'isWeighted': False,
             'isLabeled': False
         }))
-        self.assertTrue(graph.IsIsomorphic({
-            'vertices': [{'label': 'a', 'x': 1.0, 'y': 1.0}, {'label': 'b', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
-            'edges': [{'src': 0, 'dst': 1, 'weight': 2}, {'src': 1, 'dst': 2, 'weight': 1}],
+        self.assertTrue(graph.IsIsomorphicTo({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0}, 
+                {'label': 'b', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'c', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2}, 
+                {'src': 1, 'dst': 2, 'weight': 1}
+            ],
             'isDirected': False,
             'isWeighted': True,
             'isLabeled': True
         }).eval({
-            'vertices': [{'label': 'b', 'x': 1.0, 'y': 1.0}, {'label': 'a', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
-            'edges': [{'src': 2, 'dst': 0, 'weight': 1}, {'src': 1, 'dst': 0, 'weight': 2}],
+            'vertices': [
+                {'label': 'b', 'x': 1.0, 'y': 1.0}, 
+                {'label': 'a', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'c', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 2, 'dst': 0, 'weight': 1}, 
+                {'src': 1, 'dst': 0, 'weight': 2}
+            ],
             'isDirected': False,
             'isWeighted': True,
             'isLabeled': True
         }))
-        self.assertFalse(graph.IsIsomorphic(_cycleGraph(5)).eval(_nullGraph(5)))
-        self.assertFalse(graph.IsIsomorphic(_nullGraph(5)).eval(_cycleGraph(5)))
-        self.assertFalse(graph.IsIsomorphic(_nullGraph(5)).eval(_nullGraph(6)))
-        self.assertFalse(graph.IsIsomorphic(_completeGraph(5)).eval(_cycleGraph(5)))
-        self.assertFalse(graph.IsIsomorphic(_cycleGraph(5)).eval(_completeGraph(5)))
-        self.assertFalse(graph.IsIsomorphic({
-            'vertices': [{'label': 'a', 'x': 1.0, 'y': 1.0}, {'label': 'b', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
-            'edges': [{'src': 0, 'dst': 1, 'weight': 1}, {'src': 1, 'dst': 2, 'weight': 2}],
+        self.assertTrue(graph.IsIsomorphicTo({
+            'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0},
+                {'label': '', 'x': 2.0, 'y': 2.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': False
+        }).eval({
+            'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0},
+                {'label': '', 'x': 2.0, 'y': 2.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1}
+            ],
+            'isDirected': True,
+            'isWeighted': False,
+            'isLabeled': False
+        })
+        self.assertFalse(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_nullGraph(5)))
+        self.assertFalse(graph.IsIsomorphicTo(_nullGraph(5)).eval(_cycleGraph(5)))
+        self.assertFalse(graph.IsIsomorphicTo(_nullGraph(5)).eval(_nullGraph(6)))
+        self.assertFalse(graph.IsIsomorphicTo(_completeGraph(5)).eval(_cycleGraph(5)))
+        self.assertFalse(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_completeGraph(5)))
+        self.assertFalse(graph.IsIsomorphicTo({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0}, 
+                {'label': 'b', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'c', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1}, 
+                {'src': 1, 'dst': 2, 'weight': 2}
+            ],
             'isDirected': False,
             'isWeighted': True,
             'isLabeled': True
         }).eval({
-            'vertices': [{'label': 'b', 'x': 1.0, 'y': 1.0}, {'label': 'a', 'x': 2.0, 'y': 2.0}, {'label': 'c', 'x': 3.0, 'y': 3.0}],
-            'edges': [{'src': 0, 'dst': 1, 'weight': 1}, {'src': 1, 'dst': 2, 'weight': 2}],
+            'vertices': [
+                {'label': 'b', 'x': 1.0, 'y': 1.0}, 
+                {'label': 'a', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'c', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1}, 
+                {'src': 1, 'dst': 2, 'weight': 2}
+            ],
             'isDirected': False,
             'isWeighted': True,
             'isLabeled': True
         }))
+        self.assertFalse(graph.IsIsomorphicTo({
+            'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0},
+                {'label': '', 'x': 2.0, 'y': 2.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': False
+        }).eval({
+            'vertices': [
+                {'label': '', 'x': 1.0, 'y': 1.0},
+                {'label': '', 'x': 2.0, 'y': 2.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': False
+        })
+        self.assertFalse(graph.IsIsomorphicTo({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': True
+        }).eval({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'c', 'x': 2.0, 'y': 2.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2}
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': True
+        })

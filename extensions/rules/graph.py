@@ -22,7 +22,7 @@ from extensions.rules import base
 import itertools
 
 # TODO(czx): Speed up the isomorphism checker?
-class IsIsomorphic(base.GraphRule):
+class IsIsomorphicTo(base.GraphRule):
     description = 'is isomorphic to {{g|Graph}}, including matching labels'
     is_generic = False
 
@@ -31,37 +31,31 @@ class IsIsomorphic(base.GraphRule):
             return False
         if len(subject['edges']) != len(self.g['edges']):
             return False
+
         # Construct adjacency matrix
-        adj = [[0 for v in subject['vertices']] for v in subject['vertices']]
+        adj = [[None for v in subject['vertices']] for v in subject['vertices']]
         for edge in subject['edges']:
-            weight = 1
-            if subject['isWeighted']:
-                weight = edge['weight']
+            weight = edge['weight'] if subject['isWeighted'] else 1
             adj[edge['src']][edge['dst']] = weight
             if not subject['isDirected']:
                 adj[edge['dst']][edge['src']] = weight
+
         # Check against every permutation of vertices. 
         # The new index of vertex i in self.g is perm[i].
-        numVertices = len(self.g['vertices'])
-        for perm in itertools.permutations(range(numVertices)):
+        num_vertices = len(self.g['vertices'])
+        for perm in itertools.permutations(range(num_vertices)):
             # Test matching labels
             if subject['isLabeled']:
-                labelMismatch = False
-                for i in xrange(numVertices):
-                    if self.g['vertices'][perm[i]]['label'] != subject['vertices'][i]['label']:
-                        labelMismatch = True
-                        break
-                if labelMismatch:
+                if any([self.g['vertices'][perm[i]]['label'] != subject['vertices'][i]['label'] for i in xrange(num_vertices)]):
                     continue
+
             # Test isomorphism
-            foundIsomorphism = True
+            found_isomorphism = True
             for edge in self.g['edges']:
-                weight = 1
-                if self.g['isWeighted']:
-                    weight = edge['weight']
+                weight = edge['weight'] if subject['isWeighted'] else 1
                 if adj[perm[edge['src']]][perm[edge['dst']]] != weight:
-                    foundIsomorphism = False
+                    found_isomorphism = False
                     break
-            if foundIsomorphism:
+            if found_isomorphism:
                 return True
         return False

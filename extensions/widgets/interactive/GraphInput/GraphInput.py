@@ -20,15 +20,8 @@ from core.domain import widget_domain
 from extensions.value_generators.models import generators
 
 class GraphInput(widget_domain.BaseWidget):
-    """Definition of a widget.
-    
-    Do NOT make any changes to this widget definition while the Oppia app is
-    running, otherwise things will break.
-
-    This class represents a widget, whose id is the name of the class. It is
-    auto-discovered when the default widgets are refreshed.
-    """
-
+    """Interactive widget for graphs."""
+       
     # The human-readable name of the widget.
     name = 'Graph Input'
 
@@ -36,11 +29,10 @@ class GraphInput(widget_domain.BaseWidget):
     category = 'Custom'
     
     # A descrption of the widget.
-    description = (
-        'A widget where users create and manipulate graphs.')
+    description = 'A widget where users create and manipulate graphs.'
     
-    # Customization parameters and their descriptions, types and default
-    # values. This attribute name MUST be prefixed by '_'.
+    # Customization parameters and their descriptions, schemas and default
+    # values.
     _customization_arg_specs = [{
         'name': 'graph',
         'description': 'The initial graph.',
@@ -49,8 +41,28 @@ class GraphInput(widget_domain.BaseWidget):
             'obj_type': 'Graph',
         },
         'default_value': {
-            'vertices': [],
-            'edges': [],
+            'vertices': [{
+                'x': 50.0,
+                'y': 50.0,
+                'label': '',
+            }, {
+                'x': 100.0,
+                'y': 50.0,
+                'label': '',
+            }, {
+                'x': 50.0,
+                'y': 100.0,
+                'label': '',
+            }],
+            'edges': [{
+                'src': 0,
+                'dst': 1,
+                'weight': 1,
+            }, {
+                'src': 1,
+                'dst': 2,
+                'weight': 1,
+            }],
             'isLabeled': False,
             'isDirected': False,
             'isWeighted': False,
@@ -64,7 +76,9 @@ class GraphInput(widget_domain.BaseWidget):
         'default_value': False 
     }, {
         'name': 'vertexEditPermissions',
-        'description': 'Whether the learner is allowed to edit the vertex set (i.e. add/remove vertices, change vertex names).',
+        'description': (
+            'Whether the learner is allowed to edit the vertex '
+            'set (i.e. add/remove vertices, change vertex names).'),
         'schema': {
             'type': 'bool',
         },

@@ -425,7 +425,7 @@ class Graph(BaseObject):
     edit_html_filename = 'graph_editor'
     edit_js_filename = 'GraphEditor'
 
-    VERTEX_SCHEMA = {
+    _VERTEX_SCHEMA = {
         'type': 'dict',
         'properties': [{
             'name': 'x',
@@ -438,7 +438,7 @@ class Graph(BaseObject):
             'schema': UnicodeString.SCHEMA
         }]
     }
-    EDGE_SCHEMA = {
+    _EDGE_SCHEMA = {
         'type': 'dict',
         'properties': [{
             'name': 'src',
@@ -448,7 +448,7 @@ class Graph(BaseObject):
             'schema': Int.SCHEMA
         }, {
             'name': 'weight',
-            'schema': Real.SCHEMA 
+            'schema': Int.SCHEMA 
         }]
     }
     SCHEMA = {
@@ -457,13 +457,13 @@ class Graph(BaseObject):
             'name': 'vertices',
             'schema': {
                 'type': 'list',
-                'items': VERTEX_SCHEMA
+                'items': _VERTEX_SCHEMA
             }
         }, {
             'name': 'edges',
             'schema': {
                 'type': 'list',
-                'items': EDGE_SCHEMA
+                'items': _EDGE_SCHEMA
             }
         }, {
             'name': 'isLabeled',
@@ -476,4 +476,44 @@ class Graph(BaseObject):
             'schema': Boolean.SCHEMA
         }]
     }
+    
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        try:
+            assert isinstance(raw, dict)
+            assert isinstance(raw['vertices'], list)
+            assert isinstance(raw['edges'], list)
+            assert raw['isDirected'] in [True, False]
+            assert raw['isWeighted'] in [True, False]
+            assert raw['isLabeled'] in [True, False]
+            
+            for vertex in raw['vertices']:
+                assert isinstance(vertex['x'], float)
+                assert isinstance(vertex['y'], float)
+                assert isinstance(vertex['label'], basestring)
+                if not raw['isLabeled']:
+                    vertex['label'] = ''
+            
+            for edge in raw['edges']:
+                assert isinstance(edge['src'], int)
+                assert isinstance(edge['dst'], int)
+                assert isinstance(edge['weight'], int)
+                assert (edge['src'] != edge['dst'])
+                if not raw['isWeighted']:
+                    edge['weight'] = 1
 
+            # Tests uniqueness of edge, is there a better way?s
+            if raw['isDirected']:
+                edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
+            else:
+                edge_pairs = (
+                    [(edge['src'], edge['dst']) for edge in raw['edges']] + 
+                    [(edge['dst'], edge['src']) for edge in raw['edges']]
+                )
+            assert len(set(edge_pairs)) == len(edge_pairs)
+            
+        except Exception:
+            raise TypeError('Cannot convert to graph %s' % raw)
+
+        return raw

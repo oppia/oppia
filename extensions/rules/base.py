@@ -55,5 +55,6 @@ class UnicodeStringRule(rule_domain.Rule):
 class CheckedProofRule(rule_domain.Rule):
     subject_type = objects.CheckedProof
 
+
 class GraphRule(rule_domain.Rule):
     subject_type = objects.Graph
