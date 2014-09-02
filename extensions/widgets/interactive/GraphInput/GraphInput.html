@@ -34,7 +34,7 @@
     </div>
   </div>
   <div class="oppia-graph-viz-container">
-    <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="clickGraphSVG($event)">
+    <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="onClickGraphSVG($event)">
       <svg viewBox="0 0 50 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
         <g ng-repeat="button in buttons">
           <rect width="30"
@@ -81,7 +81,7 @@
       </line>
       <line graph-input-edge 
         ng-repeat="edge in graph.edges"
-        ng-click="clickGraphEdge(graph, state)"
+        ng-click="onClickGraphEdge(graph, state)"
         ng-attr-x1="<[graph.vertices[edge.src].x]>"
         ng-attr-y1="<[graph.vertices[edge.src].y]>"
         ng-attr-x2="<[graph.vertices[edge.dst].x]>"
@@ -99,9 +99,9 @@
         </text>
         <circle ng-mouseenter="state.hoverVertex = $index"
           ng-mouseleave="state.hoverVertex = ($index === state.hoverVertex) ? null : state.hoverVertex"
-          ng-click="clickGraphVertex(graph, state)"
-          ng-mousedown="mousedownGraphVertex(graph, state)"
-          ng-mouseup="mouseupGraphVertex(graph,state)"
+          ng-click="onClickGraphVertex(graph, state)"
+          ng-mousedown="onMousedownGraphVertex(graph, state)"
+          ng-mouseup="onMouseupGraphVertex(graph,state)"
           ng-dblclick="startEditVertexLabel(graph, state)"
           cx="0"
           cy="0"
