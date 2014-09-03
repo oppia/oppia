@@ -89,10 +89,19 @@ class DashboardHandler(base.BaseHandler):
                 self.user_id))
 
         # Replace author_ids with their usernames.
-        author_ids = [update['author_id'] for update in recent_updates]
+        author_ids = [
+            update['author_id'] for update in recent_updates
+            if update['author_id']]
         author_usernames = user_services.get_usernames(author_ids)
-        for ind, update in enumerate(recent_updates):
-            update['author_username'] = author_usernames[ind]
+
+        author_id_to_username = {
+            None: '',
+        }
+        for ind in range(len(author_ids)):
+            author_id_to_username[author_ids[ind]] = author_usernames[ind]
+        for update in recent_updates:
+            update['author_username'] = (
+                author_id_to_username[update['author_id']])
             del update['author_id']
 
         self.values.update({

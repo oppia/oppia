@@ -25,6 +25,11 @@ from core.platform import models
 
 
 def subscribe_to_thread(user_id, feedback_thread_id):
+    """Subscribes a user to a feedback thread.
+
+    Callers of this function should ensure that the user_id and
+    feedback_thread_id are valid.
+    """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if not subscriptions_model:
@@ -38,6 +43,12 @@ def subscribe_to_thread(user_id, feedback_thread_id):
 
 
 def subscribe_to_activity(user_id, activity_id):
+    """Subscribes a user to an activity (and, therefore, indirectly to all
+    feedback threads for that activity).
+
+    Callers of this function should ensure that the user_id and activity_id
+    are valid.
+    """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)
     if not subscriptions_model:
