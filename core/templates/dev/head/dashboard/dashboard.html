@@ -53,19 +53,22 @@
               </div>
 
               <div class="col-lg-4 col-md-4 col-sm-4">
-                <h4>Private explorations</h4>
-                  <ul>
-                    <li ng-repeat="expId in privateExplorationIds">
-                      <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
-                    </li>
-                  </ul>
+                <div>
+                  <a class="btn btn-success" ng-click="showCreateExplorationModal()">
+                    Create New Exploration
+                  </a>
+                </div>
 
-                  <div>
-                    <a class="btn btn-success" ng-click="showCreateExplorationModal()">
-                      Create New Exploration
-                    </a>
-                  </div>
-                </h4>
+                <div ng-if="!isEmpty(privateExplorationIds)">
+                  <hr>
+                  <h4>Private explorations</h4>
+                    <ul>
+                      <li ng-repeat="expId in privateExplorationIds">
+                        <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
+                      </li>
+                    </ul>
+                  </h4>
+                </div>
 
                 <div ng-if="!isEmpty(betaExplorationIds)">
                   <hr>
