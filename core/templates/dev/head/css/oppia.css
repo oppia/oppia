@@ -347,6 +347,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 150px;
 }
 
+/* Gallery sidebar menu for small screens. */
+.oppia-gallery-sidebar {
+  height: 100%;
+  min-height: 700px;
+}
+
 .oppia-gallery-tiles-container {
   background-color: white;
   border-radius: 3px;
@@ -354,10 +360,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   /* This is the same as the min-height in .oppia-gallery-menu. */
   min-height: 600px;
   padding-left: 20px;
-}
-
-.playtest-headers {
-  border-bottom: 1pt solid #333;
 }
 
 .oppia-gallery-tile {

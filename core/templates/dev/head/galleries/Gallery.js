@@ -99,9 +99,9 @@ oppia.directive('checkboxGroup', function() {
 });
 
 oppia.controller('Gallery', [
-    '$scope', '$http', '$rootScope', 'createExplorationButtonService',
+    '$scope', '$http', '$rootScope', '$window', 'createExplorationButtonService',
     'oppiaDatetimeFormatter',
-    function($scope, $http, $rootScope, createExplorationButtonService,
+    function($scope, $http, $rootScope, $window, createExplorationButtonService,
              oppiaDatetimeFormatter) {
   $scope.galleryDataUrl = '/galleryhandler/data';
 
@@ -160,5 +160,23 @@ oppia.controller('Gallery', [
     });
 
     $rootScope.loadingMessage = '';
+  });
+
+  $scope.gallerySidebarIsActive = false;
+  $scope.toggleGallerySidebar = function() {
+    $scope.gallerySidebarIsActive = !$scope.gallerySidebarIsActive;
+  };
+
+  $scope.isScreenLarge = function() {
+    return Math.max(document.documentElement.clientWidth, $window.innerWidth || 0) > 768;
+  };
+
+  $scope.screenIsLarge = $scope.isScreenLarge();
+  $window.addEventListener('resize', function() {
+    $scope.screenIsLarge = $scope.isScreenLarge();
+    if ($scope.screenIsLarge) {
+      $scope.gallerySidebarIsActive = false;
+    }
+    $scope.$apply();
   });
 }]);
