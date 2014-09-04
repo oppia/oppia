@@ -589,7 +589,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
         committer_id, '', force_deletion=force_deletion)
 
     exploration_model = exp_models.ExplorationModel.get(exploration_id)
-    exploration_model.delete(committer_id, '', force_deletion=force_deletion)
+    exploration_model.delete(
+        committer_id, 'Exploration deleted.', force_deletion=force_deletion)
 
     # This must come after the exploration is retrieved. Otherwise the memcache
     # key will be reinstated.

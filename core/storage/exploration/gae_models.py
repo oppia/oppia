@@ -294,6 +294,9 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
 
     A new instance of this model is created and saved every time a commit to
     ExplorationModel or ExplorationRightsModel occurs.
+
+    The id for this model is of the form
+    'exploration-{{EXP_ID}}-{{EXP_VERSION}}'.
     """
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
@@ -325,6 +328,10 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     # on this property is faster than an inequality query on
     # post_commit_status.
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
+
+    @classmethod
+    def get_commit(cls, exploration_id, version):
+        return cls.get_by_id('exploration-%s-%s' % (exploration_id, version))
 
     @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):

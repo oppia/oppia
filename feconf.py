@@ -276,6 +276,10 @@ SHOW_SKIN_CHOOSER = False
 OUTPUT_FORMAT_JSON = 'json'
 OUTPUT_FORMAT_ZIP = 'zip'
 
+# Types of updates shown in the 'recent updates' table in the dashboard page.
+UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
+UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
+
 # List of supported language codes.
 ALL_LANGUAGE_CODES = [{
     'code': 'en', 'description': 'English',

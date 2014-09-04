@@ -516,7 +516,6 @@ class JobRegistryTests(test_utils.GenericTestBase):
 
             event_types_listened_to = klass.get_event_types_listened_to()
             self.assertTrue(isinstance(event_types_listened_to, list))
-            self.assertGreater(len(event_types_listened_to), 0)
             for event_type in event_types_listened_to:
                 self.assertTrue(isinstance(event_type, basestring))
                 self.assertTrue(issubclass(

@@ -1282,7 +1282,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         'commit_type': 'delete',
         'post_commit_community_owned': False,
         'post_commit_is_private': True,
-        'commit_message': '',
+        'commit_message': 'Exploration deleted.',
         'post_commit_status': 'private'
     }
 

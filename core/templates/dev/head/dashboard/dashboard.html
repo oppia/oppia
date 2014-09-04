@@ -13,44 +13,91 @@
             Dashboard
           </h3>
 
-          <h4>Private explorations</h4>
-            <ul>
-              <li ng-repeat="expId in privateExplorationIds">
-                <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
-              </li>
-            </ul>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 col-md-8 col-sm-8">
+                <h4>Most recent updates to explorations and threads</h4>
+                <div ng-if="recentUpdates.length === 0">
+                  <em>No recent updates.</em>
+                </div>
 
-            <div>
-              <a class="btn btn-success" ng-click="showCreateExplorationModal()">
-                Create New Exploration
-              </a>
+                <div ng-if="recentUpdates.length > 0">
+                  <table class="table">
+                    <tr>
+                      <th></th>
+                      <th>Exploration</th>
+                      <th>Last updated</th>
+                      <th>by</th>
+                      <th>Subject</th>
+                    </tr>
+                    <tr ng-repeat="update in recentUpdates">
+                      <td>
+                        <span ng-if="update.type === 'exploration_commit'"
+                              class="glyphicon glyphicon-flag"
+                              title="Exploration commit"></span>
+                        <span ng-if="update.type === 'feedback_thread'"
+                              class="glyphicon glyphicon-comment"
+                              title="Feedback thread"></span>
+                      </td>
+                      <td>
+                        <a href="/create/<[update.activity_id]>">
+                          <[update.activity_title]>
+                        </a>
+                      </td>
+                      <td><[getLocaleStringForDatetime(update.last_updated_ms)]></td>
+                      <td><[update.author_username]></td>
+                      <td><[update.subject]></td>
+                    </tr>
+                  </table>
+                </div>
+              </div>
+
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <div>
+                  <a class="btn btn-success" ng-click="showCreateExplorationModal()">
+                    Create New Exploration
+                  </a>
+                </div>
+
+                <div ng-if="!isEmpty(privateExplorationIds)">
+                  <hr>
+                  <h4>Private explorations</h4>
+                    <ul>
+                      <li ng-repeat="expId in privateExplorationIds">
+                        <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
+                      </li>
+                    </ul>
+                  </h4>
+                </div>
+
+                <div ng-if="!isEmpty(betaExplorationIds)">
+                  <hr>
+                  <h4>Beta explorations</h4>
+                  <ul>
+                    <li ng-repeat="expId in betaExplorationIds">
+                      <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div ng-if="!isEmpty(releasedExplorationIds)">
+                  <hr>
+                  <h4>Released explorations</h4>
+                  <ul>
+                    <li ng-repeat="expId in releasedExplorationIds">
+                      <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div ng-if="isEmpty(privateExplorationIds) && isEmpty(betaExplorationIds) && isEmpty(releasedExplorationIds)">
+                  <p>
+                    <em>You currently aren't managing or collaborating on any explorations.</em>
+                  </p>
+                </div>
+              </div>
+
             </div>
-          </h4>
-
-          <div ng-if="!isEmpty(betaExplorationIds)">
-            <hr>
-            <h4>Beta explorations</h4>
-            <ul>
-              <li ng-repeat="expId in betaExplorationIds">
-                <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
-              </li>
-            </ul>
-          </div>
-
-          <div ng-if="!isEmpty(releasedExplorationIds)">
-            <hr>
-            <h4>Released explorations</h4>
-            <ul>
-              <li ng-repeat="expId in releasedExplorationIds">
-                <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
-              </li>
-            </ul>
-          </div>
-
-          <div ng-if="isEmpty(privateExplorationIds) && isEmpty(betaExplorationIds) && isEmpty(releasedExplorationIds)">
-            <p>
-              <em>You currently aren't managing or collaborating on any explorations.</em>
-            </p>
           </div>
         </div>
       </div>
