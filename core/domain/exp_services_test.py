@@ -1765,9 +1765,9 @@ class SearchTests(ExplorationServicesUnitTests):
             rights_manager, 'get_exploration_rights', mock_get_rights
         )
 
-        with get_doc_swap, add_docs_swap:
+        with get_doc_swap, add_docs_swap, get_rights_swap:
 
-            exp_services.update_exploration_status_in_search(rights)
+            exp_services.update_exploration_status_in_search(self.EXP_ID)
 
         self.assertEqual(get_doc_counter.times_called, 1)
         self.assertEqual(add_docs_counter.times_called, 1)
@@ -1815,3 +1815,48 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(cursor, expected_result_cursor)
         self.assertTrue(check_exploration_list_equality(result, explorations))
+
+
+class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
+
+    def test_exploration_contents_change_event_triggers(self):
+        recorded_ids = []
+
+        @classmethod
+        def mock_record(cls, exp_id):
+            recorded_ids.append(exp_id)
+
+        record_event_swap = self.swap(
+            event_services.ExplorationContentChangeEventHandler,
+            'record',
+            mock_record)
+
+        with record_event_swap:
+            exploration = exp_domain.Exploration.create_default_exploration(
+                self.EXP_ID, 'title', 'category'
+            )
+            exp_services.save_new_exploration(self.OWNER_ID, exploration)
+            exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
+
+        self.assertEqual(recorded_ids, [self.EXP_ID] * 2)
+
+    def test_exploration_status_change_event(self):
+        recorded_ids = []
+
+        @classmethod
+        def mock_record(cls, exp_id):
+            recorded_ids.append(exp_id)
+
+        record_event_swap = self.swap(
+            event_services.ExplorationStatusChangeEventHandler,
+            'record',
+            mock_record)
+
+        with record_event_swap:
+            rights_manager.create_new_exploration_rights(self.EXP_ID, self.OWNER_ID)
+            rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+            rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
+            rights_manager.unpublicize_exploration(self.user_id_admin, self.EXP_ID)
+            rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
+
+        self.assertEqual(recorded_ids, [self.EXP_ID] * 4)

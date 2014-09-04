@@ -641,8 +641,4 @@ def unpublicize_exploration(committer_id, exploration_id):
         'Exploration unpublicized.')
 
 
-# TODO(frederikcreemers) Move this event handler back into event_service when
-# we've figured out how to handle them
-def _handle_exploration_status_change_event(exp_id):
-        """Indexes the changed exploration."""
-        exp_services.update_exploration_status_in_search(exp_id)
+
