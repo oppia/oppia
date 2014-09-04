@@ -22,6 +22,7 @@ import urllib
 import zipfile
 
 import common
+import subprocess
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -212,12 +213,6 @@ UI_CODEMIRROR_ZIP_URL = (
 UI_CODEMIRROR_ZIP_ROOT_NAME = 'ui-codemirror-src%s' % UI_CODEMIRROR_REV
 UI_CODEMIRROR_TARGET_ROOT_NAME = 'ui-codemirror-%s' % UI_CODEMIRROR_REV
 
-MIDI_JS_REV = '09335aa7078be606f6d2389a3defb6d616db9ff7'
-MIDI_JS_ZIP_URL = (
-    'https://github.com/mudcube/MIDI.js/archive/%s.zip' % MIDI_JS_REV)
-MIDI_JS_ZIP_ROOT_NAME = 'MIDI.js-%s' % MIDI_JS_REV
-MIDI_JS_TARGET_ROOT_NAME = 'midi-js-09335a'
-
 UI_MAP_REV = '0.5.0'
 UI_MAP_ROOT_NAME = 'ui-map-%s' % UI_MAP_REV
 UI_MAP_ZIP_URL = (
@@ -271,9 +266,6 @@ download_and_unzip_files(
 download_and_unzip_files(
     UI_CODEMIRROR_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     UI_CODEMIRROR_ZIP_ROOT_NAME, UI_CODEMIRROR_TARGET_ROOT_NAME)
-download_and_unzip_files(
-    MIDI_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
-    MIDI_JS_ZIP_ROOT_NAME, MIDI_JS_TARGET_ROOT_NAME)
 download_and_unzip_files(
     UI_MAP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     UI_MAP_ZIP_ROOT_NAME, UI_MAP_TARGET_ROOT_NAME)
@@ -355,3 +347,25 @@ download_and_untar_files(
 download_and_untar_files(
     GAE_CLOUD_STORAGE_TAR_URL, THIRD_PARTY_DIR,
     GAE_CLOUD_STORAGE_TAR_ROOT_NAME, GAE_CLOUD_STORAGE_TARGET_ROOT_NAME)
+
+MIDI_JS_REV = '09335aa7078be606f6d2389a3defb6d616db9ff7'
+MIDI_JS_ZIP_URL = (
+    'https://github.com/mudcube/MIDI.js/archive/%s.zip' % MIDI_JS_REV)
+MIDI_JS_ZIP_ROOT_NAME = 'MIDI.js-%s' % MIDI_JS_REV
+MIDI_JS_TARGET_ROOT_NAME = 'midi-js-09335a'
+MIDI_JS_PATCH_ROOT_NAME = 'midi-js-09335a-patched'
+
+download_and_unzip_files(
+    MIDI_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    MIDI_JS_ZIP_ROOT_NAME, MIDI_JS_TARGET_ROOT_NAME)
+
+# Copy Midi files to new directory and add patch for updated chrome api.
+try:
+    if not os.path.exists(MIDI_JS_PATCH_ROOT_NAME):
+        shutil.copytree(
+            os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_TARGET_ROOT_NAME),
+            os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME))
+        # Apply the patch.
+        subprocess.call('git apply scripts/data/MIDI.js.patch', shell=True)
+except:
+    pass

@@ -1,0 +1,31 @@
+From ce5e72f45f6482d23dd19469acd1f3c4b4f7c565 Mon Sep 17 00:00:00 2001
+From: Michael Wagner <wagnerdmike@gmail.com>
+Date: Thu, 4 Sep 2014 11:15:25 -0700
+Subject: [PATCH] Edit MIDI.js for patch.
+
+---
+ third_party/static/midi-js-09335a-patched/build/MIDI.js | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/third_party/static/midi-js-09335a-patched/build/MIDI.js b/third_party/static/midi-js-09335a-patched/build/MIDI.js
+index 6093ae0..2d68de6 100644
+--- a/third_party/static/midi-js-09335a-patched/build/MIDI.js
++++ b/third_party/static/midi-js-09335a-patched/build/MIDI.js
+@@ -417,12 +417,12 @@ if (window.AudioContext || window.webkitAudioContext) (function () {
+ 		source.buffer = audioBuffers[instrument + "" + note];
+ 		source.connect(ctx.destination);
+ 		///
+-		var gainNode = ctx.createGainNode();
++		var gainNode = ctx.createGain();
+ 		var value = (velocity / 100) * masterVolume * 2 - 1;
+ 		gainNode.connect(ctx.destination);
+ 		gainNode.gain.value = Math.max(-1, value);
+ 		source.connect(gainNode);
+-		source.noteOn(delay || 0);
++		source.start(delay || 0);
+ 		return source;
+ 	};
+ 
+-- 
+1.7.12.4 (Apple Git-37)
+
