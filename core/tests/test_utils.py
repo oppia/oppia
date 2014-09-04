@@ -302,7 +302,8 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_user_stub()
         self.testbed.init_memcache_stub()
         self.testbed.init_datastore_v3_stub(consistency_policy=policy)
-        self.testbed.init_taskqueue_stub()
+        # The root path tells the testbed where to find the queue.yaml file.
+        self.testbed.init_taskqueue_stub(root_path=os.getcwd())
         self.taskqueue_stub = self.testbed.get_stub(
             testbed.TASKQUEUE_SERVICE_NAME)
         self.testbed.init_urlfetch_stub()
@@ -317,17 +318,38 @@ class AppEngineTestBase(TestBase):
         self._delete_all_models()
         self.testbed.deactivate()
 
-    def count_jobs_in_taskqueue(self):
-        return len(self.taskqueue_stub.get_filtered_tasks())
+    def _get_all_queue_names(self):
+        return [q['name'] for q in self.taskqueue_stub.GetQueues()]
 
-    def process_and_flush_pending_tasks(self):
-        from google.appengine.ext import deferred
+    def count_jobs_in_taskqueue(self, queue_name=None):
+        """Counts the jobs in the given queue. If queue_name is None,
+        defaults to counting the jobs in all queues available.
+        """
+        if queue_name:
+            return len(self.taskqueue_stub.get_filtered_tasks(
+                queue_names=[queue_name]))
+        else:
+            return len(self.taskqueue_stub.get_filtered_tasks())
 
-        tasks = self.taskqueue_stub.get_filtered_tasks()
-        self.taskqueue_stub.FlushQueue('default')
+    def process_and_flush_pending_tasks(self, queue_name=None):
+        """Runs and flushes pending tasks. If queue_name is None, does so for
+        all queues; otherwise, this only runs and flushes tasks for the
+        specified queue.
+
+        For more information on self.taskqueue_stub see
+
+            https://code.google.com/p/googleappengine/source/browse/trunk/python/google/appengine/api/taskqueue/taskqueue_stub.py
+        """
+        queue_names = [queue_name] if queue_name else self._get_all_queue_names()
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names=queue_names)
+        for q in queue_names:
+            self.taskqueue_stub.FlushQueue(q)
+
         while tasks:
             for task in tasks:
                 if task.url == '/_ah/queue/deferred':
+                    from google.appengine.ext import deferred
                     deferred.run(task.payload)
                 else:
                     # All other tasks are expected to be mapreduce ones.
@@ -342,8 +364,10 @@ class AppEngineTestBase(TestBase):
                         raise RuntimeError(
                             'MapReduce task to URL %s failed' % task.url)
 
-            tasks = self.taskqueue_stub.get_filtered_tasks()
-            self.taskqueue_stub.FlushQueue('default')
+            tasks = self.taskqueue_stub.get_filtered_tasks(
+                queue_names=queue_names)
+            for q in queue_names:
+                self.taskqueue_stub.FlushQueue(q)
 
 
 if feconf.PLATFORM == 'gae':

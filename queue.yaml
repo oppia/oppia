@@ -1,0 +1,7 @@
+total_storage_limit: 120M
+queue:
+# Leave the default rate of this queue unchanged.
+- name: default
+  rate: 5/s
+- name: events
+  rate: 5/s
