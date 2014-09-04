@@ -23,7 +23,7 @@ if [ "$SETUP_GAE_DONE" ]; then
 fi
 export SETUP_GAE_DONE=true
 
-export GOOGLE_APP_ENGINE_HOME=$TOOLS_DIR/google_appengine_1.8.8/google_appengine
+export GOOGLE_APP_ENGINE_HOME=$TOOLS_DIR/google_appengine_1.9.10/google_appengine
 export COVERAGE_HOME=$TOOLS_DIR/coverage-3.6
 
 # Note that if the following line is changed so that it uses webob_1_1_1, PUT requests from the frontend fail.

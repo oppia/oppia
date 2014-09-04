@@ -45,11 +45,11 @@ set -- "${remaining_params[@]}"
 
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
-if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
+if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  wget http://googleappengine.googlecode.com/files/google_appengine_1.8.8.zip -O gae-download.zip
-  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.8.8/
+  wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.10.zip -O gae-download.zip
+  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.10/
   rm gae-download.zip
 fi
 
