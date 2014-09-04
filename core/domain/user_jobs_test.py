@@ -23,7 +23,10 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import rights_manager
+from core.domain import subscription_services
 from core.domain import user_jobs
+from core.platform import models
+(user_models,) = models.Registry.import_models([models.NAMES.user])
 from core.tests import test_utils
 import feconf
 import utils
@@ -230,22 +233,22 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             USER_A_EMAIL = 'user_a@example.com'
             USER_A_USERNAME = 'a'
             self.register_editor(USER_A_EMAIL, username=USER_A_USERNAME)
-            user_id_a = self.get_user_id_from_email(USER_A_EMAIL)
+            user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
 
             USER_B_EMAIL = 'user_b@example.com'
             USER_B_USERNAME = 'b'
             self.register_editor(USER_B_EMAIL, username=USER_B_USERNAME)
-            user_id_b = self.get_user_id_from_email(USER_B_EMAIL)
+            user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
             # User A creates an exploration.
             self._save_new_default_exploration(
-                user_id_a, EXP_ID, EXP_TITLE, 'Category')
+                user_a_id, EXP_ID, EXP_TITLE, 'Category')
             exp_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                EXP_ID, None, user_id_b, FEEDBACK_THREAD_SUBJECT, 'text')
+                EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
             thread_id = (
                 feedback_services.get_threadlist(EXP_ID)[0]['thread_id'])
             message = feedback_services.get_messages(thread_id)[0]
@@ -255,20 +258,20 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_id_a))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id))
             recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_id_b))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id))
             expected_feedback_thread_update_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
-                'author_id': user_id_b,
+                'author_id': user_b_id,
                 'last_updated_ms': message['created_on'],
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
             expected_exploration_created_update_dict = (
                 self._get_expected_exploration_created_dict(
-                    user_id_a, EXP_ID, EXP_TITLE, exp_last_updated_ms))
+                    user_a_id, EXP_ID, EXP_TITLE, exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
             self.assertEqual(recent_updates_for_user_a, [
@@ -290,49 +293,49 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             USER_A_EMAIL = 'user_a@example.com'
             USER_A_USERNAME = 'a'
             self.register_editor(USER_A_EMAIL, username=USER_A_USERNAME)
-            user_id_a = self.get_user_id_from_email(USER_A_EMAIL)
+            user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
 
             USER_B_EMAIL = 'user_b@example.com'
             USER_B_USERNAME = 'b'
             self.register_editor(USER_B_EMAIL, username=USER_B_USERNAME)
-            user_id_b = self.get_user_id_from_email(USER_B_EMAIL)
+            user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
             # User A creates an exploration.
             self._save_new_default_exploration(
-                user_id_a, EXP_ID, EXP_TITLE, 'Category')
+                user_a_id, EXP_ID, EXP_TITLE, 'Category')
             exp_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
 
             # User B starts a feedback thread.
             feedback_services.create_thread(
-                EXP_ID, None, user_id_b, FEEDBACK_THREAD_SUBJECT, 'text')
+                EXP_ID, None, user_b_id, FEEDBACK_THREAD_SUBJECT, 'text')
             thread_id = (
                 feedback_services.get_threadlist(EXP_ID)[0]['thread_id'])
             message = feedback_services.get_messages(thread_id)[0]
 
             # User A adds user B as an editor of the exploration.
             rights_manager.assign_role(
-                user_id_a, EXP_ID, user_id_b, rights_manager.ROLE_EDITOR)
+                user_a_id, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
             ModifiedRecentUpdatesAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_id_a))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id))
             recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_id_b))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id))
             expected_feedback_thread_update_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
-                'author_id': user_id_b,
+                'author_id': user_b_id,
                 'last_updated_ms': message['created_on'],
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }
             expected_exploration_created_update_dict = (
                 self._get_expected_exploration_created_dict(
-                    user_id_a, EXP_ID, EXP_TITLE, exp_last_updated_ms))
+                    user_a_id, EXP_ID, EXP_TITLE, exp_last_updated_ms))
 
             # User A sees A's commit and B's feedback thread.
             self.assertEqual(recent_updates_for_user_a, [
@@ -345,3 +348,149 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 expected_exploration_created_update_dict,
             ])
 
+
+class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
+    """Tests for the one-off dashboard subscriptions job."""
+    EXP_ID = 'exp_id'
+    USER_A_EMAIL = 'a@example.com'
+    USER_A_USERNAME = 'a'
+    USER_B_EMAIL = 'b@example.com'
+    USER_B_USERNAME = 'b'
+    USER_C_EMAIL = 'c@example.com'
+    USER_C_USERNAME = 'c'
+
+    def _run_one_off_job(self):
+        """Runs the one-off MapReduce job."""
+        job_id = user_jobs.DashboardSubscriptionsOneOffJob.create_new()
+        user_jobs.DashboardSubscriptionsOneOffJob.enqueue(job_id)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+
+    def _null_fn(self, *args, **kwargs):
+        """A mock for functions of the form subscribe_to_*() to represent
+        behavior prior to the implementation of subscriptions.
+        """
+        pass
+
+    def setUp(self):
+        super(DashboardSubscriptionsOneOffJobTests, self).setUp()
+
+        self.register_editor(self.USER_A_EMAIL, username=self.USER_A_USERNAME)
+        self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
+        self.register_editor(self.USER_B_EMAIL, username=self.USER_B_USERNAME)
+        self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
+        self.register_editor(self.USER_C_EMAIL, username=self.USER_C_USERNAME)
+        self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
+
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_activity', self._null_fn):
+            # User A creates and saves a new valid exploration.
+            self.save_new_valid_exploration(self.EXP_ID, self.user_a_id)
+
+    def test_feedback_thread_subscription(self):
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(user_b_subscriptions_model, None)
+        self.assertEqual(user_c_subscriptions_model, None)
+
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_activity', self._null_fn):
+            # User B starts a feedback thread.
+            feedback_services.create_thread(
+                self.EXP_ID, None, self.user_b_id, 'subject', 'text')
+            # User C adds to that thread.
+            thread_id = (
+                feedback_services.get_threadlist(self.EXP_ID)[0]['thread_id'])
+            feedback_services.create_message(
+                thread_id, self.user_c_id, None, None, 'more text')
+
+        self._run_one_off_job()
+        
+        # Both users are subscribed to the feedback thread.
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id)
+
+        self.assertEqual(user_b_subscriptions_model.activity_ids, [])
+        self.assertEqual(user_c_subscriptions_model.activity_ids, [])
+        self.assertEqual(
+            user_b_subscriptions_model.feedback_thread_ids, [thread_id])
+        self.assertEqual(
+            user_c_subscriptions_model.feedback_thread_ids, [thread_id])
+
+    def test_exploration_subscription(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_activity', self._null_fn):
+            # User A adds user B as an editor to the exploration.
+            rights_manager.assign_role(
+                self.user_a_id, self.EXP_ID, self.user_b_id,
+                rights_manager.ROLE_EDITOR)
+
+        self._run_one_off_job()
+        
+        # Both users are subscribed to the exploration.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+
+        self.assertEqual(user_a_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(user_b_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
+
+    def test_community_owned_exploration(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_activity', self._null_fn):
+            # User A adds user B as an editor to the exploration.
+            rights_manager.assign_role(
+                self.user_a_id, self.EXP_ID, self.user_b_id,
+                rights_manager.ROLE_EDITOR)
+            # The exploration becomes community-owned.
+            rights_manager.publish_exploration(self.user_a_id, self.EXP_ID)
+            rights_manager.release_ownership(self.user_a_id, self.EXP_ID)
+            # User C edits the exploration.
+            exp_services.update_exploration(
+                self.user_c_id, self.EXP_ID, [], 'Update exploration')
+
+        self._run_one_off_job()
+
+        # User A and user B are subscribed to the exploration; user C is not.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
+
+        self.assertEqual(user_a_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(user_b_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(user_c_subscriptions_model, None)
+
+    def test_deleted_exploration(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_activity', self._null_fn):
+
+            # User A deletes the exploration.
+            exp_services.delete_exploration(self.user_a_id, self.EXP_ID)
+
+        self._run_one_off_job()
+
+        # User A is not subscribed to the exploration.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id, strict=False)
+        self.assertEqual(user_a_subscriptions_model, None)
