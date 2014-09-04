@@ -746,9 +746,9 @@ oppia.directive('oppiaResponseMusicNotesInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
         $scope.notes = [];
-        for (var note in $scope.answer) {
-          if (note.readableNoteName) {
-            $scope.notes.push(note.readableNodeName);
+        for (var i = 0; i < $scope.answer.length; i++) {
+          if ($scope.answer[i].readableNoteName) {
+            $scope.notes.push($scope.answer[i].readableNoteName);
           }
         }
 
