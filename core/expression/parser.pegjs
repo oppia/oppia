@@ -245,7 +245,6 @@ __
 
 PrimaryExpression
   = name:Identifier { return ['#', name]; }
-  / "$" name:Identifier { return ['$', name]; }
   / Literal
   / "(" __ expression:Expression __ ")" { return expression; }
 

@@ -31,4 +31,5 @@ source $(dirname $0)/setup.sh || exit 1
 
 bash scripts/create_expression_parser.sh
 
-NODE_PATH=$NODE_PATH:core/expression node core/expression/test.js
+cat core/expression/evaluator.js core/expression/test.js |\
+NODE_PATH=$NODE_PATH:core/expression node
