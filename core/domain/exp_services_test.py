@@ -1678,6 +1678,9 @@ class SearchTests(ExplorationServicesUnitTests):
         for exp in exp_objs:
             exp_services.save_new_exploration(self.OWNER_ID, exp)
 
+        for exp in exp_objs:
+            rights_manager.publish_exploration(self.OWNER_ID, exp.id)
+
         with add_docs_swap:
             exp_services.index_explorations_given_domain_objects(exp_objs)
 
@@ -1686,8 +1689,10 @@ class SearchTests(ExplorationServicesUnitTests):
 
     def test_index_explorations_given_ids(self):
 
-        expected_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_exp_titles = ['title 0', 'title 1', 'title 2', 'title 3', 'title 4']
+        all_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
+        expected_exp_ids = all_exp_ids[:-1]
+        all_exp_titles = ['title 0', 'title 1', 'title 2', 'title 3', 'title 4']
+        expected_exp_titles = all_exp_titles[:-1]
 
         def mock_add_documents_to_index(docs, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
@@ -1703,12 +1708,20 @@ class SearchTests(ExplorationServicesUnitTests):
                                   add_docs_counter)
 
         for i in xrange(5):
-            self.save_new_default_exploration(expected_exp_ids[i],
-                                              self.OWNER_ID,
-                                              expected_exp_titles[i])
+            self.save_new_default_exploration(
+                all_exp_ids[i],
+                self.OWNER_ID,
+                all_exp_titles[i])
+
+        # We're only publishing the first 4 explorations, so we're not expecting
+        # The last exploration to be indexed.
+        for i in xrange(4):
+            rights_manager.publish_exploration(
+                self.OWNER_ID,
+                expected_exp_ids[i])
 
         with add_docs_swap:
-            exp_services.index_explorations_given_ids(expected_exp_ids)
+            exp_services.index_explorations_given_ids(all_exp_ids)
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
@@ -1747,30 +1760,48 @@ class SearchTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(docs, [{'is': 'beta'}])
 
+        def mock_delete_docs(ids, index):
+            self.assertEqual(ids, [self.EXP_ID])
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+
+        public_rights = rights_manager.ExplorationRights(
+            self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+            status=rights_manager.EXPLORATION_STATUS_PUBLIC
+        )
+
+        private_rights = rights_manager.ExplorationRights(
+            self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+            status=rights_manager.EXPLORATION_STATUS_PRIVATE
+        )
+
+        rights_object = public_rights
+
         def mock_get_rights(exp_id):
-            return rights_manager.ExplorationRights(
-                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.EXPLORATION_STATUS_PUBLIC
-            )
+            return rights_object
 
         get_doc_counter = test_utils.CallCounter(mock_get_doc)
         add_docs_counter = test_utils.CallCounter(mock_add_docs)
-
+        delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
 
         get_doc_swap = self.swap(
             search_services, 'get_document_from_index', get_doc_counter)
         add_docs_swap = self.swap(
             search_services, 'add_documents_to_index', add_docs_counter)
+        delete_docs_swap = self.swap(
+            search_services, 'delete_documents_from_index', delete_docs_counter)
         get_rights_swap = self.swap(
-            rights_manager, 'get_exploration_rights', mock_get_rights
-        )
+            rights_manager, 'get_exploration_rights', mock_get_rights)
 
-        with get_doc_swap, add_docs_swap, get_rights_swap:
 
+        with get_doc_swap, add_docs_swap, get_rights_swap, delete_docs_swap:
+            exp_services.update_exploration_status_in_search(self.EXP_ID)
+            # Test that explorations are deleted from the index when they're unpublished
+            rights_object = private_rights
             exp_services.update_exploration_status_in_search(self.EXP_ID)
 
         self.assertEqual(get_doc_counter.times_called, 1)
         self.assertEqual(add_docs_counter.times_called, 1)
+        self.assertEqual(delete_docs_counter.times_called, 1)
 
     def test_search_explorations(self):
         expected_query_string = 'a query string'

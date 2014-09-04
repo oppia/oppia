@@ -996,6 +996,9 @@ def _exp_rights_to_search_dict(rights):
 
     return doc
 
+def _should_index(exp):
+    rights = rights_manager.get_exploration_rights(exp.id)
+    return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
 
 def _exp_to_search_dict(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
@@ -1019,7 +1022,8 @@ def _exp_to_search_dict(exp):
 
 
 def index_explorations_given_domain_objects(exp_objects):
-    search_docs = [_exp_to_search_dict(exp) for exp in exp_objects]
+    search_docs = [_exp_to_search_dict(exp) for exp in exp_objects
+                   if _should_index(exp)]
     search_services.add_documents_to_index(search_docs, SEARCH_INDEX_EXPLORATIONS)
 
 
@@ -1040,8 +1044,12 @@ def patch_exploration_search_document(exp_id, update):
 
 def update_exploration_status_in_search(exp_id):
     rights = rights_manager.get_exploration_rights(exp_id)
-    patch_exploration_search_document(
-        rights.id, _exp_rights_to_search_dict(rights))
+    if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+        search_services.delete_documents_from_index(
+            [exp_id], SEARCH_INDEX_EXPLORATIONS)
+    else:
+        patch_exploration_search_document(
+            rights.id, _exp_rights_to_search_dict(rights))
 
 
 def search_explorations(
