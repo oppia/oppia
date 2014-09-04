@@ -39,11 +39,11 @@ THIRD_PARTY_DIR = os.path.join(CURR_DIR, 'third_party')
 
 DIRS_TO_ADD_TO_SYS_PATH = [
     os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.8.8', 'google_appengine'),
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.10', 'google_appengine'),
     CURR_DIR,
     os.path.join(OPPIA_TOOLS_DIR, 'webtest-1.4.2'),
     os.path.join(
-        OPPIA_TOOLS_DIR, 'google_appengine_1.8.8', 'google_appengine',
+        OPPIA_TOOLS_DIR, 'google_appengine_1.9.10', 'google_appengine',
         'lib', 'webob_0_9'),
     os.path.join(CURR_DIR, 'third_party', 'bleach-1.2.2'),
     os.path.join(THIRD_PARTY_DIR, 'html5lib-python-0.95'),
