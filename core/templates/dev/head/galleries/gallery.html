@@ -10,13 +10,13 @@
     <div class="oppia-main-content">
 
       <div class="row">
-        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-10">
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
           <h3 class="oppia-page-title">
             Gallery
           </h3>
         </div>
 
-        <div class="col-lg-9 col-md-9 col-sm-9 col-xs-1">
+        <div class="col-lg-9 col-md-9 col-sm-9 hidden-xs">
           {% if not user_email %}
             <!-- User must log in. -->
             <span class="pull-right">
@@ -123,7 +123,7 @@
                   </div>
                 </div>
 
-                <div class="col-lg-2 col-md-2 col-sm-2" ng-if="exploration.is_editable">
+                <div class="col-lg-2 col-md-2 col-sm-2 hidden-xs" ng-if="exploration.is_editable">
                   <button class="btn btn-default btn-sm pull-right oppia-gallery-edit-btn" ng-click="navigateTo('/create/<[exploration.id]>')">
                     <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
                     Edit

@@ -71,11 +71,11 @@
                       <a href="/gallery">Gallery</a>
                     </li>
                     <li class="dropdown">
-                      <a class="dropdown-toggle" data-toggle="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         About
-                        <b class="caret"></b>
+                        <span class="caret"></span>
                       </a>
-                      <ul class="dropdown-menu">
+                      <ul class="dropdown-menu" role="menu">
                         {% for page in ABOUT_PAGES %}
                           <li>
                             <a href="{{page['url']}}">{{page['name']}}</a>
@@ -105,9 +105,9 @@
                           {% elif is_moderator %}
                             (Moderator)
                           {% endif %}
-                          <b class="caret"></b>
+                          <span class="caret"></span>
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu" role="menu">
                           <li>
                             <a href="{{logout_url}}">Logout</a>
                           </li>

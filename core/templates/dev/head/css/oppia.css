@@ -225,16 +225,19 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: white;
 }
 
-/* Show the navbar submenu dropdowns on-hover rather than on-click. */
-.nav .dropdown:hover > .dropdown-menu {
-  display: block;
-}
-.nav .dropdown:hover > .dropdown-menu > li > a {
-  color: white;
-}
-.nav .dropdown:hover > .dropdown-menu > li > a:hover {
-  background: rgb(10, 48, 106);
-  color: white;
+/* Show the navbar submenu dropdowns on-hover rather than on-click, if the
+   screen size is large enough. */
+@media (min-width: 768px) {
+  .nav .dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+  .nav .dropdown:hover > .dropdown-menu > li > a {
+    color: white;
+  }
+  .nav .dropdown:hover > .dropdown-menu > li > a:hover {
+    background: rgb(10, 48, 106);
+    color: white;
+  }
 }
 
 .oppia-main-content {
@@ -347,10 +350,27 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 150px;
 }
 
-/* Gallery sidebar menu for small screens. */
+/* Gallery sidebar menu for small screens. Includes animation. */
 .oppia-gallery-sidebar {
   height: 100%;
   min-height: 700px;
+  -moz-transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+
+.oppia-gallery-menu.ng-enter {
+  opacity: 0;
+}
+.oppia-gallery-menu.ng-enter.ng-enter-active {
+  opacity: 1;
+}
+.oppia-gallery-menu.ng-enter {
+  -moz-transition: all 0.2s linear 0.2s;
+  -webkit-transition: all 0.2s linear 0.2s;
+  -o-transition: all 0.2s linear 0.2s;
+  transition: all 0.2s linear 0.2s;
 }
 
 .oppia-gallery-tiles-container {
