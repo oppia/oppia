@@ -1838,7 +1838,7 @@ class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
             exp_services.save_new_exploration(self.OWNER_ID, exploration)
             exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [], '')
 
-        self.assertEqual(recorded_ids, [self.EXP_ID] * 2)
+        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID])
 
     def test_exploration_status_change_event(self):
         recorded_ids = []
@@ -1859,4 +1859,5 @@ class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
             rights_manager.unpublicize_exploration(self.user_id_admin, self.EXP_ID)
             rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
 
-        self.assertEqual(recorded_ids, [self.EXP_ID] * 4)
+        self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID,
+                                        self.EXP_ID, self.EXP_ID])
