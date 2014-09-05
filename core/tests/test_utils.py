@@ -28,6 +28,7 @@ current_user_services = models.Registry.import_current_user_services()
 import feconf
 import main
 
+import inspect
 import json
 
 
@@ -268,6 +269,12 @@ class TestBase(unittest.TestCase):
         with self.swap(math, "sqrt", lambda x: 42):
             print math.sqrt(16.0) # prints 42
         print math.sqrt(16.0) # prints 4 as expected.
+
+        NOTE: self.swap and other context managers that are created using
+        contextlib.contextmanager use generators that yield exactly once. This
+        means that you can only use them once after construction, otherwise, the
+        generator will immediately raise StopIteration, and contextlib will raise
+        a RuntimeError.
         """
         original = getattr(obj, attr)
         setattr(obj, attr, newvalue)
@@ -305,6 +312,7 @@ class AppEngineTestBase(TestBase):
         self.testbed.init_urlfetch_stub()
         self.testbed.init_files_stub()
         self.testbed.init_blobstore_stub()
+        self.testbed.init_search_stub()
 
         # The root path tells the testbed where to find the queue.yaml file.
         self.testbed.init_taskqueue_stub(root_path=os.getcwd())
@@ -378,3 +386,101 @@ if feconf.PLATFORM == 'gae':
     GenericTestBase = AppEngineTestBase
 else:
     raise Exception('Invalid platform: expected one of [\'gae\']')
+
+
+class FunctionWrapper(object):
+    """A utility for making function wrappers. Create a subclass and override
+       any or both of the pre_call_hook and post_call_hook methods. See these methods
+       for more info."""
+
+    def __init__(self, f):
+        """Creates a new FunctionWrapper instance.
+
+        args:
+          - f: a callable, or data descriptor. If it's a descriptor, its __get__
+            should return a bound method. For example, f can be a function, a
+            method, a static or class method, but not a @property."""
+        self._f = f
+        self._instance = None
+
+    def __call__(self, *args, **kwargs):
+        if self._instance is not None:
+            args = [self._instance] + list(args)
+
+        args_dict = inspect.getcallargs(self._f, *args, **kwargs)
+
+        self.pre_call_hook(args_dict)
+
+        result = self._f(*args, **kwargs)
+
+        self.post_call_hook(args_dict, result)
+
+        return result
+
+    def __get__(self, instance, owner):
+        # We have to implement __get__ because otherwise, we don't have a chance
+        # to bind to the instance self._f was bound to. See the following SO answer:
+        # http://stackoverflow.com/a/22555978/675311
+        self._instance = instance
+        return self
+
+    def pre_call_hook(self, args):
+        pass
+
+    def post_call_hook(self, args, result):
+        pass
+
+
+class CallCounter(FunctionWrapper):
+    """A function wrapper that keeps track of how often the function is called.
+       Note that the counter is incremented before each call, so it is also
+       increased when the function raises an exception."""
+
+    def __init__(self, f):
+        """Counts the number of times the given function has been called.
+           See FunctionWrapper for arguments."""
+        super(CallCounter, self).__init__(f)
+        self._times_called = 0
+
+    @property
+    def times_called(self):
+        return self._times_called
+
+    def pre_call_hook(self, args):
+        self._times_called += 1
+
+
+class FailingFunction(FunctionWrapper):
+    """A function wrapper that makes a function fail, raising a given exception.
+       It can be set to succeed after a given number of calls."""
+
+    INFINITY = 'infinity'
+
+    def __init__(self, f, exception, num_tries_before_success):
+        """Create a new Failing function.
+
+        args:
+          - f: see FunctionWrapper.
+          - exception: the exception to be raised.
+          - num_tries_before_success: the number of times to raise an exception,
+            before a call succeeds. If this is 0, all calls will succeed, if it
+            is FailingFunction.INFINITY, all calls will fail.
+        """
+        super(FailingFunction, self).__init__(f)
+        self._exception = exception
+        self._num_tries_before_success = num_tries_before_success
+        self._always_fail = self._num_tries_before_success == FailingFunction.INFINITY
+        self._times_called = 0
+
+
+        if not (self._num_tries_before_success >= 0 or self._always_fail):
+            raise ValueError(
+                             'num_tries_before_success should either be an'
+                             'integer greater than or equal to 0,'
+                             'or FailingFunction.INFINITY')
+
+    def pre_call_hook(self, args):
+        self._times_called += 1
+        call_should_fail = not self._num_tries_before_success < self._times_called
+        if call_should_fail or self._always_fail:
+            raise self._exception

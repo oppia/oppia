@@ -22,12 +22,14 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.domain import config_domain
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+import feconf
 import utils
 
 
@@ -200,6 +202,15 @@ def get_non_private_exploration_rights():
     """Returns a list of rights domain objects for non-private explorations."""
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_non_private()]
+
+
+def get_page_of_non_private_exploration_rights(
+        page_size=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    """Returns a page of rights domain objects non-private explorations."""
+    results, cursor, more = exp_models.ExplorationRightsModel.get_page_of_non_private_exploration_rights(
+        page_size=page_size, cursor=cursor
+    )
+    return [_get_exploration_rights_from_model(result) for result in results], cursor, more
 
 
 def get_community_owned_exploration_rights():
@@ -576,6 +587,7 @@ def _change_exploration_status(
 
     _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds)
+    event_services.ExplorationStatusChangeEventHandler.record(exploration_id)
 
 
 def publish_exploration(committer_id, exploration_id):
@@ -636,3 +648,6 @@ def unpublicize_exploration(committer_id, exploration_id):
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
         'Exploration unpublicized.')
+
+
+

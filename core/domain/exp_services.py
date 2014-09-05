@@ -25,17 +25,21 @@ storage model to be changed without affecting this module and others above it.
 __author__ = 'Sean Lip'
 
 import copy
+import datetime
 import logging
 import os
 import StringIO
 import zipfile
 
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import fs_domain
 from core.domain import rights_manager
 from core.platform import models
 import feconf
 memcache_services = models.Registry.import_memcache_services()
+search_services = models.Registry.import_search_services()
+taskqueue_services = models.Registry.import_taskqueue_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
 import utils
 
@@ -45,6 +49,8 @@ CMD_CREATE_NEW = 'create_new'
 # TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
 SUBMIT_HANDLER_NAME = 'submit'
 
+#Name for the exploration search index
+SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
@@ -86,6 +92,50 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return exploration
         else:
             return None
+
+def get_multiple_explorations_by_id(exp_ids, strict=True):
+    """Returns a dict of domain objects representing explorations with the given
+    ids as keys..
+    """
+    exp_ids = set(exp_ids)
+    result = {}
+    uncached = []
+    memcache_keys = [_get_exploration_memcache_key(i) for i in exp_ids]
+    cache_result = memcache_services.get_multi(memcache_keys)
+
+    for exp_obj in cache_result.itervalues():
+        result[exp_obj.id] = exp_obj
+
+    for _id in exp_ids:
+        if _id not in result:
+            uncached.append(_id)
+
+    db_exp_models = exp_models.ExplorationModel.get_multi(uncached)
+    db_results_dict = {}
+    not_found = []
+    for i, eid in enumerate(uncached):
+        model = db_exp_models[i]
+        if model:
+            exploration = get_exploration_from_model(model)
+        else:
+            logging.info('Tried to fetch exploration with id %s, but no such'
+                         'exploration exists in the datastore' % eid)
+            exploration = None
+            not_found.append(eid)
+        db_results_dict[eid] = exploration
+
+    if strict and not_found:
+        raise ValueError('Couldn\'t find explorations with the following ids:\n%s'
+                        % '\n'.join(not_found))
+
+    cache_update = {eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
+                    if db_results_dict[eid] is not None}
+
+    if cache_update:
+        memcache_services.set_multi(cache_update)
+
+    result.update(db_results_dict)
+    return result
 
 
 def get_new_exploration_id():
@@ -524,6 +574,8 @@ def _save_exploration(
     exploration_model.commit(
         committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
+    event_services.ExplorationContentChangeEventHandler.record(exploration.id)
+    _handle_exp_change_event(exploration.id)
 
     exploration.version += 1
 
@@ -557,6 +609,8 @@ def _create_exploration(
         param_changes=exploration.param_change_dicts,
     )
     model.commit(committer_id, commit_message, commit_cmds)
+    event_services.ExplorationContentChangeEventHandler.record(exploration.id)
+    _handle_exp_change_event(exploration.id)
     exploration.version += 1
 
 
@@ -596,6 +650,10 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     # key will be reinstated.
     exploration_memcache_key = _get_exploration_memcache_key(exploration_id)
     memcache_services.delete(exploration_memcache_key)
+
+    #delete the exploration from search.
+    search_services.delete_documents_from_index([exploration_id],
+                                                SEARCH_INDEX_EXPLORATIONS)
 
 
 # Operations on exploration snapshots.
@@ -837,17 +895,21 @@ def get_next_page_of_all_commits(
 
 
 def get_next_page_of_all_non_private_commits(
-        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
-    """Returns a page of non-private commits in reverse time order.
+        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None, max_age=None):
+    """Returns a page of non-private commits in reverse time order. If max_age
+    is given, it should be a datetime.timedelta instance.
 
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
         https://developers.google.com/appengine/docs/python/ndb/queryclass
     """
+    if max_age is not None and not isinstance(max_age, datetime.timedelta):
+        raise ValueError("max_age must be a datetime.timedelta instance. or None.")
+
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_non_private_commits(
-            page_size, urlsafe_start_cursor))
+            page_size, urlsafe_start_cursor, max_age=max_age))
 
     return ([exp_domain.ExplorationCommitLogEntry(
         entry.created_on, entry.last_updated, entry.user_id, entry.username,
@@ -887,7 +949,7 @@ def get_next_page_of_all_commits_by_user_id(
     The return value is a triple (results, cursor, more) as described in
     fetch_page() at:
 
-        https://developers.google.com/appengine/docs/python/ndb/queryclass
+        https://developers.google.com/appengine/docs/python/ndb/queryclass#Query_fetch_page
     """
     results, new_urlsafe_start_cursor, more = (
         exp_models.ExplorationCommitLogEntryModel.get_all_commits_by_user_id(
@@ -899,3 +961,107 @@ def get_next_page_of_all_commits_by_user_id(
         entry.commit_cmds, entry.version, entry.post_commit_status,
         entry.post_commit_community_owned, entry.post_commit_is_private
     ) for entry in results], new_urlsafe_start_cursor, more)
+
+
+def _exp_rights_to_search_dict(rights):
+    # Allow searches like "is:beta" or "is:publicized".
+    doc = {}
+    if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+        doc['is'] = 'publicized'
+    else:
+        doc['is'] = 'beta'
+
+    return doc
+
+
+def _should_index(exp):
+    rights = rights_manager.get_exploration_rights(exp.id)
+    return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
+
+
+def _exp_to_search_dict(exp):
+    rights = rights_manager.get_exploration_rights(exp.id)
+    doc = {
+        'id': exp.id,
+        'language_code': exp.language_code,
+        'title': exp.title,
+        'category': exp.category,
+        'skills': exp.skill_tags,
+        'blurb': exp.blurb,
+        'objective': exp.objective,
+        'author_notes': exp.author_notes,
+    }
+    doc.update(_exp_rights_to_search_dict(rights))
+
+    #TODO(frederik): Calculate an exploration's 'rank' based on statistics.
+    # By default, a document's rank is the time it was indexed, so the most
+    # recently changed explorations would rank higher.
+
+    return doc
+
+
+def index_explorations_given_domain_objects(exp_objects):
+    search_docs = [_exp_to_search_dict(exp) for exp in exp_objects
+                   if _should_index(exp)]
+    search_services.add_documents_to_index(search_docs, SEARCH_INDEX_EXPLORATIONS)
+
+
+def index_explorations_given_ids(exp_ids):
+    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=True)
+    index_explorations_given_domain_objects(exploration_models.values())
+
+
+def patch_exploration_search_document(exp_id, update):
+    """Patches an exploration's current search document, with the values
+    from the 'update' dictionary."""
+
+    doc = search_services.get_document_from_index(
+        exp_id, SEARCH_INDEX_EXPLORATIONS)
+    doc.update(update)
+    search_services.add_documents_to_index([doc], SEARCH_INDEX_EXPLORATIONS)
+
+
+def update_exploration_status_in_search(exp_id):
+    rights = rights_manager.get_exploration_rights(exp_id)
+    if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
+        search_services.delete_documents_from_index(
+            [exp_id], SEARCH_INDEX_EXPLORATIONS)
+    else:
+        patch_exploration_search_document(
+            rights.id, _exp_rights_to_search_dict(rights))
+
+
+def search_explorations(
+    query, sort=None, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    """Searcher through the exploration
+
+    args:
+      - query_string: the query string to search for.
+      - sort: a string indicating how to sort results.
+        This should be a string of space separated values.
+        Each value should start with a '+' or a '-' character indicating whether
+        to sort in ascending or descending
+        order respectively. This character should be followed by a field name to
+        sort on. When this is None, results are based on 'rank'.
+        See _exp_to_search_dict to see how rank is determined
+      - limit: the maximum number of results to return.
+      - cursor: A cursor, used to get the next page of results.
+        If there are more documents that match the query than
+        'limit', this function will return a cursor to get the next page.
+
+    returns: a tuple:
+      - a list of Exploration domain objects that match the query.
+      - a cursor if there are more matching exploration to fetch, None otherwise.
+        If a cursor is returned, it will be a web-safe string that can be used in URLs.
+    """
+    results, cursor = search_services.search(query, SEARCH_INDEX_EXPLORATIONS,
+                                             cursor, limit, sort, ids_only=True)
+    ids = [result.get('id') for result in results]
+    explorations = get_multiple_explorations_by_id(ids, strict=True)
+    return [explorations[_id] for _id in ids ], cursor
+
+# Temporary event handlers
+
+def _handle_exp_change_event(exp_id):
+    """Indexes the changed exploration."""
+    index_explorations_given_ids([exp_id])

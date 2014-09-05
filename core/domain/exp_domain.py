@@ -681,6 +681,33 @@ class Exploration(object):
         self.created_on = created_on
         self.last_updated = last_updated
 
+    def is_equal_to(self, other):
+        simple_props = ['id', 'title', 'category', 'objective', 'language_code',
+                        'skill_tags', 'blurb', 'author_notes', 'default_skin',
+                        'init_state_name', 'version']
+
+        for prop in simple_props:
+            if getattr(self, prop) != getattr(other, prop):
+                return False
+
+        for (state_name, state_obj) in self.states.iteritems():
+            if state_name not in other.states:
+                return False
+            if state_obj.to_dict() != other.states[state_name].to_dict():
+                return False
+
+        for (ps_name, ps_obj) in self.param_specs.iteritems():
+            if ps_name not in other.param_specs:
+                return False
+            if ps_obj.to_dict() != other.param_specs[ps_name].to_dict():
+                return False
+
+        for i in xrange(len(self.param_changes)):
+            if self.param_changes[i].to_dict() != other.param_changes[i].to_dict():
+                return False
+
+        return True
+
     @classmethod
     def create_default_exploration(
             cls, exploration_id, title, category,

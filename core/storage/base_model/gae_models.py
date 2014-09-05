@@ -24,6 +24,7 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
+import datetime
 
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
@@ -83,9 +84,13 @@ class BaseModel(ndb.Model):
         super(BaseModel, self).put()
 
     @classmethod
-    def get_multi(cls, entity_ids):
+    def get_multi(cls, entity_ids, strict=False):
         entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
-        return ndb.get_multi(entity_keys)
+        entities = ndb.get_multi(entity_keys)
+        for i in xrange(len(entities)):
+            if entities[i] and entities[i].deleted:
+                entities[i] = None
+        return entities
 
     @classmethod
     def put_multi(cls, entities):
