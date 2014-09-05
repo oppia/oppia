@@ -321,6 +321,15 @@ download_and_unzip_files(
 
 
 # Download all the tar files.
+
+GAE_MAPREDUCE_REV = '1.9.0.0'
+GAE_MAPREDUCE_ROOT_NAME = 'gae-mapreduce-%s' % GAE_MAPREDUCE_REV
+GAE_MAPREDUCE_TAR_URL = (
+    'https://pypi.python.org/packages/source/G/GoogleAppEngineMapReduce/'
+    'GoogleAppEngineMapReduce-%s.tar.gz' % GAE_MAPREDUCE_REV)
+GAE_MAPREDUCE_TAR_ROOT_NAME = 'GoogleAppEngineMapReduce-%s' % GAE_MAPREDUCE_REV
+GAE_MAPREDUCE_TARGET_ROOT_NAME = GAE_MAPREDUCE_ROOT_NAME
+
 GAE_CLOUD_STORAGE_REV = '1.9.0.0'
 GAE_CLOUD_STORAGE_ROOT_NAME = 'gae-cloud-storage-%s' % GAE_CLOUD_STORAGE_REV
 GAE_CLOUD_STORAGE_TAR_URL = (
@@ -328,17 +337,17 @@ GAE_CLOUD_STORAGE_TAR_URL = (
     'GoogleAppEngineCloudStorageClient/'
     'GoogleAppEngineCloudStorageClient-%s.tar.gz' % GAE_CLOUD_STORAGE_REV)
 GAE_CLOUD_STORAGE_TAR_ROOT_NAME = (
-    'GoogleAppEngineCloudStorageClient-%s' % GAE_CLOUD_STORAGE_REV)
+    'GoogleAppEngineCloudStorageClient-%s' % GAE_MAPREDUCE_REV)
 GAE_CLOUD_STORAGE_TARGET_ROOT_NAME = GAE_CLOUD_STORAGE_ROOT_NAME
 
+
+download_and_untar_files(
+    GAE_MAPREDUCE_TAR_URL, THIRD_PARTY_DIR,
+    GAE_MAPREDUCE_TAR_ROOT_NAME, GAE_MAPREDUCE_TARGET_ROOT_NAME)
 download_and_untar_files(
     GAE_CLOUD_STORAGE_TAR_URL, THIRD_PARTY_DIR,
     GAE_CLOUD_STORAGE_TAR_ROOT_NAME, GAE_CLOUD_STORAGE_TARGET_ROOT_NAME)
 
-
-# Deal with special cases.
-
-# Special case 1: Download and patch MIDI.js.
 MIDI_JS_REV = '09335aa7078be606f6d2389a3defb6d616db9ff7'
 MIDI_JS_ZIP_URL = (
     'https://github.com/mudcube/MIDI.js/archive/%s.zip' % MIDI_JS_REV)
@@ -359,27 +368,3 @@ if not os.path.exists(
     # Apply the patch.
     subprocess.check_call(
         ['git', 'apply', os.path.join('scripts', 'data', 'MIDI.js.patch')])
-
-
-# Special case 2: Download and patch gae-mapreduce.
-GAE_MAPREDUCE_REV = '1.9.0.0'
-GAE_MAPREDUCE_ROOT_NAME = 'gae-mapreduce-%s' % GAE_MAPREDUCE_REV
-GAE_MAPREDUCE_TAR_URL = (
-    'https://pypi.python.org/packages/source/G/GoogleAppEngineMapReduce/'
-    'GoogleAppEngineMapReduce-%s.tar.gz' % GAE_MAPREDUCE_REV)
-GAE_MAPREDUCE_TAR_ROOT_NAME = 'GoogleAppEngineMapReduce-%s' % GAE_MAPREDUCE_REV
-GAE_MAPREDUCE_TARGET_ROOT_NAME = GAE_MAPREDUCE_ROOT_NAME
-GAE_MAPREDUCE_PATCH_ROOT_NAME = '%s-patched' % GAE_MAPREDUCE_ROOT_NAME
-
-download_and_untar_files(
-    GAE_MAPREDUCE_TAR_URL, THIRD_PARTY_DIR,
-    GAE_MAPREDUCE_TAR_ROOT_NAME, GAE_MAPREDUCE_TARGET_ROOT_NAME)
-
-if not os.path.exists(
-    os.path.join(THIRD_PARTY_DIR, GAE_MAPREDUCE_PATCH_ROOT_NAME)):
-    shutil.copytree(
-        os.path.join(THIRD_PARTY_DIR, GAE_MAPREDUCE_TARGET_ROOT_NAME),
-        os.path.join(THIRD_PARTY_DIR, GAE_MAPREDUCE_PATCH_ROOT_NAME))
-    # Apply the patch.
-    subprocess.check_call(
-        ['git', 'apply', os.path.join('scripts', 'data', 'gae-mapreduce.patch')])

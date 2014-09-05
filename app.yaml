@@ -74,7 +74,7 @@ handlers:
   http_headers:
     Cache-Control: 'no-cache'
 - url: /mapreduce/pipeline/images
-  static_dir: third_party/gae-mapreduce-1.9.0.0-patched/mapreduce/lib/pipeline/ui/images
+  static_dir: third_party/gae-mapreduce-1.9.0.0/mapreduce/lib/pipeline/ui/images
   secure: always
 - url: /mapreduce(/.*)?
   script: mapreduce.main.APP
