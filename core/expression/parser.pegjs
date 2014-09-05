@@ -12,8 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This grammar is a small subset of JavaScript and based on the example
-// JavaScript grammar that comes with PEGJS.
+// This file is based on the example JavaScript grammar that comes with PEGJS.
+//
+// Grammar spec:
+// This is a small subset of JavaScript.
 // - Only the expression grammar is included.
 // - No newliens or comments (but whitespaces are fine).
 // - No assignment operators (including increment and decrement).
@@ -21,13 +23,22 @@
 // - No Array and Object type (literals as well as look up).
 // - No bit-wise operators.
 //
-// The resulting parse tree is made of polish notation where each node is an
-// array and the first element is the operator name, and the rest are the
-// arguments of the operator.
+// Parser output:
+// The parse tree is made of arrays and JavaScript's primitives, i.e. booleans,
+// numbers, strings, and nulls (but not undefineds).
+// Each node of the tree is an array, representing the operation performed for
+// that node. The first element of the array is the operator, and the rest
+// are the parameters for that operator (i.e. polish notation).
+// Most operators have the same textural name as in the corresponding input
+// grammar, e.g. logical or operator is "||". This is the same for function
+// calls, e.g. "abs(-30)" will be represented as ["abs", -30].
 // "#" is a special operator for parameter value look up (with one argument
 // which is the parameter name).
 // The difference of unary and binary '+' and '-' need to be infered by the
 // number of arguments.
+// The first element of the array can contain a string which should be an
+// existing operator name, or an operator itself. I.e. both ["abs", -30] and
+// [["#", "abs"], -30] are valid representation of "abs(-30)".
 
 start
   = __ expression:Expression __ { return expression; }

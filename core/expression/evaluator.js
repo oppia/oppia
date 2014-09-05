@@ -1,3 +1,34 @@
+// Copyright 2014 The Oppia Authors. All Rights Reserved.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS-IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+// This file defiens the evaluation engine as well as the system operators.
+//
+// Defining new operators:
+// Operatos are given an array of arguments which are already all evaluated.
+// The operators should verify the argument array has the required number of
+// arguments. Operators should coarse the input arguments to the desired
+// typed values, and never error on the wrong type of inputs. This does not
+// prevent operators to eror on wrong parameter values (e.g. getting negative
+// number for an index).
+// When successful, operators should return any valid Javascript value. In
+// general, one operator should always return a same type of values, but there
+// may be exceptions (e.g. "+" operator may return a number or a string
+// depending on the types of the input arguments).
+// Constraints on the input arguments (number, types, and any other
+// constraints) as well as the ouput value and type should be documented.
+
+
 // TODO: Wrap this in a angular service.
 
 var evaluate = function(parsed, envs) {
