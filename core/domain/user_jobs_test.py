@@ -352,6 +352,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
 class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     """Tests for the one-off dashboard subscriptions job."""
     EXP_ID = 'exp_id'
+    EXP_ID_2 = 'exp_id_2'
     USER_A_EMAIL = 'a@example.com'
     USER_A_USERNAME = 'a'
     USER_B_EMAIL = 'b@example.com'
@@ -388,6 +389,17 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 subscription_services, 'subscribe_to_activity', self._null_fn):
             # User A creates and saves a new valid exploration.
             self.save_new_valid_exploration(self.EXP_ID, self.user_a_id)
+
+    def test_null_case(self):
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        self.assertEqual(user_b_subscriptions_model, None)
+
+        self._run_one_off_job()
+
+        user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_b_id, strict=False)
+        self.assertEqual(user_b_subscriptions_model, None)
 
     def test_feedback_thread_subscription(self):
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
@@ -435,19 +447,44 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
             rights_manager.assign_role(
                 self.user_a_id, self.EXP_ID, self.user_b_id,
                 rights_manager.ROLE_EDITOR)
+            # User A adds user C as a viewer of the exploration.
+            rights_manager.assign_role(
+                self.user_a_id, self.EXP_ID, self.user_c_id,
+                rights_manager.ROLE_VIEWER)
 
         self._run_one_off_job()
-        
-        # Both users are subscribed to the exploration.
+
+        # Users A and B are subscribed to the exploration. User C is not.
         user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_a_id)
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_b_id)
+        user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_c_id, strict=False)
 
         self.assertEqual(user_a_subscriptions_model.activity_ids, [self.EXP_ID])
         self.assertEqual(user_b_subscriptions_model.activity_ids, [self.EXP_ID])
         self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
+        self.assertEqual(user_c_subscriptions_model, None)
+
+    def test_two_explorations(self):
+        with self.swap(
+                subscription_services, 'subscribe_to_thread', self._null_fn
+            ), self.swap(
+                subscription_services, 'subscribe_to_activity', self._null_fn):
+            # User A creates and saves another valid exploration.
+            self.save_new_valid_exploration(self.EXP_ID_2, self.user_a_id)
+
+        self._run_one_off_job()
+
+        # User A is subscribed to two explorations.
+        user_a_subscriptions_model = user_models.UserSubscriptionsModel.get(
+            self.user_a_id)
+
+        self.assertEqual(
+            sorted(user_a_subscriptions_model.activity_ids),
+            sorted([self.EXP_ID, self.EXP_ID_2]))
 
     def test_community_owned_exploration(self):
         with self.swap(
