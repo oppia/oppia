@@ -81,13 +81,13 @@ if ( nc -vz localhost 8181 >/dev/null 2>&1 ); then
 fi
 
 # Launch a browser window.
-if [ -f "/opt/google/chrome/chrome" ]; then
+if [ -f "/usr/bin/google-chrome" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
   echo "  Chrome browser window pointing to this server."
   echo ""
-  (sleep 5; /opt/google/chrome/chrome http://localhost:8181/ )&
+  (sleep 5; /usr/bin/google-chrome http://localhost:8181/ )&
 elif [ -e /Applications/Google\ Chrome.app ]; then
   echo ""
   echo "  INFORMATION"
