@@ -18,6 +18,7 @@ import ast
 
 from core import jobs
 from core.domain import feedback_services
+from core.domain import subscription_services
 from core.platform import models
 (exp_models, feedback_models, user_models) = models.Registry.import_models([
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user])
@@ -142,3 +143,67 @@ class RecentUpdatesMRJobManager(
 
         user_models.UserRecentChangesBatchModel(
             id=key, output=sorted_values[: DEFAULT_QUERY_LIMIT]).put()
+
+
+class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):
+    """One-off job for subscribing users to explorations and feedback
+    threads.
+    """
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            exp_models.ExplorationRightsModel,
+            feedback_models.FeedbackMessageModel,
+        ]
+
+    @staticmethod
+    def map(item):
+        if isinstance(item, feedback_models.FeedbackMessageModel):
+            if item.author_id:
+                yield (item.author_id, {
+                    'type': 'feedback',
+                    'id': item.thread_id
+                })
+        elif isinstance(item, exp_models.ExplorationRightsModel):
+            if item.deleted:
+                return
+
+            if not item.community_owned:
+                for owner_id in item.owner_ids:
+                    yield (owner_id, {
+                        'type': 'exploration',
+                        'id': item.id
+                    })
+                for editor_id in item.editor_ids:
+                    yield (editor_id, {
+                        'type': 'exploration',
+                        'id': item.id
+                    })
+            else:
+                # Go through the history.
+                current_version = item.version
+                for version in range(1, current_version + 1):
+                    model = exp_models.ExplorationRightsModel.get_version(
+                        item.id, version)
+
+                    if not model.community_owned:
+                        for owner_id in model.owner_ids:
+                            yield (owner_id, {
+                                'type': 'exploration',
+                                'id': item.id
+                            })
+                        for editor_id in model.editor_ids:
+                            yield (editor_id, {
+                                'type': 'exploration',
+                                'id': item.id
+                            })
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        values = [ast.literal_eval(v) for v in stringified_values]
+        for item in values:
+            if item['type'] == 'feedback':
+                subscription_services.subscribe_to_thread(key, item['id'])
+            elif item['type'] == 'exploration':
+                subscription_services.subscribe_to_activity(key, item['id'])
