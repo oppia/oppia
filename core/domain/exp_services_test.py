@@ -17,8 +17,7 @@
 __author__ = 'Sean Lip'
 
 import datetime
-import functools
-import os
+    import os
 import StringIO
 import zipfile
 
