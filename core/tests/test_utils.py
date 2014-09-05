@@ -235,6 +235,12 @@ class TestBase(unittest.TestCase):
         with self.swap(math, "sqrt", lambda x: 42):
             print math.sqrt(16.0) # prints 42
         print math.sqrt(16.0) # prints 4 as expected.
+
+        NOTE: self.swap and other context managers that are created using
+        contextlib.contextmanager use generators that yield exactly once. This
+        means that you can only use them once after construction, otherwise, the
+        generator will immediately raise StopIteration, and contextlib will raise
+        a RuntimeError.
         """
         original = getattr(obj, attr)
         setattr(obj, attr, newvalue)

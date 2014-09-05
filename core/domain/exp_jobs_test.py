@@ -20,6 +20,7 @@ from core import jobs
 from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import exp_domain
+from core.domain import rights_manager
 from core.platform import models
 (exp_models) = models.Registry.import_models([models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
@@ -39,6 +40,7 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
 
         for exp in explorations:
             exp_services.save_new_exploration('owner_id', exp)
+            rights_manager.publish_exploration('owner_id', exp.id)
 
         self.process_and_flush_pending_tasks()
 

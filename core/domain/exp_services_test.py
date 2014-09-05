@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 import datetime
+import functools
 import os
 import StringIO
 import zipfile
@@ -1714,7 +1715,7 @@ class SearchTests(ExplorationServicesUnitTests):
                 all_exp_titles[i])
 
         # We're only publishing the first 4 explorations, so we're not expecting
-        # The last exploration to be indexed.
+        # the last exploration to be indexed.
         for i in xrange(4):
             rights_manager.publish_exploration(
                 self.OWNER_ID,
@@ -1749,7 +1750,7 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_update_exploration_status_in_search(self):
+    def test_update_public_exploration_status_in_search(self):
 
         def mock_get_doc(doc_id, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
@@ -1760,47 +1761,50 @@ class SearchTests(ExplorationServicesUnitTests):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
             self.assertEqual(docs, [{'is': 'beta'}])
 
-        def mock_delete_docs(ids, index):
-            self.assertEqual(ids, [self.EXP_ID])
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-
-        public_rights = rights_manager.ExplorationRights(
-            self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-            status=rights_manager.EXPLORATION_STATUS_PUBLIC
-        )
-
-        private_rights = rights_manager.ExplorationRights(
-            self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-            status=rights_manager.EXPLORATION_STATUS_PRIVATE
-        )
-
-        rights_object = public_rights
-
         def mock_get_rights(exp_id):
-            return rights_object
+            return rights_manager.ExplorationRights(
+                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                status=rights_manager.EXPLORATION_STATUS_PUBLIC
+            )
 
         get_doc_counter = test_utils.CallCounter(mock_get_doc)
         add_docs_counter = test_utils.CallCounter(mock_add_docs)
-        delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
 
         get_doc_swap = self.swap(
             search_services, 'get_document_from_index', get_doc_counter)
         add_docs_swap = self.swap(
             search_services, 'add_documents_to_index', add_docs_counter)
+        get_rights_swap = self.swap(
+            rights_manager, 'get_exploration_rights', mock_get_rights)
+
+        with get_doc_swap, add_docs_swap, get_rights_swap:
+            exp_services.update_exploration_status_in_search(self.EXP_ID)
+
+        self.assertEqual(get_doc_counter.times_called, 1)
+        self.assertEqual(add_docs_counter.times_called, 1)
+
+    def test_update_private_exploration_status_in_search(self):
+
+        def mock_delete_docs(ids, index):
+            self.assertEqual(ids, [self.EXP_ID])
+            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
+
+        def mock_get_rights(exp_id):
+            return rights_manager.ExplorationRights(
+                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                status=rights_manager.EXPLORATION_STATUS_PRIVATE
+            )
+
+        delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
+
         delete_docs_swap = self.swap(
             search_services, 'delete_documents_from_index', delete_docs_counter)
         get_rights_swap = self.swap(
             rights_manager, 'get_exploration_rights', mock_get_rights)
 
-
-        with get_doc_swap, add_docs_swap, get_rights_swap, delete_docs_swap:
-            exp_services.update_exploration_status_in_search(self.EXP_ID)
-            # Test that explorations are deleted from the index when they're unpublished
-            rights_object = private_rights
+        with get_rights_swap, delete_docs_swap:
             exp_services.update_exploration_status_in_search(self.EXP_ID)
 
-        self.assertEqual(get_doc_counter.times_called, 1)
-        self.assertEqual(add_docs_counter.times_called, 1)
         self.assertEqual(delete_docs_counter.times_called, 1)
 
     def test_search_explorations(self):

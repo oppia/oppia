@@ -996,9 +996,11 @@ def _exp_rights_to_search_dict(rights):
 
     return doc
 
+
 def _should_index(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
     return rights.status != rights_manager.EXPLORATION_STATUS_PRIVATE
+
 
 def _exp_to_search_dict(exp):
     rights = rights_manager.get_exploration_rights(exp.id)
@@ -1084,5 +1086,5 @@ def search_explorations(
 # Temporary event handlers
 
 def _handle_exp_change_event(exp_id):
-        """Indexes the changed exploration."""
-        index_explorations_given_ids([exp_id])
+    """Indexes the changed exploration."""
+    index_explorations_given_ids([exp_id])
