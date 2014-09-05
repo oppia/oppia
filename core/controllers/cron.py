@@ -21,17 +21,18 @@ email_services = models.Registry.import_email_services()
 import feconf
 
 
-class JobFailureMailerHandler(base.BaseHandler):
+class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
 
     def get(self):
         """Handles GET requests."""
-        NINETY_MINUTES_IN_MSECS = 90 * 60 * 1000
+        TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
 
-        failed_jobs = jobs.get_stuck_jobs(NINETY_MINUTES_IN_MSECS)
+        failed_jobs = jobs.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
         if failed_jobs:
+            email_subject = 'MapReduce failure alert'
             email_message = (
-                'Some jobs have failed in the past 90 minutes. '
+                'Some jobs have failed in the past 25 hours. '
                 'More information:')
 
             for job in failed_jobs:
@@ -51,7 +52,9 @@ class JobFailureMailerHandler(base.BaseHandler):
                     job.retries, job.slice_retries, job.update_time,
                     job.last_work_item
                 )
+        else:
+            email_subject = 'MapReduce status report'
+            email_message = 'All MapReduce jobs are running fine.'
 
-            email_services.send_mail_to_admin(
-                feconf.ADMIN_EMAIL_ADDRESS, 'MapReduce failure alert',
-                email_message)
+        email_services.send_mail_to_admin(
+            feconf.ADMIN_EMAIL_ADDRESS, email_subject, email_message)

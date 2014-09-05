@@ -29,8 +29,8 @@ import webapp2
 # Register the URLs with the classes responsible for handling them.
 urls = [
     main.get_redirect_route(
-    	r'/cron/mail/admin/job_failure', cron.JobFailureMailerHandler,
-    	'job_failure_mailer'),
+        r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler,
+        'job_failure_mailer'),
 ]
 
 
