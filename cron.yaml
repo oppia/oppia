@@ -1,1 +1,4 @@
 cron:
+- description: email admin about job failures
+  url: /mail/admin/job_failure
+  schedule: every 1 hours
