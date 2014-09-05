@@ -360,9 +360,11 @@ download_and_unzip_files(
     MIDI_JS_ZIP_ROOT_NAME, MIDI_JS_TARGET_ROOT_NAME)
 
 # Copy Midi files to new directory and add patch for updated chrome api.
-if not os.path.exists(os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME)):
+if not os.path.exists(
+    os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME)):
     shutil.copytree(
         os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_TARGET_ROOT_NAME),
         os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME))
     # Apply the patch.
-    subprocess.check_call(['git', 'apply', os.path.join('scripts', 'data', 'MIDI.js.patch')])
+    subprocess.check_call(
+        ['git', 'apply', os.path.join('scripts', 'data', 'MIDI.js.patch')])
