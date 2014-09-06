@@ -97,7 +97,8 @@ class RecentUpdatesMRJobManager(
 
         # TODO(sll): Rewrite this to deal with the multiple cases once we
         # have adventures.
-        activities = exp_models.ExplorationModel.get_multi(activity_ids_list)
+        activities = exp_models.ExplorationModel.get_multi(
+            activity_ids_list, include_deleted=True)
         for activity in activities:
             last_commit = (
                 exp_models.ExplorationCommitLogEntryModel.get_commit(

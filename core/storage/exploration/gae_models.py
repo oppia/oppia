@@ -87,9 +87,9 @@ class ExplorationModel(base_models.VersionedModel):
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
 
     @classmethod
-    def get_multi(cls, exp_ids):
+    def get_multi(cls, exp_ids, include_deleted=False):
         """Returns a list of exploration models, given a list of ids."""
-        return super(ExplorationModel, cls).get_multi(exp_ids)
+        return super(ExplorationModel, cls).get_multi(exp_ids, include_deleted)
 
     @classmethod
     def get_exploration_count(cls):
