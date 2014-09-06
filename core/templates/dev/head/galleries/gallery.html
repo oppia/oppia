@@ -49,7 +49,7 @@
       </div>
 
       <div class="row">
-        <div class="col-lg-3 col-md-3 col-sm-3 oppia-gallery-sidebar oppia-light-border-right" ng-class="{'col-xs-1': !gallerySidebarIsActive, 'col-xs-6': gallerySidebarIsActive}">
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-1 oppia-gallery-sidebar oppia-light-border-right" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
           <div class="visible-xs">
             <div ng-if="!gallerySidebarIsActive">
               <button ng-click="toggleGallerySidebar()" class="pull-right">
@@ -101,7 +101,7 @@
           </div>
         </div>
 
-        <div class="col-lg-8 col-md-8 col-sm-8" ng-class="{'col-xs-10': !gallerySidebarIsActive, 'col-xs-5': gallerySidebarIsActive}">
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
           <div class="tab-content oppia-gallery-tiles-container">
             <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguageCodes:'language_code' | selectedCategoriesFilter:selectedStatuses:'status').length === 0">
               <em>No explorations selected.</em>

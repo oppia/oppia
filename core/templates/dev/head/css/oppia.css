@@ -343,15 +343,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-right: 1px solid #bbb;
 }
 
-.oppia-gallery-menu {
-  float: left;
-  min-height: 600px;
-  padding: 0 15px 0 15px;
-  width: 150px;
-}
-
 /* Gallery sidebar menu for small screens. Includes animation. */
 .oppia-gallery-sidebar {
+  float: left;
   height: 100%;
   min-height: 700px;
   -moz-transition: all 0.5s;
@@ -359,18 +353,37 @@ div.wysiwyg iframe.wysiwyg-content-large {
   -o-transition: all 0.5s;
   transition: all 0.5s;
 }
+.oppia-gallery-sidebar.oppia-gallery-sidebar-active {
+  width: 50%;
+  max-width: 170px;
+}
 
+.oppia-gallery-main {
+  float: left;
+  -moz-transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.oppia-gallery-main.oppia-gallery-sidebar-active {
+  width: 45%;
+}
+
+.oppia-gallery-menu {
+  float: left;
+  min-height: 600px;
+  padding: 0 15px 0 15px;
+  width: 150px;
+}
 .oppia-gallery-menu.ng-enter {
   opacity: 0;
-}
-.oppia-gallery-menu.ng-enter.ng-enter-active {
-  opacity: 1;
-}
-.oppia-gallery-menu.ng-enter {
   -moz-transition: all 0.2s linear 0.2s;
   -webkit-transition: all 0.2s linear 0.2s;
   -o-transition: all 0.2s linear 0.2s;
   transition: all 0.2s linear 0.2s;
+}
+.oppia-gallery-menu.ng-enter.ng-enter-active {
+  opacity: 1;
 }
 
 .oppia-gallery-tiles-container {
