@@ -27,15 +27,18 @@ class JobStatusMailerHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
+        MAX_JOBS_TO_REPORT_ON = 50
 
+        # TODO(sll): Get the 50 most recent failed shards, not all of them.
         failed_jobs = jobs.get_stuck_jobs(TWENTY_FIVE_HOURS_IN_MSECS)
         if failed_jobs:
             email_subject = 'MapReduce failure alert'
             email_message = (
-                'Some jobs have failed in the past 25 hours. '
-                'More information:')
+                '%s jobs have failed in the past 25 hours. More information '
+                '(about at most %s jobs; to see more, please check the logs):'
+            ) % len(failed_jobs, MAX_JOBS_TO_REPORT_ON)
 
-            for job in failed_jobs:
+            for job in failed_jobs[:MAX_JOBS_TO_REPORT_ON]:
                 email_message += '\n'
                 email_message += '-----------------------------------'
                 email_message += '\n'

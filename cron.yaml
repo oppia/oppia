@@ -1,4 +1,4 @@
 cron:
 - description: daily email about mapreduce job statuses
-  url: /mail/admin/job_status
+  url: /cron/mail/admin/job_status
   schedule: every day 16:00
