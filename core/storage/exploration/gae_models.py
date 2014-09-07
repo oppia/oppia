@@ -89,7 +89,8 @@ class ExplorationModel(base_models.VersionedModel):
     @classmethod
     def get_multi(cls, exp_ids, include_deleted=False):
         """Returns a list of exploration models, given a list of ids."""
-        return super(ExplorationModel, cls).get_multi(exp_ids, include_deleted)
+        return super(ExplorationModel, cls).get_multi(
+            exp_ids, include_deleted=include_deleted)
 
     @classmethod
     def get_exploration_count(cls):
