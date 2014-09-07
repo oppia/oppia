@@ -50,8 +50,9 @@ oppia.controller('Dashboard', [
     'Statistics'
   ];
 
-  $scope.getLocaleStringForDatetime = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getLocaleString(millisSinceEpoch);
+  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch);
   };
 
   $scope.dashboardDataUrl = '/dashboardhandler/data';

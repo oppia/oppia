@@ -166,10 +166,6 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
       var date = new Date(millisSinceEpoch);
       return date.toUTCString();
     },
-    getLocaleString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toLocaleString();
-    },
     // Returns just the time if the local datetime representation has the
     // same date as the current date. Otherwise, returns just the date.
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
