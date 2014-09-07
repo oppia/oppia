@@ -359,16 +359,3 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_commits_by_exp_id(
-            cls, exploration_id, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.exploration_id == exploration_id),
-            page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_commits_by_user_id(
-            cls, user_id, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.user_id == user_id), page_size, urlsafe_start_cursor)
