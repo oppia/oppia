@@ -15,6 +15,7 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
+import logging
 
 from core import jobs
 from core.domain import feedback_services
@@ -98,7 +99,12 @@ class RecentUpdatesMRJobManager(
         activities = exp_models.ExplorationModel.get_multi(
             activity_ids_list, include_deleted=True)
 
-        for activity in activities:
+        for ind, activity in enumerate(activities):
+            if activity is None:
+                logging.error(
+                    'Could not find activity %s' % activity_ids_list[ind])
+                continue
+
             metadata_obj = exp_models.ExplorationModel.get_snapshots_metadata(
                 activity.id, [activity.version], allow_deleted=True)[0]
             yield (user_id, {
