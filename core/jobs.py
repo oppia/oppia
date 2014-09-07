@@ -37,6 +37,7 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
+from mapreduce import model as mapreduce_model
 from mapreduce.lib.pipeline import pipeline
 from mapreduce import util as mapreduce_util
 
@@ -1085,6 +1086,26 @@ def get_continuous_computations_info(cc_classes):
         result.append(cc_dict)
 
     return result
+
+
+def get_stuck_jobs(recency_msecs):
+    """Returns a list of jobs which were last updated at most recency_msecs
+    milliseconds ago and have experienced more than one retry."""
+    threshold_time = (
+        datetime.datetime.utcnow() -
+        datetime.timedelta(0, 0, 0, recency_msecs))
+    shard_state_model_class = mapreduce_model.ShardState
+
+    # TODO(sll): Clean up old jobs so that this query does not have to iterate
+    # over so many elements in a full table scan.
+    recent_job_models = shard_state_model_class.all()
+
+    stuck_jobs = []
+    for job_model in recent_job_models:
+        if job_model.update_time > threshold_time and job_model.retries > 0:
+            stuck_jobs.append(job_model)
+
+    return stuck_jobs
 
 
 ABSTRACT_BASE_CLASSES = frozenset([
