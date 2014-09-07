@@ -1328,7 +1328,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         'commit_type': 'delete',
         'post_commit_community_owned': False,
         'post_commit_is_private': True,
-        'commit_message': 'Exploration deleted.',
+        'commit_message': feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         'post_commit_status': 'private'
     }
 

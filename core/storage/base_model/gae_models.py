@@ -382,14 +382,19 @@ class VersionedModel(BaseModel):
             return cls.get_version(entity_id, version)
 
     @classmethod
-    def get_snapshots_metadata(cls, model_instance_id, version_numbers):
+    def get_snapshots_metadata(
+            cls, model_instance_id, version_numbers, allow_deleted=False):
         """Returns a list of dicts, each representing a model snapshot.
 
         One dict is returned for each version number in the list of version
         numbers requested. If any of the version numbers does not exist, an
         error is raised.
+
+        If `allow_deleted` is False, an error is raised if the current model
+        has been deleted.
         """
-        cls.get(model_instance_id)._require_not_marked_deleted()
+        if not allow_deleted:
+            cls.get(model_instance_id)._require_not_marked_deleted()
 
         snapshot_ids = [
             cls._get_snapshot_id(model_instance_id, version_number)
