@@ -27,6 +27,7 @@ from core.domain import subscription_services
 from core.domain import user_jobs
 from core.platform import models
 (user_models,) = models.Registry.import_models([models.NAMES.user])
+taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
 import feconf
 import utils
@@ -93,7 +94,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
 
             ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
             self.process_and_flush_pending_tasks()
 
             self.assertEqual(
@@ -120,7 +124,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 exp_services.get_exploration_by_id(EXP_ID).last_updated)
 
             ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
             self.process_and_flush_pending_tasks()
 
             recent_updates = (
@@ -149,7 +156,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             exp_services.delete_exploration(USER_ID, EXP_ID)
 
             ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
             self.process_and_flush_pending_tasks()
 
             recent_updates = (
@@ -203,7 +213,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 exp_services.get_exploration_by_id(EXP_2_ID).last_updated)
 
             ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
             self.process_and_flush_pending_tasks()
 
             recent_updates = (
@@ -254,7 +267,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             message = feedback_services.get_messages(thread_id)[0]
 
             ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
@@ -318,7 +334,10 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 user_a_id, EXP_ID, user_b_id, rights_manager.ROLE_EDITOR)
 
             ModifiedRecentUpdatesAggregator.start_computation()
-            self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+            self.assertEqual(
+                self.count_jobs_in_taskqueue(
+                    queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+                1)
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
@@ -364,7 +383,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         """Runs the one-off MapReduce job."""
         job_id = user_jobs.DashboardSubscriptionsOneOffJob.create_new()
         user_jobs.DashboardSubscriptionsOneOffJob.enqueue(job_id)
-        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(
+            self.count_jobs_in_taskqueue(
+                queue_name=taskqueue_services.QUEUE_NAME_DEFAULT),
+            1)
         self.process_and_flush_pending_tasks()
 
     def _null_fn(self, *args, **kwargs):

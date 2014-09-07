@@ -84,12 +84,19 @@ class BaseModel(ndb.Model):
         super(BaseModel, self).put()
 
     @classmethod
-    def get_multi(cls, entity_ids, strict=False):
+    def get_multi(cls, entity_ids, include_deleted=False):
+        """Returns a list, each entry of which is the instance model
+        corresponding to the entity_id, except for the following two cases (in
+        which the corresponding entry is None instead):
+          - the instance is not found
+          - the instance has been deleted, and `include_deleted` is True.
+        """
         entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
         entities = ndb.get_multi(entity_keys)
-        for i in xrange(len(entities)):
-            if entities[i] and entities[i].deleted:
-                entities[i] = None
+        if not include_deleted:
+            for i in xrange(len(entities)):
+                if entities[i] and entities[i].deleted:
+                    entities[i] = None
         return entities
 
     @classmethod
