@@ -45,8 +45,8 @@ oppia.directive('oppiaInteractiveCodeRepl', [
           editor.setOption('lineNumbers', true);
           editor.setOption('indentWithTabs', true);
 
-          // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
-          // 'scheme' have CodeMirror-supported syntax highlighting. For other
+          // Note that only 'coffeescript', 'javascript', 'python', and 'ruby'
+          // have CodeMirror-supported syntax highlighting. For other
           // languages, syntax highlighting will not happen.
           editor.setOption('mode', $scope.language);
 
