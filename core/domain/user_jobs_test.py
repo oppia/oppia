@@ -173,7 +173,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
                 'author_id': USER_ID,
-                'subject': 'Exploration deleted.',
+                'subject': feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
             }, recent_updates[0])
             self.assertLess(
                 last_updated_ms_before_deletion,

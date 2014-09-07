@@ -119,7 +119,9 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
-# Ensure that ADMIN_EMAIL_ADDRESS is valid before setting this to True.
+# Ensure that ADMIN_EMAIL_ADDRESS is valid and corresponds to an owner of the
+# app before setting this to True. If ADMIN_EMAIL_ADDRESS is not that of an
+# app owner, email messages from this user cannot be sent.
 CAN_SEND_EMAILS_TO_ADMIN = False
 
 # The maximum size of an uploaded file, in bytes.
@@ -272,6 +274,9 @@ EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 # Play type constants
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
+
+# Predefined commit messages.
+COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
 
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False

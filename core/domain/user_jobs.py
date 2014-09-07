@@ -15,6 +15,7 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
+import logging
 
 from core import jobs
 from core.domain import feedback_services
@@ -95,30 +96,37 @@ class RecentUpdatesMRJobManager(
         activity_ids_list = item.activity_ids
         feedback_thread_ids_list = item.feedback_thread_ids
 
-        # TODO(sll): Rewrite this to deal with the multiple cases once we
-        # have adventures.
         activities = exp_models.ExplorationModel.get_multi(
             activity_ids_list, include_deleted=True)
-        for activity in activities:
-            last_commit = (
-                exp_models.ExplorationCommitLogEntryModel.get_commit(
-                    activity.id, activity.version))
+
+        for ind, activity in enumerate(activities):
+            if activity is None:
+                logging.error(
+                    'Could not find activity %s' % activity_ids_list[ind])
+                continue
+
+            metadata_obj = exp_models.ExplorationModel.get_snapshots_metadata(
+                activity.id, [activity.version], allow_deleted=True)[0]
             yield (user_id, {
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'activity_id': activity.id,
                 'activity_title': activity.title,
+                'author_id': metadata_obj['committer_id'],
                 'last_updated_ms': utils.get_time_in_millisecs(
                     activity.last_updated),
-                'author_id': last_commit.user_id,
-                'subject': last_commit.commit_message,
+                'subject': (
+                    feconf.COMMIT_MESSAGE_EXPLORATION_DELETED
+                    if activity.deleted else metadata_obj['commit_message']
+                ),
             })
 
             # If the user subscribes to this activity, he/she is automatically
             # subscribed to all feedback threads for this activity.
-            threads = feedback_services.get_threadlist(activity.id)
-            for thread in threads:
-                if thread['thread_id'] not in feedback_thread_ids_list:
-                    feedback_thread_ids_list.append(thread['thread_id'])
+            if not activity.deleted:
+                threads = feedback_services.get_threadlist(activity.id)
+                for thread in threads:
+                    if thread['thread_id'] not in feedback_thread_ids_list:
+                        feedback_thread_ids_list.append(thread['thread_id'])
 
         for feedback_thread_id in feedback_thread_ids_list:
             last_message = (
@@ -130,9 +138,9 @@ class RecentUpdatesMRJobManager(
                 'activity_id': last_message.exploration_id,
                 'activity_title': exp_models.ExplorationModel.get_by_id(
                     last_message.exploration_id).title,
+                'author_id': last_message.author_id,
                 'last_updated_ms': utils.get_time_in_millisecs(
                     last_message.created_on),
-                'author_id': last_message.author_id,
                 'subject': last_message.get_thread_subject(),
             })
 

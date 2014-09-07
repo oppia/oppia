@@ -21,9 +21,22 @@ email_services = models.Registry.import_email_services()
 import feconf
 
 
+def require_cron(handler):
+    """Decorator to ensure that the handler is being called by cron."""
+    def _require_cron(self, *args, **kwargs):
+        if self.request.headers.get('X-AppEngine-Cron') is None:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        else:
+            return handler(self, *args, **kwargs)
+
+    return _require_cron
+
+
 class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
 
+    @require_cron
     def get(self):
         """Handles GET requests."""
         TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
@@ -36,7 +49,7 @@ class JobStatusMailerHandler(base.BaseHandler):
             email_message = (
                 '%s jobs have failed in the past 25 hours. More information '
                 '(about at most %s jobs; to see more, please check the logs):'
-            ) % len(failed_jobs, MAX_JOBS_TO_REPORT_ON)
+            ) % (len(failed_jobs), MAX_JOBS_TO_REPORT_ON)
 
             for job in failed_jobs[:MAX_JOBS_TO_REPORT_ON]:
                 email_message += '\n'

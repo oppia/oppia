@@ -157,7 +157,11 @@ with common.CD(RELEASE_DIR_PATH):
 
     # Run the tests; ensure there are no errors.
     print 'Running tests...'
-    subprocess.check_output(['python', 'scripts/backend_tests.py'])
+    test_output = subprocess.check_output([
+        'python', 'scripts/backend_tests.py'])
+
+    if 'All tests passed.' not in test_output:
+        raise Exception('Tests failed. Halting deployment.\n%s' % test_output)
 
     # Deploy to GAE.
     subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])

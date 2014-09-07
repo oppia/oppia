@@ -1328,7 +1328,7 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
         'commit_type': 'delete',
         'post_commit_community_owned': False,
         'post_commit_is_private': True,
-        'commit_message': 'Exploration deleted.',
+        'commit_message': feconf.COMMIT_MESSAGE_EXPLORATION_DELETED,
         'post_commit_status': 'private'
     }
 
@@ -1438,84 +1438,6 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
             self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[0])
 
         #TODO(frederikcreemers@gmail.com) test max_age here.
-
-    def test_get_commit_log_for_exploration_id(self):
-        all_commits = exp_services.get_next_page_of_all_commits_by_exp_id(
-            self.EXP_ID_1)[0]
-        self.assertEqual(len(all_commits), 5)
-        for ind, commit in enumerate(all_commits):
-            if ind != 0:
-                self.assertGreater(
-                    all_commits[ind - 1].last_updated,
-                    all_commits[ind].last_updated)
-
-        commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-2])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-3])
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-4])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-5])
-
-        all_commits = exp_services.get_next_page_of_all_commits_by_exp_id(
-            self.EXP_ID_2)[0]
-        self.assertEqual(len(all_commits), 3)
-        for ind, commit in enumerate(all_commits):
-            if ind != 0:
-                self.assertGreater(
-                    all_commits[ind - 1].last_updated,
-                    all_commits[ind].last_updated)
-
-        commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-1])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-2])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-3])
-
-    def test_get_commit_log_for_explorations_by_user(self):
-        all_commits = exp_services.get_next_page_of_all_commits_by_user_id(
-            self.ALBERT_ID)[0]
-        self.assertEqual(len(all_commits), 6)
-        for ind, commit in enumerate(all_commits):
-            if ind != 0:
-                self.assertGreater(
-                    all_commits[ind - 1].last_updated,
-                    all_commits[ind].last_updated)
-
-        commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_1, commit_dicts[-1])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_CREATE_EXP_2, commit_dicts[-2])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_1, commit_dicts[-3])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_EDIT_EXP_2, commit_dicts[-4])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_DELETE_EXP_1, commit_dicts[-5])
-        self.assertDictContainsSubset(
-            self.COMMIT_ALBERT_PUBLISH_EXP_2, commit_dicts[-6])
-
-        all_commits = exp_services.get_next_page_of_all_commits_by_user_id(
-            self.BOB_ID)[0]
-        self.assertEqual(len(all_commits), 2)
-        for ind, commit in enumerate(all_commits):
-            if ind != 0:
-                self.assertGreater(
-                    all_commits[ind - 1].created_on,
-                    all_commits[ind].created_on)
-
-        commit_dicts = [commit.to_dict() for commit in all_commits]
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_EDIT_EXP_1, commit_dicts[-1])
-        self.assertDictContainsSubset(
-            self.COMMIT_BOB_REVERT_EXP_1, commit_dicts[-2])
 
     def test_paging(self):
         all_commits, cursor, more = exp_services.get_next_page_of_all_commits(

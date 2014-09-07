@@ -87,12 +87,6 @@ class ExplorationModel(base_models.VersionedModel):
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
 
     @classmethod
-    def get_multi(cls, exp_ids, include_deleted=False):
-        """Returns a list of exploration models, given a list of ids."""
-        return super(ExplorationModel, cls).get_multi(
-            exp_ids, include_deleted=include_deleted)
-
-    @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
         return cls.get_all().count()
@@ -365,16 +359,3 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_commits_by_exp_id(
-            cls, exploration_id, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.exploration_id == exploration_id),
-            page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_commits_by_user_id(
-            cls, user_id, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.user_id == user_id), page_size, urlsafe_start_cursor)
