@@ -69,9 +69,9 @@ oppia.factory('oppiaPlayerService', [
   // URLs refer to $rootScope.explorationId.
   $rootScope.explorationId = explorationId;
 
+  var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
     '/explorehandler/init/' + explorationId + (version ? '?v=' + version : ''));
-  var version = GLOBALS.explorationVersion;
   var sessionId = null;
   var isLoggedIn = false;
 
