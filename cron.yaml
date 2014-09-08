@@ -2,3 +2,6 @@ cron:
 - description: daily email about mapreduce job statuses
   url: /cron/mail/admin/job_status
   schedule: every day 16:00
+- description: clean up old mapreduce jobs
+  url: /cron/jobs/cleanup
+  schedule: every day 08:00

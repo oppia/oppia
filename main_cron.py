@@ -31,6 +31,9 @@ urls = [
     main.get_redirect_route(
         r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler,
         'job_failure_mailer'),
+    main.get_redirect_route(
+        r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler,
+        'job_cleanup_handler'),
 ]
 
 
