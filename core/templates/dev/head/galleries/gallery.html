@@ -10,7 +10,13 @@
     <div class="oppia-main-content">
 
       <div class="row">
-        <div class="col-lg-10 col-md-10 col-sm-10">
+        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+          <h3 class="oppia-page-title">
+            Gallery
+          </h3>
+        </div>
+
+        <div class="col-lg-9 col-md-9 col-sm-9 hidden-xs">
           {% if not user_email %}
             <!-- User must log in. -->
             <span class="pull-right">
@@ -39,53 +45,63 @@
               {% endif %}
             </span>
           {% endif %}
-
-          <h3 class="oppia-page-title">
-            Gallery
-          </h3>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-lg-2 col-md-2 col-sm-2">
-          <div class="nav nav-tabs oppia-gallery-nav-tabs oppia-light-border-right">
-            <div class="oppia-gallery-menu">
-              <h4><strong>Status</strong></h4>
-              <ul class="nav nav-pills nav-stacked">
-                <li class="checkbox">
-                  <label>
-                    <input type="checkbox" ng-model="selectedStatuses.publicized">
-                    Released
-                  </label>
-                </li>
-                <li class="checkbox">
-                  <label>
-                    <input type="checkbox" ng-model="selectedStatuses.public">
-                    Beta
-                  </label>
-                </li>
-                {% if username %}
-                  <li class="checkbox">
-                    <label>
-                      <input type="checkbox" ng-model="selectedStatuses.private">
-                      Private
-                    </label>
-                  </li>
-                {% endif %}
-              </ul>
-
-              <h4><strong>Categories</strong></h4>
-              <checkbox-group all-categories-label="All categories" model="selectedCategories">
-              </checkbox-group>
-
-              <h4><strong>Languages</strong></h4>
-              <checkbox-group all-categories-label="All languages" model="selectedLanguageCodes">
-              </checkbox-group>
+        <div class="col-lg-3 col-md-3 col-sm-3 col-xs-1 oppia-gallery-sidebar oppia-light-border-right" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
+          <div class="visible-xs">
+            <div ng-if="!gallerySidebarIsActive">
+              <button ng-click="toggleGallerySidebar()" class="pull-right">
+                <span class="glyphicon glyphicon-chevron-right">
+                </span>
+              </button>
             </div>
+
+            <div ng-if="gallerySidebarIsActive">
+              <button ng-click="toggleGallerySidebar()" class="pull-right">
+                <span class="glyphicon glyphicon-chevron-left">
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <div class="oppia-gallery-menu" ng-if="gallerySidebarIsActive || screenIsLarge">
+            <h4><strong>Status</strong></h4>
+            <ul class="nav nav-pills nav-stacked">
+              <li class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="selectedStatuses.publicized">
+                  Released
+                </label>
+              </li>
+              <li class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="selectedStatuses.public">
+                  Beta
+                </label>
+              </li>
+              {% if username %}
+                <li class="checkbox">
+                  <label>
+                    <input type="checkbox" ng-model="selectedStatuses.private">
+                    Private
+                  </label>
+                </li>
+              {% endif %}
+            </ul>
+
+            <h4><strong>Categories</strong></h4>
+            <checkbox-group all-categories-label="All categories" model="selectedCategories">
+            </checkbox-group>
+
+            <h4><strong>Languages</strong></h4>
+            <checkbox-group all-categories-label="All languages" model="selectedLanguageCodes">
+            </checkbox-group>
           </div>
         </div>
 
-        <div class="col-lg-8 col-md-8 col-sm-8">
+        <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
           <div class="tab-content oppia-gallery-tiles-container">
             <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguageCodes:'language_code' | selectedCategoriesFilter:selectedStatuses:'status').length === 0">
               <em>No explorations selected.</em>
@@ -107,7 +123,7 @@
                   </div>
                 </div>
 
-                <div class="col-lg-2 col-md-2 col-sm-2" ng-if="exploration.is_editable">
+                <div class="col-lg-2 col-md-2 col-sm-2 hidden-xs" ng-if="exploration.is_editable">
                   <button class="btn btn-default btn-sm pull-right oppia-gallery-edit-btn" ng-click="navigateTo('/create/<[exploration.id]>')">
                     <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
                     Edit

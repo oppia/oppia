@@ -163,7 +163,7 @@ ANGULAR_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'angularjs-%s' % ANGULAR_REV)
 ANGULAR_FILES = [
     'angular%s.%s' % (part1, part2) for (part1, part2) in itertools.product(
-        ['', '-resource', '-route', '-sanitize'],
+        ['', '-animate', '-resource', '-route', '-sanitize'],
         ['js', 'min.js', 'min.js.map'])]
 ANGULAR_TEST_FILES = ['angular-mocks.js', 'angular-scenario.js']
 

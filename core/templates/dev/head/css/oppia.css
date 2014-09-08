@@ -225,16 +225,19 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: white;
 }
 
-/* Show the navbar submenu dropdowns on-hover rather than on-click. */
-.nav .dropdown:hover > .dropdown-menu {
-  display: block;
-}
-.nav .dropdown:hover > .dropdown-menu > li > a {
-  color: white;
-}
-.nav .dropdown:hover > .dropdown-menu > li > a:hover {
-  background: rgb(10, 48, 106);
-  color: white;
+/* Show the navbar submenu dropdowns on-hover rather than on-click, if the
+   screen size is large enough. */
+@media (min-width: 768px) {
+  .nav .dropdown:hover > .dropdown-menu {
+    display: block;
+  }
+  .nav .dropdown:hover > .dropdown-menu > li > a {
+    color: white;
+  }
+  .nav .dropdown:hover > .dropdown-menu > li > a:hover {
+    background: rgb(10, 48, 106);
+    color: white;
+  }
 }
 
 .oppia-main-content {
@@ -340,11 +343,47 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-right: 1px solid #bbb;
 }
 
+/* Gallery sidebar menu for small screens. Includes animation. */
+.oppia-gallery-sidebar {
+  float: left;
+  height: 100%;
+  min-height: 700px;
+  -moz-transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.oppia-gallery-sidebar.oppia-gallery-sidebar-active {
+  width: 50%;
+  max-width: 170px;
+}
+
+.oppia-gallery-main {
+  float: left;
+  -moz-transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.oppia-gallery-main.oppia-gallery-sidebar-active {
+  width: 45%;
+}
+
 .oppia-gallery-menu {
   float: left;
   min-height: 600px;
   padding: 0 15px 0 15px;
   width: 150px;
+}
+.oppia-gallery-menu.ng-enter {
+  opacity: 0;
+  -moz-transition: all 0.2s linear 0.2s;
+  -webkit-transition: all 0.2s linear 0.2s;
+  -o-transition: all 0.2s linear 0.2s;
+  transition: all 0.2s linear 0.2s;
+}
+.oppia-gallery-menu.ng-enter.ng-enter-active {
+  opacity: 1;
 }
 
 .oppia-gallery-tiles-container {
@@ -354,10 +393,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   /* This is the same as the min-height in .oppia-gallery-menu. */
   min-height: 600px;
   padding-left: 20px;
-}
-
-.playtest-headers {
-  border-bottom: 1pt solid #333;
 }
 
 .oppia-gallery-tile {
