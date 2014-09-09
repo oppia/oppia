@@ -147,6 +147,9 @@ ABOUT_PAGES = [{
     'url': '/contact',
 }]
 
+# Whether to include a page with the Oppia discussion forum.
+SHOW_FORUM_PAGE = True
+
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {
     NONINTERACTIVE_PREFIX: {

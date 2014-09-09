@@ -85,6 +85,11 @@
                         {% endfor %}
                       </ul>
                     </li>
+                    {% if SHOW_FORUM_PAGE %}
+                      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+                        <a href="/forum">Forum</a>
+                      </li>
+                    {% endif %}
                     {% block navbar_additions %}
                     {% endblock %}
                   </ul>

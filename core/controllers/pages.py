@@ -16,11 +16,12 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+
+import urllib
+
 from core.controllers import base
 from core.controllers import editor
 from core.domain import config_domain
-from core.domain import exp_services
-from core.domain import user_services
 import feconf
 
 
@@ -29,7 +30,8 @@ ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
     'The admin email address to display on the About pages',
     default_value='ADMIN_EMAIL_ADDRESS')
 SITE_FORUM_URL = config_domain.ConfigProperty(
-    'site_forum_url', 'UnicodeString', 'The site forum URL',
+    'site_forum_url', 'UnicodeString',
+    'The site forum URL (for links; the Forum page is configured separately)',
     default_value='https://site/forum/url')
 SITE_NAME = config_domain.ConfigProperty(
     'site_name', 'UnicodeString', 'The site name', default_value='SITE_NAME')
@@ -64,7 +66,7 @@ class SiteGuidelinesPage(base.BaseHandler):
 
 
 class ContactPage(base.BaseHandler):
-    """Page with feedback."""
+    """Page with contact details."""
 
     def get(self):
         """Handles GET requests."""
@@ -74,3 +76,21 @@ class ContactPage(base.BaseHandler):
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
         })
         self.render_template('pages/contact.html')
+
+
+class ForumPage(base.BaseHandler):
+    """Page with an embedded forum."""
+
+    def get(self):
+        """Handles GET requests."""
+        if not feconf.SHOW_FORUM_PAGE:
+            raise self.PageNotFoundException
+
+        self.values.update({
+            'OPPIA_FORUM_URL': (
+                'https://groups.google.com/forum/embed/?hideforumtitle=true'
+                '&parenturl=%s#!categories/oppia/' %
+                urllib.quote(self.request.uri, safe='')
+            ),
+        })
+        self.render_template('pages/forum.html')

@@ -258,6 +258,7 @@ class BaseHandler(webapp2.RequestHandler):
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'FULL_SITE_URL': FULL_SITE_URL.value,
             'ABOUT_PAGES': feconf.ABOUT_PAGES,
+            'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
         })
 
         if self.user_id:
