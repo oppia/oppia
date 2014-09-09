@@ -48,6 +48,14 @@ class Video(widget_domain.BaseWidget):
             'Video end time in seconds: (leave at 0 to play until the end.)'),
         'schema': NONNEGATIVE_INT_SCHEMA,
         'default_value': 0
+    }, {
+        'name': 'autoplay',
+        'description': (
+            'Autoplay:'),
+        'schema': {
+            'type': 'bool'
+        },
+        'default_value': False,
     }]
 
     # The HTML tag name for this non-interactive widget.
