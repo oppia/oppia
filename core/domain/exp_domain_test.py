@@ -429,6 +429,56 @@ states:
         self.assertEqual(exploration.to_yaml(), self.YAML_CONTENT_V3)
 
 
+class ConversionUnitTests(test_utils.GenericTestBase):
+    """Test conversion methods."""
+
+    def test_convert_exploration_to_player_dict(self):
+        EXP_TITLE = 'A title'
+        SECOND_STATE_NAME = 'first state'
+
+        exploration = exp_domain.Exploration.create_default_exploration(
+            'eid', EXP_TITLE, 'A category')
+        exploration.add_states([SECOND_STATE_NAME])
+
+        def _get_default_state_dict(dest_name):
+            return {
+                'content': [{
+                    'type': 'text',
+                    'value': ''
+                }],
+                'param_changes': [],
+                'widget': {
+                    'customization_args': {},
+                    'handlers': [{
+                        'name': 'submit',
+                        'rule_specs': [{
+                            'definition': {
+                                'rule_type': 'default',
+                            },
+                            'description': 'Default',
+                            'dest': dest_name,
+                            'feedback': [],
+                            'param_changes': [],
+                        }],
+                    }],
+                    'sticky': False,
+                    'widget_id': 'TextInput',
+                },
+            }
+
+        self.assertEqual(exploration.to_player_dict(), {
+            'init_state_name': feconf.DEFAULT_STATE_NAME,
+            'title': EXP_TITLE,
+            'states': {
+                feconf.DEFAULT_STATE_NAME: _get_default_state_dict(
+                    feconf.DEFAULT_STATE_NAME),
+                SECOND_STATE_NAME: _get_default_state_dict(SECOND_STATE_NAME),
+            },
+            'param_changes': [],
+            'param_specs': {},
+        })
+
+
 class StateOperationsUnitTests(test_utils.GenericTestBase):
     """Test methods operating on states."""
 

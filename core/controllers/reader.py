@@ -131,13 +131,13 @@ class ExplorationHandler(base.BaseHandler):
         session_id = utils.generate_random_string(24)
 
         self.values.update({
+            'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
             'init_html': init_state.content[0].to_html(reader_params),
             'interactive_html': interactive_html,
             'params': reader_params,
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
-            'title': exploration.title,
             'session_id': session_id,
         })
         self.render_json(self.values)

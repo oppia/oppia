@@ -23,7 +23,7 @@ function SnapshotsSkin($scope, warningsData, oppiaPlayerService) {
     $scope.inputTemplate = '';
     $scope.currentQuestion = '';
     oppiaPlayerService.loadInitialState(function(data) {
-      $scope.explorationTitle = data.title;
+      $scope.explorationTitle = data.exploration.title;
       $scope.currentQuestion = data.init_html;
       $scope.inputTemplate = data.interactive_html;
     }, function(data) {

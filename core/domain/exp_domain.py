@@ -1380,6 +1380,20 @@ class Exploration(object):
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
         })
 
+    def to_player_dict(self):
+        """Returns a copy of the exploration suitable for inclusion in the
+        learner view."""
+        return {
+            'init_state_name': self.init_state_name,
+            'title': self.title,
+            'states': {
+                state_name: self.export_state_to_frontend_dict(state_name)
+                for state_name in self.states
+            },
+            'param_changes': self.param_change_dicts,
+            'param_specs': self.param_specs_dict,
+        }
+
     def get_interactive_widget_ids(self):
         """Get all interactive widget ids used in this exploration."""
         result = set([])

@@ -64,8 +64,23 @@ function ConversationSkin(
     $scope.responseLog = [];
     $scope.inputTemplate = '';
     oppiaPlayerService.loadInitialState(function(data) {
-      $scope.explorationTitle = data.title;
-      $scope.loadPage(data);
+      $scope.explorationTitle = data.exploration.title;
+      $scope.hasInteractedAtLeastOnce = false;
+
+      $scope.finished = data.finished;
+      $scope.inputTemplate = data.interactive_html;
+      $scope.responseLog = [{
+        previousReaderAnswer: '',
+        feedback: '',
+        question: data.init_html,
+        isMostRecentQuestion: true
+      }];
+      $scope.stateName = data.state_name;
+
+      messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
+      $scope.showPage = true;
+      $scope.adjustPageHeight(false, null);
+
       $window.scrollTo(0, 0);
     }, function(data) {
       warningsData.addWarning(
@@ -79,32 +94,10 @@ function ConversationSkin(
     oppiaPlayerService.showFeedbackModal();
   };
 
-  $scope.loadPage = function(data) {
-    $scope.hasInteractedAtLeastOnce = false;
-
-    $scope.categories = data.categories;
-    $scope.finished = data.finished;
-    $scope.inputTemplate = data.interactive_html;
-    $scope.responseLog = [{
-      previousReaderAnswer: '',
-      feedback: '',
-      question: data.init_html,
-      isMostRecentQuestion: true
-    }];
-    $scope.stateName = data.state_name;
-    $scope.title = data.title;
-
-    messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
-    $scope.showPage = true;
-    $scope.adjustPageHeight(false, null);
-  };
-
   $scope.submitAnswer = function(answer, handler) {
     oppiaPlayerService.submitAnswer(answer, handler, function(data) {
       warningsData.clear();
       $scope.hasInteractedAtLeastOnce = true;
-
-      $scope.categories = data.categories;
 
       // This is a bit of a hack. When a refresh happens, AngularJS compares
       // $scope.inputTemplate to the previous value of $scope.inputTemplate.
