@@ -110,8 +110,6 @@ oppia.controller('Gallery', [
     'public': false,
     'private': false
   };
-  $scope.selectedCategories = {};
-  $scope.selectedLanguages = {};
 
   var _navigated = false;
   // Prevent trying to navigate to two places at once when the user clicks on the
@@ -153,10 +151,10 @@ oppia.controller('Gallery', [
       $scope.betaExplorations).concat($scope.privateExplorations);
 
     $scope.selectedCategories = {};
-    $scope.selectedLanguageCodes = {};
+    $scope.selectedLanguages = {};
     $scope.allExplorationsInOrder.map(function(expDict) {
       $scope.selectedCategories[expDict.category] = true;
-      $scope.selectedLanguageCodes[expDict.language_code] = true;
+      $scope.selectedLanguages[expDict.language] = true;
     });
 
     $rootScope.loadingMessage = '';

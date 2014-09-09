@@ -66,6 +66,13 @@ class GalleryPage(base.BaseHandler):
 class GalleryHandler(base.BaseHandler):
     """Provides data for the exploration gallery page."""
 
+    def _get_short_language_description(self, full_language_description):
+        if ' (' not in full_language_description:
+            return full_language_description
+        else:
+            ind = full_language_description.find(' (')
+            return full_language_description[:ind]
+
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
@@ -73,6 +80,11 @@ class GalleryHandler(base.BaseHandler):
         # TODO(sll): Precompute and cache gallery categories. Or have a fixed
         # list of categories and 'Other', and gradually classify the
         # explorations in 'Other'.
+
+        language_codes_to_short_descs = {
+            lc['code']: self._get_short_language_description(lc['description'])
+            for lc in feconf.ALL_LANGUAGE_CODES
+        }
 
         explorations_dict = (
             exp_services.get_non_private_explorations_summary_dict(
@@ -87,7 +99,8 @@ class GalleryHandler(base.BaseHandler):
             'title': exp_data['title'],
             'category': exp_data['category'],
             'objective': exp_data['objective'],
-            'language_code': exp_data['language_code'],
+            'language': language_codes_to_short_descs.get(
+                exp_data['language_code'], exp_data['language_code']),
             'last_updated': exp_data['last_updated'],
             'status': exp_data['status'],
             'community_owned': exp_data['community_owned'],
