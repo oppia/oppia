@@ -101,7 +101,7 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.generateTmpWidgetPreview = function() {
-    $scope.tmpWidget.tag = $scope._getWidgetPreviewTag(
+    $scope.tmpWidgetTag = $scope._getWidgetPreviewTag(
       $scope.tmpWidget.widget_id, $scope.tmpWidget.customization_args);
   };
 
@@ -191,7 +191,7 @@ oppia.controller('StateInteraction', [
           }
           $scope.tmpWidget.customization_args = angular.copy(widgetTemplate.customization_args);
 
-          $scope.tmpWidget.tag = $scope.widgetPreviewHtml;
+          $scope.tmpWidgetTag = $scope.widgetPreviewHtml;
           return;
         }
       }
@@ -232,6 +232,7 @@ oppia.controller('StateInteraction', [
     for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
       $scope.tmpWidget.customization_args[i].value = $scope.tmpWidget.customization_args[i].default_value;
     }
+    $scope.generateTmpWidgetPreview();
     $scope.accordionStatus.isPreviewOpen = true;
   };
 

@@ -173,7 +173,14 @@ class StateExportUnitTests(test_utils.GenericTestBase):
             'param_changes': [],
             'widget': {
                 'widget_id': u'TextInput',
-                'customization_args': {},
+                'customization_args': {
+                    'placeholder': {
+                        'value': 'Type your answer here.'
+                    },
+                    'rows': {
+                        'value': 1
+                    }
+                },
                 'sticky': False,
                 'handlers': [{
                     'name': u'submit',
@@ -213,7 +220,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -230,7 +241,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -380,7 +395,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -397,7 +416,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -448,7 +471,14 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 }],
                 'param_changes': [],
                 'widget': {
-                    'customization_args': {},
+                    'customization_args': {
+                        'placeholder': {
+                            'value': 'Type your answer here.'
+                        },
+                        'rows': {
+                            'value': 1
+                        },
+                    },
                     'handlers': [{
                         'name': 'submit',
                         'rule_specs': [{

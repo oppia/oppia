@@ -153,7 +153,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         self.assertEqual(reader_dict['state_history'], self.state_history)
         self.assertRegexpMatches(reader_dict['init_html'], expected_response)
-        self.assertEqual(reader_dict['title'], expected_title)
+        self.assertEqual(reader_dict['exploration']['title'], expected_title)
 
     def test_welcome_exploration(self):
         """Test a reader's progression through the default exploration."""

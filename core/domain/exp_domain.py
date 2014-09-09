@@ -389,10 +389,25 @@ class AnswerHandlerInstance(object):
 class WidgetInstance(object):
     """Value object for a widget instance."""
 
+    def _get_full_customization_args(self):
+        """Populates the customization_args dict of the widget with default
+        values, if any of the expected customization_args are missing.
+        """
+        full_customization_args_dict = copy.deepcopy(self.customization_args)
+
+        widget = widget_registry.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, self.widget_id)
+        for ca_spec in widget.customization_arg_specs:
+            if ca_spec.name not in full_customization_args_dict:
+                full_customization_args_dict[ca_spec.name] = {
+                    'value': ca_spec.default_value
+                }
+        return full_customization_args_dict
+
     def to_dict(self):
         return {
             'widget_id': self.widget_id,
-            'customization_args': self.customization_args,
+            'customization_args': self._get_full_customization_args(),
             'handlers': [handler.to_dict() for handler in self.handlers],
             'sticky': self.sticky
         }

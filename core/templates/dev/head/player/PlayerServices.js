@@ -52,8 +52,10 @@ oppia.factory('stopwatchProviderService', ['$log', function($log) {
 // A service that provides a number of utility functions for JS used by
 // individual skins.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', 'messengerService', 'stopwatchProviderService',
-    function($http, $rootScope, $modal, messengerService, stopwatchProviderService) {
+    '$http', '$rootScope', '$modal', '$filter', 'messengerService',
+    'stopwatchProviderService', 'warningsData', 'oppiaHtmlEscaper', function(
+      $http, $rootScope, $modal, $filter, messengerService,
+      stopwatchProviderService, warningsData, oppiaHtmlEscaper) {
 
   var explorationId = null;
   // The pathname should be: .../explore/{exploration_id}
@@ -74,6 +76,7 @@ oppia.factory('oppiaPlayerService', [
     '/explorehandler/init/' + explorationId + (version ? '?v=' + version : ''));
   var sessionId = null;
   var isLoggedIn = false;
+  var _exploration = null;
 
   $rootScope.currentParams = {};
   var stateHistory = [];
@@ -84,6 +87,25 @@ oppia.factory('oppiaPlayerService', [
     $rootScope.currentParams = newParams;
     stateName = newStateName;
     stateHistory = newStateHistory;
+  };
+
+  // TODO(sll): Move this (and the corresponding code in the exploration editor) to
+  // a common standalone service.
+  var _getInteractiveWidgetHtml = function(widgetId, widgetCustomizationArgSpecs) {
+    var el = $(
+      '<oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId) +
+      '>');
+    for (var caSpecName in widgetCustomizationArgSpecs) {
+      var caSpecValue = (
+        $rootScope.currentParams.hasOwnProperty(caSpecName) ?
+        $rootScope.currentParams[caSpecName] :
+        widgetCustomizationArgSpecs[caSpecName].value);
+
+      el.attr(
+        $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
+        oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+    }
+    return ($('<div>').append(el)).html();
   };
 
   var _feedbackModalCtrl = ['$scope', '$modalInstance', 'isLoggedIn', 'currentStateName', function(
@@ -134,16 +156,42 @@ oppia.factory('oppiaPlayerService', [
   var stopwatch = stopwatchProviderService.getInstance();
 
   return {
-    loadInitialState: function(successCallback, errorCallback) {
+    loadInitialState: function(successCallback) {
       $http.get(explorationDataUrl).success(function(data) {
+        _exploration = data.exploration;
         isLoggedIn = data.is_logged_in;
         sessionId = data.sessionId;
         stopwatch.resetStopwatch();
         _updateStatus(data.params, data.state_name, data.state_history);
+        // TODO(sll): Restrict what is passed here to just the relevant blobs of content.
         successCallback(data);
-      }).error(errorCallback);
+      }).error(function(data) {
+        warningsData.addWarning(
+          data.error || 'There was an error loading the exploration.');
+      });
     },
-    submitAnswer: function(answer, handler, successCallback, errorCallback) {
+    getExplorationTitle: function() {
+      return _exploration.title;
+    },
+    getInteractiveWidgetHtml: function(stateName) {
+      return _getInteractiveWidgetHtml(
+        _exploration.states[stateName].widget.widget_id,
+        _exploration.states[stateName].widget.customization_args);
+    },
+    getRandomSuffix: function() {
+      // This is a bit of a hack. When a refresh to a $scope variable happens,
+      // AngularJS compares the new value of the variable to its previous value.
+      // If they are the same, then the variable is not updated. Appending a random
+      // suffix makes the new value different from the previous one, and
+      // thus indirectly forces a refresh.
+      var randomSuffix = '';
+      var N = Math.round(Math.random() * 1000);
+      for (var i = 0; i < N; i++) {
+        randomSuffix += ' ';
+      }
+      return randomSuffix;
+    },
+    submitAnswer: function(answer, handler, successCallback) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -169,11 +217,12 @@ oppia.factory('oppiaPlayerService', [
 
         _updateStatus(data.params, data.state_name, data.state_history);
         stopwatch.resetStopwatch();
+        // TODO(sll): Restrict what is passed here to just the relevant blobs of content.
         successCallback(data);
-      })
-      .error(function(data) {
+      }).error(function(data) {
         answerIsBeingProcessed = false;
-        errorCallback(data);
+        warningsData.addWarning(
+          data.error || 'There was an error processing your input.');
       });
     },
     showFeedbackModal: function() {

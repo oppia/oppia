@@ -338,7 +338,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -355,7 +359,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -386,7 +394,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -403,7 +415,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -507,7 +523,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -524,7 +544,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -555,7 +579,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -572,7 +600,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
