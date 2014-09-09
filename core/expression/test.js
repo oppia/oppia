@@ -74,17 +74,37 @@ applyTests([
   [false, 'boolTrue == boolFalse'],
   [true, 'strNull != strXYZ'],
   [0, 'boolFalse ? boolTrue : numZero'],
+  [ExprUndefinedVarError, 'numZero + numOne'],
+  [ExprWrongNumArgsError, ['+', 10, 20, 30]],
+  [ExprWrongNumArgsError, ['==', true]],
 
 ], function(expected, expression) {
-  var parsed = parser.parse(expression);
+  // 'expected' should be either a JavaScript primitive value that would be the
+  // result of evaluation 'expression', or an exception that is expected to be
+  // thrown.
+  // 'expression' is either a string (in which case parsed) or a parse tree.
+  var parsed = typeof(expression) == 'string' ?
+      parser.parse(expression) : expression;
   var parsed_json = JSON.stringify(parsed);
-  var evaled = evaluate(parsed, ENVS);
-  if (evaled != expected) {
-    console.error('input     : ' + expression);
-    console.error('parsed    : ' + parsed_json);
-    console.error('evaluated : ' + evaled);
-    console.error('expected  : ' + expected);
-    throw new Error;
+  var evaled;
+  try {
+    evaled = evaluate(parsed, ENVS);
+    if (expected instanceof Error || evaled != expected) {
+      console.error('input     : ' + expression);
+      console.error('parsed    : ' + parsed_json);
+      console.error('evaluated : ' + evaled);
+      console.error('expected  : ' + expected);
+      throw new Error;
+    }
+  } catch (e) {
+    if (!(e instanceof expected)) {
+      // Wrong or unexpected exception.
+      console.error('input     : ' + expression);
+      console.error('parsed    : ' + parsed_json);
+      console.error('exception : ' + e);
+      console.error('expected  : ' + expected);
+      throw new Error;
+    }
   }
 });
 
