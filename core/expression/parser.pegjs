@@ -12,16 +12,25 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/*******************************************************************************
+ * NOTE TO DEVELOPERS
+ * If you update this file you must run create_expr_parser.sh script to generate
+ * the parser JS file. See instructions in README.txt.
+ ******************************************************************************/
+
 // This file is based on the example JavaScript grammar that comes with PEGJS.
+// https://github.com/dmajda/pegjs/blob/master/examples/javascript.pegjs
 //
 // Grammar spec:
 // This is a small subset of JavaScript.
-// - Only the expression grammar is included.
-// - No newliens or comments (but whitespaces are fine).
+// - Only the expression grammar is included (i.e. no statements or any other
+//   larger grammar constructs).
+// - No newlines or comments (but whitespaces are fine).
 // - No assignment operators (including increment and decrement).
 // - No comma operator.
 // - No Array and Object type (literals as well as look up).
 // - No bit-wise operators.
+// - The operator precedence is same as that of JavaScript.
 //
 // Parser output:
 // The parse tree is made of arrays and JavaScript's primitives, i.e. booleans,
@@ -29,16 +38,16 @@
 // Each node of the tree is an array, representing the operation performed for
 // that node. The first element of the array is the operator, and the rest
 // are the parameters for that operator (i.e. polish notation).
-// Most operators have the same textural name as in the corresponding input
+// Most operators have the same textual name as in the corresponding input
 // grammar, e.g. logical or operator is "||". This is the same for function
-// calls, e.g. "abs(-30)" will be represented as ["abs", -30].
+// calls, e.g. "abs(-30)" will be represented as ['abs', -30].
 // "#" is a special operator for parameter value look up (with one argument
 // which is the parameter name).
 // The difference of unary and binary '+' and '-' need to be infered by the
 // number of arguments.
 // The first element of the array can contain a string which should be an
-// existing operator name, or an operator itself. I.e. both ["abs", -30] and
-// [["#", "abs"], -30] are valid representation of "abs(-30)".
+// existing operator name, or an operator itself. I.e. both ['abs', -30] and
+// [['#', 'abs'], -30] are valid representations of "abs(-30)".
 
 start
   = __ expression:Expression __ { return expression; }
@@ -49,16 +58,6 @@ SourceCharacter
 WhiteSpace "whitespace"
   = [\t\v\f \u00A0\uFEFF]
   / Zs
-
-LineTerminator
-  = [\n\r\u2028\u2029]
-
-LineTerminatorSequence "end of line"
-  = "\n"
-  / "\r\n"
-  / "\r"
-  / "\u2028" // line separator
-  / "\u2029" // paragraph separator
 
 Identifier "identifier"
   = !ReservedWord name:IdentifierName { return name; }
@@ -168,11 +167,11 @@ SingleStringCharacters
   = chars:SingleStringCharacter+ { return chars.join(""); }
 
 DoubleStringCharacter
-  = !('"' / "\\" / LineTerminator) char_:SourceCharacter { return char_;     }
+  = !('"' / "\\") char_:SourceCharacter { return char_;     }
   / "\\" sequence:EscapeSequence                         { return sequence;  }
 
 SingleStringCharacter
-  = !("'" / "\\" / LineTerminator) char_:SourceCharacter { return char_;     }
+  = !("'" / "\\") char_:SourceCharacter { return char_;     }
   / "\\" sequence:EscapeSequence                         { return sequence;  }
 
 EscapeSequence
@@ -197,7 +196,7 @@ SingleEscapeCharacter
     }
 
 NonEscapeCharacter
-  = (!EscapeCharacter / LineTerminator) char_:SourceCharacter { return char_; }
+  = (!EscapeCharacter) char_:SourceCharacter { return char_; }
 
 EscapeCharacter
   = SingleEscapeCharacter
@@ -248,11 +247,8 @@ Pc = [\u005F\u203F\u2040\u2054\uFE33\uFE34\uFE4D\uFE4E\uFE4F\uFF3F]
 // Separator, Space
 Zs = [\u0020\u00A0\u1680\u180E\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200A\u202F\u205F\u3000]
 
-_
-  = (WhiteSpace)*
-
 __
-  = (WhiteSpace / LineTerminatorSequence)*
+  = (WhiteSpace)*
 
 PrimaryExpression
   = name:Identifier { return ['#', name]; }

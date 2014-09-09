@@ -37,6 +37,9 @@ set -e
 source $(dirname $0)/setup.sh || exit 1
 
 
+EXPRESSION_PARSER_DEFINITION=core/expression/parser.pegjs
+EXPRESSION_PARSER_JS=core/expression/parser.js
+
 # Install the basic environment, e.g. nodejs.
 bash scripts/install_third_party.sh
 
@@ -46,6 +49,6 @@ if [ ! -d "$NODE_MODULE_DIR/pegjs" ]; then
   $NPM_INSTALL pegjs@0.8.0
 fi
 
-$NODE_MODULE_DIR/pegjs/bin/pegjs core/expression/parser.pegjs
+$NODE_MODULE_DIR/pegjs/bin/pegjs $EXPRESSION_PARSER_DEFINITION $EXPRESSION_PARSER_JS
 
 echo Done!

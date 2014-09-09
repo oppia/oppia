@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// This file defiens the evaluation engine as well as the system operators.
+// This file defines the evaluation engine as well as the system operators.
 //
 // Defining new operators:
 // Operatos are given an array of arguments which are already all evaluated.
@@ -29,7 +29,7 @@
 // constraints) as well as the ouput value and type should be documented.
 
 
-// TODO: Wrap this in a angular service.
+// TODO(kashida): Wrap this in a angular service.
 
 var evaluate = function(parsed, envs) {
   if (parsed instanceof Array) {
@@ -62,10 +62,10 @@ var lookupEnvs = function(name, envs) {
   return value;
 };
 
-// TODO: Validate number of arguments.
+// TODO(kashida): Validate number of arguments.
 var system = {
   '#': function(args, envs) {
-    return lookupEnvs(args[0] + "", envs);
+    return lookupEnvs(args[0] + '', envs);
   },
   '+': function(args, envs) {
     return args.length == 1 ? args[0] : args[0] + args[1];
@@ -104,15 +104,15 @@ var system = {
     return args[0] != args[1];
   },
   '&&': function(args, envs) {
-    // TODO: Make this short-circuit.
+    // TODO(kashida): Make this short-circuit.
     return args[0] && args[1];
   },
   '||': function(args, envs) {
-    // TODO: Make this short-circuit.
+    // TODO(kashida): Make this short-circuit.
     return args[0] || args[1];
   },
   '?': function(args, envs) {
-    // TODO: Make this short-circuit.
+    // TODO(kashida): Make this short-circuit.
     return args[0] ? args[1] : args[2];
   },
 };
