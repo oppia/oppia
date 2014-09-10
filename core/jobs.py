@@ -112,7 +112,7 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id):
+    def enqueue(cls, job_id, additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing."""
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -122,7 +122,7 @@ class BaseJobManager(object):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id)
+        cls._real_enqueue(job_id, additional_job_params)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -219,7 +219,7 @@ class BaseJobManager(object):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id):
+    def _real_enqueue(cls, job_id, additional_job_params):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Must be implemented by subclasses.
@@ -356,7 +356,7 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id):
+    def _real_enqueue(cls, job_id, unused_additional_job_params):
         taskqueue_services.defer(cls._run_job, job_id)
 
 
@@ -413,6 +413,10 @@ class BaseMapReduceJobManager(BaseJobManager):
     # to generate URLs pointing at the pipeline support UI.
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
 
+    @staticmethod
+    def get_mapper_param(param_name):
+        return context.get().mapreduce_spec.mapper.params[param_name]
+
     @classmethod
     def entity_classes_to_map_over(cls):
         """Return a list of reference to the datastore classes to map over."""
@@ -463,7 +467,7 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id):
+    def _real_enqueue(cls, job_id, additional_job_params):
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
             '%s.%s' % (
@@ -488,6 +492,16 @@ class BaseMapReduceJobManager(BaseJobManager):
                     utils.get_current_time_in_millisecs()),
             }
         }
+
+        if additional_job_params is not None:
+            for param_name in additional_job_params:
+                if param_name in kwargs['mapper_params']:
+                    raise Exception(
+                        'Additional job param %s shadows an existing mapper '
+                        'param' % param_name)
+                kwargs['mapper_params'][param_name] = copy.deepcopy(
+                    additional_job_params[param_name])
+
         mr_pipeline = MapReduceJobPipeline(
             job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
         mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
