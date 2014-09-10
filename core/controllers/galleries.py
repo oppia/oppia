@@ -114,20 +114,26 @@ class GalleryHandler(base.BaseHandler):
                 'You may be running up against the default query limits.'
                 % feconf.DEFAULT_QUERY_LIMIT)
 
+        private_explorations_list = []
+        beta_explorations_list = []
+        released_explorations_list = []
+
+        for e_dict in explorations_list:
+            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE:
+                private_explorations_list.append(e_dict)
+            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
+                beta_explorations_list.append(e_dict)
+            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+                released_explorations_list.append(e_dict)
+
         private_explorations_list = sorted(
-            [e_dict for e_dict in explorations_list
-             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE],
-            key=lambda x: x['last_updated'],
+            private_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
         beta_explorations_list = sorted(
-            [e_dict for e_dict in explorations_list 
-             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC],
-            key=lambda x: x['last_updated'],
+            beta_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
         publicized_explorations_list = sorted(
-            [e_dict for e_dict in explorations_list 
-             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED],
-            key=lambda x: x['last_updated'],
+            released_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
 
         self.values.update({
