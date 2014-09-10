@@ -556,6 +556,11 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             'must implement the _get_continuous_computation_class() method.')
 
     @staticmethod
+    def _get_job_queued_msec():
+        return float(context.get().mapreduce_spec.mapper.params[
+            MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
+
+    @staticmethod
     def _entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was queued.
 
@@ -563,10 +568,10 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         especially if the datastore classes being iterated over are append-only
         event logs.
         """
-        created_on_msecs = utils.get_time_in_millisecs(entity.created_on)
-        job_queued_msecs = float(context.get().mapreduce_spec.mapper.params[
+        created_on_msec = utils.get_time_in_millisecs(entity.created_on)
+        job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
-        return job_queued_msecs >= created_on_msecs
+        return job_queued_msec >= created_on_msec
 
     @classmethod
     def _post_completed_hook(cls, job_id):

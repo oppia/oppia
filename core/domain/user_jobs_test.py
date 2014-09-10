@@ -101,7 +101,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             self.assertEqual(
-                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID),
+                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID)[1],
                 [self._get_expected_exploration_created_dict(
                     USER_ID, EXP_ID, EXP_TITLE, expected_last_updated_ms)])
 
@@ -131,7 +131,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID)[1])
             self.assertEqual([{
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'last_updated_ms': expected_last_updated_ms,
@@ -163,7 +163,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(USER_ID)[1])
             self.assertEqual(len(recent_updates), 1)
             self.assertEqual(sorted(recent_updates[0].keys()), [
                 'activity_id', 'activity_title', 'author_id',
@@ -220,7 +220,7 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_id))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_id)[1])
             self.assertEqual([(
                 self._get_expected_exploration_created_dict(
                     user_id, EXP_2_ID, EXP_2_TITLE, exp2_last_updated_ms)
@@ -274,9 +274,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id)[1])
             recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id)[1])
             expected_feedback_thread_update_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -341,9 +341,9 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id)[1])
             recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id))
+                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id)[1])
             expected_feedback_thread_update_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
