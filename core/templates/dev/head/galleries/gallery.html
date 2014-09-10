@@ -132,10 +132,6 @@
               </div>
 
               <div class="oppia-gallery-tile-bottom">
-                <span class="oppia-gallery-tile-last-updated">
-                  Last update: <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                </span>
-
                 <span class="pull-right">
                   <span class="label label-info">
                     <[exploration.category]>
@@ -146,6 +142,10 @@
                   <span ng-if="exploration.status === 'private'" class="label label-info" style="opacity: 0.5">
                     Private
                   </span>
+                </span>
+
+                <span class="oppia-gallery-tile-last-updated">
+                  Last update: <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                 </span>
               </div>
             </div>

@@ -200,7 +200,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def get_non_private(cls):
         """Returns an iterable with non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
+            ndb.OR(
+                ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLICIZED,
+                ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLIC)
         ).filter(
             ExplorationRightsModel.deleted == False
         ).fetch(QUERY_LIMIT)
@@ -209,7 +211,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
     def get_page_of_non_private(cls, page_size=QUERY_LIMIT, urlsafe_start_cursor=None):
         """Returns a page of non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
+            ndb.OR(
+                ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLICIZED,
+                ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLIC)
         ).filter(
             ExplorationRightsModel.deleted == False
         ).order(
