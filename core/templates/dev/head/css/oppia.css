@@ -406,7 +406,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-bottom: 10px;
   width: 100%;
 }
-.oppia-gallery-tile:hover, .oppia-gallery-tile-anchor:hover {
+.oppia-gallery-tile:hover {
   background-color: #ddd;
   cursor: pointer;
   text-decoration: none;
@@ -435,7 +435,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tile-middle {
-  padding: 2px 10px 5px 10px;
+  padding: 2px 10px 10px 10px;
 }
 
 .oppia-gallery-tile-last-updated {
@@ -444,7 +444,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-gallery-tile-bottom {
   border-top: 1px solid #CCC;
-  padding: 2px 0 5px 10px;
+  padding: 4px 0 5px 10px;
   white-space: nowrap;
 }
 

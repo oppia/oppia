@@ -8,7 +8,6 @@
 
   <div class="container" ng-controller="Gallery">
     <div class="oppia-main-content">
-
       <div class="row">
         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
           <h3 class="oppia-page-title">
@@ -108,9 +107,13 @@
             </div>
 
             <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="container oppia-gallery-tile">
-              <div class="row oppia-gallery-tile-anchor">
+              <div style="position: relative;">
+                <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 0;">
+                  <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
+                  Edit
+                </a>
 
-                <div class="col-lg-10 col-md-10 col-sm-10" ng-click="navigateTo('/explore/<[exploration.id]>')">
+                <div class="row" ng-click="navigateTo('/explore/<[exploration.id]>')" style="margin-bottom: 2px;">
                   <div class="oppia-gallery-tile-top">
                     <div class="oppia-gallery-tile-description">
                       <span class="oppia-gallery-tile-title"><[exploration.title]></span>
@@ -121,32 +124,25 @@
                     <span ng-if="exploration.objective"><[getFormattedObjective(exploration.objective)]></span>
                     <span ng-if="!exploration.objective"><em>No objective specified.</em></span>
                   </div>
+
+                  <div class="oppia-gallery-tile-bottom">
+                    <span class="pull-right">
+                      <span class="label label-info">
+                        <[exploration.category]>
+                      </span>
+                      <span ng-if="exploration.status === 'public'" class="label label-info" style="opacity: 0.5">
+                        Beta
+                      </span>
+                      <span ng-if="exploration.status === 'private'" class="label label-info" style="opacity: 0.5">
+                        Private
+                      </span>
+                    </span>
+
+                    <span class="oppia-gallery-tile-last-updated" ng-if="!gallerySidebarIsActive || screenIsLarge">
+                      Last update: <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                    </span>
+                  </div>
                 </div>
-
-                <div class="col-lg-2 col-md-2 col-sm-2 hidden-xs" ng-if="exploration.is_editable">
-                  <button class="btn btn-default btn-sm pull-right oppia-gallery-edit-btn" ng-click="navigateTo('/create/<[exploration.id]>')">
-                    <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
-                    Edit
-                  </button>
-                </div>
-              </div>
-
-              <div class="oppia-gallery-tile-bottom">
-                <span class="pull-right">
-                  <span class="label label-info">
-                    <[exploration.category]>
-                  </span>
-                  <span ng-if="exploration.status === 'public'" class="label label-info" style="opacity: 0.5">
-                    Beta
-                  </span>
-                  <span ng-if="exploration.status === 'private'" class="label label-info" style="opacity: 0.5">
-                    Private
-                  </span>
-                </span>
-
-                <span class="oppia-gallery-tile-last-updated">
-                  Last update: <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                </span>
               </div>
             </div>
           </div>

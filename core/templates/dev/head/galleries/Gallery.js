@@ -111,14 +111,8 @@ oppia.controller('Gallery', [
     'private': false
   };
 
-  var _navigated = false;
-  // Prevent trying to navigate to two places at once when the user clicks on the
-  // "See inside" button within the main gallery tile.
   $scope.navigateTo = function(url) {
-    if (!_navigated) {
-      _navigated = true;
-      window.location.href = url;
-    }
+    window.location.href = url;
   };
 
   $scope.getCategoryList = function() {
