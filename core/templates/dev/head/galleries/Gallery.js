@@ -111,10 +111,6 @@ oppia.controller('Gallery', [
     'private': false
   };
 
-  $scope.navigateTo = function(url) {
-    window.location.href = url;
-  };
-
   $scope.getCategoryList = function() {
     return Object.keys($scope.selectedCategories);
   };

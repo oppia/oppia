@@ -73,16 +73,29 @@
 
   <div class="oppia-feedback-and-dest" ng-class="{'oppia-lightly-grayed': isTmpRule === 'true'}">
     <div class="oppia-feedback-bubble">
+      <span ng-if="isEditable" class="pull-right">
+        <button type="button" class="btn btn-default btn-xs" ng-click="openRuleFeedbackEditor()" ng-if="!ruleFeedbackEditorIsOpen">
+          <span class="glyphicon glyphicon-pencil" title="Edit Rule Feedback"></span>
+        </button>
+        <button type="button" class="btn btn-success btn-xs" ng-click="closeRuleFeedbackEditor()" ng-if="ruleFeedbackEditorIsOpen">
+          Done
+        </button>
+      </span>
+
       <span ng-if="rule.feedback.length > 0">
         Feedback options (<em>one is chosen at random</em>):
       </span>
-      <span ng-show="isEditable">
-        <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="rule.feedback" disabled="$scope.isTmpRule === 'true'">
+      <span ng-if="rule.feedback.length == 0">
+        <em>No feedback specified.</em>
+      </span>
+
+      <span ng-if="isEditable && ruleFeedbackEditorIsOpen">
+        <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback" disabled="$scope.isTmpRule === 'true'">
         </schema-based-editor>
       </span>
-      <span ng-hide="isEditable">
-        <schema-based-reader schema="RULE_FEEDBACK_SCHEMA" local-value="rule.feedback">
-        </schema-based-editor>
+      <span ng-if="!isEditable || !ruleFeedbackEditorIsOpen">
+        <schema-based-viewer schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
+        </schema-based-viewer>
       </span>
     </div>
 

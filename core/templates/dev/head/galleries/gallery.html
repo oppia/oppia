@@ -106,14 +106,14 @@
               <em>No explorations selected.</em>
             </div>
 
-            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="container oppia-gallery-tile">
+            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="oppia-gallery-tile">
               <div style="position: relative;">
-                <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 0;">
+                <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 5px;">
                   <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
                   Edit
                 </a>
 
-                <div class="row" ng-click="navigateTo('/explore/<[exploration.id]>')" style="margin-bottom: 2px;">
+                <a ng-href="/explore/<[exploration.id]>" style="margin-bottom: 2px; text-decoration: none;">
                   <div class="oppia-gallery-tile-top">
                     <div class="oppia-gallery-tile-description">
                       <span class="oppia-gallery-tile-title"><[exploration.title]></span>
@@ -142,7 +142,7 @@
                       Last update: <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                     </span>
                   </div>
-                </div>
+                </a>
               </div>
             </div>
           </div>

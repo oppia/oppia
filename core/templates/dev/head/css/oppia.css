@@ -408,17 +408,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 .oppia-gallery-tile:hover {
   background-color: #ddd;
-  cursor: pointer;
-  text-decoration: none;
 }
 
 .oppia-gallery-tile-title {
   color: #18447E;
   font-size: 120%;
   font-weight: bold;
-}
-.oppia-gallery-tile-title:hover {
-  text-decoration: none;
 }
 .oppia-gallery-tile-top {
   padding: 5px 10px 0 10px;
@@ -439,6 +434,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tile-last-updated {
+  color: #18447E;
   opacity: 0.7;
 }
 
