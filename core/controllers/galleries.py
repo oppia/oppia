@@ -17,6 +17,7 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 import collections
+import logging
 
 from core.controllers import base
 from core.domain import config_domain
@@ -106,6 +107,12 @@ class GalleryHandler(base.BaseHandler):
             'community_owned': exp_data['community_owned'],
             'is_editable': exp_data['is_editable'],
         } for (exp_id, exp_data) in explorations_dict.iteritems()]
+
+        if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+            logging.error(
+                '%s explorations were fetched to load the gallery page. '
+                'You may be running up against the default query limits.'
+                % feconf.DEFAULT_QUERY_LIMIT)
 
         private_explorations_list = sorted(
             [e_dict for e_dict in explorations_list

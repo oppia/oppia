@@ -27,10 +27,6 @@ import feconf
 import utils
 
 
-# The maximum number of results to ever display in a user dashboard.
-DEFAULT_QUERY_LIMIT = 1000
-
-
 class RecentUpdatesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     pass
@@ -151,7 +147,7 @@ class RecentUpdatesMRJobManager(
             values, key=lambda x: x['last_updated_ms'], reverse=True)
 
         user_models.UserRecentChangesBatchModel(
-            id=key, output=sorted_values[: DEFAULT_QUERY_LIMIT]).put()
+            id=key, output=sorted_values[: feconf.DEFAULT_QUERY_LIMIT]).put()
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):

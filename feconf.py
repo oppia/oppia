@@ -50,6 +50,9 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
+# The maximum number of results to retrieve in a datastore query.
+DEFAULT_QUERY_LIMIT = 1000
+
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
