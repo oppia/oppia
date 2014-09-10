@@ -43,6 +43,9 @@ from mapreduce import util as mapreduce_util
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
+# Name of an additional parameter to pass into the MR job for cleaning up
+# old auxiliary job models.
+MAPPER_PARAM_MAX_START_TIME_MSEC = 'max_start_time_msec'
 
 STATUS_CODE_NEW = job_models.STATUS_CODE_NEW
 STATUS_CODE_QUEUED = job_models.STATUS_CODE_QUEUED
@@ -415,6 +418,10 @@ class BaseMapReduceJobManager(BaseJobManager):
 
     @staticmethod
     def get_mapper_param(param_name):
+        mapper_params = context.get().mapreduce_spec.mapper.params
+        if param_name not in mapper_params:
+            raise Exception(
+                'Could not find %s in %s' % (param_name, mapper_params))
         return context.get().mapreduce_spec.mapper.params[param_name]
 
     @classmethod
@@ -1125,6 +1132,51 @@ def get_stuck_jobs(recency_msecs):
             stuck_jobs.append(job_model)
 
     return stuck_jobs
+
+
+class JobCleanupManager(BaseMapReduceJobManager):
+    """One-off job for cleaning up old auxiliary entities for MR jobs."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            mapreduce_model.MapreduceState,
+            mapreduce_model.ShardState
+        ]
+
+    @staticmethod
+    def map(item):
+        max_start_time_msec = JobCleanupManager.get_mapper_param(
+            MAPPER_PARAM_MAX_START_TIME_MSEC)
+
+        if isinstance(item, mapreduce_model.MapreduceState):
+            if (item.result_status == 'success' and
+                    utils.get_time_in_millisecs(item.start_time) <
+                    max_start_time_msec):
+                item.delete()
+                yield ('mr_state_deleted', 1)
+            else:
+                yield ('mr_state_remaining', 1)
+
+        if isinstance(item, mapreduce_model.ShardState):
+            if (item.result_status == 'success' and
+                    utils.get_time_in_millisecs(item.update_time) <
+                    max_start_time_msec):
+                item.delete()
+                yield ('shard_state_deleted', 1)
+            else:
+                yield ('shard_state_remaining', 1)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        values = [ast.literal_eval(v) for v in stringified_values]
+        if key.endswith('_deleted'):
+            logging.warning(
+                'Delete count: %s entities (%s)' % (sum(values), key))
+        else:
+            logging.warning(
+                'Entities remaining count: %s entities (%s)' %
+                (sum(values), key))
 
 
 ABSTRACT_BASE_CLASSES = frozenset([

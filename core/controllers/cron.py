@@ -14,7 +14,6 @@
 
 """Controllers for the cron jobs."""
 
-import ast
 import logging
 
 from core import jobs
@@ -25,14 +24,10 @@ email_services = models.Registry.import_email_services()
 import feconf
 import utils
 
-from mapreduce import model as mapreduce_model
 from mapreduce.lib.pipeline import pipeline
 
 # The default retention timeline is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
-# Name of an additional parameter to pass into the MR job for cleaning up
-# old auxiliary job models.
-MAPPER_PARAM_MAX_START_TIME_MSEC = 'max_start_time_msec'
 
 
 def require_cron_or_superadmin(handler):
@@ -93,55 +88,12 @@ class JobStatusMailerHandler(base.BaseHandler):
             feconf.ADMIN_EMAIL_ADDRESS, email_subject, email_message)
 
 
-class _JobCleanupManager(jobs.BaseMapReduceJobManager):
-    """One-off job for cleaning up old auxiliary entities for MR jobs."""
-
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [
-            mapreduce_model.MapreduceState,
-            mapreduce_model.ShardState
-        ]
-
-    @staticmethod
-    def map(item):
-        max_start_time_msec = _JobCleanupManager.get_mapper_param(
-            MAPPER_PARAM_MAX_START_TIME_MSEC)
-
-        if isinstance(item, mapreduce_model.MapreduceState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.start_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('mr_state_deleted', 1)
-            else:
-                yield ('mr_state_remaining', 1)
-
-        if isinstance(item, mapreduce_model.ShardState):
-            if (item.result_status == 'success' and
-                    utils.get_time_in_millisecs(item.update_time) <
-                    max_start_time_msec):
-                item.delete()
-                yield ('shard_state_deleted', 1)
-            else:
-                yield ('mr_state_remaining', 1)
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        values = [ast.literal_eval(v) for v in stringified_values]
-        if key.endswith('_deleted'):
-            logging.warning(
-                'Delete count: %s entities (%s)' % (sum(values), key))
-        else:
-            logging.warning(
-                'Entities remaining count: %s entities (%s)' %
-                (sum(values), key))
-
-
 class CronMapreduceCleanupHandler(base.BaseHandler):
 
     def get(self):
-        """Clean up intermediate data items for completed or failed M/R jobs.
+        """Clean up intermediate data items for completed M/R jobs that
+        started more than MAX_MAPREDUCE_METADATA_RETENTION_MSECS milliseconds
+        ago.
 
         Map/reduce runs leave around a large number of rows in several
         tables.  This data is useful to have around for a while:
@@ -150,13 +102,8 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         However, after a few days, this information is less relevant, and
         should be cleaned up.
         """
-        self._clean_mapreduce(MAX_MAPREDUCE_METADATA_RETENTION_MSECS)
+        recency_msec = MAX_MAPREDUCE_METADATA_RETENTION_MSECS
 
-    @classmethod
-    def _clean_mapreduce(cls, recency_msec):
-        """Cleans up all MR jobs that started more than recency_msec
-        milliseconds ago.
-        """
         num_cleaned = 0
 
         min_age_msec = recency_msec
@@ -209,11 +156,12 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
 
         logging.warning('%s MR jobs cleaned up.' % num_cleaned)
 
-        if job_models.JobModel.do_unfinished_jobs_exist('_JobCleanupManager'):
+        if job_models.JobModel.do_unfinished_jobs_exist(
+                jobs.JobCleanupManager.__name__):
             logging.warning('A previous cleanup job is still running.')
         else:
-            _JobCleanupManager.enqueue(
-                _JobCleanupManager.create_new(), additional_job_params={
-                    MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
+            jobs.JobCleanupManager.enqueue(
+                jobs.JobCleanupManager.create_new(), additional_job_params={
+                    jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
                 })
             logging.warning('Deletion jobs for auxiliary entities kicked off.')

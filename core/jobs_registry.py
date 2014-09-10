@@ -18,9 +18,9 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import exp_jobs
 from core.domain import stats_jobs
 from core.domain import user_jobs
-from core.domain import exp_jobs
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
