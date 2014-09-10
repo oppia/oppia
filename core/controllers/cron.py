@@ -14,6 +14,7 @@
 
 """Controllers for the cron jobs."""
 
+import ast
 import logging
 
 from core import jobs
@@ -24,7 +25,6 @@ email_services = models.Registry.import_email_services()
 import feconf
 import utils
 
-from mapreduce import main as mapreduce_main
 from mapreduce import model as mapreduce_model
 from mapreduce.lib.pipeline import pipeline
 
@@ -163,7 +163,8 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         # Only consider jobs that started at most 1 week before recency_msec.
         max_age_msec = recency_msec + 7 * 24 * 60 * 60 * 1000
         # The latest start time that a job scheduled for cleanup may have.
-        max_start_time_msec = utils.get_current_time_in_millisecs() - min_age_msec
+        max_start_time_msec = (
+            utils.get_current_time_in_millisecs() - min_age_msec)
 
         # Get all pipeline ids from jobs that started between max_age_msecs
         # and max_age_msecs + 1 week, before now.
