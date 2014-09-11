@@ -71,8 +71,9 @@ oppia.controller('ExplorationEditor', [
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
       warningsData.clear();
-      $scope.isDiscardInProgress = true;
+      $rootScope.$broadcast('externalSave');
 
+      $scope.isDiscardInProgress = true;
       changeListService.discardAllChanges();
       $scope.doFullRefresh = true;
       $scope.initExplorationPage(function() {
