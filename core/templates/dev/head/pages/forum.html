@@ -9,7 +9,11 @@
     <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8">
         <div class="oppia-about">
-          <h1>Forum</h1>
+          {% if on_localhost %}
+            <div class="oppia-warning">
+              <strong>Warning:</strong> This page may not display correctly on localhost. To view it, change 'localhost' to '127.0.0.1' in the URL bar.
+            </div>
+          {% endif %}
 
           <iframe src="{{OPPIA_FORUM_URL}}" frameborder="0" width="1000" height="700">
           </iframe>

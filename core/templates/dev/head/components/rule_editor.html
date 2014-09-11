@@ -77,9 +77,6 @@
         <button type="button" class="btn btn-default btn-xs" ng-click="openRuleFeedbackEditor()" ng-if="!ruleFeedbackEditorIsOpen">
           <span class="glyphicon glyphicon-pencil" title="Edit Rule Feedback"></span>
         </button>
-        <button type="button" class="btn btn-success btn-xs" ng-click="closeRuleFeedbackEditor()" ng-if="ruleFeedbackEditorIsOpen">
-          Done
-        </button>
       </span>
 
       <span ng-if="rule.feedback.length > 0">
@@ -96,6 +93,12 @@
       <span ng-if="!isEditable || !ruleFeedbackEditorIsOpen">
         <schema-based-viewer schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
         </schema-based-viewer>
+      </span>
+
+      <span ng-if="isEditable" class="pull-right">
+        <button type="button" class="btn btn-success btn-sm" ng-click="closeRuleFeedbackEditor()" ng-if="ruleFeedbackEditorIsOpen">
+          Save Feedback
+        </button>
       </span>
     </div>
 

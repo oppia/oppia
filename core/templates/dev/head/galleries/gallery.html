@@ -9,41 +9,41 @@
   <div class="container" ng-controller="Gallery">
     <div class="oppia-main-content">
       <div class="row">
-        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-12">
+        <div class="col-lg-11 col-md-11 col-sm-11 col-xs-11">
+          <div class="hidden-xs">
+            {% if not user_email %}
+              <!-- User must log in. -->
+              <span class="pull-right">
+                <a class="btn btn-success btn-lg" href="{{login_url}}">
+                  Create New Exploration
+                </a>
+              </span>
+            {% elif not username %}
+              <!-- User must register. -->
+              <span class="pull-right">
+                <a class="btn btn-success btn-lg" href="/editor_prerequisites?return_url=gallery">
+                  Create New Exploration
+                </a>
+              </span>
+            {% else %}
+              <span class="pull-right">
+                <a class="btn btn-success btn-lg"
+                   ng-click="showCreateExplorationModal(getCategoryList())">
+                  Create New Exploration
+                </a>
+                {% if allow_yaml_file_upload %}
+                  <a class="btn btn-default btn-lg"
+                      ng-click="showUploadExplorationModal(getCategoryList())">
+                    Upload Existing Exploration
+                  </a>
+                {% endif %}
+              </span>
+            {% endif %}
+          </div>
+
           <h3 class="oppia-page-title">
             Gallery
           </h3>
-        </div>
-
-        <div class="col-lg-9 col-md-9 col-sm-9 hidden-xs">
-          {% if not user_email %}
-            <!-- User must log in. -->
-            <span class="pull-right">
-              <a class="btn btn-success btn-lg" href="{{login_url}}">
-                Create New Exploration
-              </a>
-            </span>
-          {% elif not username %}
-            <!-- User must register. -->
-            <span class="pull-right">
-              <a class="btn btn-success btn-lg" href="/editor_prerequisites?return_url=gallery">
-                Create New Exploration
-              </a>
-            </span>
-          {% else %}
-            <span class="pull-right">
-              <a class="btn btn-success btn-lg"
-                 ng-click="showCreateExplorationModal(getCategoryList())">
-                Create New Exploration
-              </a>
-              {% if allow_yaml_file_upload %}
-                <a class="btn btn-default btn-lg"
-                    ng-click="showUploadExplorationModal(getCategoryList())">
-                  Upload Existing Exploration
-                </a>
-              {% endif %}
-            </span>
-          {% endif %}
         </div>
       </div>
 

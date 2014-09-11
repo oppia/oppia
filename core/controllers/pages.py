@@ -18,6 +18,7 @@ __author__ = 'sll@google.com (Sean Lip)'
 
 
 import urllib
+import urlparse
 
 from core.controllers import base
 from core.controllers import editor
@@ -86,11 +87,17 @@ class ForumPage(base.BaseHandler):
         if not feconf.SHOW_FORUM_PAGE:
             raise self.PageNotFoundException
 
+        # Note: if you are working in the development environment and
+        # are accessing this page at localhost, please replace
+        # 'localhost' with '127.0.0.1'.
+        _, netloc, _, _, _ = urlparse.urlsplit(self.request.uri)
+
         self.values.update({
             'OPPIA_FORUM_URL': (
                 'https://groups.google.com/forum/embed/?hideforumtitle=true'
                 '&parenturl=%s#!categories/oppia/' %
                 urllib.quote(self.request.uri, safe='')
             ),
+            'on_localhost': netloc.startswith('localhost'),
         })
         self.render_template('pages/forum.html')

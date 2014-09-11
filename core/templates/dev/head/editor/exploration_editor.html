@@ -66,7 +66,7 @@
           <ul>
             <li>It should help its intended audience learn something new.</li>
             <li>It should convey more than a single isolated factoid.</li>
-            <li>It should provide useful feedback and guidance to help the learner (and not just 'Correct'/'Incorrect').</li>
+            <li>It should provide useful feedback and guidance to help the learner.</li>
             <li>It should not substantially duplicate existing explorations.</li>
           </ul>
         </p>
@@ -84,8 +84,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" ng-click="publish()">Publish</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
 
@@ -117,8 +117,8 @@
       </div>
 
       <div class="modal-footer">
-        <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
         <button class="btn btn-default" ng-click="close()">Close</button>
+        <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
       </div>
     </script>
 
@@ -162,8 +162,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
       </div>
     </script>
 
@@ -179,8 +179,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-danger" ng-click="reallyDelete()">Delete State</button>
       </div>
     </script>
 
@@ -236,8 +236,8 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-success" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save Exploration</button>
       </div>
     </script>
 
@@ -248,7 +248,7 @@
             <strong>Note:</strong> This is a private, unpublishable copy of a
             <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
             You are very welcome to submit feedback to improve the original exploration: to do this,
-            click the previous link, then click the green Feedback button on the left of the page.
+            click the previous link, then click the Feedback button on the top-right.
             Thank you!
           </div>
         </div>

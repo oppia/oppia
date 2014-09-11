@@ -47,7 +47,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           },
           ui_config: {
-            add_element_text: 'Add Feedback'
+            add_element_text: 'Add Feedback Option'
           }
         };
 

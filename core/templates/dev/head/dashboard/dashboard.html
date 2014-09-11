@@ -17,9 +17,13 @@
             <div class="row">
               <div class="col-lg-8 col-md-8 col-sm-8">
                 <h4>Most recent updates to explorations and threads</h4>
-                <span class="pull-right" ng-if="jobQueuedMsec" style="opacity: 0.7; font-size: smaller;">
-                  Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>
-                </span>
+                <div>
+                  <span class="pull-right" ng-if="jobQueuedMsec" style="opacity: 0.7; font-size: smaller;">
+                    Last updated: <[getLocaleAbbreviatedDatetimeString(jobQueuedMsec)]>
+                  </span>
+                  <!-- This seems to be needed because otherwise, in Firefox, the 'last updated' string gets merged into the table of recent updates. -->
+                  <br>
+                </div>
 
                 <div ng-if="recentUpdates.length === 0">
                   <em>No recent updates.</em>
