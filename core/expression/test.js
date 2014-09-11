@@ -11,14 +11,19 @@ var applyTests = function(arr, validatorFunction) {
 // Test the parser.
 applyTests([
   [10, '10'],
+  [32, '0x20'],
   [10.1, '10.1'],
+  [0.001, '1e-3'],
   ['abc', '"abc"'],
+  ["a'b'c", '"a\'b\'c"'],
   [null, 'null'],
   [true, 'true'],
   [false, 'false'],
 
   [['#', 'abc'],
       'abc'],
+  [['#', 'あいうえお'],
+      'あいうえお'],
   [[['#', 'abc'], [1, 2]],
       'abc(1, 2)'],
   [[[[['#', 'abc'], [1, 2]], []], [3]],
@@ -29,6 +34,9 @@ applyTests([
   [['-', ['#', 'abc']],
       '-abc'],
 
+  // There is a double width space after '+'.
+  [['+', 1, 2], "\t" + '1 +　2 '],
+
   [['*', ['/', 3, 4], 5],
       '3 / 4 * 5'],
   [['-', ['+', 2, ['*', ['/', 3, 4], 5]], 6],
@@ -37,14 +45,39 @@ applyTests([
   [['||', ['&&', ['<', 2, 3], ['==', 4, 6]], true],
       '2 < 3 && 4 == 6 || true'],
 
+  // Expected to produce parser error.
+  [undefined, 'a1a-'],
+  [undefined, '0.3.4'],
+  [undefined, 'abc()('],
+  [undefined, '()'],
+  [undefined, '*100'],
+
 ], function(expected, expression) {
-  var parsed = parser.parse(expression);
-  var parsed_json = JSON.stringify(parsed);
-  var expected_json = JSON.stringify(expected);
-  if (parsed_json != expected_json) {
-    console.error('input    : ' + expression);
-    console.error('parsed   : ' + parsed_json);
-    console.error('expected : ' + expected_json);
+  // 'expected' should be either a JavaScript primitive value that would be the
+  // result of evaluation 'expression', or an undefined which would expect the
+  // parser to fail.
+  // 'expression' is the expression string to be parsed.
+  var failed = false;
+  try {
+    var parsed = parser.parse(expression);
+    parsed_json = JSON.stringify(parsed);
+    var expected_json = JSON.stringify(expected);
+    if (expected === undefined || parsed_json != expected_json) {
+      console.error('input    : ' + expression);
+      console.error('parsed   : ' + parsed_json);
+      console.error('expected : ' + expected_json);
+      failed = true;
+    }
+  } catch (e) {
+    if (expected !== undefined || !(e instanceof parser.SyntaxError)) {
+      // Wrong or unexpected exception.
+      console.error('input     : ' + expression);
+      console.error('exception : ' + e);
+      console.error('expected  : ' + expected);
+      failed = true;
+    }
+  }
+  if (failed) {
     throw new Error;
   }
 });
@@ -65,6 +98,7 @@ applyTests([
   [0, 'numZero'],
   [10, '+10'],
   [-80.001, '20 - num100_001'],
+  [0, '0x100 - 256'],
   [true, '!strNull'],
   [-5, '1 - 2 * 3'],
   [1000.01, 'num100_001 / 0.1'],
@@ -86,15 +120,15 @@ applyTests([
   var parsed = typeof(expression) == 'string' ?
       parser.parse(expression) : expression;
   var parsed_json = JSON.stringify(parsed);
-  var evaled;
+  var failed = false;
   try {
-    evaled = evaluate(parsed, ENVS);
+    var evaled = evaluate(parsed, ENVS);
     if (expected instanceof Error || evaled != expected) {
       console.error('input     : ' + expression);
       console.error('parsed    : ' + parsed_json);
       console.error('evaluated : ' + evaled);
       console.error('expected  : ' + expected);
-      throw new Error;
+      failed = true;
     }
   } catch (e) {
     if (!(e instanceof expected)) {
@@ -103,8 +137,11 @@ applyTests([
       console.error('parsed    : ' + parsed_json);
       console.error('exception : ' + e);
       console.error('expected  : ' + expected);
-      throw new Error;
+      failed = true;
     }
+  }
+  if (failed) {
+    throw new Error;
   }
 });
 
