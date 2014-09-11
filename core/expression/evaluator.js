@@ -23,19 +23,36 @@
 // Both errors are children of ExpressionError, so caller can use this error
 // to catch only these expected error cases.
 //
-// Defining new operators:
-// Operatos are given an array of arguments which are already all evaluated.
-// The operators should verify the argument array has the required number of
-// arguments. Operators should coarse the input arguments to the desired
-// typed values, and never error on the wrong type of inputs. This does not
-// prevent operators to eror on wrong parameter values (e.g. getting negative
-// number for an index).
-// When successful, operators should return any valid Javascript value. In
-// general, one operator should always return a same type of values, but there
-// may be exceptions (e.g. "+" operator may return a number or a string
+// An expression is evaluated in a context consisting of predefined system
+// variables, system operators and system functions. User defined parameters
+// may override the meaning of system variables and functions (but not
+// operators). Users also can define parameters with new names. Referencing a
+// variable which is not defined as neither system variables, system functions,
+// nor user parameters may result in exception.
+//
+// All system variables, system operators, and system functions are defined
+// as 'system' variable in this file.
+//
+// TODO(kashida): Split the following section into two:
+//     - A general overview of operators (including some concrete examples)
+//     - A numbered sequence of steps which a new contributor should follow in
+//         order to define a new operator.
+// Defining new operators and functions:
+// Operators and functions are given an array of arguments which are already all
+// evaluated. E.g. for an expression "1 + 2 * 3", the "+" plus operator receives
+// values 1 and 6 (i.e. "2 * 3" already evaluated).
+// The operators and functions should verify that the argument array
+// has the required number of arguments. Operators and functions can coerse the
+// input arguments to the desired typed values, or throw an exception if wrong
+// type of argument is given.
+// type of inputs. This does not prevent operators to eror on wrong parameter
+// values (e.g. getting negative number for an index).
+// When successful, operators and functions may return any valid JavaScript
+// values. In general, an operator always returns the same type of value, but
+// there are exceptions (e.g. "+" operator may return a number or a string
 // depending on the types of the input arguments).
 // Constraints on the input arguments (number, types, and any other
-// constraints) as well as the ouput value and type should be documented.
+// constraints) as well as the output value and type should be documented.
 
 
 // TODO(kashida): Wrap this in a angular service.
@@ -71,8 +88,21 @@ ExprWrongNumArgsError.prototype.toString = function() {
 };
 
 
+/**
+ * @param {*} Parse output from the parser. See parser.pegjs for the data
+ *     structure.
+ * @param {!Array.<!Object>} Evaluation environments. See lookupEnvs below for
+ *     the structure.
+ */
 var evaluate = function(parsed, envs) {
+  // Arrays are intermediate nodes of the parse tree, and others (JavaScript
+  // primitives) are the terminal nodes, as described in parser.pegjs "Parser
+  // output" section.
   if (parsed instanceof Array) {
+    if (parsed.length == 0) {
+      throw "Parser generated an intermediate node with zero children";
+    }
+
     // Evaluate all the elements, including the operator.
     var evaled = parsed.map(function(item) {
       return evaluate(item, envs);
@@ -88,6 +118,16 @@ var evaluate = function(parsed, envs) {
   return parsed;
 };
 
+/**
+ * Looks up a variable of the given name in the env. Here the variable can be
+ * system or user defined functions and parameters, as well as system operators.
+ * @param {string} name
+ * @param {!Array.<!Object>} envs Represents a nested name space environment to
+ *     look up the name in. The first element is looked up first (i.e. has
+ *     higher precedence).
+ * @throws {ExprUndefinedVarError} The named variable was not found in the given
+ *     environment.
+ */
 var lookupEnvs = function(name, envs) {
   // Parameter value look up.
   var value;

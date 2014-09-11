@@ -1,3 +1,5 @@
+// TODO(kashdia): Integrated with Karma.
+
 var parser = require('parser');
 
 var applyTests = function(arr, validatorFunction) {
