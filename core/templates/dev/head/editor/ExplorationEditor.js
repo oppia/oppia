@@ -633,6 +633,7 @@ oppia.controller('ExplorationEditor', [
       explorationLanguageCodeService.init(data.language_code);
 
       $scope.explorationTitleService = explorationTitleService;
+      $scope.explorationCategoryService = explorationCategoryService;
       $scope.explorationObjectiveService = explorationObjectiveService;
       $scope.explorationRightsService = explorationRightsService;
 

@@ -255,39 +255,35 @@
       </div>
 
       <div class="row oppia-exploration-editor-top-row">
-        <div class="col-lg-5 col-md-5 col-sm-5">
+        <div class="col-lg-6 col-md-6 col-sm-6">
           <div>
             <span class="oppia-page-title">
               <[explorationTitleService.displayed]>
             </span>
-            <span ng-if="explorationRightsService.isPrivate()" class="label label-info">
+          </div>
+          <div>
+            <span class="label label-info">
+              <[explorationCategoryService.displayed]>
+            </span>
+            <span ng-if="explorationRightsService.isPrivate()" class="label label-primary">
               Private
             </span>
-            <span ng-if="explorationRightsService.isPublic()" class="label label-info">
+            <span ng-if="explorationRightsService.isPublic()" class="label label-primary">
               Beta
             </span>
-            <span ng-if="explorationRightsService.isPublicized()" class="label label-info">
+            <span ng-if="explorationRightsService.isPublicized()" class="label label-primary">
               Released
             </span>
-            <span ng-if="explorationRightsService.isCloned()" class="label label-info">
+            <span ng-if="explorationRightsService.isCloned()" class="label label-primary">
               Cloned
             </span>
-            <span ng-if="explorationRightsService.isCommunityOwned()" class="label label-info">
+            <span ng-if="explorationRightsService.isCommunityOwned()" class="label label-primary">
               Community-owned
-            </span>
-          </div>
-
-          <div>
-            <span ng-if="explorationObjectiveService.displayed">
-              <strong>Aim of the exploration:</strong> <[explorationObjectiveService.displayed]>.
-            </span>
-            <span ng-if="!explorationObjectiveService.displayed">
-              <em>No objective specified.</em>
             </span>
           </div>
         </div>
 
-        <div class="col-lg-7 col-md-7 col-sm-7">
+        <div class="col-lg-6 col-md-6 col-sm-6">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <span class="pull-right" style="margin-top: 10px;">
