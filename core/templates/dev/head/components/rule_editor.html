@@ -125,7 +125,7 @@
         <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9]+$">
         </select2-dropdown>
         <span ng-if="rule.dest == stateName"> ⟳ </span><br />
-        <button type="button" class="btn btn-default btn-sm" ng-click="closeRuleDestEditor()" ng-disabled="!rule.dest">Done</button>
+        <button type="button" class="btn btn-default btn-sm" style="margin-top: 2px;" ng-click="closeRuleDestEditor()" ng-disabled="!rule.dest">Done</button>
       </div>
     </div>
 

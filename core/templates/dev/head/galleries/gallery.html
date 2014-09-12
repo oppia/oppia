@@ -103,7 +103,15 @@
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
           <div class="tab-content oppia-gallery-tiles-container">
             <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status').length === 0">
-              <em>No explorations selected.</em>
+              <div>
+                <em>No explorations selected.</em>
+              </div>
+              <br>
+              <div>
+                <em ng-if="selectedStatuses.publicized && !selectedStatuses.public">
+                  However, there may be beta explorations in these categories available for playtesting. Click the 'Beta' checkbox on the left to view them!
+                </em>
+              </div>
             </div>
 
             <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="oppia-gallery-tile">
