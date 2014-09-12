@@ -472,7 +472,7 @@ class WidgetInstance(object):
                     'Invalid widget customization arg name: %s' % arg_name)
             if arg_name not in widget_customization_arg_names:
                 extra_args.append(arg_name)
-                logging.error(
+                logging.warning(
                     'Parameter %s for widget %s is invalid.'
                     % (arg_name, self.widget_id))
             # TODO(sll): Find a way to verify that the arg_values have the
