@@ -3,6 +3,62 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.9 (11 Sep 2014)
+--------------------
+Deprecations:
+* Deprecate the 'File Input' and 'Tar File Input' widgets.
+* Deprecate the 'lua' and 'scheme' language options for the Code REPL widget.
+
+General frontend improvements:
+* User dashboard: add a table of recent updates to a user's explorations and feedback threads.
+* User dashboard: move the 'Create New Exploration' button to the top of the column listing a user's explorations.
+* Galleries: consolidate the Learn, Playtest and Contribute pages into a single responsive gallery with options for filtering by languages and categories.
+* Learner view: fix a bug where version numbers of explorations were being ignored in external embeddings.
+* Learner view: add a button group with 'restart', 'feedback' and 'look inside' options to the top right of the page.
+* Learner view: remove the warning at the top if a user views an unpublished exploration.
+* Forum page: add a new forum page which embeds the oppia Google Group.
+* Site guidelines page: update the publication policies to reflect the change in the gallery layout.
+* All pages: add a meta tag to prevent unnecessary 404 errors when browserconfig.xml and apple-touch-icon.png are fetched.
+
+Editor page improvements:
+* Add a visualization that allows exploration editors to visually compare differences between versions.
+* Add support for specifying the language that an exploration is written in.
+* When a new state is added to an exploration, navigate to it automatically.
+* Make the layout of buttons and tooltips more consistent throughout the editor page.
+* When the 'discard changes' button is clicked, register all pending changes before clearing the change stack.
+* Add text to the widget picker and language selector pointing users to the issue tracker, where they can request new widgets and languages.
+* Remove the obtrusive warning message for a missing objective.
+* Disable the 'create feedback thread' button until the preconditions for successful thread creation are satisfied.
+* When the widget type changes, show the preview tab in the interactive widget editor accordion by default.
+* Remove some text from the 'publish exploration' modal.
+* Make the editor page degrade gracefully when running on localhost.
+* Load all interactive widgets at the outset in order to minimize the number of RPCs required to the backend.
+* Add frontend services to cache the widget definitions, in order to prevent multiple refetches of the same data.
+
+Widget improvements:
+* Remove autofocus behavior from several interactive widgets, since this is a distraction in the editor page.
+* InteractiveMap widget: remove a spurious 404 error in the response template.
+* LogicProof widget: automatically convert '^'s into AND symbols to ameliorate typos.
+* LogicProof widget: fix a typo in the keystroke table.
+* MultipleChoiceInput widget: replace the radio options with buttons, so that they work better on a mobile interface.
+* MusicNotesInput widget: update MIDI.js to correspond to the updated Web Audio API.
+
+Infrastructure:
+* Use the new schema-based forms framework in several widgets and other places in the editor page.
+* Add focus management and UI configuration options to the forms framework.
+* Add backend code and an indexing job for exploration search functionality.
+* Add the current time and a button for viewing individual job outputs to the admin page.
+* Add a one-off job to populate the user dashboard.
+* Add cron jobs for deleting old auxiliary models and for sending a daily email to the admin summarizing the statuses of recently-run MapReduce jobs.
+* Fix a flaky backend test for statistics MapReduce jobs.
+* Ensure that the deploy script fails if the backend tests do not pass.
+* Make Karma tests run on Mac OS X.
+* Increase the default datastore query limit from 100 to 1000.
+* In the start.sh script, change the path to google-chrome to prevent a 'missing symlink' error on some Linux systems.
+* Upgrade the GAE development SDK version from 1.8.8 to 1.9.10.
+* Update ui-codemirror from v0.1.1 to v0.1.2.
+
+
 v1.2.8 (12 Aug 2014)
 --------------------
 General features:

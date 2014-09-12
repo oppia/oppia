@@ -406,19 +406,14 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-bottom: 10px;
   width: 100%;
 }
-.oppia-gallery-tile:hover, .oppia-gallery-tile-anchor:hover {
+.oppia-gallery-tile:hover {
   background-color: #ddd;
-  cursor: pointer;
-  text-decoration: none;
 }
 
 .oppia-gallery-tile-title {
   color: #18447E;
   font-size: 120%;
   font-weight: bold;
-}
-.oppia-gallery-tile-title:hover {
-  text-decoration: none;
 }
 .oppia-gallery-tile-top {
   padding: 5px 10px 0 10px;
@@ -435,16 +430,17 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tile-middle {
-  padding: 2px 10px 5px 10px;
+  padding: 2px 10px 10px 10px;
 }
 
 .oppia-gallery-tile-last-updated {
+  color: #18447E;
   opacity: 0.7;
 }
 
 .oppia-gallery-tile-bottom {
   border-top: 1px solid #CCC;
-  padding: 2px 0 5px 10px;
+  padding: 4px 0 5px 10px;
   white-space: nowrap;
 }
 

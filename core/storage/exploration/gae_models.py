@@ -27,8 +27,6 @@ import feconf
 from google.appengine.ext import ndb
 
 
-QUERY_LIMIT = 100
-
 EXPLORATION_STATUS_PRIVATE = 'private'
 EXPLORATION_STATUS_PUBLIC = 'public'
 EXPLORATION_STATUS_PUBLICIZED = 'publicized'
@@ -185,7 +183,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLIC
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_publicized(cls):
@@ -194,7 +192,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLICIZED
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_non_private(cls):
@@ -203,10 +201,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_page_of_non_private(cls, page_size=QUERY_LIMIT, urlsafe_start_cursor=None):
+    def get_page_of_non_private(
+            cls, page_size=feconf.DEFAULT_QUERY_LIMIT, urlsafe_start_cursor=None):
         """Returns a page of non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
@@ -225,7 +224,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.community_owned == True
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -240,7 +239,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                    ExplorationRightsModel.viewer_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -252,7 +251,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                    ExplorationRightsModel.editor_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_viewable(cls, user_id):
@@ -264,7 +263,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.viewer_ids == user_id
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):

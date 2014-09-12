@@ -133,6 +133,9 @@ class AdminPage(base.BaseHandler):
             'recent_job_data': recent_job_data,
             'unfinished_job_data': unfinished_job_data,
             'continuous_computations_data': continuous_computations_data,
+            'human_readable_current_time': (
+                utils.get_human_readable_time_string(
+                    utils.get_current_time_in_millisecs())),
         })
 
         self.render_template('admin/admin.html')

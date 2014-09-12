@@ -24,30 +24,31 @@ email_services = models.Registry.import_email_services()
 import feconf
 import utils
 
-from mapreduce import main as mapreduce_main
-from mapreduce import model as mapreduce_model
 from mapreduce.lib.pipeline import pipeline
 
 # The default retention timeline is 2 days.
 MAX_MAPREDUCE_METADATA_RETENTION_MSECS = 2 * 24 * 60 * 60 * 1000
 
 
-def require_cron(handler):
-    """Decorator to ensure that the handler is being called by cron."""
-    def _require_cron(self, *args, **kwargs):
-        if self.request.headers.get('X-AppEngine-Cron') is None:
+def require_cron_or_superadmin(handler):
+    """Decorator to ensure that the handler is being called by cron or by a
+    superadmin of the application.
+    """
+    def _require_cron_or_superadmin(self, *args, **kwargs):
+        if (self.request.headers.get('X-AppEngine-Cron') is None
+                and not self.is_super_admin):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
         else:
             return handler(self, *args, **kwargs)
 
-    return _require_cron
+    return _require_cron_or_superadmin
 
 
 class JobStatusMailerHandler(base.BaseHandler):
     """Handler for mailing admin about job failures."""
 
-    @require_cron
+    @require_cron_or_superadmin
     def get(self):
         """Handles GET requests."""
         TWENTY_FIVE_HOURS_IN_MSECS = 25 * 60 * 60 * 1000
@@ -90,7 +91,9 @@ class JobStatusMailerHandler(base.BaseHandler):
 class CronMapreduceCleanupHandler(base.BaseHandler):
 
     def get(self):
-        """Clean up intermediate data items for completed or failed M/R jobs.
+        """Clean up intermediate data items for completed M/R jobs that
+        started more than MAX_MAPREDUCE_METADATA_RETENTION_MSECS milliseconds
+        ago.
 
         Map/reduce runs leave around a large number of rows in several
         tables.  This data is useful to have around for a while:
@@ -99,20 +102,16 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
         However, after a few days, this information is less relevant, and
         should be cleaned up.
         """
-        self._clean_mapreduce(MAX_MAPREDUCE_METADATA_RETENTION_MSECS)
+        recency_msec = MAX_MAPREDUCE_METADATA_RETENTION_MSECS
 
-    @classmethod
-    def _clean_mapreduce(cls, recency_msec):
-        """Cleans up all MR jobs that started more than recency_msec
-        milliseconds ago.
-        """
         num_cleaned = 0
 
         min_age_msec = recency_msec
         # Only consider jobs that started at most 1 week before recency_msec.
         max_age_msec = recency_msec + 7 * 24 * 60 * 60 * 1000
         # The latest start time that a job scheduled for cleanup may have.
-        max_start_time_msec = utils.get_current_time_in_millisecs() - min_age_msec
+        max_start_time_msec = (
+            utils.get_current_time_in_millisecs() - min_age_msec)
 
         # Get all pipeline ids from jobs that started between max_age_msecs
         # and max_age_msecs + 1 week, before now.
@@ -155,28 +154,14 @@ class CronMapreduceCleanupHandler(base.BaseHandler):
                     p.cleanup()
                     num_cleaned += 1
 
-        mapreduce_state_model_entities_deleted = 0
-        shard_state_model_entities_deleted = 0
+        logging.warning('%s MR jobs cleaned up.' % num_cleaned)
 
-        mapreduce_state_model_class = mapreduce_model.MapreduceState
-        shard_state_model_class = mapreduce_model.ShardState
-
-        for entity in mapreduce_state_model_class.all():
-            if (entity.result_status == 'success' and
-                    utils.get_time_in_millisecs(entity.start_time) <
-                    max_start_time_msec):
-                entity.delete()
-                mapreduce_state_model_entities_deleted += 1
-
-        for entity in shard_state_model_class.all():
-            if (entity.result_status == 'success' and
-                    utils.get_time_in_millisecs(entity.update_time) <
-                    max_start_time_msec):
-                entity.delete()
-                shard_state_model_entities_deleted += 1
-        
-        logging.warning(
-            '%s MR jobs cleaned up, %s MR state entities deleted, '
-            '%s shard state entities deleted.' % (
-                num_cleaned, mapreduce_state_model_entities_deleted,
-                shard_state_model_entities_deleted))
+        if job_models.JobModel.do_unfinished_jobs_exist(
+                jobs.JobCleanupManager.__name__):
+            logging.warning('A previous cleanup job is still running.')
+        else:
+            jobs.JobCleanupManager.enqueue(
+                jobs.JobCleanupManager.create_new(), additional_job_params={
+                    jobs.MAPPER_PARAM_MAX_START_TIME_MSEC: max_start_time_msec
+                })
+            logging.warning('Deletion jobs for auxiliary entities kicked off.')

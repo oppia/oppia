@@ -65,6 +65,7 @@ oppia.controller('Dashboard', [
   // Retrieves dashboard data from the server.
   $http.get($scope.dashboardDataUrl).success(function(data) {
     $scope.recentUpdates = data.recent_updates;
+    $scope.jobQueuedMsec = data.job_queued_msec;
 
     $scope.privateExplorationIds = [];
     $scope.betaExplorationIds = [];

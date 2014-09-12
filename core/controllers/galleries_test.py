@@ -70,7 +70,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'Welcome',
             'title': 'Welcome to Oppia!',
-            'language_code': 'en',
+            'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
         }, response_dict['beta'][0])
@@ -84,7 +84,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'Welcome',
             'title': 'Welcome to Oppia!',
-            'language_code': 'en',
+            'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['released'][0])

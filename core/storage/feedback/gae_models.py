@@ -20,6 +20,7 @@ __author__ = 'Koji Ashida'
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import feconf
 import utils
 
 from google.appengine.ext import ndb
@@ -36,8 +37,6 @@ STATUS_CHOICES = [
     STATUS_CHOICES_COMPLIMENT,
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
-
-QUERY_LIMIT = 100
 
 
 class FeedbackThreadModel(base_models.BaseModel):
@@ -114,7 +113,8 @@ class FeedbackThreadModel(base_models.BaseModel):
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.exploration_id == exploration_id).fetch(QUERY_LIMIT)
+            cls.exploration_id == exploration_id).fetch(
+                feconf.DEFAULT_QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -183,7 +183,7 @@ class FeedbackMessageModel(base_models.BaseModel):
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.thread_id == thread_id).fetch(QUERY_LIMIT)
+            cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_most_recent_message(cls, thread_id):

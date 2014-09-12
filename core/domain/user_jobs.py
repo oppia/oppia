@@ -27,10 +27,6 @@ import feconf
 import utils
 
 
-# The maximum number of results to ever display in a user dashboard.
-DEFAULT_QUERY_LIMIT = 1000
-
-
 class RecentUpdatesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     pass
@@ -60,21 +56,26 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
         pass
 
-    # Public query method.
+    # Public query methods.
     @classmethod
     def get_recent_updates(cls, user_id):
-        """Returns a list of recent updates to explorations and feedback
-        threads. Each entry is a dict with keys 'type', 'activity_id',
-        'activity_title', 'last_updated_ms', 'author_id' and 'subject'.
+        """Gets a list of recent updates to show on this user's dashboard.
 
-        The 'type' is either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
-        feconf.UPDATE_TYPE_FEEDBACK_MESSAGE. The 'activity_id' is the id of the
+        Returns a 2-tuple. The first element is a float representing the number
+        of milliseconds since the Epoch when the job was queued. The second
+        element is a list of recent updates to explorations and feedback
+        threads; each entry is a dict with keys 'type', 'activity_id',
+        'activity_title', 'last_updated_ms', 'author_id' and 'subject'. Here,
+        'type' is either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
+        feconf.UPDATE_TYPE_FEEDBACK_MESSAGE, 'activity_id' is the id of the
         exploration being committed to or to which the feedback thread belongs,
-        and the 'activity_title' is its title.
+        and 'activity_title' is the corresponding title.
         """
         user_model = user_models.UserRecentChangesBatchModel.get(
             user_id, strict=False)
-        return user_model.output if user_model else []
+        return (
+            user_model.job_queued_msec if user_model else None,
+            user_model.output if user_model else [])
 
 
 class RecentUpdatesMRJobManager(
@@ -93,6 +94,9 @@ class RecentUpdatesMRJobManager(
     @staticmethod
     def map(item):
         user_id = item.id
+        job_queued_msec = RecentUpdatesMRJobManager._get_job_queued_msec()
+        reducer_key = '%s@%s' % (user_id, job_queued_msec)
+
         activity_ids_list = item.activity_ids
         feedback_thread_ids_list = item.feedback_thread_ids
 
@@ -107,7 +111,7 @@ class RecentUpdatesMRJobManager(
 
             metadata_obj = exp_models.ExplorationModel.get_snapshots_metadata(
                 activity.id, [activity.version], allow_deleted=True)[0]
-            yield (user_id, {
+            yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'activity_id': activity.id,
                 'activity_title': activity.title,
@@ -133,7 +137,7 @@ class RecentUpdatesMRJobManager(
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     feedback_thread_id))
 
-            yield (user_id, {
+            yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
                 'activity_id': last_message.exploration_id,
                 'activity_title': exp_models.ExplorationModel.get_by_id(
@@ -146,12 +150,21 @@ class RecentUpdatesMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        if '@' not in key:
+            logging.error(
+                'Invalid reducer key for RecentUpdatesMRJob: %s' % key)
+
+        user_id = key[:key.find('@')]
+        job_queued_msec = float(key[key.find('@') + 1:])
+
         values = [ast.literal_eval(sv) for sv in stringified_values]
         sorted_values = sorted(
             values, key=lambda x: x['last_updated_ms'], reverse=True)
 
         user_models.UserRecentChangesBatchModel(
-            id=key, output=sorted_values[: DEFAULT_QUERY_LIMIT]).put()
+            id=user_id, output=sorted_values[: feconf.DEFAULT_QUERY_LIMIT],
+            job_queued_msec=job_queued_msec
+        ).put()
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):

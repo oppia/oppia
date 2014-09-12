@@ -44,3 +44,6 @@ class EmailTests(test_utils.GenericTestBase):
                 to=feconf.ADMIN_EMAIL_ADDRESS)
             self.assertEqual(1, len(messages))
             self.assertEqual(feconf.ADMIN_EMAIL_ADDRESS, messages[0].to)
+            self.assertIn(
+                '(Sent from %s)' % self.EXPECTED_TEST_APP_ID,
+                messages[0].body.decode())
