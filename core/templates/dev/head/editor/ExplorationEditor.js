@@ -402,9 +402,6 @@ oppia.controller('ExplorationEditor', [
         $scope.initExplorationPage(callback);
       }
     }
-
-    // Reset location hash
-    $location.url($location.path());
   });
 
   /********************************************
