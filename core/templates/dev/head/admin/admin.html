@@ -16,9 +16,7 @@
     <div>
       Click <a href="/">here</a> to go to the main Oppia page.
     </div>
-
     <br>
-
     <div ng-if="message" style="background-color: lightyellow; position: fixed; width: 30%; z-index: 3000; border: 1px solid brown; right: 5px;">
       <[message]>
     </div>
@@ -39,58 +37,10 @@
       {% endfor %}
     </div>
 
-    <h3>Configuration properties</h3>
-
-    <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
-      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
-        <div class="row" style="padding-bottom: 10px;">
-          <span class="col-lg-2 col-md-2 col-sm-2">
-            <em><[configPropertyData.description]></em>
-          </span>
-          <span class="col-lg-6 col-md-6 col-sm-6">
-            <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value" is-editable="true">
-            </object-editor>
-          </span>
-          <span class="col-lg-2 col-md-2 col-sm-2">
-            <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
-          </span>
-        </div>
-      </div>
-
-      <button ng-click="saveConfigProperties()">Save</button>
-      <button ng-click="reloadConfigProperties()">Undo changes</button>
-    </div>
-
-    <div ng-if="!isNonemptyObject(configProperties)">
-      No configuration properties are available.
-    </div>
-
-    <h3>Computed configuration properties</h3>
-
-    <div ng-if="isNonemptyObject(computedProperties)">
-      <ul>
-        <li ng-repeat="(computedPropertyId, computedPropertyData) in computedProperties">
-          <em><[computedPropertyData.description]></em>
-          <button ng-click="refreshComputedProperty(computedPropertyId)">Reload</button>
-        </li>
-      </ul>
-    </div>
-
-    <div ng-if="!isNonemptyObject(computedProperties)">
-      No computed configuration properties are available.
-    </div>
-
-    <h3>Performance Counters</h3>
-
-    <ul>
-      {% for counter in counters %}
-        <li>
-          {{counter.description}} : {{counter.value}}
-        </li>
-      {% endfor %}
-    </ul>
-
     <h3>Jobs</h3>
+
+    <h4>Current time: {{human_readable_current_time}}</h4>
+
     <h4>One-off jobs</h4>
     <ul>
       {% for job_spec in one_off_job_specs %}
@@ -201,6 +151,57 @@
         <[jobOutput]>
       </p>
     </div>
+
+    <h3>Configuration properties</h3>
+
+    <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
+      <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
+        <div class="row" style="padding-bottom: 10px;">
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <em><[configPropertyData.description]></em>
+          </span>
+          <span class="col-lg-6 col-md-6 col-sm-6">
+            <object-editor obj-type="<[configPropertyData.obj_type]>" value="configPropertyData.value" is-editable="true">
+            </object-editor>
+          </span>
+          <span class="col-lg-2 col-md-2 col-sm-2">
+            <button type="button" class="btn btn-default" ng-click="revertToDefaultConfigPropertyValue(configPropertyId)">Revert to default</button>
+          </span>
+        </div>
+      </div>
+
+      <button ng-click="saveConfigProperties()">Save</button>
+      <button ng-click="reloadConfigProperties()">Undo changes</button>
+    </div>
+
+    <div ng-if="!isNonemptyObject(configProperties)">
+      No configuration properties are available.
+    </div>
+
+    <h3>Computed configuration properties</h3>
+
+    <div ng-if="isNonemptyObject(computedProperties)">
+      <ul>
+        <li ng-repeat="(computedPropertyId, computedPropertyData) in computedProperties">
+          <em><[computedPropertyData.description]></em>
+          <button ng-click="refreshComputedProperty(computedPropertyId)">Reload</button>
+        </li>
+      </ul>
+    </div>
+
+    <div ng-if="!isNonemptyObject(computedProperties)">
+      No computed configuration properties are available.
+    </div>
+
+    <h3>Performance Counters</h3>
+
+    <ul>
+      {% for counter in counters %}
+        <li>
+          {{counter.description}} : {{counter.value}}
+        </li>
+      {% endfor %}
+    </ul>
 
     {% include 'forms/form_builder_templates.html' %}
     {% include 'footer_js_libs.html' %}
