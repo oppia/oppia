@@ -22,11 +22,11 @@ oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
-    'changeListService', 'warningsData', function(
+    'explorationInitStateNameService', 'changeListService', 'warningsData', function(
       $scope, $http, $window, $modal, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
-      changeListService, warningsData) {
+      explorationInitStateNameService, changeListService, warningsData) {
 
   var GALLERY_PAGE_URL = '/gallery';
 
@@ -36,6 +36,7 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationObjectiveService = explorationObjectiveService;
     $scope.explorationLanguageCodeService = explorationLanguageCodeService;
     $scope.explorationRightsService = explorationRightsService;
+    $scope.explorationInitStateNameService = explorationInitStateNameService;
 
     explorationData.getData().then(function(data) {
       $scope.paramSpecs = data.param_specs || {};
@@ -65,6 +66,19 @@ oppia.controller('ExplorationSettings', [
 
   $scope.saveExplorationLanguageCode = function() {
     explorationLanguageCodeService.saveDisplayedValue();
+  };
+
+  $scope.saveExplorationInitStateName = function() {
+    var newInitStateName = explorationInitStateNameService.displayed;
+
+    // TODO(sll):
+    // - Validate that the new initial state name is valid. If not,
+    // revert to the original and show a warning.
+    // - Calculate which states have rule destinations that need to be changed.
+    // If these exist, show a confirmation dialog (rules with destinations
+    // that are the initial state will be deleted).
+    // - Perform the necessary changes to the exploration graph and rules.
+    explorationInitStateNameService.saveDisplayedValue();
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {

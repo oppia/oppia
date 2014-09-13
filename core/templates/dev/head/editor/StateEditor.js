@@ -21,7 +21,7 @@
 oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
-  'focusService', function(
+  'explorationInitStateNameService', 'focusService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
     focusService) {
@@ -99,9 +99,8 @@ oppia.controller('StateEditor', [
       return false;
     } else {
       // Tidy up the rest of the states.
-      // TODO(sll): Pull initStateName out into a service.
-      if ($scope.$parent.$parent.initStateName == activeStateName) {
-        $scope.$parent.$parent.initStateName = newStateName;
+      if (explorationInitStateNameService.displayed === activeStateName) {
+        explorationInitStateNameService.saveDisplayedValue(newStateName);
       }
 
       $scope.states[newStateName] = angular.copy(

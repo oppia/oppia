@@ -434,20 +434,40 @@ oppia.factory('explorationObjectiveService', [
   return child;
 }]);
 
-
 // A data service that stores the exploration language code.
 oppia.factory('explorationLanguageCodeService', [
-    'explorationPropertyService', '$filter', 'validatorsService',
-    function(explorationPropertyService, $filter, validatorsService) {
+    'explorationPropertyService', function(explorationPropertyService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'language_code';
   child.getAllLanguageCodes = function() {
     return GLOBALS.ALL_LANGUAGE_CODES;
   };
+  child.getCurrentLanguageDescription = function() {
+    for (var i = 0; i < GLOBALS.ALL_LANGUAGE_CODES.length; i++) {
+      if (GLOBALS.ALL_LANGUAGE_CODES[i].code === child.displayed) {
+        return GLOBALS.ALL_LANGUAGE_CODES[i].description;
+      }
+    }
+  };
   child._isValid = function(value) {
     return GLOBALS.ALL_LANGUAGE_CODES.some(function(elt) {
       return elt.code === value;
     });
+  };
+  return child;
+}]);
+
+// A data service that stores the name of the exploration's initial state.
+// NOTE: This service does not perform validation. Users of this service
+// should ensure that new initial state names passed to the service are
+// valid.
+oppia.factory('explorationInitStateNameService', [
+    'explorationPropertyService', 'explorationData',
+    function(explorationPropertyService, explorationData) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'init_state_name';
+  child._isValid = function(value) {
+    return true;
   };
   return child;
 }]);
