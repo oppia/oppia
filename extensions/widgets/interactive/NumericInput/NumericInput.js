@@ -29,7 +29,7 @@ oppia.directive('oppiaInteractiveNumericInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = 0;
 
-        $scope.schema = {
+        $scope.NUMERIC_INPUT_FORM_SCHEMA = {
           type: 'float',
           ui_config: {}
         };
