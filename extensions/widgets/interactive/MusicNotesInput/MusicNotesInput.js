@@ -27,7 +27,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
       scope: {},
       templateUrl: 'interactiveWidget/MusicNotesInput',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.SOUNDFONT_URL = '/third_party/static/midi-js-09335a-patched/soundfont/';
+        $scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         $scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.sequenceToGuessWithValue);
 

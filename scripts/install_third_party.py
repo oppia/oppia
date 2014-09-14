@@ -348,23 +348,12 @@ download_and_untar_files(
     GAE_CLOUD_STORAGE_TAR_URL, THIRD_PARTY_DIR,
     GAE_CLOUD_STORAGE_TAR_ROOT_NAME, GAE_CLOUD_STORAGE_TARGET_ROOT_NAME)
 
-MIDI_JS_REV = '09335aa7078be606f6d2389a3defb6d616db9ff7'
+MIDI_JS_REV = '2ef687b47e5f478f1506b47238f3785d9ea8bd25'
 MIDI_JS_ZIP_URL = (
     'https://github.com/mudcube/MIDI.js/archive/%s.zip' % MIDI_JS_REV)
 MIDI_JS_ZIP_ROOT_NAME = 'MIDI.js-%s' % MIDI_JS_REV
-MIDI_JS_TARGET_ROOT_NAME = 'midi-js-09335a'
-MIDI_JS_PATCH_ROOT_NAME = 'midi-js-09335a-patched'
+MIDI_JS_TARGET_ROOT_NAME = 'midi-js-2ef687'
 
 download_and_unzip_files(
     MIDI_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     MIDI_JS_ZIP_ROOT_NAME, MIDI_JS_TARGET_ROOT_NAME)
-
-# Copy Midi files to new directory and add patch for updated chrome api.
-if not os.path.exists(
-    os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME)):
-    shutil.copytree(
-        os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_TARGET_ROOT_NAME),
-        os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME))
-    # Apply the patch.
-    subprocess.check_call(
-        ['git', 'apply', os.path.join('scripts', 'data', 'MIDI.js.patch')])
