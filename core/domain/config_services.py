@@ -33,8 +33,7 @@ def set_property(committer_id, name, value):
     if config_property is None:
         raise Exception('No config property with name %s found.')
 
-    value = obj_services.Registry.get_object_class_by_type(
-        config_property.obj_type).normalize(value)
+    value = config_property.normalize(value)
 
     # Set value in datastore.
     datastore_item = config_models.ConfigPropertyModel.get(
