@@ -20,8 +20,8 @@
 // - Variable look-up ('#' operator) failure. (ExprUndefinedVarError)
 // - Wrong number of arguments in the node for the given operator.
 //   (ExprWrongNumArgsError)
-// Both errors are children of ExpressionError, so caller can use this error
-// to catch only these expected error cases.
+// Both errors are children of ExpressionError, so caller can use
+// ExpressionError to catch only these expected error cases.
 //
 // An expression is evaluated in a context consisting of predefined system
 // variables, system operators and system functions. User defined parameters
@@ -157,6 +157,7 @@ var verifyNumArgs = function(args, expectedNum, expectedMax) {
   throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
 }
 
+// TODO(kashida): Document all operators input and output contracts.
 var system = {
   '#': function(args, envs) {
     return lookupEnvs(args[0] + '', envs);

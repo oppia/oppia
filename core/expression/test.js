@@ -121,14 +121,15 @@ applyTests([
   // 'expected' should be either a JavaScript primitive value that would be the
   // result of evaluation 'expression', or an exception that is expected to be
   // thrown.
-  // 'expression' is either a string (in which case parsed) or a parse tree.
+  // 'expression' is either a string (in which case parsed) or an array
+  // (representing a parse tree).
   var parsed = typeof(expression) == 'string' ?
       parser.parse(expression) : expression;
   var parsed_json = JSON.stringify(parsed);
   var failed = false;
   try {
     var evaled = evaluate(parsed, ENVS);
-    if (expected instanceof Error || evaled != expected) {
+    if (expected instanceof Error || evaled !== expected) {
       console.error('input     : ' + expression);
       console.error('parsed    : ' + parsed_json);
       console.error('evaluated : ' + evaled);
