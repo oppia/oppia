@@ -16,6 +16,7 @@ applyTests([
   [32, '0x20'],
   [10.1, '10.1'],
   [0.001, '1e-3'],
+  [0.35, '.35'],
   ['abc', '"abc"'],
   ["a'b'c", '"a\'b\'c"'],
   [null, 'null'],
@@ -35,9 +36,10 @@ applyTests([
       '+10'],
   [['-', ['#', 'abc']],
       '-abc'],
+  [['-', 0.35], '-.35'],
 
   // There is a double width space after '+'.
-  [['+', 1, 2], "\t" + '1 +　2 '],
+  [['+', 1, 2], '\t1 +　2 '],
 
   [['*', ['/', 3, 4], 5],
       '3 / 4 * 5'],
@@ -56,9 +58,10 @@ applyTests([
 
 ], function(expected, expression) {
   // 'expected' should be either a JavaScript primitive value that would be the
-  // result of evaluation 'expression', or an undefined which would expect the
-  // parser to fail.
+  // result of evaluating 'expression', or undefined (which means that the
+  // parser is expected to fail).
   // 'expression' is the expression string to be parsed.
+
   var failed = false;
   try {
     var parsed = parser.parse(expression);
