@@ -33,6 +33,6 @@ bash scripts/create_expr_parser.sh
 
 # The node interpreter binary doesn't take multiple input files as arguments,
 # so we concatenate the two input files and send them as one chunk through
-# stdin to node. Also adding core/expression to NODE_PATH allows "node" to find
-# parser.js.
-cat core/expression/evaluator.js core/expression/test.js | NODE_PATH=$NODE_PATH:core/expression node
+# stdin to node. Also adding core/templates/dev/head/expressions to NODE_PATH
+# allows "node" to find parser.js.
+cat core/templates/dev/head/expressions/evaluator.js core/templates/dev/head/expressions/test.js | NODE_PATH=$NODE_PATH:core/templates/dev/head/expressions node
