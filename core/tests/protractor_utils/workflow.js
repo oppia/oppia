@@ -31,16 +31,16 @@ var createExploration = function(name, category) {
   element(by.buttonText('Add New Exploration')).click();
 };
 
-// Moves from exploration editor view to reader view; there must be no unsaved
+// Moves from exploration editor view to player view; there must be no unsaved
 // changes.
-// NOTE: we do not use the button because that will open in a new window.
-var moveToReader = function() {
+// NOTE: we do not use the preview button because that will open a new window.
+var moveToPlayer = function() {
   browser.getCurrentUrl().then(function(url) {
     expect(url.slice(0, 29)).toBe('http://localhost:4445/create/');
-    var explorationID = url.slice(29, 41);
-    browser.get('/explore/' + explorationID);
+    var explorationId = url.slice(29, 41);
+    browser.get('/explore/' + explorationId);
   });
 };
 
 exports.createExploration = createExploration;
-exports.moveToReader = moveToReader;
+exports.moveToPlayer = moveToPlayer;

@@ -13,7 +13,7 @@
 // limitations under the License.	
 
 /**
- * @fileoverview End-to-end tests of the interaction between the reader and editor
+ * @fileoverview End-to-end tests of the interaction between the player and editor
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
@@ -21,7 +21,7 @@
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
-var reader = require('../protractor_utils/reader.js');
+var player = require('../protractor_utils/player.js');
 
 describe('Editing content', function() {
   it('should display plain text', function() {
@@ -36,10 +36,10 @@ describe('Editing content', function() {
     editor.editRule('default').setDestination('END');
 
     editor.saveChanges().then(function() {
-      workflow.moveToReader();
-      expect(reader.getCurrentQuestionText()).toBe('plain text');
-      reader.answerContinueWidget();
-      reader.expectExplorationToBeOver();
+      workflow.moveToPlayer();
+      expect(player.getCurrentQuestionText()).toBe('plain text');
+      player.answerContinueWidget();
+      player.expectExplorationToBeOver();
     });
   });
 
@@ -56,20 +56,19 @@ describe('Editing content', function() {
     editor.editContent().appendUnorderedList(['an entry', 'another entry']);
     editor.editContent().close();
 
-    editor.selectNumericWidget();
-    editor.selectContinueWidget('click here');
     editor.selectSimpleMultipleChoiceWidget(['option A', 'option B']);
 
-    editor.editRule('default').editFeedback().appendEntry('Add Feedback');
     editor.editRule('default').editFeedback().editRichTextEntry(0).
       appendPlainText('wrong');
 
     editor.editRule('default').setDestination('END');
 
+    protractor.getInstance().sleep(30000);
+
     editor.saveChanges().then(function() {
-      workflow.moveToReader();
-      reader.answerMultipleChoiceWidget('option B');
-      reader.expectExplorationToBeOver();
+      workflow.moveToPlayer();
+      player.answerMultipleChoiceWidget('option B');
+      player.expectExplorationToBeOver();
     });
   });
 });

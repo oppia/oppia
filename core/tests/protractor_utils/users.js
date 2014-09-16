@@ -41,7 +41,7 @@ var logout = function() {
   driver.findElement(protractor.By.id('submit-logout')).click();
 };
 
-var appointModerator = function(email) {
+var _appointModerator = function(email) {
   browser.get('/admin');
   var moderatorList = element(
     by.repeater(
@@ -56,7 +56,7 @@ var appointModerator = function(email) {
   protractor.getInstance().sleep(1000);
 };
 
-var appointAdmin = function(email) {
+var _appointAdmin = function(email) {
   browser.get('/admin');
   var adminList = element(
     by.repeater(
@@ -72,7 +72,7 @@ var appointAdmin = function(email) {
 };
 
 // This will fail if the user already has a username.
-var chooseUsername = function(username) {
+var registerAsEditor = function(username) {
   browser.get('/gallery');
   element(by.css('.btn-lg')).click();
   element(by.model('username')).sendKeys(username);
@@ -82,26 +82,26 @@ var chooseUsername = function(username) {
 
 var createUser = function(email, username) {
   login(email);
-  chooseUsername(username);
+  registerAsEditor(username);
   logout();
 };
 
 var createAndLoginUser = function(email, username) {
   login(email);
-  chooseUsername(username);
+  registerAsEditor(username);
 };
 
 var createModerator = function(email, username) {
   login(email, true);
-  chooseUsername(username);
-  appointModerator(email);
+  registerAsEditor(username);
+  _appointModerator(email);
   logout();
 };
 
 var createAdmin = function(email, username) {
   login(email, true);
-  chooseUsername(username);
-  appointAdmin(email);
+  registerAsEditor(username);
+  _appointAdmin(email);
   logout();
 };
 
@@ -111,3 +111,4 @@ exports.createUser = createUser;
 exports.createAndLoginUser = createAndLoginUser;
 exports.createModerator = createModerator;
 exports.createAdmin = createAdmin;
+

@@ -26,10 +26,10 @@ objects = require('./objects.js');
 var editContent = function() {
   var operations = objects.editRichText(element(by.css('.oppia-state-content')));
   operations.open = function() {
-    element(by.id('protractor-test-edit-content')).click();
+    element(by.css('.protractor-test-edit-content')).click();
   };
   operations.close = function() {
-    element(by.css('.oppia-state-content')).element(by.buttonText('Close')).click();
+    element(by.css('.oppia-state-content')).element(by.buttonText('Save Content')).click();
   };
   return operations;
 };
@@ -37,12 +37,12 @@ var editContent = function() {
 
 // Interactive widgets
 var _openWidgetEditor = function(widgetIndex) {
-  element(by.id('protractor-test-edit-interaction')).click();
+  element(by.css('.protractor-test-edit-interaction')).click();
   element(by.repeater('widget in widgetList').row(widgetIndex)).click();
 };
 
 var _closeWidgetEditor = function() {
-  element(by.id('protractor-test-save-interaction')).click();
+  element(by.css('.protractor-test-save-interaction')).click();
 };
 
 var selectNumericWidget = function() {
@@ -54,7 +54,7 @@ var selectContinueWidget = function(buttonText) {
   _openWidgetEditor(0);
   if (buttonText) {
     element(by.linkText('Customize')).click();
-    objects.editUnicode(element(by.id('protractor-test-widget-args'))).setText(buttonText);
+    objects.editUnicode(element(by.css('.protractor-test-widget-args'))).setText(buttonText);
   }
   _closeWidgetEditor();
 };
@@ -62,10 +62,10 @@ var selectContinueWidget = function(buttonText) {
 var selectSimpleMultipleChoiceWidget = function(textArray) {
   _openWidgetEditor(1);
   element(by.linkText('Customize')).click();
-  var editor = objects.editList(element(by.id('protractor-test-widget-args')));
-  editor.editRichTextEntry(0).appendPlainText(textArray[0]);
+  var customizer = objects.editList(element(by.css('.protractor-test-widget-args')));
+  customizer.editRichTextEntry(0).appendPlainText(textArray[0]);
   for (var i = 1; i < textArray.length; i++) {
-    var newEntry = editor.appendEntry('Add multiple choice option');
+    var newEntry = customizer.appendEntry('Add multiple choice option');
     objects.editRichText(newEntry).appendPlainText(textArray[i]);
   }
   _closeWidgetEditor();
@@ -75,11 +75,19 @@ var selectSimpleMultipleChoiceWidget = function(textArray) {
 // Rules are zero-indexed; 'default' denotes the default rule.
 var editRule = function(ruleNum) {
   var elem = (ruleNum === 'default') ?
-    element(by.id('protractor-test-default-rule')):
+    element(by.css('.protractor-test-default-rule')):
     element(by.repeater('rule in handler track by $index').row(ruleNum));
   return {
     editFeedback: function() {
-      return objects.editList(elem.element(by.css('.oppia-feedback-bubble')))
+      var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
+      // There may are may not be a button; if there is we click it
+      feedbackElement.element.all(by.css('.protractor-test-edit-feedback')).
+        then(function(buttons) {
+          if (buttons.length > 0) {
+            buttons[0].click();
+          }
+        });
+      return objects.editList(feedbackElement);
     },
     // Enter 'END' for the end state.
     setDestination: function(destinationName) {
@@ -90,20 +98,21 @@ var editRule = function(ruleNum) {
   }
 };
 
-// This must be run asynchronously; it will fail if no changes have been made.
+// This must be run using .then() rather than directly; it will throw an error
+// if there are no pending changes.
 var saveChanges = function(commitMessage) {
   return {
-    then: function(subsequentFunction) {
-      element(by.id('protractor-test-save-changes')).click().then(function() {
+    then: function(successCallback) {
+      element(by.css('.protractor-test-save-changes')).click().then(function() {
         if (commitMessage) {
           element(by.model('commitMessage')).sendKeys(commitMessage);
         }
-        element(by.css('.modal-footer')).element(by.css('.btn-success')).
+        element(by.css('.protractor-test-close-save-modal')).
           click().then(function() {
             // This is necessary to give the page time to record the changes,
             // so that it does not attempt to stop the user leaving.
             protractor.getInstance().sleep(2000);
-            subsequentFunction();
+            successCallback();
         });
       });
     }
@@ -116,6 +125,6 @@ exports.selectNumericWidget = selectNumericWidget;
 exports.selectContinueWidget = selectContinueWidget;
 exports.selectSimpleMultipleChoiceWidget = selectSimpleMultipleChoiceWidget;
 
-exports.editRule = editRule
+exports.editRule = editRule;
 
 exports.saveChanges = saveChanges;

@@ -20,6 +20,7 @@
  */
 
 var editList = function(elem) {
+  // Returns the list-entry with the given index
   var _retrieveEntry = function(entryNum) {
     return elem.element(by.repeater('item in localValue track by $index').
       row(entryNum));
@@ -27,10 +28,11 @@ var editList = function(elem) {
   // NOTE: this returns a promise, not an integer.
   var _getLength = function() {
     return elem.element.all(by.repeater('item in localValue track by $index')).
-      then(function(items) {
-        return items.length;
+        then(function(items) {
+      return items.length;
     });
-  }
+  };
+
   return {
     editUnicodeEntry: function(entryNum) {
       return editUnicode(_retrieveEntry(entryNum));
@@ -44,23 +46,13 @@ var editList = function(elem) {
       var appendButtonText = appendButtonText || 'Add element'
       elem.element(by.buttonText(appendButtonText)).click();
       return _retrieveEntry(listLength);
-    },
-    deleteEntry: function(entryNum) {
-      // TODO: FIX AND TEST!
-      elem.element(by.repeater('item in localValue track by $index').
-        row(entryNum)).child(2).element(by.tagName('button')).click();
     }
   };
 };
 
-// Some unicode editors require clicking "Edit" first and other do not; the
-// needToClickEdit boolean indicates which this is.
-var editUnicode = function(elem, needToClickEdit) {
+var editUnicode = function(elem) {
   return {
     setText: function(text) {
-      if (needToClickEdit) {
-        elem.element(by.linkText('Edit')).click();
-      }
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(text);
     }
@@ -77,11 +69,6 @@ var editReal = function(elem) {
 };
 
 var editRichText = function(elem) {
-  // It may or may not be necessary to click (Edit) to open the editor.
-  // TODO: FIX & reinstate
-  //try {
-  //  elem.element(by.linkText('Edit')).click();
-  //} catch(err) {}
   var _appendContentText = function(text) {
     elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')).
       sendKeys(text);
