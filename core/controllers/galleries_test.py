@@ -16,12 +16,15 @@
 
 __author__ = 'Sean Lip'
 
+from core import jobs_registry
 from core.controllers import galleries
 from core.domain import config_services
+from core.domain import exp_jobs_test
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
+
 
 CAN_EDIT_STR = 'can_edit'
 
@@ -46,48 +49,77 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
     def test_gallery_handler(self):
         """Test the gallery data handler."""
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_default_exploration(
-            self.EXP_ID, owner_id, title=self.EXP_TITLE)
-        self.set_admins([self.OWNER_EMAIL])
 
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual({
-            'is_admin': False,
-            'is_moderator': False,
-            'is_super_admin': False,
-            'private': [],
-            'beta': [],
-            'released': [],
-        }, response_dict)
+        with self.swap(
+                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
+                [exp_jobs_test.ModifiedExpSummaryAggregator]):
 
-        # Load a public demo exploration.
-        exp_services.load_demo('0')
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['released'], [])
-        self.assertEqual(len(response_dict['beta']), 1)
-        self.assertDictContainsSubset({
-            'id': '0',
-            'category': 'Welcome',
-            'title': 'Welcome to Oppia!',
-            'language': 'English',
-            'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
-        }, response_dict['beta'][0])
+            owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+            self.save_new_default_exploration(
+                self.EXP_ID, owner_id, title=self.EXP_TITLE)
+            self.set_admins([self.OWNER_EMAIL])
 
-        # Publicize the demo exploration.
-        rights_manager.publicize_exploration(owner_id, '0')
-        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['beta'], [])
-        self.assertEqual(len(response_dict['released']), 1)
-        self.assertDictContainsSubset({
-            'id': '0',
-            'category': 'Welcome',
-            'title': 'Welcome to Oppia!',
-            'language': 'English',
-            'objective': 'become familiar with Oppia\'s capabilities',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
-        }, response_dict['released'][0])
+            # run batch job
+            self.process_and_flush_pending_tasks()
+            exp_jobs_test.ModifiedExpSummaryAggregator.start_computation()
+            self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            # need to stop computation here, otherwise cannot start new
+            # computation below. todo: undertand this better
+            exp_jobs_test.ModifiedExpSummaryAggregator.stop_computation(owner_id)
+
+            response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+            self.assertEqual({
+                'is_admin': False,
+                'is_moderator': False,
+                'is_super_admin': False,
+                'private': [],
+                'beta': [],
+                'released': [],
+            }, response_dict)
+
+            # Load a public demo exploration.
+            exp_services.load_demo('0')
+
+            # run batch job
+            exp_jobs_test.ModifiedExpSummaryAggregator.start_computation()
+            self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+            self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+            exp_jobs_test.ModifiedExpSummaryAggregator.stop_computation(owner_id)
+
+            response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+            self.assertEqual(response_dict['released'], [])
+            self.assertEqual(len(response_dict['beta']), 1)
+            self.assertDictContainsSubset({
+                'id': '0',
+                'category': 'Welcome',
+                'title': 'Welcome to Oppia!',
+                'language_code': 'en',
+                'objective': 'become familiar with Oppia\'s capabilities',
+                'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
+            }, response_dict['beta'][0])
+
+            # Publicize the demo exploration.
+            rights_manager.publicize_exploration(owner_id, '0')
+
+            # run batch job
+            exp_jobs_test.ModifiedExpSummaryAggregator.start_computation()
+            self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+            self.process_and_flush_pending_tasks()
+
+            response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+            self.assertEqual(response_dict['beta'], [])
+            self.assertEqual(len(response_dict['released']), 1)
+            self.assertDictContainsSubset({
+                'id': '0',
+                'category': 'Welcome',
+                'title': 'Welcome to Oppia!',
+                'language_code': 'en',
+                'objective': 'become familiar with Oppia\'s capabilities',
+                'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+            }, response_dict['released'][0])
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""

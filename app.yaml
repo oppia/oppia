@@ -1,5 +1,5 @@
-application: oppiaserver
-version: 1-2-9
+application: oppia-msl
+version: 1
 runtime: python27
 api_version: 1
 threadsafe: false

@@ -22,10 +22,13 @@ import logging
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import widget_registry
 from core.platform import models
+(base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 
@@ -52,6 +55,7 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+
         noninteractive_widget_html = (
             widget_registry.Registry.get_noninteractive_widget_html())
 
@@ -77,36 +81,27 @@ class GalleryHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
-
-        # TODO(sll): Precompute and cache gallery categories. Or have a fixed
-        # list of categories and 'Other', and gradually classify the
-        # explorations in 'Other'.
+        # TODO(msl): Add realtime layer to get up-to-date gallery
 
         language_codes_to_short_descs = {
             lc['code']: self._get_short_language_description(lc['description'])
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 
-        explorations_dict = (
-            exp_services.get_non_private_explorations_summary_dict(
-                user_id=self.user_id))
-        if self.user_id:
-            explorations_dict.update(
-                exp_services.get_private_at_least_viewable_explorations_summary_dict(
-                    self.user_id))
+        # Get all exploration summaries (keyed by exploration id)
+        exp_summary_models = exp_models.ExpSummaryModel.get_non_private()
 
         explorations_list = [{
-            'id': exp_id,
-            'title': exp_data['title'],
-            'category': exp_data['category'],
-            'objective': exp_data['objective'],
-            'language': language_codes_to_short_descs.get(
-                exp_data['language_code'], exp_data['language_code']),
-            'last_updated': exp_data['last_updated'],
-            'status': exp_data['status'],
-            'community_owned': exp_data['community_owned'],
-            'is_editable': exp_data['is_editable'],
-        } for (exp_id, exp_data) in explorations_dict.iteritems()]
+            'id': expsum.id,
+            'title': expsum.title,
+            'category': expsum.category,
+            'objective': expsum.objective,
+            'language_code': expsum.language_code,
+            'last_updated': expsum.last_updated,
+            'status': expsum.status,
+            'community_owned': expsum.community_owned,
+            'is_editable': exp_services.exp_summary_is_editable(expsum, user_id=self.user_id)
+        } for expsum in exp_summary_models]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(

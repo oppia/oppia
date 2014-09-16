@@ -48,7 +48,7 @@ echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
 if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.10.zip -O gae-download.zip
+  wget --no-check-certificate https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.10.zip -O gae-download.zip
   unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.10/
   rm gae-download.zip
 fi
@@ -57,8 +57,8 @@ fi
 echo Checking if webtest is installed in third_party
 if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   echo Installing webtest framework
-  # a bug in older versions of wget prevents it from properly getting the certificate and downloading pypi
-  wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip --no-check-certificate -O webtest-download.zip
+  # a bug in older versions of wget --no-check-certificate prevents it from properly getting the certificate and downloading pypi
+  wget --no-check-certificate http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip --no-check-certificate -O webtest-download.zip
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip
   # Move WebTest-1.4.2 to tmp directory first to get around case insensitivity

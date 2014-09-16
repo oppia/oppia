@@ -10,6 +10,31 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
+- kind: DeleteExpCopiesRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: ExpCopiesRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: ExpDeleteRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
+- kind: ExpSummaryModel
+  properties:
+  - name: deleted
+  - name: status
+
+- kind: ExpSummaryRealtimeModel
+  properties:
+  - name: realtime_layer
+  - name: created_on
+
 - kind: ExplorationCommitLogEntryModel
   properties:
   - name: exploration_id

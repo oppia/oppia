@@ -143,6 +143,15 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
+def exp_summary_is_editable(exp_summary_model, user_id=None):
+    """Checks if a given user may edit an exploration by checking
+    the exploration's summary model."""
+    return user_id is not None and (
+        user_id in exp_summary_model.editor_ids
+        or user_id in exp_summary_model.owner_ids
+        or exp_summary_model.community_owned)
+
+
 # Query methods.
 def _get_explorations_summary_dict(exploration_rights, user_id=None):
     """Returns exploration summaries corresponding to the given rights objects.
@@ -380,6 +389,7 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'default_skin_id':
                     exploration.update_default_skin_id(change.new_value)
         return exploration
+
     except Exception as e:
         logging.error(
             '%s %s %s %s' % (
@@ -613,6 +623,14 @@ def _create_exploration(
     _handle_exp_change_event(exploration.id)
     exploration.version += 1
 
+    # create summary of exploration TODO(msl): Here, and in rest of
+    # exp_services, is it guaranteed that the exp_model is already put
+    # in the datastore when we call summarize_exploration? this would
+    # require that creating, deleting, updating, reverting
+    # explorations uses put instead of put_async? is this actually the
+    # case?
+    exp_models.ExpSummaryModel.summarize_exploration(
+        exp_models.ExplorationModel.get(exploration.id))
 
 def save_new_exploration(committer_id, exploration):
     commit_message = (
@@ -622,6 +640,7 @@ def save_new_exploration(committer_id, exploration):
         'title': exploration.title,
         'category': exploration.category,
     }])
+
 
 
 def delete_exploration(committer_id, exploration_id, force_deletion=False):
@@ -655,6 +674,9 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     #delete the exploration from search.
     search_services.delete_documents_from_index([exploration_id],
                                                 SEARCH_INDEX_EXPLORATIONS)
+
+    # delete summary of changed exploration
+    exp_models.ExpSummaryModel.get(exploration_id).delete()
 
 
 # Operations on exploration snapshots.
@@ -745,6 +767,9 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
+    # update summary of changed exploration
+    exp_models.ExpSummaryModel.summarize_exploration(
+        exp_models.ExplorationModel.get(exploration_id))
 
 def revert_exploration(
         committer_id, exploration_id, current_version, revert_to_version):
@@ -777,6 +802,10 @@ def revert_exploration(
         committer_id, 'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
+
+    # update summary of changed exploration
+    exp_models.ExpSummaryModel.summarize_exploration(
+        exp_models.ExplorationModel.get(exploration_id))
 
 
 # Creation and deletion methods.

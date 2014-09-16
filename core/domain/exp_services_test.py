@@ -41,6 +41,9 @@ from core.tests import test_utils
 import feconf
 import utils
 
+# TODO(msl): test ExpSummaryModel changes if explorations are updated, 
+# reverted, deleted, created
+
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
 
