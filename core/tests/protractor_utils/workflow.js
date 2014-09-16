@@ -28,7 +28,7 @@ var createExploration = function(name, category) {
     sendText(category);
   element(by.css('.select2-container')).click();
   element(by.css('.select2-input')).sendKeys(category + '\n');
-  element(by.buttonText('Save')).click();
+  element(by.buttonText('Add New Exploration')).click();
 };
 
 // Moves from exploration editor view to reader view; there must be no unsaved

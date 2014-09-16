@@ -40,7 +40,7 @@ class BaseEventHandler(object):
         """Dispatch events asynchronously to continuous computation realtime
         layers that are listening for them.
         """
-        taskqueue_services.defer(
+        taskqueue_services.defer_to_events_queue(
             jobs_registry.ContinuousComputationEventDispatcher.dispatch_event,
             cls.EVENT_TYPE, *args, **kwargs)
 
@@ -135,6 +135,30 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
+
+
+class ExplorationContentChangeEventHandler(BaseEventHandler):
+    """Event handler for receiving exploration change events. This event is
+    triggered whenever changes to an exploration's contents or metadata (title, blurb etc.)
+    are persisted. This includes when a a new exploration is created."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_CHANGE
+
+    @classmethod
+    def _handle_event(cls, *args, **kwargs):
+        pass
+
+
+class ExplorationStatusChangeEventHandler(BaseEventHandler):
+    """Event handler for receiving exploration status change events.
+    These events are triggered whenever an exploration is published, publicized,
+    unpublished or unpublicized."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_EXPLORATION_STATUS_CHANGE
+
+    @classmethod
+    def _handle_event(cls, *args, **kwargs):
+        pass
 
 
 class Registry(object):

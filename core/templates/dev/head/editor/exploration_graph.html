@@ -5,7 +5,7 @@
   </div>
 
   <div ng-if="editabilityService.isEditable()" class="oppia-add-state-container">
-    <form role="form" class="form-horizontal" ng-submit="addState(newStateDesc)">
+    <form role="form" class="form-horizontal" ng-submit="addState(newStateDesc, onClickStateInMinimap)">
       <div class="form-group">
         <div class="col-lg-8 col-md-8 col-sm-8">
           <input type="text" class="form-control" ng-model="newStateDesc" class="oppia-add-state-input" placeholder="New State Name">

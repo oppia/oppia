@@ -69,7 +69,7 @@ RELEASE_DIR_NAME = '%s-deploy-%s' % (
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.8.8', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.10', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')
@@ -157,7 +157,11 @@ with common.CD(RELEASE_DIR_PATH):
 
     # Run the tests; ensure there are no errors.
     print 'Running tests...'
-    subprocess.check_output(['python', 'scripts/backend_tests.py'])
+    test_output = subprocess.check_output([
+        'python', 'scripts/backend_tests.py'])
+
+    if 'All tests passed.' not in test_output:
+        raise Exception('Tests failed. Halting deployment.\n%s' % test_output)
 
     # Deploy to GAE.
     subprocess.check_output([APPCFG_PATH, 'update', '.', '--oauth2'])

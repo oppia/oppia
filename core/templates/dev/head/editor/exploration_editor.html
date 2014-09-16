@@ -66,7 +66,7 @@
           <ul>
             <li>It should help its intended audience learn something new.</li>
             <li>It should convey more than a single isolated factoid.</li>
-            <li>It should provide useful feedback and guidance to help the learner (and not just 'Correct'/'Incorrect').</li>
+            <li>It should provide useful feedback and guidance to help the learner.</li>
             <li>It should not substantially duplicate existing explorations.</li>
           </ul>
         </p>
@@ -77,15 +77,15 @@
         <p>
           If your exploration meets all these criteria, please feel free to publish
           it so that others can playtest and improve it! Good explorations can subsequently be
-          moved to the Learn gallery. (You can find more information
+          moved to the gallery. (You can find more information
           <a href="/site_guidelines#/how-to-use" target="_blank">here</a>
           about how this works.)
         </p>
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-success" ng-click="publish()">Publish</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
 
@@ -96,7 +96,7 @@
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to submit your exploration to be reviewed for release! Once released, the exploration will appear in the Learn gallery for everyone to learn from.
+          Congratulations, you are about to submit your exploration to be reviewed for release! Once released, the exploration will appear in the gallery for everyone to learn from.
         </p>
 
         <p>
@@ -117,8 +117,8 @@
       </div>
 
       <div class="modal-footer">
-        <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
         <button class="btn btn-default" ng-click="close()">Close</button>
+        <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
       </div>
     </script>
 
@@ -162,8 +162,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
-        <button class="btn btn-default" ng-click="cancel()">Close</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-danger" ng-click="reallyDelete()">Delete Exploration</button>
       </div>
     </script>
 
@@ -179,8 +179,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-default" ng-click="reallyDelete()">Delete</button>
-        <button class="btn btn-default" ng-click="cancel()">Close</button>
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-danger" ng-click="reallyDelete()">Delete State</button>
       </div>
     </script>
 
@@ -236,8 +236,8 @@
         </p>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-success" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save</button>
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <button class="btn btn-success" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save Exploration</button>
       </div>
     </script>
 
@@ -248,68 +248,58 @@
             <strong>Note:</strong> This is a private, unpublishable copy of a
             <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
             You are very welcome to submit feedback to improve the original exploration: to do this,
-            click the previous link, then click the green Feedback button on the left of the page.
+            click the previous link, then click the Feedback button on the top-right.
             Thank you!
           </div>
         </div>
       </div>
 
       <div class="row oppia-exploration-editor-top-row">
-        <div class="col-lg-5 col-md-5 col-sm-5">
+        <div class="col-lg-6 col-md-6 col-sm-6">
           <div>
             <span class="oppia-page-title">
               <[explorationTitleService.displayed]>
             </span>
-            <span ng-if="explorationRightsService.isPrivate()" class="label label-info">
+          </div>
+          <div>
+            <span class="label label-info">
+              <[explorationCategoryService.displayed]>
+            </span>
+            <span ng-if="explorationRightsService.isPrivate()" class="label label-primary">
               Private
             </span>
-            <span ng-if="explorationRightsService.isPublic()" class="label label-info">
+            <span ng-if="explorationRightsService.isPublic()" class="label label-primary">
               Beta
             </span>
-            <span ng-if="explorationRightsService.isPublicized()" class="label label-info">
+            <span ng-if="explorationRightsService.isPublicized()" class="label label-primary">
               Released
             </span>
-            <span ng-if="explorationRightsService.isCloned()" class="label label-info">
+            <span ng-if="explorationRightsService.isCloned()" class="label label-primary">
               Cloned
             </span>
-            <span ng-if="explorationRightsService.isCommunityOwned()" class="label label-info">
+            <span ng-if="explorationRightsService.isCommunityOwned()" class="label label-primary">
               Community-owned
-            </span>
-          </div>
-
-          <div>
-            <span ng-if="explorationObjectiveService.displayed">
-              <strong>Aim of the exploration:</strong> to help learners <[explorationObjectiveService.displayed]>.
-            </span>
-            <span ng-if="!explorationObjectiveService.displayed">
-              <em>No objective specified.</em>
             </span>
           </div>
         </div>
 
-        <div class="col-lg-7 col-md-7 col-sm-7">
+        <div class="col-lg-6 col-md-6 col-sm-6">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <span class="pull-right" style="margin-top: 10px;">
 
                 {% if can_publish %}
                   <span ng-if="explorationRightsService.isPrivate()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length">
+                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
                       publish
                     </button>
-                    <img class="oppia-help" src="/images/help.png"
-                         tooltip="Click this button to publish your exploration to the playtest queue."
-                         tooltip-placement="bottom">
                   </span>
                 {% endif %}
 
                 <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-                  <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}">
+                  <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the gallery by default." tooltip-placement="bottom">
                     nominate for release
                   </button>
-                  <img class="oppia-help" src="/images/help.png"
-                       tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the Learn Gallery by default."
-                       tooltip-placement="bottom">
                 </span>
 
                 <span class="oppia-exploration-ctrl" ng-if="!explorationRightsService.isPrivate()">

@@ -201,7 +201,8 @@ class EditorTest(BaseEditorControllerTest):
         # TODO(sll): Use the ExplorationPlayer in reader_test for this.
         exploration_dict = self.get_json(
             '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
-        self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
+        self.assertEqual(
+            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
@@ -310,7 +311,8 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         self.logout()
         exploration_dict = self.get_json(
             '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
-        self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
+        self.assertEqual(
+            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
@@ -365,7 +367,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -382,7 +388,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -399,7 +409,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:

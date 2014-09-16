@@ -389,10 +389,25 @@ class AnswerHandlerInstance(object):
 class WidgetInstance(object):
     """Value object for a widget instance."""
 
+    def _get_full_customization_args(self):
+        """Populates the customization_args dict of the widget with default
+        values, if any of the expected customization_args are missing.
+        """
+        full_customization_args_dict = copy.deepcopy(self.customization_args)
+
+        widget = widget_registry.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, self.widget_id)
+        for ca_spec in widget.customization_arg_specs:
+            if ca_spec.name not in full_customization_args_dict:
+                full_customization_args_dict[ca_spec.name] = {
+                    'value': ca_spec.default_value
+                }
+        return full_customization_args_dict
+
     def to_dict(self):
         return {
             'widget_id': self.widget_id,
-            'customization_args': self.customization_args,
+            'customization_args': self._get_full_customization_args(),
             'handlers': [handler.to_dict() for handler in self.handlers],
             'sticky': self.sticky
         }
@@ -457,7 +472,7 @@ class WidgetInstance(object):
                     'Invalid widget customization arg name: %s' % arg_name)
             if arg_name not in widget_customization_arg_names:
                 extra_args.append(arg_name)
-                logging.error(
+                logging.warning(
                     'Parameter %s for widget %s is invalid.'
                     % (arg_name, self.widget_id))
             # TODO(sll): Find a way to verify that the arg_values have the
@@ -680,6 +695,33 @@ class Exploration(object):
         self.version = version
         self.created_on = created_on
         self.last_updated = last_updated
+
+    def is_equal_to(self, other):
+        simple_props = ['id', 'title', 'category', 'objective', 'language_code',
+                        'skill_tags', 'blurb', 'author_notes', 'default_skin',
+                        'init_state_name', 'version']
+
+        for prop in simple_props:
+            if getattr(self, prop) != getattr(other, prop):
+                return False
+
+        for (state_name, state_obj) in self.states.iteritems():
+            if state_name not in other.states:
+                return False
+            if state_obj.to_dict() != other.states[state_name].to_dict():
+                return False
+
+        for (ps_name, ps_obj) in self.param_specs.iteritems():
+            if ps_name not in other.param_specs:
+                return False
+            if ps_obj.to_dict() != other.param_specs[ps_name].to_dict():
+                return False
+
+        for i in xrange(len(self.param_changes)):
+            if self.param_changes[i].to_dict() != other.param_changes[i].to_dict():
+                return False
+
+        return True
 
     @classmethod
     def create_default_exploration(
@@ -1352,6 +1394,20 @@ class Exploration(object):
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
         })
+
+    def to_player_dict(self):
+        """Returns a copy of the exploration suitable for inclusion in the
+        learner view."""
+        return {
+            'init_state_name': self.init_state_name,
+            'title': self.title,
+            'states': {
+                state_name: self.export_state_to_frontend_dict(state_name)
+                for state_name in self.states
+            },
+            'param_changes': self.param_change_dicts,
+            'param_specs': self.param_specs_dict,
+        }
 
     def get_interactive_widget_ids(self):
         """Get all interactive widget ids used in this exploration."""

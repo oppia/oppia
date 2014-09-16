@@ -24,8 +24,7 @@ from core import jobs_registry
 from core.domain import event_services
 from core.domain import stats_jobs
 from core.platform import models
-(job_models, stats_models,) = models.Registry.import_models([
-    models.NAMES.job, models.NAMES.statistics])
+(stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 from core.tests import test_utils
 import feconf
 

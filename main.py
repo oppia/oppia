@@ -138,7 +138,7 @@ for path, handler_class in mapreduce_main.create_handlers_map():
 mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 
-# Register the URL with the responsible classes
+# Register the URLs with the classes responsible for handling them.
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
@@ -149,6 +149,7 @@ urls = [
         'dashboard_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(
         r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),

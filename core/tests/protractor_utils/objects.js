@@ -41,7 +41,7 @@ var editList = function(elem) {
     // This returns the element of the appended entry, for further manipulation
     appendEntry: function(appendButtonText) {
       var listLength = _getLength();
-      var appendButtonText = appendButtonText || 'Add List Element'
+      var appendButtonText = appendButtonText || 'Add element'
       elem.element(by.buttonText(appendButtonText)).click();
       return _retrieveEntry(listLength);
     },

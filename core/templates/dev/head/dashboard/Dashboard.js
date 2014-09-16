@@ -19,8 +19,10 @@
  */
 
 oppia.controller('Dashboard', [
-    '$scope', '$http', '$rootScope', 'warningsData', 'createExplorationButtonService',
-    function($scope, $http, $rootScope, warningsData, createExplorationButtonService) {
+    '$scope', '$http', '$rootScope', 'warningsData', 'oppiaDatetimeFormatter',
+    'createExplorationButtonService',
+    function($scope, $http, $rootScope, warningsData, oppiaDatetimeFormatter,
+             createExplorationButtonService) {
   var EXPLORATION_STATUS_PRIVATE = 'private';
   var EXPLORATION_STATUS_BETA = 'public';
   var EXPLORATION_STATUS_RELEASED = 'publicized';
@@ -48,6 +50,11 @@ oppia.controller('Dashboard', [
     'Statistics'
   ];
 
+  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch);
+  };
+
   $scope.dashboardDataUrl = '/dashboardhandler/data';
   $rootScope.loadingMessage = 'Loading';
 
@@ -57,6 +64,9 @@ oppia.controller('Dashboard', [
 
   // Retrieves dashboard data from the server.
   $http.get($scope.dashboardDataUrl).success(function(data) {
+    $scope.recentUpdates = data.recent_updates;
+    $scope.jobQueuedMsec = data.job_queued_msec;
+
     $scope.privateExplorationIds = [];
     $scope.betaExplorationIds = [];
     $scope.releasedExplorationIds = [];

@@ -123,22 +123,16 @@ class ExplorationHandler(base.BaseHandler):
             exploration.init_state_name, init_params)
 
         init_state = exploration.init_state
-
-        interactive_widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
-        interactive_html = interactive_widget.get_interactive_widget_tag(
-            init_state.widget.customization_args)
         session_id = utils.generate_random_string(24)
 
         self.values.update({
+            'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
             'init_html': init_state.content[0].to_html(reader_params),
-            'interactive_html': interactive_html,
             'params': reader_params,
+            'session_id': session_id,
             'state_history': [exploration.init_state_name],
             'state_name': exploration.init_state_name,
-            'title': exploration.title,
-            'session_id': session_id,
         })
         self.render_json(self.values)
 
@@ -168,11 +162,11 @@ class FeedbackHandler(base.BaseHandler):
             exploration_id, 1, old_state_name, handler, rule,
             recorded_answer)
 
-    def _append_content(self, exploration, sticky, finished, old_params,
-                        new_state, new_state_name, state_has_changed):
+    def _append_content(self, exploration, finished, old_params,
+                        new_state_name, state_has_changed):
         """Appends content for the new state to the output variables."""
         if finished:
-            return {}, '', ''
+            return {}, ''
 
         # Populate new parameters.
         new_params = exploration.update_with_state_params(
@@ -184,14 +178,7 @@ class FeedbackHandler(base.BaseHandler):
             question_html = exploration.states[
                 new_state_name].content[0].to_html(new_params)
 
-        interactive_html = (
-            '' if sticky else
-            widget_registry.Registry.get_widget_by_id(
-                feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
-            ).get_interactive_widget_tag(new_state.widget.customization_args)
-        )
-
-        return (new_params, question_html, interactive_html)
+        return (new_params, question_html)
 
     @require_playable
     def post(self, exploration_id, escaped_state_name):
@@ -272,20 +259,18 @@ class FeedbackHandler(base.BaseHandler):
         # Add the content for the new state to the response HTML.
         finished = (new_state_name == feconf.END_DEST)
         state_has_changed = (old_state_name != new_state_name)
-        new_params, question_html, interactive_html = (
-            self._append_content(
-                exploration, sticky, finished, old_params, new_state,
-                new_state_name, state_has_changed))
+        new_params, question_html = self._append_content(
+            exploration, finished, old_params, new_state_name,
+            state_has_changed)
 
         values.update({
-            'interactive_html': interactive_html,
-            'exploration_id': exploration_id,
-            'state_name': new_state_name,
             'feedback_html': feedback_html,
-            'question_html': question_html,
-            'params': new_params,
             'finished': finished,
+            'params': new_params,
+            'question_html': question_html,
             'state_history': state_history,
+            'state_name': new_state_name,
+            'sticky': sticky,
         })
 
         self.render_json(values)

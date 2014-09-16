@@ -38,6 +38,11 @@
               </div>
             </accordion-group>
           </accordion>
+          <span class="help-block" style="font-size: smaller">
+            <em>
+              Don't see the type of interaction you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
+            </em>
+          </span>
         </div>
 
         <div class="col-lg-8 col-md-8 col-sm-8">
@@ -51,7 +56,7 @@
                   </a>
                 </accordion-heading>
                 <div class="oppia-preview">
-                  <div angular-html-bind="tmpWidget.tag"></div>
+                  <div angular-html-bind="tmpWidgetTag"></div>
                 </div>
               </accordion-group>
 
@@ -83,7 +88,7 @@
               Cancel
             </button>
             <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid" id="protractor-test-save-interaction">
-              Use this interaction
+              Save Interaction
             </button>
           </span>
         </div>

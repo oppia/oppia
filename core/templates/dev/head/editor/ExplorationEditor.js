@@ -71,8 +71,9 @@ oppia.controller('ExplorationEditor', [
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
       warningsData.clear();
-      $scope.isDiscardInProgress = true;
+      $rootScope.$broadcast('externalSave');
 
+      $scope.isDiscardInProgress = true;
       changeListService.discardAllChanges();
       $scope.doFullRefresh = true;
       $scope.initExplorationPage(function() {
@@ -401,9 +402,6 @@ oppia.controller('ExplorationEditor', [
         $scope.initExplorationPage(callback);
       }
     }
-
-    // Reset location hash
-    $location.url($location.path());
   });
 
   /********************************************
@@ -635,6 +633,7 @@ oppia.controller('ExplorationEditor', [
       explorationLanguageCodeService.init(data.language_code);
 
       $scope.explorationTitleService = explorationTitleService;
+      $scope.explorationCategoryService = explorationCategoryService;
       $scope.explorationObjectiveService = explorationObjectiveService;
       $scope.explorationRightsService = explorationRightsService;
 
