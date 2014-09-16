@@ -47,13 +47,13 @@ exports.config = {
 
   // The timeout for each script run on the browser. This should be longer
   // than the maximum time your application needs to stabilize between tasks.
-  allScriptsTimeout: 11000,
+  allScriptsTimeout: 50000,
 
   // ----- What tests to run -----
-  //
+  //  
   // Spec patterns are relative to the location of this config.
   specs: [
-    '../templates/dev/head/**/*Spec-e2e.js'
+    'protractor/*.js'
   ],
 
   // Patterns to exclude.
@@ -139,7 +139,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 30000
+    defaultTimeoutInterval: 100000
   },
 
   // ----- Options to be passed to mocha -----

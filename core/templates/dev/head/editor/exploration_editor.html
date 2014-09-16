@@ -324,7 +324,7 @@
                 </a>
 
                 <span ng-if="editabilityService.isEditable()">
-                  <button class="btn oppia-main-control-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+                  <button class="btn oppia-main-control-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()" id="protractor-test-save-changes">
                     save changes
                     <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
                   </button>

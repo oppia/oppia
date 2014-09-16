@@ -17,7 +17,7 @@
           <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
         </div>
         <div class="col-lg-1 col-md-1 col-sm-1">
-          <button type="button" class="btn btn-default btn-xs pull-right" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
+          <button type="button" class="btn btn-default btn-xs pull-right" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded" id="protractor-test-edit-interaction">
             <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
           </button>
         </div>
@@ -60,7 +60,7 @@
                   <accordion-heading>
                     <a href="#" ng-click="showCustomizationForm()">Customize</a>
                   </accordion-heading>
-                  <form name="form.schemaForm">
+                  <form name="form.schemaForm" id="protractor-test-widget-args">
                     <div ng-repeat="customizationArg in tmpWidget.customization_args">
                       <strong><[customizationArg.description]></strong>
                       <div>
@@ -82,7 +82,7 @@
             <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
               Cancel
             </button>
-            <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
+            <button type="button" class="btn btn-success" ng-click="selectInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid" id="protractor-test-save-interaction">
               Use this interaction
             </button>
           </span>

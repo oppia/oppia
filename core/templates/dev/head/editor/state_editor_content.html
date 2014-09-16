@@ -16,7 +16,7 @@
   <hr class="oppia-param-and-content-separator">
 
   <div ng-if="!contentMemento">
-    <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()" ng-if="editabilityService.isEditable()">
+    <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()" ng-if="editabilityService.isEditable()" id="protractor-test-edit-content">
       <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
     </button>
     <span ng-show="content[0].value == ''" class="oppia-placeholder">
