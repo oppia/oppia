@@ -1,4 +1,4 @@
-// TODO(kashdia): Integrated with Karma.
+// TODO(kashida): Integrated with Karma.
 
 var parser = require('parser');
 

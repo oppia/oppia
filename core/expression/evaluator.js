@@ -27,8 +27,8 @@
 // variables, system operators and system functions. User defined parameters
 // may override the meaning of system variables and functions (but not
 // operators). Users also can define parameters with new names. Referencing a
-// variable which is not defined as neither system variables, system functions,
-// nor user parameters may result in exception.
+// variable which is not defined as a system variable, system function, or user
+// parameter will result in ExprUndefinedVarError to be thrown.
 //
 // All system variables, system operators, and system functions are defined
 // as 'system' variable in this file.
@@ -91,16 +91,17 @@ ExprWrongNumArgsError.prototype.toString = function() {
 /**
  * @param {*} Parse output from the parser. See parser.pegjs for the data
  *     structure.
- * @param {!Array.<!Object>} Evaluation environments. See lookupEnvs below for
- *     the structure.
+ * @param {!Array.<!Object>} envs Represents a nested name space environment to
+ *     look up the name in. The first element is looked up first (i.e. has
+ *     higher precedence).
  */
 var evaluate = function(parsed, envs) {
-  // Arrays are intermediate nodes of the parse tree, and others (JavaScript
-  // primitives) are the terminal nodes, as described in parser.pegjs "Parser
-  // output" section.
+  // The intermediate nodes of the parse tree are arrays. The terminal nodes are
+  // JavaScript primitives (as described in the "Parser output" section of
+  // parser.pegjs).
   if (parsed instanceof Array) {
     if (parsed.length == 0) {
-      throw "Parser generated an intermediate node with zero children";
+      throw 'Parser generated an intermediate node with zero children';
     }
 
     // Evaluate all the elements, including the operator.
@@ -121,7 +122,7 @@ var evaluate = function(parsed, envs) {
 /**
  * Looks up a variable of the given name in the env. Here the variable can be
  * system or user defined functions and parameters, as well as system operators.
- * @param {string} name
+ * @param {string} name The name to look up.
  * @param {!Array.<!Object>} envs Represents a nested name space environment to
  *     look up the name in. The first element is looked up first (i.e. has
  *     higher precedence).
