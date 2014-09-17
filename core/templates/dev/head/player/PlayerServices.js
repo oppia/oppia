@@ -49,13 +49,47 @@ oppia.factory('stopwatchProviderService', ['$log', function($log) {
   };
 }]);
 
+// A service that maintains the current set of parameters for the learner.
+oppia.factory('learnerParamsService', ['$log', function($log) {
+  var _paramDict = {};
+
+  return {
+    init: function(initParamSpecs) {
+      // initParamSpecs is a dict mapping the parameter names used in the
+      // exploration to their default values.
+      _paramDict = angular.copy(initParamSpecs);
+    },
+    getValue: function(paramName) {
+      if (!_paramDict.hasOwnProperty(paramName)) {
+        throw 'Invalid parameter name: ' + paramName;
+      } else {
+        return angular.copy(_paramDict[paramName]);
+      }
+    },
+    setValue: function(paramName, newParamValue) {
+      // TODO(sll): Currently, all parameters are strings. In the future, we
+      // will need to maintain information about parameter types.
+      if (!_paramDict.hasOwnProperty(paramName)) {
+        throw 'Cannot set unknown parameter: ' + paramName;
+      } else {
+        _paramDict[paramName] = String(newParamValue);
+      }
+    },
+    getAllParams: function() {
+      return angular.copy(_paramDict);
+    }
+  };
+}]);
+
 // A service that provides a number of utility functions for JS used by
 // individual skins.
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', 'messengerService',
-    'stopwatchProviderService', 'warningsData', 'oppiaHtmlEscaper', function(
+    'stopwatchProviderService', 'learnerParamsService', 'warningsData',
+    'oppiaHtmlEscaper', function(
       $http, $rootScope, $modal, $filter, messengerService,
-      stopwatchProviderService, warningsData, oppiaHtmlEscaper) {
+      stopwatchProviderService, learnerParamsService, warningsData,
+      oppiaHtmlEscaper) {
 
   var explorationId = null;
   // The pathname should be: .../explore/{exploration_id}
@@ -78,13 +112,14 @@ oppia.factory('oppiaPlayerService', [
   var isLoggedIn = false;
   var _exploration = null;
 
-  $rootScope.currentParams = {};
+  learnerParamsService.init({});
   var stateHistory = [];
   var stateName = null;
   var answerIsBeingProcessed = false;
 
   var _updateStatus = function(newParams, newStateName, newStateHistory) {
-    $rootScope.currentParams = newParams;
+    // TODO(sll): Do this more incrementally.
+    learnerParamsService.init(newParams);
     stateName = newStateName;
     stateHistory = newStateHistory;
   };
@@ -93,14 +128,10 @@ oppia.factory('oppiaPlayerService', [
   // a common standalone service.
   var _getInteractiveWidgetHtml = function(widgetId, widgetCustomizationArgSpecs) {
     var el = $(
-      '<oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId) +
-      '>');
+      '<oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId) + '>');
     for (var caSpecName in widgetCustomizationArgSpecs) {
-      var caSpecValue = (
-        $rootScope.currentParams.hasOwnProperty(caSpecName) ?
-        $rootScope.currentParams[caSpecName] :
-        widgetCustomizationArgSpecs[caSpecName].value);
-
+      var caSpecValue = widgetCustomizationArgSpecs[caSpecName].value;
+      // TODO(sll): Evaluate any values here that correspond to expressions.
       el.attr(
         $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
         oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
@@ -202,7 +233,7 @@ oppia.factory('oppiaPlayerService', [
       $http.post(stateTransitionUrl, {
         answer: answer,
         handler: handler,
-        params: $rootScope.currentParams,
+        params: learnerParamsService.getAllParams(),
         state_history: stateHistory,
         version: version,
         session_id: sessionId,
