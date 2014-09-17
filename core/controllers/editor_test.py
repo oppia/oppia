@@ -207,27 +207,18 @@ class EditorTest(BaseEditorControllerTest):
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': '0', 'handler': 'submit'})
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': 'blah', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': 'blah', 'handler': 'submit'})
 
         for _ in range(2):
             exploration_dict = self.post_json(
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah2', 'handler': 'submit',
-                    'state_history': exploration_dict['state_history'],
                 }
             )
 
@@ -236,7 +227,6 @@ class EditorTest(BaseEditorControllerTest):
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah3', 'handler': 'submit',
-                    'state_history': exploration_dict['state_history'],
                 }
             )
 
@@ -317,19 +307,11 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': '0', 'handler': 'submit'})
         state_name = exploration_dict['state_name']
         self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': 'blah', 'handler': 'submit',
-                'state_history': exploration_dict['state_history']
-            }
-        )
+            {'answer': 'blah', 'handler': 'submit'})
         # Ensure that all events get propagated.
         self.process_and_flush_pending_tasks()
 
