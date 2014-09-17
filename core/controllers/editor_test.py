@@ -734,6 +734,8 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     OWNER_EMAIL = 'owner@example.com'
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     COLLABORATOR2_EMAIL = 'collaborator2@example.com'
+    COLLABORATOR2_USERNAME = 'collab2'
+    COLLABORATOR3_EMAIL = 'collaborator3@example.com'
     VIEWER_EMAIL = 'viewer@example.com'
     VIEWER2_EMAIL = 'viewer2@example.com'
 
@@ -744,6 +746,9 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.register_editor(self.ADMIN_EMAIL, username='adm')
         self.register_editor(self.OWNER_EMAIL, username='owner')
         self.register_editor(self.COLLABORATOR_EMAIL, username='collab')
+        self.register_editor(self.COLLABORATOR2_EMAIL,
+            username=self.COLLABORATOR2_USERNAME)
+        self.register_editor(self.COLLABORATOR3_EMAIL, username='collab3')
         self.register_editor(self.VIEWER_EMAIL, username='viewer')
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -773,13 +778,19 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.VIEWER_EMAIL,
+                'new_member_identifier': self.VIEWER_EMAIL,
                 'new_member_role': rights_manager.ROLE_VIEWER
             }, csrf_token)
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.COLLABORATOR_EMAIL,
+                'new_member_identifier': self.COLLABORATOR_EMAIL,
+                'new_member_role': rights_manager.ROLE_EDITOR
+            }, csrf_token)
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_identifier': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
 
@@ -822,7 +833,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.VIEWER2_EMAIL,
+                'new_member_identifier': self.VIEWER2_EMAIL,
                 'new_member_role': rights_manager.ROLE_VIEWER
             }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
@@ -830,7 +841,52 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_email': self.COLLABORATOR2_EMAIL,
+                'new_member_identifier': self.COLLABORATOR3_EMAIL,
+                'new_member_role': rights_manager.ROLE_EDITOR,
+                }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['code'], 401)
+
+        self.logout()
+
+        # Check that collaborator2 can access editor page and can edit.
+        self.login(self.COLLABORATOR2_EMAIL)
+        response = self.testapp.get('/create/%s' % EXP_ID)
+        self.assertEqual(response.status_int, 200)
+        self.assert_can_edit(response.body)
+        csrf_token = self.get_csrf_token_from_response(response)
+
+        # Check that collaborator2 can add a new state called 'State 5'
+        add_url = '%s/%s' % (feconf.EXPLORATION_DATA_PREFIX, EXP_ID)
+        response_dict = self.put_json(
+            add_url,
+            {
+                'version': exploration.version,
+                'commit_message': 'Added State 5',
+                'change_list': [{
+                    'cmd': 'add_state',
+                    'state_name': 'State 5'
+                }]
+            },
+            csrf_token=csrf_token,
+            expected_status_int=200
+        )
+        self.assertIn('State 5', response_dict['states'])
+
+        # Check that collaborator2 cannot add new members
+        exploration = exp_services.get_exploration_by_id(EXP_ID)
+        rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID)
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_identifier': self.VIEWER2_EMAIL,
+                'new_member_role': rights_manager.ROLE_VIEWER
+            }, csrf_token, expect_errors=True, expected_status_int=401)
+        self.assertEqual(response_dict['code'], 401)
+
+        response_dict = self.put_json(
+            rights_url, {
+                'version': exploration.version,
+                'new_member_identifier': self.COLLABORATOR3_EMAIL,
                 'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
