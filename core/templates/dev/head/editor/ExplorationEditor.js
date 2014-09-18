@@ -190,6 +190,8 @@ oppia.controller('ExplorationEditor', [
             $scope.deletedStates = deletedStates;
             $scope.commitMessageIsOptional = commitMessageIsOptional;
 
+            // TODO(sll): The keys for this dict already appear in
+            // EditorServices.changeListService; consider deduplicating.
             $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES = {
               'title': 'Title',
               'category': 'Category',
@@ -197,14 +199,16 @@ oppia.controller('ExplorationEditor', [
               'language_code': 'Language',
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes',
-              'default_skin_id': 'Default skin'
+              'default_skin_id': 'Default skin',
+              'init_state_name': 'First state'
             };
 
             var EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS = {
               'title': true,
               'category': true,
               'objective': true,
-              'default_skin_id': true
+              'default_skin_id': true,
+              'init_state_name': true
             };
 
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {

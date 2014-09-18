@@ -71,13 +71,14 @@ oppia.controller('ExplorationSettings', [
   $scope.saveExplorationInitStateName = function() {
     var newInitStateName = explorationInitStateNameService.displayed;
 
-    // TODO(sll):
-    // - Validate that the new initial state name is valid. If not,
-    // revert to the original and show a warning.
-    // - Calculate which states have rule destinations that need to be changed.
-    // If these exist, show a confirmation dialog (rules with destinations
-    // that are the initial state will be deleted).
-    // - Perform the necessary changes to the exploration graph and rules.
+    // TODO(sll): Make the whole exploration a dict, so we can remove
+    // the awkward reference to $scope.$parent.
+    if (!$scope.$parent.states.hasOwnProperty(newInitStateName)) {
+      warningsData.addWarning('Invalid initial state name: ' + newInitStateName);
+      explorationInitStateNameService.restoreFromMemento();
+      return;
+    }
+
     explorationInitStateNameService.saveDisplayedValue();
   };
 

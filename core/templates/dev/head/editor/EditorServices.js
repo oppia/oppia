@@ -176,7 +176,8 @@ oppia.factory('changeListService', [
     'language_code': true,
     'param_specs': true,
     'param_changes': true,
-    'default_skin_id': true
+    'default_skin_id': true,
+    'init_state_name': true
   };
 
   var ALLOWED_STATE_BACKEND_NAMES = {
@@ -217,7 +218,10 @@ oppia.factory('changeListService', [
       });
     },
     /**
-     * Saves a change dict that represents the renaming of a state.
+     * Saves a change dict that represents the renaming of a state. This
+     * is also intended to change exploration.initStateName if necessary
+     * (i.e., the latter change is implied and does not have to be recorded
+     * separately in another change dict).
      *
      * It is the responsibility of the caller to check that the two names
      * are not equal.
