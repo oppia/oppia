@@ -775,19 +775,19 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
 
         # Owner adds rights for other users
         rights_url = '%s/%s' % (feconf.EXPLORATION_RIGHTS_PREFIX, EXP_ID)
-        response_dict = self.put_json(
+        self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_identifier': self.VIEWER_EMAIL,
                 'new_member_role': rights_manager.ROLE_VIEWER
             }, csrf_token)
-        response_dict = self.put_json(
+        self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_identifier': self.COLLABORATOR_EMAIL,
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
-        response_dict = self.put_json(
+        self.put_json(
             rights_url, {
                 'version': exploration.version,
                 'new_member_identifier': self.COLLABORATOR2_USERNAME,
@@ -843,7 +843,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'version': exploration.version,
                 'new_member_identifier': self.COLLABORATOR3_EMAIL,
                 'new_member_role': rights_manager.ROLE_EDITOR,
-                }, csrf_token, expect_errors=True, expected_status_int=401)
+            }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
 
         self.logout()

@@ -117,6 +117,7 @@ def get_email_from_username(username):
     else:
         return user_model.email
 
+
 def get_user_id_from_username(username):
     """Gets the user_id for a given username.
 
