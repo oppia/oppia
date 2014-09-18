@@ -372,6 +372,7 @@ class ExplorationRightsHandler(EditorHandler):
         is_public = self.payload.get('is_public')
         is_publicized = self.payload.get('is_publicized')
         is_community_owned = self.payload.get('is_community_owned')
+        # This can be an email address or a username.
         new_member_identifier = self.payload.get('new_member_identifier')
         new_member_role = self.payload.get('new_member_role')
 
