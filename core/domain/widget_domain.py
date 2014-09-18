@@ -229,45 +229,6 @@ class BaseWidget(object):
                 'Could not find rule with name %s for handler %s'
                 % (rule_name, handler_name))
 
-    def get_reader_response_html(self, state_customization_args, answer,
-                                 sticky):
-        """Gets the parameterized HTML tag for a reader response."""
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
-        parameters = {
-            'answer': answer,
-            # The widget stays through the state transition because it is marked
-            # sticky in the exploration and the new state uses the same widget.
-            'stateSticky': sticky,
-        }
-
-        # Special case for multiple-choice input. 
-        # TODO(sll): Turn the answer into the actual multiple-choice string, and
-        # remove this special case.
-        for ca_spec in self.customization_arg_specs:
-            if ca_spec.name == 'choices':
-                parameters['choices'] = (
-                    state_customization_args['choices']['value']
-                    if 'choices' in state_customization_args
-                    else ca_spec.default_value)
-
-        attr_strings = []
-        for param_name, param_value in parameters.iteritems():
-            attr_strings.append(
-                jinja_utils.parse_string(
-                    '{{arg_name}}="{{arg_value}}"', {
-                        'arg_name': param_name,
-                        'arg_value': json.dumps(param_value),
-                    }
-                )
-            )
-
-        tag_name = ('oppia-response-%s' %
-                    utils.camelcase_to_hyphenated(self.id))
-        return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
-
     def get_stats_log_html(self, state_customization_args, answer):
         """Gets the HTML for recording a reader response for the stats log.
 

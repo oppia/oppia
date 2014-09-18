@@ -88,24 +88,25 @@ function ConversationSkin(
   $scope.initializePage();
 
   $scope.submitAnswer = function(answer, handler) {
-    oppiaPlayerService.submitAnswer(answer, handler, function(data) {
+    oppiaPlayerService.submitAnswer(answer, handler, function(
+        newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
       warningsData.clear();
       $scope.hasInteractedAtLeastOnce = true;
 
-      $scope.stateName = data.state_name;
-      $scope.finished = data.finished;
+      $scope.stateName = newStateName;
+      $scope.finished = (newStateName === 'END');
 
-      if (!data.finished && !data.sticky) {
+      if (!$scope.finished && !isSticky) {
         // The previous widget is not sticky and should be replaced.
         $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
-          data.state_name) + oppiaPlayerService.getRandomSuffix();
+          newStateName) + oppiaPlayerService.getRandomSuffix();
       }
 
       $scope.responseLog = $scope.responseLog || [];
 
       // TODO(sll): Check the state change instead of question_html so that it
       // works correctly when the new state doesn't have a question string.
-      var isQuestion = !!data.question_html;
+      var isQuestion = !!questionHtml;
       if (isQuestion) {
         // Clean up the previous isMostRecentQuestion marker.
         $scope.responseLog.forEach(function(log) {
@@ -116,9 +117,9 @@ function ConversationSkin(
       // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
       // and 'question', so that the aria-live attribute will read it out.
       $scope.responseLog.push({
-        previousReaderAnswer: data.reader_response_html + oppiaPlayerService.getRandomSuffix(),
-        feedback: data.feedback_html + oppiaPlayerService.getRandomSuffix(),
-        question: data.question_html + (isQuestion ? oppiaPlayerService.getRandomSuffix() : ''),
+        previousReaderAnswer: readerResponseHtml + oppiaPlayerService.getRandomSuffix(),
+        feedback: feedbackHtml + oppiaPlayerService.getRandomSuffix(),
+        question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : ''),
         isMostRecentQuestion: isQuestion
       });
 
