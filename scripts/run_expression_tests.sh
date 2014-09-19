@@ -29,7 +29,7 @@ fi
 set -e
 source $(dirname $0)/setup.sh || exit 1
 
-bash scripts/create_expr_parser.sh
+bash scripts/create_expression_parser.sh
 
 # The node interpreter binary doesn't take multiple input files as arguments,
 # so we concatenate the two input files and send them as one chunk through

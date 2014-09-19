@@ -31,11 +31,11 @@ How to update the parser:
 1. Modify parser.pegjs.
 2. Add tests in test.js for the new or modified grammar.
 3. Run tests by executing
-    bash scripts/run_expr_tests.sh
-  in oppia directory. Note this runs scripts/create_expr_parser.sh as well which
-  updates parser.js. If for whatever reason you need to check in the change
-  without running the tests, you then need to run
-    bash scripts/create_expr_parser.sh
+    bash scripts/run_expression_tests.sh
+  in oppia directory. Note this runs scripts/create_expression_parser.sh as well
+  which updates parser.js. If for whatever reason you need to check in the
+  change without running the tests, you then need to run
+    bash scripts/create_expression_parser.sh
   directly in order to update parser.js.
 4. Repeat 1-3 until the desired grammar is written and tested.
 5. Check the changes. You need to check in parser.pegjs as well as parser.js

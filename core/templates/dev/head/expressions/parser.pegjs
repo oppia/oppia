@@ -14,8 +14,8 @@
 
 /*******************************************************************************
  * NOTE TO DEVELOPERS
- * If you update this file you must run create_expr_parser.sh script to generate
- * the parser JS file. See instructions in README.txt.
+ * If you update this file you must run create_expression_parser.sh script to
+ * generate the parser JS file. See instructions in README.txt.
  ******************************************************************************/
 
 // This file is based on the example JavaScript grammar that comes with PEGJS.
