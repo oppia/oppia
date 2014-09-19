@@ -5,8 +5,8 @@ var parser = require('parser');
 var applyTests = function(arr, validatorFunction) {
   arr.forEach(function(test, i) {
     var expected = test[0];
-    var input = test[1];
-    validatorFunction(expected, input);
+    var parserInput = test[1];
+    validatorFunction(expected, parserInput);
   });
 };
 
