@@ -41,20 +41,13 @@ class DependencyControllerTests(test_utils.GenericTestBase):
     """Tests for dependency loading on user-facing pages."""
 
     def test_no_dependencies_in_non_exploration_pages(self):
-        response = self.testapp.get(feconf.LEARN_GALLERY_URL)
+        response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['jsrepl'])
 
         response = self.testapp.get('/about')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(no=['jsrepl'])
-
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
-        response = self.testapp.get(feconf.CONTRIBUTE_GALLERY_URL)
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['jsrepl'])
-        self.logout()
 
     def test_dependencies_loaded_in_exploration_editor(self):
         exp_services.load_demo('0')

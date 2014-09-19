@@ -18,6 +18,7 @@
 
 __author__ = 'Koji Ashida'
 
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 (feedback_models,) = models.Registry.import_models([models.NAMES.feedback])
@@ -40,7 +41,10 @@ def get_threadlist(exploration_id):
 
 def create_thread(
         exploration_id, state_name, original_author_id, subject, text):
-    """Creates a thread and the first message in it."""
+    """Creates a thread and the first message in it.
+
+    Note that `state_name` may be None.
+    """
     thread_id = feedback_models.FeedbackThreadModel.generate_new_thread_id(
         exploration_id)
     thread = feedback_models.FeedbackThreadModel.create(
@@ -78,10 +82,15 @@ def get_messages(thread_id):
 
 def create_message(
         thread_id, author_id, updated_status, updated_subject, text):
-    """Creates a new message for the thread.
+    """Creates a new message for the thread and subscribes the author to the
+    thread.
 
     Returns False if the message with the ID already exists.
     """
+    # Get the thread at the outset, in order to check that the thread_id passed
+    # in is valid.
+    thread = feedback_models.FeedbackThreadModel.get(thread_id)
+
     message_id = feedback_models.FeedbackMessageModel.get_message_count(
         thread_id)
     msg = feedback_models.FeedbackMessageModel.create(thread_id, message_id)
@@ -98,13 +107,15 @@ def create_message(
     # We do a put() even if the status and subject are not updated, so that the
     # last_updated time of the thread reflects the last time a message was
     # added to it.
-    thread = feedback_models.FeedbackThreadModel.get(thread_id)
     if message_id != 0 and (updated_status or updated_subject):
         if updated_status and updated_status != thread.status:
             thread.status = updated_status
         if updated_subject and updated_subject != thread.subject:
             thread.subject = updated_subject
     thread.put()
+
+    if author_id:
+        subscription_services.subscribe_to_thread(author_id, thread_id)
     return True
 
 

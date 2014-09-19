@@ -19,16 +19,15 @@
 __author__ = 'Sean Lip'
 
 import datetime
-import feconf
 import logging
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import feconf
 import utils
 
 from google.appengine.ext import ndb
 
-QUERY_LIMIT = 100
 MAX_ANSWER_HASH_LEN = 100
 
 
@@ -300,19 +299,13 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         start_event_entity.put()
 
 
-class ExplorationAnnotationsModel(base_models.BaseModel):
-    """Model for exploration-level statistics."""
-
-    # Caching was causing issues with stale data being shown after MapReduce
-    # jobs were run. Benefits of caching were considered to be minimal, so 
-    # all caching has been turned off for statistics models.
-    _use_cache = False
-    _use_memcache = False
-
+class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
+    """Batch model for storing MapReduce calculation output for
+    exploration-level statistics."""
     # Number of students who started the exploration
-    num_starts = ndb.IntegerProperty(indexed=True)
+    num_starts = ndb.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration
-    num_completions = ndb.IntegerProperty(indexed=True)
+    num_completions = ndb.IntegerProperty(indexed=False)
 
 
 def process_submitted_answer(

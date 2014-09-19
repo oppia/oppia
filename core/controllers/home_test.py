@@ -17,7 +17,9 @@
 __author__ = 'Sean Lip'
 
 from core.domain import rights_manager
+from core.domain import user_jobs
 from core.tests import test_utils
+import feconf
 
 
 class HomePageTest(test_utils.GenericTestBase):
@@ -29,8 +31,8 @@ class HomePageTest(test_utils.GenericTestBase):
         response.mustcontain(
             'Bite-sized learning journeys',
             'Browse the explorations gallery', '100% free!',
-            'Learn', 'About', 'Contact',
-            'Login', 'Create an Oppia account', 'Contribute',
+            'Gallery', 'About', 'Contact',
+            'Login', 'Create an Oppia account',
             # No navbar tabs should be highlighted.
             no=['class="active"',
                 'Profile', 'Logout', 'Create an exploration', 'Dashboard'])
@@ -48,7 +50,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'Bite-sized learning journeys',
-            'Contribute', 'Profile', 'Logout', 'Create an exploration',
+            'Gallery', 'Profile', 'Logout', 'Create an exploration',
             self.get_expected_logout_url('/'),
             no=['Login', 'Create an Oppia account', 'Dashboard',
                 self.get_expected_login_url('/')])
@@ -68,7 +70,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Dashboard', 'Contribute', 'Profile', 'Logout',
+            'Dashboard', 'Gallery', 'Profile', 'Logout',
             self.get_expected_logout_url('/'),
             no=['Login', 'Create an Oppia account',
                 'Bite-sized learning journeys',
@@ -81,19 +83,24 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
     OWNER_EMAIL = 'editor@example.com'
     COLLABORATOR_EMAIL = 'collaborator@example.com'
     VIEWER_EMAIL = 'viewer@example.com'
+
+    OWNER_USERNAME = 'owner'
+    COLLABORATOR_USERNAME = 'collaborator'
+    VIEWER_USERNAME = 'viewer'
+
     EXP_ID = 'exp_id'
     EXP_TITLE = 'Exploration title'
 
     def setUp(self):
         super(DashboardHandlerTest, self).setUp()
-        self.register_editor(self.OWNER_EMAIL, username='owner')
+        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
         self.register_editor(
-            self.COLLABORATOR_EMAIL, username='collaborator')
-        self.register_editor(self.VIEWER_EMAIL, username='viewer')
-        self.OWNER_ID = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.COLLABORATOR_ID = self.get_user_id_from_email(
+            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.collaborator_id = self.get_user_id_from_email(
             self.COLLABORATOR_EMAIL)
-        self.VIEWER_ID = self.get_user_id_from_email(self.VIEWER_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
     def test_no_explorations(self):
         self.login(self.OWNER_EMAIL)
@@ -103,7 +110,7 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def test_managers_can_see_explorations_on_dashboard(self):
         self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID, title=self.EXP_TITLE)
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         self.set_admins([self.OWNER_EMAIL])
 
         self.login(self.OWNER_EMAIL)
@@ -111,31 +118,31 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PRIVATE)
 
-        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLIC)
 
-        rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLICIZED)
         self.logout()
 
     def test_collaborators_can_see_explorations_on_dashboard(self):
         self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID, title=self.EXP_TITLE)
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role(
-            self.OWNER_ID, self.EXP_ID, self.COLLABORATOR_ID,
+            self.owner_id, self.EXP_ID, self.collaborator_id,
             rights_manager.ROLE_EDITOR)
         self.set_admins([self.OWNER_EMAIL])
 
@@ -144,44 +151,93 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PRIVATE)
 
-        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLIC)
 
-        rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(len(response['explorations']), 1)
         self.assertIn(self.EXP_ID, response['explorations'])
         self.assertEqual(
-            response['explorations'][self.EXP_ID]['rights']['status'],
+            response['explorations'][self.EXP_ID]['status'],
             rights_manager.EXPLORATION_STATUS_PUBLICIZED)
 
         self.logout()
 
     def test_viewer_cannot_see_explorations_on_dashboard(self):
         self.save_new_default_exploration(
-            self.EXP_ID, self.OWNER_ID, title=self.EXP_TITLE)
+            self.EXP_ID, self.owner_id, title=self.EXP_TITLE)
         rights_manager.assign_role(
-            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
+            self.owner_id, self.EXP_ID, self.viewer_id,
             rights_manager.ROLE_VIEWER)
+        self.set_admins([self.OWNER_EMAIL])
 
         self.login(self.VIEWER_EMAIL)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(response['explorations'], {})
 
-        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publish_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(response['explorations'], {})
 
-        self.set_admins([self.OWNER_EMAIL])
-        rights_manager.publicize_exploration(self.OWNER_ID, self.EXP_ID)
+        rights_manager.publicize_exploration(self.owner_id, self.EXP_ID)
         response = self.get_json('/dashboardhandler/data')
         self.assertEqual(response['explorations'], {})
         self.logout()
+
+    def _get_recent_updates_mock_by_viewer(self, unused_user_id):
+        """Returns a single feedback thread by VIEWER_ID."""
+        return (100000, [{
+            'activity_id': 'exp_id',
+            'activity_title': 'exp_title',
+            'author_id': self.viewer_id,
+            'last_updated_ms': 100000,
+            'subject': 'Feedback Message Subject',
+            'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+        }])
+
+    def _get_recent_updates_mock_by_anonymous_user(self, unused_user_id):
+        """Returns a single feedback thread by an anonymous user."""
+        return (200000, [{
+            'activity_id': 'exp_id',
+            'activity_title': 'exp_title',
+            'author_id': None,
+            'last_updated_ms': 100000,
+            'subject': 'Feedback Message Subject',
+            'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
+        }])
+
+    def test_author_ids_are_handled_correctly(self):
+        """Test that author ids are converted into author usernames
+        and that anonymous authors are handled correctly.
+        """
+        with self.swap(
+                user_jobs.DashboardRecentUpdatesAggregator,
+                'get_recent_updates',
+                self._get_recent_updates_mock_by_viewer):
+            self.login(self.VIEWER_EMAIL)
+            response = self.get_json('/dashboardhandler/data')
+            self.assertEqual(len(response['recent_updates']), 1)
+            self.assertEqual(
+                response['recent_updates'][0]['author_username'],
+                self.VIEWER_USERNAME)
+            self.assertNotIn('author_id', response['recent_updates'][0])
+
+        with self.swap(
+                user_jobs.DashboardRecentUpdatesAggregator,
+                'get_recent_updates',
+                self._get_recent_updates_mock_by_anonymous_user):
+            self.login(self.VIEWER_EMAIL)
+            response = self.get_json('/dashboardhandler/data')
+            self.assertEqual(len(response['recent_updates']), 1)
+            self.assertEqual(
+                response['recent_updates'][0]['author_username'], '')
+            self.assertNotIn('author_id', response['recent_updates'][0])

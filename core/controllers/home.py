@@ -20,6 +20,7 @@ from core.controllers import base
 from core.controllers import pages
 from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import user_jobs
 from core.domain import user_services
 
 
@@ -44,9 +45,9 @@ class HomePage(base.BaseHandler):
     If the user is logged in and is registered as an editor, we show their
     personal dashboard, otherwise we show the generic splash page.
     """
-    # We use 'contribute' because the createExploration() modal makes a call
+    # We use 'gallery' because the createExploration() modal makes a call
     # there.
-    PAGE_NAME_FOR_CSRF = 'contribute'
+    PAGE_NAME_FOR_CSRF = 'gallery'
 
     def _get_splash_page(self):
         if SPLASH_PAGE_EXPLORATION_ID.value:
@@ -80,8 +81,33 @@ class DashboardHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+        if self.user_id is None:
+            raise self.PageNotFoundException
+
+        job_queued_msec, recent_updates = (
+            user_jobs.DashboardRecentUpdatesAggregator.get_recent_updates(
+                self.user_id))
+
+        # Replace author_ids with their usernames.
+        author_ids = [
+            update['author_id'] for update in recent_updates
+            if update['author_id']]
+        author_usernames = user_services.get_usernames(author_ids)
+
+        author_id_to_username = {
+            None: '',
+        }
+        for ind in range(len(author_ids)):
+            author_id_to_username[author_ids[ind]] = author_usernames[ind]
+        for update in recent_updates:
+            update['author_username'] = (
+                author_id_to_username[update['author_id']])
+            del update['author_id']
+
         self.values.update({
             'explorations': exp_services.get_at_least_editable_summary_dict(
                 self.user_id),
+            'job_queued_msec': job_queued_msec,
+            'recent_updates': recent_updates,
         })
         self.render_json(self.values)

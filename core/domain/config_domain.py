@@ -47,7 +47,7 @@ class ConfigProperty(object):
         self._obj_type = obj_type
         self._description = description
         self._default_value = obj_services.Registry.get_object_class_by_type(
-            self.obj_type).normalize(default_value)
+            self._obj_type).normalize(default_value)
 
         Registry._config_registry[self.name] = self
 
@@ -56,8 +56,9 @@ class ConfigProperty(object):
         return self._name
 
     @property
-    def obj_type(self):
-        return self._obj_type
+    def schema(self):
+        return obj_services.Registry.get_object_class_by_type(
+            self._obj_type).SCHEMA
 
     @property
     def description(self):
@@ -83,6 +84,10 @@ class ConfigProperty(object):
             return datastore_item.value
 
         return self.default_value
+
+    def normalize(self, value):
+        return obj_services.Registry.get_object_class_by_type(
+            self._obj_type).normalize(value)
 
 
 class ComputedProperty(ConfigProperty):
@@ -124,14 +129,14 @@ class Registry(object):
         """Return a dict of editable config property schemas.
 
         The keys of the dict are config property names. The values are dicts
-        with the following keys: obj_type, description, value.
+        with the following keys: schema, description, value.
         """
         schemas_dict = {}
 
         for (property_name, instance) in cls._config_registry.iteritems():
             if not property_name.startswith(COMPUTED_PROPERTY_PREFIX):
                 schemas_dict[property_name] = {
-                    'obj_type': instance.obj_type,
+                    'schema': instance.schema,
                     'description': instance.description,
                     'value': instance.value
                 }

@@ -16,6 +16,7 @@
 
 __author__ = 'Sean Lip'
 
+from core.domain import exp_services
 from core.tests import test_utils
 import feconf
 
@@ -25,7 +26,8 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
     def test_redirect_to_prerequisites_page_happens(self):
         self.login('editor@example.com')
 
-        response = self.testapp.get('/contribute')
+        exp_services.load_demo('0')
+        response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 302)
         self.assertIn(
             feconf.EDITOR_PREREQUISITES_URL, response.headers['location'])

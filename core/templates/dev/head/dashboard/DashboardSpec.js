@@ -30,16 +30,12 @@ describe('Dashboard controller', function() {
         explorations: {
           'private_exp_id': {
             category: 'Private category',
-            rights: {
-              status: 'private'
-            },
+            status: 'private',
             title: 'Private exploration'
           },
           'released_exp_id': {
             category: 'Released category',
-            rights: {
-              status: 'publicized'
-            },
+            status: 'publicized',
             title: 'Released exploration'
           }
         }

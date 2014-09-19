@@ -138,7 +138,7 @@ for path, handler_class in mapreduce_main.create_handlers_map():
 mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 
-# Register the URL with the responsible classes
+# Register the URLs with the classes responsible for handling them.
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
@@ -149,6 +149,7 @@ urls = [
         'dashboard_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(
         r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
@@ -169,25 +170,20 @@ urls = [
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
     get_redirect_route(
-        r'%s' % feconf.LEARN_GALLERY_URL, galleries.LearnPage,
+        r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
+    get_redirect_route(
+        r'%s' % feconf.GALLERY_DATA_URL, galleries.GalleryHandler,
+        'gallery_handler'),
+
+    get_redirect_route(
+        r'%s' % feconf.LEARN_GALLERY_URL, galleries.GalleryRedirectPage,
         'learn_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.LEARN_GALLERY_DATA_URL, galleries.LearnHandler,
-        'learn_gallery_handler'),
-
-    get_redirect_route(
-        r'%s' % feconf.PLAYTEST_QUEUE_URL, galleries.PlaytestPage,
+        r'%s' % feconf.PLAYTEST_QUEUE_URL, galleries.GalleryRedirectPage,
         'playtest_queue_page'),
     get_redirect_route(
-        r'%s' % feconf.PLAYTEST_QUEUE_DATA_URL, galleries.PlaytestHandler,
-        'playtest_queue_handler'),
-
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.ContributePage,
+        r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
-    get_redirect_route(
-        r'%s' % feconf.CONTRIBUTE_GALLERY_DATA_URL,
-        galleries.ContributeHandler, 'contribute_gallery_handler'),
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
@@ -224,6 +220,9 @@ urls = [
         (r'%s/<exploration_id>/<escaped_state_name>'
          % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
         reader.FeedbackHandler, 'feedback_handler'),
+    get_redirect_route(
+        r'/explorehandler/state_hit_event/<exploration_id>',
+        reader.StateHitEventHandler, 'state_hit_event_handler'),
     get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),

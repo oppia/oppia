@@ -23,49 +23,32 @@ function SnapshotsSkin($scope, warningsData, oppiaPlayerService) {
     $scope.inputTemplate = '';
     $scope.currentQuestion = '';
     oppiaPlayerService.loadInitialState(function(data) {
-      $scope.explorationTitle = data.title;
       $scope.currentQuestion = data.init_html;
-      $scope.inputTemplate = data.interactive_html;
-    }, function(data) {
-      warningsData.addWarning(
-        data.error || 'There was an error loading the exploration.');
+      $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(data.state_name);
+      $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
     });
   };
 
   $scope.initializePage();
 
   $scope.submitAnswer = function(answer, handler) {
-    oppiaPlayerService.submitAnswer(answer, handler, function(data) {
-      if (data.state_name === 'END') {
+    oppiaPlayerService.submitAnswer(answer, handler, function(
+        newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
+      if (newStateName === 'END') {
         $scope.currentQuestion = 'You have finished.';
         $scope.inputTemplate = '';
         return;
       }
 
-      // This is a bit of a hack. When a refresh happens, AngularJS compares
-      // $scope.inputTemplate to the previous value of $scope.inputTemplate.
-      // If they are the same, then $scope.inputTemplate is not updated, and
-      // the reader's previous answers still remain present. The random suffix
-      // makes the new template different from the previous one, and thus
-      // indirectly forces a refresh.
-      var randomSuffix = '';
-      var N = Math.round(Math.random() * 1000);
-      for (var i = 0; i < N; i++) {
-        randomSuffix += ' ';
-      }
-
-      if (data.interactive_html) {
-        // A non-empty interactive_html means that the previous widget
-        // is not sticky and should be replaced.
-        $scope.inputTemplate = data.interactive_html + randomSuffix;
+      if (!isSticky) {
+        // The previous widget is not sticky and should be replaced.
+        $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
+          newStateName) + oppiaPlayerService.getRandomSuffix();
       }
 
       // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
       // and 'question', so that the aria-live attribute will read it out.
-      $scope.currentQuestion = data.question_html + randomSuffix;
-    }, function(data) {
-      warningsData.addWarning(
-        data.error || 'There was an error processing your input.');
+      $scope.currentQuestion = questionHtml + oppiaPlayerService.getRandomSuffix();
     });
   };
 }

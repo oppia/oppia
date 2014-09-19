@@ -20,6 +20,7 @@ __author__ = 'Koji Ashida'
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import feconf
 import utils
 
 from google.appengine.ext import ndb
@@ -36,8 +37,6 @@ STATUS_CHOICES = [
     STATUS_CHOICES_COMPLIMENT,
     STATUS_CHOICES_NOT_ACTIONABLE,
 ]
-
-QUERY_LIMIT = 100
 
 
 class FeedbackThreadModel(base_models.BaseModel):
@@ -108,21 +107,14 @@ class FeedbackThreadModel(base_models.BaseModel):
         return cls.get_by_id(cls._generate_id(exploration_id, thread_id))
 
     @classmethod
-    def get(cls, instance_id):
-        """Gets the FeedbackThreadModel entry for the given ID.
-
-        Returns None if the thread is not found or is already deleted.
-        """
-        return super(FeedbackThreadModel, cls).get(instance_id, strict=False)
-
-    @classmethod
     def get_threads(cls, exploration_id):
         """Returns an array of threads associated to the exploration.
 
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.exploration_id == exploration_id).fetch(QUERY_LIMIT)
+            cls.exploration_id == exploration_id).fetch(
+                feconf.DEFAULT_QUERY_LIMIT)
 
 
 class FeedbackMessageModel(base_models.BaseModel):
@@ -157,6 +149,9 @@ class FeedbackMessageModel(base_models.BaseModel):
     def exploration_id(self):
         return self.id.split('.')[0]
 
+    def get_thread_subject(self):
+        return FeedbackThreadModel.get_by_id(self.thread_id).subject
+
     @classmethod
     def create(cls, thread_id, message_id):
         """Creates a new FeedbackMessageModel entry.
@@ -170,13 +165,16 @@ class FeedbackMessageModel(base_models.BaseModel):
         return cls(id=instance_id)
 
     @classmethod
-    def get(cls, thread_id, message_id):
+    def get(cls, thread_id, message_id, strict=True):
         """Gets the FeedbackMessageModel entry for the given ID.
 
-        Returns None if the message is not found or is already deleted.
+        If the message id is valid and it is not marked as deleted, returns the
+        message instance. Otherwise:
+        - if strict is True, raises EntityNotFoundError
+        - if strict is False, returns None.
         """
         instance_id = cls._generate_id(thread_id, message_id)
-        return super(FeedbackMessageModel, cls).get(instance_id, strict=False)
+        return super(FeedbackMessageModel, cls).get(instance_id, strict=strict)
 
     @classmethod
     def get_messages(cls, thread_id):
@@ -185,7 +183,12 @@ class FeedbackMessageModel(base_models.BaseModel):
         Does not include the deleted entries.
         """
         return cls.get_all().filter(
-            cls.thread_id == thread_id).fetch(QUERY_LIMIT)
+            cls.thread_id == thread_id).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_most_recent_message(cls, thread_id):
+        return cls.get_all().filter(
+            cls.thread_id == thread_id).order(-cls.last_updated).get()
 
     @classmethod
     def get_message_count(cls, thread_id):

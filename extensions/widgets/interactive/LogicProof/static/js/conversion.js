@@ -33,6 +33,9 @@ var logicProofConversion = (function() {
   }, {
     old: '$',
     new: '\u2203'
+  }, {
+    old: '^',
+    new: '\u2227'
   }];
 
   var convertToLogicCharacters = function(oldString) {

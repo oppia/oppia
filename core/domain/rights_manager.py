@@ -22,11 +22,14 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.domain import config_domain
+from core.domain import event_services
 from core.domain import exp_domain
+from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+import feconf
 import utils
 
 
@@ -171,6 +174,9 @@ def create_new_exploration_rights(exploration_id, committer_id):
         status=exploration_rights.status
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
+    subscription_services.subscribe_to_activity(
+        committer_id, exploration_id)
+
 
 def get_exploration_rights(exploration_id):
     """Retrieves the rights for this exploration from the datastore."""
@@ -196,6 +202,15 @@ def get_non_private_exploration_rights():
     """Returns a list of rights domain objects for non-private explorations."""
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_non_private()]
+
+
+def get_page_of_non_private_exploration_rights(
+        page_size=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    """Returns a page of rights domain objects non-private explorations."""
+    results, cursor, more = exp_models.ExplorationRightsModel.get_page_of_non_private_exploration_rights(
+        page_size=page_size, cursor=cursor
+    )
+    return [_get_exploration_rights_from_model(result) for result in results], cursor, more
 
 
 def get_community_owned_exploration_rights():
@@ -436,7 +451,8 @@ class Actor(object):
 
 
 def assign_role(committer_id, exploration_id, assignee_id, new_role):
-    """Assign `assignee_id` to the given role.
+    """Assign `assignee_id` to the given role and subscribes the assignee
+    to future exploration updates.
 
     The caller should ensure that assignee_id corresponds to a valid user in
     the system.
@@ -515,6 +531,10 @@ def assign_role(committer_id, exploration_id, assignee_id, new_role):
     _save_exploration_rights(
         committer_id, exp_rights, commit_message, commit_cmds)
 
+    if new_role in [ROLE_OWNER, ROLE_EDITOR]:
+        subscription_services.subscribe_to_activity(
+            assignee_id, exploration_id)
+
 
 def release_ownership(committer_id, exploration_id):
     """Releases ownership of an exploration to the community.
@@ -567,6 +587,7 @@ def _change_exploration_status(
 
     _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds)
+    event_services.ExplorationStatusChangeEventHandler.record(exploration_id)
 
 
 def publish_exploration(committer_id, exploration_id):
@@ -627,3 +648,6 @@ def unpublicize_exploration(committer_id, exploration_id):
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
         'Exploration unpublicized.')
+
+
+

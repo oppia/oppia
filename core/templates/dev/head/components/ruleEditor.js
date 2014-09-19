@@ -47,7 +47,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           },
           ui_config: {
-            add_element_text: 'Add Feedback'
+            add_element_text: 'Add Feedback Option'
           }
         };
 
@@ -160,14 +160,24 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.saveRule();
           }
         });
-        $scope.$watch('rule.feedback', function(newValue, oldValue) {
+
+        $scope.ruleFeedbackEditorIsOpen = false;
+        $scope.openRuleFeedbackEditor = function() {
+          if ($scope.rule.feedback.length === 0) {
+            $scope.rule.feedback.push('');
+          }
+          $scope.ruleFeedbackEditorIsOpen = true;
+        };
+        $scope.closeRuleFeedbackEditor = function() {
           if ($scope.isTmpRule !== 'true') {
             $scope.saveRule();
           }
-        }, true);
+          $scope.ruleFeedbackEditorIsOpen = false;
+        };
 
         $scope.$on('externalSave', function() {
           $scope.closeRuleDescriptionEditor();
+          $scope.closeRuleFeedbackEditor();
           $scope.closeRuleDestEditor();
         });
 

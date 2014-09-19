@@ -45,11 +45,11 @@ set -- "${remaining_params[@]}"
 
 
 echo Checking whether GAE is installed in $GOOGLE_APP_ENGINE_HOME
-if [ ! -d "$GOOGLE_APP_ENGINE_HOME" ]; then
+if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
   echo Installing Google App Engine
   mkdir -p $GOOGLE_APP_ENGINE_HOME
-  wget http://googleappengine.googlecode.com/files/google_appengine_1.8.8.zip -O gae-download.zip
-  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.8.8/
+  wget https://storage.googleapis.com/appengine-sdks/featured/google_appengine_1.9.11.zip -O gae-download.zip
+  unzip gae-download.zip -d $TOOLS_DIR/google_appengine_1.9.11/
   rm gae-download.zip
 fi
 
@@ -81,13 +81,13 @@ if ( nc -vz localhost 8181 >/dev/null 2>&1 ); then
 fi
 
 # Launch a browser window.
-if [ -f "/opt/google/chrome/chrome" ]; then
+if [ -f "/usr/bin/google-chrome" ]; then
   echo ""
   echo "  INFORMATION"
   echo "  Setting up a local development server at localhost:8181. Opening a"
   echo "  Chrome browser window pointing to this server."
   echo ""
-  (sleep 5; /opt/google/chrome/chrome http://localhost:8181/ )&
+  (sleep 5; /usr/bin/google-chrome http://localhost:8181/ )&
 elif [ -e /Applications/Google\ Chrome.app ]; then
   echo ""
   echo "  INFORMATION"
@@ -106,5 +106,8 @@ fi
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
 echo Starting GAE development server
+# To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
+# settings in feconf.py. Be careful with this -- you do not want to spam people
+# accidentally!
 python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=yes .
 echo Done!

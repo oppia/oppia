@@ -19,7 +19,10 @@
 __author__ = 'Sean Lip'
 
 from core.domain import event_services
+from core.platform import models
+taskqueue_services = models.Registry.import_taskqueue_services()
 from core.tests import test_utils
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -48,3 +51,22 @@ class EventHandlerUnitTests(test_utils.GenericTestBase):
         self.assertEqual([
             numbers_model.number for numbers_model in NumbersModel.query()
         ], [2])
+
+
+class EventHandlerTaskQueueUnitTests(test_utils.GenericTestBase):
+    """Test that events go into the correct queue."""
+
+    def test_events_go_into_the_events_queue(self):
+        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+        event_services.StartExplorationEventHandler.record(
+            'eid1', 1, 'sid1', 'session1', {}, feconf.PLAY_TYPE_NORMAL)
+        self.assertEqual(self.count_jobs_in_taskqueue(), 1)
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            queue_name=taskqueue_services.QUEUE_NAME_EVENTS), 1)
+        self.assertEqual(self.count_jobs_in_taskqueue(
+            queue_name=taskqueue_services.QUEUE_NAME_DEFAULT), 0)
+
+        self.process_and_flush_pending_tasks()
+
+        self.assertEqual(self.count_jobs_in_taskqueue(), 0)

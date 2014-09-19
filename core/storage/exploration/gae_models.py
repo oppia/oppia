@@ -18,14 +18,14 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
+
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
 
 from google.appengine.ext import ndb
 
-
-QUERY_LIMIT = 100
 
 EXPLORATION_STATUS_PRIVATE = 'private'
 EXPLORATION_STATUS_PUBLIC = 'public'
@@ -83,11 +83,6 @@ class ExplorationModel(base_models.VersionedModel):
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
-
-    @classmethod
-    def get_multi(cls, exp_ids):
-        """Returns a list of exploration models, given a list of ids."""
-        return super(ExplorationModel, cls).get_multi(exp_ids)
 
     @classmethod
     def get_exploration_count(cls):
@@ -188,7 +183,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLIC
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_publicized(cls):
@@ -197,7 +192,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLICIZED
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_non_private(cls):
@@ -206,7 +201,21 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_page_of_non_private(
+            cls, page_size=feconf.DEFAULT_QUERY_LIMIT, urlsafe_start_cursor=None):
+        """Returns a page of non-private exp rights models."""
+        return ExplorationRightsModel.query().filter(
+            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ExplorationRightsModel.deleted == False
+        ).order(
+            #these orders are because inequality filters require them.
+            #more info: http://stackoverflow.com/questions/12449197/badargumenterror-multiquery-with-cursors-requires-key-order-in-ndb
+            ExplorationRightsModel.status, ExplorationRightsModel._key
+        ).fetch_page(page_size=page_size, start_cursor=urlsafe_start_cursor)
 
     @classmethod
     def get_community_owned(cls):
@@ -215,7 +224,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.community_owned == True
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -230,7 +239,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                    ExplorationRightsModel.viewer_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -242,7 +251,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                    ExplorationRightsModel.editor_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_viewable(cls, user_id):
@@ -254,7 +263,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.viewer_ids == user_id
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -294,6 +303,9 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
 
     A new instance of this model is created and saved every time a commit to
     ExplorationModel or ExplorationRightsModel occurs.
+
+    The id for this model is of the form
+    'exploration-{{EXP_ID}}-{{EXP_VERSION}}'.
     """
     # Update superclass model to make these properties indexed.
     created_on = ndb.DateTimeProperty(auto_now_add=True, indexed=True)
@@ -327,25 +339,22 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
     post_commit_is_private = ndb.BooleanProperty(indexed=True)
 
     @classmethod
+    def get_commit(cls, exploration_id, version):
+        return cls.get_by_id('exploration-%s-%s' % (exploration_id, version))
+
+    @classmethod
     def get_all_commits(cls, page_size, urlsafe_start_cursor):
         return cls._fetch_page_sorted_by_last_updated(
             cls.query(), page_size, urlsafe_start_cursor)
 
     @classmethod
-    def get_all_non_private_commits(cls, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.post_commit_is_private == False),
-            page_size, urlsafe_start_cursor)
+    def get_all_non_private_commits(cls, page_size, urlsafe_start_cursor, max_age=None):
+        if not isinstance(max_age, datetime.timedelta) and max_age is not None:
+            raise ValueError('max_age must be a datetime.timedelta instance or None.')
 
-    @classmethod
-    def get_all_commits_by_exp_id(
-            cls, exploration_id, page_size, urlsafe_start_cursor):
+        query = cls.query(cls.post_commit_is_private == False)
+        if max_age:
+            query = query.filter(
+                cls.last_updated >= datetime.datetime.utcnow() - max_age)
         return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.exploration_id == exploration_id),
-            page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_commits_by_user_id(
-            cls, user_id, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.user_id == user_id), page_size, urlsafe_start_cursor)
+            query, page_size, urlsafe_start_cursor)

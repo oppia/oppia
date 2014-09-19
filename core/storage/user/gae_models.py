@@ -50,3 +50,27 @@ class UserSettingsModel(base_models.BaseModel):
         """Returns a user model given a normalized username"""
         return cls.get_all().filter(
             cls.normalized_username == normalized_username).get()
+
+
+class UserSubscriptionsModel(base_models.BaseModel):
+    """A list of things that a user subscribes to.
+
+    Instances of this class are keyed by the user id.
+    """
+    # IDs of activities (e.g., explorations) that this user subscribes to.
+    activity_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # IDs of feedback thread ids that this user subscribes to.
+    feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+
+
+class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
+    """A list of recent changes corresponding to things a user subscribes to.
+
+    This is computed using a MapReduce batch job and may not be up to date.
+    Instances of this class are keyed by the user id.
+    """
+    # The output of the batch job.
+    output = ndb.JsonProperty(indexed=False)
+    # The time, in milliseconds since the epoch, when the job that computed
+    # this batch model was queued.
+    job_queued_msec = ndb.FloatProperty(indexed=False)

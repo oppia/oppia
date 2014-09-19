@@ -19,7 +19,7 @@
 __author__ = 'Sean Lip'
 
 from core.domain import skins_services
-import test_utils
+from core.tests import test_utils
 
 
 class DefaultSkinsUnitTests(test_utils.GenericTestBase):

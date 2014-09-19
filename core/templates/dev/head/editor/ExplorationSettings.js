@@ -22,13 +22,13 @@ oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
-    'changeListService', 'warningsData', function(
+    'explorationInitStateNameService', 'changeListService', 'warningsData', function(
       $scope, $http, $window, $modal, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
-      changeListService, warningsData) {
+      explorationInitStateNameService, changeListService, warningsData) {
 
-  var CONTRIBUTE_GALLERY_PAGE = '/contribute';
+  var GALLERY_PAGE_URL = '/gallery';
 
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
@@ -36,6 +36,7 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationObjectiveService = explorationObjectiveService;
     $scope.explorationLanguageCodeService = explorationLanguageCodeService;
     $scope.explorationRightsService = explorationRightsService;
+    $scope.explorationInitStateNameService = explorationInitStateNameService;
 
     explorationData.getData().then(function(data) {
       $scope.paramSpecs = data.param_specs || {};
@@ -65,6 +66,20 @@ oppia.controller('ExplorationSettings', [
 
   $scope.saveExplorationLanguageCode = function() {
     explorationLanguageCodeService.saveDisplayedValue();
+  };
+
+  $scope.saveExplorationInitStateName = function() {
+    var newInitStateName = explorationInitStateNameService.displayed;
+
+    // TODO(sll): Make the whole exploration a dict, so we can remove
+    // the awkward reference to $scope.$parent.
+    if (!$scope.$parent.states.hasOwnProperty(newInitStateName)) {
+      warningsData.addWarning('Invalid initial state name: ' + newInitStateName);
+      explorationInitStateNameService.restoreFromMemento();
+      return;
+    }
+
+    explorationInitStateNameService.saveDisplayedValue();
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
@@ -154,7 +169,7 @@ oppia.controller('ExplorationSettings', [
         deleteUrl += ('?role=' + role);
       }
       $http['delete'](deleteUrl).success(function(data) {
-        $window.location = CONTRIBUTE_GALLERY_PAGE;
+        $window.location = GALLERY_PAGE_URL;
       });
     });
   };

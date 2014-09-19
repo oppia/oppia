@@ -19,15 +19,14 @@
  */
 
 function ConversationSkin(
-    $scope, $timeout, $window, warningsData, messengerService,
-    oppiaPlayerService) {
+    $scope, $timeout, $window, warningsData, messengerService, oppiaPlayerService) {
 
   var urlParams = $scope.getUrlParams();
   $scope.iframed = !!urlParams.iframed;
 
   $scope.showPage = !$scope.iframed;
-
   $scope.hasInteractedAtLeastOnce = false;
+  $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
 
   $window.addEventListener('beforeunload', function(e) {
     if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
@@ -64,74 +63,50 @@ function ConversationSkin(
     $scope.responseLog = [];
     $scope.inputTemplate = '';
     oppiaPlayerService.loadInitialState(function(data) {
-      $scope.explorationTitle = data.title;
-      $scope.loadPage(data);
+      $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
+      $scope.hasInteractedAtLeastOnce = false;
+
+      $scope.finished = data.finished;
+      $scope.stateName = data.state_name;
+      $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml($scope.stateName);
+
+      $scope.responseLog = [{
+        previousReaderAnswer: '',
+        feedback: '',
+        question: data.init_html,
+        isMostRecentQuestion: true
+      }];
+
+      messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
+      $scope.showPage = true;
+      $scope.adjustPageHeight(false, null);
+
       $window.scrollTo(0, 0);
-    }, function(data) {
-      warningsData.addWarning(
-        data.error || 'There was an error loading the exploration.');
     });
   };
 
   $scope.initializePage();
 
-  $scope.showFeedbackModal = function() {
-    oppiaPlayerService.showFeedbackModal();
-  };
-
-  $scope.loadPage = function(data) {
-    $scope.hasInteractedAtLeastOnce = false;
-
-    $scope.categories = data.categories;
-    $scope.finished = data.finished;
-    $scope.inputTemplate = data.interactive_html;
-    $scope.responseLog = [{
-      previousReaderAnswer: '',
-      feedback: '',
-      question: data.init_html,
-      isMostRecentQuestion: true
-    }];
-    $scope.stateName = data.state_name;
-    $scope.title = data.title;
-
-    messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
-    $scope.showPage = true;
-    $scope.adjustPageHeight(false, null);
-  };
-
   $scope.submitAnswer = function(answer, handler) {
-    oppiaPlayerService.submitAnswer(answer, handler, function(data) {
+    oppiaPlayerService.submitAnswer(answer, handler, function(
+        newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
       warningsData.clear();
       $scope.hasInteractedAtLeastOnce = true;
 
-      $scope.categories = data.categories;
+      $scope.stateName = newStateName;
+      $scope.finished = (newStateName === 'END');
 
-      // This is a bit of a hack. When a refresh happens, AngularJS compares
-      // $scope.inputTemplate to the previous value of $scope.inputTemplate.
-      // If they are the same, then $scope.inputTemplate is not updated, and
-      // the reader's previous answers still remain present. The random suffix
-      // makes the new template different from the previous one, and thus
-      // indirectly forces a refresh.
-      var randomSuffix = '';
-      var N = Math.round(Math.random() * 1000);
-      for (var i = 0; i < N; i++) {
-        randomSuffix += ' ';
+      if (!$scope.finished && !isSticky) {
+        // The previous widget is not sticky and should be replaced.
+        $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
+          newStateName) + oppiaPlayerService.getRandomSuffix();
       }
-
-      if (data.interactive_html) {
-        // A non-empty interactive_html means that the previous widget
-        // is not sticky and should be replaced.
-        $scope.inputTemplate = data.interactive_html + randomSuffix;
-      }
-
-      $scope.stateName = data.state_name;
-      $scope.finished = data.finished;
 
       $scope.responseLog = $scope.responseLog || [];
 
       // TODO(sll): Check the state change instead of question_html so that it
       // works correctly when the new state doesn't have a question string.
-      var isQuestion = !!data.question_html;
+      var isQuestion = !!questionHtml;
       if (isQuestion) {
         // Clean up the previous isMostRecentQuestion marker.
         $scope.responseLog.forEach(function(log) {
@@ -142,9 +117,9 @@ function ConversationSkin(
       // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
       // and 'question', so that the aria-live attribute will read it out.
       $scope.responseLog.push({
-        previousReaderAnswer: data.reader_response_html + randomSuffix,
-        feedback: data.feedback_html + randomSuffix,
-        question: data.question_html + (isQuestion ? randomSuffix : ''),
+        previousReaderAnswer: readerResponseHtml + oppiaPlayerService.getRandomSuffix(),
+        feedback: feedbackHtml + oppiaPlayerService.getRandomSuffix(),
+        question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : ''),
         isMostRecentQuestion: isQuestion
       });
 
@@ -162,8 +137,6 @@ function ConversationSkin(
         messengerService.sendMessage(
           messengerService.EXPLORATION_COMPLETED, null);
       }
-    }, function(data) {
-      warningsData.addWarning('There was an error processing your input.');
     });
   };
 

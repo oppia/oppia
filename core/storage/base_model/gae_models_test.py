@@ -64,6 +64,21 @@ class BaseModelUnitTests(test_utils.GenericTestBase):
         with self.assertRaises(base_models.BaseModel.EntityNotFoundError):
             model.get(model_id)
 
+    def test_get_multi(self):
+        model1 = base_models.BaseModel()
+        model2 = base_models.BaseModel()
+        model2.deleted = True
+
+        model1.put()
+        model2.put()
+
+        model1_id = model1.id
+        model2_id = model2.id
+
+        result = base_models.BaseModel.get_multi([model1_id, model2_id, 'none'])
+
+        self.assertEqual(result, [model1, None, None])
+
     def test_get_new_id_method_returns_unique_ids(self):
         ids = set([])
         for item in range(100):

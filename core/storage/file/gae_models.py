@@ -21,12 +21,10 @@ __author__ = 'Sean Lip'
 import os
 
 import core.storage.base_model.gae_models as base_models
-
-from google.appengine.ext import ndb
-
+import feconf
 import utils
 
-QUERY_LIMIT = 1000
+from google.appengine.ext import ndb
 
 
 class FileMetadataSnapshotMetadataModel(base_models.BaseSnapshotMetadataModel):
@@ -52,7 +50,8 @@ class FileMetadataModel(base_models.VersionedModel):
 
     @classmethod
     def get_undeleted(cls):
-        return cls.get_all().filter(cls.deleted == False).fetch(QUERY_LIMIT)
+        return cls.get_all().filter(cls.deleted == False).fetch(
+            feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def _construct_id(cls, exploration_id, filepath):

@@ -20,6 +20,7 @@ from core.controllers import editor
 from core.controllers import pages
 from core.domain import config_domain
 from core.tests import test_utils
+import feconf
 
 
 ADMIN_EMAIL = 'admin@example.com'
@@ -153,18 +154,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         # Log in as a moderator.
         self.login(MODERATOR_EMAIL)
-        response = self.testapp.get('/learn')
+        response = self.testapp.get(feconf.GALLERY_URL)
         response.mustcontain('Moderator', no=['Admin'])
         self.logout()
 
         # Log in as an admin.
         self.login(ADMIN_EMAIL)
-        response = self.testapp.get('/learn')
+        response = self.testapp.get(feconf.GALLERY_URL)
         response.mustcontain('Admin', no=['Moderator'])
         self.logout()
 
         # Log in as a both-moderator-and-admin.
         self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
-        response = self.testapp.get('/learn')
+        response = self.testapp.get(feconf.GALLERY_URL)
         response.mustcontain('Admin', no=['Moderator'])
         self.logout()

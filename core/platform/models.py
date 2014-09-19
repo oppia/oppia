@@ -79,6 +79,11 @@ class _Gae(_Platform):
         return gae_current_user_services
 
     @classmethod
+    def import_email_services(cls):
+        from core.platform.email import gae_email_services
+        return gae_email_services
+
+    @classmethod
     def import_memcache_services(cls):
         from core.platform.memcache import gae_memcache_services
         return gae_memcache_services
@@ -87,6 +92,11 @@ class _Gae(_Platform):
     def import_taskqueue_services(cls):
         from core.platform.taskqueue import gae_taskqueue_services
         return gae_taskqueue_services
+
+    @classmethod
+    def import_search_services(cls):
+        from core.platform.search import gae_search_services
+        return gae_search_services
 
     NAME = 'gae'
 
@@ -113,9 +123,17 @@ class Registry(object):
         return cls._get().import_transaction_services()
 
     @classmethod
+    def import_email_services(cls):
+        return cls._get().import_email_services()
+
+    @classmethod
     def import_memcache_services(cls):
         return cls._get().import_memcache_services()
 
     @classmethod
     def import_taskqueue_services(cls):
         return cls._get().import_taskqueue_services()
+
+    @classmethod
+    def import_search_services(cls):
+        return cls._get().import_search_services()

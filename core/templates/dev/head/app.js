@@ -24,7 +24,7 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia',
-  ['ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.sortable'].concat(
+  ['ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.sortable'].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
@@ -165,10 +165,6 @@ oppia.factory('oppiaDatetimeFormatter', [function() {
     getHumanReadableDatetime: function(millisSinceEpoch) {
       var date = new Date(millisSinceEpoch);
       return date.toUTCString();
-    },
-    getLocaleString: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toLocaleString();
     },
     // Returns just the time if the local datetime representation has the
     // same date as the current date. Otherwise, returns just the date.

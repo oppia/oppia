@@ -201,32 +201,24 @@ class EditorTest(BaseEditorControllerTest):
         # TODO(sll): Use the ExplorationPlayer in reader_test for this.
         exploration_dict = self.get_json(
             '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
-        self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
+        self.assertEqual(
+            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': '0', 'handler': 'submit'})
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': 'blah', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': 'blah', 'handler': 'submit'})
 
         for _ in range(2):
             exploration_dict = self.post_json(
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah2', 'handler': 'submit',
-                    'state_history': exploration_dict['state_history'],
                 }
             )
 
@@ -235,7 +227,6 @@ class EditorTest(BaseEditorControllerTest):
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah3', 'handler': 'submit',
-                    'state_history': exploration_dict['state_history'],
                 }
             )
 
@@ -310,24 +301,17 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         self.logout()
         exploration_dict = self.get_json(
             '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
-        self.assertEqual(exploration_dict['title'], 'Welcome to Oppia!')
+        self.assertEqual(
+            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': '0', 'handler': 'submit'})
         state_name = exploration_dict['state_name']
         self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': 'blah', 'handler': 'submit',
-                'state_history': exploration_dict['state_history']
-            }
-        )
+            {'answer': 'blah', 'handler': 'submit'})
         # Ensure that all events get propagated.
         self.process_and_flush_pending_tasks()
 
@@ -365,7 +349,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -382,7 +370,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -399,7 +391,11 @@ states:
       value: ''
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -685,7 +681,7 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         # Joe logs in.
         self.login('joe@example.com')
 
-        response = self.testapp.get('/contribute', expect_errors=True)
+        response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % EXP_ID)
         self.assertEqual(response.status_int, 200)
@@ -695,9 +691,9 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         config_services.set_property(
             feconf.ADMIN_COMMITTER_ID, 'banned_usernames', ['joe'])
 
-        # Test that Joe is banned.
-        response = self.testapp.get('/contribute', expect_errors=True)
-        self.assertEqual(response.status_int, 401)
+        # Test that Joe is banned. (He can still access the gallery.)
+        response = self.testapp.get(feconf.GALLERY_URL, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 200)
         self.assert_cannot_edit(response.body)

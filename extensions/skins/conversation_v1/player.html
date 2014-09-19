@@ -2,18 +2,24 @@
       href="/extensions/skins/conversation_v1/static/conversation.css">
 
 <div ng-controller="ConversationSkin" ng-style="getStyle()">
-  <div ng-if="!iframed" class="conversation-skin-feedback-button" ng-click="showFeedbackModal()">
-    <center>
-      <br><br><br>Feedback
-    </center>
+  <div class="hidden-xs hidden-sm pull-right btn-group-vertical" data-spy="affix" data-offset-top="50" style="right: 50px;">
+    <a class="btn btn-default" ng-click="resetPage()" style="text-align: left;">
+      <span class="glyphicon glyphicon-refresh"></span>
+      Restart
+    </a>
+    <button class="btn btn-default" ng-click="showFeedbackModal()" style="text-align: left;">
+      <span class="glyphicon glyphicon-envelope"></span>
+      Feedback
+    </button>
+    <a class="btn btn-default" ng-href="/create/<[explorationId]>" style="text-align: left;" target="_blank">
+      <span class="glyphicon glyphicon-eye-open"></span>
+      Look Inside
+    </a>
   </div>
 
   <div class="oppia-content" role="main">
     <div class="conversation-skin-exploration-header">
-      <a href="" ng-click="resetPage()" class="pull-right conversation-skin-exploration-header-sublink">
-        Clear history and restart
-      </a>
-      <h3 role="heading"><[title]></h3>
+      <h3 role="heading"><[explorationTitle]></h3>
     </div>
 
     <div class="conversation-skin-iframe-container">
