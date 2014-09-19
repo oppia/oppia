@@ -104,16 +104,14 @@ var evaluate = function(parsed, envs) {
       throw 'Parser generated an intermediate node with zero children';
     }
 
-    // Evaluate all the elements, including the operator.
-    var evaled = parsed.map(function(item) {
+    // Now the first element should be a function name.
+    var op = lookupEnvs(parsed[0], envs);
+
+    // Evaluate rest of the elements, i.e. the arguments.
+    var args = parsed.slice(1).map(function(item) {
       return evaluate(item, envs);
     });
-    // Now the first element should be a function.
-    var op = evaled[0];
-    if (typeof(op) == 'string') {
-      op = lookupEnvs(op, envs);
-    }
-    return op(evaled.slice(1), envs);
+    return op(args, envs);
   }
   // This should be a terminal node with the actual value.
   return parsed;

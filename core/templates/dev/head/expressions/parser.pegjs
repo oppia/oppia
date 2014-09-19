@@ -36,7 +36,7 @@
 // The parse tree is made of arrays and JavaScript's primitives, i.e. booleans,
 // numbers, strings, and nulls (but not undefineds).
 // Each node of the tree is an array, representing the operation performed for
-// that node. The first element of the array is the operator, and the rest
+// that node. The first element of the array is the operator name, and the rest
 // are the parameters for that operator (i.e. polish notation).
 // Most operators have the same textual name as in the corresponding input
 // grammar, e.g. logical or operator is "||". This is the same for function
@@ -45,9 +45,6 @@
 // which is the parameter name).
 // The difference of unary and binary '+' and '-' need to be infered by the
 // number of arguments.
-// The first element of the array can contain a string which should be an
-// existing operator name, or an operator itself. I.e. both ['abs', -30] and
-// [['#', 'abs'], -30] are valid representations of "abs(-30)".
 
 start
   = __ expression:Expression __ { return expression; }
@@ -256,7 +253,7 @@ PrimaryExpression
   / "(" __ expression:Expression __ ")" { return expression; }
 
 CallExpression
-  = name:PrimaryExpression __ args:(Arguments)+ {
+  = name:Identifier __ args:(Arguments)+ {
       var result = [name, args.shift()];
       while (args.length > 0) {
         result = [result, args.shift()];
