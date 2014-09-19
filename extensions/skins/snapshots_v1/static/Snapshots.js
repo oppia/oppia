@@ -32,22 +32,23 @@ function SnapshotsSkin($scope, warningsData, oppiaPlayerService) {
   $scope.initializePage();
 
   $scope.submitAnswer = function(answer, handler) {
-    oppiaPlayerService.submitAnswer(answer, handler, function(data) {
-      if (data.finished) {
+    oppiaPlayerService.submitAnswer(answer, handler, function(
+        newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
+      if (newStateName === 'END') {
         $scope.currentQuestion = 'You have finished.';
         $scope.inputTemplate = '';
         return;
       }
 
-      if (!data.sticky) {
+      if (!isSticky) {
         // The previous widget is not sticky and should be replaced.
         $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
-          data.state_name) + oppiaPlayerService.getRandomSuffix();
+          newStateName) + oppiaPlayerService.getRandomSuffix();
       }
 
       // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
       // and 'question', so that the aria-live attribute will read it out.
-      $scope.currentQuestion = data.question_html + oppiaPlayerService.getRandomSuffix();
+      $scope.currentQuestion = questionHtml + oppiaPlayerService.getRandomSuffix();
     });
   };
 }

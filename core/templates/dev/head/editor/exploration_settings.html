@@ -41,6 +41,13 @@
                     </span>
                   </div>
                 </div>
+                <div class="form-group">
+                  <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
+                  <div class="col-lg-10 col-md-10 col-sm-10">
+                    <select id="explorationInitStateName" class="form-control" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for (name, _) in states">
+                    </select>
+                  </div>
+                </div>
               </div>
             </div>
 
@@ -78,8 +85,27 @@
                   </label>
                 </div>
                 <div class="col-lg-10 col-md-10 col-sm-10">
-                  This exploration helps learners to
-                  <span id="explorationObjective" type="text"><[explorationObjectiveService.displayed]></span>.
+                  <span id="explorationObjective" type="text">
+                    <[explorationObjectiveService.displayed]>
+                  </span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationLanguageCode">Language</label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  <[explorationLanguageCodeService.getCurrentLanguageDescription()]>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationInitStateName">First State</label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  <[explorationInitStateNameService.displayed]>
                 </div>
               </div>
             </div>
