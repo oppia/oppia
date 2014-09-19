@@ -28,11 +28,11 @@ oppia.directive('oppiaNoninteractiveVideo', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue),
             end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);
-        $scope.autoplay = (oppiaHtmlEscaper.escapedJsonToObj($attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
+        $scope.autoplaySuffix = (oppiaHtmlEscaper.escapedJsonToObj($attrs.autoplayWithValue) ? '&autoplay=1' : '&autoplay=0');
         $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoIdWithValue);
         $scope.timingParams = '&start=' + start + '&end=' + end;
         $scope.videoUrl = $sce.trustAsResourceUrl(
-          'https://www.youtube.com/embed/' + $scope.videoId + '?rel=' + $scope.timingParams + $scope.autoplay
+          'https://www.youtube.com/embed/' + $scope.videoId + '?rel=' + $scope.timingParams + $scope.autoplaySuffix
         );
       }]
     };

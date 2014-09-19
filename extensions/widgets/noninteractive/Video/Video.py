@@ -51,7 +51,7 @@ class Video(widget_domain.BaseWidget):
     }, {
         'name': 'autoplay',
         'description': (
-            'Autoplay:'),
+            'Autoplay this video once the question has loaded?'),
         'schema': {
             'type': 'bool'
         },
