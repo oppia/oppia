@@ -35,8 +35,6 @@ EXPECTED_MESSAGE_KEYS = [
 
 class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
-    EDITOR_EMAIL = 'editor@example.com'
-    EDITOR_USERNAME = 'editor'
     EXP_ID = '0'
 
     def setUp(self):
@@ -56,9 +54,9 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         self.post_json('%s/%s' % (
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
             {
-                'state_name': 'Welcome!',
-                'subject': 'New subject',
-                'text': 'Some text'
+                'state_name': self._get_unicode_test_string('statename'),
+                'subject': self._get_unicode_test_string('subject'),
+                'text': self._get_unicode_test_string('text'),
             }, self.csrf_token)
         self.logout()
 
@@ -80,7 +78,7 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         self.assertEqual(len(response_dict['threads']), 1)
         self.assertDictContainsSubset({
             'status': 'open',
-            'state_name': 'Welcome!'
+            'state_name': self._get_unicode_test_string('statename'),
         }, response_dict['threads'][0])
 
         # Non-logged-in users can see individual messages.
@@ -91,8 +89,8 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
         self.assertEqual(len(response_dict['messages']), 1)
         self.assertDictContainsSubset({
             'updated_status': 'open',
-            'updated_subject': 'New subject',
-            'text': 'Some text'
+            'updated_subject': self._get_unicode_test_string('subject'),
+            'text': self._get_unicode_test_string('text'),
         }, response_dict['messages'][0])
 
     def test_non_logged_in_users_cannot_create_threads_and_messages(self):
@@ -100,8 +98,8 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
             feconf.FEEDBACK_THREADLIST_URL_PREFIX, self.EXP_ID),
             {
                 'state_name': 'Welcome!',
-                'subject': 'New subject',
-                'text': 'Some text'
+                'subject': self.UNICODE_TEST_STRING,
+                'text': self.UNICODE_TEST_STRING,
             }, self.csrf_token, expect_errors=True, expected_status_int=401)
 
         thread_url = '%s/%s/%s' % (
@@ -109,14 +107,12 @@ class FeedbackThreadPermissionsTests(test_utils.GenericTestBase):
 
         self.post_json(thread_url, {
             'exploration_id': '0',
-            'text': 'New text'
+            'text': self.UNICODE_TEST_STRING,
         }, self.csrf_token, expect_errors=True, expected_status_int=401)
 
 
 class FeedbackThreadIntegrationTests(test_utils.GenericTestBase):
 
-    EDITOR_EMAIL = 'editor@example.com'
-    EDITOR_USERNAME = 'editor'
     EXP_ID = '0'
 
     def setUp(self):

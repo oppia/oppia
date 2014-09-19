@@ -64,9 +64,8 @@ class HomePageTest(test_utils.GenericTestBase):
             'Login', self.get_expected_login_url('/'),
             no=['Logout', self.get_expected_logout_url('/')])
 
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
-
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
@@ -80,13 +79,8 @@ class HomePageTest(test_utils.GenericTestBase):
 
 class DashboardHandlerTest(test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'editor@example.com'
     COLLABORATOR_EMAIL = 'collaborator@example.com'
-    VIEWER_EMAIL = 'viewer@example.com'
-
-    OWNER_USERNAME = 'owner'
     COLLABORATOR_USERNAME = 'collaborator'
-    VIEWER_USERNAME = 'viewer'
 
     EXP_ID = 'exp_id'
     EXP_TITLE = 'Exploration title'

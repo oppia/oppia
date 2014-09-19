@@ -24,7 +24,7 @@ import feconf
 class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
     def test_redirect_to_prerequisites_page_happens(self):
-        self.login('editor@example.com')
+        self.login(self.EDITOR_EMAIL)
 
         exp_services.load_demo('0')
         response = self.testapp.get('/create/0')
@@ -41,17 +41,14 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_accepting_terms_is_handled_correctly(self):
-        self.register_editor('editor@example.com')
-
-        self.login('editor@example.com')
-
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.post_json(
             feconf.EDITOR_PREREQUISITES_DATA_URL, {'agreed_to_terms': False},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
-
         self.assertEqual(response_dict['code'], 400)
         self.assertIn('you will need to accept', response_dict['error'])
 
@@ -69,7 +66,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_username_is_handled_correctly(self):
-        self.login('editor@example.com')
+        self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
@@ -97,6 +94,14 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
 
         response_dict = self.post_json(
             feconf.EDITOR_PREREQUISITES_DATA_URL,
+            {'username': self.UNICODE_TEST_STRING, 'agreed_to_terms': True},
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn(
+            'can only have alphanumeric characters', response_dict['error'])
+
+        response_dict = self.post_json(
+            feconf.EDITOR_PREREQUISITES_DATA_URL,
             {'username': 'abcde', 'agreed_to_terms': True},
             csrf_token=csrf_token)
 
@@ -108,7 +113,7 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
     def test_username_check(self):
         self.register_editor('abc@example.com', username='abc')
 
-        self.login('editor@example.com')
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -128,6 +133,14 @@ class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
         response_dict = self.post_json(
             feconf.USERNAME_CHECK_DATA_URL, {'username': '!!!INVALID!!!'},
+            csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
+        self.assertEqual(response_dict['code'], 400)
+        self.assertIn(
+            'can only have alphanumeric characters', response_dict['error'])
+
+        response_dict = self.post_json(
+            feconf.USERNAME_CHECK_DATA_URL,
+            {'username': self.UNICODE_TEST_STRING},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(response_dict['code'], 400)
         self.assertIn(
