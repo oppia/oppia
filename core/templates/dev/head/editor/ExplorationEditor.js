@@ -26,14 +26,14 @@ oppia.controller('ExplorationEditor', [
   '$log', 'explorationData', 'warningsData', 'activeInputData',
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'validatorsService', 'editabilityService',
+  'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
-    explorationRightsService, validatorsService, editabilityService,
-    oppiaDatetimeFormatter, widgetDefinitionsService) {
+    explorationRightsService, explorationInitStateNameService, validatorsService,
+    editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService) {
 
   $scope.editabilityService = editabilityService;
 
@@ -71,8 +71,9 @@ oppia.controller('ExplorationEditor', [
     var confirmDiscard = confirm('Do you want to discard your changes?');
     if (confirmDiscard) {
       warningsData.clear();
-      $scope.isDiscardInProgress = true;
+      $rootScope.$broadcast('externalSave');
 
+      $scope.isDiscardInProgress = true;
       changeListService.discardAllChanges();
       $scope.doFullRefresh = true;
       $scope.initExplorationPage(function() {
@@ -189,6 +190,8 @@ oppia.controller('ExplorationEditor', [
             $scope.deletedStates = deletedStates;
             $scope.commitMessageIsOptional = commitMessageIsOptional;
 
+            // TODO(sll): The keys for this dict already appear in
+            // EditorServices.changeListService; consider deduplicating.
             $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES = {
               'title': 'Title',
               'category': 'Category',
@@ -196,14 +199,16 @@ oppia.controller('ExplorationEditor', [
               'language_code': 'Language',
               'param_specs': 'Parameter specifications',
               'param_changes': 'Initial parameter changes',
-              'default_skin_id': 'Default skin'
+              'default_skin_id': 'Default skin',
+              'init_state_name': 'First state'
             };
 
             var EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS = {
               'title': true,
               'category': true,
               'objective': true,
-              'default_skin_id': true
+              'default_skin_id': true,
+              'init_state_name': true
             };
 
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
@@ -374,8 +379,8 @@ oppia.controller('ExplorationEditor', [
     } else {
       if (path.indexOf('/gui/') != -1) {
         $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
-      } else if ($scope.initStateName) {
-        $location.path('/gui/' + $scope.initStateName);
+      } else if (explorationInitStateNameService.displayed) {
+        $location.path('/gui/' + explorationInitStateNameService.displayed);
       } else {
         return;
       }
@@ -385,7 +390,7 @@ oppia.controller('ExplorationEditor', [
         var stateData = $scope.states[stateName];
         if (stateData === null || stateData === undefined || $.isEmptyObject(stateData)) {
           // This state does not exist. Redirect to the initial state.
-          $scope.showStateEditor($scope.initStateName);
+          $scope.showStateEditor(explorationInitStateNameService.displayed);
           warningsData.addWarning('State ' + stateName + ' does not exist.');
           return;
         } else {
@@ -401,9 +406,6 @@ oppia.controller('ExplorationEditor', [
         $scope.initExplorationPage(callback);
       }
     }
-
-    // Reset location hash
-    $location.url($location.path());
   });
 
   /********************************************
@@ -411,7 +413,7 @@ oppia.controller('ExplorationEditor', [
   ********************************************/
   $scope.refreshGraph = function() {
     $scope.graphData = $scope.getNodesAndLinks(
-      $scope.states, $scope.initStateName);
+      $scope.states, explorationInitStateNameService.displayed);
   };
 
   $scope.areExplorationWarningsVisible = false;
@@ -633,10 +635,13 @@ oppia.controller('ExplorationEditor', [
       explorationCategoryService.init(data.category);
       explorationObjectiveService.init(data.objective);
       explorationLanguageCodeService.init(data.language_code);
+      explorationInitStateNameService.init(data.init_state_name);
 
       $scope.explorationTitleService = explorationTitleService;
+      $scope.explorationCategoryService = explorationCategoryService;
       $scope.explorationObjectiveService = explorationObjectiveService;
       $scope.explorationRightsService = explorationRightsService;
+      $scope.explorationInitStateNameService = explorationInitStateNameService;
 
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
@@ -646,7 +651,6 @@ oppia.controller('ExplorationEditor', [
 
       $scope.paramSpecs = data.param_specs || {};
 
-      $scope.initStateName = data.init_state_name;
       $scope.currentUser = data.user;
       $scope.currentVersion = data.version;
 
@@ -663,7 +667,7 @@ oppia.controller('ExplorationEditor', [
       if ($scope.doFullRefresh) {
         if (!editorContextService.getActiveStateName() ||
             !$scope.states.hasOwnProperty(editorContextService.getActiveStateName())) {
-          editorContextService.setActiveStateName($scope.initStateName);
+          editorContextService.setActiveStateName(explorationInitStateNameService.displayed);
         }
         $scope.showStateEditor(editorContextService.getActiveStateName());
         $scope.doFullRefresh = false;
@@ -820,7 +824,9 @@ oppia.controller('ExplorationEditor', [
   $scope.deleteState = function(deleteStateName) {
     warningsData.clear();
 
-    if (deleteStateName === $scope.initStateName || deleteStateName === END_DEST) {
+    var initStateName = explorationInitStateNameService.displayed;
+
+    if (deleteStateName === initStateName || deleteStateName === END_DEST) {
       return;
     }
 
@@ -848,7 +854,7 @@ oppia.controller('ExplorationEditor', [
         }
       ]
     }).result.then(function(deleteStateName) {
-      if (deleteStateName == $scope.initStateName) {
+      if (deleteStateName == initStateName) {
         warningsData.addWarning(
           'Deleting the initial state of a question is not supported. ' +
           'Perhaps edit it instead?');
@@ -873,7 +879,7 @@ oppia.controller('ExplorationEditor', [
       }
 
       if (editorContextService.getActiveStateName() === deleteStateName) {
-        $scope.showStateEditor($scope.initStateName);
+        $scope.showStateEditor(initStateName);
       }
 
       changeListService.deleteState(deleteStateName);

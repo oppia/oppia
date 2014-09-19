@@ -195,25 +195,25 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def _get_recent_updates_mock_by_viewer(self, unused_user_id):
         """Returns a single feedback thread by VIEWER_ID."""
-        return [{
+        return (100000, [{
             'activity_id': 'exp_id',
             'activity_title': 'exp_title',
             'author_id': self.viewer_id,
             'last_updated_ms': 100000,
             'subject': 'Feedback Message Subject',
             'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-        }]
+        }])
 
     def _get_recent_updates_mock_by_anonymous_user(self, unused_user_id):
         """Returns a single feedback thread by an anonymous user."""
-        return [{
+        return (200000, [{
             'activity_id': 'exp_id',
             'activity_title': 'exp_title',
             'author_id': None,
             'last_updated_ms': 100000,
             'subject': 'Feedback Message Subject',
             'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-        }]
+        }])
 
     def test_author_ids_are_handled_correctly(self):
         """Test that author ids are converted into author usernames

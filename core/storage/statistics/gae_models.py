@@ -19,16 +19,15 @@
 __author__ = 'Sean Lip'
 
 import datetime
-import feconf
 import logging
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import feconf
 import utils
 
 from google.appengine.ext import ndb
 
-QUERY_LIMIT = 100
 MAX_ANSWER_HASH_LEN = 100
 
 

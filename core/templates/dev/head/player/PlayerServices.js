@@ -49,11 +49,50 @@ oppia.factory('stopwatchProviderService', ['$log', function($log) {
   };
 }]);
 
+// A service that maintains the current set of parameters for the learner.
+oppia.factory('learnerParamsService', ['$log', function($log) {
+  var _paramDict = {};
+
+  return {
+    // TODO(sll): Forbid use of 'answer', 'choices', 'stateSticky' as possible keys.
+    init: function(initParamSpecs) {
+      // initParamSpecs is a dict mapping the parameter names used in the
+      // exploration to their default values.
+      _paramDict = angular.copy(initParamSpecs);
+    },
+    getValue: function(paramName) {
+      if (!_paramDict.hasOwnProperty(paramName)) {
+        throw 'Invalid parameter name: ' + paramName;
+      } else {
+        return angular.copy(_paramDict[paramName]);
+      }
+    },
+    setValue: function(paramName, newParamValue) {
+      // TODO(sll): Currently, all parameters are strings. In the future, we
+      // will need to maintain information about parameter types.
+      if (!_paramDict.hasOwnProperty(paramName)) {
+        throw 'Cannot set unknown parameter: ' + paramName;
+      } else {
+        _paramDict[paramName] = String(newParamValue);
+      }
+    },
+    getAllParams: function() {
+      return angular.copy(_paramDict);
+    }
+  };
+}]);
+
 // A service that provides a number of utility functions for JS used by
 // individual skins.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', 'messengerService', 'stopwatchProviderService',
-    function($http, $rootScope, $modal, messengerService, stopwatchProviderService) {
+    '$http', '$rootScope', '$modal', '$filter', 'messengerService',
+    'stopwatchProviderService', 'learnerParamsService', 'warningsData',
+    'oppiaHtmlEscaper', function(
+      $http, $rootScope, $modal, $filter, messengerService,
+      stopwatchProviderService, learnerParamsService, warningsData,
+      oppiaHtmlEscaper) {
+
+  var _END_DEST = 'END';
 
   var explorationId = null;
   // The pathname should be: .../explore/{exploration_id}
@@ -74,16 +113,44 @@ oppia.factory('oppiaPlayerService', [
     '/explorehandler/init/' + explorationId + (version ? '?v=' + version : ''));
   var sessionId = null;
   var isLoggedIn = false;
+  var _exploration = null;
 
-  $rootScope.currentParams = {};
+  learnerParamsService.init({});
   var stateHistory = [];
   var stateName = null;
   var answerIsBeingProcessed = false;
 
-  var _updateStatus = function(newParams, newStateName, newStateHistory) {
-    $rootScope.currentParams = newParams;
+  var _updateStatus = function(newParams, newStateName) {
+    // TODO(sll): Do this more incrementally.
+    learnerParamsService.init(newParams);
     stateName = newStateName;
-    stateHistory = newStateHistory;
+    stateHistory.push(stateName);
+  };
+
+  // TODO(sll): Move this (and the corresponding code in the exploration editor) to
+  // a common standalone service.
+  var _getInteractiveWidgetHtml = function(widgetId, widgetCustomizationArgSpecs) {
+    var el = $(
+      '<oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId) + '>');
+    for (var caSpecName in widgetCustomizationArgSpecs) {
+      var caSpecValue = widgetCustomizationArgSpecs[caSpecName].value;
+      // TODO(sll): Evaluate any values here that correspond to expressions.
+      el.attr(
+        $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
+        oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
+    }
+    return ($('<div>').append(el)).html();
+  };
+
+  var _getReaderResponseHtml = function(widgetId, answer, isSticky, choices) {
+    var el = $(
+      '<oppia-response-' + $filter('camelCaseToHyphens')(widgetId) + '>');
+    el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+    el.attr('state-sticky', oppiaHtmlEscaper.objToEscapedJson(isSticky));
+    if (choices) {
+      el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(choices));
+    }
+    return ($('<div>').append(el)).html();
   };
 
   var _feedbackModalCtrl = ['$scope', '$modalInstance', 'isLoggedIn', 'currentStateName', function(
@@ -92,7 +159,7 @@ oppia.factory('oppiaPlayerService', [
     $scope.currentStateName = currentStateName;
 
     $scope.isSubmitterAnonymized = false;
-    $scope.relatedTo = $scope.currentStateName === 'END' ? 'exploration' : 'state';
+    $scope.relatedTo = $scope.currentStateName === _END_DEST ? 'exploration' : 'state';
     $scope.subject = '';
     $scope.feedback = '';
 
@@ -134,16 +201,42 @@ oppia.factory('oppiaPlayerService', [
   var stopwatch = stopwatchProviderService.getInstance();
 
   return {
-    loadInitialState: function(successCallback, errorCallback) {
+    loadInitialState: function(successCallback) {
       $http.get(explorationDataUrl).success(function(data) {
+        _exploration = data.exploration;
         isLoggedIn = data.is_logged_in;
         sessionId = data.sessionId;
         stopwatch.resetStopwatch();
-        _updateStatus(data.params, data.state_name, data.state_history);
+        _updateStatus(data.params, data.state_name);
+        // TODO(sll): Restrict what is passed here to just the relevant blobs of content.
         successCallback(data);
-      }).error(errorCallback);
+      }).error(function(data) {
+        warningsData.addWarning(
+          data.error || 'There was an error loading the exploration.');
+      });
     },
-    submitAnswer: function(answer, handler, successCallback, errorCallback) {
+    getExplorationTitle: function() {
+      return _exploration.title;
+    },
+    getInteractiveWidgetHtml: function(stateName) {
+      return _getInteractiveWidgetHtml(
+        _exploration.states[stateName].widget.widget_id,
+        _exploration.states[stateName].widget.customization_args);
+    },
+    getRandomSuffix: function() {
+      // This is a bit of a hack. When a refresh to a $scope variable happens,
+      // AngularJS compares the new value of the variable to its previous value.
+      // If they are the same, then the variable is not updated. Appending a random
+      // suffix makes the new value different from the previous one, and
+      // thus indirectly forces a refresh.
+      var randomSuffix = '';
+      var N = Math.round(Math.random() * 1000);
+      for (var i = 0; i < N; i++) {
+        randomSuffix += ' ';
+      }
+      return randomSuffix;
+    },
+    submitAnswer: function(answer, handler, successCallback) {
       if (answerIsBeingProcessed) {
         return;
       }
@@ -154,26 +247,67 @@ oppia.factory('oppiaPlayerService', [
       $http.post(stateTransitionUrl, {
         answer: answer,
         handler: handler,
-        params: $rootScope.currentParams,
-        state_history: stateHistory,
+        params: learnerParamsService.getAllParams(),
         version: version,
-        session_id: sessionId,
-        client_time_spent_in_secs: stopwatch.getTimeInSecs()
       }).success(function(data) {
         answerIsBeingProcessed = false;
+
+        var oldStateName = stateName;
+        var newStateName = data.state_name;
+        var oldStateData = _exploration.states[oldStateName];
+        // NB: This may be undefined if newStateName === END_DEST.
+        var newStateData = _exploration.states[newStateName];
+        // TODO(sll): If the new state widget is the same as the old state widget,
+        // and the new state widget is sticky, do not render the reader response.
+        // The interactive widget in the frontend should take care of this.
+        // TODO(sll): This special-casing is not great; we should make the
+        // interface for updating the frontend more generic so that all the updates
+        // happen in the same place. Perhaps in the non-sticky case we should call
+        // a frontend method named appendFeedback() or similar.
+        var isSticky = (
+          newStateName !== _END_DEST && newStateData.widget.sticky &&
+          newStateData.widget.widget_id === oldStateData.widget.widget_id);
+
+        // Record the state hit to the event handler.
+        var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + explorationId;
+        $http.post(stateHitEventHandlerUrl, {
+          new_state_name: newStateName,
+          first_time: stateHistory.indexOf(newStateName) === -1,
+          exploration_version: version,
+          session_id: sessionId,
+          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+          old_params: learnerParamsService.getAllParams()
+        });
+
+        // Broadcast the state hit to the parent page.
         messengerService.sendMessage(messengerService.STATE_TRANSITION, {
           oldStateName: stateName,
           jsonAnswer: JSON.stringify(answer),
           newStateName: data.state_name
         });
 
-        _updateStatus(data.params, data.state_name, data.state_history);
+        _updateStatus(data.params, data.state_name);
         stopwatch.resetStopwatch();
-        successCallback(data);
-      })
-      .error(function(data) {
+
+        // TODO(sll): Get rid of this special case for multiple choice.
+        var oldWidgetChoices = null;
+        if (_exploration.states[oldStateName].widget.customization_args.choices) {
+          oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
+        }
+
+        var readerResponseHtml = _getReaderResponseHtml(
+          _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
+        if (newStateData) {
+          learnerParamsService.init(data.params);
+        }
+
+        successCallback(
+          newStateName, isSticky, data.question_html, readerResponseHtml,
+          data.feedback_html);
+      }).error(function(data) {
         answerIsBeingProcessed = false;
-        errorCallback(data);
+        warningsData.addWarning(
+          data.error || 'There was an error processing your input.');
       });
     },
     showFeedbackModal: function() {

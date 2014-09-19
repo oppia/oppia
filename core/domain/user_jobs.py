@@ -15,6 +15,7 @@
 """Jobs for queries personalized to individual users."""
 
 import ast
+import logging
 
 from core import jobs
 from core.domain import feedback_services
@@ -24,10 +25,6 @@ from core.platform import models
     models.NAMES.exploration, models.NAMES.feedback, models.NAMES.user])
 import feconf
 import utils
-
-
-# The maximum number of results to ever display in a user dashboard.
-DEFAULT_QUERY_LIMIT = 1000
 
 
 class RecentUpdatesRealtimeModel(
@@ -59,21 +56,26 @@ class DashboardRecentUpdatesAggregator(jobs.BaseContinuousComputationManager):
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
         pass
 
-    # Public query method.
+    # Public query methods.
     @classmethod
     def get_recent_updates(cls, user_id):
-        """Returns a list of recent updates to explorations and feedback
-        threads. Each entry is a dict with keys 'type', 'activity_id',
-        'activity_title', 'last_updated_ms', 'author_id' and 'subject'.
+        """Gets a list of recent updates to show on this user's dashboard.
 
-        The 'type' is either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
-        feconf.UPDATE_TYPE_FEEDBACK_MESSAGE. The 'activity_id' is the id of the
+        Returns a 2-tuple. The first element is a float representing the number
+        of milliseconds since the Epoch when the job was queued. The second
+        element is a list of recent updates to explorations and feedback
+        threads; each entry is a dict with keys 'type', 'activity_id',
+        'activity_title', 'last_updated_ms', 'author_id' and 'subject'. Here,
+        'type' is either feconf.UPDATE_TYPE_EXPLORATION_COMMIT or
+        feconf.UPDATE_TYPE_FEEDBACK_MESSAGE, 'activity_id' is the id of the
         exploration being committed to or to which the feedback thread belongs,
-        and the 'activity_title' is its title.
+        and 'activity_title' is the corresponding title.
         """
         user_model = user_models.UserRecentChangesBatchModel.get(
             user_id, strict=False)
-        return user_model.output if user_model else []
+        return (
+            user_model.job_queued_msec if user_model else None,
+            user_model.output if user_model else [])
 
 
 class RecentUpdatesMRJobManager(
@@ -92,58 +94,77 @@ class RecentUpdatesMRJobManager(
     @staticmethod
     def map(item):
         user_id = item.id
+        job_queued_msec = RecentUpdatesMRJobManager._get_job_queued_msec()
+        reducer_key = '%s@%s' % (user_id, job_queued_msec)
+
         activity_ids_list = item.activity_ids
         feedback_thread_ids_list = item.feedback_thread_ids
 
-        # TODO(sll): Rewrite this to deal with the multiple cases once we
-        # have adventures.
         activities = exp_models.ExplorationModel.get_multi(
             activity_ids_list, include_deleted=True)
-        for activity in activities:
-            last_commit = (
-                exp_models.ExplorationCommitLogEntryModel.get_commit(
-                    activity.id, activity.version))
-            yield (user_id, {
+
+        for ind, activity in enumerate(activities):
+            if activity is None:
+                logging.error(
+                    'Could not find activity %s' % activity_ids_list[ind])
+                continue
+
+            metadata_obj = exp_models.ExplorationModel.get_snapshots_metadata(
+                activity.id, [activity.version], allow_deleted=True)[0]
+            yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_EXPLORATION_COMMIT,
                 'activity_id': activity.id,
                 'activity_title': activity.title,
+                'author_id': metadata_obj['committer_id'],
                 'last_updated_ms': utils.get_time_in_millisecs(
                     activity.last_updated),
-                'author_id': last_commit.user_id,
-                'subject': last_commit.commit_message,
+                'subject': (
+                    feconf.COMMIT_MESSAGE_EXPLORATION_DELETED
+                    if activity.deleted else metadata_obj['commit_message']
+                ),
             })
 
             # If the user subscribes to this activity, he/she is automatically
             # subscribed to all feedback threads for this activity.
-            threads = feedback_services.get_threadlist(activity.id)
-            for thread in threads:
-                if thread['thread_id'] not in feedback_thread_ids_list:
-                    feedback_thread_ids_list.append(thread['thread_id'])
+            if not activity.deleted:
+                threads = feedback_services.get_threadlist(activity.id)
+                for thread in threads:
+                    if thread['thread_id'] not in feedback_thread_ids_list:
+                        feedback_thread_ids_list.append(thread['thread_id'])
 
         for feedback_thread_id in feedback_thread_ids_list:
             last_message = (
                 feedback_models.FeedbackMessageModel.get_most_recent_message(
                     feedback_thread_id))
 
-            yield (user_id, {
+            yield (reducer_key, {
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
                 'activity_id': last_message.exploration_id,
                 'activity_title': exp_models.ExplorationModel.get_by_id(
                     last_message.exploration_id).title,
+                'author_id': last_message.author_id,
                 'last_updated_ms': utils.get_time_in_millisecs(
                     last_message.created_on),
-                'author_id': last_message.author_id,
                 'subject': last_message.get_thread_subject(),
             })
 
     @staticmethod
     def reduce(key, stringified_values):
+        if '@' not in key:
+            logging.error(
+                'Invalid reducer key for RecentUpdatesMRJob: %s' % key)
+
+        user_id = key[:key.find('@')]
+        job_queued_msec = float(key[key.find('@') + 1:])
+
         values = [ast.literal_eval(sv) for sv in stringified_values]
         sorted_values = sorted(
             values, key=lambda x: x['last_updated_ms'], reverse=True)
 
         user_models.UserRecentChangesBatchModel(
-            id=key, output=sorted_values[: DEFAULT_QUERY_LIMIT]).put()
+            id=user_id, output=sorted_values[: feconf.DEFAULT_QUERY_LIMIT],
+            job_queued_msec=job_queued_msec
+        ).put()
 
 
 class DashboardSubscriptionsOneOffJob(jobs.BaseMapReduceJobManager):

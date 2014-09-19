@@ -112,13 +112,10 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             self.EXP_ID, self.last_state_name)
         reader_dict = self.post_json(url, {
             'answer': answer, 'handler': 'submit', 'params': self.last_params,
-            'state_history': self.state_history,
         })
 
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
-        self.state_history += [self.last_state_name]
-        self.assertEqual(reader_dict['state_history'], self.state_history)
 
         return reader_dict
 
@@ -149,11 +146,9 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
-        self.state_history = [self.last_state_name]
 
-        self.assertEqual(reader_dict['state_history'], self.state_history)
         self.assertRegexpMatches(reader_dict['init_html'], expected_response)
-        self.assertEqual(reader_dict['title'], expected_title)
+        self.assertEqual(reader_dict['exploration']['title'], expected_title)
 
     def test_welcome_exploration(self):
         """Test a reader's progression through the default exploration."""
@@ -236,12 +231,8 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         # Viewer submits answer '0'
         exploration_dict = self.post_json(
             '%s/%s/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX,
-                          EXP_ID,
-                          state_name_1),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history']
-            }
+                          EXP_ID, state_name_1),
+            {'answer': '0', 'handler': 'submit'}
         )
         state_name_2 = exploration_dict['state_name']
 

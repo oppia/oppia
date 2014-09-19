@@ -178,7 +178,7 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)">Create Thread</button>
+      <button class="btn btn-success" ng-click="create(newThreadSubject, newThreadText)" ng-disabled="!newThreadSubject || !newThreadText">Create Thread</button>
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     </div>
   </script>

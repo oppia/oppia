@@ -22,6 +22,7 @@ __author__ = 'Sean Lip'
 from core import counters
 import feconf
 
+from google.appengine.api import app_identity
 from google.appengine.api import mail
 
 
@@ -39,6 +40,9 @@ def send_mail_to_admin(sender, subject, body):
             raise Exception(
                 'Malformed email address: %s' %
                 feconf.ADMIN_EMAIL_ADDRESS)
+
+        app_id = app_identity.get_application_id()
+        body = '(Sent from %s)\n\n%s' % (app_id, body)
 
         mail.send_mail(sender, feconf.ADMIN_EMAIL_ADDRESS, subject, body)
         counters.EMAILS_SENT.inc()

@@ -91,16 +91,10 @@ oppia.controller('ExplorationHistory', [
 
   // Check if valid versions were selected
   $scope.areCompareVersionsSelected = function() {
-    if (!$scope.compareVersion) {
-      return true;
-    }
-    if (!$scope.compareVersion.hasOwnProperty('v1')) {
-      return true;
-    }
-    if (!$scope.compareVersion.hasOwnProperty('v2')) {
-      return true;
-    }
-    return false;
+    return (
+      $scope.compareVersion &&
+      $scope.compareVersion.hasOwnProperty('v1') &&
+      $scope.compareVersion.hasOwnProperty('v2'));
   };
 
   // Downloads the zip file for an exploration.

@@ -149,6 +149,7 @@ urls = [
         'dashboard_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(
         r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
@@ -219,6 +220,9 @@ urls = [
         (r'%s/<exploration_id>/<escaped_state_name>'
          % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
         reader.FeedbackHandler, 'feedback_handler'),
+    get_redirect_route(
+        r'/explorehandler/state_hit_event/<exploration_id>',
+        reader.StateHitEventHandler, 'state_hit_event_handler'),
     get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),

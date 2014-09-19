@@ -26,7 +26,6 @@ import copy
 import logging
 import re
 import string
-import time
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
@@ -55,7 +54,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'skill_tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'default_skin_id')
+        'default_skin_id', 'init_state_name')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -389,10 +388,25 @@ class AnswerHandlerInstance(object):
 class WidgetInstance(object):
     """Value object for a widget instance."""
 
+    def _get_full_customization_args(self):
+        """Populates the customization_args dict of the widget with default
+        values, if any of the expected customization_args are missing.
+        """
+        full_customization_args_dict = copy.deepcopy(self.customization_args)
+
+        widget = widget_registry.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, self.widget_id)
+        for ca_spec in widget.customization_arg_specs:
+            if ca_spec.name not in full_customization_args_dict:
+                full_customization_args_dict[ca_spec.name] = {
+                    'value': ca_spec.default_value
+                }
+        return full_customization_args_dict
+
     def to_dict(self):
         return {
             'widget_id': self.widget_id,
-            'customization_args': self.customization_args,
+            'customization_args': self._get_full_customization_args(),
             'handlers': [handler.to_dict() for handler in self.handlers],
             'sticky': self.sticky
         }
@@ -457,7 +471,7 @@ class WidgetInstance(object):
                     'Invalid widget customization arg name: %s' % arg_name)
             if arg_name not in widget_customization_arg_names:
                 extra_args.append(arg_name)
-                logging.error(
+                logging.warning(
                     'Parameter %s for widget %s is invalid.'
                     % (arg_name, self.widget_id))
             # TODO(sll): Find a way to verify that the arg_values have the
@@ -1088,6 +1102,14 @@ class Exploration(object):
     def update_default_skin_id(self, default_skin_id):
         self.default_skin = default_skin_id
 
+    def update_init_state_name(self, init_state_name):
+        if init_state_name not in self.states:
+            raise Exception(
+                'Invalid new initial state name: %s; '
+                'it is not in the list of states %s for this '
+                'exploration.' % (init_state_name, self.states.keys()))
+        self.init_state_name = init_state_name
+
     # Methods relating to parameters.
     def get_obj_type_for_param(self, param_name):
         """Returns the obj_type for the given parameter."""
@@ -1154,12 +1176,12 @@ class Exploration(object):
 
         self._require_valid_state_name(new_state_name)
 
-        if self.init_state_name == old_state_name:
-            self.init_state_name = new_state_name
-
         self.states[new_state_name] = copy.deepcopy(
             self.states[old_state_name])
         del self.states[old_state_name]
+
+        if self.init_state_name == old_state_name:
+            self.update_init_state_name(new_state_name)
 
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
@@ -1379,6 +1401,20 @@ class Exploration(object):
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
         })
+
+    def to_player_dict(self):
+        """Returns a copy of the exploration suitable for inclusion in the
+        learner view."""
+        return {
+            'init_state_name': self.init_state_name,
+            'title': self.title,
+            'states': {
+                state_name: self.export_state_to_frontend_dict(state_name)
+                for state_name in self.states
+            },
+            'param_changes': self.param_change_dicts,
+            'param_specs': self.param_specs_dict,
+        }
 
     def get_interactive_widget_ids(self):
         """Get all interactive widget ids used in this exploration."""

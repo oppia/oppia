@@ -27,8 +27,6 @@ import feconf
 from google.appengine.ext import ndb
 
 
-QUERY_LIMIT = 100
-
 EXPLORATION_STATUS_PRIVATE = 'private'
 EXPLORATION_STATUS_PUBLIC = 'public'
 EXPLORATION_STATUS_PUBLICIZED = 'publicized'
@@ -85,12 +83,6 @@ class ExplorationModel(base_models.VersionedModel):
     # The list of parameter changes to be performed once at the start of a
     # reader's encounter with an exploration.
     param_changes = ndb.JsonProperty(repeated=True, indexed=False)
-
-    @classmethod
-    def get_multi(cls, exp_ids, include_deleted=False):
-        """Returns a list of exploration models, given a list of ids."""
-        return super(ExplorationModel, cls).get_multi(
-            exp_ids, include_deleted=include_deleted)
 
     @classmethod
     def get_exploration_count(cls):
@@ -191,7 +183,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLIC
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_publicized(cls):
@@ -200,7 +192,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLICIZED
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_non_private(cls):
@@ -209,10 +201,11 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
-    def get_page_of_non_private(cls, page_size=QUERY_LIMIT, urlsafe_start_cursor=None):
+    def get_page_of_non_private(
+            cls, page_size=feconf.DEFAULT_QUERY_LIMIT, urlsafe_start_cursor=None):
         """Returns a page of non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
@@ -231,7 +224,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.community_owned == True
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
@@ -246,7 +239,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                    ExplorationRightsModel.viewer_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_at_least_editable(cls, user_id):
@@ -258,7 +251,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                    ExplorationRightsModel.editor_ids == user_id)
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
     def get_viewable(cls, user_id):
@@ -270,7 +263,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
             ExplorationRightsModel.viewer_ids == user_id
         ).filter(
             ExplorationRightsModel.deleted == False
-        ).fetch(QUERY_LIMIT)
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
@@ -365,16 +358,3 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_commits_by_exp_id(
-            cls, exploration_id, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.exploration_id == exploration_id),
-            page_size, urlsafe_start_cursor)
-
-    @classmethod
-    def get_all_commits_by_user_id(
-            cls, user_id, page_size, urlsafe_start_cursor):
-        return cls._fetch_page_sorted_by_last_updated(
-            cls.query(cls.user_id == user_id), page_size, urlsafe_start_cursor)

@@ -50,6 +50,9 @@ FRONTEND_TEMPLATES_DIR = os.path.join(
 DEPENDENCIES_TEMPLATES_DIR = os.path.join('extensions', 'dependencies')
 VALUE_GENERATORS_DIR = os.path.join('extensions', 'value_generators')
 
+# The maximum number of results to retrieve in a datastore query.
+DEFAULT_QUERY_LIMIT = 1000
+
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
@@ -119,7 +122,9 @@ ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
-# Ensure that ADMIN_EMAIL_ADDRESS is valid before setting this to True.
+# Ensure that ADMIN_EMAIL_ADDRESS is valid and corresponds to an owner of the
+# app before setting this to True. If ADMIN_EMAIL_ADDRESS is not that of an
+# app owner, email messages from this user cannot be sent.
 CAN_SEND_EMAILS_TO_ADMIN = False
 
 # The maximum size of an uploaded file, in bytes.
@@ -144,6 +149,9 @@ ABOUT_PAGES = [{
     'name': 'Contact',
     'url': '/contact',
 }]
+
+# Whether to include a page with the Oppia discussion forum.
+SHOW_FORUM_PAGE = True
 
 # Ids and locations of the permitted widgets.
 ALLOWED_WIDGETS = {
@@ -273,6 +281,9 @@ EVENT_TYPE_MAYBE_LEAVE_EXPLORATION = 'leave'
 PLAY_TYPE_PLAYTEST = 'playtest'
 PLAY_TYPE_NORMAL = 'normal'
 
+# Predefined commit messages.
+COMMIT_MESSAGE_EXPLORATION_DELETED = 'Exploration deleted.'
+
 # Unlaunched feature.
 SHOW_SKIN_CHOOSER = False
 
@@ -284,81 +295,83 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# List of supported language codes.
+# List of supported language codes. Each description has a
+# parenthetical part that may be stripped out to give a shorter
+# description.
 ALL_LANGUAGE_CODES = [{
-    'code': 'en', 'description': 'English',
+    'code': 'en', 'description': u'English',
 }, {
-    'code': 'ar', 'description': 'Arabic',
+    'code': 'ar', 'description': u'العربية (Arabic)',
 }, {
-    'code': 'bg', 'description': 'Bulgarian',
+    'code': 'bg', 'description': u'български (Bulgarian)',
 }, {
-    'code': 'ca', 'description': 'Catalan',
+    'code': 'ca', 'description': u'català (Catalan)',
 }, {
-    'code': 'zh', 'description': 'Chinese',
+    'code': 'zh', 'description': u'中文 (Chinese)',
 }, {
-    'code': 'hr', 'description': 'Croatian',
+    'code': 'hr', 'description': u'hrvatski (Croatian)',
 }, {
-    'code': 'cs', 'description': 'Czech',
+    'code': 'cs', 'description': u'čeština (Czech)',
 }, {
-    'code': 'da', 'description': 'Danish',
+    'code': 'da', 'description': u'dansk (Danish)',
 }, {
-    'code': 'nl', 'description': 'Dutch',
+    'code': 'nl', 'description': u'Nederlands (Dutch)',
 }, {
-    'code': 'tl', 'description': 'Filipino',
+    'code': 'tl', 'description': u'Filipino (Filipino)',
 }, {
-    'code': 'fi', 'description': 'Finnish',
+    'code': 'fi', 'description': u'suomi (Finnish)',
 }, {
-    'code': 'fr', 'description': 'French',
+    'code': 'fr', 'description': u'français (French)',
 }, {
-    'code': 'de', 'description': 'German',
+    'code': 'de', 'description': u'Deutsch (German)',
 }, {
-    'code': 'el', 'description': 'Greek',
+    'code': 'el', 'description': u'ελληνικά (Greek)',
 }, {
-    'code': 'he', 'description': 'Hebrew',
+    'code': 'he', 'description': u'עברית (Hebrew)',
 }, {
-    'code': 'hi', 'description': 'Hindi',
+    'code': 'hi', 'description': u'हिन्दी (Hindi)',
 }, {
-    'code': 'hu', 'description': 'Hungarian',
+    'code': 'hu', 'description': u'magyar (Hungarian)',
 }, {
-    'code': 'id', 'description': 'Indonesian',
+    'code': 'id', 'description': u'Bahasa Indonesia (Indonesian)',
 }, {
-    'code': 'it', 'description': 'Italian',
+    'code': 'it', 'description': u'italiano (Italian)',
 }, {
-    'code': 'ja', 'description': 'Japanese',
+    'code': 'ja', 'description': u'日本語 (Japanese)',
 }, {
-    'code': 'ko', 'description': 'Korean',
+    'code': 'ko', 'description': u'한국어 (Korean)',
 }, {
-    'code': 'lv', 'description': 'Latvian',
+    'code': 'lv', 'description': u'latviešu (Latvian)',
 }, {
-    'code': 'lt', 'description': 'Lithuanian',
+    'code': 'lt', 'description': u'lietuvių (Lithuanian)',
 }, {
-    'code': 'no', 'description': 'Norwegian',
+    'code': 'no', 'description': u'Norsk (Norwegian)',
 }, {
-    'code': 'fa', 'description': 'Persian',
+    'code': 'fa', 'description': u'فارسی (Persian)',
 }, {
-    'code': 'pl', 'description': 'Polish',
+    'code': 'pl', 'description': u'polski (Polish)',
 }, {
-    'code': 'pt', 'description': 'Portuguese',
+    'code': 'pt', 'description': u'português (Portuguese)',
 }, {
-    'code': 'ro', 'description': 'Romanian',
+    'code': 'ro', 'description': u'română (Romanian)',
 }, {
-    'code': 'ru', 'description': 'Russian',
+    'code': 'ru', 'description': u'русский (Russian)',
 }, {
-    'code': 'sr', 'description': 'Serbian',
+    'code': 'sr', 'description': u'српски (Serbian)',
 }, {
-    'code': 'sk', 'description': 'Slovak',
+    'code': 'sk', 'description': u'slovenčina (Slovak)',
 }, {
-    'code': 'sl', 'description': 'Slovenian',
+    'code': 'sl', 'description': u'slovenščina (Slovenian)',
 }, {
-    'code': 'es', 'description': 'Spanish',
+    'code': 'es', 'description': u'español (Spanish)',
 }, {
-    'code': 'sv', 'description': 'Swedish',
+    'code': 'sv', 'description': u'svenska (Swedish)',
 }, {
-    'code': 'th', 'description': 'Thai',
+    'code': 'th', 'description': u'ภาษาไทย (Thai)',
 }, {
-    'code': 'tr', 'description': 'Turkish',
+    'code': 'tr', 'description': u'Türkçe (Turkish)',
 }, {
-    'code': 'uk', 'description': 'Ukrainian',
+    'code': 'uk', 'description': u'українська (Ukrainian)',
 }, {
-    'code': 'vi', 'description': 'Vietnamese',
+    'code': 'vi', 'description': u'Tiếng Việt (Vietnamese)',
 }]

@@ -200,8 +200,6 @@ class BaseWidget(object):
                     rule_cls.description,
                     {'classifier': rule_cls.__name__}
                 ) for rule_cls in handler.rules)
-
-            result['tag'] = self.get_interactive_widget_tag({})
         elif self.type == feconf.NONINTERACTIVE_PREFIX:
             # Add RTE toolbar information for noninteractive widgets.
             result.update({
@@ -230,75 +228,6 @@ class BaseWidget(object):
             raise Exception(
                 'Could not find rule with name %s for handler %s'
                 % (rule_name, handler_name))
-
-    def get_interactive_widget_tag(self, state_customization_args):
-        """Gets the HTML tag used to display an interactive widget."""
-        if state_customization_args is None:
-            state_customization_args = {}
-
-        tag_name = ('oppia-interactive-%s' %
-                    utils.camelcase_to_hyphenated(self.id))
-
-        attr_strings = []
-        for ca_spec in self.customization_arg_specs:
-            ca_value = (
-                state_customization_args[ca_spec.name]['value']
-                if ca_spec.name in state_customization_args
-                else ca_spec.default_value)
-
-            arg_name = '%s-with-value' % utils.camelcase_to_hyphenated(
-                ca_spec.name)
-            # Note that the use of jinja here applies autoescaping,
-            # resulting in a string that is safe to pass to the frontend.
-            attr_strings.append(
-                jinja_utils.parse_string(
-                    '{{arg_name}}="{{arg_value}}"', {
-                        'arg_name': arg_name,
-                        'arg_value': json.dumps(ca_value),
-                    }
-                )
-            )
-
-        return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
-
-    def get_reader_response_html(self, state_customization_args, answer,
-                                 sticky):
-        """Gets the parameterized HTML tag for a reader response."""
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
-        parameters = {
-            'answer': answer,
-            # The widget stays through the state transition because it is marked
-            # sticky in the exploration and the new state uses the same widget.
-            'stateSticky': sticky,
-        }
-
-        # Special case for multiple-choice input. 
-        # TODO(sll): Turn the answer into the actual multiple-choice string, and
-        # remove this special case.
-        for ca_spec in self.customization_arg_specs:
-            if ca_spec.name == 'choices':
-                parameters['choices'] = (
-                    state_customization_args['choices']['value']
-                    if 'choices' in state_customization_args
-                    else ca_spec.default_value)
-
-        attr_strings = []
-        for param_name, param_value in parameters.iteritems():
-            attr_strings.append(
-                jinja_utils.parse_string(
-                    '{{arg_name}}="{{arg_value}}"', {
-                        'arg_name': param_name,
-                        'arg_value': json.dumps(param_value),
-                    }
-                )
-            )
-
-        tag_name = ('oppia-response-%s' %
-                    utils.camelcase_to_hyphenated(self.id))
-        return '<%s %s></%s>' % (tag_name, ' '.join(attr_strings), tag_name)
 
     def get_stats_log_html(self, state_customization_args, answer):
         """Gets the HTML for recording a reader response for the stats log.
