@@ -26,42 +26,6 @@ from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 
 
-class StateCounter(object):
-    """Domain object that keeps counts associated with states.
-
-    All methods and properties in this file should be independent of the
-    specific storage model used.
-    """
-    def __init__(self, first_entry_count, subsequent_entries_count,
-                 resolved_answer_count, active_answer_count):
-        self.first_entry_count = first_entry_count
-        self.subsequent_entries_count = subsequent_entries_count
-        self.resolved_answer_count = resolved_answer_count
-        self.active_answer_count = active_answer_count
-
-    @property
-    def total_entry_count(self):
-        """Total number of entries to the state."""
-        return self.first_entry_count + self.subsequent_entries_count
-
-    @property
-    def no_answer_count(self):
-        """Number of times a reader left without entering an answer."""
-        return (self.first_entry_count + self.subsequent_entries_count
-                - self.resolved_answer_count - self.active_answer_count)
-
-    @classmethod
-    def get(cls, exploration_id, state_name):
-        state_counter_model = stats_models.StateCounterModel.get_or_create(
-            exploration_id, state_name)
-        return cls(
-            state_counter_model.first_entry_count,
-            state_counter_model.subsequent_entries_count,
-            state_counter_model.resolved_answer_count,
-            state_counter_model.active_answer_count
-        )
-
-
 class StateRuleAnswerLog(object):
     """Domain object that stores answers which match different state rules.
 

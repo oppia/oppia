@@ -567,15 +567,18 @@ class ExplorationStatisticsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
+        (state_stats, last_updated) = (
+            stats_services.get_state_stats_for_exploration(exploration_id))
+
         self.render_json({
             'num_starts': stats_services.get_exploration_start_count(
                 exploration_id),
             'num_completions': stats_services.get_exploration_completed_count(
                 exploration_id),
-            'state_stats': stats_services.get_state_stats_for_exploration(
-                exploration_id),
+            'state_stats': state_stats,
             'improvements': stats_services.get_state_improvements(
                 exploration_id),
+            'last_updated': last_updated,
         })
 
 

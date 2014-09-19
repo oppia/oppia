@@ -21,13 +21,29 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rule_domain
 from core.domain import stats_domain
+from core.domain import stats_jobs
 from core.domain import stats_services
 from core.tests import test_utils
 import feconf
 
-# TODO(sfederwisch): Move off of old models. Old models use string
-# versions of the rules, while the new ones take in the whole rule.
-# This will require moving off of DEFAULT_RULESPEC_STR in those cases.
+class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
+    """A modified StatisticsAggregator that does not start a new batch
+    job when the previous one has finished.
+    """
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return ModifiedStatisticsMRJobManager
+
+    @classmethod
+    def _kickoff_batch_job_after_previous_one_ends(cls):
+        pass
+
+
+class ModifiedStatisticsMRJobManager(stats_jobs.StatisticsMRJobManager):
+
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return ModifiedStatisticsAggregator
 
 
 class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
@@ -38,87 +54,28 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         'sid', 'NormalizedString')
     SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
 
-    def test_record_state_hit(self):
-        event_services.StateHitEventHandler.record('eid', 'sname', True)
-
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.first_entry_count, 1)
-        self.assertEquals(counter.subsequent_entries_count, 0)
-        self.assertEquals(counter.resolved_answer_count, 0)
-        self.assertEquals(counter.active_answer_count, 0)
-        self.assertEquals(counter.total_entry_count, 1)
-        self.assertEquals(counter.no_answer_count, 1)
-
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(answer_log.answers, {})
-
-        event_services.StateHitEventHandler.record('eid', 'sname', False)
-
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.first_entry_count, 1)
-        self.assertEquals(counter.subsequent_entries_count, 1)
-        self.assertEquals(counter.resolved_answer_count, 0)
-        self.assertEquals(counter.active_answer_count, 0)
-        self.assertEquals(counter.total_entry_count, 2)
-        self.assertEquals(counter.no_answer_count, 2)
-
-        answer_log = stats_domain.StateRuleAnswerLog.get(
-            'eid', 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
-        self.assertEquals(answer_log.answers, {})
-
     def test_record_answer_submitted(self):
-        event_services.StateHitEventHandler.record('eid', 'sname', True)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
             'answer')
-
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.first_entry_count, 1)
-        self.assertEquals(counter.subsequent_entries_count, 0)
-        self.assertEquals(counter.total_entry_count, 1)
-        self.assertEquals(counter.resolved_answer_count, 0)
-        self.assertEquals(counter.active_answer_count, 1)
-        self.assertEquals(counter.no_answer_count, 0)
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer': 1})
 
-        event_services.StateHitEventHandler.record('eid', 'sname', False)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
             'answer')
 
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.first_entry_count, 1)
-        self.assertEquals(counter.subsequent_entries_count, 1)
-        self.assertEquals(counter.total_entry_count, 2)
-        self.assertEquals(counter.resolved_answer_count, 0)
-        self.assertEquals(counter.active_answer_count, 2)
-        self.assertEquals(counter.no_answer_count, 0)
-
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer': 2})
-
-        event_services.StateHitEventHandler.record('eid', 'sname', False)
-
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.first_entry_count, 1)
-        self.assertEquals(counter.subsequent_entries_count, 2)
-        self.assertEquals(counter.total_entry_count, 3)
-        self.assertEquals(counter.resolved_answer_count, 0)
-        self.assertEquals(counter.active_answer_count, 2)
-        self.assertEquals(counter.no_answer_count, 1)
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'answer': 2})
 
     def test_resolve_answers_for_default_rule(self):
-        event_services.StateHitEventHandler.record('eid', 'sname', True)
-
         # Submit three answers.
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
@@ -129,10 +86,6 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
             'a3')
-
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.resolved_answer_count, 0)
-        self.assertEquals(counter.active_answer_count, 3)
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
@@ -151,10 +104,6 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         event_services.DefaultRuleAnswerResolutionEventHandler.record(
             'eid', 'sname', self.SUBMIT_HANDLER, ['a1', 'a2'])
 
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.resolved_answer_count, 2)
-        self.assertEquals(counter.active_answer_count, 1)
-
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)
         self.assertEquals(answer_log.answers, {'a3': 1})
@@ -170,10 +119,6 @@ class AnalyticsEventHandlersUnitTests(test_utils.GenericTestBase):
         # Resolve the last answer.
         event_services.DefaultRuleAnswerResolutionEventHandler.record(
             'eid', 'sname', self.SUBMIT_HANDLER, ['a3'])
-
-        counter = stats_domain.StateCounter.get('eid', 'sname')
-        self.assertEquals(counter.resolved_answer_count, 3)
-        self.assertEquals(counter.active_answer_count, 0)
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', 'sname', self.SUBMIT_HANDLER, 'Rule')
@@ -193,10 +138,9 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             'eid', 'A title', 'A category')
         exp_services.save_new_exploration('fake@user.com', exp)
 
-        for _ in range(5):
-            event_services.StateHitEventHandler.record(
-                'eid', exp.init_state_name, True)
-
+        event_services.StateHitEventHandler.record(
+            'eid', 1, exp.init_state_name, 'session_id',
+            feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, exp.init_state_name, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, '1')
@@ -204,11 +148,15 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             event_services.AnswerSubmissionEventHandler.record(
                 'eid', 1, exp.init_state_name, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '2')
-        self.assertEquals(stats_services.get_state_improvements('eid'), [{
-            'type': 'default',
-            'rank': 3,
-            'state_name': exp.init_state_name
-        }])
+        ModifiedStatisticsAggregator.start_computation()
+        self.process_and_flush_pending_tasks()
+        with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
+            ModifiedStatisticsAggregator.get_statistics):
+            self.assertEquals(stats_services.get_state_improvements('eid'), [{
+                'type': 'default',
+                'rank': 3,
+                'state_name': exp.init_state_name
+            }])
 
     def test_single_default_rule_hit(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -216,15 +164,21 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
 
-        event_services.StateHitEventHandler.record('eid', state_name, True)
+        event_services.StateHitEventHandler.record(
+            'eid', 1, state_name, 'session_id',
+            feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, '1')
-        self.assertEquals(stats_services.get_state_improvements('eid'), [{
-            'type': 'default',
-            'rank': 1,
-            'state_name': exp.init_state_name
-        }])
+        ModifiedStatisticsAggregator.start_computation()
+        self.process_and_flush_pending_tasks()
+        with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
+            ModifiedStatisticsAggregator.get_statistics):
+            self.assertEquals(stats_services.get_state_improvements('eid'), [{
+                'type': 'default',
+                'rank': 1,
+                'state_name': exp.init_state_name
+            }])
 
     def test_no_improvement_flag_hit(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -244,8 +198,6 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         ]
         exp_services._save_exploration('fake@user.com', exp, '', [])
 
-        event_services.StateHitEventHandler.record(
-            'eid', exp.init_state_name, True)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, exp.init_state_name, self.SUBMIT_HANDLER,
             not_default_rule_spec, '1')
@@ -259,31 +211,42 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
 
         # Hit the default rule once, and fail to answer twice. The result
         # should be classified as incomplete.
-        for _ in range(3):
+        for i in range(2):
             event_services.StateHitEventHandler.record(
-                'eid', state_name, True)
+                'eid', 1, state_name, 'session_id %d' % i,
+                feconf.PLAY_TYPE_NORMAL)
+            event_services.MaybeLeaveExplorationEventHandler.record(
+                'eid', 1, state_name, 'session_id %d' % i, 10.0, {},
+                feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, '1')
-        self.assertEquals(stats_services.get_state_improvements('eid'), [{
-            'rank': 2,
-            'type': 'incomplete',
-            'state_name': state_name
-        }])
+        ModifiedStatisticsAggregator.start_computation()
+        self.process_and_flush_pending_tasks()
+        with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
+            ModifiedStatisticsAggregator.get_statistics):
+            self.assertEquals(stats_services.get_state_improvements('eid'), [{
+                'rank': 2,
+                'type': 'incomplete',
+                'state_name': state_name
+            }])
 
         # Now hit the default two more times. The result should be classified
         # as default.
         for i in range(2):
             event_services.StateHitEventHandler.record(
-                'eid', state_name, True)
+                'eid', 1, state_name, 'session_id',
+                feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
                 'eid', 1, state_name, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '1')
-        self.assertEquals(stats_services.get_state_improvements('eid'), [{
-            'rank': 3,
-            'type': 'default',
-            'state_name': state_name
-        }])
+        with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
+            ModifiedStatisticsAggregator.get_statistics):
+            self.assertEquals(stats_services.get_state_improvements('eid'), [{
+                'rank': 3,
+                'type': 'default',
+                'state_name': state_name
+            }])
 
     def test_two_state_default_hit(self):
         exp = exp_domain.Exploration.create_default_exploration(
@@ -298,19 +261,24 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         # Hit the default rule of state 1 once, and the default rule of state 2
         # twice.
         event_services.StateHitEventHandler.record(
-            'eid', FIRST_STATE_NAME, True)
+            'eid', 1, FIRST_STATE_NAME, 'session_id',
+            feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, '1')
 
         for i in range(2):
             event_services.StateHitEventHandler.record(
-                'eid', SECOND_STATE_NAME, True)
+                'eid', 1, SECOND_STATE_NAME, 'session_id',
+                feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
                 'eid', 1, SECOND_STATE_NAME, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '1')
-
-        states = stats_services.get_state_improvements('eid')
+        ModifiedStatisticsAggregator.start_computation()
+        self.process_and_flush_pending_tasks()
+        with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
+            ModifiedStatisticsAggregator.get_statistics):
+            states = stats_services.get_state_improvements('eid')
         self.assertEquals(states, [{
             'rank': 2,
             'type': 'default',
@@ -324,12 +292,15 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         # Hit the default rule of state 1 two more times.
         for i in range(2):
             event_services.StateHitEventHandler.record(
-                'eid', FIRST_STATE_NAME, True)
+                'eid', 1, FIRST_STATE_NAME, 'session_id',
+                feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
                 'eid', 1, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '1')
 
-        states = stats_services.get_state_improvements('eid')
+        with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
+            ModifiedStatisticsAggregator.get_statistics):
+            states = stats_services.get_state_improvements('eid')
         self.assertEquals(states, [{
             'rank': 3,
             'type': 'default',

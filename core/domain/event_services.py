@@ -62,18 +62,6 @@ class BaseEventHandler(object):
         cls._handle_event(*args, **kwargs)
 
 
-class StateHitEventHandler(BaseEventHandler):
-    """Event handler for recording state hits."""
-
-    EVENT_TYPE = feconf.EVENT_TYPE_STATE_HIT
-
-    @classmethod
-    def _handle_event(cls, exploration_id, state_name, first_time):
-        """Record an event when a state is encountered by the reader."""
-        stats_models.StateCounterModel.inc(
-            exploration_id, state_name, first_time)
-
-
 class AnswerSubmissionEventHandler(BaseEventHandler):
     """Event handler for recording answer submissions."""
 
@@ -135,6 +123,18 @@ class MaybeLeaveExplorationEventHandler(BaseEventHandler):
         stats_models.MaybeLeaveExplorationEventLogEntryModel.create(
             exp_id, exp_version, state_name, session_id, time_spent,
             params, play_type)
+
+
+class StateHitEventHandler(BaseEventHandler):
+    """Event handler for recording state hit events."""
+
+    EVENT_TYPE = feconf.EVENT_TYPE_STATE_HIT
+
+    @classmethod
+    def _handle_event(
+            cls, exp_id, exp_version, state_name, session_id, play_type):
+        stats_models.StateHitEventLogEntryModel.create(
+            exp_id, exp_version, state_name, session_id, play_type)
 
 
 class Registry(object):

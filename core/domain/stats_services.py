@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
+from core.domain import stats_jobs
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 import feconf
@@ -33,18 +34,11 @@ SUBMIT_HANDLER_NAME = 'submit'
 
 def get_exploration_start_count(exploration_id):
     """Returns the number of times this exploration has been accessed."""
-    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    return stats_domain.StateCounter.get(
-        exploration_id, exploration.init_state_name).first_entry_count
-
+    return stats_jobs.StatisticsAggregator.get_statistics(exploration_id)['start_exploration_count']
 
 def get_exploration_completed_count(exploration_id):
     """Returns the number of times this exploration has been completed."""
-    # Note that the subsequent_entries_count for END_DEST should be 0.
-    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
-    return stats_domain.StateCounter.get(
-        exploration_id, feconf.END_DEST).first_entry_count
+    return stats_jobs.StatisticsAggregator.get_statistics(exploration_id)['complete_exploration_count']
 
 
 def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
@@ -95,17 +89,23 @@ def get_state_stats_for_exploration(exploration_id):
     exploration = exp_services.get_exploration_by_id(exploration_id)
 
     state_stats = {}
+    exp_stats = stats_jobs.StatisticsAggregator.get_statistics(exploration_id)
+    last_updated = exp_stats['last_updated']
+    state_hit_counts = exp_stats['state_hit_counts']
     for state_name in exploration.states:
-        state_counts = stats_domain.StateCounter.get(
-            exploration_id, state_name)
+        first_entry_count = 0
+        total_entry_count = 0
+        if state_name in state_hit_counts:
+            first_entry_count = state_hit_counts[state_name]['first_entry_count']
+            total_entry_count = state_hit_counts[state_name]['total_entry_count']
 
         state_stats[state_name] = {
             'name': state_name,
-            'firstEntryCount': state_counts.first_entry_count,
-            'totalEntryCount': state_counts.total_entry_count,
+            'firstEntryCount': first_entry_count,
+            'totalEntryCount': total_entry_count,
         }
 
-    return state_stats
+    return (state_stats, last_updated)
 
 
 def get_state_improvements(exploration_id):
@@ -125,16 +125,22 @@ def get_state_improvements(exploration_id):
         } for state_name in state_list])
 
     for ind, state_name in enumerate(state_list):
-        state_counts = stats_domain.StateCounter.get(
-            exploration_id, state_name)
-        total_entry_count = state_counts.total_entry_count
+        state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(exploration_id)['state_hit_counts']
+        total_entry_count = 0
+        no_answer_submitted_count = 0
+        if state_name in state_hit_counts:
+            total_entry_count = state_hit_counts[state_name]['total_entry_count']
+            if 'no_answer_count' in state_hit_counts[state_name]:
+                no_answer_submitted_count = state_hit_counts[state_name]['no_answer_count']
+            else:
+                no_answer_submitted_count = 0
+
         if total_entry_count == 0:
             continue
 
         threshold = 0.2 * total_entry_count
         default_rule_answer_log = default_rule_answer_logs[ind]
         default_count = default_rule_answer_log.total_answer_count
-        no_answer_submitted_count = state_counts.no_answer_count
 
         eligible_flags = []
         state = exploration.states[state_name]

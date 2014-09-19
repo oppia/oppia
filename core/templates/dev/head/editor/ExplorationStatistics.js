@@ -20,7 +20,9 @@
 
 oppia.controller('ExplorationStatistics', [
     '$scope', '$http', '$location', '$modal', 'warningsData',
-    function($scope, $http, $location, $modal, warningsData) {
+    'oppiaDatetimeFormatter',
+    function($scope, $http, $location, $modal, warningsData,
+             oppiaDatetimeFormatter) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -28,6 +30,11 @@ oppia.controller('ExplorationStatistics', [
     legendPosition: 'right',
     width: 500
   };
+
+  $scope.getLocaleStringForDatetime = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getLocaleString(millisSinceEpoch);
+  };
+
 
   $scope.hasTabLoaded = false;
   $scope.$on('refreshStatisticsTab', function(evt) {
@@ -43,6 +50,7 @@ oppia.controller('ExplorationStatistics', [
       var numCompletions = data.num_completions;
       var improvements = data.improvements;
       $scope.stateStats = data.state_stats;
+      $scope.lastUpdated = data.last_updated;
 
       if (numVisits > 0) {
         $scope.hasExplorationBeenVisited = true;
@@ -56,10 +64,11 @@ oppia.controller('ExplorationStatistics', [
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'
       };
+      console.log('Hello', $scope.stateStats);
       for (var stateName in $scope.states) {
-        var visits = $scope.stateStats[stateName].firstEntryCount;
-        $scope.statsGraphOpacities[stateName] = Math.max(
-          visits / numVisits, 0.05);
+          var visits = $scope.stateStats[stateName].firstEntryCount;
+          $scope.statsGraphOpacities[stateName] = Math.max(
+            visits / numVisits, 0.05);
       }
       $scope.statsGraphOpacities[END_DEST] = Math.max(
         numCompletions / numVisits, 0.05);

@@ -142,11 +142,13 @@ class ExplorationHandler(base.BaseHandler):
         })
         self.render_json(self.values)
 
-        event_services.StateHitEventHandler.record(
-            exploration_id, exploration.init_state_name, True)
         event_services.StartExplorationEventHandler.record(
             exploration_id, version, exploration.init_state_name,
             session_id, reader_params, feconf.PLAY_TYPE_NORMAL)
+
+        event_services.StateHitEventHandler.record(
+            exploration_id, version, exploration.init_state_name,
+            session_id, feconf.PLAY_TYPE_NORMAL)
 
 
 class FeedbackHandler(base.BaseHandler):
@@ -231,14 +233,16 @@ class FeedbackHandler(base.BaseHandler):
             None if new_state_name == feconf.END_DEST
             else exploration.states[new_state_name])
 
-        event_services.StateHitEventHandler.record(
-            exploration_id, new_state_name,
-            (new_state_name not in state_history))
+        print (session_id)
         if new_state_name == feconf.END_DEST:
             event_services.MaybeLeaveExplorationEventHandler.record(
                 exploration_id, version, feconf.END_DEST,
                 session_id, client_time_spent_in_secs, old_params,
                 feconf.PLAY_TYPE_NORMAL)
+        else:
+            event_services.StateHitEventHandler.record(
+                exploration_id, version, new_state_name,
+                session_id, feconf.PLAY_TYPE_NORMAL)
 
         state_history.append(new_state_name)
 

@@ -23,7 +23,9 @@ from core.domain import user_jobs
 
 # List of all manager classes for one-off batch jobs for which to show controls
 # on the admin dashboard.
-ONE_OFF_JOB_MANAGERS = []
+ONE_OFF_JOB_MANAGERS = [
+    stats_jobs.StateCounterTranslationOneOffJob
+]
 
 # List of all ContinuousComputation managers to show controls for on the
 # admin dashboard.

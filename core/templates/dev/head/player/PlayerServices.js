@@ -137,7 +137,7 @@ oppia.factory('oppiaPlayerService', [
     loadInitialState: function(successCallback, errorCallback) {
       $http.get(explorationDataUrl).success(function(data) {
         isLoggedIn = data.is_logged_in;
-        sessionId = data.sessionId;
+        sessionId = data.session_id;
         stopwatch.resetStopwatch();
         _updateStatus(data.params, data.state_name, data.state_history);
         successCallback(data);

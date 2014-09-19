@@ -71,7 +71,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
             exp_version = 1
-            state = 'sid'
+            exploration = self.save_new_valid_exploration(exp_id, 'owner') 
+            state = exploration.init_state_name
 
             self._record_start(exp_id, exp_version, state, 'session1')
             self._record_start(exp_id, exp_version, state, 'session2')
@@ -91,7 +92,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
             exp_version = 1
-            state = 'sid'
+            exploration = self.save_new_valid_exploration(exp_id, 'owner') 
+            state = exploration.init_state_name
 
             self._record_start(exp_id, exp_version, state, 'session1')
             self._record_leave(
@@ -115,7 +117,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
             exp_version = 1
-            state = 'sid'
+            exploration = self.save_new_valid_exploration(exp_id, 'owner') 
+            state = exploration.init_state_name
 
             self._record_start(exp_id, exp_version, state, 'session1')
             self._record_leave(exp_id, exp_version, state, 'session1')
@@ -140,11 +143,14 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+
             exp_version = 1
             exp_id_1 = 'eid1'
-            state_1_1 = 'sid1'
+            exploration = self.save_new_valid_exploration(exp_id_1, 'owner') 
+            state_1_1 = exploration.init_state_name
             exp_id_2 = 'eid2'
-            state_2_1 = 'sid1'
+            exploration = self.save_new_valid_exploration(exp_id_2, 'owner') 
+            state_2_1 = exploration.init_state_name
 
             # Record 2 start events for exp_id_1 and 1 start event for
             # exp_id_2.
@@ -155,29 +161,21 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             ModifiedStatisticsAggregator.start_computation()
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
-            self.assertEqual(
-                ModifiedStatisticsAggregator.get_statistics(exp_id_1), {
-                    'start_exploration_count': 2,
-                    'complete_exploration_count': 0
-                })
-            self.assertEqual(
-                ModifiedStatisticsAggregator.get_statistics(exp_id_2), {
-                    'start_exploration_count': 1,
-                    'complete_exploration_count': 0
-                })
+            results = ModifiedStatisticsAggregator.get_statistics(exp_id_1)
+            self.assertEqual(2, results['start_exploration_count'])
+            self.assertEqual(0, results['complete_exploration_count'])
+            results = ModifiedStatisticsAggregator.get_statistics(exp_id_2)
+            self.assertEqual(1, results['start_exploration_count'])
+            self.assertEqual(0, results['complete_exploration_count'])
 
             # Record 1 more start event for exp_id_1 and 1 more start event
             # for exp_id_2.
             self._record_start(exp_id_1, exp_version, state_1_1, 'session2')
             self._record_start(exp_id_2, exp_version, state_2_1, 'session3')
             self.process_and_flush_pending_tasks()
-            self.assertEqual(
-                ModifiedStatisticsAggregator.get_statistics(exp_id_1), {
-                    'start_exploration_count': 3,
-                    'complete_exploration_count': 0
-                })
-            self.assertEqual(
-                ModifiedStatisticsAggregator.get_statistics(exp_id_2), {
-                    'start_exploration_count': 2,
-                    'complete_exploration_count': 0
-                })
+            results = ModifiedStatisticsAggregator.get_statistics(exp_id_1)
+            self.assertEqual(3, results['start_exploration_count'])
+            self.assertEqual(0, results['complete_exploration_count'])
+            results = ModifiedStatisticsAggregator.get_statistics(exp_id_2)
+            self.assertEqual(2, results['start_exploration_count'])
+            self.assertEqual(0, results['complete_exploration_count'])
