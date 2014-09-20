@@ -88,7 +88,7 @@ var editRule = function(ruleNum) {
     editFeedback: function() {
       var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
       // This button will not be shown if we are part way through editing.
-      feedbackElement.element.all(by.css('.protractor-test-edit-feedback')).
+      feedbackElement.all(by.css('.protractor-test-edit-feedback')).
         then(function(buttons) {
           if (buttons.length > 0) {
             buttons[0].click();

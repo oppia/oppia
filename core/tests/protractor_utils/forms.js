@@ -28,7 +28,7 @@ var editList = function(elem) {
   };
   // NOTE: this returns a promise, not an integer.
   var _getLength = function() {
-    return elem.element.all(by.repeater('item in localValue track by $index')).
+    return elem.all(by.repeater('item in localValue track by $index')).
         then(function(items) {
       return items.length;
     });
