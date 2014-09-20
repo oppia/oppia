@@ -142,24 +142,19 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     Event schema documentation
     --------------------------
-    V0: The attribute values are as follows:
+    V1: 
         event_type: 'leave' (there are no 'maybe leave' events in V0)
         exploration_id: id of exploration currently being played
-        exploration_version: approximate version of exploration
+        exploration_version: version of exploration
         state_name: Name of current state
         play_type: 'normal'
-        approximate_created_on date (probably not useful)
-        event_schema_version: 0
-
-    V1: As in V0 with the following modifications:
-      - The exploration_version and created_on dates are exact.
-      - The following additional fields were added:
-          session_id: ID of current student's session
-          params: current parameter values, in the form of a map of parameter name
-            to value
-          client_time_spent_in_secs: time spent in this state before the event was
-            triggered
-      - event_schema_version: 1
+        created_on date
+        event_schema_version: 1
+        session_id: ID of current student's session
+        params: current parameter values, in the form of a map of parameter name
+          to value
+        client_time_spent_in_secs: time spent in this state before the event was
+          triggered
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -218,23 +213,18 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
  
     Event schema documentation
     --------------------------
-    V0: The attribute values are as follows:
+    V1: 
         event_type: 'start'
         exploration_id: id of exploration currently being played
-        exploration_version: approximate version of exploration
+        exploration_version: version of exploration
         state_name: Name of current state
         client_time_spent_in_secs: 0
         play_type: 'normal'
-        approximate_created_on date (probably not useful)
-        event_schema_version: 0
-
-    V1: As in V0 with the following modifications:
-      - The exploration_version and created_on dates are exact.
-      - The following additional fields were added:
-          session_id: ID of current student's session
-          params: current parameter values, in the form of a map of parameter name
-            to value
-      - event_schema_version: 1
+        created_on date
+        event_schema_version: 1
+        session_id: ID of current student's session
+        params: current parameter values, in the form of a map of parameter name
+          to value
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -292,12 +282,14 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     """An event triggered by a student getting to a particular state.
         event_type: 'state_hit'
         exploration_id: id of exploration currently being played
-        exploration_version: approximate version of exploration
+        exploration_version: version of exploration
         state_name: Name of current state
         play_type: 'normal'
-        approximate_created_on date (probably not useful)
+        created_on date
         event_schema_version: 1
         session_id: ID of current student's session
+        params: current parameter values, in the form of a map of parameter name
+            to value
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -312,6 +304,8 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
     state_name = ndb.StringProperty(indexed=True)
     # ID of current student's session
     session_id = ndb.StringProperty(indexed=True)
+    # Current parameter values, map of parameter name to value
+    params = ndb.JsonProperty(indexed=False)
     # Which type of play-through this is (preview, from gallery)
     play_type = ndb.StringProperty(indexed=True,
                                    choices=[feconf.PLAY_TYPE_PLAYTEST,
@@ -330,7 +324,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
                               session_id))
 
     @classmethod
-    def create(cls, exp_id, exp_version, state_name, session_id, play_type):
+    def create(cls, exp_id, exp_version, state_name, session_id, params, play_type):
         """Creates a new leave exploration event."""
         entity_id = cls.get_new_event_entity_id(
             exp_id, session_id)
@@ -340,6 +334,7 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
             exploration_version=exp_version,
             state_name=state_name,
             session_id=session_id,
+            params=params,
             play_type=play_type)
         state_event_entity.put()
          
@@ -352,6 +347,9 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     # Number of students who have completed the exploration
     num_completions = ndb.IntegerProperty(indexed=False)
     # Keyed by state name that describes students who have hit each state
+    # {state_name: {'first_entry_count': ...,
+    #               'total_entry_count': ...,
+    #               'no_answer_count': ...}}
     state_hit_counts = ndb.JsonProperty(indexed=False)
 
 

@@ -139,7 +139,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('fake@user.com', exp)
 
         event_services.StateHitEventHandler.record(
-            'eid', 1, exp.init_state_name, 'session_id',
+            'eid', 1, exp.init_state_name, 'session_id', {},
             feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, exp.init_state_name, self.SUBMIT_HANDLER,
@@ -165,7 +165,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         state_name = exp.init_state_name
 
         event_services.StateHitEventHandler.record(
-            'eid', 1, state_name, 'session_id',
+            'eid', 1, state_name, 'session_id', {},
             feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, state_name, self.SUBMIT_HANDLER,
@@ -214,7 +214,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         for i in range(2):
             event_services.StateHitEventHandler.record(
                 'eid', 1, state_name, 'session_id %d' % i,
-                feconf.PLAY_TYPE_NORMAL)
+                {}, feconf.PLAY_TYPE_NORMAL)
             event_services.MaybeLeaveExplorationEventHandler.record(
                 'eid', 1, state_name, 'session_id %d' % i, 10.0, {},
                 feconf.PLAY_TYPE_NORMAL)
@@ -236,7 +236,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         for i in range(2):
             event_services.StateHitEventHandler.record(
                 'eid', 1, state_name, 'session_id',
-                feconf.PLAY_TYPE_NORMAL)
+                {}, feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
                 'eid', 1, state_name, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '1')
@@ -262,7 +262,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         # twice.
         event_services.StateHitEventHandler.record(
             'eid', 1, FIRST_STATE_NAME, 'session_id',
-            feconf.PLAY_TYPE_NORMAL)
+            {}, feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, '1')
@@ -270,7 +270,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         for i in range(2):
             event_services.StateHitEventHandler.record(
                 'eid', 1, SECOND_STATE_NAME, 'session_id',
-                feconf.PLAY_TYPE_NORMAL)
+                {}, feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
                 'eid', 1, SECOND_STATE_NAME, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '1')
@@ -293,7 +293,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         for i in range(2):
             event_services.StateHitEventHandler.record(
                 'eid', 1, FIRST_STATE_NAME, 'session_id',
-                feconf.PLAY_TYPE_NORMAL)
+                {}, feconf.PLAY_TYPE_NORMAL)
             event_services.AnswerSubmissionEventHandler.record(
                 'eid', 1, FIRST_STATE_NAME, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '1')

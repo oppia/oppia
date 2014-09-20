@@ -15,6 +15,7 @@
 """Jobs for statistics views."""
 
 import ast
+import collections
 
 from core import jobs
 from core.platform import models
@@ -93,10 +94,12 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_statistics(cls, exploration_id):
-        """Returns a dict with two keys: 'start_exploration_count' and
-        'complete_exploration_count'. The corresponding values are the
-        number of times the given exploration was started and completed,
-        respectively.
+        """Returns a dict with keys:
+        'start_exploration_count': # of times exploration was started
+        'complete_exploration_count': # of times exploration was completed
+        'state_hit_counts': {state_name: {'first_entry_count': # of sessions state which hit this state
+                                          'total_entry_count': # of total hits for this state
+                                          'no_answer_count': # of hits with no answer for this state}}
         """
         mr_model = stats_models.ExplorationAnnotationsModel.get(
             exploration_id, strict=False)
@@ -188,88 +191,79 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        # Number of times exploration was started
+        new_models_start_count = 0
+        # Number of times exploration was completed
+        new_models_complete_count = 0
+        # {state_name: {'total_entry_count': ...,
+        #               'first_entry_count': ...,
+        #               'no_answer_count': ...}}
+        state_stats = collections.defaultdict(lambda: collections.defaultdict(int))
+        # {state_name: set(session ids that have reached this state)}
+        state_session_ids = collections.defaultdict(set)
+        # Session ids that have completed this state
+        new_models_end_sessions = set()
+        # {session_id: (timestamp of last known maybe leave event, state_name)}
+        new_models_maybe_leave_info = collections.defaultdict(lambda: (0, ''))
+
+        # Iterate through items
+        for value_str in stringified_values:
+            value = ast.literal_eval(value_str)
+            # If this is a start event increment start count
+            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
+                new_models_start_count += 1
+            elif (value['event_type'] ==
+                  feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION):
+                # If this maybe leave is on the end state, it is a complete
+                if value['state_name'] == feconf.END_DEST:
+                    # Increment count
+                    new_models_complete_count += 1
+                    # Track that we have seen a 'real' end for this session id
+                    new_models_end_sessions.add(value['session_id'])
+                # If this is not on the end state, we want to keep the last one so far
+                else:
+                    (last_timestamp_so_far, _) = new_models_maybe_leave_info[value['session_id']]
+                    if last_timestamp_so_far < value['timestamp']:
+                        new_models_maybe_leave_info[value['session_id']] = (
+                            value['timestamp'], value['state_name'])
+            # If this is a state hit, increment total count and add to the set of session ids seen so far
+            elif (value['event_type'] ==
+                  feconf.EVENT_TYPE_STATE_HIT):
+                state_stats[value['state_name']]['total_entry_count'] += 1
+                state_session_ids[value['state_name']].add(value['session_id'])
+
+        # After iterating through all events, take the size of the set of session ids as the first entry count
+        for state_name in state_session_ids:
+            state_stats[state_name]['first_entry_count'] = len(state_session_ids[state_name])
+
+        # Get the set of session ids that left without completing
+        # Given by the set of session ids with maybe leave events at intermediate states 
+        # minus the ones that have a end state maybe leave.
+        leave_states = set(new_models_maybe_leave_info.keys()).difference(new_models_end_sessions)
+        for session_id in leave_states:
+            # Grab the state name of the state they left on and count that as no answer
+            (_, state_name) = new_models_maybe_leave_info[session_id]
+            state_stats[state_name]['no_answer_count'] += 1
+
+        # Update all stats with old model values
         exp_model = exp_models.ExplorationModel.get(key) 
         old_models_start_count = stats_models.StateCounterModel.get_or_create(
             key, exp_model.init_state_name).first_entry_count
         old_models_complete_count = stats_models.StateCounterModel.get_or_create(
             key, feconf.END_DEST).first_entry_count
 
-        new_models_start_count = 0
-        new_models_complete_count = 0
-        state_stats = {}
-        state_session_ids = {}
-        new_models_end_sessions = set()
-        new_models_maybe_leave_info = {}
-        for value_str in stringified_values:
-            value = ast.literal_eval(value_str)
-            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                new_models_start_count += 1
-            elif (value['event_type'] ==
-                  feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION):
-                if value['state_name'] == feconf.END_DEST:
-                    new_models_complete_count += 1
-                    new_models_end_sessions.add(value['session_id'])
-                else:
-                    if value['session_id'] in new_models_maybe_leave_info:
-                        (timestamp, _) = new_models_maybe_leave_info[value['session_id']]
-                        if timestamp < value['session_id']:
-                            new_models_maybe_leave_info[value['session_id']] = (
-                                value['timestamp'], value['state_name'])
-                    else:
-                        new_models_maybe_leave_info[value['session_id']] = (
-                            value['timestamp'], value['state_name'])
-            elif (value['event_type'] ==
-                  feconf.EVENT_TYPE_STATE_HIT):
-                if value['state_name'] in state_stats:
-                  state_session_ids[value['state_name']].add(value['session_id'])
-                  state_stats[value['state_name']]['total_entry_count'] += 1
-                else:
-                  state_session_ids[value['state_name']] = set([value['session_id']])
-                  state_stats[value['state_name']] = {'total_entry_count': 1}
-        for state_name in state_session_ids:
-            state_stats[state_name]['first_entry_count'] = len(state_session_ids[state_name])
-
-        leave_states = set(new_models_maybe_leave_info.keys()).difference(new_models_end_sessions)
-
-        for session_id in leave_states:
-            (_, state_name) = new_models_maybe_leave_info[session_id]
-            if state_name not in state_stats:
-                state_stats[state_name] = {'no_answer_count': 1}
-            if 'no_answer_count' in state_stats[state_name]:
-                state_stats[state_name]['no_answer_count'] += 1
-            else:
-                state_stats[state_name]['no_answer_count'] = 1
-
-
-        for state_name in state_stats:
-            counter_model = stats_models.StateCounterModel.get_or_create(
-                        key, state_name)
-            no_answer_count = (
-                counter_model.first_entry_count + counter_model.subsequent_entries_count
-                    - counter_model.resolved_answer_count - counter_model.active_answer_count)
-            if 'no_answer_count' not in state_stats[state_name]:
-                state_stats[state_name]['no_answer_count'] = no_answer_count
-            else:
-                state_stats[state_name]['no_answer_count'] += no_answer_count
-
         num_starts = (
             old_models_start_count + new_models_start_count)
         num_completes = (
             old_models_complete_count + new_models_complete_count)
-        for state in exp_model.states:
-            state_counter = stats_models.StateCounterModel.get_or_create(key, state)
-            if state in state_stats:
-               if 'first_entry_count' in state_stats[state]:
-                   state_stats[state]['first_entry_count'] += state_counter.first_entry_count
-               else:
-                   state_stats[state]['first_entry_count'] = state_counter.first_entry_count
-               if 'total_entry_count' in state_stats[state]:
-                   state_stats[state]['total_entry_count'] += state_counter.first_entry_count + state_counter.subsequent_entries_count
-               else:
-                   state_stats[state]['total_entry_count'] = state_counter.first_entry_count + state_counter.subsequent_entries_count
-            else:
-               state_stats[state] = {'first_entry_count': state_counter.first_entry_count,
-                                     'total_entry_count': state_counter.first_entry_count + state_counter.subsequent_entries_count}
+        for state_name in exp_model.states:
+            state_counter = stats_models.StateCounterModel.get_or_create(key, state_name)
+            no_answer_count = (
+                state_counter.first_entry_count + state_counter.subsequent_entries_count
+                    - state_counter.resolved_answer_count - state_counter.active_answer_count)
+            state_stats[state_name]['no_answer_count'] += no_answer_count
+            state_stats[state_name]['first_entry_count'] += state_counter.first_entry_count
+            state_stats[state_name]['total_entry_count'] += state_counter.first_entry_count + state_counter.subsequent_entries_count
 
         stats_models.ExplorationAnnotationsModel(
             id=key,

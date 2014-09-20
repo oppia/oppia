@@ -130,11 +130,14 @@ class StateHitEventHandler(BaseEventHandler):
 
     EVENT_TYPE = feconf.EVENT_TYPE_STATE_HIT
 
+    # TODO(sll): remove params before sending this event to the jobs taskqueue
     @classmethod
     def _handle_event(
-            cls, exp_id, exp_version, state_name, session_id, play_type):
+            cls, exp_id, exp_version, state_name, session_id,
+            params, play_type):
         stats_models.StateHitEventLogEntryModel.create(
-            exp_id, exp_version, state_name, session_id, play_type)
+            exp_id, exp_version, state_name, session_id,
+            params, play_type)
 
 
 class Registry(object):
