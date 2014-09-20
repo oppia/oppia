@@ -19,13 +19,15 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+forms = require('./forms.js');
+
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
   browser.get('/gallery');
-  element(by.css('.btn-lg')).click();
+  element(by.css('.protractor-test-create-exploration')).click();
   element(by.model('newExplorationTitle')).sendKeys(name);
-  objects.editDropdown(element(by.tagName('select2-dropdown'))).
-    sendText(category);
+  forms.editAutocompleteDropdown(element(by.tagName('select2-dropdown'))).
+    setText(category);
   element(by.css('.select2-container')).click();
   element(by.css('.select2-input')).sendKeys(category + '\n');
   element(by.buttonText('Add New Exploration')).click();

@@ -19,7 +19,8 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var objects = require('./objects.js');
+var forms = require('./forms.js');
+var general = require('./general.js')
 
 var login = function(email, isSuperAdmin) {
   // Use of element is not possible because the login page is non-angular.
@@ -48,12 +49,12 @@ var _appointModerator = function(email) {
       '(configPropertyId, configPropertyData) in configProperties').row(10));
   expect(moderatorList.element(by.tagName('em')).getText())
     .toBe('Email addresses of moderators');
-  var newEntry = objects.editList(moderatorList).appendEntry();
-  objects.editUnicode(newEntry, true).setText(email);
+  var newEntry = forms.editList(moderatorList).appendEntry();
+  forms.editUnicode(newEntry, true).setText(email);
   element(by.buttonText('Save')).click();
   browser.driver.switchTo().alert().accept();
   // Time is needed for the saving to complete.
-  protractor.getInstance().sleep(1000);
+  general.waitForSystem();
 };
 
 var _appointAdmin = function(email) {
@@ -63,18 +64,18 @@ var _appointAdmin = function(email) {
       '(configPropertyId, configPropertyData) in configProperties').row(1));
   expect(adminList.element(by.tagName('em')).getText())
     .toBe('Email addresses of admins');
-  var newEntry = objects.editList(adminList).appendEntry();
-  objects.editUnicode(newEntry, true).setText(email);
+  var newEntry = forms.editList(adminList).appendEntry();
+  forms.editUnicode(newEntry, true).setText(email);
   element(by.buttonText('Save')).click();
   browser.driver.switchTo().alert().accept();
   // Time is needed for the saving to complete.
-  protractor.getInstance().sleep(1000);
+  general.waitForSystem();
 };
 
 // This will fail if the user already has a username.
 var registerAsEditor = function(username) {
   browser.get('/gallery');
-  element(by.css('.btn-lg')).click();
+  element(by.css('.protractor-test-create-exploration')).click();
   element(by.model('username')).sendKeys(username);
   element(by.model('agreedToTerms')).click();
   element(by.buttonText('Submit and start contributing')).click();

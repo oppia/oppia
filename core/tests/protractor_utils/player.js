@@ -19,8 +19,15 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+// The get functions return promises rather than values.
+
 var getCurrentQuestionText = function() {
   return element(by.css('.conversation-skin-response')).getText();
+};
+
+var getContinueButtonText = function() {
+  return element(by.tagName('oppia-interactive-continue')).
+    element(by.tagName('button')).getText();
 };
 
 var answerContinueWidget = function() {
@@ -38,12 +45,18 @@ var answerMultipleChoiceWidget = function(answerText) {
 };
 
 var expectExplorationToBeOver = function() {
-  expect(element.all(by.css('.conversation-skin-response-finished')).count()).
-    toBe(1);
-}
+  expect(element(by.css('.conversation-skin-response-finished')).
+    isDisplayed()).toBe(true);
+};
+
+var expectExplorationToNotBeOver = function() {
+  expect(element(by.css('.conversation-skin-response-finished')).
+    isDisplayed()).toBe(false);
+};
 
 exports.getCurrentQuestionText = getCurrentQuestionText;
 exports.answerContinueWidget = answerContinueWidget;
 exports.answerNumericWidget = answerNumericWidget;
 exports.answerMultipleChoiceWidget = answerMultipleChoiceWidget;
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
+exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;

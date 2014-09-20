@@ -24,7 +24,7 @@ var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
 describe('Editing content', function() {
-  it('should display plain text', function() {
+  it('should display plain text content', function() {
     users.createUser('user1@example.com', 'user1');
     users.login('user1@example.com');
     workflow.createExploration('sums', 'maths');
@@ -38,12 +38,15 @@ describe('Editing content', function() {
     editor.saveChanges().then(function() {
       workflow.moveToPlayer();
       expect(player.getCurrentQuestionText()).toBe('plain text');
+      player.expectExplorationToNotBeOver();
       player.answerContinueWidget();
       player.expectExplorationToBeOver();
     });
+
+    users.logout();
   });
 
-  it('should create functioning multiple choice widgets', function() {
+  it('should create content and functioning multiple choice widgets', function() {
     users.createUser('user2@example.com', 'user2');
     users.login('user2@example.com');
     workflow.createExploration('sums', 'maths');
@@ -63,12 +66,13 @@ describe('Editing content', function() {
 
     editor.editRule('default').setDestination('END');
 
-    protractor.getInstance().sleep(30000);
-
     editor.saveChanges().then(function() {
       workflow.moveToPlayer();
+      player.expectExplorationToNotBeOver();
       player.answerMultipleChoiceWidget('option B');
       player.expectExplorationToBeOver();
     });
+
+    users.logout();
   });
 });

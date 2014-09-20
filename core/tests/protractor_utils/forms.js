@@ -13,12 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for interacting with object editor when carrrying
+ * @fileoverview Utilities for interacting with forms when carrrying
  * out end-to-end testing with protractor.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+// elem is the element within which the list occurs.
 var editList = function(elem) {
   // Returns the list-entry with the given index
   var _retrieveEntry = function(entryNum) {
@@ -43,7 +44,7 @@ var editList = function(elem) {
     // This returns the element of the appended entry, for further manipulation
     appendEntry: function(appendButtonText) {
       var listLength = _getLength();
-      var appendButtonText = appendButtonText || 'Add element'
+      var appendButtonText = appendButtonText || 'Add element';
       elem.element(by.buttonText(appendButtonText)).click();
       return _retrieveEntry(listLength);
     }
@@ -73,7 +74,7 @@ var editRichText = function(elem) {
     elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')).
       sendKeys(text);
   };
-  var _clickContentMenu = function(className) {
+  var _clickContentMenuButton = function(className) {
     elem.element(by.css('.wysiwyg')).element(by.css('.' + className)).click();
   };
 
@@ -86,45 +87,45 @@ var editRichText = function(elem) {
       _appendContentText(text);
     },
     appendBoldText: function(text) {
-      _clickContentMenu('bold');
+      _clickContentMenuButton('bold');
       _appendContentText(text);
-      _clickContentMenu('bold');
+      _clickContentMenuButton('bold');
     },
     appendItalicText: function(text) {
-      _clickContentMenu('italic');
+      _clickContentMenuButton('italic');
       _appendContentText(text);
-      _clickContentMenu('italic');
+      _clickContentMenuButton('italic');
     },
     appendUnderlineText: function(text) {
-      _clickContentMenu('underline');
+      _clickContentMenuButton('underline');
       _appendContentText(text);
-      _clickContentMenu('underline');
+      _clickContentMenuButton('underline');
     },
     appendOrderedList: function(textArray) {
       _appendContentText('\n');
-      _clickContentMenu('insertOrderedList');
+      _clickContentMenuButton('insertOrderedList');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickContentMenu('insertOrderedList');
+      _clickContentMenuButton('insertOrderedList');
     },
     appendUnorderedList: function(textArray) {
       _appendContentText('\n');
-      _clickContentMenu('insertUnorderedList');
+      _clickContentMenuButton('insertUnorderedList');
       for (var i = 0; i < textArray.length; i++) {
         _appendContentText(textArray[i] + '\n');
       }
-      _clickContentMenu('insertUnorderedList');
+      _clickContentMenuButton('insertUnorderedList');
     },
     appendHorizontalRule: function() {
-      _clickContentMenu('insertHorizontalRule');
+      _clickContentMenuButton('insertHorizontalRule');
     }
   };
 };
 
-var editDropdown = function(elem) {
+var editAutocompleteDropdown = function(elem) {
   return {
-    sendText: function(text) {
+    setText: function(text) {
       elem.element(by.css('.select2-container')).click();
       // NOTE: the input field is top-level in the DOM rather than below the
       // container.
@@ -137,4 +138,4 @@ exports.editUnicode = editUnicode;
 exports.editReal = editReal;
 exports.editList = editList;
 exports.editRichText = editRichText;
-exports.editDropdown = editDropdown;
+exports.editAutocompleteDropdown = editAutocompleteDropdown;

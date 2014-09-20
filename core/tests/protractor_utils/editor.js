@@ -19,25 +19,31 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-objects = require('./objects.js');
+forms = require('./forms.js');
+general = require('./general.js');
 
 // Content & non-interactive widgets. It is necessary to run open() at the
 // start and close() at the end.
 var editContent = function() {
-  var operations = objects.editRichText(element(by.css('.oppia-state-content')));
+  var operations = forms.editRichText(element(by.css('.oppia-state-content')));
   operations.open = function() {
     element(by.css('.protractor-test-edit-content')).click();
   };
   operations.close = function() {
-    element(by.css('.oppia-state-content')).element(by.buttonText('Save Content')).click();
+    element(by.css('.oppia-state-content')).
+      element(by.buttonText('Save Content')).click();
   };
   return operations;
 };
 
 
 // Interactive widgets
-var _openWidgetEditor = function(widgetIndex) {
+
+// TODO (Jacob) convert to referring to widgets by name
+var _openWidgetEditor = function(widgetIndex, widgetName) {
   element(by.css('.protractor-test-edit-interaction')).click();
+  expect(element(by.repeater('widget in widgetList').row(widgetIndex)).
+    getText()).toBe(widgetName);
   element(by.repeater('widget in widgetList').row(widgetIndex)).click();
 };
 
@@ -46,27 +52,28 @@ var _closeWidgetEditor = function() {
 };
 
 var selectNumericWidget = function() {
-  _openWidgetEditor(2);
+  _openWidgetEditor(2, 'Numeric input');
   _closeWidgetEditor();
 };
 
 var selectContinueWidget = function(buttonText) {
-  _openWidgetEditor(0);
+  _openWidgetEditor(0, 'Continue');
   if (buttonText) {
     element(by.linkText('Customize')).click();
-    objects.editUnicode(element(by.css('.protractor-test-widget-args'))).setText(buttonText);
+    forms.editUnicode(element(by.css('.protractor-test-widget-args'))).setText(buttonText);
   }
   _closeWidgetEditor();
 };
 
+// textArray should be a non-empty array of strings (to be the options)
 var selectSimpleMultipleChoiceWidget = function(textArray) {
-  _openWidgetEditor(1);
+  _openWidgetEditor(1, 'Multiple choice input');
   element(by.linkText('Customize')).click();
-  var customizer = objects.editList(element(by.css('.protractor-test-widget-args')));
+  var customizer = forms.editList(element(by.css('.protractor-test-widget-args')));
   customizer.editRichTextEntry(0).appendPlainText(textArray[0]);
   for (var i = 1; i < textArray.length; i++) {
     var newEntry = customizer.appendEntry('Add multiple choice option');
-    objects.editRichText(newEntry).appendPlainText(textArray[i]);
+    forms.editRichText(newEntry).appendPlainText(textArray[i]);
   }
   _closeWidgetEditor();
 };
@@ -87,13 +94,14 @@ var editRule = function(ruleNum) {
             buttons[0].click();
           }
         });
-      return objects.editList(feedbackElement);
+      return forms.editList(feedbackElement);
     },
     // Enter 'END' for the end state.
     setDestination: function(destinationName) {
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
       destinationElement.element(by.tagName('button')).click();
-      objects.editDropdown(destinationElement).sendText(destinationName);
+      forms.editAutocompleteDropdown(destinationElement).
+        setText(destinationName + '\n');
     }
   }
 };
@@ -111,7 +119,7 @@ var saveChanges = function(commitMessage) {
           click().then(function() {
             // This is necessary to give the page time to record the changes,
             // so that it does not attempt to stop the user leaving.
-            protractor.getInstance().sleep(2000);
+            general.waitForSystem();
             successCallback();
         });
       });

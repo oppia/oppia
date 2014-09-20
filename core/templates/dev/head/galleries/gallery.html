@@ -14,20 +14,20 @@
             {% if not user_email %}
               <!-- User must log in. -->
               <span class="pull-right">
-                <a class="btn btn-success btn-lg" href="{{login_url}}">
+                <a class="btn btn-success btn-lg protractor-test-create-exploration" href="{{login_url}}">
                   Create New Exploration
                 </a>
               </span>
             {% elif not username %}
               <!-- User must register. -->
               <span class="pull-right">
-                <a class="btn btn-success btn-lg" href="/editor_prerequisites?return_url=gallery">
+                <a class="btn btn-success btn-lg protractor-test-create-exploration" href="/editor_prerequisites?return_url=gallery">
                   Create New Exploration
                 </a>
               </span>
             {% else %}
               <span class="pull-right">
-                <a class="btn btn-success btn-lg"
+                <a class="btn btn-success btn-lg protractor-test-create-exploration"
                    ng-click="showCreateExplorationModal(getCategoryList())">
                   Create New Exploration
                 </a>
