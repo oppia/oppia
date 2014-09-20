@@ -84,6 +84,8 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             base.CsrfTokenManager.is_csrf_token_valid('bad_user', page, token))
         self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
             uid, 'wrong_page', token))
+        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
+            uid, self.UNICODE_TEST_STRING, token))
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new_token'))
         self.assertFalse(
