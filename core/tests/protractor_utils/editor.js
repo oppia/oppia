@@ -106,8 +106,6 @@ var editRule = function(ruleNum) {
   }
 };
 
-// This must be run using .then() rather than directly; it will throw an error
-// if there are no pending changes.
 var saveChanges = function(commitMessage) {
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
