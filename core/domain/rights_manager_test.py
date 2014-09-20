@@ -34,17 +34,16 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.register_editor('c@example.com', 'C')
         self.register_editor('d@example.com', 'D')
         self.register_editor('e@example.com', 'E')
-        self.register_editor('admin@example.com', 'adm')
+        self.register_editor(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
 
         self.user_id_a = self.get_user_id_from_email('a@example.com')
         self.user_id_b = self.get_user_id_from_email('b@example.com')
         self.user_id_c = self.get_user_id_from_email('c@example.com')
         self.user_id_d = self.get_user_id_from_email('d@example.com')
         self.user_id_e = self.get_user_id_from_email('e@example.com')
-        self.user_id_admin = self.get_user_id_from_email('admin@example.com')
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+        self.set_admins([self.ADMIN_EMAIL])
 
         self.EXP_ID = 'exp_id'
 

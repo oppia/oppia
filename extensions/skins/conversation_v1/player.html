@@ -36,12 +36,7 @@
         </div>
 
         <div ng-if="response.question">
-          <div ng-if="!response.isMostRecentQuestion"
-               class="conversation-skin-conversation-log"
-               angular-html-bind="response.question">
-          </div>
-          <div ng-if="response.isMostRecentQuestion"
-               class="conversation-skin-response"
+          <div class="conversation-skin-response"
                angular-html-bind="response.question">
           </div>
         </div>

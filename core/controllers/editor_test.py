@@ -38,13 +38,14 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
         editable."""
-
         self.assertIn(self.CAN_EDIT_STR, response_body)
+        self.assertNotIn(self.CANNOT_EDIT_STR, response_body)
 
     def assert_cannot_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
         not editable."""
         self.assertIn(self.CANNOT_EDIT_STR, response_body)
+        self.assertNotIn(self.CAN_EDIT_STR, response_body)
 
 
 class EditorTest(BaseEditorControllerTest):
@@ -60,8 +61,8 @@ class EditorTest(BaseEditorControllerTest):
         self.assert_cannot_edit(response.body)
 
         # Register and login as an editor.
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
@@ -77,12 +78,12 @@ class EditorTest(BaseEditorControllerTest):
     def test_request_new_state_template(self):
         """Test requesting a new state template when adding a new state."""
         # Register and log in as an admin.
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         EXP_ID = 'eid'
         exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, 'A title', 'A category')
+            EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
         exploration.states[exploration.init_state_name].widget.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
         exp_services.save_new_exploration(
@@ -111,10 +112,8 @@ class EditorTest(BaseEditorControllerTest):
         exp_services.load_demo('0')
         CURRENT_VERSION = 1
 
-        # Register and log in as an admin.
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
-
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -207,27 +206,18 @@ class EditorTest(BaseEditorControllerTest):
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': '0', 'handler': 'submit'})
 
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': 'blah', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': 'blah', 'handler': 'submit'})
 
         for _ in range(2):
             exploration_dict = self.post_json(
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah2', 'handler': 'submit',
-                    'state_history': exploration_dict['state_history'],
                 }
             )
 
@@ -236,13 +226,12 @@ class EditorTest(BaseEditorControllerTest):
                 '%s/0/%s' % (
                     feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name), {
                     'answer': 'blah3', 'handler': 'submit',
-                    'state_history': exploration_dict['state_history'],
                 }
             )
 
         # Register and log in as an editor.
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -299,8 +288,8 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0'
 
         # Check, from the editor perspective, that no stats have been recorded.
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
         self.assertEqual(editor_exploration_dict['num_starts'], 0)
@@ -317,31 +306,20 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         state_name = exploration_dict['state_name']
         exploration_dict = self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history'],
-            }
-        )
+            {'answer': '0', 'handler': 'submit'})
         state_name = exploration_dict['state_name']
         self.post_json(
             '%s/0/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX, state_name),
-            {
-                'answer': 'blah', 'handler': 'submit',
-                'state_history': exploration_dict['state_history']
-            }
-        )
+            {'answer': 'blah', 'handler': 'submit'})
         # Ensure that all events get propagated.
         self.process_and_flush_pending_tasks()
 
         # Now switch back to the editor perspective.
-        self.login('editor@example.com')
-
+        self.login(self.EDITOR_EMAIL)
         editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
         self.assertEqual(editor_exploration_dict['num_starts'], 1)
         self.assertEqual(editor_exploration_dict['num_completions'], 0)
-
         # TODO(sll): Add more checks here.
-
         self.logout()
 
 
@@ -429,9 +407,9 @@ states:
     def test_exploration_download_handler_for_default_exploration(self):
 
         # Register and log in as an editor.
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
-        self.OWNER_ID = self.get_user_id_from_email('editor@example.com')
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         # Create a simple exploration
         EXP_ID = 'eid'
@@ -499,24 +477,18 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
     def setUp(self):
         """Creates dummy users."""
         super(ExplorationDeletionRightsTest, self).setUp()
-        self.admin_email = 'admin@example.com'
-        self.owner_email = 'owner@example.com'
-        self.editor_email = 'editor@example.com'
-        self.viewer_email = 'viewer@example.com'
 
-        # Usernames containing the string 'admin' are reserved.
-        self.register_editor(self.admin_email, username='adm')
-        self.register_editor(self.owner_email, username='owner')
-        self.register_editor(self.editor_email, username='editor')
-        self.register_editor(self.viewer_email, username='viewer')
+        self.register_editor(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
+        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.admin_email)
-        self.owner_id = self.get_user_id_from_email(self.owner_email)
-        self.editor_id = self.get_user_id_from_email(self.editor_email)
-        self.viewer_id = self.get_user_id_from_email(self.viewer_email)
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+        self.set_admins([self.ADMIN_EMAIL])
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
@@ -529,19 +501,19 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             self.owner_id, UNPUBLISHED_EXP_ID, self.editor_id,
             rights_manager.ROLE_EDITOR)
 
-        self.login(self.editor_email)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.viewer_email)
+        self.login(self.VIEWER_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.owner_email)
+        self.login(self.OWNER_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % UNPUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)
@@ -559,25 +531,25 @@ class ExplorationDeletionRightsTest(BaseEditorControllerTest):
             rights_manager.ROLE_EDITOR)
         rights_manager.publish_exploration(self.owner_id, PUBLISHED_EXP_ID)
 
-        self.login(self.editor_email)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.viewer_email)
+        self.login(self.VIEWER_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.owner_email)
+        self.login(self.OWNER_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID, expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
-        self.login(self.admin_email)
+        self.login(self.ADMIN_EMAIL)
         response = self.testapp.delete(
             '/createhandler/data/%s' % PUBLISHED_EXP_ID)
         self.assertEqual(response.status_int, 200)
@@ -596,14 +568,13 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
 
-        EDITOR_EMAIL = 'editor@example.com'
-        self.register_editor(EDITOR_EMAIL)
-        self.login(EDITOR_EMAIL)
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         # In version 2, change the objective and the initial state content.
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(
-           EDITOR_EMAIL, self.EXP_ID, [{
+            self.EDITOR_EMAIL, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'objective',
                 'new_value': 'the objective',
@@ -730,21 +701,20 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
 class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     """Test the handler for managing exploration editing rights."""
 
-    ADMIN_EMAIL = 'admin@example.com'
-    OWNER_EMAIL = 'owner@example.com'
     COLLABORATOR_EMAIL = 'collaborator@example.com'
+    COLLABORATOR_USERNAME = 'collab'
     COLLABORATOR2_EMAIL = 'collaborator2@example.com'
-    VIEWER_EMAIL = 'viewer@example.com'
     VIEWER2_EMAIL = 'viewer2@example.com'
 
     def test_exploration_rights_handler(self):
         """Test exploration rights handler."""
 
         # Create several users
-        self.register_editor(self.ADMIN_EMAIL, username='adm')
-        self.register_editor(self.OWNER_EMAIL, username='owner')
-        self.register_editor(self.COLLABORATOR_EMAIL, username='collab')
-        self.register_editor(self.VIEWER_EMAIL, username='viewer')
+        self.register_editor(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
+        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
+        self.register_editor(
+            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
+        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
 
         self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
@@ -752,8 +722,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
             self.COLLABORATOR_EMAIL)
         self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
 
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
+        self.set_admins([self.ADMIN_EMAIL])
 
         # Owner creates exploration
         self.login(self.OWNER_EMAIL)

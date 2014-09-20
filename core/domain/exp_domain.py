@@ -26,7 +26,6 @@ import copy
 import logging
 import re
 import string
-import time
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
@@ -55,7 +54,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'skill_tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'default_skin_id')
+        'default_skin_id', 'init_state_name')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -1103,6 +1102,14 @@ class Exploration(object):
     def update_default_skin_id(self, default_skin_id):
         self.default_skin = default_skin_id
 
+    def update_init_state_name(self, init_state_name):
+        if init_state_name not in self.states:
+            raise Exception(
+                'Invalid new initial state name: %s; '
+                'it is not in the list of states %s for this '
+                'exploration.' % (init_state_name, self.states.keys()))
+        self.init_state_name = init_state_name
+
     # Methods relating to parameters.
     def get_obj_type_for_param(self, param_name):
         """Returns the obj_type for the given parameter."""
@@ -1169,12 +1176,12 @@ class Exploration(object):
 
         self._require_valid_state_name(new_state_name)
 
-        if self.init_state_name == old_state_name:
-            self.init_state_name = new_state_name
-
         self.states[new_state_name] = copy.deepcopy(
             self.states[old_state_name])
         del self.states[old_state_name]
+
+        if self.init_state_name == old_state_name:
+            self.update_init_state_name(new_state_name)
 
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.

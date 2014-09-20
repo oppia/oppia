@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -59,6 +61,27 @@ class TestBase(unittest.TestCase):
     # This is the value that gets returned by default when
     # app_identity.get_application_id() is called during tests.
     EXPECTED_TEST_APP_ID = 'testbed-test'
+
+    # A test unicode string.
+    UNICODE_TEST_STRING = u'unicode ¡马!'
+
+    # Dummy strings representing user attributes. Note that it is up to the
+    # individual test to actually register these users as editors, admins, etc.
+    ADMIN_EMAIL = 'admin@example.com'
+    # Usernames containing the string 'admin' are reserved, so we use 'adm'
+    # instead.
+    ADMIN_USERNAME = 'adm'
+    MODERATOR_EMAIL = 'moderator@example.com'
+    MODERATOR_USERNAME = 'moderator'
+    OWNER_EMAIL = 'owner@example.com'
+    OWNER_USERNAME = 'owner'
+    EDITOR_EMAIL = 'editor@example.com'
+    EDITOR_USERNAME = 'editor'
+    VIEWER_EMAIL = 'viewer@example.com'
+    VIEWER_USERNAME = 'viewer'
+
+    def _get_unicode_test_string(self, suffix):
+        return '%s%s' % (self.UNICODE_TEST_STRING, suffix)
 
     def setUp(self):
         raise NotImplementedError
