@@ -29,4 +29,9 @@ describe('Account creation', function() {
   it('should create moderators', function() {
     users.createModerator('mod@example.com', 'moderator');
   });
+
+  // Usernames containing "admin" are not permitted.
+  it('should create admins', function() {
+    users.createAdmin('admin@example.com', 'adm1n');
+  });
 });

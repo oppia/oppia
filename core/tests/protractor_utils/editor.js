@@ -39,7 +39,7 @@ var editContent = function() {
 
 // Interactive widgets
 
-// TODO (Jacob) convert to referring to widgets by name
+// TODO (Jacob) convert to referring to widgets by name.
 var _openWidgetEditor = function(widgetIndex, widgetName) {
   element(by.css('.protractor-test-edit-interaction')).click();
   expect(element(by.repeater('widget in widgetList').row(widgetIndex)).
@@ -87,7 +87,7 @@ var editRule = function(ruleNum) {
   return {
     editFeedback: function() {
       var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
-      // There may are may not be a button; if there is we click it
+      // This button will not be shown if we are part way through editing.
       feedbackElement.element.all(by.css('.protractor-test-edit-feedback')).
         then(function(buttons) {
           if (buttons.length > 0) {
@@ -109,22 +109,16 @@ var editRule = function(ruleNum) {
 // This must be run using .then() rather than directly; it will throw an error
 // if there are no pending changes.
 var saveChanges = function(commitMessage) {
-  return {
-    then: function(successCallback) {
-      element(by.css('.protractor-test-save-changes')).click().then(function() {
-        if (commitMessage) {
-          element(by.model('commitMessage')).sendKeys(commitMessage);
-        }
-        element(by.css('.protractor-test-close-save-modal')).
-          click().then(function() {
-            // This is necessary to give the page time to record the changes,
-            // so that it does not attempt to stop the user leaving.
-            general.waitForSystem();
-            successCallback();
-        });
-      });
+  element(by.css('.protractor-test-save-changes')).click().then(function() {
+    if (commitMessage) {
+      element(by.model('commitMessage')).sendKeys(commitMessage);
     }
-  };
+    element(by.css('.protractor-test-close-save-modal')).click();
+    // This is necessary to give the page time to record the changes,
+    // so that it does not attempt to stop the user leaving.
+    protractor.getInstance().waitForAngular();
+    general.waitForSystem();
+  });
 };
 
 exports.editContent = editContent;

@@ -35,13 +35,13 @@ describe('Editing content', function() {
     editor.selectContinueWidget('click here');
     editor.editRule('default').setDestination('END');
 
-    editor.saveChanges().then(function() {
-      workflow.moveToPlayer();
-      expect(player.getCurrentQuestionText()).toBe('plain text');
-      player.expectExplorationToNotBeOver();
-      player.answerContinueWidget();
-      player.expectExplorationToBeOver();
-    });
+    editor.saveChanges();
+    workflow.moveToPlayer();
+
+    expect(player.getCurrentQuestionText()).toBe('plain text');
+    player.expectExplorationToNotBeOver();
+    player.answerContinueWidget();
+    player.expectExplorationToBeOver();
 
     users.logout();
   });
@@ -63,15 +63,15 @@ describe('Editing content', function() {
 
     editor.editRule('default').editFeedback().editRichTextEntry(0).
       appendPlainText('wrong');
-
     editor.editRule('default').setDestination('END');
 
-    editor.saveChanges().then(function() {
-      workflow.moveToPlayer();
-      player.expectExplorationToNotBeOver();
-      player.answerMultipleChoiceWidget('option B');
-      player.expectExplorationToBeOver();
-    });
+    editor.saveChanges();
+    workflow.moveToPlayer();
+
+    player.expectExplorationToNotBeOver();
+    // TODO (Jacob) Add check that the correct options are displayed.
+    player.answerMultipleChoiceWidget('option B');
+    player.expectExplorationToBeOver();
 
     users.logout();
   });

@@ -31,6 +31,9 @@ var createExploration = function(name, category) {
   element(by.css('.select2-container')).click();
   element(by.css('.select2-input')).sendKeys(category + '\n');
   element(by.buttonText('Add New Exploration')).click();
+
+  // We now want to wait for the editor to fully load.
+  protractor.getInstance().waitForAngular();
 };
 
 // Moves from exploration editor view to player view; there must be no unsaved

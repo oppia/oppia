@@ -54,7 +54,7 @@ var _appointModerator = function(email) {
   element(by.buttonText('Save')).click();
   browser.driver.switchTo().alert().accept();
   // Time is needed for the saving to complete.
-  general.waitForSystem();
+  protractor.getInstance().waitForAngular();
 };
 
 var _appointAdmin = function(email) {
@@ -69,7 +69,7 @@ var _appointAdmin = function(email) {
   element(by.buttonText('Save')).click();
   browser.driver.switchTo().alert().accept();
   // Time is needed for the saving to complete.
-  general.waitForSystem();
+  protractor.getInstance().waitForAngular();
 };
 
 // This will fail if the user already has a username.
