@@ -54,11 +54,9 @@ describe('State Editor controller', function() {
           param_changes: []
         },
         getData: function() {
-          if (mockExplorationData.data) {
-            var deferred = q.defer();
-            deferred.resolve(mockExplorationData.data);
-            return deferred.promise;
-          }
+          var deferred = q.defer();
+          deferred.resolve(mockExplorationData.data);
+          return deferred.promise;
         }
       };
 
@@ -88,7 +86,9 @@ describe('State Editor controller', function() {
                 dest: null
               }]
             }]
-          }
+          },
+          content: ['This is some content.'],
+          param_changes: ['Add state', 'Changed content']
         }
       };
 
@@ -109,12 +109,12 @@ describe('State Editor controller', function() {
       });
     }));
 
-    it('should initialize the state name', function() {
+    it('should initialize the state name and related properties', function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
       expect(scope.contentMemento).toBeNull();
-      expect(scope.content).toEqual([]);
-      expect(scope.stateParamChanges).toEqual([]);
+      expect(scope.content).toEqual(['This is some content.']);
+      expect(scope.stateParamChanges).toEqual(['Add state', 'Changed content']);
     });
 
     it('should correctly normalize whitespace in a state name', function() {
@@ -147,87 +147,12 @@ describe('State Editor controller', function() {
       expect(scope.saveStateName('#')).toBe(false);
       expect(vs.isValidEntityName('#', true)).toBe(false);
       expect(ecs.getActiveStateName()).toBe('Third State');
-      expect(mockWarningsData.addWarning).not.toHaveBeenCalled();
     });
 
     it('should not save duplicate state names', function() {
       expect(scope.saveStateName('Second State')).toBe(false);
       expect(mockWarningsData.addWarning)
         .toHaveBeenCalledWith("The name 'Second State' is already in use.");
-    });
-
-    it('should edit content correctly', function() {
-      ecs.setActiveStateName('Third State');
-      scope.initStateEditor();
-      expect(scope.contentMemento).toBeNull();
-      scope.content = 'The quick brown fox jumped over the lazy dog';
-      scope.editContent();
-      expect(scope.contentMemento)
-        .toEqual('The quick brown fox jumped over the lazy dog');
-    });
-
-    it('should save content correctly', function() {
-      ecs.setActiveStateName('First State');
-      scope.initStateEditor();
-      expect(scope.contentMemento).toBeNull();
-      scope.content = 'And now for something completely different.';
-      scope.editContent();
-      expect(scope.contentMemento)
-        .toEqual('And now for something completely different.');
-      scope.saveTextContent();
-      expect(scope.contentMemento).toEqual(null);
-      expect(mockWarningsData.addWarning)
-        .not.toHaveBeenCalled();
-    });
-
-    it('should save parameter edits correctly', function() {
-      ecs.setActiveStateName('First State');
-      scope.saveStateParamChanges('Adding a parameter change.', '');
-      expect(cls.getChangeList()[0].new_value)
-        .toEqual('Adding a parameter change.');
-
-      scope.saveStateParamChanges(
-        'Let us change again.', 'Adding a parameter change.'
-      );
-      expect(cls.getChangeList()[1].new_value).toEqual('Let us change again.');
-    });
-
-    it('should check that state name edits are independent', function() {
-      ecs.setActiveStateName('Third State');
-      scope.saveStateName('Fourth State');
-      expect(ecs.getActiveStateName()).toEqual('Fourth State');
-      expect(scope.$parent.states.hasOwnProperty('Fourth State')).toBe(true);
-      expect(scope.$parent.states.hasOwnProperty('Third State')).toBe(false);
-
-      ecs.setActiveStateName('First State');
-      scope.saveStateName('Fifth State');
-      expect(scope.$parent.states.hasOwnProperty('Fifth State')).toBe(true);
-      expect(scope.$parent.states.hasOwnProperty('First State')).toBe(false);
-    });
-
-    it('should check that state name edits are persistent', function() {
-      ecs.setActiveStateName('Second State');
-      scope.initStateEditor();
-      scope.stateNameMemento = 'A different story';
-      expect(scope.saveStateName('A different story')).toBe(false);
-      expect(ecs.getActiveStateName()).toEqual('Second State');
-    });
-
-    it('should check that content edits are persistent', function() {
-      scope.contentMemento = null;
-      scope.saveTextContent();
-      expect(cls.getChangeList()).toEqual([]);
-      scope.contentMemento = 'dadadada';
-      scope.saveTextContent();
-      expect(cls.getChangeList()[0].old_value).toEqual('dadadada');
-      expect(cls.getChangeList().length).toBe(1);
-
-      scope.contentMemento = 'Abraham Lincoln';
-      scope.content = 'Abraham Lincoln';
-      scope.saveTextContent();
-      expect(cls.getChangeList().length).toBe(1);
-      expect(cls.getChangeList()[0].hasOwnProperty('Abraham Lincoln'))
-        .toBe(false);
     });
 
     it('should check that state names are changeable', function() {
@@ -243,6 +168,124 @@ describe('State Editor controller', function() {
       scope.saveStateName('Fifth State');
       expect(scope.stateName).toEqual('Fifth State');
       expect(ecs.getActiveStateName()).toEqual('Fifth State');
+    });
+
+    it('should check that state name edits are independent', function() {
+      ecs.setActiveStateName('Third State');
+      scope.saveStateName('Fourth State');
+      expect(ecs.getActiveStateName()).toEqual('Fourth State');
+      expect(scope.$parent.states.hasOwnProperty('Fourth State')).toBe(true);
+      expect(scope.$parent.states.hasOwnProperty('Third State')).toBe(false);
+
+      ecs.setActiveStateName('First State');
+      scope.saveStateName('Fifth State');
+      expect(scope.$parent.states.hasOwnProperty('Fifth State')).toBe(true);
+      expect(scope.$parent.states.hasOwnProperty('First State')).toBe(false);
+    });
+
+    it('should not re-save unedited state names', function() {
+      ecs.setActiveStateName('Second State');
+      scope.initStateEditor();
+      scope.openStateNameEditor();
+      expect(scope.saveStateName('Second State')).toBe(false);
+    });
+
+    it('should not change state name if state name edits fail', function() {
+      ecs.setActiveStateName('Third State');
+      scope.initStateEditor();
+      scope.openStateNameEditor();
+
+      scope.saveStateName('#!% State');
+      expect(ecs.getActiveStateName()).toEqual('Third State');
+
+      scope.saveStateName(
+        'This state name is too long to be saved. Try to be brief next time.'
+      );
+      expect(ecs.getActiveStateName()).toEqual('Third State');
+
+      scope.saveStateName('First State');
+      expect(ecs.getActiveStateName()).toEqual('Third State');
+
+      scope.saveStateName('Third State');
+      expect(ecs.getActiveStateName()).toEqual('Third State');
+    });
+
+    it('should edit content correctly', function() {
+      ecs.setActiveStateName('Third State');
+      scope.initStateEditor();
+      expect(scope.contentMemento).toBeNull();
+      scope.content = ['The quick brown fox jumped over the lazy dogs'];
+      scope.editContent();
+      expect(scope.contentMemento)
+        .toEqual(['The quick brown fox jumped over the lazy dogs']);
+    });
+
+    it('should save content correctly', function() {
+      ecs.setActiveStateName('First State');
+      scope.initStateEditor();
+      expect(scope.contentMemento).toBeNull();
+      expect(scope.content).toEqual([]);
+      scope.content = ['And now for something completely different.'];
+      scope.editContent();
+      expect(scope.contentMemento)
+        .toEqual(['And now for something completely different.']);
+      scope.saveTextContent();
+      expect(scope.contentMemento).toEqual(null);
+      expect(cls.getChangeList()).not.toEqual([]);
+    });
+
+
+    it('should check that content edits are saved correctly',
+       function() {
+      ecs.setActiveStateName('Third State');
+      expect(cls.getChangeList()).toEqual([]);
+      scope.content = ['abababab'];
+      scope.editContent();
+      scope.content = ['babababa'];
+      scope.saveTextContent();
+      expect(cls.getChangeList().length).toBe(1);
+      expect(cls.getChangeList()[0].new_value).toEqual(['babababa']);
+      expect(cls.getChangeList()[0].old_value).toEqual(['abababab']);
+
+      scope.editContent();
+      scope.content = ['And now for something completely different.'];
+      scope.saveTextContent();
+      expect(cls.getChangeList().length).toBe(2);
+      expect(cls.getChangeList()[1].new_value)
+        .toEqual(['And now for something completely different.']);
+      expect(cls.getChangeList()[1].old_value).toEqual(['babababa']);
+
+      scope.content = ['dadadada'];
+      scope.saveTextContent();
+      expect(cls.getChangeList().length).toBe(2);
+      expect(cls.getChangeList()[1].new_value).not.toEqual(['dadadada']);
+
+      scope.content = ['Abraham Lincoln'];
+      scope.saveTextContent();
+      expect(cls.getChangeList().length).toBe(2);
+      expect(cls.getChangeList()[1].new_value).not.toEqual(['Abraham Lincoln']);
+    });
+
+    it('should not re-save unedited content', function() {
+      ecs.setActiveStateName('Second State');
+      scope.initStateEditor();
+      expect(cls.getChangeList()).toEqual([]);
+      expect(scope.contentMemento).toBeNull();
+      scope.content = ['Eroica'];
+      scope.saveTextContent();
+      expect(cls.getChangeList()).toEqual([]);
+    });
+
+    it('should save parameter edits correctly', function() {
+      ecs.setActiveStateName('First State');
+      scope.saveStateParamChanges('Adding a parameter change.', '');
+      expect(cls.getChangeList()[0].new_value)
+        .toEqual('Adding a parameter change.');
+
+      scope.saveStateParamChanges(
+        'Let us change again.', 'Adding a parameter change.'
+      );
+      expect(cls.getChangeList()[1].new_value).toEqual('Let us change again.');
     });
   });
 });
