@@ -233,7 +233,6 @@ oppia.factory('stateGraphArranger', [
 
       // Assign unique IDs to each node.
       var idCount = 0;
-      var nodeList = [];
       for (var nodeName in nodeData) {
         nodeData[nodeName].id = idCount;
         nodeData[nodeName].name = nodeName;
@@ -248,7 +247,7 @@ oppia.factory('stateGraphArranger', [
         var currNodeName = queue[0];
         queue.shift();
 
-        for (i = 0; i < links.length; i++) {
+        for (var i = 0; i < links.length; i++) {
           if (links[i].target == currNodeName &&
               !nodeData[links[i].source].reachableFromEnd) {
             nodeData[links[i].source].reachableFromEnd = true;
@@ -266,9 +265,6 @@ oppia.factory('stateGraphArranger', [
 oppia.directive('stateGraphViz', [
     '$filter', 'stateGraphArranger', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
     function($filter, stateGraphArranger, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
-  // constants
-  var i = 0;
-
   return {
     restrict: 'A',
     scope: {
@@ -295,80 +291,37 @@ oppia.directive('stateGraphViz', [
         };
       };
 
-      $scope.$watch($scope.getElementDimensions, function(newValue, oldValue) {
+      var _redrawGraph = function() {
         if ($scope.val) {
           $scope.drawGraph(
             $scope.val.nodes, $scope.val.links, $scope.val.initStateName,
             $scope.val.finalStateName
           );
         }
-      }, true);
-
-      $(window).resize(function() {
-        $scope.$apply();
-        if ($scope.val) {
-          $scope.drawGraph(
-            $scope.val.nodes, $scope.val.links, $scope.val.initStateName,
-            $scope.val.finalStateName
-          );
-        }
-      });
-
-      $scope.$watch('val', function(newVal, oldVal) {
-        if (newVal) {
-          $scope.drawGraph(
-            newVal.nodes, newVal.links, newVal.initStateName,
-            newVal.finalStateName
-          );
-        }
-      });
-
-      $scope.$watch('currentStateName', function(newStateName, oldStateName) {
-        if ($scope.val) {
-          $scope.drawGraph(
-            $scope.val.nodes, $scope.val.links, $scope.val.initStateName,
-            $scope.val.finalStateName
-          );
-        }
-      })
-
-      $scope.computeLayout = function(nodes, links, initStateName, finalStateName) {
-        return stateGraphArranger.computeLayout(
-          nodes, links, initStateName, finalStateName);
       };
 
-      function isStateFlagged(name, highlightStates, stateStats) {
-          return (highlightStates && name in highlightStates);
-      }
+      $scope.$watch('val', _redrawGraph, true);
+      $scope.$watch('currentStateName', _redrawGraph, true);
+      $(window).resize(_redrawGraph);
 
       $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {
-        // Clear all SVG elements on the canvas.
-        d3.select($element[0]).selectAll('svg').remove();
-
-        var nodeData = $scope.computeLayout(nodes, links, initStateName, finalStateName);
+        var nodeData = stateGraphArranger.computeLayout(
+          nodes, links, initStateName, finalStateName);
 
         var maxDepth = 0;
         for (var nodeName in nodeData) {
           maxDepth = Math.max(maxDepth, nodeData[nodeName].depth);
         }
 
-        var GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
+        $scope.GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
         // A rough upper bound for the width of a single letter, in pixels, to use
         // as a scaling factor to determine the width of graph nodes. This is not
         // an entirely accurate description because it also takes into account the
         // horizontal whitespace between graph nodes.
         var LETTER_WIDTH_IN_PIXELS = 10.5;
-        var GRAPH_WIDTH = MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS;
+        $scope.GRAPH_WIDTH = MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS;
 
-        var VIS_HEIGHT = $scope.getElementDimensions().h === 0 ? GRAPH_HEIGHT : '100%';
-        var outerVis = d3.select($element[0]).append('svg:svg')
-          .attr({
-            'class': 'oppia-graph-viz',
-            'width': '100%',
-            'height': VIS_HEIGHT
-          });
-
-        var dimensions = $scope.getElementDimensions();
+        $scope.visHeight = ($scope.getElementDimensions().h === 0 ? $scope.GRAPH_HEIGHT : '100%');
 
         // Change the position values in nodeData to use pixels.
         for (var nodeName in nodeData) {
@@ -376,16 +329,20 @@ oppia.directive('stateGraphViz', [
           var VERTICAL_PROPERTIES = ['y0', 'height', 'yLabel', 'labelHeight'];
           for (var i = 0; i < HORIZONTAL_PROPERTIES.length; i++) {
             nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] = (
-              GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] / 100.0);
+              $scope.GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] / 100.0);
             nodeData[nodeName][VERTICAL_PROPERTIES[i]] = (
-              GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_PROPERTIES[i]] / 100.0);
+              $scope.GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_PROPERTIES[i]] / 100.0);
           }
         }
 
-        var vis = outerVis.append('g');
-
-        // The translation applied when the graph is first loaded.
-        var originalTranslationAmounts = [0, 0];
+        // These constants correspond to the rectangle that, when clicked and
+        // dragged, translates the graph. Its height, width, and x and y offsets
+        // are set to arbitrary large values so that the draggable area extends beyond
+        // the graph.
+        $scope.VIEWPORT_WIDTH = Math.max(10000, $scope.GRAPH_WIDTH * 5);
+        $scope.VIEWPORT_HEIGHT = Math.max(10000, $scope.GRAPH_HEIGHT * 5);
+        $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
+        $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
         var _ensureBetween = function(value, bound1, bound2) {
           var minValue = Math.min(bound1, bound2);
@@ -393,14 +350,7 @@ oppia.directive('stateGraphViz', [
           return Math.min(Math.max(value, minValue), maxValue);
         };
 
-        // The input object is a 2-element array representing the x- and
-        // y-amounts to transform by, respectively. This function adjusts the
-        // translation amounts so that the graph remains within the bounds of the
-        // viewport.
-        // Note that this function modifies the original array. This is important --
-        // if a copy is created, the zooming will not work correctly because the
-        // d3.event.translate values do not get normalized.
-        var normalizeTranslationAmounts = function(translationAmounts) {
+        var _getGraphBoundaries = function() {
           var INFINITY = 1e30;
           var BORDER_PADDING = 5;
 
@@ -420,388 +370,211 @@ oppia.directive('stateGraphViz', [
               bottomEdge);
           }
 
-          translationAmounts[0] = _ensureBetween(
-            translationAmounts[0],
-            dimensions.w - rightEdge - originalTranslationAmounts[0],
-            - leftEdge - originalTranslationAmounts[0]);
-          translationAmounts[1] = _ensureBetween(
-            translationAmounts[1],
-            dimensions.h - bottomEdge - originalTranslationAmounts[1],
-            - topEdge - originalTranslationAmounts[1]);
-          return translationAmounts;
-        };
+          return {
+            left: leftEdge,
+            top: topEdge,
+            bottom: bottomEdge,
+            right: rightEdge
+          };
+        }
 
+        // The translation applied when the graph is first loaded.
+        var originalTranslationAmounts = [0, 0];
+
+        $scope.overallTransformStr = '';
         if ($scope.centerAtCurrentState) {
+          var dimensions = $scope.getElementDimensions();
+
           // Center the graph at the node representing the current state.
-          var originalTranslationAmounts = [
+          originalTranslationAmounts[0] = (
             dimensions.w / 2 - nodeData[$scope.currentStateName].x0 -
-            nodeData[$scope.currentStateName].width / 2,
+            nodeData[$scope.currentStateName].width / 2);
+          originalTranslationAmounts[1] = (
             dimensions.h / 2 - nodeData[$scope.currentStateName].y0 -
-            nodeData[$scope.currentStateName].height / 2];
+            nodeData[$scope.currentStateName].height / 2);
 
-          normalizeTranslationAmounts(originalTranslationAmounts);
+          var graphBoundaries = _getGraphBoundaries();
+          if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
+            originalTranslationAmounts[0] = (
+              dimensions.w / 2 - (graphBoundaries.right + graphBoundaries.left) / 2);
+          } else {
+            originalTranslationAmounts[0] = _ensureBetween(
+              originalTranslationAmounts[0],
+              dimensions.w - graphBoundaries.right, - graphBoundaries.left);
+          }
 
-          vis = vis.append('g').attr(
-            'transform', 'translate(' + originalTranslationAmounts + ')');
+          if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
+            originalTranslationAmounts[1] = (
+              dimensions.h / 2 - (graphBoundaries.bottom + graphBoundaries.top) / 2);
+          } else {
+            originalTranslationAmounts[1] = _ensureBetween(
+              originalTranslationAmounts[1],
+              dimensions.h - graphBoundaries.bottom, - graphBoundaries.top);
+          }
+
+          $scope.overallTransformStr = 'translate(' + originalTranslationAmounts + ')';
+          $element.find('#pannablechild').attr('transform', 'translate(0,0)');
         }
 
         if ($scope.allowPanning) {
-          vis = vis.append('g')
-            .call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
-              vis.attr(
-                'transform',
-                'translate(' + normalizeTranslationAmounts(d3.event.translate) + ')');
-            }))
-            .append('g');
+          var dimensions = $scope.getElementDimensions();
 
-          // This is the rectangle that, when clicked and dragged, translates
-          // the graph. Its height, width, and x and y offsets are set to
-          // arbitrary large values so that the draggable area extends beyond
-          // the graph.
-          vis.append('svg:rect')
-            .attr({
-              'width': Math.max(10000, GRAPH_WIDTH * 5),
-              'height': Math.max(10000, GRAPH_HEIGHT * 5),
-              'x': -Math.max(1000, GRAPH_WIDTH * 2),
-              'y': -Math.max(1000, GRAPH_HEIGHT * 2)
-            })
-            .style({
-              'fill-opacity': 0,
-              'fill': 'none',
-              'pointer-events': 'all',
-              'cursor': 'move'
-            });
+          var vis = d3.select($element.find('#pannable')[0]);
+          vis.call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
+            var actualTranslationAmounts = angular.copy(d3.event.translate);
+            var graphBoundaries = _getGraphBoundaries();
+            if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
+              actualTranslationAmounts[0] = 0;
+            } else {
+              actualTranslationAmounts[0] = _ensureBetween(
+                actualTranslationAmounts[0],
+                dimensions.w - graphBoundaries.right - originalTranslationAmounts[0],
+                - graphBoundaries.left - originalTranslationAmounts[0]);
+            }
+
+            if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
+              actualTranslationAmounts[1] = 0;
+            } else {
+              actualTranslationAmounts[1] = _ensureBetween(
+                actualTranslationAmounts[1],
+                dimensions.h - graphBoundaries.bottom - originalTranslationAmounts[1],
+                - graphBoundaries.top - originalTranslationAmounts[1]);
+            }
+
+            // We need a separate layer here so that the translation does not
+            // influence the panning event receivers.
+            $element.find('#pannablechild').attr(
+              'transform', 'translate(' + actualTranslationAmounts + ')');            
+          }));
         }
 
-        var augmentedLinks = [];
-        for (var i = 0; i < links.length; i++) {
-          augmentedLinks.push({
-            source: nodeData[links[i].source],
-            target: nodeData[links[i].target]
-          });
+        $scope.augmentedLinks = links.map(function(link) {
+          return {
+            source: angular.copy(nodeData[link.source]),
+            target: angular.copy(nodeData[link.target])
+          };
+        });
+
+        for (var i = 0; i < $scope.augmentedLinks.length; i++) {
+          var link = $scope.augmentedLinks[i];
+          if (link.source.name !== link.target.name) {
+            var sourcex = link.source.xLabel;
+            var sourcey = link.source.yLabel;
+            var targetx = link.target.xLabel;
+            var targety = link.target.yLabel;
+
+            if (sourcex === targetx && sourcey === targety) {
+              // TODO(sll): Investigate why this happens.
+              return;
+            }
+
+            var sourceWidth = link.source.width;
+            var sourceHeight = link.source.height;
+            var targetWidth = link.target.width;
+            var targetHeight = link.target.height;
+
+            var dx = targetx - sourcex,
+                dy = targety - sourcey;
+
+            /* Fractional amount of truncation to be applied to the end of
+               each link. */
+            var startCutoff = (sourceWidth/2)/Math.abs(dx);
+            var endCutoff = (targetWidth/2)/Math.abs(dx);
+            if (dx === 0 || dy !== 0) {
+              startCutoff = (dx === 0) ? (sourceHeight/2)/Math.abs(dy) : Math.min(
+                  startCutoff, (sourceHeight/2)/Math.abs(dy));
+              endCutoff = (dx === 0) ? (targetHeight/2)/Math.abs(dy) : Math.min(
+                  endCutoff, (targetHeight/2)/Math.abs(dy));
+            }
+
+            var dxperp = targety - sourcey,
+                dyperp = sourcex - targetx,
+                norm = Math.sqrt(dxperp*dxperp + dyperp*dyperp);
+            dxperp /= norm;
+            dyperp /= norm;
+
+            var midx = sourcex + dx/2 + dxperp*(sourceHeight/2),
+                midy = sourcey + dy/2 + dyperp*(targetHeight/2),
+                startx = sourcex + startCutoff*dx,
+                starty = sourcey + startCutoff*dy,
+                endx = targetx - endCutoff*dx,
+                endy = targety - endCutoff*dy;
+
+            // Draw a quadratic bezier curve.
+            $scope.augmentedLinks[i].d = (
+              'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
+              ' ' + endx + ' ' + endy);
+          }
         }
 
-        vis.append('svg:defs').selectAll('marker').data(['arrowhead'])
-          .enter().append('svg:marker').attr({
-            'id': String,
-            'viewBox': '-5 -5 18 18',
-            'refX': 10,
-            'refY': 6,
-            'markerWidth': 6,
-            'markerHeight': 9,
-            'orient': 'auto'
-          })
-          .append('svg:path').attr({
-            'd': 'M -5 0 L 12 6 L -5 12 z',
-            'fill': 'grey'
-          });
+        var _getNodeStrokeWidth = function(nodeName) {
+          return nodeName == $scope.currentStateName ? '4' :
+                 (nodeName == initStateName || nodeName == END_DEST) ? '2' : '1';
+        };
 
-        var gradient = vis.selectAll('defs').selectAll('linearGradient')
-            .data(['nodeGradient'])
-          .enter().append('svg:linearGradient').attr({
-            'id': String,
-            'x1': '0%',
-            'x2': '100%',
-            'y1': '0%',
-            'y2': '0%'
-          });
-        gradient.append('stop')
-          .attr({'offset': '0%'})
-          .style({'stop-color': $scope.nodeFill, 'stop-opacity': 1});
-        gradient.append('stop')
-          .attr({'offset': '100%'})
-          .style({'stop-color': $scope.nodeFill, 'stop-opacity': 0.1});
+        var _getNodeFillOpacity = function(nodeName) {
+          return $scope.opacityMap ? $scope.opacityMap[nodeName] : 0.5;
+        };
 
-        if ($scope.opacityMap) {
-          var legendWidth = 210;
-          var legendHeight = 70;
-          var x = GRAPH_WIDTH - legendWidth;
-          var legend = vis.append('svg:rect')
-            .attr({'width': legendWidth, 'x': x})
-            .style({'fill': 'transparent', 'stroke': 'black'});
+        $scope.isStateFlagged = function(nodeName) {
+          return $scope.highlightStates && $scope.highlightStates.hasOwnProperty(nodeName);
+        };
 
-          vis.append('svg:rect')
-            .attr({
-              'width': legendWidth - 20,
-              'height': 20,
-              'x': x + 10,
-              'y': 10
-            })
-            .style({
-              'stroke-width': 0.5,
-              'stroke': 'black',
-              'fill': 'url(#nodeGradient)'
-            });
+        $scope.getNodeTitle = function(node) {
+          var warning = '';
+          if (node.reachable === false) {
+            warning = 'Warning: this state is unreachable.';
+          } else if (node.reachableFromEnd === false) {
+            warning = 'Warning: there is no path from this state to the END state.';
+          }
 
-          vis.append('svg:text')
-            .text($scope.opacityMap['legend'])
-            .attr({'x': x + 10, 'y': 50});
+          var tooltip = node.name;
+          if (warning) {
+            tooltip += ' (' + warning + ')';
+          }
+          return tooltip;
+        };
 
-          legend.attr('height', legendHeight);
-        }
+        $scope.onNodeDeletionClick = function(nodeName) {
+          if (nodeName !== initStateName && nodeName !== END_DEST) {
+            $scope.onDeleteFunction(nodeName);
+          }
+        };
 
-        // Update the links.
-        var linkEnter = vis.selectAll('path.link').data(augmentedLinks).enter();
-        linkEnter.append('svg:g')
-            .attr('class', 'link')
-          .insert('svg:path', 'g')
-            .style({'stroke-width': 3, 'stroke': '#b3b3b3'})
-            .attr({
-              'class': 'link',
-              'marker-end': function(d) {
-                return 'url(#arrowhead)';
-              },
-              'd': function(d) {
-                if (d.source == d.target) {
-                  return;
-                }
+        $scope.getHighlightTransform = function(x0, y0) {
+          return 'rotate(-10,' + (x0 - 10) + ',' + (y0 - 5) + ')';
+        };
 
-                var sourcex = d.source.xLabel;
-                var sourcey = d.source.yLabel;
-                var targetx = d.target.xLabel;
-                var targety = d.target.yLabel;
+        $scope.getHighlightTextTransform = function(x0, y0) {
+          return 'rotate(-10,' + x0 + ',' + (y0 - 4) + ')';
+        };
 
-                if (sourcex === targetx && sourcey === targety) {
-                  // TODO(sll): Investigate why this happens.
-                  return;
-                }
-
-                var sourceWidth = d.source.width;
-                var sourceHeight = d.source.height;
-                var targetWidth = d.target.width;
-                var targetHeight = d.target.height;
-
-                var dx = targetx - sourcex,
-                    dy = targety - sourcey;
-
-                /* Fractional amount of truncation to be applied to the end of
-                   each link. */
-                var startCutoff = (sourceWidth/2)/Math.abs(dx);
-                var endCutoff = (targetWidth/2)/Math.abs(dx);
-                if (dx === 0 || dy !== 0) {
-                  startCutoff = (dx === 0) ? (sourceHeight/2)/Math.abs(dy) : Math.min(
-                      startCutoff, (sourceHeight/2)/Math.abs(dy));
-                  endCutoff = (dx === 0) ? (targetHeight/2)/Math.abs(dy) : Math.min(
-                      endCutoff, (targetHeight/2)/Math.abs(dy));
-                }
-
-                var dxperp = targety - sourcey,
-                    dyperp = sourcex - targetx,
-                    norm = Math.sqrt(dxperp*dxperp + dyperp*dyperp);
-                dxperp /= norm;
-                dyperp /= norm;
-
-                var midx = sourcex + dx/2 + dxperp*(sourceHeight/2),
-                    midy = sourcey + dy/2 + dyperp*(targetHeight/2),
-                    startx = sourcex + startCutoff*dx,
-                    starty = sourcey + startCutoff*dy,
-                    endx = targetx - endCutoff*dx,
-                    endy = targety - endCutoff*dy;
-
-                // Draw a quadratic bezier curve.
-                return 'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
-                    ' ' + endx + ' ' + endy;
-              }
-            });
+        $scope.canNavigateToNode = function(nodeName) {
+          return nodeName !== END_DEST && nodeName !== $scope.currentStateName;
+        };
 
         // Update the nodes.
-        var nodeList = [];
+        $scope.nodeList = [];
         for (var nodeName in nodeData) {
-          nodeList.push(nodeData[nodeName]);
-        }
-        var nodeEnter = vis.selectAll('g.node')
-          .data(nodeList, function(d) { return d.id; }).enter()
-          .append('svg:g').attr('class', 'node');
+          nodeData[nodeName].style = (
+            'stroke-width: ' + _getNodeStrokeWidth(nodeName) + '; ' +
+            'fill-opacity: ' + _getNodeFillOpacity(nodeName) + ';');
 
-        nodeEnter.append('svg:rect')
-          .attr({
-            'rx': 4,
-            'ry': 4,
-            'height': function(d) { return d.height; },
-            'width': function(d) { return d.width; },
-            'x': function(d) { return d.x0; },
-            'y': function(d) { return d.y0; },
-            'class': function(d) {
-              return (d.name !== END_DEST && d.name !== $scope.currentStateName) ? 'clickable' : null;
-            }
-          })
-          .style({
-            'stroke': function(d) {
-              return '#000';
-            },
-            'stroke-width': function(d) {
-              return (
-                d.name == $scope.currentStateName ? '4' :
-                (d.name == initStateName || d.name == END_DEST) ? '2' : '1');
-            },
-            'fill': function(d) {
-              return (
-                $scope.nodeFill ? $scope.nodeFill :
-                d.name == initStateName ? '#bbedb1' :
-                d.name == END_DEST ? 'green' :
-                d.reachable === false ? 'pink' :
-                d.reachableFromEnd === false ? 'pink' :
-                'beige'
-              );
-            },
-            'fill-opacity': function(d) {
-              return $scope.opacityMap ? $scope.opacityMap[d.name] : 0.5;
-            }
-          })
-          .on('click', function(d) {
-            $scope.onClickFunction(d.name);
-          })
-          .on('mouseover', function(d) {
-            if (d.name !== END_DEST && d.name !== $scope.currentStateName) {
-              d3.select(this).transition().duration(150)
-                .attr('height', d.height + 6)
-                .attr('width', d.width + 6)
-                .attr('x', d.x0 - 3)
-                .attr('y', d.y0 - 3)
-                .style('fill', '#c6def8');
-            }
-          })
-          .on('mouseout', function(d) {
-            var fill = (
-              $scope.nodeFill ? $scope.nodeFill :
-              d.name == initStateName ? '#bbedb1' :
-              d.name == END_DEST ? 'green' :
-              d.reachable === false ? 'pink' :
-              d.reachableFromEnd === false ? 'pink' :
-              'beige'
-            );
+          if ($scope.nodeFill) {
+            nodeData[nodeName].style += ('fill: ' + $scope.nodeFill + '; ');
+          }
 
-            d3.select(this).transition().duration(150)
-              .attr('height', d.height)
-              .attr('width', d.width)
-              .attr('x', d.x0)
-              .attr('y', d.y0)
-              .style('fill', fill);
-          });
+          nodeData[nodeName].isInitNode = (nodeName === initStateName);
+          nodeData[nodeName].isEndNode = (nodeName === END_DEST);
+          nodeData[nodeName].isBadNode = (
+            nodeName !== initStateName && nodeName !== END_DEST &&
+            !(nodeData[nodeName].reachable && nodeData[nodeName].reachableFromEnd));
+          nodeData[nodeName].isNormalNode = (
+            nodeName !== initStateName && nodeName !== END_DEST &&
+            nodeData[nodeName].reachable && nodeData[nodeName].reachableFromEnd);
 
-        nodeEnter.append('svg:title')
-          .text(function(d) {
-            var warning = '';
-            if (d.reachable === false) {
-              warning = 'Warning: this state is unreachable.';
-            } else if (d.reachableFromEnd === false) {
-              warning = 'Warning: there is no path from this state to the END state.';
-            }
-
-            var tooltip = d.name;
-            if (warning) {
-              tooltip += ' (' + warning + ')';
-            }
-            return tooltip;
-          });
-
-        nodeEnter.append('svg:text')
-          .text(function(d) { return d.label; })
-          .attr({
-            'text-anchor': 'middle',
-            'x': function(d) { return d.xLabel; },
-            'y': function(d) { return d.yLabel; }
-          });
-
-        if ($scope.highlightStates) {
-          nodeEnter.append('svg:rect')
-            .on('click', function(d) {
-              $scope.onClickFunction(d.name);
-            })
-            .attr({
-              'width': '22',
-              'height': '22',
-              'x': function(d) { return d.x0; },
-              'y': function(d) { return d.y0; },
-              'class': function(d) {
-                return d.name !== END_DEST ? 'clickable' : null;
-              },
-              'transform': function(d) {
-                return 'rotate(-10,' + (d.x0 - 10) + ',' + (d.y0 - 5) + ')';
-              }
-            }).style({
-              'fill': '#FFFFC2',
-              'stroke-width': '1',
-              'stroke': '#DDDDDD',
-              'fill-opacity': function(d) {
-                return isStateFlagged(
-                  d.name, $scope.highlightStates, $scope.expStats, $scope.stateStats) ? '1' : '0';
-              },
-              'stroke-opacity': function(d) {
-                return isStateFlagged(
-                  d.name, $scope.highlightStates, $scope.expStats, $scope.stateStats) ? '1' : '0' ;
-              }
-            });
-
-          nodeEnter.append('svg:text')
-            .text(function(d) {
-              return isStateFlagged(
-                  d.name, $scope.highlightStates, $scope.expStats, $scope.stateStats) ? '⚠' : '';
-            })
-            .attr({
-              'fill': 'firebrick',
-              'text-anchor': 'middle',
-              'x': function(d) { return d.x0 + 11; },
-              'y': function(d) { return d.y0 + 17; },
-              'transform': function(d) {
-                return 'rotate(-10,' + d.x0 + ',' + (d.y0 - 4) + ')';
-              }
-            }).style({
-              'font-size': '22px',
-            });
-        }
-
-        if ($scope.isEditable && $scope.onDeleteFunction) {
-          // Add a 'delete node' handler.
-          nodeEnter.append('svg:rect')
-            .attr({
-              'height': 15,
-              'width': 15,
-              'opacity': 0,  // developers: comment out this line to see the delete target
-              'stroke-width': '0',
-              'x': function(d) { return (d.x0 + d.width); },
-              'y': function(d) { return d.y0; },
-              'transform': function(d) {
-                return 'translate(' + (+0) + ',' + (-15) + ')';
-              },
-              'class': function(d) {
-                if (d.name !== initStateName && d.name !== END_DEST) {
-                  return 'clickable';
-                }
-              }
-            })
-            .style('fill', 'pink')
-            .on('click', function(d) {
-              if (d.name !== initStateName && d.name !== END_DEST) {
-                $scope.onDeleteFunction(d.name);
-              }
-            })
-
-          nodeEnter.append('svg:text')
-            .attr({
-              'dx': function(d) { return (d.x0 + d.width); },
-              'dy': function(d) { return d.y0; },
-              'text-anchor': 'right'
-            })
-            .text(function(d) {
-              return (d.name !== initStateName && d.name !== END_DEST) ? 'x' : '';
-            });
-        }
-
-        if ($scope.onMaximizeFunction) {
-          outerVis.append('foreignObject')
-            .attr('x', dimensions.w - 20)
-            .attr('y', 0)
-            .attr('width', 20)
-            .attr('height', 25)
-            .append('xhtml:button')
-              .on('click', $scope.onMaximizeFunction)
-              .attr('class', 'btn btn-default btn-xs')
-              .append('xhtml:span')
-                .attr('title', 'Expand Map')
-                .append('xhtml:strong')
-                  .attr('style', 'font-size: larger;')
-                  .text('+');
+          nodeData[nodeName].canDelete = (nodeName !== initStateName && nodeName !== END_DEST);
+          $scope.nodeList.push(nodeData[nodeName]);
         }
       }
     }]

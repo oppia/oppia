@@ -98,8 +98,16 @@ oppia.factory('$exceptionHandler', ['$log', function($log) {
       '',
       'Source: ' + window.location.href,
       exception.message,
-      String((new Error()).stack)
+      String(exception.stack)
     ].join('\n');
+
+    // Ignore errors due to cancelling child animations in the state graph.
+    // TODO(sll): Remove this when we upgrade Angular to a version that fixes
+    // the following bug: https://github.com/angular/angular.js/issues/4548
+    if (messageAndSourceAndStackTrace.indexOf('ngRepeatAction') !== -1 &&
+        messageAndSourceAndStackTrace.indexOf('angular-animate') !== -1) {
+      return;
+    }
 
     // Catch all errors, to guard against infinite recursive loops.
     try {

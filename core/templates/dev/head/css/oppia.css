@@ -742,39 +742,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-bottom: 10px;
 }
 
-.oppia-graph-viz path.link {
-  fill: none;
-  stroke: #666;
-  stroke-width: 1.5px;
-}
-
-.oppia-graph-viz ellipse {
-  fill: #ccc;
-  stroke: #333;
-  stroke-width: 1.5px;
-}
-
-.oppia-graph-viz text {
-  font: 12px sans-serif;
-  pointer-events: none;
-}
-
-.oppia-graph-viz text.shadow {
-  stroke: #fff;
-  stroke-width: 3px;
-  stroke-opacity: .8;
-}
-
-.oppia-graph-viz .node rect {
-  fill: #fff;
-  fill-opacity: .5;
-  stroke-width: 0px;
-}
-
-.oppia-graph-viz .clickable {
-  cursor: pointer;
-}
-
 .oppia-rule {
   height: 30px;
 }
