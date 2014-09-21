@@ -78,7 +78,9 @@ var editRichText = function(elem) {
     elem.element(by.css('.wysiwyg')).element(by.css('.' + className)).click();
   };
   var _clearContent = function() {
-    expect(elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')).isPresent()).toBe(true);
+    expect(elem.element(
+      by.tagName('rich-text-editor')).element(by.tagName('iframe')).isPresent()
+    ).toBe(true);
     browser.switchTo().frame(
       elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')));
     // Angular is not present in this iframe, so we use browser.driver.
