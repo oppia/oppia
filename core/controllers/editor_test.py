@@ -719,10 +719,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
     ADMIN_EMAIL = 'admin@example.com'
     OWNER_EMAIL = 'owner@example.com'
     COLLABORATOR_EMAIL = 'collaborator@example.com'
+    COLLABORATOR_USERNAME = 'collab'
     COLLABORATOR2_EMAIL = 'collaborator2@example.com'
     COLLABORATOR2_USERNAME = 'collab2'
     COLLABORATOR3_EMAIL = 'collaborator3@example.com'
+    COLLABORATOR3_USERNAME = 'collab3'
     VIEWER_EMAIL = 'viewer@example.com'
+    VIEWER_USERNAME = 'viewer'
     VIEWER2_EMAIL = 'viewer2@example.com'
 
     def test_exploration_rights_handler(self):
