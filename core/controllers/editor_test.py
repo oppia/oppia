@@ -764,6 +764,12 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.put_json(
             rights_url, {
                 'version': exploration.version,
+                'new_member_username': self.VIEWER_USERNAME,
+                'new_member_role': rights_manager.ROLE_VIEWER
+            }, csrf_token)
+        self.put_json(
+            rights_url, {
+                'version': exploration.version,
                 'new_member_username': self.COLLABORATOR_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
@@ -774,6 +780,13 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
 
+        self.logout()
+
+        # Check that viewer can access editor page but cannot edit.
+        self.login(self.VIEWER_EMAIL)
+        response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
+        self.assertEqual(response.status_int, 200)
+        self.assert_cannot_edit(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
