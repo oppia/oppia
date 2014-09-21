@@ -372,29 +372,18 @@ class ExplorationRightsHandler(EditorHandler):
         is_public = self.payload.get('is_public')
         is_publicized = self.payload.get('is_publicized')
         is_community_owned = self.payload.get('is_community_owned')
-        # This can be an email address or a username.
-        new_member_identifier = self.payload.get('new_member_identifier')
+        new_member_username = self.payload.get('new_member_username')
         new_member_role = self.payload.get('new_member_role')
 
-        if new_member_identifier:
+        if new_member_username:
             if not rights_manager.Actor(self.user_id).can_modify_roles(
                     exploration_id):
                 raise self.UnauthorizedUserException(
                     'Only an owner of this exploration can add or change '
                     'roles.')
 
-            if '@' in new_member_identifier:
-                new_member_id = user_services.get_user_id_from_email(
-                    new_member_identifier)
-
-                if new_member_id is not None:
-                    user_services.get_or_create_user(
-                        new_member_id, new_member_identifier)
-
-            else:
-                new_member_id = user_services.get_user_id_from_username(
-                    new_member_identifier)
-
+            new_member_id = user_services.get_user_id_from_username(
+                new_member_username)
             if new_member_id is None:
                 raise Exception(
                     'Sorry, we could not find the specified user.')
