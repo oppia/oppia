@@ -157,9 +157,9 @@
                 <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
                   <strong>Add or Change Role</strong>
                   <br><br>
-                  <form ng-submit="editRole(newMemberEmail, newMemberRole.value)">
-                    Email: <input type="text" ng-model="newMemberEmail"
-                           placeholder="Email address">
+                  <form ng-submit="editRole(newMemberIdentifier, newMemberRole.value)">
+                    Username/Email: <input type="text" ng-model="newMemberIdentifier"
+                           placeholder="Username or email address">
                     <br>
                     Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES" style="width: 250px;">
                     </select>
