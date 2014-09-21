@@ -94,20 +94,20 @@ oppia.controller('ExplorationSettings', [
   ********************************************/
   $scope.openEditRolesForm = function() {
     activeInputData.name = 'explorationMetadata.editRoles';
-    $scope.newMemberIdentifier = '';
+    $scope.newMemberUsername = '';
     $scope.newMemberRole = $scope.ROLES[0];
   };
 
   $scope.closeEditRolesForm = function() {
-    $scope.newMemberIdentifier = '';
+    $scope.newMemberUsername = '';
     $scope.newMemberRole = $scope.ROLES[0];
     activeInputData.clear();
   };
 
-  $scope.editRole = function(newMemberIdentifier, newMemberRole) {
+  $scope.editRole = function(newMemberUsername, newMemberRole) {
     activeInputData.clear();
     explorationRightsService.saveChangeToBackend({
-      new_member_identifier: newMemberIdentifier,
+      new_member_username: newMemberUsername,
       new_member_role: newMemberRole
     });
   };

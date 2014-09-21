@@ -764,29 +764,16 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_identifier': self.VIEWER_EMAIL,
-                'new_member_role': rights_manager.ROLE_VIEWER
-            }, csrf_token)
-        self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_identifier': self.COLLABORATOR_EMAIL,
+                'new_member_username': self.COLLABORATOR_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
         self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_identifier': self.COLLABORATOR2_USERNAME,
+                'new_member_username': self.COLLABORATOR2_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR
             }, csrf_token)
 
-        self.logout()
-
-        # Check that viewer can access editor page but cannot edit.
-        self.login(self.VIEWER_EMAIL)
-        response = self.testapp.get('/create/%s' % EXP_ID, expect_errors=True)
-        self.assertEqual(response.status_int, 200)
-        self.assert_cannot_edit(response.body)
         self.logout()
 
         # Check that collaborator can access editor page and can edit.
@@ -819,15 +806,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_identifier': self.VIEWER2_EMAIL,
-                'new_member_role': rights_manager.ROLE_VIEWER
-            }, csrf_token, expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['code'], 401)
-
-        response_dict = self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_identifier': self.COLLABORATOR3_EMAIL,
+                'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
             }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
@@ -864,15 +843,7 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         response_dict = self.put_json(
             rights_url, {
                 'version': exploration.version,
-                'new_member_identifier': self.VIEWER2_EMAIL,
-                'new_member_role': rights_manager.ROLE_VIEWER
-            }, csrf_token, expect_errors=True, expected_status_int=401)
-        self.assertEqual(response_dict['code'], 401)
-
-        response_dict = self.put_json(
-            rights_url, {
-                'version': exploration.version,
-                'new_member_identifier': self.COLLABORATOR3_EMAIL,
+                'new_member_username': self.COLLABORATOR3_USERNAME,
                 'new_member_role': rights_manager.ROLE_EDITOR,
                 }, csrf_token, expect_errors=True, expected_status_int=401)
         self.assertEqual(response_dict['code'], 401)
