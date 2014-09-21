@@ -77,11 +77,22 @@ var editRichText = function(elem) {
   var _clickContentMenuButton = function(className) {
     elem.element(by.css('.wysiwyg')).element(by.css('.' + className)).click();
   };
+  var _clearContent = function() {
+    expect(elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')).isPresent()).toBe(true);
+    browser.switchTo().frame(
+      elem.element(by.tagName('rich-text-editor')).element(by.tagName('iframe')));
+    // Angular is not present in this iframe, so we use browser.driver.
+    browser.driver.findElement(by.tagName('body')).clear();
+    browser.switchTo().defaultContent();
+  };
 
   return {
     clear: function() {
-      elem.element(by.tagName('rich-text-editor')).element(by.tagName('body')).
-        clear();
+      _clearContent();
+    },
+    setPlainText: function(text) {
+      _clearContent();
+      _appendContentText(text);
     },
     appendPlainText: function(text) {
       _appendContentText(text);

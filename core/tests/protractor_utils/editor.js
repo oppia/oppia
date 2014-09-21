@@ -70,7 +70,7 @@ var selectSimpleMultipleChoiceWidget = function(textArray) {
   _openWidgetEditor(1, 'Multiple choice input');
   element(by.linkText('Customize')).click();
   var customizer = forms.editList(element(by.css('.protractor-test-widget-args')));
-  customizer.editRichTextEntry(0).appendPlainText(textArray[0]);
+  customizer.editRichTextEntry(0).setPlainText(textArray[0]);
   for (var i = 1; i < textArray.length; i++) {
     var newEntry = customizer.appendEntry('Add multiple choice option');
     forms.editRichText(newEntry).appendPlainText(textArray[i]);
