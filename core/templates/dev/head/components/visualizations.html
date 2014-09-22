@@ -82,13 +82,13 @@
 
     <svg class="oppia-graph-viz" width="100%" ng-attr-height="<[visHeight]>">
       <g ng-attr-transform="<[overallTransformStr]>">
-        <g id="pannable">
+        <g>
           <rect class="pannable-rect" ng-if="allowPanning"
                 ng-attr-width="<[VIEWPORT_WIDTH]>" ng-attr-height="<[VIEWPORT_HEIGHT]>"
                 ng-attr-x="<[VIEWPORT_X]>" ng-attr-y="<[VIEWPORT_Y]>">
           </rect>
 
-          <g id="pannablechild">
+          <g class="pannable-child">
             <g ng-repeat="link in augmentedLinks">
               <path class="link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)">
               </path>

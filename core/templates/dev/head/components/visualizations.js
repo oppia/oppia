@@ -378,13 +378,14 @@ oppia.directive('stateGraphViz', [
           };
         }
 
+        var graphBoundaries = _getGraphBoundaries();
+        var dimensions = $scope.getElementDimensions();
+        var pannableChildJqueryElt = $element.find('.pannable-child');
+
         // The translation applied when the graph is first loaded.
         var originalTranslationAmounts = [0, 0];
-
         $scope.overallTransformStr = '';
         if ($scope.centerAtCurrentState) {
-          var dimensions = $scope.getElementDimensions();
-
           // Center the graph at the node representing the current state.
           originalTranslationAmounts[0] = (
             dimensions.w / 2 - nodeData[$scope.currentStateName].x0 -
@@ -393,7 +394,6 @@ oppia.directive('stateGraphViz', [
             dimensions.h / 2 - nodeData[$scope.currentStateName].y0 -
             nodeData[$scope.currentStateName].height / 2);
 
-          var graphBoundaries = _getGraphBoundaries();
           if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
             originalTranslationAmounts[0] = (
               dimensions.w / 2 - (graphBoundaries.right + graphBoundaries.left) / 2);
@@ -413,39 +413,39 @@ oppia.directive('stateGraphViz', [
           }
 
           $scope.overallTransformStr = 'translate(' + originalTranslationAmounts + ')';
-          $element.find('#pannablechild').attr('transform', 'translate(0,0)');
+          pannableChildJqueryElt.attr('transform', 'translate(0,0)');
         }
 
         if ($scope.allowPanning) {
-          var dimensions = $scope.getElementDimensions();
+          // Without the timeout, $element.find fails to find the required rect in the
+          // state graph modal dialog.
+          setTimeout(function() {
+            var vis = d3.select($element.find('rect.pannable-rect')[0]);
+            vis.call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
+              if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
+                d3.event.translate[0] = 0;
+              } else {
+                d3.event.translate[0] = _ensureBetween(
+                  d3.event.translate[0],
+                  dimensions.w - graphBoundaries.right - originalTranslationAmounts[0],
+                  - graphBoundaries.left - originalTranslationAmounts[0]);
+              }
 
-          var vis = d3.select($element.find('#pannable')[0]);
-          vis.call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
-            var actualTranslationAmounts = angular.copy(d3.event.translate);
-            var graphBoundaries = _getGraphBoundaries();
-            if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
-              actualTranslationAmounts[0] = 0;
-            } else {
-              actualTranslationAmounts[0] = _ensureBetween(
-                actualTranslationAmounts[0],
-                dimensions.w - graphBoundaries.right - originalTranslationAmounts[0],
-                - graphBoundaries.left - originalTranslationAmounts[0]);
-            }
+              if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
+                d3.event.translate[1] = 0;
+              } else {
+                d3.event.translate[1] = _ensureBetween(
+                  d3.event.translate[1],
+                  dimensions.h - graphBoundaries.bottom - originalTranslationAmounts[1],
+                  - graphBoundaries.top - originalTranslationAmounts[1]);
+              }
 
-            if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
-              actualTranslationAmounts[1] = 0;
-            } else {
-              actualTranslationAmounts[1] = _ensureBetween(
-                actualTranslationAmounts[1],
-                dimensions.h - graphBoundaries.bottom - originalTranslationAmounts[1],
-                - graphBoundaries.top - originalTranslationAmounts[1]);
-            }
-
-            // We need a separate layer here so that the translation does not
-            // influence the panning event receivers.
-            $element.find('#pannablechild').attr(
-              'transform', 'translate(' + actualTranslationAmounts + ')');            
-          }));
+              // We need a separate layer here so that the translation does not
+              // influence the panning event receivers.
+              pannableChildJqueryElt.attr(
+                'transform', 'translate(' + d3.event.translate + ')');
+            }));
+          });
         }
 
         $scope.augmentedLinks = links.map(function(link) {
