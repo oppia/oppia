@@ -26,7 +26,7 @@ var login = function(email, isSuperAdmin) {
   // Use of element is not possible because the login page is non-angular.
   // The full url is also necessary.
   var driver = protractor.getInstance().driver;
-  driver.get('http://localhost:4445/_ah/login');
+  driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
 
   driver.findElement(protractor.By.name('email')).clear();
   driver.findElement(protractor.By.name('email')).sendKeys(email);
@@ -38,38 +38,26 @@ var login = function(email, isSuperAdmin) {
 
 var logout = function() {
   var driver = protractor.getInstance().driver;
-  driver.get('http://localhost:4445/_ah/login');
+  driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   driver.findElement(protractor.By.id('submit-logout')).click();
 };
 
-var _appointModerator = function(email) {
-  browser.get('/admin');
-  var moderatorList = element(
-    by.repeater(
-      '(configPropertyId, configPropertyData) in configProperties').row(10));
-  expect(moderatorList.element(by.tagName('em')).getText())
-    .toBe('Email addresses of moderators');
-  var newEntry = forms.editList(moderatorList).appendEntry();
-  forms.editUnicode(newEntry, true).setText(email);
-  element(by.buttonText('Save')).click();
-  browser.driver.switchTo().alert().accept();
-  // Time is needed for the saving to complete.
-  protractor.getInstance().waitForAngular();
-};
-
-var _appointAdmin = function(email) {
-  browser.get('/admin');
-  var adminList = element(
-    by.repeater(
-      '(configPropertyId, configPropertyData) in configProperties').row(1));
-  expect(adminList.element(by.tagName('em')).getText())
-    .toBe('Email addresses of admins');
-  var newEntry = forms.editList(adminList).appendEntry();
-  forms.editUnicode(newEntry, true).setText(email);
-  element(by.buttonText('Save')).click();
-  browser.driver.switchTo().alert().accept();
-  // Time is needed for the saving to complete.
-  protractor.getInstance().waitForAngular();
+var _appendToConfigList = function(listName, textToAppend) {
+  browser.get(general.ADMIN_URL_SUFFIX);
+  element.all(
+        by.repeater('(configPropertyId, configPropertyData) in configProperties')
+      ).map(function(configProperty) {
+    configProperty.element(by.tagName('em')).getText().then(function(title) {
+      if (title.match(listName)) {
+        var newEntry = forms.editList(configProperty).appendEntry();
+        forms.editUnicode(newEntry, true).setText(textToAppend);
+        element(by.buttonText('Save')).click();
+        browser.driver.switchTo().alert().accept();
+        // Time is needed for the saving to complete.
+        protractor.getInstance().waitForAngular();
+      }
+    });
+  });
 };
 
 // This will fail if the user already has a username.
@@ -95,14 +83,14 @@ var createAndLoginUser = function(email, username) {
 var createModerator = function(email, username) {
   login(email, true);
   registerAsEditor(username);
-  _appointModerator(email);
+  _appendToConfigList('Email addresses of moderators', email);
   logout();
 };
 
 var createAdmin = function(email, username) {
   login(email, true);
   registerAsEditor(username);
-  _appointAdmin(email);
+  _appendToConfigList('Email addresses of admins', email);
   logout();
 };
 

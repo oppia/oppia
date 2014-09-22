@@ -25,6 +25,7 @@ var getCurrentQuestionText = function() {
   return element(by.css('.conversation-skin-response')).getText();
 };
 
+
 var getContinueButtonText = function() {
   return element(by.tagName('oppia-interactive-continue')).
     element(by.tagName('button')).getText();
@@ -34,15 +35,25 @@ var answerContinueWidget = function() {
   element(by.tagName('oppia-interactive-continue')).click();
 };
 
+
 var answerNumericWidget = function(answer) {
   element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer + '\n');
+};
+
+
+var getMultipleChoiceOptions = function() {
+  return element.all(by.repeater('choice in choices track by $index')).
+      map(function(elem) {
+    return elem.getText();
+  })
 };
 
 var answerMultipleChoiceWidget = function(answerText) {
   element(by.tagName('oppia-interactive-multiple-choice-input')).
     element(by.buttonText(answerText)).click();
 };
+
 
 var expectExplorationToBeOver = function() {
   expect(element(by.css('.conversation-skin-response-finished')).
@@ -56,7 +67,11 @@ var expectExplorationToNotBeOver = function() {
 
 exports.getCurrentQuestionText = getCurrentQuestionText;
 exports.answerContinueWidget = answerContinueWidget;
+
 exports.answerNumericWidget = answerNumericWidget;
+
+exports.getMultipleChoiceOptions = getMultipleChoiceOptions;
 exports.answerMultipleChoiceWidget = answerMultipleChoiceWidget;
+
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;

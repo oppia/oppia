@@ -20,6 +20,7 @@
  */
 
 forms = require('./forms.js');
+editor = require('./editor.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
@@ -36,16 +37,67 @@ var createExploration = function(name, category) {
   protractor.getInstance().waitForAngular();
 };
 
-// Moves from exploration editor view to player view; there must be no unsaved
-// changes.
-// NOTE: we do not use the preview button because that will open a new window.
-var moveToPlayer = function() {
-  browser.getCurrentUrl().then(function(url) {
-    expect(url.slice(0, 29)).toBe('http://localhost:4445/create/');
-    var explorationId = url.slice(29, 41);
-    browser.get('/explore/' + explorationId);
+// Functions run from the state editor.
+
+// This will only work if all changes have been saved and there are no 
+// outstanding warnings.
+var publishExploration = function() {
+  element(by.css('.protractor-test-publish-exploration')).click();
+  element(by.css('.protractor-test-confirm-publish')).click();
+};
+
+// roleName here is the user-visible form.
+var _addExplorationRole = function(roleName, email) {
+  editor.runFromSettingsTab(function() {
+    element(by.css('.protractor-test-edit-roles')).click();
+    element(by.css('.protractor-test-role-email')).sendKeys(email);
+    element(by.css('.protractor-test-role-select')).element(by.cssContainingText('option', roleName)).click();
+    element(by.css('.protractor-test-save-role')).click();
   });
 };
 
+var addExplorationManager = function(email) {
+  _addExplorationRole('Manager', email);
+};
+
+var addExplorationCollaborator = function(email) {
+  _addExplorationRole('Collaborator', email);
+};
+
+var addExplorationPlaytester = function(email) {
+  _addExplorationRole('Playtester', email);
+};
+
+// roleName here is the server-side form.
+var _getExplorationRoles = function(roleName) {
+  var result = editor.runFromSettingsTab(function() {
+    return element.all(by.repeater(
+        roleName + 'Name in explorationRightsService.' + roleName +
+          'Names track by $index')).map(function(elem) {
+      return elem.getText();
+    }); 
+  });
+  return result;
+};
+
+var getExplorationManagers = function() {
+  return _getExplorationRoles('owner');
+};
+
+var getExplorationCollaborators = function() {
+  return _getExplorationRoles('editor');
+};
+
+var getExplorationPlaytesters = function() {
+  return _getExplorationRoles('viewer');
+};
+
 exports.createExploration = createExploration;
-exports.moveToPlayer = moveToPlayer;
+exports.publishExploration = publishExploration;
+
+exports.addExplorationManager = addExplorationManager;
+exports.addExplorationCollaborator = addExplorationCollaborator;
+exports.addExplorationPlaytester = addExplorationPlaytester;
+exports.getExplorationManagers = getExplorationManagers;
+exports.getExplorationCollaborators = getExplorationCollaborators;
+exports.getExplorationPlaytesters = getExplorationPlaytesters;

@@ -85,7 +85,7 @@
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-click="publish()">Publish Exploration</button>
+        <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
 
@@ -290,7 +290,7 @@
 
                 {% if can_publish %}
                   <span ng-if="explorationRightsService.isPrivate()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
+                    <button type="button" class="btn btn-default oppia-main-control-button protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
                       publish
                     </button>
                   </span>

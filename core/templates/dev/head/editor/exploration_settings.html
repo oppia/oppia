@@ -149,7 +149,7 @@
             <div class="col-lg-6 col-md-6 col-sm-6">
               {% if can_modify_roles %}
                 <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
-                  <button type="button" class="btn btn-default" ng-click="openEditRolesForm()">
+                  <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
                     Edit Roles
                   </button>
                 </div>
@@ -159,14 +159,14 @@
                   <br><br>
                   <form ng-submit="editRole(newMemberEmail, newMemberRole.value)">
                     Email: <input type="text" ng-model="newMemberEmail"
-                           placeholder="Email address">
+                           placeholder="Email address" class="protractor-test-role-email">
                     <br>
-                    Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES" style="width: 250px;">
+                    Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES" style="width: 250px;" class="protractor-test-role-select">
                     </select>
                     <br>
                     <em>Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
                     <br>
-                    <input type="submit" class="btn btn-default" value="Save">
+                    <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
                     <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
                       ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
                       Cancel

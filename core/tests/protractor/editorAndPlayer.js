@@ -36,7 +36,7 @@ describe('Editing content', function() {
     editor.editRule('default').setDestination('END');
 
     editor.saveChanges();
-    workflow.moveToPlayer();
+    general.moveToPlayer();
 
     expect(player.getCurrentQuestionText()).toBe('plain text');
     player.expectExplorationToNotBeOver();
@@ -66,10 +66,10 @@ describe('Editing content', function() {
     editor.editRule('default').setDestination('END');
 
     editor.saveChanges();
-    workflow.moveToPlayer();
+    general.moveToPlayer();
 
     player.expectExplorationToNotBeOver();
-    // TODO (Jacob) Add check that the correct options are displayed.
+    expect(player.getMultipleChoiceOptions()).toEqual(['option A', 'option B']);
     player.answerMultipleChoiceWidget('option B');
     player.expectExplorationToBeOver();
 

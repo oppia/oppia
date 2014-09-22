@@ -39,12 +39,15 @@ var editContent = function() {
 
 // Interactive widgets
 
-// TODO (Jacob) convert to referring to widgets by name.
-var _openWidgetEditor = function(widgetIndex, widgetName) {
+var _openWidgetEditor = function(widgetName) {
   element(by.css('.protractor-test-edit-interaction')).click();
-  expect(element(by.repeater('widget in widgetList').row(widgetIndex)).
-    getText()).toBe(widgetName);
-  element(by.repeater('widget in widgetList').row(widgetIndex)).click();
+  element.all(by.repeater('widget in widgetList')).map(function(elem) {
+    elem.getText().then(function(name) {
+      if (name.match(widgetName)) {
+        elem.click();
+      }
+    });
+  });
 };
 
 var _closeWidgetEditor = function() {
@@ -52,12 +55,12 @@ var _closeWidgetEditor = function() {
 };
 
 var selectNumericWidget = function() {
-  _openWidgetEditor(2, 'Numeric input');
+  _openWidgetEditor('Numeric input');
   _closeWidgetEditor();
 };
 
 var selectContinueWidget = function(buttonText) {
-  _openWidgetEditor(0, 'Continue');
+  _openWidgetEditor('Continue');
   if (buttonText) {
     element(by.linkText('Customize')).click();
     forms.editUnicode(element(by.css('.protractor-test-widget-args'))).setText(buttonText);
@@ -67,7 +70,7 @@ var selectContinueWidget = function(buttonText) {
 
 // textArray should be a non-empty array of strings (to be the options)
 var selectSimpleMultipleChoiceWidget = function(textArray) {
-  _openWidgetEditor(1, 'Multiple choice input');
+  _openWidgetEditor('Multiple choice input');
   element(by.linkText('Customize')).click();
   var customizer = forms.editList(element(by.css('.protractor-test-widget-args')));
   customizer.editRichTextEntry(0).setPlainText(textArray[0]);
@@ -106,11 +109,42 @@ var editRule = function(ruleNum) {
   }
 };
 
+// All functions involving the settings tab should be sent through this
+// wrapper.
+var runFromSettingsTab = function(callbackFunction) {
+  element(by.linkText('Settings')).click();
+  var result = callbackFunction();
+  element(by.linkText('Main')).click();
+  return result;
+};
+
+var setTitle = function(title) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationTitle')).clear();
+    element(by.id('explorationTitle')).sendKeys(title);
+  });
+};
+
+var setCategory = function(category) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationCategory')).clear();
+    element(by.id('explorationCategory')).sendKeys(category);
+  });
+};
+
+var setObjective = function(category) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationObjective')).clear();
+    element(by.id('explorationObjective')).sendKeys(objective);
+  });
+};
+
 var saveChanges = function(commitMessage) {
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
       element(by.model('commitMessage')).sendKeys(commitMessage);
     }
+    protractor.getInstance().waitForAngular();
     element(by.css('.protractor-test-close-save-modal')).click();
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
@@ -126,5 +160,10 @@ exports.selectContinueWidget = selectContinueWidget;
 exports.selectSimpleMultipleChoiceWidget = selectSimpleMultipleChoiceWidget;
 
 exports.editRule = editRule;
+
+exports.runFromSettingsTab = runFromSettingsTab;
+exports.setTitle = setTitle;
+exports.setCategory = setCategory;
+exports.setObjective = setObjective;
 
 exports.saveChanges = saveChanges;
