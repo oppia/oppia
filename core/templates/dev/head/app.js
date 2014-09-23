@@ -278,6 +278,21 @@ oppia.factory('widgetDefinitionsService', ['$http', '$log', '$q', function($http
   };
 }]);
 
+// Service for manipulating the page URL.
+oppia.factory('urlService', ['$window', function($window) {
+  return {
+    getUrlParams: function() {
+      var params = {};
+      var parts = $window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
+        params[key] = value;
+      });
+      return params;
+    },
+    isIframed: function() {
+      return !!(this.getUrlParams().iframed);
+    }
+  };
+}]);
 
 // Add a String.prototype.trim() polyfill for IE8.
 if (typeof String.prototype.trim !== 'function') {
