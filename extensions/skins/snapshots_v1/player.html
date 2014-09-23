@@ -1,20 +1,20 @@
-<div ng-controller="SnapshotsSkin" ng-cloak>
-  <div class="container">
-    <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <h3 role="heading"><[explorationTitle]></h3>
+<script type="text/ng-template" id="skins/Snapshots">
+  <div ng-cloak>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <h3 role="heading"><[explorationTitle]></h3>
+        </div>
       </div>
-    </div>
 
-    <div class="row">
-      <div class="col-lg-8 col-md-8 col-sm-8">
-        <div angular-html-bind="currentQuestion"></div>
-      </div>
-      <div class="col-lg-4 col-md-4 col-sm-4">
-        <div angular-html-bind="inputTemplate"></div>
+      <div class="row">
+        <div class="col-lg-8 col-md-8 col-sm-8">
+          <div angular-html-bind="currentQuestion"></div>
+        </div>
+        <div class="col-lg-4 col-md-4 col-sm-4">
+          <div angular-html-bind="inputTemplate"></div>
+        </div>
       </div>
     </div>
   </div>
-</div>
-
-<script src="/extensions/skins/snapshots_v1/static/Snapshots.js"></script>
+</script>

@@ -215,6 +215,9 @@ oppia.factory('oppiaPlayerService', [
           data.error || 'There was an error loading the exploration.');
       });
     },
+    getExplorationId: function() {
+      return explorationId;
+    },
     getExplorationTitle: function() {
       return _exploration.title;
     },
