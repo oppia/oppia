@@ -99,8 +99,7 @@ describe('State Editor controller', function() {
             customization_args: {
               value: 'something clever',
               parse_with_jinja: false
-            },
-            $$hashKey: '06M'
+            }
           }]
         }
       };
@@ -217,6 +216,7 @@ describe('State Editor controller', function() {
       scope.saveStateName('#!% State');
       expect(ecs.getActiveStateName()).toEqual('Third State');
 
+      // Long states name will not save.
       scope.saveStateName(
         'This state name is too long to be saved. Try to be brief next time.'
       );
@@ -236,7 +236,9 @@ describe('State Editor controller', function() {
       scope.initStateEditor();
       expect(scope.contentMemento).toBeNull();
       expect(scope.content).toEqual([]);
-      scope.content = scope.getContent('And now for something completely different.');
+      scope.content = scope.getContent(
+        'And now for something completely different.'
+      );
       scope.editContent();
       expect(scope.contentMemento[0].value)
         .toEqual('And now for something completely different.');
@@ -259,7 +261,9 @@ describe('State Editor controller', function() {
       expect(cls.getChangeList()[0].old_value[0].value).toEqual('abababab');
 
       scope.editContent();
-      scope.content = scope.getContent('And now for something completely different.');
+      scope.content = scope.getContent(
+        'And now for something completely different.'
+      );
       scope.saveTextContent();
       expect(cls.getChangeList().length).toBe(2);
       expect(cls.getChangeList()[1].new_value[0].value)
@@ -286,8 +290,7 @@ describe('State Editor controller', function() {
         customization_args: {
           value: 'something else',
           parse_with_jinja: false
-        },
-        $$hashKey: '06M'
+        }
       };
 
       var changeTwo = {
@@ -296,12 +299,12 @@ describe('State Editor controller', function() {
         customization_args: {
           value: 'And now for something completely different',
           parse_with_jinja: false
-        },
-        $$hashKey: '06M'
+        }
       };
 
       scope.saveStateParamChanges(changeOne, []);
-      expect(cls.getChangeList()[0].new_value.customization_args.value).toEqual('something else');
+      expect(cls.getChangeList()[0].new_value.customization_args.value)
+        .toEqual('something else');
 
       scope.saveStateParamChanges(changeTwo, changeOne);
       expect(cls.getChangeList()[1].new_value.customization_args.value).toEqual(
