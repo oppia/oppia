@@ -268,13 +268,12 @@ oppia.directive('stateGraphViz', [
   return {
     restrict: 'A',
     scope: {
-      val: '=',
+      val: '&',
       highlightStates: '=',
       nodeFill: '@',
       opacityMap: '=',
-      stateStats: '=',
       allowPanning: '@',
-      currentStateName: '=',
+      currentStateName: '&',
       centerAtCurrentState: '@',
       onClickFunction: '=',
       onDeleteFunction: '=',
@@ -282,27 +281,70 @@ oppia.directive('stateGraphViz', [
       isEditable: '='
     },
     templateUrl: 'visualizations/stateGraphViz',
-    replace: true,
     controller: ['$scope', '$element', function($scope, $element) {
-      $scope.getElementDimensions = function() {
+      var _redrawGraph = function() {
+        if ($scope.val()) {
+          $scope.drawGraph(
+            $scope.val().nodes, $scope.val().links,
+            $scope.val().initStateName, $scope.val().finalStateName
+          );
+        }
+      };
+
+      $scope.$watch('val()', _redrawGraph, true);
+      $scope.$watch('currentStateName()', _redrawGraph);
+      $(window).resize(_redrawGraph);
+
+      // A rough upper bound for the width of a single letter, in pixels, to use
+      // as a scaling factor to determine the width of graph nodes. This is not
+      // an entirely accurate description because it also takes into account the
+      // horizontal whitespace between graph nodes.
+      var LETTER_WIDTH_IN_PIXELS = 10.5;
+      var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel', 'labelWidth'];
+      var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel', 'labelHeight'];
+      $scope.GRAPH_WIDTH = MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS;
+
+      var _getElementDimensions = function() {
         return {
           'h': $element.height(),
           'w': $element.width()
         };
       };
 
-      var _redrawGraph = function() {
-        if ($scope.val) {
-          $scope.drawGraph(
-            $scope.val.nodes, $scope.val.links, $scope.val.initStateName,
-            $scope.val.finalStateName
-          );
-        }
+      // Returns the closest number to `value` in the range [bound1, bound2].
+      var _ensureBetween = function(value, bound1, bound2) {
+        var minValue = Math.min(bound1, bound2);
+        var maxValue = Math.max(bound1, bound2);
+        return Math.min(Math.max(value, minValue), maxValue);
       };
 
-      $scope.$watch('val', _redrawGraph, true);
-      $scope.$watch('currentStateName', _redrawGraph, true);
-      $(window).resize(_redrawGraph);
+      var _getGraphBoundaries = function(nodeData) {
+        var INFINITY = 1e30;
+        var BORDER_PADDING = 5;
+
+        var leftEdge = INFINITY;
+        var topEdge = INFINITY;
+        var bottomEdge = -INFINITY;
+        var rightEdge = -INFINITY;
+
+        for (var nodeName in nodeData) {
+          leftEdge = Math.min(nodeData[nodeName].x0 - BORDER_PADDING, leftEdge);
+          topEdge = Math.min(nodeData[nodeName].y0 - BORDER_PADDING, topEdge);
+          rightEdge = Math.max(
+            nodeData[nodeName].x0 + BORDER_PADDING + nodeData[nodeName].width,
+            rightEdge);
+          bottomEdge = Math.max(
+            nodeData[nodeName].y0 + BORDER_PADDING + nodeData[nodeName].height,
+            bottomEdge);
+        }
+
+        return {
+          left: leftEdge,
+          top: topEdge,
+          bottom: bottomEdge,
+          right: rightEdge
+        };
+      }
 
       $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {
         var nodeData = stateGraphArranger.computeLayout(
@@ -312,26 +354,17 @@ oppia.directive('stateGraphViz', [
         for (var nodeName in nodeData) {
           maxDepth = Math.max(maxDepth, nodeData[nodeName].depth);
         }
-
         $scope.GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
-        // A rough upper bound for the width of a single letter, in pixels, to use
-        // as a scaling factor to determine the width of graph nodes. This is not
-        // an entirely accurate description because it also takes into account the
-        // horizontal whitespace between graph nodes.
-        var LETTER_WIDTH_IN_PIXELS = 10.5;
-        $scope.GRAPH_WIDTH = MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS;
 
-        $scope.visHeight = ($scope.getElementDimensions().h === 0 ? $scope.GRAPH_HEIGHT : '100%');
+        var dimensions = _getElementDimensions();
 
         // Change the position values in nodeData to use pixels.
         for (var nodeName in nodeData) {
-          var HORIZONTAL_PROPERTIES = ['x0', 'width', 'xLabel', 'labelWidth'];
-          var VERTICAL_PROPERTIES = ['y0', 'height', 'yLabel', 'labelHeight'];
-          for (var i = 0; i < HORIZONTAL_PROPERTIES.length; i++) {
-            nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] = (
-              $scope.GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_PROPERTIES[i]] / 100.0);
-            nodeData[nodeName][VERTICAL_PROPERTIES[i]] = (
-              $scope.GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_PROPERTIES[i]] / 100.0);
+          for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
+            nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]] = (
+              $scope.GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]] / 100.0);
+            nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]] = (
+              $scope.GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]] / 100.0);
           }
         }
 
@@ -344,43 +377,7 @@ oppia.directive('stateGraphViz', [
         $scope.VIEWPORT_X = -Math.max(1000, $scope.GRAPH_WIDTH * 2);
         $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
-        var _ensureBetween = function(value, bound1, bound2) {
-          var minValue = Math.min(bound1, bound2);
-          var maxValue = Math.max(bound1, bound2);
-          return Math.min(Math.max(value, minValue), maxValue);
-        };
-
-        var _getGraphBoundaries = function() {
-          var INFINITY = 1e30;
-          var BORDER_PADDING = 5;
-
-          var leftEdge = INFINITY;
-          var topEdge = INFINITY;
-          var bottomEdge = -INFINITY;
-          var rightEdge = -INFINITY;
-
-          for (var nodeName in nodeData) {
-            leftEdge = Math.min(nodeData[nodeName].x0 - BORDER_PADDING, leftEdge);
-            topEdge = Math.min(nodeData[nodeName].y0 - BORDER_PADDING, topEdge);
-            rightEdge = Math.max(
-              nodeData[nodeName].x0 + BORDER_PADDING + nodeData[nodeName].width,
-              rightEdge);
-            bottomEdge = Math.max(
-              nodeData[nodeName].y0 + BORDER_PADDING + nodeData[nodeName].height,
-              bottomEdge);
-          }
-
-          return {
-            left: leftEdge,
-            top: topEdge,
-            bottom: bottomEdge,
-            right: rightEdge
-          };
-        }
-
-        var graphBoundaries = _getGraphBoundaries();
-        var dimensions = $scope.getElementDimensions();
-        var pannableChildJqueryElt = $element.find('.pannable-child');
+        var graphBoundaries = _getGraphBoundaries(nodeData);
 
         // The translation applied when the graph is first loaded.
         var originalTranslationAmounts = [0, 0];
@@ -388,11 +385,11 @@ oppia.directive('stateGraphViz', [
         if ($scope.centerAtCurrentState) {
           // Center the graph at the node representing the current state.
           originalTranslationAmounts[0] = (
-            dimensions.w / 2 - nodeData[$scope.currentStateName].x0 -
-            nodeData[$scope.currentStateName].width / 2);
+            dimensions.w / 2 - nodeData[$scope.currentStateName()].x0 -
+            nodeData[$scope.currentStateName()].width / 2);
           originalTranslationAmounts[1] = (
-            dimensions.h / 2 - nodeData[$scope.currentStateName].y0 -
-            nodeData[$scope.currentStateName].height / 2);
+            dimensions.h / 2 - nodeData[$scope.currentStateName()].y0 -
+            nodeData[$scope.currentStateName()].height / 2);
 
           if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
             originalTranslationAmounts[0] = (
@@ -413,15 +410,15 @@ oppia.directive('stateGraphViz', [
           }
 
           $scope.overallTransformStr = 'translate(' + originalTranslationAmounts + ')';
-          pannableChildJqueryElt.attr('transform', 'translate(0,0)');
+          $scope.innerTransformStr = 'translate(0,0)';
         }
 
         if ($scope.allowPanning) {
           // Without the timeout, $element.find fails to find the required rect in the
           // state graph modal dialog.
           setTimeout(function() {
-            var vis = d3.select($element.find('rect.pannable-rect')[0]);
-            vis.call(d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
+            d3.select($element.find('rect.pannable-rect')[0]).call(
+                d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
               if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
                 d3.event.translate[0] = 0;
               } else {
@@ -442,8 +439,8 @@ oppia.directive('stateGraphViz', [
 
               // We need a separate layer here so that the translation does not
               // influence the panning event receivers.
-              pannableChildJqueryElt.attr(
-                'transform', 'translate(' + d3.event.translate + ')');
+              $scope.innerTransformStr = 'translate(' + d3.event.translate + ')';
+              $scope.$apply();
             }));
           });
         }
@@ -508,7 +505,7 @@ oppia.directive('stateGraphViz', [
         }
 
         var _getNodeStrokeWidth = function(nodeName) {
-          return nodeName == $scope.currentStateName ? '4' :
+          return nodeName == $scope.currentStateName() ? '4' :
                  (nodeName == initStateName || nodeName == END_DEST) ? '2' : '1';
         };
 
@@ -550,7 +547,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.canNavigateToNode = function(nodeName) {
-          return nodeName !== END_DEST && nodeName !== $scope.currentStateName;
+          return nodeName !== END_DEST && nodeName !== $scope.currentStateName();
         };
 
         // Update the nodes.

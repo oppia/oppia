@@ -1,78 +1,78 @@
 <script type="text/ng-template" id="visualizations/stateGraphViz">
-  <div>
-    <!-- NOTE TO DEVELOPERS: The svg defs needed for this directive are
-    included at the bottom of exploration_editor.html. In order for the
-    elements to render properly in Firefox, there cannot be multiple defs
-    with the same id on the page. -->
+  <!-- NOTE TO DEVELOPERS: The svg defs needed for this directive are
+  included at the bottom of exploration_editor.html. In order for the
+  elements to render properly in Firefox, there cannot be multiple defs
+  with the same id on the page. -->
 
-    <style>
-      .oppia-graph-viz .pannable-rect {
-        cursor: move;
-        fill: none;
-        fill-opacity: 0;
-        pointer-events: all;
-      }
+  <style>
+    .oppia-graph-viz .pannable-rect {
+      cursor: move;
+      fill: none;
+      fill-opacity: 0;
+      pointer-events: all;
+    }
 
-      .oppia-graph-viz path.link {
-        fill: none;
-        stroke: rgb(179, 179, 179);
-        stroke-width: 3px;
-      }
+    .oppia-graph-viz path.link {
+      fill: none;
+      stroke: rgb(179, 179, 179);
+      stroke-width: 3px;
+    }
 
-      .oppia-graph-viz text {
-        font: 12px sans-serif;
-        pointer-events: none;
-      }
+    .oppia-graph-viz text {
+      font: 12px sans-serif;
+      pointer-events: none;
+    }
 
-      .oppia-graph-viz text.shadow {
-        stroke: #fff;
-        stroke-width: 3px;
-        stroke-opacity: .8;
-      }
+    .oppia-graph-viz text.shadow {
+      stroke: #fff;
+      stroke-width: 3px;
+      stroke-opacity: .8;
+    }
 
-      .oppia-graph-viz .node rect {
-        fill: beige;
-        pointer-events: all;
-        stroke: rgb(0, 0, 0);
-        -moz-transition: all 0.15s;
-        -webkit-transition: all 0.15s;
-        -o-transition: all 0.15s;
-        transition: all 0.15s;
-      }
-      .oppia-graph-viz .node rect.init-node {
-        fill: #bbedb1;
-      }
-      .oppia-graph-viz .node rect.end-node {
-        fill: green;
-      }
-      .oppia-graph-viz .node rect.bad-node {
-        fill: pink;
-      }
-      .oppia-graph-viz .node rect.normal-node:hover,
-      .oppia-graph-viz .node rect.init-node:hover,
-      .oppia-graph-viz .node rect.bad-node:hover {
-        fill: blue;
-      }
+    .oppia-graph-viz .node rect {
+      fill: beige;
+      pointer-events: all;
+      stroke: rgb(0, 0, 0);
+      -moz-transition: all 0.15s;
+      -webkit-transition: all 0.15s;
+      -o-transition: all 0.15s;
+      transition: all 0.15s;
+    }
+    .oppia-graph-viz .node rect.init-node {
+      fill: #bbedb1;
+    }
+    .oppia-graph-viz .node rect.end-node {
+      fill: green;
+    }
+    .oppia-graph-viz .node rect.bad-node {
+      fill: pink;
+    }
+    .oppia-graph-viz .node rect.normal-node:hover,
+    .oppia-graph-viz .node rect.init-node:hover,
+    .oppia-graph-viz .node rect.bad-node:hover {
+      fill: blue;
+    }
 
-      .oppia-graph-viz .highlight {
-        fill: #FFFFC2;
-        fill-opacity: 1;
-        stroke: #DDD;
-        stroke-width: 1;
-        stroke-opacity: 1;
-      }
+    .oppia-graph-viz .highlight {
+      fill: #FFFFC2;
+      fill-opacity: 1;
+      stroke: #DDD;
+      stroke-width: 1;
+      stroke-opacity: 1;
+    }
 
-      .oppia-graph-viz .clickable {
-        cursor: pointer;
-      }
+    .oppia-graph-viz .clickable {
+      cursor: pointer;
+    }
 
-      .oppia-graph-viz .legend-bar {
-        fill: url('#nodegradient');
-        stroke: black;
-        stroke-width: 0.5;
-      }                  
-    </style>
+    .oppia-graph-viz .legend-bar {
+      fill: url('#nodegradient');
+      stroke: black;
+      stroke-width: 0.5;
+    }
+  </style>
 
+  <div style="height: 100%">
     <button ng-if="onMaximizeFunction" ng-click="onMaximizeFunction()"
             class="btn btn-default btn-xs" style="position: absolute; right: 15px;">
       <span title="Expand Map">
@@ -80,7 +80,7 @@
       </span>
     </button>
 
-    <svg class="oppia-graph-viz" width="100%" ng-attr-height="<[visHeight]>">
+    <svg class="oppia-graph-viz" width="100%" height="100%">
       <g>
         <g ng-attr-transform="<[overallTransformStr]>">
           <rect class="pannable-rect" ng-if="allowPanning"
@@ -89,7 +89,7 @@
           </rect>
 
           <g>
-            <g class="pannable-child">
+            <g class="pannable-child" ng-attr-transform="<[innerTransformStr]>">
               <g ng-repeat="link in augmentedLinks">
                 <path class="link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)">
                 </path>

@@ -167,7 +167,7 @@ ANGULAR_FILES = [
         ['js', 'min.js', 'min.js.map'])]
 ANGULAR_TEST_FILES = ['angular-mocks.js', 'angular-scenario.js']
 
-D3_REV = '3.2.8'
+D3_REV = '3.4.11'
 D3_URL = 'https://raw.github.com/mbostock/d3/v%s' % D3_REV
 D3_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'd3js-%s' % D3_REV)
 D3_FILES = ['d3.min.js']
