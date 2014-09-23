@@ -318,3 +318,66 @@ describe('Exploration rights service', function() {
     });
   });
 });
+
+describe('New state template service', function() {
+  beforeEach(module('oppia'));
+
+  describe('new state template service', function() {
+    var nsts = null;
+
+    beforeEach(inject(function($injector) {
+      GLOBALS = {
+        NEW_STATE_TEMPLATE: {
+          content: [{type: 'text', value: ''}],
+          param_changes: [],
+          widget: {
+            handlers: [{
+              name: 'submit',
+              rule_specs: [{
+                dest: '(untitled state)',
+                definition: {rule_type: 'default'},
+                feedback: [],
+                param_changes: [],
+                description: 'Default',
+              }],
+            }],
+            widget_id: 'TextInput',
+            customization_args: {
+              rows: {value: 1},
+              placeholder: {value: 'Type your answer here.'}
+            },
+            sticky: false
+          },
+          unresolved_answers: {},
+        }
+      };
+      nsts = $injector.get('newStateTemplateService');
+    }));
+
+    it('should correctly retrieve a new state template', function() {
+      expect(nsts.getNewStateTemplate('new state name')).toEqual({
+        content: [{type: 'text', value: ''}],
+        param_changes: [],
+        widget: {
+          handlers: [{
+            name: 'submit',
+            rule_specs: [{
+              dest: 'new state name',
+              definition: {rule_type: 'default'},
+              feedback: [],
+              param_changes: [],
+              description: 'Default'
+            }]
+          }],
+          widget_id: 'TextInput',
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: 'Type your answer here.'}
+          },
+          sticky: false
+        },
+        unresolved_answers: {}
+      });
+    });
+  });
+});

@@ -17,10 +17,10 @@
 __author__ = 'Sean Lip'
 
 import os
-import json
 import StringIO
 import zipfile
 
+from core.controllers import editor
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -75,36 +75,15 @@ class EditorTest(BaseEditorControllerTest):
 
         self.logout()
 
-    def test_request_new_state_template(self):
-        """Test requesting a new state template when adding a new state."""
-        # Register and log in as an admin.
-        self.register_editor(self.EDITOR_EMAIL)
-        self.login(self.EDITOR_EMAIL)
-
-        EXP_ID = 'eid'
-        exploration = exp_domain.Exploration.create_default_exploration(
-            EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
-        exploration.states[exploration.init_state_name].widget.handlers[
-            0].rule_specs[0].dest = feconf.END_DEST
-        exp_services.save_new_exploration(
-            self.get_current_logged_in_user_id(), exploration)
-
-        response = self.testapp.get('/create/%s' % EXP_ID)
-        csrf_token = self.get_csrf_token_from_response(response)
-
-        # Add a new state called 'New valid state name'.
-        response_dict = self.post_json(
-            '/createhandler/new_state_template/%s' % EXP_ID, {
-                'state_name': 'New valid state name'
-            }, csrf_token)
-
-        self.assertDictContainsSubset({
-            'content': [{'type': 'text', 'value': ''}],
-            'unresolved_answers': {}
-        }, response_dict['new_state'])
-        self.assertTrue('widget' in response_dict['new_state'])
-
-        self.logout()
+    def test_new_state_template(self):
+        """Test the validity of the NEW_STATE_TEMPLATE."""
+        exp_services.load_demo('0')
+        exploration = exp_services.get_exploration_by_id('0')
+        exploration.add_states([feconf.DEFAULT_STATE_NAME])
+        new_state_dict = exploration.export_state_to_frontend_dict(
+            '(untitled state)')
+        new_state_dict['unresolved_answers'] = {}
+        self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
 
     def test_add_new_state_error_cases(self):
         """Test the error cases for adding a new state to an exploration."""

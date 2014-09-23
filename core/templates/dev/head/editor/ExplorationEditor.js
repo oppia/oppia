@@ -27,13 +27,14 @@ oppia.controller('ExplorationEditor', [
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', 'widgetDefinitionsService', function(
+  'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
-    editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService) {
+    editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
+    newStateTemplateService) {
 
   $scope.editabilityService = editabilityService;
 
@@ -749,14 +750,13 @@ oppia.controller('ExplorationEditor', [
       templateUrl: 'modals/publishExploration',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
+        $scope.publish = $modalInstance.close;
 
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
     }).result.then(function() {
       explorationRightsService.saveChangeToBackend({is_public: true});
     });
@@ -768,12 +768,11 @@ oppia.controller('ExplorationEditor', [
       templateUrl: 'modals/nominateExploration',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.close = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
+        $scope.close = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
     });
   };
 
@@ -806,19 +805,14 @@ oppia.controller('ExplorationEditor', [
 
     warningsData.clear();
 
-    $scope.newStateTemplateUrl = '/createhandler/new_state_template/' + $scope.explorationId;
-    $http.post($scope.newStateTemplateUrl, {state_name: newStateName}).success(function(data) {
-      $scope.states[newStateName] = data.new_state;
-
-      changeListService.addState(newStateName);
-
-      $scope.refreshGraph();
-      $scope.newStateDesc = '';
-
-      if (successCallback) {
-        successCallback(newStateName);
-      }
-    });
+    $scope.states[newStateName] = newStateTemplateService.getNewStateTemplate(
+      newStateName);
+    changeListService.addState(newStateName);
+    $scope.refreshGraph();
+    $scope.newStateDesc = '';
+    if (successCallback) {
+      successCallback(newStateName);
+    }
   };
 
   $scope.deleteState = function(deleteStateName) {

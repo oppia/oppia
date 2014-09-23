@@ -43,6 +43,41 @@ import jinja2
 
 # The maximum number of exploration history snapshots to show by default.
 DEFAULT_NUM_SNAPSHOTS = 30
+# The frontend template for a new state. It is sent to the frontend when the
+# exploration editor page is first loaded, so that new states can be
+# added in a way that is completely client-side.
+# IMPORTANT: Before adding this state to an existing exploration, the
+# state name and the destination of the default rule should first be
+# changed to the desired new state name.
+NEW_STATE_TEMPLATE = {
+    'content': [{
+        'type': 'text',
+        'value': ''
+    }],
+    'param_changes': [],
+    'widget': {
+        'handlers': [{
+            'name': 'submit',
+            'rule_specs': [{
+                'dest': feconf.DEFAULT_STATE_NAME,
+                'definition': {
+                    'rule_type': 'default'
+                },
+                'feedback': [],
+                'param_changes': [],
+                'description': 'Default',
+            }],
+        }],
+        'widget_id': 'TextInput',
+        'customization_args': {
+            'rows': {'value': 1},
+            'placeholder': {'value': 'Type your answer here.'}
+        },
+        'sticky': False
+    },
+    'unresolved_answers': {},
+}
+
 
 def get_value_generators_js():
     """Return a string that concatenates the JS for all value generators."""
@@ -229,6 +264,7 @@ class ExplorationPage(EditorHandler):
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
         })
 
         self.render_template('editor/exploration_editor.html')
@@ -272,7 +308,7 @@ class ExplorationHandler(EditorHandler):
                 widget.id: widget.to_dict()
                 for widget in widget_registry.Registry.get_widgets_of_type(
                     feconf.INTERACTIVE_PREFIX)
-            }
+            },
         }
 
         if feconf.SHOW_SKIN_CHOOSER:
@@ -694,20 +730,3 @@ class ChangeListSummaryHandler(EditorHandler):
                 'summary': summary,
                 'warning_message': warning_message
             })
-
-
-class NewStateTemplateHandler(EditorHandler):
-    """Returns the template for a newly-added state."""
-
-    @require_editor
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        new_state_name = self.payload.get('state_name')
-
-        exploration = exp_services.get_exploration_by_id(exploration_id)
-        exploration.add_states([new_state_name])
-        new_state = exploration.export_state_to_frontend_dict(new_state_name)
-        new_state['unresolved_answers'] = {}
-        self.render_json({
-            'new_state': new_state
-        })
