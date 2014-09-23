@@ -47,25 +47,25 @@ var publishExploration = function() {
 };
 
 // roleName here is the user-visible form of the role name (e.g. 'Manager')
-var _addExplorationRole = function(roleName, email) {
+var _addExplorationRole = function(roleName, username) {
   editor.runFromSettingsTab(function() {
     element(by.css('.protractor-test-edit-roles')).click();
-    element(by.css('.protractor-test-role-email')).sendKeys(email);
+    element(by.css('.protractor-test-role-username')).sendKeys(username);
     element(by.css('.protractor-test-role-select')).element(by.cssContainingText('option', roleName)).click();
     element(by.css('.protractor-test-save-role')).click();
   });
 };
 
-var addExplorationManager = function(email) {
-  _addExplorationRole('Manager', email);
+var addExplorationManager = function(username) {
+  _addExplorationRole('Manager', username);
 };
 
-var addExplorationCollaborator = function(email) {
-  _addExplorationRole('Collaborator', email);
+var addExplorationCollaborator = function(username) {
+  _addExplorationRole('Collaborator', username);
 };
 
-var addExplorationPlaytester = function(email) {
-  _addExplorationRole('Playtester', email);
+var addExplorationPlaytester = function(username) {
+  _addExplorationRole('Playtester', username);
 };
 
 // roleName here is the server-side form of the name (e.g. 'owner')

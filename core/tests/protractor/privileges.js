@@ -29,7 +29,7 @@ describe('Permissions for private explorations', function() {
 
     users.login('alice@example.com');
     workflow.createExploration('message', 'secrets');
-    workflow.addExplorationCollaborator('bob@example.com');
+    workflow.addExplorationCollaborator('Bob');
     expect(workflow.getExplorationManagers()).toEqual(['Alice']);
     expect(workflow.getExplorationCollaborators()).toEqual(['Bob']);
     expect(workflow.getExplorationPlaytesters()).toEqual([]);
