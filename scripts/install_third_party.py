@@ -183,7 +183,7 @@ download_files(D3_URL, D3_DST, D3_FILES)
 
 # Download all the frontend library zip files.
 
-SELECT2_REV = '3.4.1'
+SELECT2_REV = '3.5.1'
 SELECT2_ZIP_URL = (
     'https://github.com/ivaynberg/select2/archive/%s.zip' % SELECT2_REV)
 SELECT2_ZIP_ROOT_NAME = 'select2-%s' % SELECT2_REV

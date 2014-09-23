@@ -237,7 +237,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save Exploration</button>
+        <button class="btn btn-success protractor-test-close-save-modal" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save Exploration</button>
       </div>
     </script>
 
@@ -314,7 +314,7 @@
                 </a>
 
                 <span ng-if="editabilityService.isEditable()">
-                  <button class="btn oppia-main-control-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+                  <button class="btn oppia-main-control-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
                     save changes
                     <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
                   </button>

@@ -30,15 +30,6 @@ oppia.controller('Base', [
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';
 
-  // Gets URL parameter values.
-  $scope.getUrlParams = function() {
-    var params = {};
-    var parts = $window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-      params[key] = value;
-    });
-    return params;
-  };
-
   /**
    * Checks if an object is empty.
    */

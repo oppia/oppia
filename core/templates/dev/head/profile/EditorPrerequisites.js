@@ -19,8 +19,8 @@
  */
 
 oppia.controller('EditorPrerequisites', [
-    '$scope', '$http', '$rootScope', 'warningsData',
-    function($scope, $http, $rootScope, warningsData) {
+    '$scope', '$http', '$rootScope', 'warningsData', 'urlService',
+    function($scope, $http, $rootScope, warningsData, urlService) {
   $scope.editorPrerequisitesDataUrl = '/editor_prerequisites_handler/data/';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
@@ -97,7 +97,7 @@ oppia.controller('EditorPrerequisites', [
     }
 
     $http.post('/editor_prerequisites_handler/data', requestParams).success(function(data) {
-      window.location = window.decodeURIComponent($scope.getUrlParams().return_url);
+      window.location = window.decodeURIComponent(urlService.getUrlParams().return_url);
     });
   };
 }]);

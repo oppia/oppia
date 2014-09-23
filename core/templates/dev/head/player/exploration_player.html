@@ -16,7 +16,7 @@
 {% endblock header_js %}
 
 {% block content %}
-  {{ skin_html }}
+  {{ skin_tag }}
   <br><br><br>
 
   <script type="text/ng-template" id="modals/playerFeedback">
@@ -95,7 +95,9 @@
   {{ super() }}
   <script>
     {{ include_js_file('player/PlayerServices.js') }}
+    {{ include_skins_js_file(skin_js_url) }}
   </script>
 
+  {{ skin_html }}
   {{ widget_js_directives }}
 {% endblock footer_js %}
