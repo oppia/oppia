@@ -26,13 +26,13 @@
 // An expression is evaluated in a context consisting of predefined system
 // variables, system operators, and system functions. In the input language,
 // operators are predefined set of characters in infix, postfix, or ternary
-// format (there is currently no postifx operators) while functions have the
-// form of function calls (e.g. "abs(10)"). In the parse tree they are treated
-// similarly. User defined parameters may override the meaning of system
-// variables and functions (but not operators). Users also can define parameters
-// with new names. Referencing a variable which is not defined as a system
-// variable, system function, or user parameter will result in
-// ExprUndefinedVarError to be thrown.
+// format (there is currently no postfix operators) while functions have the
+// form of function calls (e.g. "abs(10)"). In the parse tree, there is no
+// difference between operators and functions. User defined parameters may
+// override the meaning of system variables and functions (but not operators).
+// Users also can define parameters with new names. Referencing a variable which
+// is not defined as a system variable, system function, or user parameter will
+// result in ExprUndefinedVarError to be thrown.
 //
 // All system variables, system operators, and system functions are defined
 // as 'system' variable in this file.

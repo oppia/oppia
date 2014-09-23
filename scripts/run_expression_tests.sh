@@ -35,4 +35,5 @@ bash scripts/create_expression_parser.sh
 # so we concatenate the two input files and send them as one chunk through
 # stdin to node. Also adding core/templates/dev/head/expressions to NODE_PATH
 # allows "node" to find parser.js.
-cat core/templates/dev/head/expressions/evaluator.js core/templates/dev/head/expressions/test.js | NODE_PATH=$NODE_PATH:core/templates/dev/head/expressions node
+EXPRESSIONS_DIR=core/templates/dev/head/expressions
+cat $EXPRESSIONS_DIR/evaluator.js $EXPRESSIONS_DIR/test.js | NODE_PATH=$NODE_PATH:$EXPRESSIONS_DIR node
