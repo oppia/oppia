@@ -64,7 +64,7 @@ var editReal = function(elem) {
   return {
     setValue: function(value) {
       elem.element(by.tagName('input')).clear();
-      elem.element(by.tagName('input')).sendKeys(text);
+      elem.element(by.tagName('input')).sendKeys(value);
     }
   };
 };
@@ -141,8 +141,9 @@ var editAutocompleteDropdown = function(elem) {
     setText: function(text) {
       elem.element(by.css('.select2-container')).click();
       // NOTE: the input field is top-level in the DOM rather than below the
-      // container.
-      element(by.css('.select2-input')).sendKeys(text + '\n');
+      // container. The id is assigned when the dropdown is clicked.
+      element(by.id('select2-drop')).element(by.css('.select2-input')).
+        sendKeys(text + '\n');
     }
   };
 };

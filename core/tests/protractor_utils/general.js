@@ -20,7 +20,7 @@
  */
 
 // Time (in ms) to wait when the system needs time for some computations.
-var WAIT_TIME = 2000;
+var WAIT_TIME = 4000;
 
 var waitForSystem = function() {
   protractor.getInstance().sleep(WAIT_TIME);
@@ -33,7 +33,7 @@ var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
 var EXPLORATION_ID_LENGTH = 12;
 
-// If we are currently in the editor, this will return a promise of the 
+// If we are currently in the editor, this will return a promise with the 
 // exploration ID.
 var getExplorationIdFromEditor = function() {
   return {
@@ -42,7 +42,8 @@ var getExplorationIdFromEditor = function() {
         var expectedPrefix = SERVER_URL_PREFIX + EDITOR_URL_SLICE;
         expect(url.slice(0, expectedPrefix.length)).toBe(expectedPrefix);
         var explorationId = url.slice(
-          expectedPrefix.length, expectedPrefix.length + EXPLORATION_ID_LENGTH);
+          expectedPrefix.length, expectedPrefix.length + EXPLORATION_ID_LENGTH
+        );
         return callbackFunction(explorationId);
       });
     }

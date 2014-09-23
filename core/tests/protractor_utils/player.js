@@ -22,7 +22,21 @@
 // The get functions return promises rather than values.
 
 var getCurrentQuestionText = function() {
-  return element(by.css('.conversation-skin-response')).getText();
+  return element.all(by.repeater('response in responseLog track by $index')).
+      count().then(function(numResponses) {
+    return element(by.repeater('response in responseLog track by $index').
+      row(numResponses - 1)).
+      element(by.css('.protractor-test-conversation-content')).getText();
+  });
+};
+
+var getLatestFeedbackText = function() {
+  return element.all(by.repeater('response in responseLog track by $index')).
+      count().then(function(numResponses) {
+    return element(by.repeater('response in responseLog track by $index').
+      row(numResponses - 1)).
+      element(by.css('.protractor-test-conversation-feedback')).getText();
+  });
 };
 
 
@@ -66,6 +80,9 @@ var expectExplorationToNotBeOver = function() {
 };
 
 exports.getCurrentQuestionText = getCurrentQuestionText;
+exports.getLatestFeedbackText = getLatestFeedbackText;
+
+exports.getContinueButtonText = getContinueButtonText;
 exports.answerContinueWidget = answerContinueWidget;
 
 exports.answerNumericWidget = answerNumericWidget;

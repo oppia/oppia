@@ -22,6 +22,14 @@
 forms = require('./forms.js');
 general = require('./general.js');
 
+var setStateName = function(name) {
+  var nameElement = element(by.css('.oppia-state-name-container'))
+  nameElement.click();
+  nameElement.element(by.tagName('input')).clear();
+  nameElement.element(by.tagName('input')).sendKeys(name);
+  nameElement.element(by.buttonText('Done')).click();
+};
+
 // Content & non-interactive widgets. It is necessary to run open() at the
 // start and close() at the end.
 var editContent = function() {
@@ -63,7 +71,8 @@ var selectContinueWidget = function(buttonText) {
   _openWidgetEditor('Continue');
   if (buttonText) {
     element(by.linkText('Customize')).click();
-    forms.editUnicode(element(by.css('.protractor-test-widget-args'))).setText(buttonText);
+    forms.editUnicode(element(by.css('.protractor-test-widget-args'))).
+      setText(buttonText);
   }
   _closeWidgetEditor();
 };
@@ -72,7 +81,8 @@ var selectContinueWidget = function(buttonText) {
 var selectSimpleMultipleChoiceWidget = function(textArray) {
   _openWidgetEditor('Multiple choice input');
   element(by.linkText('Customize')).click();
-  var customizer = forms.editList(element(by.css('.protractor-test-widget-args')));
+  var customizer = forms.editList(
+    element(by.css('.protractor-test-widget-args')));
   customizer.editRichTextEntry(0).setPlainText(textArray[0]);
   for (var i = 1; i < textArray.length; i++) {
     var newEntry = customizer.appendEntry('Add multiple choice option');
@@ -107,6 +117,139 @@ var editRule = function(ruleNum) {
         setText(destinationName + '\n');
     }
   }
+};
+
+// This function is run from the "select rule type" interface being open. It
+// will select the rule to be used, enter the relevant parameters and then
+// click "Done".
+// parameterArray is an array of element of the form {
+//    value: the rule assigned to the parameter
+//    fragmentNum: the index in the list of rule fragments of the parameter
+//    type: the type of the parameter
+// }
+var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
+  // It is necessary to get all the texts first, as clicking 'Select' will 
+  // remove the allRuleTypes from the DOM.
+  ruleElement.all(by.repeater('(description, name) in allRuleTypes')).map(
+      function(option) {
+    return option.getText();
+  }).then(function(descriptions) {
+    for (var i = 0; i < descriptions.length; i++) {
+      if (descriptions[i].match(ruleDescription)) {
+        ruleElement.element(
+          by.repeater('(description, name) in allRuleTypes').row(i)
+        ).element(by.buttonText('Select')).click();
+      }
+    }
+  });
+  // Now we enter the parameters
+  for (var i = 0; i < parameterArray.length; i++) {
+    var parameterElement = ruleElement.element(
+      by.repeater('item in ruleDescriptionFragments track by $index'
+    ).row(parameterArray[i].fragmentNum));
+    if (parameterArray[i].type === 'real') {
+      forms.editReal(parameterElement).setValue(parameterArray[i].value);
+    } else if (parameterArray[i].type === 'unicode') {
+      forms.editUnicode(parameterElement).setText(parameterArray[i].value);
+    } else if (parameterArray[i].type === 'choice') {
+      parameterElement.element(
+        by.cssContainingText('option', parameterArray[i].value
+      )).click();
+    }
+  }
+  ruleElement.element(by.buttonText('Done')).click();
+};
+
+var _addRule = function(ruleDescription, parameterArray) {
+  element(by.css('.oppia-add-rule-button')).click();
+  _editRuleType(
+    element(by.css('.protractor-test-temporary-rule')), ruleDescription, 
+    parameterArray);
+};
+
+var addNumericRule = {
+  IsInclusivelyBetween: function(a, b) {
+    _addRule('is between INPUT and INPUT, inclusive', [{
+      value: a,
+      fragmentNum: 1,
+      type: 'real'
+    }, {
+      value: b,
+      fragmentNum: 3,
+      type: 'real'
+    }]);
+  },
+  Equals: function(a) {
+    _addRule('is equal to INPUT', [{
+      value: a,
+      fragmentNum: 1,
+      type: 'real'
+    }]);
+  },
+  IsGreaterThanOrEqualTo: function(a) {
+    _addRule('is greater than or equal to INPUT', [{
+      value: a,
+      fragmentNum: 1,
+      type: 'real'
+    }]);
+  },
+  IsGreaterThan: function(a) {
+    _addRule('is greater than INPUT', [{
+      value: a,
+      fragmentNum: 1,
+      type: 'real'
+    }]);
+  },
+  IsLessThanOrEqualTo: function(a) {
+    _addRule('is less than or equal to INPUT', [{
+      value: a,
+      fragmentNum: 1,
+      type: 'real'
+    }]);
+  },
+  IsLessThan: function(a) {
+    _addRule('is less than INPUT', [{
+      value: a,
+      fragmentNum: 1,
+      type: 'real'
+    }]);
+  },
+  IsWithinTolerance: function(a, b) {
+    _addRule('is within INPUT of INPUT', [{
+      value: a,
+      fragmentNum: 1,
+      type: 'real'
+    }, {
+      value: b,
+      fragmentNum: 3,
+      type: 'real'
+    }]);
+  }
+};
+
+var addMultipleChoiceRule = {
+  Equals: function(a) {
+    _addRule('is equal to INPUT', {
+      value: a,
+      fragmentNum: 1,
+      // In the backend this is a non-negative int, but that parameter is
+      // presented in the client as a dropdown so we use that here.
+      type: 'choice'
+    });
+  }
+};
+
+// NOTE: if the state is not visible in the state graph this function will fail
+var moveToState = function(targetName) {
+  element.all(by.css('.node')).map(function(stateElement) {
+    return stateElement.element(by.tagName('title')).getText();
+  }).then(function(listOfNames) {
+    for (var i = 0; i < listOfNames.length; i++) {
+      if (listOfNames[i] === targetName) {
+        element.all(by.css('.node')).get(i).click();
+      }
+    }
+  });
 };
 
 // All functions involving the settings tab should be sent through this
@@ -145,6 +288,7 @@ var saveChanges = function(commitMessage) {
       element(by.model('commitMessage')).sendKeys(commitMessage);
     }
     protractor.getInstance().waitForAngular();
+    general.waitForSystem();
     element(by.css('.protractor-test-close-save-modal')).click();
     // This is necessary to give the page time to record the changes,
     // so that it does not attempt to stop the user leaving.
@@ -153,6 +297,7 @@ var saveChanges = function(commitMessage) {
   });
 };
 
+exports.setStateName = setStateName;
 exports.editContent = editContent;
 
 exports.selectNumericWidget = selectNumericWidget;
@@ -160,6 +305,10 @@ exports.selectContinueWidget = selectContinueWidget;
 exports.selectSimpleMultipleChoiceWidget = selectSimpleMultipleChoiceWidget;
 
 exports.editRule = editRule;
+exports.addNumericRule = addNumericRule;
+exports.addMultipleChoiceRule = addMultipleChoiceRule;
+
+exports.moveToState = moveToState;
 
 exports.runFromSettingsTab = runFromSettingsTab;
 exports.setTitle = setTitle;

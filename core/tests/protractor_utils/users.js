@@ -45,8 +45,8 @@ var logout = function() {
 var _appendToConfigList = function(listName, textToAppend) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(
-        by.repeater('(configPropertyId, configPropertyData) in configProperties')
-      ).map(function(configProperty) {
+      by.repeater('(configPropertyId, configPropertyData) in configProperties')
+    ).map(function(configProperty) {
     configProperty.element(by.tagName('em')).getText().then(function(title) {
       if (title.match(listName)) {
         var newEntry = forms.editList(configProperty).appendEntry();

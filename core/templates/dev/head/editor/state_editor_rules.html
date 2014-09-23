@@ -35,7 +35,7 @@
         </button>
       </div>
 
-      <div ng-if="tmpRule">
+      <div ng-if="tmpRule" class="protractor-test-temporary-rule">
         <rule-editor rule="tmpRule" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-tmp-rule="saveTmpRule" delete-rule="cancelTmpRule()" is-editable="editabilityService.isEditable()">
         </rule-editor>
       </div>

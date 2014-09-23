@@ -21,8 +21,8 @@
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
-describe('Appointing roles', function() {
-  it('should award correct permissions to collaborators', function() {
+describe('Permissions for private explorations', function() {
+  it('should be correct for collaborators', function() {
     users.createUser('alice@example.com', 'Alice');
     users.createUser('bob@example.com', 'Bob');
     users.createUser('eve@example.com', 'Eve');

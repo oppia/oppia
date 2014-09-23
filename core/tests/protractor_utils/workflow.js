@@ -46,7 +46,7 @@ var publishExploration = function() {
   element(by.css('.protractor-test-confirm-publish')).click();
 };
 
-// roleName here is the user-visible form.
+// roleName here is the user-visible form of the role name (e.g. 'Manager')
 var _addExplorationRole = function(roleName, email) {
   editor.runFromSettingsTab(function() {
     element(by.css('.protractor-test-edit-roles')).click();
@@ -68,12 +68,14 @@ var addExplorationPlaytester = function(email) {
   _addExplorationRole('Playtester', email);
 };
 
-// roleName here is the server-side form.
+// roleName here is the server-side form of the name (e.g. 'owner')
 var _getExplorationRoles = function(roleName) {
   var result = editor.runFromSettingsTab(function() {
+    var itemName = roleName + 'Name';
+    var listName = roleName + 'Names';
     return element.all(by.repeater(
-        roleName + 'Name in explorationRightsService.' + roleName +
-          'Names track by $index')).map(function(elem) {
+          itemName + ' in explorationRightsService.' + listName + ' track by $index'
+        )).map(function(elem) {
       return elem.getText();
     }); 
   });
