@@ -848,8 +848,9 @@ class Exploration(object):
                 'This exploration has no initial state name specified.')
         if self.init_state_name not in self.states:
             raise utils.ValidationError(
-                'There is no state corresponding to the exploration\'s '
-                'initial state name.')
+                'There is no state in %s corresponding to the exploration\'s '
+                'initial state name %s.' %
+                (self.states.keys(), self.init_state_name))
 
         if not isinstance(self.param_specs, dict):
             raise utils.ValidationError(

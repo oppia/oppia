@@ -77,7 +77,8 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                r'There is no state corresponding to .* initial state name.'):
+                r'There is no state in \[\'ABC\'\] corresponding to '
+                'the exploration\'s initial state name initname.'):
             exploration.validate()
 
         exploration.states = {exploration.init_state_name: new_state}
