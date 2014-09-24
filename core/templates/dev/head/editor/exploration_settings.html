@@ -220,7 +220,7 @@
 
               {% if can_publicize %}
                 <p ng-show="explorationRightsService.isPublic()">
-                  <button type="button" class="btn btn-default" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                  <button type="button" class="btn btn-default protractor-test-release-exploration" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
                     Move out of beta
                     <span ng-if="currentUserIsAdmin">(as admin)</span>
                     <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>

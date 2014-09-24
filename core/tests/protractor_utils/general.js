@@ -33,21 +33,30 @@ var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
 var EXPLORATION_ID_LENGTH = 12;
 
-// If we are currently in the editor, this will return a promise with the 
-// exploration ID.
-var getExplorationIdFromEditor = function() {
+
+var _getExplorationId = function(currentUrlPrefix) {
   return {
     then: function(callbackFunction) {
       browser.getCurrentUrl().then(function(url) {
-        var expectedPrefix = SERVER_URL_PREFIX + EDITOR_URL_SLICE;
-        expect(url.slice(0, expectedPrefix.length)).toBe(expectedPrefix);
+        expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
         var explorationId = url.slice(
-          expectedPrefix.length, expectedPrefix.length + EXPLORATION_ID_LENGTH
-        );
+          currentUrlPrefix.length, 
+          currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
         return callbackFunction(explorationId);
       });
     }
   };
+};
+
+// If we are currently in the editor, this will return a promise with the 
+// exploration ID.
+var getExplorationIdFromEditor = function() {
+  return _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
+};
+
+// Likewise for the player
+var getExplorationIdFromPlayer = function() {
+  return _getExplorationId(SERVER_URL_PREFIX + PLAYER_URL_SLICE);
 };
 
 // The explorationId here should be a string, not a promise.
@@ -66,6 +75,11 @@ var moveToPlayer = function() {
   getExplorationIdFromEditor().then(openPlayer);
 };
 
+// Takes the user from the exploration player to its editor.
+var moveToEditor = function() {
+  getExplorationIdFromPlayer().then(openEditor);
+};
+
 var expect404Error = function() {
   expect(element(by.css('.oppia-wide-panel-content')).getText()).
     toMatch('Error 404');
@@ -77,7 +91,9 @@ exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
 
 exports.getExplorationIdFromEditor = getExplorationIdFromEditor;
+exports.getExplorationIdFromPlayer = getExplorationIdFromPlayer;
 exports.openEditor = openEditor;
 exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
+exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;

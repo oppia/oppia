@@ -13,7 +13,8 @@
 // limitations under the License. 
 
 /**
- * @fileoverview End-to-end tests of the interaction between the player and editor
+ * @fileoverview End-to-end tests of the interaction between the player and 
+ * editor.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */

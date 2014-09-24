@@ -122,8 +122,8 @@ var editRule = function(ruleNum) {
 // This function is run from the "select rule type" interface being open. It
 // will select the rule to be used, enter the relevant parameters and then
 // click "Done".
-// parameterArray is an array of element of the form {
-//    value: the rule assigned to the parameter
+// parameterArray is an array of elements of the form {
+//    value: the value specified for the parameter to take
 //    fragmentNum: the index in the list of rule fragments of the parameter
 //    type: the type of the parameter
 // }
@@ -142,11 +142,13 @@ var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
       }
     }
   });
+
   // Now we enter the parameters
   for (var i = 0; i < parameterArray.length; i++) {
     var parameterElement = ruleElement.element(
       by.repeater('item in ruleDescriptionFragments track by $index'
     ).row(parameterArray[i].fragmentNum));
+
     if (parameterArray[i].type === 'real') {
       forms.editReal(parameterElement).setValue(parameterArray[i].value);
     } else if (parameterArray[i].type === 'unicode') {
@@ -155,6 +157,10 @@ var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
       parameterElement.element(
         by.cssContainingText('option', parameterArray[i].value
       )).click();
+    } else {
+      throw Error(
+        'Unknown type ' + parameterArray[i].type + 
+        ' sent to editor._editRuleType');
     }
   }
   ruleElement.element(by.buttonText('Done')).click();
@@ -244,10 +250,15 @@ var moveToState = function(targetName) {
   element.all(by.css('.node')).map(function(stateElement) {
     return stateElement.element(by.tagName('title')).getText();
   }).then(function(listOfNames) {
+    var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === targetName) {
         element.all(by.css('.node')).get(i).click();
+        matched = true;
       }
+    }
+    if (! matched) {
+      throw Error('State ' + targetName + ' not found by editor.moveToState');
     }
   });
 };
@@ -275,10 +286,17 @@ var setCategory = function(category) {
   });
 };
 
-var setObjective = function(category) {
+var setObjective = function(objective) {
   runFromSettingsTab(function() {
     element(by.id('explorationObjective')).clear();
     element(by.id('explorationObjective')).sendKeys(objective);
+  });
+};
+
+var setLanguage = function(language) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationLanguageCode')).
+      element(by.cssContainingText('option', language)).click();
   });
 };
 
@@ -314,5 +332,6 @@ exports.runFromSettingsTab = runFromSettingsTab;
 exports.setTitle = setTitle;
 exports.setCategory = setCategory;
 exports.setObjective = setObjective;
+exports.setLanguage = setLanguage;
 
 exports.saveChanges = saveChanges;

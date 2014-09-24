@@ -21,6 +21,7 @@
 
 forms = require('./forms.js');
 editor = require('./editor.js');
+general = require('./general.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
@@ -37,21 +38,44 @@ var createExploration = function(name, category) {
   protractor.getInstance().waitForAngular();
 };
 
-// Functions run from the state editor.
-
 // This will only work if all changes have been saved and there are no 
-// outstanding warnings.
+// outstanding warnings; run from the editor.
 var publishExploration = function() {
   element(by.css('.protractor-test-publish-exploration')).click();
+  protractor.getInstance().waitForAngular();
+  general.waitForSystem();
   element(by.css('.protractor-test-confirm-publish')).click();
 };
+
+// Creates and publishes a minimal exploration
+var createAndPublishExploration = function(name, category, objective, language) {
+  createExploration(name, category);
+  editor.editRule('default').setDestination('END');
+  editor.setObjective(objective);
+  if (language) {
+    editor.setLanguage(language);
+  }
+  editor.selectContinueWidget();
+  editor.saveChanges();
+  publishExploration();
+};
+
+// Run from the editor, requires user to be a moderator / admin.
+var releaseExploration = function() {
+  editor.runFromSettingsTab(function() {
+    element(by.css('.protractor-test-release-exploration')).click();
+  });
+};
+
+// Role management (state editor settings tab)
 
 // roleName here is the user-visible form of the role name (e.g. 'Manager')
 var _addExplorationRole = function(roleName, username) {
   editor.runFromSettingsTab(function() {
     element(by.css('.protractor-test-edit-roles')).click();
     element(by.css('.protractor-test-role-username')).sendKeys(username);
-    element(by.css('.protractor-test-role-select')).element(by.cssContainingText('option', roleName)).click();
+    element(by.css('.protractor-test-role-select')).
+      element(by.cssContainingText('option', roleName)).click();
     element(by.css('.protractor-test-save-role')).click();
   });
 };
@@ -96,6 +120,8 @@ var getExplorationPlaytesters = function() {
 
 exports.createExploration = createExploration;
 exports.publishExploration = publishExploration;
+exports.createAndPublishExploration = createAndPublishExploration;
+exports.releaseExploration = releaseExploration;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;
