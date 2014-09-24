@@ -205,7 +205,6 @@ class FeedbackHandler(base.BaseHandler):
         handler = self.payload.get('handler')
         # Parameters associated with the reader.
         old_params = self.payload.get('params', {})
-        old_params['answer'] = answer
         # The reader's state history.
         state_history = self.payload['state_history']
         # The version of the exploration.
@@ -269,6 +268,7 @@ class FeedbackHandler(base.BaseHandler):
         values['reader_response_html'] = reader_response_html
 
         # Add Oppia's feedback to the response HTML.
+        old_params['answer'] = answer
         feedback_html = '<div>%s</div>' % jinja_utils.parse_string(
             feedback, old_params)
 

@@ -279,17 +279,18 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
 
 
 class StateHitEventLogEntryModel(base_models.BaseModel):
-    """An event triggered by a student getting to a particular state.
-        event_type: 'state_hit'
-        exploration_id: id of exploration currently being played
-        exploration_version: version of exploration
-        state_name: Name of current state
-        play_type: 'normal'
-        created_on date
-        event_schema_version: 1
-        session_id: ID of current student's session
-        params: current parameter values, in the form of a map of parameter name
-            to value
+    """An event triggered by a student getting to a particular state. The
+    definitions of the fields are as follows:
+    - event_type: 'state_hit'
+    - exploration_id: id of exploration currently being played
+    - exploration_version: version of exploration
+    - state_name: Name of current state
+    - play_type: 'normal'
+    - created_on date
+    - event_schema_version: 1
+    - session_id: ID of current student's session
+    - params: current parameter values, in the form of a map of parameter name
+              to its value
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -346,7 +347,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     num_starts = ndb.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration
     num_completions = ndb.IntegerProperty(indexed=False)
-    # Keyed by state name that describes students who have hit each state
+    # Keyed by state name that describes the numbers of hits for each state
     # {state_name: {'first_entry_count': ...,
     #               'total_entry_count': ...,
     #               'no_answer_count': ...}}

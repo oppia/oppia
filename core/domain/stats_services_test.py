@@ -26,6 +26,7 @@ from core.domain import stats_services
 from core.tests import test_utils
 import feconf
 
+
 class ModifiedStatisticsAggregator(stats_jobs.StatisticsAggregator):
     """A modified StatisticsAggregator that does not start a new batch
     job when the previous one has finished.
@@ -138,9 +139,10 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             'eid', 'A title', 'A category')
         exp_services.save_new_exploration('fake@user.com', exp)
 
-        event_services.StateHitEventHandler.record(
-            'eid', 1, exp.init_state_name, 'session_id', {},
-            feconf.PLAY_TYPE_NORMAL)
+        for ind in range(5):
+            event_services.StateHitEventHandler.record(
+                'eid', 1, exp.init_state_name, 'session_id_%s' % ind,
+                {}, feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
             'eid', 1, exp.init_state_name, self.SUBMIT_HANDLER,
             self.DEFAULT_RULESPEC, '1')
@@ -151,7 +153,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         ModifiedStatisticsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
-            ModifiedStatisticsAggregator.get_statistics):
+                       ModifiedStatisticsAggregator.get_statistics):
             self.assertEquals(stats_services.get_state_improvements('eid'), [{
                 'type': 'default',
                 'rank': 3,
@@ -173,7 +175,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         ModifiedStatisticsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
-            ModifiedStatisticsAggregator.get_statistics):
+                       ModifiedStatisticsAggregator.get_statistics):
             self.assertEquals(stats_services.get_state_improvements('eid'), [{
                 'type': 'default',
                 'rank': 1,
@@ -209,8 +211,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('fake@user.com', exp)
         state_name = exp.init_state_name
 
-        # Hit the default rule once, and fail to answer twice. The result
-        # should be classified as incomplete.
+        # Fail to answer twice.
         for i in range(2):
             event_services.StateHitEventHandler.record(
                 'eid', 1, state_name, 'session_id %d' % i,
@@ -218,13 +219,19 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
             event_services.MaybeLeaveExplorationEventHandler.record(
                 'eid', 1, state_name, 'session_id %d' % i, 10.0, {},
                 feconf.PLAY_TYPE_NORMAL)
+
+        # Hit the default rule once.
+        event_services.StateHitEventHandler.record(
+            'eid', 1, state_name, 'session_id 3', {}, feconf.PLAY_TYPE_NORMAL)
         event_services.AnswerSubmissionEventHandler.record(
-            'eid', 1, state_name, self.SUBMIT_HANDLER,
-            self.DEFAULT_RULESPEC, '1')
+            'eid', 1, state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC,
+            '1')
+
+        # The result should be classified as incomplete.
         ModifiedStatisticsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
-            ModifiedStatisticsAggregator.get_statistics):
+                       ModifiedStatisticsAggregator.get_statistics):
             self.assertEquals(stats_services.get_state_improvements('eid'), [{
                 'rank': 2,
                 'type': 'incomplete',
@@ -241,7 +248,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 'eid', 1, state_name, self.SUBMIT_HANDLER,
                 self.DEFAULT_RULESPEC, '1')
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
-            ModifiedStatisticsAggregator.get_statistics):
+                       ModifiedStatisticsAggregator.get_statistics):
             self.assertEquals(stats_services.get_state_improvements('eid'), [{
                 'rank': 3,
                 'type': 'default',
@@ -277,7 +284,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         ModifiedStatisticsAggregator.start_computation()
         self.process_and_flush_pending_tasks()
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
-            ModifiedStatisticsAggregator.get_statistics):
+                       ModifiedStatisticsAggregator.get_statistics):
             states = stats_services.get_state_improvements('eid')
         self.assertEquals(states, [{
             'rank': 2,
@@ -299,7 +306,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
                 self.DEFAULT_RULESPEC, '1')
 
         with self.swap(stats_jobs.StatisticsAggregator, 'get_statistics',
-            ModifiedStatisticsAggregator.get_statistics):
+                       ModifiedStatisticsAggregator.get_statistics):
             states = stats_services.get_state_improvements('eid')
         self.assertEquals(states, [{
             'rank': 3,

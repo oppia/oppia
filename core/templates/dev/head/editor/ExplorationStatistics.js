@@ -64,11 +64,10 @@ oppia.controller('ExplorationStatistics', [
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'
       };
-      console.log('Hello', $scope.stateStats);
       for (var stateName in $scope.states) {
-          var visits = $scope.stateStats[stateName].firstEntryCount;
-          $scope.statsGraphOpacities[stateName] = Math.max(
-            visits / numVisits, 0.05);
+        var visits = $scope.stateStats[stateName].firstEntryCount;
+        $scope.statsGraphOpacities[stateName] = Math.max(
+          visits / numVisits, 0.05);
       }
       $scope.statsGraphOpacities[END_DEST] = Math.max(
         numCompletions / numVisits, 0.05);
