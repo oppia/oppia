@@ -604,7 +604,7 @@ def _change_exploration_status(
     event_services.ExplorationStatusChangeEventHandler.record(exploration_id)
 
 
-def set_viewable_if_private(committer_id, exploration_id, viewable_if_private):
+def set_private_viewability(committer_id, exploration_id, viewable_if_private):
     """Sets the viewable_if_private attribute for an exploration's rights
     object. If viewable_if_private is True, this allows an private exploration
     to be viewed by anyone with the link.
@@ -618,6 +618,11 @@ def set_viewable_if_private(committer_id, exploration_id, viewable_if_private):
 
     exploration_rights = get_exploration_rights(exploration_id)
     old_viewable_if_private = exploration_rights.viewable_if_private
+    if old_viewable_if_private == viewable_if_private:
+        raise Exception(
+            'Trying to change viewability status of this exploration to %s, '
+            'but that is already the current value.' % viewable_if_private)
+
     exploration_rights.viewable_if_private = viewable_if_private
     commit_cmds = [{
         'cmd': 'change_viewable_if_private',

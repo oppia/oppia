@@ -430,7 +430,7 @@ class ExplorationRightsHandler(EditorHandler):
             rights_manager.release_ownership(self.user_id, exploration_id)
 
         elif viewable_if_private is not None:
-            rights_manager.set_viewable_if_private(
+            rights_manager.set_private_viewability(
                 self.user_id, exploration_id, viewable_if_private)
 
         else:
