@@ -30,6 +30,11 @@ oppia.controller('ExplorationSettings', [
 
   var GALLERY_PAGE_URL = '/gallery';
 
+  $scope.getExplorePageUrl = function() {
+    var serverName = window.location.protocol + '//' + window.location.host;
+    return serverName + '/explore/' + $scope.explorationId;
+  };
+
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
     $scope.explorationCategoryService = explorationCategoryService;

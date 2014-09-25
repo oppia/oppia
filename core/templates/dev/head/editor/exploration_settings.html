@@ -116,7 +116,7 @@
           <hr>
 
           <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="col-lg-5 col-md-5 col-sm-5">
               <h4>Roles</h4>
               <div ng-show="explorationRightsService.ownerNames.length > 0">
                 <strong>Managers</strong>
@@ -183,29 +183,41 @@
               {% endif %}
             </div>
 
-            <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="col-lg-7 col-md-7 col-sm-7">
               <h4>Permissions</h4>
-              <div ng-if="explorationRightsService.isPrivate()">
-                <span ng-if="explorationRightsService.viewableIfPrivate()">
-                  <p>This exploration is <strong>private</strong>: anyone with the link can play it.</p>
-                  <p>It is <strong>not shown</strong> in the gallery.</p>
-                </span>
-                <span ng-if="!explorationRightsService.viewableIfPrivate()">
-                  <p>This exploration is <strong>private</strong>: only invited playtesters and contributors can play it.</p>
-                  <p>It is <strong>not shown</strong> in the gallery.</p>
-                </span>
-                <button class="btn btn-default pull-right" ng-click="toggleViewabilityIfPrivate()">
+              <div class="pull-right">
+                <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
                   Toggle visibility
                 </button>
               </div>
-              <div ng-if="explorationRightsService.isPublic()">
-                <p>This exploration is <strong>public</strong>: anyone can play it.</p>
-                <p>It is <strong>shown</strong> in the gallery (in Beta mode).</p>
-              </div>
-              <div ng-if="explorationRightsService.isPublicized()">
-                <p>This exploration is <strong>public</strong>: anyone can play it.</p>
-                <p>It is <strong>shown</strong> in the gallery.</p>
-              </div>
+
+              <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
+                This exploration is <strong>private</strong>. Anyone with the link can play it.
+              </p>
+              <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
+                This exploration is <strong>private</strong>. Only invited playtesters and contributors can play it.
+              </p>
+              <p ng-if="explorationRightsService.isPublic()">
+                This exploration is <strong>public</strong>: anyone can play it.
+              </p>
+              <p ng-if="explorationRightsService.isPublicized()">
+                This exploration is <strong>public</strong>: anyone can play it.
+              </p>
+
+              <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
+                <em>Link to share:</em>
+                <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
+              </p>
+
+              <p ng-if="explorationRightsService.isPrivate()">
+                It is <strong>not shown</strong> in the gallery.
+              </p>
+              <p ng-if="explorationRightsService.isPublic()">
+                It is <strong>shown</strong> in the gallery (in Beta mode).
+              </p>
+              <p ng-if="explorationRightsService.isPublicized()">
+                It is <strong>shown</strong> in the gallery.
+              </p>
             </div>
           </div>
         </div>
