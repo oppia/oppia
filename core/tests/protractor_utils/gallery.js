@@ -22,16 +22,30 @@
 // If section = 'status' then label can be 'Released', 'Beta' or 'Private',
 // otherwise it can be any category or language respectively.
 // Verifies the previous state of the checkbox, then clicks it.
-var _clickCheckbox = function(section, label, previouslyTicked) {
+var _clickCheckbox = function(section, label, isPreviouslyTicked) {
   element(by.css('.protractor-test-gallery-' + section)).all(by.tagName('li')).
       map(function(option) {
-    option.getText().then(function(text) {
+    return option.getText().then(function(text) {
       if (text === label) {
         var checkbox = option.element(by.tagName('input'));
-        expect(checkbox.isSelected()).toBe(previouslyTicked);
+        if (isPreviouslyTicked) {
+          expect(checkbox.isSelected()).toBeTruthy();
+        } else {
+          expect(checkbox.isSelected()).toBeFalsy();
+        }
         checkbox.click();
+        return true;
       }
+      return false;
     });
+  }).then(function(results) {
+    var foundCheckbox = false;
+    for (var i = 0; i < results.length; i++) {
+      foundCheckbox = foundCheckbox || results[i];
+    }
+    if (! foundCheckbox) {
+      throw Error('Checkbox ' + label + ' not found in section ' + section);
+    }
   });
 };
 
