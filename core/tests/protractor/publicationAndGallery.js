@@ -44,7 +44,7 @@ describe('Gallery view', function() {
 
     users.login('varda@example.com');
     browser.get('/gallery');
-    gallery.clickCheckBox('status', 'Beta');
+    gallery.tickCheckbox('status', 'Beta');
     // TODO (Jacob) move directly to editor when issue 373 is fixed.
     gallery.playExploration('Vingilot');
     player.answerContinueWidget();
@@ -70,25 +70,25 @@ describe('Gallery view', function() {
 
     browser.get('/gallery');
     // This box is checked by default so we uncheck it.
-    gallery.clickCheckBox('status', 'Released');
+    gallery.untickCheckbox('status', 'Released');
 
     // We next check explorations are visible under the right conditions.
     for (var key in properties) {
-      for (var i = 0; i < 3; i++) {
-        gallery.clickCheckBox(key, properties[key][i]);
-        for (var j = 0; j < 3; j++) {
+      for (var i = 0; i < names.length; i++) {
+        gallery.tickCheckbox(key, properties[key][i]);
+        for (var j = 0; j < names.length; j++) {
           if (j === i) {
             gallery.expectExplorationToBeVisible(names[j]);
           } else {
             gallery.expectExplorationToBeHidden(names[j]);
           }
         }
-        gallery.clickCheckBox(key, properties[key][i]);
+        gallery.untickCheckbox(key, properties[key][i]);
       }
 
       // Now select everything in this section ready for the next test
-      for (var i = 0; i < 3; i++) {
-        gallery.clickCheckBox(key, properties[key][i]);
+      for (var i = 0; i < names.length; i++) {
+        gallery.tickCheckbox(key, properties[key][i]);
       }
     }
 

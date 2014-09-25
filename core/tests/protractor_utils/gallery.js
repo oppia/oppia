@@ -19,16 +19,28 @@
  */
 
 // Here section can be 'status', 'category' or 'language'.
-// If section = 'status' then label can be 'Released', 'Beta' or 'Private'.
-var clickCheckBox = function(section, label) {
+// If section = 'status' then label can be 'Released', 'Beta' or 'Private',
+// otherwise it can be any category or language respectively.
+// Verifies the previous state of the checkbox, then clicks it.
+var _clickCheckbox = function(section, label, previouslyTicked) {
   element(by.css('.protractor-test-gallery-' + section)).all(by.tagName('li')).
       map(function(option) {
     option.getText().then(function(text) {
       if (text === label) {
-        option.element(by.tagName('input')).click();
+        var checkbox = option.element(by.tagName('input'));
+        expect(checkbox.isSelected()).toBe(previouslyTicked);
+        checkbox.click();
       }
     });
   });
+};
+
+var tickCheckbox = function(section, label) {
+  _clickCheckbox(section, label, false);
+};
+
+var untickCheckbox = function(section, label) {
+  _clickCheckbox(section, label, true);
 };
 
 // Returns a promise of all explorations with the given name.
@@ -62,7 +74,7 @@ var playExploration = function(name) {
 
 var editExploration = function(name) {
   _getExplorationElements(name).then(function(elems) {
-    elems[0].element(by.css('.glyphicon-pencil')).click();
+    elems[0].element(by.css('.protractor-test-edit-exploration')).click();
   });
 };
 
@@ -73,7 +85,8 @@ var getExplorationObjective = function(name) {
   });
 };
 
-exports.clickCheckBox = clickCheckBox;
+exports.tickCheckbox = tickCheckbox;
+exports.untickCheckbox = untickCheckbox;
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;
 exports.expectExplorationToBeHidden = expectExplorationToBeHidden;
 exports.playExploration = playExploration;

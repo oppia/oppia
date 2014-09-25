@@ -117,7 +117,7 @@
             <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="oppia-gallery-tile">
               <div style="position: relative;">
                 <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 5px;">
-                  <span class="glyphicon glyphicon-pencil" title="Edit this exploration"></span>
+                  <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
                   Edit
                 </a>
 
