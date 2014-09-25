@@ -58,7 +58,8 @@ class ExplorationRights(object):
 
     def __init__(self, exploration_id, owner_ids, editor_ids, viewer_ids,
                  community_owned=False, cloned_from=None,
-                 status=EXPLORATION_STATUS_PRIVATE):
+                 status=EXPLORATION_STATUS_PRIVATE,
+                 viewable_if_private=False):
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
@@ -66,6 +67,7 @@ class ExplorationRights(object):
         self.community_owned = community_owned
         self.cloned_from = cloned_from
         self.status = status
+        self.viewable_if_private = viewable_if_private
 
     def validate(self):
         """Validates an ExplorationRights object.
@@ -114,7 +116,8 @@ class ExplorationRights(object):
                 'community_owned': True,
                 'owner_names': [],
                 'editor_names': [],
-                'viewer_names': []
+                'viewer_names': [],
+                'viewable_if_private': self.viewable_if_private,
             }
         else:
             return {
@@ -127,6 +130,7 @@ class ExplorationRights(object):
                     self.editor_ids),
                 'viewer_names': user_services.get_human_readable_user_ids(
                     self.viewer_ids),
+                'viewable_if_private': self.viewable_if_private,
             }
 
 
@@ -138,7 +142,8 @@ def _get_exploration_rights_from_model(exploration_rights_model):
         exploration_rights_model.viewer_ids,
         community_owned=exploration_rights_model.community_owned,
         cloned_from=exploration_rights_model.cloned_from,
-        status=exploration_rights_model.status
+        status=exploration_rights_model.status,
+        viewable_if_private=exploration_rights_model.viewable_if_private,
     )
 
 
@@ -156,6 +161,7 @@ def _save_exploration_rights(
     model.community_owned = exploration_rights.community_owned
     model.cloned_from = exploration_rights.cloned_from
     model.status = exploration_rights.status
+    model.viewable_if_private = exploration_rights.viewable_if_private
 
     model.commit(committer_id, commit_message, commit_cmds)
 
@@ -171,7 +177,8 @@ def create_new_exploration_rights(exploration_id, committer_id):
         editor_ids=exploration_rights.editor_ids,
         viewer_ids=exploration_rights.viewer_ids,
         community_owned=exploration_rights.community_owned,
-        status=exploration_rights.status
+        status=exploration_rights.status,
+        viewable_if_private=exploration_rights.viewable_if_private,
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
     subscription_services.subscribe_to_activity(
@@ -242,8 +249,8 @@ def get_viewable_exploration_rights(user_id):
     it, and cannot edit it.
 
     There may be other explorations that this user can view -- namely, those
-    that he/she owns or is allowed to edit -- that are not returned by this
-    query.
+    that he/she owns or is allowed to edit, or private explorations that are
+    viewable by anyone -- that are not returned by this query.
     """
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_viewable(user_id)]
@@ -322,6 +329,7 @@ class Actor(object):
 
         if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
             return (self.has_explicit_viewing_rights(exploration_id)
+                    or exp_rights.viewable_if_private
                     or self.is_moderator())
         else:
             return True
@@ -363,6 +371,12 @@ class Actor(object):
         return (
             is_deleting_own_private_exploration or
             is_moderator_deleting_public_exploration)
+
+    def can_change_private_viewability(self, exploration_id):
+        """Note that this requires the exploration in question
+        to be private.
+        """
+        return self.can_publish(exploration_id)
 
     def can_publish(self, exploration_id):
         if exp_domain.Exploration.is_demo_exploration_id(exploration_id):
@@ -588,6 +602,35 @@ def _change_exploration_status(
     _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds)
     event_services.ExplorationStatusChangeEventHandler.record(exploration_id)
+
+
+def set_viewable_if_private(committer_id, exploration_id, viewable_if_private):
+    """Sets the viewable_if_private attribute for an exploration's rights
+    object. If viewable_if_private is True, this allows an private exploration
+    to be viewed by anyone with the link.
+    """
+    if not Actor(committer_id).can_change_private_viewability(exploration_id):
+        logging.error(
+            'User %s tried to change private viewability of exploration %s '
+            'but was refused permission.' % (committer_id, exploration_id))
+        raise Exception(
+            'The viewability status of this exploration cannot be changed.')
+
+    exploration_rights = get_exploration_rights(exploration_id)
+    old_viewable_if_private = exploration_rights.viewable_if_private
+    exploration_rights.viewable_if_private = viewable_if_private
+    commit_cmds = [{
+        'cmd': 'change_viewable_if_private',
+        'old_viewable_if_private': old_viewable_if_private,
+        'new_viewable_if_private': viewable_if_private,
+    }]
+    commit_message = (
+        'Made exploration viewable to anyone with the link.'
+        if viewable_if_private else
+        'Made exploration viewable only to invited playtesters.')
+
+    _save_exploration_rights(
+        committer_id, exploration_rights, commit_message, commit_cmds)
 
 
 def publish_exploration(committer_id, exploration_id):

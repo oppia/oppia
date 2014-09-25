@@ -127,6 +127,12 @@ oppia.controller('ExplorationSettings', [
     });
   };
 
+  $scope.toggleViewabilityIfPrivate = function() {
+    explorationRightsService.saveChangeToBackend({
+      viewable_if_private: !explorationRightsService.viewableIfPrivate()
+    });
+  };
+
   /********************************************
   * Methods relating to control buttons.
   ********************************************/
