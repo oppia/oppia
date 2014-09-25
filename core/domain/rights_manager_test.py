@@ -280,7 +280,50 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
             rights_manager.Actor(self.user_id_admin).can_publicize(
                 self.EXP_ID))
 
+    def test_changing_viewability(self):
+        exp = exp_domain.Exploration.create_default_exploration(
+            self.EXP_ID, 'A title', 'A category')
+        exp_services.save_new_exploration(self.user_id_a, exp)
 
-class PageRightsTest(test_utils.GenericTestBase):
-    """Test which pages can be viewed by different users."""
-    pass
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
+
+        self.assertTrue(rights_manager.Actor(
+            self.user_id_a).can_change_private_viewability(self.EXP_ID))
+        self.assertFalse(rights_manager.Actor(
+            self.user_id_b).can_change_private_viewability(self.EXP_ID))
+        self.assertTrue(rights_manager.Actor(
+            self.user_id_admin).can_change_private_viewability(self.EXP_ID))
+
+        with self.assertRaisesRegexp(Exception, 'already the current value'):
+            rights_manager.set_private_viewability(
+                self.user_id_a, self.EXP_ID, False)
+        with self.assertRaisesRegexp(Exception, 'cannot be changed'):
+            rights_manager.set_private_viewability(
+                self.user_id_b, self.EXP_ID, True)
+
+        rights_manager.set_private_viewability(
+            self.user_id_a, self.EXP_ID, True)
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_view(self.EXP_ID))
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
+
+        rights_manager.set_private_viewability(
+            self.user_id_a, self.EXP_ID, False)
+        self.assertTrue(
+            rights_manager.Actor(self.user_id_a).can_view(self.EXP_ID))
+        self.assertFalse(
+            rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
+
+        rights_manager.publish_exploration(self.user_id_a, self.EXP_ID)
+        self.assertFalse(rights_manager.Actor(
+            self.user_id_a).can_change_private_viewability(self.EXP_ID))
+
+        rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
+        self.assertTrue(rights_manager.Actor(
+            self.user_id_a).can_change_private_viewability(self.EXP_ID))
+        self.assertFalse(rights_manager.Actor(
+            self.user_id_b).can_change_private_viewability(self.EXP_ID))
+        self.assertTrue(rights_manager.Actor(
+            self.user_id_admin).can_change_private_viewability(self.EXP_ID))

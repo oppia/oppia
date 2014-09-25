@@ -374,6 +374,7 @@ class ExplorationRightsHandler(EditorHandler):
         is_community_owned = self.payload.get('is_community_owned')
         new_member_username = self.payload.get('new_member_username')
         new_member_role = self.payload.get('new_member_role')
+        viewable_if_private = self.payload.get('viewable_if_private')
 
         if new_member_username:
             if not rights_manager.Actor(self.user_id).can_modify_roles(
@@ -427,6 +428,10 @@ class ExplorationRightsHandler(EditorHandler):
                 raise self.InvalidInputException(e)
 
             rights_manager.release_ownership(self.user_id, exploration_id)
+
+        elif viewable_if_private is not None:
+            rights_manager.set_private_viewability(
+                self.user_id, exploration_id, viewable_if_private)
 
         else:
             raise self.InvalidInputException(

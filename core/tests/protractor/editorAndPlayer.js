@@ -105,8 +105,7 @@ describe('Full exploration editor', function() {
     users.login('user4@example.com');
 
     workflow.createExploration('sums', 'maths');
-    // TODO (Jacob) reinstate when issue 368 is fixed
-    // editor.setStateName('state 1');
+    editor.setStateName('state 1');
     editor.editContent().open();
     editor.editContent().appendPlainText('this is state 1');
     editor.editContent().close();
@@ -120,8 +119,7 @@ describe('Full exploration editor', function() {
     editor.editContent().close();
     editor.selectSimpleMultipleChoiceWidget(['return', 'complete']);
     editor.addMultipleChoiceRule.Equals('return');
-    // TODO (Jacob) change back to 'state 1'
-    editor.editRule(0).setDestination('(untitled state)');
+    editor.editRule(0).setDestination('state 1');
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
