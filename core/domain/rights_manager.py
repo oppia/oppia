@@ -39,6 +39,8 @@ import utils
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'
 CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
+CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
+CMD_RELEASE_OWNERSHIP = 'release_ownership'
 
 EXPLORATION_STATUS_PRIVATE = 'private'
 EXPLORATION_STATUS_PUBLIC = 'public'
@@ -568,7 +570,7 @@ def release_ownership(committer_id, exploration_id):
     exploration_rights.editor_ids = []
     exploration_rights.viewer_ids = []
     commit_cmds = [{
-        'cmd': 'release_ownership',
+        'cmd': CMD_RELEASE_OWNERSHIP,
     }]
 
     _save_exploration_rights(
@@ -591,7 +593,7 @@ def _change_exploration_status(
     old_status = exploration_rights.status
     exploration_rights.status = new_status
     commit_cmds = [{
-        'cmd': 'change_exploration_status',
+        'cmd': CMD_CHANGE_EXPLORATION_STATUS,
         'old_status': old_status,
         'new_status': new_status
     }]
@@ -625,7 +627,7 @@ def set_private_viewability(committer_id, exploration_id, viewable_if_private):
 
     exploration_rights.viewable_if_private = viewable_if_private
     commit_cmds = [{
-        'cmd': 'change_viewable_if_private',
+        'cmd': CMD_CHANGE_PRIVATE_VIEWABILITY,
         'old_viewable_if_private': old_viewable_if_private,
         'new_viewable_if_private': viewable_if_private,
     }]

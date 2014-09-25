@@ -295,16 +295,19 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
         self.assertTrue(rights_manager.Actor(
             self.user_id_admin).can_change_private_viewability(self.EXP_ID))
 
+        with self.assertRaisesRegexp(Exception, 'already the current value'):
+            rights_manager.set_private_viewability(
+                self.user_id_a, self.EXP_ID, False)
+        with self.assertRaisesRegexp(Exception, 'cannot be changed'):
+            rights_manager.set_private_viewability(
+                self.user_id_b, self.EXP_ID, True)
+
         rights_manager.set_private_viewability(
             self.user_id_a, self.EXP_ID, True)
         self.assertTrue(
             rights_manager.Actor(self.user_id_a).can_view(self.EXP_ID))
         self.assertTrue(
             rights_manager.Actor(self.user_id_b).can_view(self.EXP_ID))
-
-        with self.assertRaises(Exception):
-            rights_manager.set_private_viewability(
-                self.user_id_a, self.EXP_ID, True)
 
         rights_manager.set_private_viewability(
             self.user_id_a, self.EXP_ID, False)

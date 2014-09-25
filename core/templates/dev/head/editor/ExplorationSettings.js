@@ -29,10 +29,12 @@ oppia.controller('ExplorationSettings', [
       explorationInitStateNameService, changeListService, warningsData) {
 
   var GALLERY_PAGE_URL = '/gallery';
+  var EXPLORE_PAGE_PREFIX = '/explore/';
 
   $scope.getExplorePageUrl = function() {
-    var serverName = window.location.protocol + '//' + window.location.host;
-    return serverName + '/explore/' + $scope.explorationId;
+    return (
+      window.location.protocol + '//' + window.location.host +
+      EXPLORE_PAGE_PREFIX + $scope.explorationId);
   };
 
   $scope.initSettingsTab = function() {
