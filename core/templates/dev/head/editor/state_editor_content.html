@@ -7,15 +7,7 @@
 {% block cls %}oppia-state-content{% endblock %}
 
 {% block center %}
-  <param-change-editor param-changes="stateParamChanges"
-      param-specs="paramSpecs" save-param-changes="saveStateParamChanges"
-      add-exploration-param-spec="addExplorationParamSpec"
-      is-editable="editabilityService.isEditable()">
-  </param-change-editor>
-
-  <hr class="oppia-param-and-content-separator">
-
-  <div ng-if="!contentMemento">
+  <div ng-if="!contentMemento" class="oppia-state-content-display">
     <button type="button" class="btn btn-default btn-xs pull-right protractor-test-edit-content" ng-click="editContent()" ng-if="editabilityService.isEditable()">
       <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
     </button>
