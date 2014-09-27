@@ -1,8 +1,8 @@
 <div class="row">
-  <div class="col-lg-1 col-md-1 col-sm-1">
+  <div class="col-lg-2 col-md-2 col-sm-2">
   </div>
 
-  <div class="col-lg-11 col-md-11 col-sm-11">
+  <div class="col-lg-10 col-md-10 col-sm-10">
     <div class="oppia-state-editor-header">
       <div class="oppia-state-name-container">
         <div ng-if="editabilityService.isEditable()">
@@ -33,7 +33,6 @@
     <div style="margin-bottom: -15px;">
       {% include 'editor/state_editor_content.html' %}
     </div>
-    <br><br>
     <div ng-controller="StateInteraction">
       {% include 'editor/state_editor_interaction.html' %}
       {% include 'editor/state_editor_rules.html' %}

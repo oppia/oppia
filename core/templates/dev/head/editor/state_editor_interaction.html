@@ -13,20 +13,23 @@
   </div>
 
   <div ng-if="hasLoaded">
-    <div ng-if="!interactiveWidgetEditorIsShown">
+    <div ng-if="!interactiveWidgetEditorIsShown" class="oppia-interactive-section">
       <div class="row">
-        <div class="col-lg-11 col-md-11 col-sm-11">
-          <div angular-html-bind="widgetPreviewHtml" class="oppia-preview"></div>
-        </div>
-        <div class="col-lg-1 col-md-1 col-sm-1">
-          <button type="button" class="btn btn-default btn-xs pull-right protractor-test-edit-interaction" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <button type="button" class="btn btn-default btn-sm pull-right oppia-open-interactive-widget-editor-btn protractor-test-edit-interaction" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded" style="padding-right: 20px; margin-bottom: -10px;">
             <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
+            Edit
           </button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div angular-html-bind="widgetPreviewHtml" class="oppia-interaction-preview"></div>
         </div>
       </div>
     </div>
 
-    <div ng-if="interactiveWidgetEditorIsShown" style="margin: 10px; padding: 10px; border: 1px solid black;">
+    <div ng-if="interactiveWidgetEditorIsShown" style="padding: 10px; border: 1px solid #ccc;">
       <span class="pull-right">
         Widget type:
         <select ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
@@ -70,18 +73,18 @@
           </div>
         </div>
       </div>
+    </div>
 
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <span class="pull-right" ng-if="tmpWidget">
-            <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
-              Cancel
-            </button>
-            <button type="button" class="btn btn-success protractor-test-save-interaction" ng-click="saveInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
-              Save Customizations
-            </button>
-          </span>
-        </div>
+    <div class="row" style="margin-top: 5px;">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <span ng-if="tmpWidget">
+          <button type="button" class="btn btn-success protractor-test-save-interaction" ng-click="saveInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
+            Save Customizations
+          </button>
+          <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
+            Cancel
+          </button>
+        </span>
       </div>
     </div>
   </div>
