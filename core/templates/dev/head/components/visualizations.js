@@ -67,23 +67,19 @@ oppia.factory('stateGraphArranger', [
     // object are the node labels. The corresponding values are objects with
     // the following keys:
     //   - x0: the x-position of the top-left corner of the node, measured
-    //       as a percentage of the total width.
+    //       as a fraction of the total width.
     //   - y0: the y-position of the top-left corner of the node, measured
-    //       as a percentage of the total height.
-    //   - width: the width of the node, measured as a percentage of the total
+    //       as a fraction of the total height.
+    //   - width: the width of the node, measured as a fraction of the total
     //       width.
-    //   - height: the height of the node, measured as a percentage of the total
+    //   - height: the height of the node, measured as a fraction of the total
     //       height.
     //   - xLabel: the x-position of the middle of the box containing
-    //       the node label, measured as a percentage of the total width.
+    //       the node label, measured as a fraction of the total width.
     //       The node label is centered horizontally within this box.
     //   - yLabel: the y-position of the middle of the box containing
-    //       the node label, measured as a percentage of the total height.
+    //       the node label, measured as a fraction of the total height.
     //       The node label is centered vertically within this box.
-    //   - labelWidth: the width of the label box, measured as a percentage
-    //       of the total width.
-    //   - labelHeight: the height of the label box, measured as a percentage
-    //       of the total height.
     //   - reachable: whether there is a path from the start node to this node.
     //   - reachableFromEnd: whether there is a path from this node to the END node.
     //   - id: a unique id for the node.
@@ -172,11 +168,11 @@ oppia.factory('stateGraphArranger', [
       var totalColumns = MAX_NODES_PER_ROW;
 
       // Horizontal padding between the graph and the edge of the graph visualization,
-      // measured as a percentage of the entire height.
-      var HORIZONTAL_EDGE_PADDING_PERCENT = 5.0;
+      // measured as a fraction of the entire height.
+      var HORIZONTAL_EDGE_PADDING_FRACTION = 0.05;
       // Vertical edge padding between the graph and the edge of the graph visualization,
-      // measured as a percentage of the entire height.
-      var VERTICAL_EDGE_PADDING_PERCENT = 5.0;
+      // measured as a fraction of the entire height.
+      var VERTICAL_EDGE_PADDING_FRACTION = 0.05;
 
       // The vertical padding, measured as a fraction of the height of a grid rectangle,
       // between the top of the grid rectangle and the top of the node. An equivalent amount
@@ -193,18 +189,18 @@ oppia.factory('stateGraphArranger', [
       // As above, but for the horizontal padding.
       var NODE_LABEL_X_PADDING_FRACTION = 0.05;
 
-      // Helper function that returns a horizontal position, in terms of a percentage of
+      // Helper function that returns a horizontal position, in terms of a fraction of
       // the total width, given a horizontal offset in terms of grid rectangles.
       function getHorizontalPosition(offsetInGridRectangles) {
-        var percentageGridWidth = (100.0 - HORIZONTAL_EDGE_PADDING_PERCENT * 2) / totalColumns;
-        return HORIZONTAL_EDGE_PADDING_PERCENT + percentageGridWidth * offsetInGridRectangles;
+        var fractionalGridWidth = (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns;
+        return HORIZONTAL_EDGE_PADDING_FRACTION + fractionalGridWidth * offsetInGridRectangles;
       }
 
-      // Helper function that returns a vertical position, in terms of a percentage of
+      // Helper function that returns a vertical position, in terms of a fraction of
       // the total height, given a vertical offset in terms of grid rectangles.
       function getVerticalPosition(offsetInGridRectangles) {
-        var percentageGridHeight = (100.0 - VERTICAL_EDGE_PADDING_PERCENT * 2) / totalRows;
-        return VERTICAL_EDGE_PADDING_PERCENT + percentageGridHeight * offsetInGridRectangles;
+        var fractionalGridHeight = (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows;
+        return VERTICAL_EDGE_PADDING_FRACTION + fractionalGridHeight * offsetInGridRectangles;
       }
 
       for (var nodeName in nodeData) {
@@ -217,18 +213,11 @@ oppia.factory('stateGraphArranger', [
         nodeData[nodeName].xLabel = getHorizontalPosition(nodeData[nodeName].offset + 0.5);
 
         nodeData[nodeName].height = (
-          (100.0 - VERTICAL_EDGE_PADDING_PERCENT * 2) / totalRows
+          (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows
         ) * (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2);
         nodeData[nodeName].width = (
-          (100.0 - HORIZONTAL_EDGE_PADDING_PERCENT * 2) / totalColumns
+          (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns
         ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2);
-
-        nodeData[nodeName].labelHeight = (
-          (100.0 - VERTICAL_EDGE_PADDING_PERCENT * 2) / totalRows
-        ) * (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2 - NODE_LABEL_Y_PADDING_FRACTION * 2);
-        nodeData[nodeName].labelWidth = (
-          (100.0 - HORIZONTAL_EDGE_PADDING_PERCENT * 2) / totalColumns
-        ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2 - NODE_LABEL_X_PADDING_FRACTION * 2);
       }
 
       // Assign unique IDs to each node.
@@ -300,8 +289,8 @@ oppia.directive('stateGraphViz', [
       // an entirely accurate description because it also takes into account the
       // horizontal whitespace between graph nodes.
       var LETTER_WIDTH_IN_PIXELS = 10.5;
-      var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel', 'labelWidth'];
-      var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel', 'labelHeight'];
+      var HORIZONTAL_NODE_PROPERTIES = ['x0', 'width', 'xLabel'];
+      var VERTICAL_NODE_PROPERTIES = ['y0', 'height', 'yLabel'];
       $scope.GRAPH_WIDTH = MAX_NODES_PER_ROW * MAX_NODE_LABEL_LENGTH * LETTER_WIDTH_IN_PIXELS;
 
       var _getElementDimensions = function() {
@@ -362,9 +351,9 @@ oppia.directive('stateGraphViz', [
         for (var nodeName in nodeData) {
           for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
             nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]] = (
-              $scope.GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]] / 100.0);
+              $scope.GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]]);
             nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]] = (
-              $scope.GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]] / 100.0);
+              $scope.GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]]);
           }
         }
 
