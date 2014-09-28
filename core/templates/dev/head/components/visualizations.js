@@ -370,7 +370,8 @@ oppia.directive('stateGraphViz', [
 
         // The translation applied when the graph is first loaded.
         var originalTranslationAmounts = [0, 0];
-        $scope.overallTransformStr = '';
+        $scope.overallTransformStr = 'translate(0,0)';
+        $scope.innerTransformStr = 'translate(0,0)';
         if ($scope.centerAtCurrentState) {
           // Center the graph at the node representing the current state.
           originalTranslationAmounts[0] = (
