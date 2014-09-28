@@ -29,10 +29,6 @@ oppia.directive('graphEditor', function($compile, warningsData) {
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $element, $attrs) {
       $scope.alwaysEditable = true;
-      $scope.graph = $scope.$parent.value; 
-      $scope.vertexEditPermissions = true;
-      $scope.movePermissions = true;
-      $scope.graphEditPermissions = true;
     }
   };
 });

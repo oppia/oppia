@@ -90,6 +90,12 @@ oppia.directive('oppiaResponseGraphInput', [
 oppia.directive('graphViz', function() {
   return {
     restrict: 'E',
+    scope: {
+      graph: '=?',
+      vertexEditPermissions: '=?',
+      movePermissions: '=?',
+      optionsEditPermissions: '=?',
+    },
     templateUrl: 'graphViz/graphVizSvg',
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
       if ($scope.graph === undefined) {
@@ -197,6 +203,9 @@ oppia.directive('graphViz', function() {
         text: 'Weighted',
         option: 'isWeighted'
       }];
+      $scope.toggleGraphOption = function(option) {
+        $scope.graph[option] = !$scope.graph[option];
+      };
       $scope.setMode = function(mode, $event) {
         // Prevents new vertex from being added in add edge mode
         $event.preventDefault();
@@ -213,8 +222,16 @@ oppia.directive('graphViz', function() {
 oppia.directive('graphInputVertex', ['$document', function($document) {
   return {
     restrict: 'A',
+    scope: {
+      graph: '=',
+      state: '=',
+      vertex: '=',
+      $index: '=index',
+    },
     controller: function($scope, $element, $attrs) {
-      $scope.onClickGraphVertex = function(graph, state) {
+      var graph = $scope.graph;
+      var state = $scope.state;
+      $scope.onClickGraphVertex = function() {
         if (state.currentMode === state.MODES.DELETE && state.vertexEditPermissions) {
           graph.edges = $.map(graph.edges, function(edge) {
             if (edge.src === $scope.$index || edge.dst === $scope.$index) {
@@ -232,13 +249,13 @@ oppia.directive('graphInputVertex', ['$document', function($document) {
         }
       };
 
-      $scope.onMousedownGraphVertex = function(graph, state) {
+      $scope.onMousedownGraphVertex = function() {
         if (state.currentMode === state.MODES.ADD_EDGE) {
           state.addEdgeVertex = $scope.$index;
           $document.on('mouseup', clearAddEdgeVertex);
           function clearAddEdgeVertex() {
             if (state.hoverVertex !== null) {
-              if (checkNewEdgeIsValid(graph, state.addEdgeVertex, state.hoverVertex)) {
+              if (checkNewEdgeIsValid(state.addEdgeVertex, state.hoverVertex)) {
                 graph.edges.push({
                   src: state.addEdgeVertex,
                   dst: state.hoverVertex,
@@ -255,18 +272,18 @@ oppia.directive('graphInputVertex', ['$document', function($document) {
         }
       };
 
-      $scope.onMouseupGraphVertex = function(graph, state) {
+      $scope.onMouseupGraphVertex = function() {
         state.dragVertex = null;
       };
 
-      $scope.startEditVertexLabel = function(graph, state) {
+      $scope.startEditVertexLabel = function() {
         if (!graph.isLabeled) {
           return;
         }
         state.selectVertex = $scope.$index;
       };
       
-      function checkNewEdgeIsValid(graph, src, dst) {
+      function checkNewEdgeIsValid(src, dst) {
         if (src === null || dst === null || src === dst) {
           return false;
         }
@@ -282,11 +299,22 @@ oppia.directive('graphInputVertex', ['$document', function($document) {
 }]);
 
 oppia.directive('graphInputEdge', ['$document', function($document) {
-  return function($scope, $element, $attrs) {
-    $scope.onClickGraphEdge = function(graph, state) {
-      if (state.currentMode === state.MODES.DELETE) {
-        graph.edges.splice($scope.$index, 1);
+  return {
+    restrict: 'A',
+    scope: {
+      graph: '=',
+      state: '=',
+      edge: '=',
+      $index: '=index',
+    },
+    controller: function($scope, $element, $attrs) {
+      var graph = $scope.graph;
+      var state = $scope.state;
+      $scope.onClickGraphEdge = function() {
+        if (state.currentMode === state.MODES.DELETE) {
+          graph.edges.splice($scope.$index, 1);
+        }
       }
     }
-  };
+  }
 }]);

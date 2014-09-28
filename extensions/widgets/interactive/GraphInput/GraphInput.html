@@ -5,7 +5,7 @@
     }
   </style>
   <div>
-    <graph-viz></graph-viz>
+    <graph-viz graph="graph" vertex-edit-permissions="vertexEditPermissions" move-permissions="movePermissions"></graph-viz>
     <button class="btn btn-default" ng-click="submitGraph()">Submit</button>
     <span ng-show="errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
       <[errorMessage]>
@@ -51,7 +51,7 @@
           </text>
         </g>
       </svg>
-      <g ng-if="graphEditPermissions" ng-repeat="button in graphOptions">
+      <g ng-if="optionsEditPermissions" ng-repeat="button in graphOptions">
         <rect width="70"
           height="30"
           ng-attr-x="<[10 + 110 * $index]>"
@@ -59,7 +59,7 @@
           rx="5"
           ry="5"
           ng-attr-style="stroke: black; fill: white; stroke-width: <[graph[button.option] ? 3 : 1]>;"
-          ng-click="graph[button.option] = !graph[button.option];">
+          ng-click="toggleGraphOption(button.option)">
         </rect>
         <text style="pointer-events: none;" ng-attr-x="<[20 + 108 * $index]>" y="30">
           <[button.text]>
@@ -81,28 +81,36 @@
       </line>
       <line graph-input-edge 
         ng-repeat="edge in graph.edges"
-        ng-click="onClickGraphEdge(graph, state)"
+        ng-click="onClickGraphEdge()"
         ng-attr-x1="<[graph.vertices[edge.src].x]>"
         ng-attr-y1="<[graph.vertices[edge.src].y]>"
         ng-attr-x2="<[graph.vertices[edge.dst].x]>"
         ng-attr-y2="<[graph.vertices[edge.dst].y]>"
-        style="stroke: black; stroke-width: 2;">
+        style="stroke: black; stroke-width: 2;"
+        graph="graph"
+        state="state"
+        edge="edge"
+        index="$index">
       </line>
       <g graph-input-vertex 
         ng-repeat="vertex in graph.vertices"
-        ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)">
+        ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)"
+        graph="graph"
+        state="state"
+        vertex="vertex"
+        index="$index">
         <text ng-if="graph.isLabeled" 
           x="0" 
           y="-10"
-          ng-dblclick="startEditVertexLabel(graph, state)">
+          ng-dblclick="startEditVertexLabel()">
           <[vertex.label]>
         </text>
         <circle ng-mouseenter="state.hoverVertex = $index"
           ng-mouseleave="state.hoverVertex = ($index === state.hoverVertex) ? null : state.hoverVertex"
-          ng-click="onClickGraphVertex(graph, state)"
-          ng-mousedown="onMousedownGraphVertex(graph, state)"
-          ng-mouseup="onMouseupGraphVertex(graph,state)"
-          ng-dblclick="startEditVertexLabel(graph, state)"
+          ng-click="onClickGraphVertex()"
+          ng-mousedown="onMousedownGraphVertex()"
+          ng-mouseup="onMouseupGraphVertex()"
+          ng-dblclick="startEditVertexLabel()"
           cx="0"
           cy="0"
           r="5">
