@@ -52,7 +52,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         with self.swap(
                 jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                [exp_jobs_test.ModifiedExpSummaryAggregator]):
+                [exp_jobs_test.ModifiedExpSummariesAggregator]):
 
             owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
             self.save_new_default_exploration(
@@ -61,13 +61,13 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
             # run batch job
             self.process_and_flush_pending_tasks()
-            exp_jobs_test.ModifiedExpSummaryAggregator.start_computation()
+            exp_jobs_test.ModifiedExpSummariesAggregator.start_computation()
             self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(self.count_jobs_in_taskqueue(), 0)
             # need to stop computation here, otherwise cannot start new
             # computation below. todo: undertand this better
-            exp_jobs_test.ModifiedExpSummaryAggregator.stop_computation(owner_id)
+            exp_jobs_test.ModifiedExpSummariesAggregator.stop_computation(owner_id)
 
             response_dict = self.get_json(feconf.GALLERY_DATA_URL)
             self.assertEqual({
@@ -83,11 +83,11 @@ class GalleryPageTest(test_utils.GenericTestBase):
             exp_services.load_demo('0')
 
             # run batch job
-            exp_jobs_test.ModifiedExpSummaryAggregator.start_computation()
+            exp_jobs_test.ModifiedExpSummariesAggregator.start_computation()
             self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(self.count_jobs_in_taskqueue(), 0)
-            exp_jobs_test.ModifiedExpSummaryAggregator.stop_computation(owner_id)
+            exp_jobs_test.ModifiedExpSummariesAggregator.stop_computation(owner_id)
 
             response_dict = self.get_json(feconf.GALLERY_DATA_URL)
             self.assertEqual(response_dict['released'], [])
@@ -96,7 +96,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
                 'id': '0',
                 'category': 'Welcome',
                 'title': 'Welcome to Oppia!',
-                'language_code': 'en',
+                'language': 'English',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
             }, response_dict['beta'][0])
@@ -105,7 +105,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             rights_manager.publicize_exploration(owner_id, '0')
 
             # run batch job
-            exp_jobs_test.ModifiedExpSummaryAggregator.start_computation()
+            exp_jobs_test.ModifiedExpSummariesAggregator.start_computation()
             self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
@@ -116,7 +116,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
                 'id': '0',
                 'category': 'Welcome',
                 'title': 'Welcome to Oppia!',
-                'language_code': 'en',
+                'language': 'English',
                 'objective': 'become familiar with Oppia\'s capabilities',
                 'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
             }, response_dict['released'][0])

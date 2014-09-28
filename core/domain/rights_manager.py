@@ -159,6 +159,12 @@ def _save_exploration_rights(
 
     model.commit(committer_id, commit_message, commit_cmds)
 
+    # update summary of changed exploration (note that exploration rights id
+    # is the same as exploration id)
+    from core.domain import exp_services
+    exploration = exp_services.get_exploration_by_id(exploration_rights.id)
+    exp_services.update_exploration_summary(exploration)
+
 
 def create_new_exploration_rights(exploration_id, committer_id):
     exploration_rights = ExplorationRights(
@@ -176,7 +182,6 @@ def create_new_exploration_rights(exploration_id, committer_id):
 
     subscription_services.subscribe_to_activity(
         committer_id, exploration_id)
-
 
 def get_exploration_rights(exploration_id):
     """Retrieves the rights for this exploration from the datastore."""

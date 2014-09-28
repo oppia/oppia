@@ -42,7 +42,7 @@ import feconf
 import utils
 
 # TODO(msl): test ExpSummaryModel changes if explorations are updated, 
-# reverted, deleted, created
+# reverted, deleted, created, rights changed
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
@@ -1753,6 +1753,7 @@ class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
             mock_record)
 
         with record_event_swap:
+            self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
             rights_manager.create_new_exploration_rights(self.EXP_ID, self.OWNER_ID)
             rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
             rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)

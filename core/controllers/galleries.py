@@ -88,20 +88,27 @@ class GalleryHandler(base.BaseHandler):
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 
-        # Get all exploration summaries (keyed by exploration id)
-        exp_summary_models = exp_models.ExpSummaryModel.get_non_private()
+        # Get non-private and viewable private exploration summaries
+        exp_summaries_dict = exp_services.get_non_private_exploration_summaries()
+        if self.user_id:
+            exp_summaries_dict.update(
+                exp_services.get_private_at_least_viewable_exploration_summaries(
+                    self.user_id))
 
         explorations_list = [{
-            'id': expsum.id,
-            'title': expsum.title,
-            'category': expsum.category,
-            'objective': expsum.objective,
-            'language_code': expsum.language_code,
-            'last_updated': expsum.last_updated,
-            'status': expsum.status,
-            'community_owned': expsum.community_owned,
-            'is_editable': exp_services.exp_summary_is_editable(expsum, user_id=self.user_id)
-        } for expsum in exp_summary_models]
+            'id': exp_summary.id,
+            'title': exp_summary.title,
+            'category': exp_summary.category,
+            'objective': exp_summary.objective,
+            'language': language_codes_to_short_descs.get(
+                exp_summary.language_code, exp_summary.language_code),
+            'last_updated': exp_summary.last_updated,
+            'status': exp_summary.status,
+            'community_owned': exp_summary.community_owned,
+            'is_editable': exp_services.exp_summary_is_editable(
+                exp_summary,
+                user_id=self.user_id)
+        } for key, exp_summary in exp_summaries_dict.iteritems()]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(

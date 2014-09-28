@@ -1415,3 +1415,40 @@ class Exploration(object):
         for (state_name, state) in self.states.iteritems():
             result.add(state.widget.widget_id)
         return list(result)
+
+
+class ExplorationSummary(object):
+    """Domain object for an Oppia exploration summary."""
+
+    def __init__(self, exploration_id, title, category, objective,
+                 language_code, skill_tags, status,
+                 community_owned, owner_ids, editor_ids,
+                 viewer_ids, version, created_on=None,
+                 last_updated=None):
+        self.id = exploration_id
+        self.title = title
+        self.category = category
+        self.objective = objective
+        self.language_code = language_code
+        self.skill_tags = skill_tags
+        self.status = status
+        self.community_owned = community_owned
+        self.owner_ids = owner_ids
+        self.editor_ids = editor_ids
+        self.viewer_ids = viewer_ids
+        self.version = version
+        self.created_on = created_on
+        self.last_updated = last_updated
+
+    def is_equal_to(self, other):
+        simple_props = ['id', 'title', 'category', 'objective', 'language_code',
+                        'skill_tags', 'status', 'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version', 'created_on',
+                        'last_updated']
+
+        for prop in simple_props:
+            if getattr(self, prop) != getattr(other, prop):
+                print 'different', prop,  getattr(self, prop), getattr(other, prop)
+                return False
+
+        return True
