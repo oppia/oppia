@@ -83,8 +83,12 @@ describe('State editor', function() {
     editor.editRule(0).setDestination('END');
     editor.editRule(0).editFeedback().editRichTextEntry(0).
       appendPlainText('correct');
+    // TODO(sll): This call should be unnecessary.
+    editor.editRule(0).closeRuleEditor();
     editor.editRule('default').editFeedback().editRichTextEntry(0).
       appendPlainText('out of bounds');
+    // TODO(sll): This call should be unnecessary.
+    editor.editRule('default').closeRuleEditor();
     editor.saveChanges();
 
     general.moveToPlayer();

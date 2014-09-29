@@ -61,16 +61,21 @@ input.ng-dirty.ng-invalid {
 /* Change the color of odd-numbered lines in a table. */
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
-   background-color: #f0f0f0;
- }
+  background-color: #f0f0f0;
+}
 
- .oppia-form-error {
-   color: red;
- }
+.oppia-form-error {
+  color: red;
+}
 
- .oppia-serious-warning-text {
-   color: red;
- }
+.oppia-warning-text {
+  background: #F9EDBE;
+  color: black;
+}
+
+.oppia-serious-warning-text {
+  color: red;
+}
 
 .oppia-editor h3 {
   font-size: 18px;
@@ -659,7 +664,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-placeholder {
-  color: #aaa;
+  color: #888;
   font-style: italic;
 }
 
@@ -784,105 +789,71 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-right: 5px;
 }
 
-.oppia-rule-block {
-  margin-top: 10px;
-}
-
 .oppia-add-rule-button {
-  font-weight: bold;
-  margin-bottom: 10px;
-  margin-top: 10px;
-  padding: 5px;
-  width: 100%;
+  margin-top: -10px;
 }
 
 .oppia-edit-rule-description-button {
   margin-left: 5px;
 }
 
-.oppia-rule-sort-arrows {
-  cursor: move;
-  font-size: 14px;
-  margin-top: 10px;
+.oppia-readonly-rule-container {
+  margin-left: -30px;
 }
-
-.oppia-rule-sort-handle {
+.oppia-readonly-rule-tile {
+  background: #eee;
   border-bottom-left-radius: 8px;
-  border-top-left-radius: 8px;
-  height: 34px;
-  left: -9px;
-  position: absolute;
-  top: 0px;
-  width: 25px;
-}
-.oppia-rule-sort-handle-warning {
-  background-color: #F7E49B;
-}
-.oppia-rule-sort-handle-no-warning {
-  background-color: #2E5A93;
-}
-
-.oppia-rule-bubble {
-  background: #18447E;
+  border-bottom-right-radius: 8px;
   border-top-right-radius: 8px;
-  color: #ffffff;
-  padding: 5px;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  margin-bottom: 0;
+  margin-left: 0;
+  margin-right: -50px;
 }
-
-.oppia-non-default-rule-header-bubble {
-  cursor: move;
+.oppia-readonly-rule-tile:hover {
+  background: #ddd;
 }
-
-.oppia-default-rule-header-bubble {
-  border-top-left-radius: 8px;
+.oppia-readonly-rule-container:hover .oppia-rule-edit-button {
+  background: #47a447;
+  color: white;
 }
-
-.oppia-rule-header-bubble {
-  font-weight: bold;
-  text-align: center;
-}
-
-.oppia-rule-header-bubble img {
+.oppia-readonly-rule-tile img {
   max-height: 50px;
 }
 
-.oppia-rule-description-picker-bubble {
-  text-align: center;
+.oppia-rule-sort-handle {
+  background: #ccc;
+  border-bottom-left-radius: 8px;
+  border-top-left-radius: 8px;
+  float: left;
+  margin-left: -10px;
+  width: 25px;
+}
+.oppia-rule-sort-arrows {
+  cursor: move;
+  font-size: 14px;
+  margin-left: 5px;
 }
 
-.oppia-rule-bubble-warning {
-  background: #F9EDBE;
-  border-top-right-radius: 8px;
-  padding: 5px;
-  color: #000;
-}
-
-.oppia-rule-bubble-description-picker {
+.oppia-rule-bubble {
   background: #F9EDBE;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
-  padding: 5px;
   color: #000;
+  padding: 5px;
+  text-align: center;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
-}
-
-.oppia-rule-description-editor {
-  display: inline-block;
 }
 
 .oppia-feedback-and-dest {
   display: table;
   width: 100%;
 }
-
 .oppia-feedback-bubble {
   background: #E0E0E0;
   border-bottom-left-radius: 8px;
   display: table-cell;
   padding: 5px 10px;
 }
-
 .oppia-dest-bubble {
   background: #EEEEEE;
   border-bottom-right-radius: 8px;

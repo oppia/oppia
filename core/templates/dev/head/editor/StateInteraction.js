@@ -224,8 +224,8 @@ oppia.controller('StateInteraction', [
   $scope.RULE_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
-    handle: '.oppia-non-default-rule-header-bubble',
-    items: '.oppia-rule-block',
+    handle: '.oppia-rule-sort-handle',
+    items: '.oppia-sortable-rule-block',
     tolerance: 'pointer',
     start: function(e, ui) {
       $scope.$broadcast('externalSave');

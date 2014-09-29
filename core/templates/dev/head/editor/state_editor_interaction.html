@@ -18,7 +18,7 @@
         <div class="col-lg-12 col-md-12 col-sm-12">
           <button type="button" class="btn btn-default btn-sm pull-right oppia-open-interactive-widget-editor-btn protractor-test-edit-interaction" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded" style="padding-right: 20px; margin-bottom: -10px;">
             <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
-            Edit
+            Edit Interaction
           </button>
         </div>
       </div>
@@ -29,7 +29,7 @@
       </div>
     </div>
 
-    <div ng-if="interactiveWidgetEditorIsShown" style="padding: 10px; border: 1px solid #ccc;">
+    <div ng-if="interactiveWidgetEditorIsShown" style="padding: 20px; border: 1px solid #ccc;">
       <span class="pull-right">
         Widget type:
         <select ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>

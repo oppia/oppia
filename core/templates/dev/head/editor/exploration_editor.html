@@ -323,8 +323,16 @@
 
                 <span ng-if="editabilityService.isEditable()">
                   <button class="btn oppia-main-control-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
-                    save changes
-                    <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+                    <span ng-if="!isSaveInProgress">
+                      <span ng-if="!getChangeListLength() && lastSaveOrDiscardAction == 'save'">saved</span>
+                      <span ng-if="getChangeListLength() || lastSaveOrDiscardAction !== 'save'">
+                        save changes
+                        <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+                      </span>
+                    </span>
+                    <span ng-if="isSaveInProgress">
+                      saving...
+                    </span>
                   </button>
 
                   <button class="btn btn-default oppia-main-control-button" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()">discard changes</button>
@@ -372,7 +380,6 @@
               </div>
               <div class="col-lg-3 col-md-3 col-sm-3">
                 {% include 'editor/exploration_graph.html' %}
-                <hr class="oppia-graph-and-stats-separator">
                 {% include 'editor/state_statistics.html' %}
               </div>
             </div>

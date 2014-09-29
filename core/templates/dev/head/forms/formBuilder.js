@@ -1009,6 +1009,10 @@ oppia.directive('schemaBasedIntEditor', [function() {
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      if ($scope.localValue === undefined) {
+        $scope.localValue = 0;
+      }
+
       if ($scope.allowExpressions()) {
         $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
         $scope.expressionMode = angular.isString($scope.localValue);
@@ -1053,6 +1057,10 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             return $scope.validators()[i].max_value;
           }
         }
+      }
+
+      if ($scope.localValue === undefined) {
+        $scope.localValue = 0.0;
       }
 
       if ($scope.allowExpressions()) {

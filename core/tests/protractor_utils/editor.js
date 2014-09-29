@@ -46,7 +46,6 @@ var editContent = function() {
 
 
 // Interactive widgets
-
 var _openWidgetEditor = function() {
   element(by.css('.protractor-test-edit-interaction')).click();
 };
@@ -91,6 +90,15 @@ var selectSimpleMultipleChoiceWidget = function(textArray) {
 };
 
 
+// Rules
+var _openRuleEditor = function(elem) {
+  elem.element(by.css('.oppia-rule-edit-button')).click();
+};
+
+var _closeRuleEditor = function(elem) {
+  elem.element(by.css('.protractor-test-save-rule')).click();
+};
+
 // Rules are zero-indexed; 'default' denotes the default rule.
 var editRule = function(ruleNum) {
   var elem = (ruleNum === 'default') ?
@@ -98,6 +106,7 @@ var editRule = function(ruleNum) {
     element(by.repeater('rule in handler track by $index').row(ruleNum));
   return {
     editFeedback: function() {
+      _openRuleEditor(elem);
       var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
       // This button will not be shown if we are part way through editing.
       feedbackElement.all(by.css('.protractor-test-edit-feedback')).
@@ -108,19 +117,23 @@ var editRule = function(ruleNum) {
         });
       return forms.editList(feedbackElement);
     },
+    closeRuleEditor: function() {
+      // TODO(sll): there must be a better way to structure this.
+      _closeRuleEditor(elem);
+    },
     // Enter 'END' for the end state.
     setDestination: function(destinationName) {
+      _openRuleEditor(elem);
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
-      destinationElement.element(by.tagName('button')).click();
       forms.editAutocompleteDropdown(destinationElement).
         setText(destinationName + '\n');
+      _closeRuleEditor(elem);
     }
   }
 };
 
-// This function is run from the "select rule type" interface being open. It
-// will select the rule to be used, enter the relevant parameters and then
-// click "Done".
+// This function selects the rule to be used and enters the relevant parameters.
+// It assumes that the rule editor is already open.
 // parameterArray is an array of elements of the form {
 //    value: the value specified for the parameter to take
 //    fragmentNum: the index in the list of rule fragments of the parameter
@@ -129,52 +142,48 @@ var editRule = function(ruleNum) {
 var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
   // It is necessary to get all the texts first, as clicking 'Select' will 
   // remove the allRuleTypes from the DOM.
-  ruleElement.all(by.repeater('(description, name) in allRuleTypes')).map(
-      function(option) {
-    return option.getText();
-  }).then(function(descriptions) {
-    for (var i = 0; i < descriptions.length; i++) {
-      if (descriptions[i].match(ruleDescription)) {
-        ruleElement.element(
-          by.repeater('(description, name) in allRuleTypes').row(i)
-        ).element(by.buttonText('Select')).click();
+
+  var select2Elt = ruleElement.element(by.css('.protractor-test-rule-description')).click();
+
+  element(by.id('select2-drop')).element(
+      by.cssContainingText('li.select2-results-dept-0', ruleDescription)).then(
+      function(optionElt) {
+    optionElt.click();
+    protractor.getInstance().waitForAngular();
+
+    // Now we enter the parameters
+    for (var i = 0; i < parameterArray.length; i++) {
+      var parameterElement = ruleElement.element(
+        by.repeater('item in ruleDescriptionFragments track by $index'
+      ).row(parameterArray[i].fragmentNum));
+
+      if (parameterArray[i].type === 'real') {
+        forms.editReal(parameterElement).setValue(parameterArray[i].value);
+      } else if (parameterArray[i].type === 'unicode') {
+        forms.editUnicode(parameterElement).setText(parameterArray[i].value);
+      } else if (parameterArray[i].type === 'choice') {
+        parameterElement.element(
+          by.cssContainingText('option', parameterArray[i].value
+        )).click();
+      } else {
+        throw Error(
+          'Unknown type ' + parameterArray[i].type + 
+          ' sent to editor._editRuleType');
       }
     }
   });
-
-  // Now we enter the parameters
-  for (var i = 0; i < parameterArray.length; i++) {
-    var parameterElement = ruleElement.element(
-      by.repeater('item in ruleDescriptionFragments track by $index'
-    ).row(parameterArray[i].fragmentNum));
-
-    if (parameterArray[i].type === 'real') {
-      forms.editReal(parameterElement).setValue(parameterArray[i].value);
-    } else if (parameterArray[i].type === 'unicode') {
-      forms.editUnicode(parameterElement).setText(parameterArray[i].value);
-    } else if (parameterArray[i].type === 'choice') {
-      parameterElement.element(
-        by.cssContainingText('option', parameterArray[i].value
-      )).click();
-    } else {
-      throw Error(
-        'Unknown type ' + parameterArray[i].type + 
-        ' sent to editor._editRuleType');
-    }
-  }
-  ruleElement.element(by.buttonText('Done')).click();
 };
 
 var _addRule = function(ruleDescription, parameterArray) {
   element(by.css('.oppia-add-rule-button')).click();
-  _editRuleType(
-    element(by.css('.protractor-test-temporary-rule')), ruleDescription, 
-    parameterArray);
+  var newRuleElt = element(by.css('.protractor-test-temporary-rule'));
+  _editRuleType(newRuleElt, ruleDescription, parameterArray);
+  _closeRuleEditor(newRuleElt);
 };
 
 var addNumericRule = {
   IsInclusivelyBetween: function(a, b) {
-    _addRule('is between INPUT and INPUT, inclusive', [{
+    _addRule('is between ... and ..., inclusive', [{
       value: a,
       fragmentNum: 1,
       type: 'real'
@@ -185,42 +194,42 @@ var addNumericRule = {
     }]);
   },
   Equals: function(a) {
-    _addRule('is equal to INPUT', [{
+    _addRule('is equal to ...', [{
       value: a,
       fragmentNum: 1,
       type: 'real'
     }]);
   },
   IsGreaterThanOrEqualTo: function(a) {
-    _addRule('is greater than or equal to INPUT', [{
+    _addRule('is greater than or equal to ...', [{
       value: a,
       fragmentNum: 1,
       type: 'real'
     }]);
   },
   IsGreaterThan: function(a) {
-    _addRule('is greater than INPUT', [{
+    _addRule('is greater than ...', [{
       value: a,
       fragmentNum: 1,
       type: 'real'
     }]);
   },
   IsLessThanOrEqualTo: function(a) {
-    _addRule('is less than or equal to INPUT', [{
+    _addRule('is less than or equal to ...', [{
       value: a,
       fragmentNum: 1,
       type: 'real'
     }]);
   },
   IsLessThan: function(a) {
-    _addRule('is less than INPUT', [{
+    _addRule('is less than ...', [{
       value: a,
       fragmentNum: 1,
       type: 'real'
     }]);
   },
   IsWithinTolerance: function(a, b) {
-    _addRule('is within INPUT of INPUT', [{
+    _addRule('is within ... of ...', [{
       value: a,
       fragmentNum: 1,
       type: 'real'
@@ -234,7 +243,7 @@ var addNumericRule = {
 
 var addMultipleChoiceRule = {
   Equals: function(a) {
-    _addRule('is equal to INPUT', {
+    _addRule('is equal to ...', {
       value: a,
       fragmentNum: 1,
       // In the backend this is a non-negative int, but that parameter is
