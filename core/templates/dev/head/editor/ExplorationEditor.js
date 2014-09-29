@@ -938,17 +938,6 @@ oppia.controller('ExplorationEditor', [
   $scope.onClickStateInMinimap = function(stateName) {
     if (stateName !== END_DEST) {
       $scope.showStateEditor(stateName);
-      // The call to $apply() is needed in order to trigger the state change
-      // event. This is probably because the call sometimes originates from the
-      // d3 code, which Angular does not know about. The call to $apply() is
-      // wrapped here within a setTimeout function as described here:
-      //
-      //   http://stackoverflow.com/questions/18626039/apply-already-in-progress-error
-      //
-      // to prevent it causing an error when it fires unnecessarily.
-      setTimeout(function() {
-        $scope.$apply();
-      });
     }
   };
 

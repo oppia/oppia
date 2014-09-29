@@ -393,6 +393,20 @@
     </div>
   </div>
 
+  <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
+  <svg width="0" height="0">
+    <defs>
+      <marker id="arrowhead" viewBox="-5 -5 18 18" refX="10" refY="6"
+              markerWidth="6" markerHeight="9" orient="auto">
+        <path d="M -5 0 L 12 6 L -5 12 z" fill="grey"></path>
+      </marker>
+      <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
+        <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>
+        <stop offset="100%" style="stop-opacity: 0.1; stop-color: darkseagreen;"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
+
   <script type="text/ng-template" id="inline/param_change_editor">
     {% include 'components/param_change_editor.html' %}
   </script>
@@ -401,11 +415,13 @@
     {% include 'components/rule_editor.html' %}
   </script>
 
+  {% include 'components/visualizations.html' %}
+
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/third_party/static/d3js-3.2.8/d3.min.js"></script>
+  <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script>
     {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationEditor.js') }}
