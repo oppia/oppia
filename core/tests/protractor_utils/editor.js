@@ -47,30 +47,29 @@ var editContent = function() {
 
 // Interactive widgets
 
-var _openWidgetEditor = function(widgetName) {
+var _openWidgetEditor = function() {
   element(by.css('.protractor-test-edit-interaction')).click();
-  element.all(by.repeater('widget in widgetList')).map(function(elem) {
-    elem.getText().then(function(name) {
-      if (name.match(widgetName)) {
-        elem.click();
-      }
-    });
-  });
 };
 
 var _closeWidgetEditor = function() {
   element(by.css('.protractor-test-save-interaction')).click();
 };
 
+var _selectWidget = function(widgetName) {
+  element(by.model('tmpWidgetId')).
+    element(by.cssContainingText('option', widgetName)).click();
+};
+
 var selectNumericWidget = function() {
-  _openWidgetEditor('Numeric input');
+  _openWidgetEditor();
+  _selectWidget('Numeric input');
   _closeWidgetEditor();
 };
 
 var selectContinueWidget = function(buttonText) {
-  _openWidgetEditor('Continue');
+  _openWidgetEditor();
+  _selectWidget('Continue');
   if (buttonText) {
-    element(by.linkText('Customize')).click();
     forms.editUnicode(element(by.css('.protractor-test-widget-args'))).
       setText(buttonText);
   }
@@ -79,8 +78,8 @@ var selectContinueWidget = function(buttonText) {
 
 // textArray should be a non-empty array of strings (to be the options)
 var selectSimpleMultipleChoiceWidget = function(textArray) {
-  _openWidgetEditor('Multiple choice input');
-  element(by.linkText('Customize')).click();
+  _openWidgetEditor();
+  _selectWidget('Multiple choice input');
   var customizer = forms.editList(
     element(by.css('.protractor-test-widget-args')));
   customizer.editRichTextEntry(0).setPlainText(textArray[0]);

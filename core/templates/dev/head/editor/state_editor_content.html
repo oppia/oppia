@@ -7,29 +7,33 @@
 {% block cls %}oppia-state-content{% endblock %}
 
 {% block center %}
-  <param-change-editor param-changes="stateParamChanges"
-      param-specs="paramSpecs" save-param-changes="saveStateParamChanges"
-      add-exploration-param-spec="addExplorationParamSpec"
-      is-editable="editabilityService.isEditable()">
-  </param-change-editor>
+  <div ng-if="!contentMemento" class="oppia-content-section">
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <button type="button" class="btn btn-default btn-sm pull-right oppia-open-content-editor-btn protractor-test-edit-content" ng-click="editContent()" ng-if="editabilityService.isEditable()" style="padding-right: 20px; margin-bottom: -10px;">
+          <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
+          Edit
+        </button>
+      </div>
+    </div>
 
-  <hr class="oppia-param-and-content-separator">
-
-  <div ng-if="!contentMemento">
-    <button type="button" class="btn btn-default btn-xs pull-right protractor-test-edit-content" ng-click="editContent()" ng-if="editabilityService.isEditable()">
-      <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
-    </button>
-    <span ng-show="content[0].value == ''" class="oppia-placeholder">
-      Click the <span class="glyphicon glyphicon-pencil"></span> button on the right to add content.
-    </span>
-    <span angular-html-bind="content[0].value"></span>
+    <div class="row">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="oppia-state-content-display">
+          <span ng-show="content[0].value == ''" class="oppia-placeholder">
+            Click the <span class="glyphicon glyphicon-pencil"></span> button on the top to add content.
+          </span>
+          <span angular-html-bind="content[0].value"></span>
+        </div>
+      </div>
+    </div>
   </div>
 
   <div ng-if="!!contentMemento">
     <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
     </schema-based-editor>
     <div style="margin-top: 5px;">
-      <button type="button" class="btn btn-success pull-right" ng-click="saveTextContent()">Save Content</button>
+      <button type="button" class="btn btn-success" ng-click="saveTextContent()">Save Content</button>
     </div>
   </div>
 {% endblock %}

@@ -247,7 +247,7 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
   };
 }]);
 
-// Service for noninteractive widget definitions.
+// Service for noninteractive and interactive widget definitions.
 oppia.factory('widgetDefinitionsService', ['$http', '$log', '$q', function($http, $log, $q) {
   var _definitions = {
     noninteractive: null,
