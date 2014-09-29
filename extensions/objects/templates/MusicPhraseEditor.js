@@ -27,6 +27,8 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: ['$scope', '$rootScope', function($scope, $rootScope) {
+      $scope.maxNotesOnStaff = 8;
+
       $scope.schema = {
         type: 'list',
         items: {
@@ -56,7 +58,7 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
       $scope.$watch('localValue', function(newValue, oldValue) {
         if (newValue && oldValue) {
           var parentValues = [];
-          for (var i = 0; i < newValue.length; i++) {
+          for (var i = 0; i < newValue.length && i < $scope.maxNotesOnStaff; i++) {
             parentValues.push({
               readableNoteName: newValue[i],
               noteDuration: {'num': 1, 'den': 1}

@@ -30,6 +30,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         $scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         $scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.sequenceToGuessWithValue);
+        $scope.hintSequence = oppiaHtmlEscaper.escapedJsonToObj(
+         $attrs.hintSequenceWithValue);
 
         /**
          * A note Object has a baseNoteMidiNumber and an offset property. For
@@ -148,6 +150,17 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
 
           repaintNotes();
         };
+
+        // Hint notes are are placed on the staff at the
+        // start of the exploration and can be removed by the reader.
+        var addHintNotesToNoteSequence = function(hintNotesToAdd) {
+          for (var i = 0; i < hintNotesToAdd.length; i++) {
+            hintNotesToAdd[i] = _convertReadableNoteToNote(hintNotesToAdd[i]);
+            hintNotesToAdd[i].noteId = $scope.generateNoteId();
+            hintNotesToAdd[i].noteStart = {'num': i, 'den': 1};
+            $scope._addNoteToNoteSequence(hintNotesToAdd[i]);
+          }
+        }($scope.hintSequence);
 
         $scope.init();
 
@@ -282,7 +295,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                 left:
                   getHorizontalPosition(getNoteStartAsFloat($scope.noteSequence[i].note)),
                 position: 'absolute'
-              })
+              });
             noteChoicesDiv.append(innerDiv);
           }
           repaintLedgerLines();
