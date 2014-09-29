@@ -1225,6 +1225,15 @@ oppia.directive('schemaBasedListEditor', [
         $scope.addElementText = $scope.uiConfig().add_element_text;
       }
 
+      $scope.maxListLength = null;
+      if ($scope.validators()) {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'has_length_at_most') {
+            $scope.maxListLength = $scope.validators()[i].max_value;
+          }
+        }
+      }
+
       if ($scope.len === undefined) {
         $scope.addElement = function() {
           $scope.localValue.push(
