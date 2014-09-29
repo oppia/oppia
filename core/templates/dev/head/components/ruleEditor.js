@@ -130,22 +130,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleEditorIsOpen = false;
 
           // If a new state has been entered, create it.
-          var foundInExistingStateList = false;
-          for (var stateName in $scope.states) {
-            if (stateName === $scope.rule.dest) {
-              foundInExistingStateList = true;
-            }
-          }
-
-          if (!foundInExistingStateList && $scope.rule.dest !== 'END') {
-            try {
-              $scope.addState($scope.rule.dest);
-              $scope.ruleDestMemento = $scope.rule.dest;
-            } catch(e) {
-              $scope.rule.dest = $scope.ruleDestMemento;
-              throw e;
-            }
-          }
+          $scope.createRuleDestIfNecessary();
 
           $scope.removeNullFeedback();
           $scope.ruleDescriptionMemento = null;
@@ -159,6 +144,29 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
           $scope.cancelEdit();
+        };
+
+        $scope.createRuleDestIfNecessary = function() {
+          var foundInExistingStateList = false;
+          for (var stateName in $scope.states) {
+            if (stateName === $scope.rule.dest) {
+              foundInExistingStateList = true;
+            }
+          }
+
+          if (!foundInExistingStateList && $scope.rule.dest !== 'END') {
+            try {
+              $scope.addState($scope.rule.dest);
+              $scope.ruleDestMemento = $scope.rule.dest;
+              $scope.destChoices.push({
+                id: $scope.rule.dest,
+                text: $scope.rule.dest
+              });
+            } catch(e) {
+              $scope.rule.dest = $scope.ruleDestMemento;
+              throw e;
+            }
+          }
         };
 
         $scope.$watch('widgetHandlerSpecs', function(newValue) {

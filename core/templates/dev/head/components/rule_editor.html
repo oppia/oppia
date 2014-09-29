@@ -111,7 +111,7 @@
       <div class="oppia-dest-bubble">
         <div class="oppia-align-center">
           <strong>Destination:</strong><br />
-          <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9]+$">
+          <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9]+$" on-selection-change="createRuleDestIfNecessary()">
           </select2-dropdown>
           <span ng-if="rule.dest == stateName"> ⟳ </span><br />
         </div>

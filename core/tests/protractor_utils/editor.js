@@ -90,44 +90,32 @@ var selectSimpleMultipleChoiceWidget = function(textArray) {
 };
 
 
-// Rules
-var _openRuleEditor = function(elem) {
-  elem.element(by.css('.oppia-rule-edit-button')).click();
-};
-
-var _closeRuleEditor = function(elem) {
-  elem.element(by.css('.protractor-test-save-rule')).click();
-};
-
 // Rules are zero-indexed; 'default' denotes the default rule.
 var editRule = function(ruleNum) {
   var elem = (ruleNum === 'default') ?
     element(by.css('.protractor-test-default-rule')):
     element(by.repeater('rule in handler track by $index').row(ruleNum));
+
+  // This button will not be shown if the rule editor is already open.
+  elem.all(by.css('.oppia-rule-edit-button')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else if (buttons.length !== 0) {
+      throw 'Expected to find at most 1 edit-rule button per rul; found ' +
+        buttons.length;
+    }
+  });
+
   return {
     editFeedback: function() {
-      _openRuleEditor(elem);
       var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
-      // This button will not be shown if we are part way through editing.
-      feedbackElement.all(by.css('.protractor-test-edit-feedback')).
-        then(function(buttons) {
-          if (buttons.length > 0) {
-            buttons[0].click();
-          }
-        });
       return forms.editList(feedbackElement);
-    },
-    closeRuleEditor: function() {
-      // TODO(sll): there must be a better way to structure this.
-      _closeRuleEditor(elem);
     },
     // Enter 'END' for the end state.
     setDestination: function(destinationName) {
-      _openRuleEditor(elem);
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
       forms.editAutocompleteDropdown(destinationElement).
         setText(destinationName + '\n');
-      _closeRuleEditor(elem);
     }
   }
 };
@@ -140,11 +128,7 @@ var editRule = function(ruleNum) {
 //    type: the type of the parameter
 // }
 var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
-  // It is necessary to get all the texts first, as clicking 'Select' will 
-  // remove the allRuleTypes from the DOM.
-
-  var select2Elt = ruleElement.element(by.css('.protractor-test-rule-description')).click();
-
+  ruleElement.element(by.css('.protractor-test-rule-description')).click();
   element(by.id('select2-drop')).element(
       by.cssContainingText('li.select2-results-dept-0', ruleDescription)).then(
       function(optionElt) {
@@ -178,7 +162,7 @@ var _addRule = function(ruleDescription, parameterArray) {
   element(by.css('.oppia-add-rule-button')).click();
   var newRuleElt = element(by.css('.protractor-test-temporary-rule'));
   _editRuleType(newRuleElt, ruleDescription, parameterArray);
-  _closeRuleEditor(newRuleElt);
+  newRuleElt.element(by.css('.protractor-test-save-rule')).click();
 };
 
 var addNumericRule = {
