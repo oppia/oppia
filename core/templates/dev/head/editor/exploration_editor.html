@@ -8,7 +8,10 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
-    GLOBALS.ALL_LANGUAGE_CODES = JSON.parse('{{ALL_LANGUAGE_CODES|js_string}}');
+    GLOBALS.ALL_LANGUAGE_CODES = JSON.parse(
+      '{{ALL_LANGUAGE_CODES|js_string}}');
+    GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
+      '{{NEW_STATE_TEMPLATE|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -30,6 +33,11 @@
       <b class="caret"></b>
     </a>
     <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a href="https://code.google.com/p/oppia/wiki/CustomizingStates" target="_blank">
+          How to Create An Exploration
+        </a>
+      </li>
       <li class="dropdown">
         <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
           Planning Your Exploration
@@ -85,7 +93,7 @@
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-click="publish()">Publish Exploration</button>
+        <button class="btn btn-success protractor-test-confirm-publish" ng-click="publish()">Publish Exploration</button>
       </div>
     </script>
 
@@ -237,7 +245,7 @@
       </div>
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save Exploration</button>
+        <button class="btn btn-success protractor-test-close-save-modal" ng-disabled = "!commitMessageIsOptional && !commitMessage" ng-click="save(commitMessage)">Save Exploration</button>
       </div>
     </script>
 
@@ -290,7 +298,7 @@
 
                 {% if can_publish %}
                   <span ng-if="explorationRightsService.isPrivate()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
+                    <button type="button" class="btn btn-default oppia-main-control-button protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
                       publish
                     </button>
                   </span>
@@ -314,7 +322,7 @@
                 </a>
 
                 <span ng-if="editabilityService.isEditable()">
-                  <button class="btn oppia-main-control-button" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+                  <button class="btn oppia-main-control-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
                     save changes
                     <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
                   </button>
@@ -390,6 +398,20 @@
     </div>
   </div>
 
+  <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
+  <svg width="0" height="0">
+    <defs>
+      <marker id="arrowhead" viewBox="-5 -5 18 18" refX="10" refY="6"
+              markerWidth="6" markerHeight="9" orient="auto">
+        <path d="M -5 0 L 12 6 L -5 12 z" fill="grey"></path>
+      </marker>
+      <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
+        <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>
+        <stop offset="100%" style="stop-opacity: 0.1; stop-color: darkseagreen;"></stop>
+      </linearGradient>
+    </defs>
+  </svg>
+
   <script type="text/ng-template" id="inline/param_change_editor">
     {% include 'components/param_change_editor.html' %}
   </script>
@@ -398,11 +420,13 @@
     {% include 'components/rule_editor.html' %}
   </script>
 
+  {% include 'components/visualizations.html' %}
+
 {% endblock content %}
 
 {% block footer_js %}
   {{ super() }}
-  <script src="/third_party/static/d3js-3.2.8/d3.min.js"></script>
+  <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script>
     {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationEditor.js') }}

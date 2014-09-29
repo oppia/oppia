@@ -115,9 +115,9 @@
         <div ng-if="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
           <hr>
 
-          <h4>Roles</h4>
           <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="col-lg-5 col-md-5 col-sm-5">
+              <h4>Roles</h4>
               <div ng-show="explorationRightsService.ownerNames.length > 0">
                 <strong>Managers</strong>
                 <ul>
@@ -144,36 +144,79 @@
                   </li>
                 </ul>
               </div>
-            </div>
 
-            <div class="col-lg-6 col-md-6 col-sm-6">
+
               {% if can_modify_roles %}
                 <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
-                  <button type="button" class="btn btn-default" ng-click="openEditRolesForm()">
+                  <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
                     Edit Roles
                   </button>
                 </div>
 
                 <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
                   <strong>Add or Change Role</strong>
-                  <br><br>
-                  <form ng-submit="editRole(newMemberEmail, newMemberRole.value)">
-                    Email: <input type="text" ng-model="newMemberEmail"
-                           placeholder="Email address">
-                    <br>
-                    Role: <select ng-model="newMemberRole" ng-options="r.name for r in ROLES" style="width: 250px;">
-                    </select>
-                    <br>
-                    <em>Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).</em>
-                    <br>
-                    <input type="submit" class="btn btn-default" value="Save">
-                    <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
-                      ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
-                      Cancel
-                    </button>
-                  </form>
+                  <div class="form-group">
+                    <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
+                      <label for="newMemberUsername">Username of invited user</label>
+                      <div>
+                        <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
+                      </div>
+                      <br>
+                      <label for="newMemberRole">Role of invited user</label>
+                      <div>
+                        <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
+                        </select>
+                        <span class="help-block">
+                          Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
+                        </span>
+                      </div>
+
+                      <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
+                      <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
+                        ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
+                        Cancel
+                      </button>
+                    </form>
+                  </div>
                 </div>
               {% endif %}
+            </div>
+
+            <div class="col-lg-7 col-md-7 col-sm-7">
+              <h4>Permissions</h4>
+              <div class="pull-right">
+                <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
+                  Toggle visibility
+                </button>
+              </div>
+
+              <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
+                This exploration is <strong>private</strong>. Anyone with the link can play it.
+              </p>
+              <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
+                This exploration is <strong>private</strong>. Only invited playtesters and contributors can play it.
+              </p>
+              <p ng-if="explorationRightsService.isPublic()">
+                This exploration is <strong>public</strong>: anyone can play it.
+              </p>
+              <p ng-if="explorationRightsService.isPublicized()">
+                This exploration is <strong>public</strong>: anyone can play it.
+              </p>
+
+              <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
+                <em>Link to share:</em>
+                <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
+              </p>
+
+              <p ng-if="explorationRightsService.isPrivate()">
+                It is <strong>not shown</strong> in the gallery.
+              </p>
+              <p ng-if="explorationRightsService.isPublic()">
+                It is <strong>shown</strong> in the gallery (in Beta mode).
+              </p>
+              <p ng-if="explorationRightsService.isPublicized()">
+                It is <strong>shown</strong> in the gallery.
+              </p>
             </div>
           </div>
         </div>
@@ -213,7 +256,7 @@
 
               {% if can_publicize %}
                 <p ng-show="explorationRightsService.isPublic()">
-                  <button type="button" class="btn btn-default" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                  <button type="button" class="btn btn-default protractor-test-release-exploration" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
                     Move out of beta
                     <span ng-if="currentUserIsAdmin">(as admin)</span>
                     <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>

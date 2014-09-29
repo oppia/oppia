@@ -90,6 +90,11 @@ class ExplorationPage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_EXPLORE,
             'skin_html': skins_services.Registry.get_skin_html(
                 exploration.default_skin),
+            'skin_js_url': skins_services.Registry.get_skin_js_url(
+                    exploration.default_skin),
+            'skin_tag': jinja2.utils.Markup(
+                skins_services.Registry.get_skin_tag(exploration.default_skin)
+            ),
             'widget_dependencies_html': jinja2.utils.Markup(
                 widget_dependencies_html),
             'widget_js_directives': jinja2.utils.Markup(widget_js_directives),

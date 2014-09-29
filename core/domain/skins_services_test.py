@@ -33,11 +33,11 @@ class DefaultSkinsUnitTests(test_utils.GenericTestBase):
     def test_default_skins_are_present(self):
         conversation_skin = skins_services.Registry.get_skin_html(
             'conversation_v1')
-        self.assertIn('Conversation.js', conversation_skin)
         self.assertIn('conversation.css', conversation_skin)
+        self.assertIn('skins/Conversation', conversation_skin)
 
         snapshots_skin = skins_services.Registry.get_skin_html('snapshots_v1')
-        self.assertIn('Snapshots.js', snapshots_skin)
+        self.assertIn('skins/Snapshots', snapshots_skin)
 
     def test_nonexistent_skins_raise_error(self):
         with self.assertRaises(Exception):

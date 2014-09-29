@@ -6,48 +6,41 @@
 
 {% block row %}
   <div ng-repeat="(handlerName, handler) in widgetHandlers">
-    {{ super() }}
-  </div>
-{% endblock %}
-
-{% block link %}
-  https://code.google.com/p/oppia/wiki/Rules
-{% endblock %}
-
-{% block line1 %}
-  <div class="row" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
-    <!-- An HTML element marked ui-sortable should contain only one element,
-    and this element should have an ng-repeat defined on it. See the
-    ui-sortable documentation for more details. -->
-    <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
-      <rule-editor rule="rule" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
-      </rule-editor>
+    <div class="col-lg-2 col-md-2 col-sm-2">
     </div>
-  </div>
-{% endblock %}
 
-{% block line2 %}
-  <div class="row" ng-if="getCurrentWidgetId() != 'Continue' && editabilityService.isEditable()">
-    <div class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
-      <div ng-if="!tmpRule">
-        <button type="button" class="btn btn-default oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
-          Add new rule
-        </button>
+    <div class="col-lg-10 col-md-10 col-sm-10 oppia-rules">
+      <div class="row" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
+        <!-- An HTML element marked ui-sortable should contain only one element,
+        and this element should have an ng-repeat defined on it. See the
+        ui-sortable documentation for more details. -->
+        <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
+          <rule-editor rule="rule" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
+          </rule-editor>
+        </div>
       </div>
 
-      <div ng-if="tmpRule">
-        <rule-editor rule="tmpRule" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-tmp-rule="saveTmpRule" delete-rule="cancelTmpRule()" is-editable="editabilityService.isEditable()">
-        </rule-editor>
-      </div>
-    </div>
-  </div>
-{% endblock %}
+      <div class="row" ng-if="getCurrentWidgetId() != 'Continue' && editabilityService.isEditable()">
+        <div class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
+          <div ng-if="!tmpRule">
+            <button type="button" class="btn btn-default oppia-align-center oppia-add-rule-button" ng-click="createTmpRule()">
+              Add new rule
+            </button>
+          </div>
 
-{% block line3 %}
-  <div class="row">
-    <div class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block">
-      <rule-editor rule="handler[handler.length - 1]" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
-      </rule-editor>
+          <div ng-if="tmpRule" class="protractor-test-temporary-rule">
+            <rule-editor rule="tmpRule" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-tmp-rule="saveTmpRule" delete-rule="cancelTmpRule()" is-editable="editabilityService.isEditable()">
+            </rule-editor>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12 oppia-rule-block protractor-test-default-rule">
+          <rule-editor rule="handler[handler.length - 1]" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
+          </rule-editor>
+        </div>
+      </div>
     </div>
   </div>
 {% endblock %}

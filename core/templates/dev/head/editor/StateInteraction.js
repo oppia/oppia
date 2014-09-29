@@ -28,9 +28,6 @@ oppia.controller('StateInteraction', [
   $scope.widgetHandlerSpecs = [];
   $scope.widgetHandlers = {};
 
-  $scope.accordionStatus = {
-    isPreviewOpen: true
-  };
   $scope.form = {};
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
@@ -52,10 +49,6 @@ oppia.controller('StateInteraction', [
 
   $scope.getCurrentWidgetId = function() {
     return stateWidgetIdService.displayed;
-  };
-
-  $scope.getCurrentWidgetSticky = function() {
-    return stateWidgetStickyService.displayed;
   };
 
   $scope._getWidgetPreviewTag = function(widgetId, widgetCustomizationArgsList) {
@@ -92,35 +85,14 @@ oppia.controller('StateInteraction', [
       }
     }
 
+    stateWidgetStickyService.restoreFromMemento();
+
     $scope.widgetHandlerSpecs = widgetTemplate.handler_specs;
     $scope.widgetPreviewHtml = $scope._getWidgetPreviewTag(
       widgetId, widgetTemplate.customization_args);
     $scope.interactiveWidgetEditorIsShown = false;
     $scope.tmpWidget = null;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
-  };
-
-  $scope.generateTmpWidgetPreview = function() {
-    $scope.tmpWidgetTag = $scope._getWidgetPreviewTag(
-      $scope.tmpWidget.widget_id, $scope.tmpWidget.customization_args);
-  };
-
-  // Group widgets into categories.
-  $scope._generateRepository = function(allWidgets) {
-    var repository = {};
-    for (var widget_id in allWidgets) {
-      var category = allWidgets[widget_id].category;
-      if (!repository.hasOwnProperty(category)) {
-        repository[category] = [];
-      }
-      repository[category].push(allWidgets[widget_id]);
-    }
-
-    return repository;
-  };
-
-  $scope.showCustomizationForm = function() {
-    $scope.$broadcast('schemaBasedFormsShown');
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -132,7 +104,6 @@ oppia.controller('StateInteraction', [
       $scope.tmpRule = null;
       $scope.stateName = editorContextService.getActiveStateName();
       $scope.allInteractiveWidgets = widgetDefinitions;
-      $scope.interactiveWidgetRepository = $scope._generateRepository(widgetDefinitions);
 
       stateWidgetIdService.init(
         $scope.stateName, stateData.widget.widget_id, $scope.states[$scope.stateName].widget,
@@ -164,43 +135,19 @@ oppia.controller('StateInteraction', [
     });
   });
 
-  $scope.saveWidgetSticky = function() {
-    stateWidgetStickyService.saveDisplayedValue();    
-  };
-
   $scope.showInteractiveWidgetEditor = function() {
     warningsData.clear();
 
     $scope.interactiveWidgetEditorIsShown = true;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
-    $scope.accordionStatus.isPreviewOpen = true;
+    $scope.$broadcast('schemaBasedFormsShown');
 
-    for (var category in $scope.interactiveWidgetRepository) {
-      for (var i = 0; i < $scope.interactiveWidgetRepository[category].length; i++) {
-        if ($scope.interactiveWidgetRepository[category][i].widget_id == stateWidgetIdService.displayed) {
-          $scope.tmpWidget = angular.copy($scope.interactiveWidgetRepository[category][i]);
-       
-          var widgetTemplate = angular.copy($scope.allInteractiveWidgets[stateWidgetIdService.displayed]);
-          for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
-            var caName = widgetTemplate.customization_args[i].name;
-            widgetTemplate.customization_args[i].value = (
-              stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
-              angular.copy(stateCustomizationArgsService.displayed[caName].value) :
-              widgetTemplate.customization_args[i].default_value
-            );
-          }
-          $scope.tmpWidget.customization_args = angular.copy(widgetTemplate.customization_args);
-
-          $scope.tmpWidgetTag = $scope.widgetPreviewHtml;
-          return;
-        }
-      }
-    }
-
-    throw 'Could not find current widget in the repository.'
+    $scope.tmpWidgetId = stateWidgetIdService.displayed;
+    $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[$scope.tmpWidgetId]);
+    $scope.setNewTmpWidget($scope.tmpWidgetId, stateCustomizationArgsService.displayed);
   };
 
-  $scope.selectInteractiveWidget = function(tmpWidget) {
+  $scope.saveInteractiveWidget = function(tmpWidget) {
     $scope.$broadcast('externalSave');
 
     var newWidget = angular.copy(tmpWidget);
@@ -221,19 +168,24 @@ oppia.controller('StateInteraction', [
       newWidget.customization_args);
     stateCustomizationArgsService.saveDisplayedValue();
 
+    stateWidgetStickyService.saveDisplayedValue();
+
     $scope.tmpRule = null;
     $scope.updateStateWidgetHandlerData();
     $scope.refreshGraph();
     $scope.resetInteractiveWidgetEditor();
   };
 
-  $scope.setNewTmpWidget = function(widget) {
-    $scope.tmpWidget = angular.copy(widget);
+  $scope.setNewTmpWidget = function(newWidgetId, newWidgetCustomizationArgs) {
+    $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[newWidgetId]);
     for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
-      $scope.tmpWidget.customization_args[i].value = $scope.tmpWidget.customization_args[i].default_value;
+      var caName = $scope.tmpWidget.customization_args[i].name;
+      $scope.tmpWidget.customization_args[i].value = (
+        newWidgetCustomizationArgs.hasOwnProperty(caName) ?
+        angular.copy(newWidgetCustomizationArgs[caName].value) :
+        $scope.tmpWidget.customization_args[i].default_value
+      );
     }
-    $scope.generateTmpWidgetPreview();
-    $scope.accordionStatus.isPreviewOpen = true;
   };
 
   $scope.createTmpRule = function() {

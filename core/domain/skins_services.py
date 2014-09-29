@@ -70,3 +70,25 @@ class Registry(object):
         if skin_id not in cls._skins_dict:
             cls._refresh_registry()
         return cls._skins_dict[skin_id].get_html()
+
+    @classmethod
+    def get_skin_js_url(cls, skin_id):
+        """Returns the URL to the directive JS code for a given skin.
+
+        Refreshes once if the skin id is not found; subsequently, throws an
+        error.
+        """
+        if skin_id not in cls._skins_dict:
+            cls._refresh_registry()
+        return cls._skins_dict[skin_id].get_js_url()
+
+    @classmethod
+    def get_skin_tag(cls, skin_id):
+        """Returns an HTML tag corresponding to the given skin.
+
+        Refreshes once if the skin id is not found; subsequently, throws an
+        error.
+        """
+        if skin_id not in cls._skins_dict:
+            cls._refresh_registry()
+        return cls._skins_dict[skin_id].get_tag()

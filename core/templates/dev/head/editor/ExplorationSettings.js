@@ -29,6 +29,13 @@ oppia.controller('ExplorationSettings', [
       explorationInitStateNameService, changeListService, warningsData) {
 
   var GALLERY_PAGE_URL = '/gallery';
+  var EXPLORE_PAGE_PREFIX = '/explore/';
+
+  $scope.getExplorePageUrl = function() {
+    return (
+      window.location.protocol + '//' + window.location.host +
+      EXPLORE_PAGE_PREFIX + $scope.explorationId);
+  };
 
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
@@ -109,21 +116,27 @@ oppia.controller('ExplorationSettings', [
   ********************************************/
   $scope.openEditRolesForm = function() {
     activeInputData.name = 'explorationMetadata.editRoles';
-    $scope.newMemberEmail = '';
+    $scope.newMemberUsername = '';
     $scope.newMemberRole = $scope.ROLES[0];
   };
 
   $scope.closeEditRolesForm = function() {
-    $scope.newMemberEmail = '';
+    $scope.newMemberUsername = '';
     $scope.newMemberRole = $scope.ROLES[0];
     activeInputData.clear();
   };
 
-  $scope.editRole = function(newMemberEmail, newMemberRole) {
+  $scope.editRole = function(newMemberUsername, newMemberRole) {
     activeInputData.clear();
     explorationRightsService.saveChangeToBackend({
-      new_member_email: newMemberEmail,
+      new_member_username: newMemberUsername,
       new_member_role: newMemberRole
+    });
+  };
+
+  $scope.toggleViewabilityIfPrivate = function() {
+    explorationRightsService.saveChangeToBackend({
+      viewable_if_private: !explorationRightsService.viewableIfPrivate()
     });
   };
 
