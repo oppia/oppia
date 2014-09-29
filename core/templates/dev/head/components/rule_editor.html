@@ -29,8 +29,8 @@
                   <span ng-if="rule.feedback.length > 0">
                     <em>
                       <[rule.feedback[0]]>
-                      <span ng-if="rule.feedback.length > 1">...</span>
                     </em>
+                    <span ng-if="rule.feedback.length > 1">(+ <[rule.feedback.length - 1]> more feedback option<span ng-if="rule.feedback.length > 2">s</span>)</span>
                   </span>
                 </li>
               </ul>

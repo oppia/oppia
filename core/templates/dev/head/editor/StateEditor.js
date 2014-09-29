@@ -18,13 +18,19 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.constant('INITIAL_STATE_CONTENT_STR', (
+  'Welcome to the Oppia editor!<br><br>' +
+  'Anything you type here will be shown to the learner playing your exploration.<br><br>' +
+  'If you need more help getting started, check out the Help link in the navigation bar.'
+));
+
 oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
-  'explorationInitStateNameService', 'focusService', function(
+  'explorationInitStateNameService', 'focusService', 'INITIAL_STATE_CONTENT_STR', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
-    explorationInitStateNameService, focusService) {
+    explorationInitStateNameService, focusService, INITIAL_STATE_CONTENT_STR) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -54,6 +60,16 @@ oppia.controller('StateEditor', [
 
     if ($scope.stateName && stateData) {
       $scope.$broadcast('stateEditorInitialized', stateData);
+    }
+
+    // Display a welcome message if no content has been entered yet.
+    if (Object.keys($scope.states).length === 1 && !$scope.content[0].value
+        && $scope.states.hasOwnProperty('(untitled state)')) {
+      $scope.openStateContentEditor();
+      $scope.content = [{
+        type: 'text',
+        value: INITIAL_STATE_CONTENT_STR
+      }];
     }
   };
 
@@ -130,7 +146,7 @@ oppia.controller('StateEditor', [
     }
   };
 
-  $scope.editContent = function() {
+  $scope.openStateContentEditor = function() {
     $scope.contentMemento = angular.copy($scope.content);
   };
 
@@ -142,7 +158,11 @@ oppia.controller('StateEditor', [
   });
 
   $scope.saveTextContent = function() {
-    if ($scope.contentMemento !== null && $scope.contentMemento !== $scope.content) {
+    if ($scope.content && $scope.content[0].value === INITIAL_STATE_CONTENT_STR) {
+      $scope.content[0].value = '';
+    }
+
+    if ($scope.contentMemento !== null && !angular.equals($scope.contentMemento, $scope.content)) {
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'content',
         angular.copy($scope.content), angular.copy($scope.contentMemento));

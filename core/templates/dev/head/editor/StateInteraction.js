@@ -30,9 +30,15 @@ oppia.controller('StateInteraction', [
 
   $scope.form = {};
 
+  $scope.showInteractiveWidgetUsageHint = false;
+  $scope.dismissInteractiveWidgetUsageHint = function() {
+    $scope.showInteractiveWidgetUsageHint = false;
+  };
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.
-  $scope.submitAnswer = function(answer, handler) {};
+  $scope.submitAnswer = function(answer, handler) {
+    $scope.showInteractiveWidgetUsageHint = true;
+  };
   $scope.adjustPageHeight = function(scroll) {};
 
   $scope.hasLoaded = false;
@@ -137,6 +143,7 @@ oppia.controller('StateInteraction', [
 
   $scope.showInteractiveWidgetEditor = function() {
     warningsData.clear();
+    $scope.dismissInteractiveWidgetUsageHint();
 
     $scope.interactiveWidgetEditorIsShown = true;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);

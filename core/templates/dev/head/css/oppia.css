@@ -727,6 +727,13 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-interactive-section:hover .oppia-interaction-preview {
   background: #ddd;
 }
+.oppia-interactive-hint {
+  background: rgba(173, 225, 441, 0.4);
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  margin-top: -10px;
+  padding: 3px 10px;
+}
 
 .oppia-rules {
   margin: -15px 0 0 0;

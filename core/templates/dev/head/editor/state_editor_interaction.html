@@ -27,6 +27,22 @@
           <div angular-html-bind="widgetPreviewHtml" class="oppia-interaction-preview"></div>
         </div>
       </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div ng-if="showInteractiveWidgetUsageHint"
+               class="oppia-interactive-hint">
+            <button type="button" class="btn btn-default btn-xs pull-right" ng-click="dismissInteractiveWidgetUsageHint()">
+              <span class="glyphicon glyphicon-remove" title="Dismiss Hint"></span>
+            </button>
+            <p>
+              You've just submitted an answer, as a learner would!
+            </p>
+            <p>
+              If you want to edit this form instead, just click the 'Edit Interaction' button above.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div ng-if="interactiveWidgetEditorIsShown" style="padding: 20px; border: 1px solid #ccc;">

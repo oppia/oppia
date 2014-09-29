@@ -201,7 +201,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         }, true);
 
         $scope.$on('externalSave', function() {
-          $scope.saveThisRule();
+          if ($scope.ruleEditorIsOpen) {
+            $scope.saveThisRule();
+          }
         });
 
         $scope.getActiveStateName = function() {
