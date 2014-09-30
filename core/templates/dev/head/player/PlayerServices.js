@@ -104,8 +104,9 @@ oppia.factory('oppiaPlayerService', [
 
   var _editorPreviewMode = null;
   var _explorationId = null;
-  // The pathname should be: .../explore/{exploration_id} or
-  // .../create/{exploration_id}#...
+  // The pathname should be one of the following:
+  //   -   /explore/{exploration_id}
+  //   -   /create/{exploration_id}
   var pathnameArray = window.location.pathname.split('/');
   for (var i = 0; i < pathnameArray.length; i++) {
     if (pathnameArray[i] === 'explore') {

@@ -31,8 +31,8 @@ class DefaultSkinsUnitTests(test_utils.GenericTestBase):
             ['conversation_v1', 'snapshots_v1'])
 
     def test_default_skins_are_present(self):
-        conversation_skin = skins_services.Registry.get_skin_templates(
-            ['conversation_v1'])
+        conversation_skin = skins_services.Registry.get_skin_templates([
+            'conversation_v1'])
         self.assertIn('conversation.css', conversation_skin)
         self.assertIn('skins/Conversation', conversation_skin)
 
