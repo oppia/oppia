@@ -27,8 +27,8 @@ class MusicNotesInput(widget_domain.BaseWidget):
         },
         'default_value': [],
     }, {
-        'name': 'hintSequence',
-        'description': 'The Sequence of notes that start on the staff.',
+        'name': 'initialSequence',
+        'description': 'The sequence of notes that start on the staff.',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',
