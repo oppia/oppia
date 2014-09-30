@@ -20,14 +20,12 @@ the moment they are not displayed there to avoid accidental use)."""
 
 __author__ = 'Marcel Schmittfull'
 
+from core.domain import exp_domain
 import feconf
 from core import jobs
-from core.domain import exp_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
-#transaction_services = models.Registry.import_transaction_services()
-#import utils
 
 from google.appengine.ext import ndb
 
@@ -35,6 +33,7 @@ from google.appengine.ext import ndb
 class ExpCopiesRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     ExpCopy = ndb.JsonProperty(repeated=True)
+
 
 class ExpCopiesAggregator(jobs.BaseContinuousComputationManager):
     """A continuous-computation job creating 10 published copies of every
@@ -121,6 +120,7 @@ class DeleteExpCopiesAggregator(jobs.BaseContinuousComputationManager):
     @classmethod
     def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
         pass
+
 
 class DeleteExpCopiesMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):

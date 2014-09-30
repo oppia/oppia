@@ -23,20 +23,20 @@ __author__ = 'Frederik Creemers'
 import collections
 import datetime
 
+from core import jobs
+from core import jobs_registry
 from core.domain import config_services
 from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_jobs
 from core.domain import exp_services
-import feconf
-from core import jobs
-from core import jobs_registry
+from core.domain import rights_manager
 from core.platform import models
+from core.tests import test_utils
+import feconf
 (job_models, exp_models,) = models.Registry.import_models([
    models.NAMES.job, models.NAMES.exploration])
-from core.domain import rights_manager
 search_services = models.Registry.import_search_services()
-from core.tests import test_utils
 import utils
 
 
@@ -173,7 +173,7 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
                 # publish or publicize exploration
                 if spec['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
                     rights_manager.publish_exploration(self.owner_id, exp_id)
-                if spec['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+                elif spec['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
                     rights_manager.publish_exploration(self.owner_id, exp_id)
                     rights_manager.publicize_exploration(self.owner_id, exp_id)
 
@@ -187,13 +187,11 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
 
                 last_updated = None
                 if exploration.last_updated:
-                    last_updated = utils.get_time_in_millisecs(
-                        exploration.last_updated)
+                    last_updated = exploration.last_updated
 
                 created_on = None
                 if exploration.created_on:
-                    created_on = utils.get_time_in_millisecs(
-                        exploration.created_on)
+                    created_on = exploration.created_on
 
                 # manually create the expectated summary specifying title, 
                 # category, etc
@@ -213,7 +211,7 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
                     created_on=created_on,
                     last_updated=last_updated)
 
-                # calling constructor for field that are not required
+                # calling constructor for fields that are not required
                 # and have no default value does not work b/c
                 # unspecified fields will be empty list in
                 # expected_job_output but will be unspecified in

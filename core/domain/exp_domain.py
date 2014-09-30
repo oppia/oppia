@@ -1448,7 +1448,6 @@ class ExplorationSummary(object):
 
         for prop in simple_props:
             if getattr(self, prop) != getattr(other, prop):
-                print 'different', prop,  getattr(self, prop), getattr(other, prop)
                 return False
 
         return True

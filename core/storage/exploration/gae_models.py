@@ -112,8 +112,9 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
-        # msl: using put() instead of put_async() to make sure summary
-        # dicts get updated correctly
+        # TODO(msl): test if put_async() leads to any problems (make
+        # sure summary dicts get updated correctly when explorations
+        # are changed)
         ExplorationCommitLogEntryModel(
             id=('exploration-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
@@ -127,7 +128,7 @@ class ExplorationModel(base_models.VersionedModel):
             post_commit_community_owned=exp_rights.community_owned,
             post_commit_is_private=(
                 exp_rights.status == EXPLORATION_STATUS_PRIVATE)
-        ).put()
+        ).put_async()
 
 
 class ExplorationRightsSnapshotMetadataModel(
@@ -285,8 +286,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
             committer_username = (
                 committer_user_settings_model.username
                 if committer_user_settings_model else '')
-            # using put() instead of put_async() to make sure summary
-            # dicts get updated correctly
+            # TODO(msl): test if put_async() leads to any problems (make
+            # sure summary dicts get updated correctly when explorations
+            # are changed)
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -300,7 +302,7 @@ class ExplorationRightsModel(base_models.VersionedModel):
                 post_commit_community_owned=self.community_owned,
                 post_commit_is_private=(
                     self.status == EXPLORATION_STATUS_PRIVATE)
-            ).put()
+            ).put_async()
 
 
 class ExplorationCommitLogEntryModel(base_models.BaseModel):
@@ -373,12 +375,12 @@ class ExpSummaryModel(base_models.BaseModel):
 
     A ExpSummaryModel instance stores the following information:
 
-        id, title, category, objective, language_code, skill_tags, 
-        last_updated (as float in milliseconds), created_on (as
-        float in milliseconds), status (private, public or publicized),
-        community_owned, owner_ids, editor_ids, viewer_ids, version.
+        id, title, category, objective, language_code, skill_tags,
+        last_updated, created_on, status (private, public or
+        publicized), community_owned, owner_ids, editor_ids,
+        viewer_ids, version.
 
-    The key of each instance is the exploration id
+    The key of each instance is the exploration id.
     """
 
     # What this exploration is called.
@@ -393,9 +395,8 @@ class ExpSummaryModel(base_models.BaseModel):
     # Skill tags associated with this exploration.
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
 
-    # want this to be convertible to JSON, so use float
-    last_updated = ndb.FloatProperty(indexed=True)
-    created_on = ndb.FloatProperty(indexed=True)
+    last_updated = ndb.DateTimeProperty(indexed=True)
+    created_on = ndb.DateTimeProperty(indexed=True)
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
@@ -472,3 +473,8 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ExpSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_exploration_count(cls):
+        """Returns the total number of explorations."""
+        return cls.get_all().count()

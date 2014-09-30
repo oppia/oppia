@@ -20,9 +20,9 @@ __author__ = 'Frederik Creemers'
 
 import ast
 
+from core.domain import exp_domain
 import feconf
 from core import jobs
-from core.domain import exp_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -38,14 +38,15 @@ class ExpSummaryRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     pass
 
+
 class ExpSummariesAggregator(jobs.BaseContinuousComputationManager):
     """A continuous-computation job computing summaries of all explorations.
     The summaries store the following information:
 
-        title, category, objective, language_code, skill_tags, 
-        last_updated (as float in milliseconds), created_on (as
-        float in milliseconds), status (private, public or publicized),
-        community_owned, owner_ids, editor_ids, viewer_ids, version.
+        title, category, objective, language_code, skill_tags,
+        last_updated, created_on, status (private, public or
+        publicized), community_owned, owner_ids, editor_ids,
+        viewer_ids, version.
     """
     @classmethod
     def get_event_types_listened_to(cls):
@@ -84,16 +85,12 @@ class ExpSummaryMRJobManager(
         from core.domain import exp_services
         if ExpSummaryMRJobManager._entity_created_before_job_queued(
 				exploration_model):
-            # create exploration summary
             exploration = exp_services.get_exploration_from_model(exploration_model)
             exp_services.create_exploration_summary(exploration)
-            yield (exploration_model.id, None)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
         pass
-
-
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):

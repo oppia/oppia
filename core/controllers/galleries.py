@@ -31,6 +31,7 @@ from core.platform import models
     models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import utils
 
 import jinja2
 
@@ -81,7 +82,10 @@ class GalleryHandler(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         # TODO(sll): Implement paging.
-        # TODO(msl): Add realtime layer to get up-to-date gallery
+
+        # TODO(sll): Precompute and cache gallery categories. Or have a fixed
+        # list of categories and 'Other', and gradually classify the
+        # explorations in 'Other'.
 
         language_codes_to_short_descs = {
             lc['code']: self._get_short_language_description(lc['description'])
@@ -95,6 +99,8 @@ class GalleryHandler(base.BaseHandler):
                 exp_services.get_private_at_least_viewable_exploration_summaries(
                     self.user_id))
 
+        # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
+        # individual lookups. Note that this will depend on user_id.
         explorations_list = [{
             'id': exp_summary.id,
             'title': exp_summary.title,
@@ -102,13 +108,14 @@ class GalleryHandler(base.BaseHandler):
             'objective': exp_summary.objective,
             'language': language_codes_to_short_descs.get(
                 exp_summary.language_code, exp_summary.language_code),
-            'last_updated': exp_summary.last_updated,
+            'last_updated': utils.get_time_in_millisecs(
+                exp_summary.last_updated),
             'status': exp_summary.status,
             'community_owned': exp_summary.community_owned,
             'is_editable': exp_services.exp_summary_is_editable(
                 exp_summary,
                 user_id=self.user_id)
-        } for key, exp_summary in exp_summaries_dict.iteritems()]
+        } for exp_summary in exp_summaries_dict.values()]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
