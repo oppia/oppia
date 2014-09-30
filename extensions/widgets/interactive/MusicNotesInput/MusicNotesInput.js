@@ -31,7 +31,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         $scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.sequenceToGuessWithValue);
         $scope.initialSequence = oppiaHtmlEscaper.escapedJsonToObj(
-         $attrs.initialSequenceWithValue);
+          $attrs.initialSequenceWithValue);
 
         /**
          * A note Object has a baseNoteMidiNumber and an offset property. For
@@ -149,19 +149,19 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           buildDroppableStaff();
 
           repaintNotes();
-          _initializeNoteSequence($scope.initialSequence);
         };
 
+        initializeNoteSequence($scope.initialSequence);
         $scope.init();
 
         // Initial notes are are placed on the staff at the
         // start of the exploration and can be removed by the learner.
-        function _initializeNoteSequence(initialNotesToAdd) {
+        function initializeNoteSequence(initialNotesToAdd) {
           for (var i = 0; i < initialNotesToAdd.length; i++) {
-            initialNotesToAdd[i] = _convertReadableNoteToNote(initialNotesToAdd[i]);
-            initialNotesToAdd[i].noteId = $scope.generateNoteId();
-            initialNotesToAdd[i].noteStart = {'num': i, 'den': 1};
-            $scope._addNoteToNoteSequence(initialNotesToAdd[i]);
+            var initialNote = _convertReadableNoteToNote(initialNotesToAdd[i]);
+            initialNote.noteId = $scope.generateNoteId();
+            initialNote.noteStart = {'num': i, 'den': 1};
+            $scope._addNoteToNoteSequence(initialNote);
           }
         }
 
