@@ -303,6 +303,8 @@ oppia.directive('graphViz', function() {
       }
       function beginEditVertexLabel($index) {
         $scope.state.selectVertex = $index;
+        var $inputElement = $($element).find('.graph-vertex-label');
+        $inputElement.val($scope.graph.vertices[$index].label);
       }
 
       function deleteEdge($index) {

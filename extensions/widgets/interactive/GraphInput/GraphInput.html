@@ -29,7 +29,7 @@
   </style>
   <div style="height: 35px;">
     <div ng-if="state.selectVertex !== null && graph.isLabeled && vertexEditPermissions">
-      <input class="graph-vertex-label" type="text"></input>
+      <input class="graph-vertex-label" type="text" ng-attr-value="<[graph.vertices[state.selectVertex].label]>"></input>
       <button class="btn btn-default" ng-click="updateLabel()">Update Label</button>
     </div>
   </div>
