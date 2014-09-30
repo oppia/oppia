@@ -37,16 +37,14 @@ dicts, each representing a customization arg -- viz.:
 __author__ = 'Sean Lip'
 
 import copy
-import logging
 import os
 
 from core.domain import obj_services
 from core.domain import rule_domain
 import feconf
 import jinja_utils
+import schema_utils
 import utils
-
-import json
 
 
 class AnswerHandler(object):
@@ -144,6 +142,15 @@ class BaseWidget(object):
         raise Exception(
             'Could not find handler in widget %s with name %s' %
             (self.name, handler_name))
+
+    def validate_customization_arg_values(self, customization_args):
+        """Validates customization arg values. The input is a dict whose
+        keys are the names of the customization args.
+        """
+        for ca_spec in self.customization_arg_specs:
+            schema_utils.normalize_against_schema(
+                customization_args[ca_spec.name]['value'],
+                ca_spec.schema)
 
     @property
     def _stats_log_template(self):
