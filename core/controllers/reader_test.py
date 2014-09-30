@@ -33,17 +33,14 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         """Before each individual test, create a dummy exploration."""
         super(ReaderPermissionsTest, self).setUp()
 
-        self.first_editor_email = 'editor@example.com'
-        self.first_editor_id = self.get_user_id_from_email(
-            self.first_editor_email)
-
-        self.register_editor(self.first_editor_email)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.register_editor(self.EDITOR_EMAIL)
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+            self.EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
         exploration.states[exploration.init_state_name].widget.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
-        exp_services.save_new_exploration(self.first_editor_id, exploration)
+        exp_services.save_new_exploration(self.editor_id, exploration)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
@@ -60,13 +57,13 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_invisible_to_other_editors(self):
-        other_editor = 'another@example.com'
+        other_editor_email = 'another@example.com'
 
         other_exploration = exp_domain.Exploration.create_default_exploration(
             'eid2', 'A title', 'A category')
-        exp_services.save_new_exploration(other_editor, other_exploration)
+        exp_services.save_new_exploration(other_editor_email, other_exploration)
 
-        self.login(other_editor)
+        self.login(other_editor_email)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -74,24 +71,22 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_their_editors(self):
-        self.login(self.first_editor_email)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
-
-        self.login('admin@example.com')
+        self.set_admins([self.ADMIN_EMAIL])
+        self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_published_explorations_are_visible_to_anyone(self):
-        rights_manager.publish_exploration(self.first_editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),

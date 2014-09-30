@@ -25,7 +25,8 @@ module.exports = function(config) {
       'extensions/widgets/interactive/**/*.html'
     ],
     exclude: [
-      'core/templates/dev/head/**/*-e2e.js'
+      'core/templates/dev/head/**/*-e2e.js',
+      'core/templates/dev/head/expressions/*.js'
     ],
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],

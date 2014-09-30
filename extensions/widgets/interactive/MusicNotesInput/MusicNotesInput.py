@@ -26,6 +26,14 @@ class MusicNotesInput(widget_domain.BaseWidget):
             'obj_type': 'MusicPhrase',
         },
         'default_value': [],
+    }, {
+        'name': 'initialSequence',
+        'description': 'The sequence of notes that start on the staff.',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'MusicPhrase',
+        },
+        'default_value': [],
     }]
 
     # Actions that the reader can perform on this widget which trigger a

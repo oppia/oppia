@@ -25,8 +25,6 @@ import feconf
 
 class ImageHandlerTest(test_utils.GenericTestBase):
 
-    EDITOR_EMAIL = 'editor@example.com'
-
     IMAGE_UPLOAD_URL_PREFIX = '/createhandler/imageupload'
     IMAGE_VIEW_URL_PREFIX = '/imagehandler'
 

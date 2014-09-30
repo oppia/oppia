@@ -27,13 +27,14 @@ oppia.controller('ExplorationEditor', [
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', 'widgetDefinitionsService', function(
+  'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
-    editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService) {
+    editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
+    newStateTemplateService) {
 
   $scope.editabilityService = editabilityService;
 
@@ -656,7 +657,8 @@ oppia.controller('ExplorationEditor', [
 
       explorationRightsService.init(
         data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
-        data.rights.status, data.rights.cloned_from, data.rights.community_owned);
+        data.rights.status, data.rights.cloned_from, data.rights.community_owned,
+        data.rights.viewable_if_private);
 
       if (GLOBALS.can_edit) {
         editabilityService.markEditable();
@@ -749,14 +751,13 @@ oppia.controller('ExplorationEditor', [
       templateUrl: 'modals/publishExploration',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.publish = $modalInstance.close;
+        $scope.publish = $modalInstance.close;
 
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
     }).result.then(function() {
       explorationRightsService.saveChangeToBackend({is_public: true});
     });
@@ -768,12 +769,11 @@ oppia.controller('ExplorationEditor', [
       templateUrl: 'modals/nominateExploration',
       backdrop: 'static',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.close = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
+        $scope.close = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
     });
   };
 
@@ -806,19 +806,14 @@ oppia.controller('ExplorationEditor', [
 
     warningsData.clear();
 
-    $scope.newStateTemplateUrl = '/createhandler/new_state_template/' + $scope.explorationId;
-    $http.post($scope.newStateTemplateUrl, {state_name: newStateName}).success(function(data) {
-      $scope.states[newStateName] = data.new_state;
-
-      changeListService.addState(newStateName);
-
-      $scope.refreshGraph();
-      $scope.newStateDesc = '';
-
-      if (successCallback) {
-        successCallback(newStateName);
-      }
-    });
+    $scope.states[newStateName] = newStateTemplateService.getNewStateTemplate(
+      newStateName);
+    changeListService.addState(newStateName);
+    $scope.refreshGraph();
+    $scope.newStateDesc = '';
+    if (successCallback) {
+      successCallback(newStateName);
+    }
   };
 
   $scope.deleteState = function(deleteStateName) {
@@ -943,17 +938,6 @@ oppia.controller('ExplorationEditor', [
   $scope.onClickStateInMinimap = function(stateName) {
     if (stateName !== END_DEST) {
       $scope.showStateEditor(stateName);
-      // The call to $apply() is needed in order to trigger the state change
-      // event. This is probably because the call sometimes originates from the
-      // d3 code, which Angular does not know about. The call to $apply() is
-      // wrapped here within a setTimeout function as described here:
-      //
-      //   http://stackoverflow.com/questions/18626039/apply-already-in-progress-error
-      //
-      // to prevent it causing an error when it fires unnecessarily.
-      setTimeout(function() {
-        $scope.$apply();
-      });
     }
   };
 

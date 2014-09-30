@@ -484,7 +484,7 @@ oppia.factory('explorationRightsService', [
   return {
     init: function(
         ownerNames, editorNames, viewerNames, status, clonedFrom,
-        isCommunityOwned) {
+        isCommunityOwned, viewableIfPrivate) {
       this.ownerNames = ownerNames;
       this.editorNames = editorNames;
       this.viewerNames = viewerNames;
@@ -493,6 +493,7 @@ oppia.factory('explorationRightsService', [
       // otherwise it is the exploration ID of the source exploration.
       this._clonedFrom = clonedFrom;
       this._isCommunityOwned = isCommunityOwned;
+      this._viewableIfPrivate = viewableIfPrivate;
     },
     clonedFrom: function() {
       return this._clonedFrom;
@@ -512,6 +513,9 @@ oppia.factory('explorationRightsService', [
     isCommunityOwned: function() {
       return this._isCommunityOwned;
     },
+    viewableIfPrivate: function() {
+      return this._viewableIfPrivate;
+    },
     saveChangeToBackend: function(requestParameters) {
       var that = this;
 
@@ -521,7 +525,8 @@ oppia.factory('explorationRightsService', [
         warningsData.clear();
         that.init(
           data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from, data.rights.community_owned);
+          data.rights.status, data.rights.cloned_from, data.rights.community_owned,
+          data.rights.viewable_if_private);
       });
     }
   };
@@ -638,4 +643,22 @@ oppia.factory('stateWidgetStickyService', [
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_sticky';
   return child;
+}]);
+
+// A service that returns the frontend representation of a newly-added state.
+oppia.factory('newStateTemplateService', [function() {
+  return {
+    // Returns a template for the new state with the given state name, changing
+    // the default rule destination to the new state name in the process.
+    // NB: clients should ensure that the desired state name is valid.
+    getNewStateTemplate: function(newStateName) {
+      var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
+      newStateTemplate.widget.handlers.forEach(function(handler) {
+        handler.rule_specs.forEach(function(ruleSpec) {
+          ruleSpec.dest = newStateName;
+        });
+      });
+      return newStateTemplate;
+    }
+  };
 }]);

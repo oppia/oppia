@@ -167,7 +167,7 @@ ANGULAR_FILES = [
         ['js', 'min.js', 'min.js.map'])]
 ANGULAR_TEST_FILES = ['angular-mocks.js', 'angular-scenario.js']
 
-D3_REV = '3.2.8'
+D3_REV = '3.4.11'
 D3_URL = 'https://raw.github.com/mbostock/d3/v%s' % D3_REV
 D3_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'd3js-%s' % D3_REV)
 D3_FILES = ['d3.min.js']
@@ -183,7 +183,7 @@ download_files(D3_URL, D3_DST, D3_FILES)
 
 # Download all the frontend library zip files.
 
-SELECT2_REV = '3.4.1'
+SELECT2_REV = '3.5.1'
 SELECT2_ZIP_URL = (
     'https://github.com/ivaynberg/select2/archive/%s.zip' % SELECT2_REV)
 SELECT2_ZIP_ROOT_NAME = 'select2-%s' % SELECT2_REV

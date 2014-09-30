@@ -30,6 +30,8 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         $scope.SOUNDFONT_URL = '/third_party/static/midi-js-2ef687/soundfont/';
         $scope.sequenceToGuess = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.sequenceToGuessWithValue);
+        $scope.initialSequence = oppiaHtmlEscaper.escapedJsonToObj(
+          $attrs.initialSequenceWithValue);
 
         /**
          * A note Object has a baseNoteMidiNumber and an offset property. For
@@ -149,7 +151,19 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
           repaintNotes();
         };
 
+        initializeNoteSequence($scope.initialSequence);
         $scope.init();
+
+        // Initial notes are are placed on the staff at the
+        // start of the exploration and can be removed by the learner.
+        function initializeNoteSequence(initialNotesToAdd) {
+          for (var i = 0; i < initialNotesToAdd.length; i++) {
+            var initialNote = _convertReadableNoteToNote(initialNotesToAdd[i]);
+            initialNote.noteId = $scope.generateNoteId();
+            initialNote.noteStart = {'num': i, 'den': 1};
+            $scope._addNoteToNoteSequence(initialNote);
+          }
+        }
 
         // Gets the staff top by getting the first staff line's position and
         // subtracting one vertical grid space from it.
@@ -282,7 +296,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
                 left:
                   getHorizontalPosition(getNoteStartAsFloat($scope.noteSequence[i].note)),
                 position: 'absolute'
-              })
+              });
             noteChoicesDiv.append(innerDiv);
           }
           repaintLedgerLines();

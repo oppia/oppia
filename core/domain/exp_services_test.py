@@ -46,14 +46,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
     EXP_ID = 'An_exploration_id'
 
-    OWNER_EMAIL = 'owner@example.com'
-    EDITOR_EMAIL = 'editor@example.com'
-    VIEWER_EMAIL = 'viewer@example.com'
-
-    OWNER_NAME = 'owner'
-    EDITOR_NAME = 'editor'
-    VIEWER_NAME = 'viewer'
-
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
         super(ExplorationServicesUnitTests, self).setUp()
@@ -66,14 +58,12 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
         user_services.get_or_create_user(self.VIEWER_ID, self.VIEWER_EMAIL)
 
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_NAME)
-        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_NAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_NAME)
+        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
+        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
 
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
-        self.user_id_admin = self.get_user_id_from_email('admin@example.com')
-
+        self.set_admins([self.ADMIN_EMAIL])
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):

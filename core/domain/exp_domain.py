@@ -474,13 +474,17 @@ class WidgetInstance(object):
                 logging.warning(
                     'Parameter %s for widget %s is invalid.'
                     % (arg_name, self.widget_id))
-            # TODO(sll): Find a way to verify that the arg_values have the
-            # correct type. Can we get sample values for the state context
-            # parameters?
         for extra_arg in extra_args:
             del self.customization_args[extra_arg]
 
-        # TODO(sll): Shouldn't this be a dict?
+        try:
+            widget.validate_customization_arg_values(self.customization_args)
+        except Exception:
+            # TODO(sll): Raise an exception here if parameters are not
+            # involved. (If they are, can we get sample values for the state
+            # context parameters?)
+            pass
+
         if not isinstance(self.handlers, list):
             raise utils.ValidationError(
                 'Expected widget answer handlers to be a list, received %s'
@@ -848,8 +852,9 @@ class Exploration(object):
                 'This exploration has no initial state name specified.')
         if self.init_state_name not in self.states:
             raise utils.ValidationError(
-                'There is no state corresponding to the exploration\'s '
-                'initial state name.')
+                'There is no state in %s corresponding to the exploration\'s '
+                'initial state name %s.' %
+                (self.states.keys(), self.init_state_name))
 
         if not isinstance(self.param_specs, dict):
             raise utils.ValidationError(

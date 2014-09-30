@@ -23,9 +23,6 @@ from core.tests import test_utils
 import feconf
 
 
-ADMIN_EMAIL = 'admin@example.com'
-BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
-MODERATOR_EMAIL = 'moderator@example.com'
 SITE_NAME = 'sitename.org'
 
 
@@ -34,7 +31,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_admin_page(self):
         """Test that the admin page shows the expected sections."""
         # Login as an admin.
-        self.login('editor@example.com', is_super_admin=True)
+        self.login(self.EDITOR_EMAIL, is_super_admin=True)
 
         response = self.testapp.get('/admin')
 
@@ -55,13 +52,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 302)
 
         # Login as a non-admin.
-        self.login('editor@example.com')
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/admin', expect_errors=True)
         self.assertEqual(response.status_int, 401)
         self.logout()
 
         # Login as an admin.
-        self.login('admin@example.com', is_super_admin=True)
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         self.assertEqual(response.status_int, 200)
         self.logout()
@@ -69,11 +66,9 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_change_configuration_property(self):
         """Test that configuration properties can be changed."""
 
-        # Login as an admin.
-        self.login('admin@example.com', is_super_admin=True)
+        ANNOUNCEMENT_TEXT = self.UNICODE_TEST_STRING
 
-        ANNOUNCEMENT_TEXT = 'TEST ANNOUNCEMENT'
-
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
 
@@ -106,9 +101,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.assertIn('SITE_NAME', response.body)
         self.assertNotIn(SITE_NAME, response.body)
 
-        # Log in as an admin and customize the site name.
-        self.login('admin@example.com', is_super_admin=True)
-
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
@@ -117,7 +110,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
                 pages.SITE_NAME.name: SITE_NAME
             }
         }, csrf_token)
-
         self.logout()
 
         # Navigate to the splash page. The site name is set.
@@ -129,43 +121,42 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that the correct role indicators show up on app pages."""
 
         # Navigate to any page. The role is not set.
-        response = self.testapp.get('/')
-        response.mustcontain(no=['Moderator', 'Admin'])
+        self.testapp.get('/').mustcontain(no=['Moderator', 'Admin'])
 
         # Log in as a superadmin. The role is set.
         self.login('superadmin@example.com', is_super_admin=True)
-        response = self.testapp.get('/')
-        response.mustcontain('Admin', no=['Moderator'])
+        self.testapp.get('/').mustcontain('Admin', no=['Moderator'])
 
         # Add a moderator, an admin, and a person with both roles, then log
         # out.
+        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
             'action': 'save_config_properties',
             'new_config_property_values': {
                 config_domain.ADMIN_EMAILS.name: [
-                    ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
+                    self.ADMIN_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
                 config_domain.MODERATOR_EMAILS.name: [
-                    MODERATOR_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
+                    self.MODERATOR_EMAIL, BOTH_MODERATOR_AND_ADMIN_EMAIL],
             }
         }, csrf_token)
         self.logout()
 
         # Log in as a moderator.
-        self.login(MODERATOR_EMAIL)
-        response = self.testapp.get(feconf.GALLERY_URL)
-        response.mustcontain('Moderator', no=['Admin'])
+        self.login(self.MODERATOR_EMAIL)
+        self.testapp.get(feconf.GALLERY_URL).mustcontain(
+            'Moderator', no=['Admin'])
         self.logout()
 
         # Log in as an admin.
-        self.login(ADMIN_EMAIL)
-        response = self.testapp.get(feconf.GALLERY_URL)
-        response.mustcontain('Admin', no=['Moderator'])
+        self.login(self.ADMIN_EMAIL)
+        self.testapp.get(feconf.GALLERY_URL).mustcontain(
+            'Admin', no=['Moderator'])
         self.logout()
 
         # Log in as a both-moderator-and-admin.
         self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
-        response = self.testapp.get(feconf.GALLERY_URL)
-        response.mustcontain('Admin', no=['Moderator'])
+        self.testapp.get(feconf.GALLERY_URL).mustcontain(
+            'Admin', no=['Moderator'])
         self.logout()

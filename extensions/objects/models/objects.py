@@ -293,6 +293,9 @@ class MusicPhrase(BaseObject):
     edit_html_filename = 'music_phrase_editor'
     edit_js_filename = 'MusicPhraseEditor'
 
+    # The maximum number of notes allowed in a music phrase.
+    _MAX_NOTES_IN_PHRASE = 8
+
     _FRACTION_PART_SCHEMA = {
         'type': 'int',
         'validators': [{
@@ -327,7 +330,11 @@ class MusicPhrase(BaseObject):
                     }]
                 }
             }],
-        }
+        },
+        'validators': [{
+            'id': 'has_length_at_most',
+            'max_value': _MAX_NOTES_IN_PHRASE,
+        }]
     }
 
 
