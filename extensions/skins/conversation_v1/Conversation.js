@@ -65,7 +65,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.initializePage = function() {
         $scope.responseLog = [];
         $scope.inputTemplate = '';
-        oppiaPlayerService.loadInitialState(function(data) {
+        oppiaPlayerService.init(function(data) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
           $scope.hasInteractedAtLeastOnce = false;

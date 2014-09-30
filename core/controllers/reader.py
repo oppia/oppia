@@ -76,7 +76,7 @@ class ExplorationPage(base.BaseHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 widget_dependency_ids))
 
-        widget_js_directives = (
+        widget_templates = (
             widget_registry.Registry.get_noninteractive_widget_html() +
             widget_registry.Registry.get_interactive_widget_html(
                 interactive_widget_ids))
@@ -88,16 +88,17 @@ class ExplorationPage(base.BaseHandler):
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
-            'skin_html': skins_services.Registry.get_skin_html(
-                exploration.default_skin),
+            'skin_templates': jinja2.utils.Markup(
+                skins_services.Registry.get_skin_templates(
+                    [exploration.default_skin])),
             'skin_js_url': skins_services.Registry.get_skin_js_url(
-                    exploration.default_skin),
+                exploration.default_skin),
             'skin_tag': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_tag(exploration.default_skin)
             ),
             'widget_dependencies_html': jinja2.utils.Markup(
                 widget_dependencies_html),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
+            'widget_templates': jinja2.utils.Markup(widget_templates),
         })
 
         if is_iframed:

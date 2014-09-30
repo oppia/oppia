@@ -442,9 +442,14 @@
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/StateInteraction.js') }}
+    {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
+    {% for skin_js_url in skin_js_urls %}
+      {{ include_skins_js_file(skin_js_url) }}
+    {% endfor %}
   </script>
 
-  {{ widget_js_directives }}
+  {{ skin_templates }}
+  {{ widget_templates }}
 {% endblock footer_js %}
