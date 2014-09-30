@@ -207,7 +207,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: (untitled state)
+init_state_name: %s
 language_code: en
 objective: ''
 param_changes: []
@@ -215,10 +215,12 @@ param_specs: {}
 schema_version: 3
 skill_tags: []
 states:
-  (untitled state):
+  %s:
     content:
     - type: text
-      value: ''
+      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
+        to the learner playing your exploration.<br><br>If you need more help getting
+        started, check out the Help link in the navigation bar.
     param_changes: []
     widget:
       customization_args:
@@ -231,7 +233,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: (untitled state)
+          dest: %s
           feedback: []
           param_changes: []
       sticky: false
@@ -257,7 +259,9 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
-""")
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME)
 
     def test_yaml_import_and_export(self):
         """Test the from_yaml() and to_yaml() methods."""
@@ -464,11 +468,11 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'eid', EXP_TITLE, 'A category')
         exploration.add_states([SECOND_STATE_NAME])
 
-        def _get_default_state_dict(dest_name):
+        def _get_default_state_dict(content_str, dest_name):
             return {
                 'content': [{
                     'type': 'text',
-                    'value': ''
+                    'value': content_str,
                 }],
                 'param_changes': [],
                 'widget': {
@@ -498,12 +502,14 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             }
 
         self.assertEqual(exploration.to_player_dict(), {
-            'init_state_name': feconf.DEFAULT_STATE_NAME,
+            'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'title': EXP_TITLE,
             'states': {
-                feconf.DEFAULT_STATE_NAME: _get_default_state_dict(
-                    feconf.DEFAULT_STATE_NAME),
-                SECOND_STATE_NAME: _get_default_state_dict(SECOND_STATE_NAME),
+                feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
+                    feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+                    feconf.DEFAULT_INIT_STATE_NAME),
+                SECOND_STATE_NAME: _get_default_state_dict(
+                    '', SECOND_STATE_NAME),
             },
             'param_changes': [],
             'param_specs': {},

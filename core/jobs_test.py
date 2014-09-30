@@ -19,7 +19,6 @@
 __author__ = 'Sean Lip'
 
 import ast
-import time
 
 from core import jobs
 from core import jobs_registry
@@ -733,7 +732,7 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
 
             # Record an event. This will put the event in the task queue.
             event_services.StartExplorationEventHandler.record(
-                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id', {},
                 feconf.PLAY_TYPE_NORMAL)
             self.assertEqual(
                 StartExplorationEventCounter.get_count(self.EXP_ID), 0)
@@ -795,11 +794,11 @@ class ContinuousComputationTests(test_utils.GenericTestBase):
             # StartExplorationEventHandler.record() would just put the event
             # in the task queue, which we don't want to flush yet.
             event_services.StartExplorationEventHandler._handle_event(
-                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id', {},
                 feconf.PLAY_TYPE_NORMAL)
             StartExplorationEventCounter.on_incoming_event(
                 event_services.StartExplorationEventHandler.EVENT_TYPE,
-                self.EXP_ID, 1, feconf.DEFAULT_STATE_NAME, 'session_id', {},
+                self.EXP_ID, 1, feconf.DEFAULT_INIT_STATE_NAME, 'session_id', {},
                 feconf.PLAY_TYPE_NORMAL)
             # The overall count is now 1.
             self.assertEqual(

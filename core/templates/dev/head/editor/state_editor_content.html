@@ -10,16 +10,18 @@
   <div ng-if="!contentMemento" class="oppia-content-section">
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <button type="button" class="btn btn-default btn-sm pull-right oppia-open-content-editor-btn protractor-test-edit-content" ng-click="openStateContentEditor()" ng-if="editabilityService.isEditable()" style="padding-right: 20px; margin-bottom: -10px;">
+        <button type="button" class="btn btn-default btn-sm oppia-section-editor-btn oppia-open-content-editor-btn protractor-test-edit-content" ng-click="openStateContentEditor()" ng-if="editabilityService.isEditable()">
           <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
           Edit
         </button>
+
+        <h3 class="oppia-state-editor-section-heading">Content</h3>
       </div>
     </div>
 
     <div class="row">
       <div class="col-lg-12 col-md-12 col-sm-12">
-        <div class="oppia-state-content-display">
+        <div class="oppia-state-content-display well">
           <span ng-show="content[0].value == ''" class="oppia-placeholder">
             You can give context to the learner here, and ask a question -- then,
             in the space below, choose a suitable way for the learner to respond.

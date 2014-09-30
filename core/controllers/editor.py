@@ -59,7 +59,7 @@ NEW_STATE_TEMPLATE = {
         'handlers': [{
             'name': 'submit',
             'rule_specs': [{
-                'dest': feconf.DEFAULT_STATE_NAME,
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'definition': {
                     'rule_type': 'default'
                 },

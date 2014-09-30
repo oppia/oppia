@@ -16,15 +16,16 @@
     <div ng-if="!interactiveWidgetEditorIsShown" class="oppia-interactive-section">
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <button type="button" class="btn btn-default btn-sm pull-right oppia-open-interactive-widget-editor-btn protractor-test-edit-interaction" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded" style="padding-right: 20px; margin-bottom: -10px;">
+          <button type="button" class="btn btn-default btn-sm oppia-open-interactive-widget-editor-btn oppia-section-editor-btn protractor-test-edit-interaction" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
             <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
-            Edit Interaction
+            Edit
           </button>
+          <h3 class="oppia-state-editor-section-heading">Interaction</h3>
         </div>
       </div>
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <div angular-html-bind="widgetPreviewHtml" class="oppia-interaction-preview"></div>
+          <div angular-html-bind="widgetPreviewHtml" class="oppia-interaction-preview well"></div>
         </div>
       </div>
       <div class="row">
@@ -46,15 +47,17 @@
     </div>
 
     <div ng-if="interactiveWidgetEditorIsShown" style="padding: 20px; border: 1px solid #ccc;">
-      <span class="pull-right">
-        Widget type:
-        <select ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
-        <span class="help-block" style="font-size: smaller">
-          <em>
-            Don't see the type of interaction you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
-          </em>
+      <form class="form-inline" role="form">
+        <span class="pull-right">
+          Widget type:
+          <select class="form-control" ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
+          <span class="help-block" style="font-size: smaller">
+            <em>
+              Don't see the type of interaction you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
+            </em>
+          </span>
         </span>
-      </span>
+      </form>
 
       <h3>Customize Interaction</h3>
       <br>

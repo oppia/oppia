@@ -35,15 +35,7 @@ var setStateName = function(name) {
 var editContent = function() {
   var operations = forms.editRichText(element(by.css('.oppia-state-content')));
   operations.open = function() {
-    // This button will not be shown if the rule editor is already open.
-    element.all(by.css('.protractor-test-edit-content')).then(function(buttons) {
-      if (buttons.length === 1) {
-        buttons[0].click();
-      } else if (buttons.length !== 0) {
-        throw 'In editor.editContent(), expected to find at most 1 edit-content ' +
-          'button; found ' + buttons.length + ' instead.';
-      }
-    });
+    element(by.css('.protractor-test-edit-content')).click();
   };
   operations.close = function() {
     element(by.css('.oppia-state-content')).

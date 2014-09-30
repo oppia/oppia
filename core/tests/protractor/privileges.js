@@ -39,7 +39,7 @@ describe('Permissions for private explorations', function() {
       users.login('bob@example.com');
       general.openEditor(explorationId);
       editor.editContent().open();
-      editor.editContent().appendPlainText('I love you');
+      editor.editContent().setPlainText('I love you');
       editor.editContent().close();
       editor.saveChanges();
       users.logout();

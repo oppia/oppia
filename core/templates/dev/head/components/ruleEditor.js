@@ -39,6 +39,8 @@ oppia.directive('ruleTypeSelector', [function() {
       var select2Node = $element[0].firstChild;
       $(select2Node).select2({
         data: choices,
+        // Suppress the search box.
+        minimumResultsForSearch: -1,
         allowClear: false,
         width: '200px',
         formatSelection: function(object, container) {

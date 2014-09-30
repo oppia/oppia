@@ -73,7 +73,7 @@
 
           <span ng-repeat="item in ruleDescriptionFragments track by $index">
             <span ng-if="item.type == 'select'" style="color: black;">
-              <select ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices)">
+              <select class="form-control" ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices)">
               </select>
             </span>
 

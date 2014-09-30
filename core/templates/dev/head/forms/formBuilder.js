@@ -476,8 +476,7 @@ oppia.directive('richTextEditor', [
         size: '@'
       },
       template: '<textarea rows="7" ng-disabled="!hasFullyLoaded"></textarea>',
-      controller: ['$scope', '$element', '$attrs', 'INITIAL_STATE_CONTENT_STR',
-          function($scope, $element, $attrs, INITIAL_STATE_CONTENT_STR) {
+      controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         $scope.disallowOppiaWidgets = ($scope.disallowOppiaWidgets || false);
 
         var rteNode = $element[0].firstChild;
@@ -741,9 +740,6 @@ oppia.directive('richTextEditor', [
             $.fn.dialog = null;
 
             $(rteNode).wysiwyg('focus');
-            if ($scope.htmlContent === INITIAL_STATE_CONTENT_STR) {
-              $(rteNode).wysiwyg('selectAll');
-            }
             $scope.hasFullyLoaded = true;
           });
         };
