@@ -8,13 +8,13 @@
 
         <div class="container-fluid">
           <div class="row oppia-readonly-rule-tile">
-            <div class="col-lg-10 col-md-10 col-sm-10" style="margin-left: -5px;">
+            <div class="col-lg-9 col-md-9 col-sm-9" style="margin-left: -5px;">
               <span>
                 <span ng-if="rule.description !== 'Default'">
-                  <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>
+                  If <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>...
                 </span>
                 <span ng-if="rule.description === 'Default'">
-                  If none of the above rules apply...
+                  If no other rules apply...
                 </span>
               </span>
 
@@ -23,7 +23,7 @@
                   <span ng-if="isRuleConfusing()">
                     <span class="glyphicon glyphicon-warning-sign"></span>
                     <span class="oppia-warning-text">
-                      Please give some feedback for this self-loop.
+                      Please provide a feedback message.
                     </span>
                   </span>
                   <span ng-if="rule.feedback.length > 0">
@@ -36,7 +36,8 @@
               </ul>
             </div>
 
-            <div class="col-lg-2 col-md-2 col-sm-2">
+            <div class="col-lg-3 col-md-3 col-sm-3">
+              Destination: <br />
               <span ng-if="rule.dest !== getActiveStateName()">
                 <span class="glyphicon glyphicon-arrow-right"></span>
                 <a href="/create/<[explorationId]>#/gui/<[getEscapedDest()]>" ng-if="rule.dest !== 'END'">
@@ -44,7 +45,7 @@
                 </a>
                 <span ng-if="rule.dest === 'END'">END</span>
               </span>
-              <span ng-if="rule.dest === getActiveStateName()">⟳</span>
+              <span ng-if="rule.dest === getActiveStateName()">⟳ <[rule.dest]></span>
             </div>
           </div>
         </div>
@@ -52,11 +53,13 @@
 
       <div class="col-lg-2 col-md-2 col-sm-2">
         <div class="pull-right" ng-if="isEditable">
-          <button type="button" class="btn btn-default btn-xs oppia-rule-edit-button" ng-click="openRuleEditor()">
+          <button type="button" class="btn btn-default btn-xs oppia-rule-edit-button pull-right" ng-click="openRuleEditor()">
             <span class="glyphicon glyphicon-pencil" title="Edit Rule"></span>
+            Edit
           </button>
-          <button type="button" class="btn btn-default btn-xs" ng-if="!isDefaultRule()" ng-click="deleteRule()">
+          <button type="button" class="btn btn-default btn-xs oppia-rule-delete-button pull-right" ng-if="!isDefaultRule()" ng-click="deleteRule()">
             <span class="glyphicon glyphicon-remove" title="Remove Rule"></span>
+            Delete
           </button>
         </div>
       </div>
@@ -88,7 +91,7 @@
       </span>
 
       <span ng-if="rule.description === 'Default'">
-        If none of the above rules apply...
+        If no other rules apply...
       </span>
     </div>
 

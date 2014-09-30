@@ -13,14 +13,10 @@
   </div>
 
   <div ng-if="hasLoaded">
-    <div ng-if="!interactiveWidgetEditorIsShown" class="oppia-interactive-section">
+    <div ng-if="!interactiveWidgetEditorIsShown" class="oppia-interactive-section oppia-editable-section" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <button type="button" class="btn btn-default btn-sm oppia-open-interactive-widget-editor-btn oppia-section-editor-btn protractor-test-edit-interaction" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
-            <span class="glyphicon glyphicon-pencil" title="Edit Interaction"></span>
-            Edit
-          </button>
-          <h3 class="oppia-state-editor-section-heading">Interaction</h3>
+          <h3 class="oppia-state-editor-section-heading">Interaction <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Name"></span></h3>
         </div>
       </div>
       <div class="row">
@@ -46,16 +42,11 @@
       </div>
     </div>
 
-    <div ng-if="interactiveWidgetEditorIsShown" style="padding: 20px; border: 1px solid #ccc;">
+    <div ng-if="interactiveWidgetEditorIsShown" class="oppia-interactive-widget-editor">
       <form class="form-inline" role="form">
-        <span class="pull-right">
+        <span class="pull-right oppia-widget-selector">
           Widget type:
           <select class="form-control" ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
-          <span class="help-block" style="font-size: smaller">
-            <em>
-              Don't see the type of interaction you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
-            </em>
-          </span>
         </span>
       </form>
 
@@ -70,10 +61,11 @@
           <div ng-if="!isEmpty(tmpWidget.customization_args)">
             <form name="form.schemaForm" class="protractor-test-widget-args">
               <div ng-repeat="customizationArg in tmpWidget.customization_args">
-                <strong><[customizationArg.description]></strong>
+                <span><[customizationArg.description]></span>
                 <div>
                   <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
                   </schema-based-editor>
+                  <div style="margin-bottom: 15px;"></div>
                 </div>
               </div>
             </form>

@@ -135,7 +135,7 @@ oppia.filter('parameterizeRuleDescription', [function() {
       description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);
     }
-    return 'Answer ' + finalRule;
+    return 'the answer ' + finalRule;
   };
 }]);
 
