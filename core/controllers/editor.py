@@ -232,10 +232,13 @@ class ExplorationPage(EditorHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 widget_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
-        widget_js_directives = (
+        widget_templates = (
             widget_registry.Registry.get_noninteractive_widget_html() +
             widget_registry.Registry.get_interactive_widget_html(
                 all_interactive_widget_ids))
+
+        skin_templates = skins_services.Registry.get_skin_templates(
+            skins_services.Registry.get_all_skin_ids())
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
@@ -261,10 +264,14 @@ class ExplorationPage(EditorHandler):
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
-            'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
+            'widget_templates': jinja2.utils.Markup(widget_templates),
+            'skin_js_urls': [
+                skins_services.Registry.get_skin_js_url(skin_id)
+                for skin_id in skins_services.Registry.get_all_skin_ids()],
+            'skin_templates': jinja2.utils.Markup(skin_templates),
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
+            'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 
         self.render_template('editor/exploration_editor.html')

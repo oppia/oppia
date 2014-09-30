@@ -83,7 +83,15 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
 }]);
 
 // A service that provides a number of utility functions for JS used by
-// individual skins.
+// individual player skins.
+// Note that this service is used both in the learner and the editor views.
+// The URL determines which of these it is. Some methods may need to be
+// implemented differently depending on whether the skin is being played
+// in the learner view, or whether it is being previewed in the editor view.
+//
+// TODO(sll): Make this read from a local client-side copy of the exploration
+// and audit it to ensure it behaves differently for learner mode and editor
+// mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
@@ -94,23 +102,38 @@ oppia.factory('oppiaPlayerService', [
 
   var _END_DEST = 'END';
 
-  var explorationId = null;
-  // The pathname should be: .../explore/{exploration_id}
+  var _editorPreviewMode = null;
+  var _explorationId = null;
+  // The pathname should be one of the following:
+  //   -   /explore/{exploration_id}
+  //   -   /create/{exploration_id}
   var pathnameArray = window.location.pathname.split('/');
   for (var i = 0; i < pathnameArray.length; i++) {
     if (pathnameArray[i] === 'explore') {
-      explorationId = pathnameArray[i + 1];
+      _explorationId = pathnameArray[i + 1];
+      _editorPreviewMode = false;
+      break;
+    } else if (pathnameArray[i] === 'create') {
+      _explorationId = pathnameArray[i + 1];
+      _editorPreviewMode = true;
       break;
     }
   }
 
+  if (_editorPreviewMode === null) {
+    throw 'No editor preview mode specified.';
+  }
+  if (_explorationId === null) {
+    throw 'No exploration id specified.';
+  }
+
   // The following line is needed for image displaying to work, since the image
   // URLs refer to $rootScope.explorationId.
-  $rootScope.explorationId = explorationId;
+  $rootScope.explorationId = _explorationId;
 
   var version = GLOBALS.explorationVersion;
   var explorationDataUrl = (
-    '/explorehandler/init/' + explorationId + (version ? '?v=' + version : ''));
+    '/explorehandler/init/' + _explorationId + (version ? '?v=' + version : ''));
   var sessionId = null;
   var isLoggedIn = false;
   var _exploration = null;
@@ -179,7 +202,7 @@ oppia.factory('oppiaPlayerService', [
 
   var _feedbackModalCallback = function(result) {
     if (result.feedback) {
-      $http.post('/explorehandler/give_feedback/' + explorationId, {
+      $http.post('/explorehandler/give_feedback/' + _explorationId, {
         subject: result.subject,
         feedback: result.feedback,
         include_author: !result.isSubmitterAnonymized && isLoggedIn,
@@ -201,7 +224,7 @@ oppia.factory('oppiaPlayerService', [
   var stopwatch = stopwatchProviderService.getInstance();
 
   return {
-    loadInitialState: function(successCallback) {
+    init: function(successCallback) {
       $http.get(explorationDataUrl).success(function(data) {
         _exploration = data.exploration;
         isLoggedIn = data.is_logged_in;
@@ -216,7 +239,7 @@ oppia.factory('oppiaPlayerService', [
       });
     },
     getExplorationId: function() {
-      return explorationId;
+      return _explorationId;
     },
     getExplorationTitle: function() {
       return _exploration.title;
@@ -246,7 +269,7 @@ oppia.factory('oppiaPlayerService', [
 
       answerIsBeingProcessed = true;
 
-      var stateTransitionUrl = '/explorehandler/transition/' + explorationId + '/' + encodeURIComponent(stateName);
+      var stateTransitionUrl = '/explorehandler/transition/' + _explorationId + '/' + encodeURIComponent(stateName);
       $http.post(stateTransitionUrl, {
         answer: answer,
         handler: handler,
@@ -271,23 +294,25 @@ oppia.factory('oppiaPlayerService', [
           newStateName !== _END_DEST && newStateData.widget.sticky &&
           newStateData.widget.widget_id === oldStateData.widget.widget_id);
 
-        // Record the state hit to the event handler.
-        var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + explorationId;
-        $http.post(stateHitEventHandlerUrl, {
-          new_state_name: newStateName,
-          first_time: stateHistory.indexOf(newStateName) === -1,
-          exploration_version: version,
-          session_id: sessionId,
-          client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-          old_params: learnerParamsService.getAllParams()
-        });
+        if (!_editorPreviewMode) {
+          // Record the state hit to the event handler.
+          var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
+          $http.post(stateHitEventHandlerUrl, {
+            new_state_name: newStateName,
+            first_time: stateHistory.indexOf(newStateName) === -1,
+            exploration_version: version,
+            session_id: sessionId,
+            client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+            old_params: learnerParamsService.getAllParams()
+          });
 
-        // Broadcast the state hit to the parent page.
-        messengerService.sendMessage(messengerService.STATE_TRANSITION, {
-          oldStateName: stateName,
-          jsonAnswer: JSON.stringify(answer),
-          newStateName: data.state_name
-        });
+          // Broadcast the state hit to the parent page.
+          messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+            oldStateName: stateName,
+            jsonAnswer: JSON.stringify(answer),
+            newStateName: data.state_name
+          });
+        }
 
         _updateStatus(data.params, data.state_name);
         stopwatch.resetStopwatch();
@@ -314,6 +339,11 @@ oppia.factory('oppiaPlayerService', [
       });
     },
     showFeedbackModal: function() {
+      if (_editorPreviewMode) {
+        warningsData.addWarning('The feedback modal is not available in preview mode.');
+        return;
+      }
+
       $modal.open({
         templateUrl: 'modals/playerFeedback',
         backdrop: 'static',

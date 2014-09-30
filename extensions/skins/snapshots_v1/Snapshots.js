@@ -28,7 +28,7 @@ oppia.directive('snapshotsSkin', [function() {
       $scope.initializePage = function() {
         $scope.inputTemplate = '';
         $scope.currentQuestion = '';
-        oppiaPlayerService.loadInitialState(function(data) {
+        oppiaPlayerService.init(function(data) {
           $scope.currentQuestion = data.init_html;
           $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(data.state_name);
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();

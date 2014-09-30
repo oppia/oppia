@@ -16,10 +16,12 @@
 
 __author__ = 'Sean Lip'
 
+from core.controllers import reader
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import param_domain
 from core.tests import test_utils
 import feconf
 
@@ -240,3 +242,60 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
             }
         )
         self.logout()
+
+
+class ExplorationParametersUnitTests(test_utils.GenericTestBase):
+    """Test methods relating to exploration parameters."""
+
+    def test_get_init_params(self):
+        """Test the get_init_params() method."""
+        independent_pc = param_domain.ParamChange(
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
+        dependent_pc = param_domain.ParamChange(
+            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
+
+        exp_param_specs = {
+            'a': param_domain.ParamSpec('UnicodeString'),
+            'b': param_domain.ParamSpec('UnicodeString'),
+        }
+        new_params = reader._get_updated_param_dict(
+            {}, [independent_pc, dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
+
+        # Jinja string evaluation fails gracefully on dependencies that do not
+        # exist.
+        new_params = reader._get_updated_param_dict(
+            {}, [dependent_pc, independent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': ''})
+
+    def test_update_learner_params(self):
+        """Test the update_learner_params() method."""
+        independent_pc = param_domain.ParamChange(
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
+        dependent_pc = param_domain.ParamChange(
+            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
+
+        exp_param_specs = {
+            'a': param_domain.ParamSpec('UnicodeString'),
+            'b': param_domain.ParamSpec('UnicodeString'),
+        }
+
+        old_params = {}
+        new_params = reader._get_updated_param_dict(
+            old_params, [independent_pc, dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
+        self.assertEqual(old_params, {})
+
+        old_params = {'a': 'secondValue'}
+        new_params = reader._get_updated_param_dict(
+            old_params, [dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'secondValue', 'b': 'secondValue'})
+        self.assertEqual(old_params, {'a': 'secondValue'})
+
+        # Jinja string evaluation fails gracefully on dependencies that do not
+        # exist.
+        old_params = {}
+        new_params = reader._get_updated_param_dict(
+            old_params, [dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'b': ''})
+        self.assertEqual(old_params, {})

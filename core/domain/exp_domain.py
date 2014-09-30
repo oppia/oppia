@@ -1115,49 +1115,6 @@ class Exploration(object):
                 'exploration.' % (init_state_name, self.states.keys()))
         self.init_state_name = init_state_name
 
-    # Methods relating to parameters.
-    def get_obj_type_for_param(self, param_name):
-        """Returns the obj_type for the given parameter."""
-        try:
-            return self.param_specs[param_name].obj_type
-        except:
-            raise Exception('Exploration %s has no parameter named %s' %
-                            (self.title, param_name))
-
-    def _get_updated_param_dict(self, param_dict, param_changes):
-        """Updates a param dict using the given list of param_changes.
-
-        Note that the list of parameter changes is ordered. Parameter
-        changes later in the list may depend on parameter changes that have
-        been set earlier in the same list.
-        """
-        new_param_dict = copy.deepcopy(param_dict)
-        for pc in param_changes:
-            obj_type = self.get_obj_type_for_param(pc.name)
-            new_param_dict[pc.name] = pc.get_normalized_value(
-                obj_type, new_param_dict)
-        return new_param_dict
-
-    def get_init_params(self):
-        """Returns an initial set of exploration parameters for a reader."""
-        return self._get_updated_param_dict({}, self.param_changes)
-
-    def update_with_state_params(self, state_name, param_dict):
-        """Updates a reader's params using the params for the given state.
-
-        Args:
-          - state_name: str. The name of the state.
-          - param_dict: dict. A dict containing parameter names and their
-              values. This dict represents the current context which is to
-              be updated.
-
-        Returns:
-          dict. An updated param dict after the changes in the state's
-            param_changes list have been applied in sequence.
-        """
-        state = self.states[state_name]
-        return self._get_updated_param_dict(param_dict, state.param_changes)
-
     # Methods relating to states.
     def add_states(self, state_names):
         """Adds multiple states to the exploration."""
@@ -1236,33 +1193,6 @@ class Exploration(object):
                 )
 
         return state_dict
-
-    def classify(self, state_name, handler_name, answer, params):
-        """Return the first rule that is satisfied by a reader's answer."""
-        state = self.states[state_name]
-
-        # Get the widget to determine the input type.
-        generic_handler = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-        ).get_handler_by_name(handler_name)
-
-        handler = next(
-            h for h in state.widget.handlers if h.name == handler_name)
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.id))
-
-        for rule_spec in handler.rule_specs:
-            if rule_domain.evaluate_rule(
-                    rule_spec.definition, self.param_specs,
-                    generic_handler.obj_type, params, answer, fs):
-                return rule_spec
-
-        raise Exception(
-            'No matching rule found for handler %s. Rule specs are %s.' % (
-                handler.name,
-                [rule_spec.to_dict() for rule_spec in handler.rule_specs]
-            )
-        )
 
     # The current version of the exploration schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
