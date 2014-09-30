@@ -202,6 +202,7 @@ oppia.directive('graphViz', function() {
         text: 'Weighted',
         option: 'isWeighted'
       }];
+      // TODO(czx): Handle what happens to pairs of edges if a directed graph becomes undirected
       $scope.toggleGraphOption = function(option) {
         $scope.graph[option] = !$scope.graph[option];
       };
@@ -272,7 +273,6 @@ oppia.directive('graphViz', function() {
       function endAddEdge() {
         $scope.state.addEdgeVertex = null;
       }
-      // TODO(czx): Handle the directed case for this
       function tryAddEdge(startIndex, endIndex) {
         if (
           startIndex === null ||
@@ -288,12 +288,18 @@ oppia.directive('graphViz', function() {
           if (startIndex === $scope.graph.edges[i].src && endIndex === $scope.graph.edges[i].dst) {
             return false;
           }
+          if ($scope.graph.isDirected === false) {
+            if (startIndex === $scope.graph.edges[i].dst && endIndex === $scope.graph.edges[i].src) {
+              return false;
+            }
+          }
         }
         $scope.graph.edges.push({
           src: startIndex,
           dst: endIndex,
           weight: 1
         });
+        return true;
       }
       function beginDragVertex($index) {
         $scope.state.dragVertex = $index;
