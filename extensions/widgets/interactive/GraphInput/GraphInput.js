@@ -113,8 +113,9 @@ oppia.directive('graphViz', function() {
       $scope.state = {
         MODES: $scope.MODES,
         currentMode: $scope.MODES.MOVE,
-        // Vertex currently being hovered over
+        // Vertex and/or edge currently being hovered over
         hoverVertex: null,
+        hoverEdge: null,
         // If in ADD_EDGE mode, source vertex of the new edge, if it exists
         addEdgeVertex: null,
         // Currently dragged vertex
@@ -151,7 +152,7 @@ oppia.directive('graphViz', function() {
       };
 
       $scope.updateLabel = function() {
-        if ($scope.state.selectVertex != null && $scope.state.vertexEditPermissions) {
+        if ($scope.state.selectVertex != null && $scope.vertexEditPermissions) {
           var newLabel = $($element).find('.graph-vertex-label').val();
           $scope.graph.vertices[$scope.state.selectVertex].label = newLabel;
           $($element).find('.graph-vertex-label').val('');
@@ -306,6 +307,7 @@ oppia.directive('graphViz', function() {
 
       function deleteEdge($index) {
         $scope.graph.edges.splice($index,1);
+        $scope.state.hoverEdge = null;
       }
       function deleteVertex($index) {
         $scope.graph.edges = $.map($scope.graph.edges, function(edge) {
@@ -322,6 +324,24 @@ oppia.directive('graphViz', function() {
         }); 
         $scope.graph.vertices.splice($index,1);
       }
+
+      // Styling functions
+      $scope.getEdgeColor = function($index) {
+        if ($scope.state.currentMode === $scope.MODES.DELETE && 
+            $index === $scope.state.hoverEdge) {
+          return "red";
+        } else {
+          return "black";
+        }
+      };
+      $scope.getHoverVertexColor = function() {
+        if ($scope.state.currentMode === $scope.MODES.DELETE &&
+            $scope.vertexEditPermissions) {
+          return "red";
+        } else {
+          return "aqua";
+        }
+      };
     }]
   }
 }); 
