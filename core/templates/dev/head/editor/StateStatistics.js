@@ -20,8 +20,8 @@
  */
 
 oppia.controller('StateStatistics', [
-    '$scope', 'explorationData', 'editorContextService',
-    function($scope, explorationData, editorContextService) {
+    '$scope', 'explorationData', 'editorContextService', 'explorationStatesService',
+    function($scope, explorationData, editorContextService, explorationStatesService) {
   $scope.unresolvedAnswersList = [];
 
   $scope.initStateStatistics = function(data) {
@@ -31,7 +31,7 @@ oppia.controller('StateStatistics', [
 
   $scope.$on('refreshStateEditor', function(evt) {
     $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = $scope.$parent.states[$scope.stateName];
+    var stateData = explorationStatesService.getState($scope.stateName);
     $scope.initStateStatistics(stateData);
   });
 

@@ -19,8 +19,8 @@
  */
 
 oppia.controller('ExplorationStatistics', [
-    '$scope', '$http', '$location', '$modal', 'warningsData',
-    function($scope, $http, $location, $modal, warningsData) {
+    '$scope', '$http', '$location', '$modal', 'warningsData', 'explorationStatesService',
+    function($scope, $http, $location, $modal, warningsData, explorationStatesService) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -56,7 +56,7 @@ oppia.controller('ExplorationStatistics', [
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'
       };
-      for (var stateName in $scope.states) {
+      for (var stateName in explorationStatesService.getStates()) {
         var visits = $scope.stateStats[stateName].firstEntryCount;
         $scope.statsGraphOpacities[stateName] = Math.max(
           visits / numVisits, 0.05);

@@ -22,14 +22,17 @@ oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
-    'explorationInitStateNameService', 'changeListService', 'warningsData', function(
+    'explorationInitStateNameService', 'changeListService', 'warningsData', 
+    'explorationStatesService', function(
       $scope, $http, $window, $modal, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
-      explorationInitStateNameService, changeListService, warningsData) {
+      explorationInitStateNameService, changeListService, warningsData, explorationStatesService) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
+
+  $scope.explorationStatesService = explorationStatesService;
 
   $scope.getExplorePageUrl = function() {
     return (
@@ -78,9 +81,7 @@ oppia.controller('ExplorationSettings', [
   $scope.saveExplorationInitStateName = function() {
     var newInitStateName = explorationInitStateNameService.displayed;
 
-    // TODO(sll): Make the whole exploration a dict, so we can remove
-    // the awkward reference to $scope.$parent.
-    if (!$scope.$parent.states.hasOwnProperty(newInitStateName)) {
+    if (!explorationStatesService.getState(newInitStateName)) {
       warningsData.addWarning('Invalid initial state name: ' + newInitStateName);
       explorationInitStateNameService.restoreFromMemento();
       return;

@@ -66,7 +66,7 @@ oppia.factory('explorationData', [
 
       /**
        * Saves the exploration to the backend, and, on a success callback,
-       * updates the data for the updated states in the frontend.
+       * updates the local copy of the exploration data.
        * @param {object} explorationChangeList Represents the change list for
        *     this save. Each element of the list is a command representing an
        *     editing action (such as add state, delete state, etc.). See the
@@ -473,6 +473,55 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
+// Data service for keeping track of the exploration's states. Note that this
+// is unlike the other exploration property services, in that it does not
+// add anything to the changelog and keeps no mementos.
+oppia.factory('explorationStatesService', ['$log', function($log) {
+  var _states = null;
+  return {
+    setStates: function(value) {
+      _states = angular.copy(value);
+    },
+    getStates: function() {
+      return angular.copy(_states);
+    },
+    getState: function(stateName) {
+      return angular.copy(_states[stateName]);
+    },
+    setState: function(stateName, stateData) {
+      _states[stateName] = angular.copy(stateData);
+    },
+    deleteState: function(stateName) {
+      delete _states[deleteStateName];
+      for (var otherStateName in _states) {
+        var handlers = _states[otherStateName].widget.handlers;
+        for (var i = 0; i < handlers.length; i++) {
+          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
+            if (handlers[i].rule_specs[j].dest === deleteStateName) {
+              handlers[i].rule_specs[j].dest = otherStateName;
+            }
+          }
+        }
+      }
+    },
+    renameState: function(oldStateName, newStateName) {
+      _states[newStateName] = angular.copy(_states[oldStateName]);
+      delete _states[oldStateName];
+
+      for (var otherStateName in _states) {
+        var handlers = _states[otherStateName].widget.handlers;
+        for (var i = 0; i < handlers.length; i++) {
+          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
+            if (handlers[i].rule_specs[j].dest === oldStateName) {
+              handlers[i].rule_specs[j].dest = newStateName;
+            }
+          }
+        }
+      }
+    }
+  };
+}]);
+
 
 // A data service that stores data about the rights for this exploration.
 oppia.factory('explorationRightsService', [
@@ -537,6 +586,8 @@ oppia.factory('statePropertyService', [
   // WARNING: This should be initialized only in the context of the state editor, and
   // every time the state is loaded, so that proper behavior is maintained if e.g.
   // the state is renamed.
+  // Note that this does not update explorationStatesService. It is maintained only locally.
+  // TODO(sll): Make this update explorationStatesService.
   return {
     init: function(stateName, value, statesAccessorDict, statesAccessorKey) {
       if (!statesAccessorDict || !statesAccessorKey) {
@@ -550,7 +601,7 @@ oppia.factory('statePropertyService', [
       $log.info('Initializing state property: ' + this.propertyName);
       $log.info(value);
 
-      // A reference to the dict in $scope.states that should be updated.
+      // A reference to the state dict that should be updated.
       this.statesAccessorDict = statesAccessorDict;
       // The name of the key in statesAccessorDict whose value should be updated.
       this.statesAccessorKey = statesAccessorKey;

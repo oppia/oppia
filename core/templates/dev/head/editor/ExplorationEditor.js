@@ -28,6 +28,7 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
+  'explorationStatesService',
   function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -35,7 +36,7 @@ oppia.controller('ExplorationEditor', [
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
-    newStateTemplateService, oppiaPlayerService) {
+    newStateTemplateService, oppiaPlayerService, explorationStatesService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -43,7 +44,7 @@ oppia.controller('ExplorationEditor', [
   $scope.enterPreviewMode = function() {
     $rootScope.$broadcast('externalSave');
     oppiaPlayerService.populateExploration({
-      states: $scope.states,
+      states: explorationStatesService.getStates(),
       init_state_name: explorationInitStateNameService.savedMemento,
       param_specs: $scope.paramSpecs,
       title: explorationTitleService.savedMemento,
@@ -437,7 +438,7 @@ oppia.controller('ExplorationEditor', [
 
       var callback = function() {
         var stateName = editorContextService.getActiveStateName();
-        var stateData = $scope.states[stateName];
+        var stateData = explorationStatesService.getState(stateName);
         if (stateData === null || stateData === undefined || $.isEmptyObject(stateData)) {
           // This state does not exist. Redirect to the initial state.
           $scope.showStateEditor(explorationInitStateNameService.displayed);
@@ -450,7 +451,7 @@ oppia.controller('ExplorationEditor', [
         }
       };
 
-      if (!$.isEmptyObject($scope.states)) {
+      if (!$.isEmptyObject(explorationStatesService.getStates())) {
         callback();
       } else {
         $scope.initExplorationPage(callback);
@@ -463,7 +464,8 @@ oppia.controller('ExplorationEditor', [
   ********************************************/
   $scope.refreshGraph = function() {
     $scope.graphData = $scope.getNodesAndLinks(
-      $scope.states, explorationInitStateNameService.displayed);
+      explorationStatesService.getStates(),
+      explorationInitStateNameService.displayed);
   };
 
   $scope.areExplorationWarningsVisible = false;
@@ -511,8 +513,9 @@ oppia.controller('ExplorationEditor', [
   // point back to the same state.
   $scope._getStatesWithInsufficientFeedback = function() {
     var problematicStates = [];
-    for (var stateName in $scope.states) {
-      var handlers = $scope.states[stateName].widget.handlers;
+    var _states = explorationStatesService.getStates();
+    for (var stateName in _states) {
+      var handlers = _states[stateName].widget.handlers;
       var isProblematic = handlers.some(function(handler) {
         return handler.rule_specs.some(function(ruleSpec) {
           return (
@@ -658,6 +661,7 @@ oppia.controller('ExplorationEditor', [
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
       widgetDefinitionsService.setInteractiveDefinitions(data.ALL_INTERACTIVE_WIDGETS);
+      explorationStatesService.setStates(data.states);
 
       explorationTitleService.init(data.title);
       explorationCategoryService.init(data.category);
@@ -673,7 +677,6 @@ oppia.controller('ExplorationEditor', [
 
       $scope.currentUserIsAdmin = data.is_admin;
       $scope.currentUserIsModerator = data.is_moderator;
-      $scope.states = angular.copy(data.states);
       $scope.defaultSkinId = data.default_skin_id;
       $scope.allSkinIds = data.all_skin_ids;
 
@@ -695,7 +698,7 @@ oppia.controller('ExplorationEditor', [
 
       if ($scope.doFullRefresh) {
         if (!editorContextService.getActiveStateName() ||
-            !$scope.states.hasOwnProperty(editorContextService.getActiveStateName())) {
+            !explorationStatesService.getState(editorContextService.getActiveStateName())) {
           editorContextService.setActiveStateName(explorationInitStateNameService.displayed);
         }
         $scope.showStateEditor(editorContextService.getActiveStateName());
@@ -708,9 +711,7 @@ oppia.controller('ExplorationEditor', [
 
       $scope.$broadcast('refreshStatisticsTab');
 
-      var stateName = editorContextService.getActiveStateName();
-      var stateData = $scope.states[stateName];
-      if (stateData && stateData && !$.isEmptyObject(stateData)) {
+      if (explorationStatesService.getState(editorContextService.getActiveStateName())) {
         $scope.$broadcast('refreshStateEditor');
       }
 
@@ -811,7 +812,7 @@ oppia.controller('ExplorationEditor', [
     return (
       validatorsService.isValidEntityName(newStateName) &&
       newStateName.toUpperCase() !== END_DEST &&
-      !$scope.states[newStateName]);
+      !explorationStatesService.getState(newStateName));
   };
 
   // Adds a new state to the list of states, and updates the backend.
@@ -824,17 +825,17 @@ oppia.controller('ExplorationEditor', [
       warningsData.addWarning('Please choose a state name that is not \'END\'.');
       return;
     }
-    for (var stateName in $scope.states) {
-      if (stateName == newStateName) {
-        warningsData.addWarning('A state with this name already exists.');
-        return;
-      }
+    if (explorationStatesService.getState(newStateName)) {
+      warningsData.addWarning('A state with this name already exists.');
+      return;
     }
 
     warningsData.clear();
 
-    $scope.states[newStateName] = newStateTemplateService.getNewStateTemplate(
-      newStateName);
+    explorationStatesService.setState(
+      newStateName,
+      newStateTemplateService.getNewStateTemplate(newStateName));
+
     changeListService.addState(newStateName);
     $scope.refreshGraph();
     $scope.newStateDesc = '';
@@ -883,22 +884,12 @@ oppia.controller('ExplorationEditor', [
         return;
       }
 
-      if (!$scope.states[deleteStateName]) {
+      if (!explorationStatesService.getState(deleteStateName)) {
         warningsData.addWarning('No state with name ' + deleteStateName + ' exists.');
         return;
       }
 
-      delete $scope.states[deleteStateName];
-      for (var otherStateName in $scope.states) {
-        var handlers = $scope.states[otherStateName].widget.handlers;
-        for (var i = 0; i < handlers.length; i++) {
-          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === deleteStateName) {
-              handlers[i].rule_specs[j].dest = otherStateName;
-            }
-          }
-        }
-      }
+      explorationStatesService.deleteState(deleteStateName);
 
       if (editorContextService.getActiveStateName() === deleteStateName) {
         $scope.showStateEditor(initStateName);

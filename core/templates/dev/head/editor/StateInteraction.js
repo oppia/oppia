@@ -21,10 +21,10 @@
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
     'oppiaHtmlEscaper', 'widgetDefinitionsService', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
-    'editabilityService',
+    'editabilityService', 'explorationStatesService',
     function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
       oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService,
-      editabilityService) {
+      editabilityService, explorationStatesService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -106,6 +106,9 @@ oppia.controller('StateInteraction', [
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
     $scope.hasLoaded = false;
 
+    // TODO(sll): Remove this; it is needed for the rules.
+    $scope.states = explorationStatesService.getStates();
+
     // TODO(sll): Build a file containing this data and serve it statically,
     // since it rarely changes. (But don't cache it, since it does change.)
     widgetDefinitionsService.getInteractiveDefinitions().then(function(widgetDefinitions) {
@@ -114,13 +117,13 @@ oppia.controller('StateInteraction', [
       $scope.allInteractiveWidgets = widgetDefinitions;
 
       stateWidgetIdService.init(
-        $scope.stateName, stateData.widget.widget_id, $scope.states[$scope.stateName].widget,
-        'widget_id');
+        $scope.stateName, stateData.widget.widget_id,
+        stateData.widget, 'widget_id');
       stateCustomizationArgsService.init(
-        $scope.stateName, stateData.widget.customization_args, $scope.states[$scope.stateName].widget,
-        'widget_customization_args');
+        $scope.stateName, stateData.widget.customization_args,
+        stateData.widget, 'widget_customization_args');
       stateWidgetStickyService.init(
-        $scope.stateName, stateData.widget.sticky, $scope.states[$scope.stateName].widget,
+        $scope.stateName, stateData.widget.sticky, stateData.widget,
         'widget_sticky');
 
       $scope.stateWidgetStickyService = stateWidgetStickyService;
@@ -276,12 +279,13 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.updateStateWidgetHandlerData = function() {
-    // Updates $scope.states from $scope.widgetHandlers.
+    // Updates the exploration states from the widget handlers.
     var activeStateName = editorContextService.getActiveStateName();
-    var stateDict = $scope.states[activeStateName];
-    for (var i = 0; i < stateDict.widget.handlers.length; i++) {
-      var handlerName = stateDict.widget.handlers[i].name;
-      stateDict.widget.handlers[i].rule_specs = $scope.widgetHandlers[handlerName];
+    var _stateDict = explorationStatesService.getState(activeStateName);
+    for (var i = 0; i < _stateDict.widget.handlers.length; i++) {
+      var handlerName = _stateDict.widget.handlers[i].name;
+      _stateDict.widget.handlers[i].rule_specs = $scope.widgetHandlers[handlerName];
     }
+    explorationStatesService.setState(activeStateName, _stateDict);
   };
 }]);

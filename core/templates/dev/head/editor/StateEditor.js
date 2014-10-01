@@ -21,10 +21,12 @@
 oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
-  'explorationInitStateNameService', 'focusService', 'editabilityService', function(
+  'explorationInitStateNameService', 'focusService', 'editabilityService',
+  'explorationStatesService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
-    explorationInitStateNameService, focusService, editabilityService) {
+    explorationInitStateNameService, focusService, editabilityService,
+    explorationStatesService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -45,7 +47,7 @@ oppia.controller('StateEditor', [
     $scope.stateNameEditorIsShown = false;
 
     $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = $scope.$parent.states[$scope.stateName];
+    var stateData = explorationStatesService.getState($scope.stateName);
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
 
@@ -89,7 +91,7 @@ oppia.controller('StateEditor', [
     }
     var activeStateName = editorContextService.getActiveStateName();
     if (newStateName !== activeStateName &&
-        $scope.states.hasOwnProperty(newStateName)) {
+        explorationStatesService.getState(newStateName)) {
       warningsData.addWarning(
         'The name \'' + newStateName + '\' is already in use.');
       return false;
@@ -99,20 +101,7 @@ oppia.controller('StateEditor', [
       $scope.stateNameEditorIsShown = false;
       return false;
     } else {
-      $scope.states[newStateName] = angular.copy(
-        $scope.states[activeStateName]);
-      delete $scope.states[activeStateName];
-
-      for (var otherStateName in $scope.states) {
-        var handlers = $scope.states[otherStateName].widget.handlers;
-        for (var i = 0; i < handlers.length; i++) {
-          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === activeStateName) {
-              handlers[i].rule_specs[j].dest = newStateName;
-            }
-          }
-        }
-      }
+      explorationStatesService.renameState(activeStateName, newStateName);
 
       editorContextService.setActiveStateName(newStateName);
       changeListService.renameState(newStateName, $scope.stateNameMemento);

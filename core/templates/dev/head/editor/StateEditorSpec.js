@@ -22,7 +22,7 @@ describe('State Editor controller', function() {
 
   describe('StateEditor', function() {
     var scope, filter, ctrl, explorationData,
-        mockWarningsData, q, cls, ecs, vs, fs;
+        mockWarningsData, q, cls, ecs, vs, fs, ess;
 
     beforeEach(function() {
       module('oppia');
@@ -37,6 +37,7 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       vs = $injector.get('validatorsService');
       fs = $injector.get('focusService');
+      ess = $injector.get('explorationStatesService');
 
       GLOBALS = {INVALID_NAME_CHARS: '#@&^%$'};
 
@@ -60,7 +61,7 @@ describe('State Editor controller', function() {
         }
       };
 
-      scope.$parent.states = {
+      ess.setStates({
         'First State': {
           widget: {
             handlers: [{
@@ -102,7 +103,7 @@ describe('State Editor controller', function() {
             }
           }]
         }
-      };
+      });      
 
       scope.refreshGraph = function() {
         return true;
@@ -122,11 +123,12 @@ describe('State Editor controller', function() {
         changeListService: cls,
         validatorsService: vs,
         focusService: fs,
+        explorationStatesService: ess,
         editabilityService: {
           isEditable: function() {
             return true;
           }
-        }
+        }        
       });
     }));
 
@@ -196,13 +198,13 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('Third State');
       scope.saveStateName('Fourth State');
       expect(ecs.getActiveStateName()).toEqual('Fourth State');
-      expect(scope.$parent.states.hasOwnProperty('Fourth State')).toBe(true);
-      expect(scope.$parent.states.hasOwnProperty('Third State')).toBe(false);
+      expect(ess.getState('Fourth State')).toBeTruthy();
+      expect(ess.getState('Third State')).toBeFalsy();
 
       ecs.setActiveStateName('First State');
       scope.saveStateName('Fifth State');
-      expect(scope.$parent.states.hasOwnProperty('Fifth State')).toBe(true);
-      expect(scope.$parent.states.hasOwnProperty('First State')).toBe(false);
+      expect(ess.getState('Fifth State')).toBeTruthy();
+      expect(ess.getState('First State')).toBeFalsy();
     });
 
     it('should not re-save unedited state names', function() {

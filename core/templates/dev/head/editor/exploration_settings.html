@@ -44,7 +44,7 @@
                 <div class="form-group">
                   <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <select id="explorationInitStateName" class="form-control" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for (name, _) in states">
+                    <select id="explorationInitStateName" class="form-control" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for (name, _) in explorationStatesService.getStates()">
                     </select>
                   </div>
                 </div>
