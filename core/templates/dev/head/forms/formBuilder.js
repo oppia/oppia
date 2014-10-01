@@ -935,37 +935,20 @@ oppia.directive('schemaBasedChoicesEditor', ['recursionHelper', function(recursi
   };
 }]);
 
+// TODO(kashiad): Add a validator so that only syntactically valid expressions
+// can be entered.
 oppia.directive('schemaBasedExpressionEditor', [function() {
   return {
     scope: {
       localValue: '=',
       disabled: '&',
-      paramNames: '&',
       // TODO(sll): Currently only takes a string which is either 'bool', 'int' or 'float'.
       // May need to generalize.
       outputType: '&',
       labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/expression',
-    restrict: 'E',
-    controller: ['$scope', function($scope) {
-      $scope.paramNameOptions = $scope.paramNames().map(function(paramName) {
-        return {
-          name: paramName,
-          value: paramName
-        };
-      });
-
-      $scope.$watch('localValue', function(newValue, oldValue) {
-        // Because JS objects are passed by reference, the current value needs
-        // to be set manually to an object in the list of options.
-        $scope.paramNameOptions.forEach(function(option) {
-          if (angular.equals(option.value, newValue)) {
-            $scope.localValue = option.value;
-          }
-        });
-      });
-    }]
+    restrict: 'E'
   };
 }]);
 
