@@ -18,6 +18,11 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.controller('ExplorationPreview', [function() {
+oppia.controller('ExplorationPreview', [
+	'$scope', 'learnerParamsService', function($scope, learnerParamsService) {
+  $scope.allParams = {};
 
+  $scope.$on('playerStateChange', function() {
+    $scope.allParams = learnerParamsService.getAllParams();
+  });
 }]);

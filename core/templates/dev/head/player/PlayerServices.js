@@ -235,6 +235,7 @@ oppia.factory('oppiaPlayerService', [
         }).success(function(initHtmlAndParamsData) {
           stopwatch.resetStopwatch();
           _updateStatus(initHtmlAndParamsData.params, _exploration.init_state_name);
+          $rootScope.$broadcast('playerStateChange');
           successCallback({
             exploration: _exploration,
             isLoggedIn: false,
@@ -251,6 +252,7 @@ oppia.factory('oppiaPlayerService', [
           sessionId = data.sessionId;
           stopwatch.resetStopwatch();
           _updateStatus(data.params, data.state_name);
+          $rootScope.$broadcast('playerStateChange');
           // TODO(sll): Restrict what is passed here to just the relevant blobs of content.
           successCallback(data);
         }).error(function(data) {
@@ -348,6 +350,7 @@ oppia.factory('oppiaPlayerService', [
               learnerParamsService.init(data.params);
             }
 
+            $rootScope.$broadcast('playerStateChange');
             successCallback(
               newStateName, isSticky, data.question_html, readerResponseHtml,
               data.feedback_html);
@@ -415,6 +418,8 @@ oppia.factory('oppiaPlayerService', [
           if (newStateData) {
             learnerParamsService.init(data.params);
           }
+
+          $rootScope.$broadcast('playerStateChange');
 
           successCallback(
             newStateName, isSticky, data.question_html, readerResponseHtml,

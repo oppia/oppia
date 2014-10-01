@@ -1,4 +1,16 @@
 <div>
+  <div style="position: fixed; top: 200px; left: 5px; width: 200px; max-width: 10%;" class="hidden-xs hidden-sm">
+    <strong>Parameters</strong>
+    <div ng-if="isEmpty(allParams)">
+      <em>No parameters set.</em>
+    </div>
+    <ul ng-if="!isEmpty(allParams)">
+      <li ng-repeat="(paramName, paramValue) in allParams">
+        <[paramName]>: <[paramValue]>
+      </li>
+    </ul>
+  </div>
+
   <!-- TODO(sll): Extend this to allow other skins. -->
   <conversation-skin></conversation-skin>
 </div>
