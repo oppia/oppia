@@ -21,8 +21,10 @@
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
     'oppiaHtmlEscaper', 'widgetDefinitionsService', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
+    'editabilityService',
     function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
-      oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService) {
+      oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService,
+      editabilityService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -142,16 +144,18 @@ oppia.controller('StateInteraction', [
   });
 
   $scope.showInteractiveWidgetEditor = function() {
-    warningsData.clear();
-    $scope.dismissInteractiveWidgetUsageHint();
+    if (editabilityService.isEditable()) {
+      warningsData.clear();
+      $scope.dismissInteractiveWidgetUsageHint();
 
-    $scope.interactiveWidgetEditorIsShown = true;
-    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
-    $scope.$broadcast('schemaBasedFormsShown');
+      $scope.interactiveWidgetEditorIsShown = true;
+      $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+      $scope.$broadcast('schemaBasedFormsShown');
 
-    $scope.tmpWidgetId = stateWidgetIdService.displayed;
-    $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[$scope.tmpWidgetId]);
-    $scope.setNewTmpWidget($scope.tmpWidgetId, stateCustomizationArgsService.displayed);
+      $scope.tmpWidgetId = stateWidgetIdService.displayed;
+      $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[$scope.tmpWidgetId]);
+      $scope.setNewTmpWidget($scope.tmpWidgetId, stateCustomizationArgsService.displayed);
+    }
   };
 
   $scope.saveInteractiveWidget = function(tmpWidget) {

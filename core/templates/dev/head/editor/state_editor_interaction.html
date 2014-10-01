@@ -13,10 +13,13 @@
   </div>
 
   <div ng-if="hasLoaded">
-    <div ng-if="!interactiveWidgetEditorIsShown" class="oppia-interactive-section oppia-editable-section" ng-click="showInteractiveWidgetEditor()" ng-if="editabilityService.isEditable()" ng-disabled="!hasLoaded">
+    <div ng-if="!interactiveWidgetEditorIsShown" ng-click="showInteractiveWidgetEditor()"
+         class="oppia-interactive-section protractor-test-edit-interaction"
+         ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
+         ng-disabled="!hasLoaded">
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <h3 class="oppia-state-editor-section-heading">Interaction <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Name"></span></h3>
+          <h3>Interaction <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Interaction"></span></h3>
         </div>
       </div>
       <div class="row">
@@ -45,7 +48,7 @@
     <div ng-if="interactiveWidgetEditorIsShown" class="oppia-interactive-widget-editor">
       <form class="form-inline" role="form">
         <span class="pull-right oppia-widget-selector">
-          Widget type:
+          Interaction type:
           <select class="form-control" ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
         </span>
       </form>
@@ -90,7 +93,7 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <span ng-if="tmpWidget">
           <button type="button" class="btn btn-success protractor-test-save-interaction" ng-click="saveInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
-            Save Customizations
+            Save Interaction
           </button>
           <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
             Cancel

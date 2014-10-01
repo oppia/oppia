@@ -1,5 +1,5 @@
 <div>
-  <div ng-if="!ruleEditorIsOpen && isTmpRule !== 'true'">
+  <div ng-if="!ruleEditorIsOpen">
     <div class="row oppia-readonly-rule-container">
       <div class="col-lg-10 col-md-10 col-sm-10">
         <div class="oppia-rule-sort-handle" ng-if="!isDefaultRule()">
@@ -22,7 +22,7 @@
                 <li>
                   <span ng-if="isRuleConfusing()">
                     <span class="glyphicon glyphicon-warning-sign"></span>
-                    <span class="oppia-warning-text">
+                    <span class="oppia-rule-warning-text">
                       Please provide a feedback message.
                     </span>
                   </span>
@@ -66,12 +66,12 @@
     </div>
   </div>
 
-  <div ng-if="isEditable && (ruleEditorIsOpen || isTmpRule === 'true')">
+  <div ng-if="isEditable && ruleEditorIsOpen">
     <div class="oppia-rule-bubble">
       <span ng-if="rule.description !== 'Default'">
         <form class="form-inline" role="form">
           Answer
-          <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="selectNewRuleType()">
+          <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="onSelectNewRuleType()">
           </rule-type-selector>
 
           <span ng-repeat="item in ruleDescriptionFragments track by $index">
@@ -95,7 +95,7 @@
       </span>
     </div>
 
-    <div class="oppia-feedback-and-dest" ng-class="{'oppia-lightly-grayed': isTmpRule === 'true'}">
+    <div class="oppia-feedback-and-dest" ng-class="{'oppia-lightly-grayed': isTmpRule()}">
       <div class="oppia-feedback-bubble">
         <span ng-if="rule.feedback.length > 0">
           Feedback options
@@ -107,7 +107,7 @@
           <em>No feedback specified.</em>
         </span>
 
-        <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback" disabled="$scope.isTmpRule === 'true'">
+        <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
         </schema-based-editor>
       </div>
 

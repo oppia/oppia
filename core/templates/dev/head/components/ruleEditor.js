@@ -77,7 +77,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       states: '=',
       addState: '=',
       widgetHandlerSpecs: '=',
-      isTmpRule: '@',
+      isTmpRule: '&',
       saveRule: '=',
       cancelEdit: '&',
       deleteRule: '&',
@@ -104,13 +104,37 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
 
+        $scope.allRuleTypes = {};
+        $scope.generateAllRuleTypes = function() {
+          for (var i = 0; i < $scope.widgetHandlerSpecs.length; i++) {
+            if ($scope.widgetHandlerSpecs[i].name == 'submit') {
+              $scope.allRuleTypes = {};
+              for (var description in $scope.widgetHandlerSpecs[i].rules) {
+                $scope.allRuleTypes[description] = $scope.widgetHandlerSpecs[i].rules[description].classifier;
+              }
+              return;
+            }
+          }
+        };
+
         $scope.ruleEditorIsOpen = false;
         $scope.openRuleEditor = function() {
           $scope.ruleEditorIsOpen = true;
           if ($scope.rule.feedback.length === 0) {
             $scope.rule.feedback.push('');
           }
-          $scope.currentRuleDescription = $scope.rule.description;
+          if ($scope.rule.description === null) {
+            $scope.generateAllRuleTypes();
+            for (var key in $scope.allRuleTypes) {
+              $scope.rule.description = key;
+              $scope.currentRuleDescription = $scope.rule.description;
+              $scope.onSelectNewRuleType();
+              break;
+            }
+          } else {
+            $scope.currentRuleDescription = $scope.rule.description;
+          }
+
           $scope.ruleDescriptionMemento = angular.copy($scope.rule.description);
           $scope.ruleDefinitionMemento = angular.copy($scope.rule.definition);
           $scope.computeRuleDescriptionFragments();
@@ -171,16 +195,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
-        $scope.$watch('widgetHandlerSpecs', function(newValue) {
-          for (var i = 0; i < newValue.length; i++) {
-            if (newValue[i].name == 'submit') {
-              $scope.allRuleTypes = {};
-              for (var description in newValue[i].rules) {
-                $scope.allRuleTypes[description] = newValue[i].rules[description].classifier;
-              }
-              return;
-            }
-          }
+        $scope.$watch('widgetHandlerSpecs', function() {
+          $scope.generateAllRuleTypes();          
         });
 
         $scope.isDefaultRule = function() {
@@ -218,7 +234,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.rule.dest === editorContextService.getActiveStateName());
         };
 
-        $scope.selectNewRuleType = function() {
+        $scope.onSelectNewRuleType = function() {
           var description = $scope.currentRuleDescription;
           $scope.rule.description = description;
           for (var desc in $scope.allRuleTypes) {
@@ -319,6 +335,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
           return result;
         };
+
+        if ($scope.isTmpRule()) {
+          $scope.openRuleEditor();
+        }
       }
     ]
   };

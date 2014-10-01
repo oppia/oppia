@@ -63,7 +63,7 @@ DEFAULT_PAGE_SIZE = 50
 DEFAULT_WIDGET_ID = 'TextInput'
 
 # Default name for the initial state of an exploration.
-DEFAULT_INIT_STATE_NAME = 'My First State'
+DEFAULT_INIT_STATE_NAME = 'First State'
 # The default content text for the initial state of an exploration.
 DEFAULT_INIT_STATE_CONTENT_STR = (
     'Welcome to the Oppia editor!<br><br>'

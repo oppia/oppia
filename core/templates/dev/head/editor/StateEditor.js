@@ -21,10 +21,10 @@
 oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
-  'explorationInitStateNameService', 'focusService', function(
+  'explorationInitStateNameService', 'focusService', 'editabilityService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
-    explorationInitStateNameService, focusService) {
+    explorationInitStateNameService, focusService, editabilityService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -132,7 +132,9 @@ oppia.controller('StateEditor', [
   };
 
   $scope.openStateContentEditor = function() {
-    $scope.contentMemento = angular.copy($scope.content);
+    if (editabilityService.isEditable()) {
+      $scope.contentMemento = angular.copy($scope.content);
+    }
   };
 
   $scope.$on('externalSave', function() {

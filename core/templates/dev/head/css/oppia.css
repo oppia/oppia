@@ -68,9 +68,9 @@ input.ng-dirty.ng-invalid {
   color: red;
 }
 
-.oppia-warning-text {
-  font-style: italic;
+.oppia-rule-warning-text {
   color: black;
+  font-style: italic;
 }
 
 .oppia-serious-warning-text {
@@ -672,14 +672,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding: 2px;
 }
 
-.oppia-editable {
-  cursor: pointer;
-  padding: 1px 3px;
-}
-.oppia-editable:hover {
-  opacity: 0.9;
-}
-
 .oppia-state-editor-header {
   margin-bottom: -20px;
   text-align: center;
@@ -688,10 +680,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-state-editor-body {
   padding: 5px 10px;
   position: relative;
-}
-
-.oppia-state-editor-section-heading {
-
 }
 
 .oppia-state-editor-footer {
@@ -705,16 +693,18 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-section-editor-btn {
-  top: 5px;
   padding-right: 20px;
   position: absolute;
   right: 20px;
+  top: 5px;
 }
 
 .oppia-state-content-display {
-  -webkit-user-select: none;
   background: rgba(0, 0, 0, 0.04);
   border-radius: 6px;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  -webkit-user-select: none;
 }
 
 .oppia-interactive-widget-display {
@@ -750,18 +740,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-editable-section {
   cursor: pointer;
 }
-
 .oppia-editor-pencil {
   font-size: 16px;
-  display:none;
+  display: none;
 }
-
-.oppia-editor-pencil-small {
-  font-size: 12px;
-}
-
 .oppia-editable-section:hover .oppia-editor-pencil {
-  display:inline;
+  display: inline;
 }
 
 .oppia-interactive-hint {
@@ -835,17 +819,11 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-add-rule-button {
   margin-top: -10px;
-  padding-left: 37px;
-  padding-right: 37px;
+  padding: 0 37px;
 }
-
 .oppia-add-rule-button:hover {
   background: #245EFF;
   color: white;
-}
-
-.oppia-edit-rule-description-button {
-  margin-left: 5px;
 }
 
 .oppia-readonly-rule-container {

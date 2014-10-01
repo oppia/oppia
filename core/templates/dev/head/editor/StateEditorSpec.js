@@ -121,7 +121,12 @@ describe('State Editor controller', function() {
         editorContextService: ecs,
         changeListService: cls,
         validatorsService: vs,
-        focusService: fs
+        focusService: fs,
+        editabilityService: {
+          isEditable: function() {
+            return true;
+          }
+        }
       });
     }));
 
