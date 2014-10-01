@@ -121,7 +121,12 @@ describe('State Editor controller', function() {
         editorContextService: ecs,
         changeListService: cls,
         validatorsService: vs,
-        focusService: fs
+        focusService: fs,
+        editabilityService: {
+          isEditable: function() {
+            return true;
+          }
+        }
       });
     }));
 
@@ -231,7 +236,7 @@ describe('State Editor controller', function() {
       expect(ecs.getActiveStateName()).toEqual('Third State');
     });
 
-    it('should save content correctly', function() {
+    it('should correctly handle no-op edits', function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
       expect(scope.contentMemento).toBeNull();
@@ -239,12 +244,12 @@ describe('State Editor controller', function() {
       scope.content = scope.getContent(
         'And now for something completely different.'
       );
-      scope.editContent();
+      scope.openStateContentEditor();
       expect(scope.contentMemento[0].value)
         .toEqual('And now for something completely different.');
       scope.saveTextContent();
       expect(scope.contentMemento).toEqual(null);
-      expect(cls.getChangeList()).not.toEqual([]);
+      expect(cls.getChangeList()).toEqual([]);
     });
 
 
@@ -253,14 +258,14 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('Third State');
       expect(cls.getChangeList()).toEqual([]);
       scope.content = scope.getContent('abababab');
-      scope.editContent();
+      scope.openStateContentEditor();
       scope.content = scope.getContent('babababa');
       scope.saveTextContent();
       expect(cls.getChangeList().length).toBe(1);
       expect(cls.getChangeList()[0].new_value[0].value).toEqual('babababa');
       expect(cls.getChangeList()[0].old_value[0].value).toEqual('abababab');
 
-      scope.editContent();
+      scope.openStateContentEditor();
       scope.content = scope.getContent(
         'And now for something completely different.'
       );

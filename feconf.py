@@ -63,7 +63,14 @@ DEFAULT_PAGE_SIZE = 50
 DEFAULT_WIDGET_ID = 'TextInput'
 
 # Default name for the initial state of an exploration.
-DEFAULT_STATE_NAME = '(untitled state)'
+DEFAULT_INIT_STATE_NAME = 'First State'
+# The default content text for the initial state of an exploration.
+DEFAULT_INIT_STATE_CONTENT_STR = (
+    'Welcome to the Oppia editor!<br><br>'
+    'Anything you type here will be shown to the learner playing '
+    'your exploration.<br><br>'
+    'If you need more help getting started, check out the Help link '
+    'in the navigation bar.')
 
 # Name (and description) of the default rule.
 DEFAULT_RULE_NAME = 'Default'

@@ -21,8 +21,10 @@
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
     'oppiaHtmlEscaper', 'widgetDefinitionsService', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
+    'editabilityService',
     function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
-      oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService) {
+      oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService,
+      editabilityService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -30,9 +32,15 @@ oppia.controller('StateInteraction', [
 
   $scope.form = {};
 
+  $scope.showInteractiveWidgetUsageHint = false;
+  $scope.dismissInteractiveWidgetUsageHint = function() {
+    $scope.showInteractiveWidgetUsageHint = false;
+  };
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.
-  $scope.submitAnswer = function(answer, handler) {};
+  $scope.submitAnswer = function(answer, handler) {
+    $scope.showInteractiveWidgetUsageHint = true;
+  };
   $scope.adjustPageHeight = function(scroll) {};
 
   $scope.hasLoaded = false;
@@ -136,15 +144,18 @@ oppia.controller('StateInteraction', [
   });
 
   $scope.showInteractiveWidgetEditor = function() {
-    warningsData.clear();
+    if (editabilityService.isEditable()) {
+      warningsData.clear();
+      $scope.dismissInteractiveWidgetUsageHint();
 
-    $scope.interactiveWidgetEditorIsShown = true;
-    $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
-    $scope.$broadcast('schemaBasedFormsShown');
+      $scope.interactiveWidgetEditorIsShown = true;
+      $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
+      $scope.$broadcast('schemaBasedFormsShown');
 
-    $scope.tmpWidgetId = stateWidgetIdService.displayed;
-    $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[$scope.tmpWidgetId]);
-    $scope.setNewTmpWidget($scope.tmpWidgetId, stateCustomizationArgsService.displayed);
+      $scope.tmpWidgetId = stateWidgetIdService.displayed;
+      $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[$scope.tmpWidgetId]);
+      $scope.setNewTmpWidget($scope.tmpWidgetId, stateCustomizationArgsService.displayed);
+    }
   };
 
   $scope.saveInteractiveWidget = function(tmpWidget) {
@@ -224,8 +235,8 @@ oppia.controller('StateInteraction', [
   $scope.RULE_LIST_SORTABLE_OPTIONS = {
     axis: 'y',
     cursor: 'move',
-    handle: '.oppia-non-default-rule-header-bubble',
-    items: '.oppia-rule-block',
+    handle: '.oppia-rule-sort-handle',
+    items: '.oppia-sortable-rule-block',
     tolerance: 'pointer',
     start: function(e, ui) {
       $scope.$broadcast('externalSave');

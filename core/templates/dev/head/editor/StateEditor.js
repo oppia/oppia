@@ -21,10 +21,10 @@
 oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
-  'explorationInitStateNameService', 'focusService', function(
+  'explorationInitStateNameService', 'focusService', 'editabilityService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
-    explorationInitStateNameService, focusService) {
+    explorationInitStateNameService, focusService, editabilityService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -55,6 +55,7 @@ oppia.controller('StateEditor', [
     if ($scope.stateName && stateData) {
       $scope.$broadcast('stateEditorInitialized', stateData);
     }
+
   };
 
   $scope.openStateNameEditor = function() {
@@ -130,8 +131,10 @@ oppia.controller('StateEditor', [
     }
   };
 
-  $scope.editContent = function() {
-    $scope.contentMemento = angular.copy($scope.content);
+  $scope.openStateContentEditor = function() {
+    if (editabilityService.isEditable()) {
+      $scope.contentMemento = angular.copy($scope.content);
+    }
   };
 
   $scope.$on('externalSave', function() {
@@ -142,7 +145,7 @@ oppia.controller('StateEditor', [
   });
 
   $scope.saveTextContent = function() {
-    if ($scope.contentMemento !== null && $scope.contentMemento !== $scope.content) {
+    if ($scope.contentMemento !== null && !angular.equals($scope.contentMemento, $scope.content)) {
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'content',
         angular.copy($scope.content), angular.copy($scope.contentMemento));

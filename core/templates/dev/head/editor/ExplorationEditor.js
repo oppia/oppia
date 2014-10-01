@@ -67,6 +67,10 @@ oppia.controller('ExplorationEditor', [
   $scope.isSaveInProgress = false;
   // Whether or not a discard action is currently in progress.
   $scope.isDiscardInProgress = false;
+  // The last 'save' or 'discard' action. Can be null (no such action has been performed
+  // yet), 'save' (the last action was a save) or 'discard' (the last action was a
+  // discard).
+  $scope.lastSaveOrDiscardAction = null;
 
   $scope.discardChanges = function() {
     var confirmDiscard = confirm('Do you want to discard your changes?');
@@ -81,6 +85,7 @@ oppia.controller('ExplorationEditor', [
         // The $apply() is needed to call all the exploration field $watch()
         // methods before flipping isDiscardInProgress.
         $scope.$apply();
+        $scope.lastSaveOrDiscardAction = 'discard';
         $scope.isDiscardInProgress = false;
       });
     }
@@ -284,6 +289,7 @@ oppia.controller('ExplorationEditor', [
           changeListService.discardAllChanges();
           $scope.initExplorationPage();
           $scope.$broadcast('refreshVersionHistory', {forceRefresh: true});
+          $scope.lastSaveOrDiscardAction = 'save';
           $scope.isSaveInProgress = false;
         }, function() {
           $scope.isSaveInProgress = false;

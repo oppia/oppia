@@ -66,11 +66,23 @@ oppia.filter('round1', [function() {
   };
 }]);
 
-// Filter that changes {{...}} tags into INPUT indicators.
-oppia.filter('bracesToText', [function() {
+// Filter that replaces all {{...}} in a string with '...'.
+oppia.filter('replaceInputsWithEllipses', [function() {
   var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
   return function(input) {
-    return input ? input.replace(pattern, '<code>INPUT</code>') : '';
+    return input ? input.replace(pattern, '...') : '';
+  };
+}]);
+
+// Filter that truncates a string at the first {{...}}.
+oppia.filter('truncateAtFirstInput', [function() {
+  var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/g;
+  return function(input) {
+    if (!input) {
+      return '';
+    }
+    var matchLocation = input.search(pattern);
+    return matchLocation === -1 ? input : (input.substring(0, matchLocation));
   };
 }]);
 
@@ -118,12 +130,14 @@ oppia.filter('parameterizeRuleDescription', [function() {
           replacementText += inputs[varName][i].readableNoteName;
         }
         replacementText += ']';
+      } else if (varType === 'NormalizedString') {
+        replacementText = '"' + replacementText + '"';
       }
 
       description = description.replace(pattern, ' ');
       finalRule = finalRule.replace(pattern, replacementText);
     }
-    return 'Answer ' + finalRule;
+    return 'the answer ' + finalRule;
   };
 }]);
 

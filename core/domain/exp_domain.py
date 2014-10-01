@@ -658,9 +658,11 @@ class State(object):
         )
 
     @classmethod
-    def create_default_state(cls, default_dest_state_name):
+    def create_default_state(cls, default_dest_state_name, is_initial_state=False):
+        text_str = (
+            feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
-            [Content('text', '')], [],
+            [Content('text', text_str)], [],
             WidgetInstance.create_default_widget(default_dest_state_name))
 
 
@@ -731,14 +733,15 @@ class Exploration(object):
             cls, exploration_id, title, category,
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
-            feconf.DEFAULT_STATE_NAME).to_dict()
+            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+
         states_dict = {
-            feconf.DEFAULT_STATE_NAME: init_state_dict
+            feconf.DEFAULT_INIT_STATE_NAME: init_state_dict
         }
 
         return cls(
             exploration_id, title, category, '', language_code, [], '', '',
-            'conversation_v1', feconf.DEFAULT_STATE_NAME, states_dict, {}, [],
+            'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [],
             0)
 
     @classmethod

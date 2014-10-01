@@ -31,7 +31,7 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.editContent().open();
-    editor.editContent().appendPlainText('plain text');
+    editor.editContent().setPlainText('plain text');
     editor.editContent().close();
     editor.selectContinueWidget('click here');
     editor.editRule('default').setDestination('END');
@@ -107,7 +107,7 @@ describe('Full exploration editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setStateName('state 1');
     editor.editContent().open();
-    editor.editContent().appendPlainText('this is state 1');
+    editor.editContent().setPlainText('this is state 1');
     editor.editContent().close();
     editor.selectNumericWidget();
     editor.addNumericRule.Equals(21);
@@ -115,7 +115,7 @@ describe('Full exploration editor', function() {
 
     editor.moveToState('state 2');
     editor.editContent().open();
-    editor.editContent().appendPlainText('this is state 2');
+    editor.editContent().setPlainText('this is state 2');
     editor.editContent().close();
     editor.selectSimpleMultipleChoiceWidget(['return', 'complete']);
     editor.addMultipleChoiceRule.Equals('return');
