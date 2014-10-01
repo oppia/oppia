@@ -13,10 +13,16 @@
   </div>
 
   <div ng-if="hasLoaded">
-    <div ng-if="!interactiveWidgetEditorIsShown" ng-click="showInteractiveWidgetEditor()"
+    <div ng-if="!interactiveWidgetEditorIsShown"
          class="oppia-interactive-section protractor-test-edit-interaction"
          ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
          ng-disabled="!hasLoaded">
+
+      <!-- We use a transparent div overlay here so that buttons within the widget
+      do not receive the click events. -->
+      <div class="oppia-interactive-section-click-handler" ng-click="showInteractiveWidgetEditor()">
+      </div>
+
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <h3>Interaction <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Interaction"></span></h3>
@@ -45,60 +51,58 @@
       </div>
     </div>
 
-    <div ng-if="interactiveWidgetEditorIsShown" class="oppia-interactive-widget-editor">
-      <form class="form-inline" role="form">
-        <span class="pull-right oppia-widget-selector">
-          Interaction type:
-          <select class="form-control" ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
-        </span>
-      </form>
+    <div ng-if="interactiveWidgetEditorIsShown" class="oppia-state-item-editor-div">
+      <div class="oppia-interactive-widget-editor">
+        <form class="form-inline" role="form">
+          <span class="pull-right oppia-widget-selector">
+            Interaction type:
+            <select class="form-control" ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
+          </span>
+        </form>
 
-      <h3>Customize Interaction</h3>
-      <br>
+        <h3>Customize Interaction</h3>
+        <br>
 
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div ng-if="isEmpty(tmpWidget.customization_args)">
-            <em>There are no customization options for this interaction.</em>
-          </div>
-          <div ng-if="!isEmpty(tmpWidget.customization_args)">
-            <form name="form.schemaForm" class="protractor-test-widget-args">
-              <div ng-repeat="customizationArg in tmpWidget.customization_args">
-                <span><[customizationArg.description]></span>
-                <div>
-                  <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
-                  </schema-based-editor>
-                  <div style="margin-bottom: 15px;"></div>
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12">
+            <div ng-if="isEmpty(tmpWidget.customization_args)">
+              <em>There are no customization options for this interaction.</em>
+            </div>
+            <div ng-if="!isEmpty(tmpWidget.customization_args)">
+              <form name="form.schemaForm" class="protractor-test-widget-args">
+                <div ng-repeat="customizationArg in tmpWidget.customization_args">
+                  <span><[customizationArg.description]></span>
+                  <div>
+                    <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+                    </schema-based-editor>
+                    <div style="margin-bottom: 15px;"></div>
+                  </div>
                 </div>
-              </div>
-            </form>
-          </div>
+              </form>
+            </div>
 
-          <hr>
+            <hr>
 
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" ng-model="stateWidgetStickyService.displayed" ng-disabled="!editabilityService.isEditable()">
-              Reuse the previous state's interaction, if possible.
-              <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
-                <span class="glyphicon glyphicon-question-sign"></span>
-              </a>
-            </label>
+            <div class="checkbox">
+              <label>
+                <input type="checkbox" ng-model="stateWidgetStickyService.displayed" ng-disabled="!editabilityService.isEditable()">
+                Reuse the previous state's interaction, if possible.
+                <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
+                  <span class="glyphicon glyphicon-question-sign"></span>
+                </a>
+              </label>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="row" style="margin-top: 5px;">
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <span ng-if="tmpWidget">
-          <button type="button" class="btn btn-success protractor-test-save-interaction" ng-click="saveInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
-            Save Interaction
-          </button>
-          <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
-            Cancel
-          </button>
-        </span>
+      <div ng-if="tmpWidget">
+        <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-interaction" ng-click="saveInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
+          Save Interaction
+        </button>
+        <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
+          Cancel
+        </button>
       </div>
     </div>
   </div>

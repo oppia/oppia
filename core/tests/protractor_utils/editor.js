@@ -97,7 +97,7 @@ var editRule = function(ruleNum) {
     element(by.repeater('rule in handler track by $index').row(ruleNum));
 
   // This button will not be shown if the rule editor is already open.
-  elem.all(by.css('.oppia-rule-edit-button')).then(function(buttons) {
+  elem.all(by.css('.protractor-test-edit-rule')).then(function(buttons) {
     if (buttons.length === 1) {
       buttons[0].click();
     } else if (buttons.length !== 0) {

@@ -13,7 +13,7 @@
         and this element should have an ng-repeat defined on it. See the
         ui-sortable documentation for more details. -->
         <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-sortable-rule-block">
-          <rule-editor rule="rule" heading="Rule #<[$index + 1]>" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
+          <rule-editor rule="rule" heading="Rule #<[$index + 1]>" num-rules="handler.length" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
           </rule-editor>
         </div>
       </div>

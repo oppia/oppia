@@ -82,7 +82,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       cancelEdit: '&',
       deleteRule: '&',
       isEditable: '=',
-      heading: '@'
+      heading: '@',
+      numRules: '&'
     },
     templateUrl: 'inline/rule_editor',
     controller: [
@@ -120,25 +121,27 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.ruleEditorIsOpen = false;
         $scope.openRuleEditor = function() {
-          $scope.ruleEditorIsOpen = true;
-          if ($scope.rule.feedback.length === 0) {
-            $scope.rule.feedback.push('');
-          }
-          if ($scope.rule.description === null) {
-            $scope.generateAllRuleTypes();
-            for (var key in $scope.allRuleTypes) {
-              $scope.rule.description = key;
-              $scope.currentRuleDescription = $scope.rule.description;
-              $scope.onSelectNewRuleType();
-              break;
+          if ($scope.isEditable) {
+            $scope.ruleEditorIsOpen = true;
+            if ($scope.rule.feedback.length === 0) {
+              $scope.rule.feedback.push('');
             }
-          } else {
-            $scope.currentRuleDescription = $scope.rule.description;
-          }
+            if ($scope.rule.description === null) {
+              $scope.generateAllRuleTypes();
+              for (var key in $scope.allRuleTypes) {
+                $scope.rule.description = key;
+                $scope.currentRuleDescription = $scope.rule.description;
+                $scope.onSelectNewRuleType();
+                break;
+              }
+            } else {
+              $scope.currentRuleDescription = $scope.rule.description;
+            }
 
-          $scope.ruleDescriptionMemento = angular.copy($scope.rule.description);
-          $scope.ruleDefinitionMemento = angular.copy($scope.rule.definition);
-          $scope.computeRuleDescriptionFragments();
+            $scope.ruleDescriptionMemento = angular.copy($scope.rule.description);
+            $scope.ruleDefinitionMemento = angular.copy($scope.rule.definition);
+            $scope.computeRuleDescriptionFragments();
+          }
         };
 
         $scope.removeNullFeedback = function() {
@@ -171,6 +174,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
           $scope.cancelEdit();
+        };
+        $scope.deleteThisRule = function() {
+          $scope.cancelThisEdit();
+          $scope.deleteRule();
         };
 
         $scope.createRuleDestIfNecessary = function() {

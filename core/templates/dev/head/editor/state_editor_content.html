@@ -27,11 +27,10 @@
     </div>
   </div>
 
-  <div ng-if="!!contentMemento">
+  <!-- The margin-bottom here preserves parity with the 'well' in the readonly mode. -->
+  <div ng-if="!!contentMemento" class="oppia-state-item-editor-div">
     <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
     </schema-based-editor>
-    <div style="margin-top: 5px;">
-      <button type="button" class="btn btn-success" ng-click="saveTextContent()">Save Content</button>
-    </div>
+    <button type="button" class="btn btn-success oppia-save-state-item-button" ng-click="saveTextContent()">Save Content</button>
   </div>
 {% endblock %}

@@ -717,6 +717,13 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding: 15px 15px 0px 15px; 
 }
 
+.oppia-state-item-editor-div {
+  margin-bottom: 20px;
+}
+.oppia-save-state-item-button {
+  margin-top: 2px;
+}
+
 .oppia-widget-selector {
   position: relative;
   bottom: 7px;
@@ -726,15 +733,16 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-top: 40px;
 }
 
-.oppia-content-section:hover .oppia-open-content-editor-btn,
-.oppia-interactive-section:hover .oppia-open-interactive-widget-editor-btn {
-  background: #47a447;
-  color: white;
-}
-
 .oppia-content-section:hover .oppia-state-content-display,
 .oppia-interactive-section:hover .oppia-interaction-preview {
   background: #eee;
+}
+
+.oppia-interactive-section-click-handler {
+  height: 100%;
+  position: absolute;
+  width: 100%;
+  z-index: 50;
 }
 
 .oppia-editable-section {
@@ -757,7 +765,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-rules {
-  margin: -15px 0 0 0;
   padding: 0 10px 5px 10px;
 }
 
@@ -838,27 +845,22 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-readonly-rule-tile img {
   max-height: 50px;
 }
-.oppia-readonly-rule-container:hover .oppia-rule-edit-button {
-  background: #245EFF;
-  color: white;
-}
 
 .oppia-rule-editable-view {
   padding-bottom: 20px;
 }
 
-.oppia-rule-delete-button:hover {
-  background: #E80B00;
-  color: white;
+.oppia-rule-dest-link {
+  position: absolute;
+  /* This must be larger than the z-index in
+     .oppia-interactive-section-click-handler, so that the rule does not
+     switch to edit mode when the destination link is clicked. */
+  z-index: 200;
 }
 
-.oppia-rule-edit-button {
-  padding-right: 18px;
-}
-
-.oppia-rule-save-button {
-  margin-top: 2px;
+.oppia-rule-save-cancel-buttons {
   margin-bottom: 5px;
+  margin-top: 2px;
 }
 
 .oppia-rule-sort-handle {
