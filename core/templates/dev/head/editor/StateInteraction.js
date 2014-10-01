@@ -282,10 +282,16 @@ oppia.controller('StateInteraction', [
     // Updates the exploration states from the widget handlers.
     var activeStateName = editorContextService.getActiveStateName();
     var _stateDict = explorationStatesService.getState(activeStateName);
+
+    _stateDict.widget.widget_id = angular.copy(stateWidgetIdService.savedMemento);
+    _stateDict.widget.customization_args = angular.copy(
+      stateCustomizationArgsService.savedMemento);
+    _stateDict.widget.sticky = angular.copy(stateWidgetStickyService.savedMemento);
     for (var i = 0; i < _stateDict.widget.handlers.length; i++) {
       var handlerName = _stateDict.widget.handlers[i].name;
       _stateDict.widget.handlers[i].rule_specs = $scope.widgetHandlers[handlerName];
     }
+
     explorationStatesService.setState(activeStateName, _stateDict);
   };
 }]);
