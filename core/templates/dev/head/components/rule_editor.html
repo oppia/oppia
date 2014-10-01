@@ -1,4 +1,6 @@
 <div>
+  <h4 ng-if="heading"><[heading]></h4>
+  <br>
   <div ng-if="!ruleEditorIsOpen">
     <div class="row oppia-readonly-rule-container">
       <div class="col-lg-10 col-md-10 col-sm-10">
@@ -66,7 +68,7 @@
     </div>
   </div>
 
-  <div ng-if="isEditable && ruleEditorIsOpen">
+  <div ng-if="isEditable && ruleEditorIsOpen" class="oppia-rule-editable-view">
     <div class="oppia-rule-bubble">
       <span ng-if="rule.description !== 'Default'">
         <form class="form-inline" role="form">
@@ -121,9 +123,7 @@
       </div>
     </div>
 
-    <div style="margin-top: 5px; margin-bottom: 5px;">
-      <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
-      <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-    </div>
+    <button type="button" class="btn btn-success oppia-rule-save-button protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
+    <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
   </div>
 </div>

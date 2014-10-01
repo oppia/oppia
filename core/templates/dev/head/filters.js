@@ -130,6 +130,8 @@ oppia.filter('parameterizeRuleDescription', [function() {
           replacementText += inputs[varName][i].readableNoteName;
         }
         replacementText += ']';
+      } else if (varType === 'NormalizedString') {
+        replacementText = '"' + replacementText + '"';
       }
 
       description = description.replace(pattern, ' ');

@@ -81,7 +81,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       saveRule: '=',
       cancelEdit: '&',
       deleteRule: '&',
-      isEditable: '='
+      isEditable: '=',
+      heading: '@'
     },
     templateUrl: 'inline/rule_editor',
     controller: [

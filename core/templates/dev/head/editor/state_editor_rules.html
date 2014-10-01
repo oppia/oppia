@@ -2,8 +2,6 @@
 
 {% block id %}rules{% endblock %}
 
-{% block label %}rules{% endblock %}
-
 {% block row %}
   <div ng-repeat="(handlerName, handler) in widgetHandlers">
     <div class="col-lg-2 col-md-2 col-sm-2">
@@ -15,12 +13,7 @@
         and this element should have an ng-repeat defined on it. See the
         ui-sortable documentation for more details. -->
         <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-sortable-rule-block">
-          <div class="row">
-            <div class="col-lg-12 col-md-12 col-sm-12">
-              <h4>Rule #<[$index + 1]></h4>
-            </div>
-          </div>
-          <rule-editor rule="rule" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
+          <rule-editor rule="rule" heading="Rule #<[$index + 1]>" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
           </rule-editor>
         </div>
       </div>
@@ -42,13 +35,8 @@
       </div>
 
       <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <h4>Default Rule</h4>
-        </div>
-      </div>
-      <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 protractor-test-default-rule">
-          <rule-editor rule="handler[handler.length - 1]" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
+          <rule-editor rule="handler[handler.length - 1]" heading="Default Rule" answer-choices="answerChoices" exploration-id="explorationId" states="states" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
           </rule-editor>
         </div>
       </div>

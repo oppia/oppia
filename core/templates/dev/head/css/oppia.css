@@ -821,10 +821,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-top: -10px;
   padding: 0 37px;
 }
-.oppia-add-rule-button:hover {
-  background: #245EFF;
-  color: white;
-}
 
 .oppia-readonly-rule-container {
   margin-left: -30px;
@@ -839,9 +835,16 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-readonly-rule-tile:hover {
   background: #ddd;
 }
+.oppia-readonly-rule-tile img {
+  max-height: 50px;
+}
 .oppia-readonly-rule-container:hover .oppia-rule-edit-button {
   background: #245EFF;
   color: white;
+}
+
+.oppia-rule-editable-view {
+  padding-bottom: 20px;
 }
 
 .oppia-rule-delete-button:hover {
@@ -853,8 +856,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding-right: 18px;
 }
 
-.oppia-readonly-rule-tile img {
-  max-height: 50px;
+.oppia-rule-save-button {
+  margin-top: 2px;
+  margin-bottom: 5px;
 }
 
 .oppia-rule-sort-handle {
@@ -891,7 +895,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   background: #E0E0E0;
   border-bottom-left-radius: 8px;
   display: table-cell;
-  padding: 5px 10px;
+  padding: 5px 10px 15px 10px;
 }
 .oppia-dest-bubble {
   background: #EEEEEE;
