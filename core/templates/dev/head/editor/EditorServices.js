@@ -41,9 +41,6 @@ oppia.factory('explorationData', [
     var explorationDataUrl = '/createhandler/data/' + explorationId;
     var resolvedAnswersUrlPrefix = '/createhandler/resolved_answers/' + explorationId;
 
-    // TODO(sll): Find a fix for multiple users editing the same exploration
-    // concurrently.
-
     // Put exploration variables here.
     var explorationData = {
       explorationId: explorationId,

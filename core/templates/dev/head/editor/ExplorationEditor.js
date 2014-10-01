@@ -23,20 +23,68 @@ var END_DEST = 'END';
 
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$location', '$modal', '$window', '$filter', '$rootScope',
-  '$log', 'explorationData', 'warningsData', 'activeInputData',
+  '$log', '$timeout', 'explorationData', 'warningsData', 'activeInputData',
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', function(
+  'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
+  function(
     $scope, $http, $location, $modal, $window, $filter, $rootScope,
-    $log, explorationData, warningsData, activeInputData,
+    $log, $timeout, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
-    newStateTemplateService) {
+    newStateTemplateService, oppiaPlayerService) {
 
+  $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
+
+  $scope.enterPreviewMode = function() {
+    $rootScope.$broadcast('externalSave');
+    oppiaPlayerService.populateExploration({
+      states: $scope.states,
+      init_state_name: explorationInitStateNameService.savedMemento,
+      param_specs: $scope.paramSpecs,
+      title: explorationTitleService.savedMemento,
+      // TODO(sll): are these actually editable?
+      param_changes: []
+    });
+    $timeout(function() {
+      $scope.isInPreviewMode = true;
+    });
+  };
+
+  $scope.exitPreviewMode = function() {
+    $scope.isInPreviewMode = false;
+    $timeout(function() {
+      editorContextService.setActiveStateName(oppiaPlayerService.getCurrentStateName());
+      $location.path('/gui/' + editorContextService.getActiveStateName());
+      $scope.$broadcast('refreshStateEditor');
+    });
+  };
+
+  /**********************************************************
+   * Called on initial load of the exploration editor page.
+   *********************************************************/
+  $rootScope.loadingMessage = 'Loading';
+
+  // The pathname should be: .../create/{exploration_id}
+  $scope.pathnameArray = window.location.pathname.split('/');
+  for (var i = 0; i < $scope.pathnameArray.length; i++) {
+    if ($scope.pathnameArray[i] === 'create') {
+      $scope.explorationId = $scope.pathnameArray[i + 1];
+      break;
+    }
+  }
+  // The exploration id needs to be attached to the root scope in order for
+  // the file picker widget to work. (Note that an alternative approach might
+  // also be to replicate this URL-based calculation in the file picker widget.)
+  $rootScope.explorationId = $scope.explorationId;
+  $scope.explorationUrl = '/create/' + $scope.explorationId;
+  $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
+  $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
+  $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
   $scope.getActiveStateName = function() {
     return editorContextService.getActiveStateName();
@@ -345,11 +393,6 @@ oppia.controller('ExplorationEditor', [
     }
   };
 
-  $scope.showMainTabWithoutStateEditor = function(stateName) {
-    warningsData.clear();
-    $location.path('/');
-  };
-
   // When the URL path changes, reroute to the appropriate tab in the
   // exploration editor page.
   $scope.$watch(function() {
@@ -526,28 +569,6 @@ oppia.controller('ExplorationEditor', [
 
   $scope.warningsList = [];
   changeListService.setPostChangeHook($scope.updateWarningsList);
-
-  /**********************************************************
-   * Called on initial load of the exploration editor page.
-   *********************************************************/
-  $rootScope.loadingMessage = 'Loading';
-
-  // The pathname should be: .../create/{exploration_id}
-  $scope.pathnameArray = window.location.pathname.split('/');
-  for (var i = 0; i < $scope.pathnameArray.length; i++) {
-    if ($scope.pathnameArray[i] === 'create') {
-      $scope.explorationId = $scope.pathnameArray[i + 1];
-      break;
-    }
-  }
-  // The exploration id needs to be attached to the root scope in order for
-  // the file picker widget to work. (Note that an alternative approach might
-  // also be to replicate this URL-based calculation in the file picker widget.)
-  $rootScope.explorationId = $scope.explorationId;
-  $scope.explorationUrl = '/create/' + $scope.explorationId;
-  $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
-  $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
-  $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
   $scope.showEmbedExplorationModal = function() {
     warningsData.clear();

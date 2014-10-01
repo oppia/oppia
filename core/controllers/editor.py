@@ -22,11 +22,14 @@ import imghdr
 import logging
 
 from core.controllers import base
+from core.controllers import reader
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import obj_services
 from core.domain import skins_services
@@ -649,8 +652,6 @@ class StateRulesStatsHandler(EditorHandler):
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
 
-    PAGE_NAME_FOR_CSRF = 'editor'
-
     @require_editor
     def post(self, exploration_id):
         """Saves an image uploaded by a content creator."""
@@ -742,3 +743,96 @@ class ChangeListSummaryHandler(EditorHandler):
                 'summary': summary,
                 'warning_message': warning_message
             })
+
+
+class InitExplorationHandler(EditorHandler):
+    """Performs a get_init_html_and_params() operation server-side and
+    returns the result. This is done while maintaining no state.
+    """
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # A domain object representing the old state.
+        init_state = exp_domain.State.from_dict(self.payload.get('init_state'))
+        # A domain object representing the exploration-level parameter changes.
+        exp_param_changes = [
+            param_domain.ParamChange.from_dict(param_change_dict)
+            for param_change_dict in self.payload.get('exp_param_changes')]
+
+        init_html, init_params = reader.get_init_html_and_params(
+            exp_param_changes, init_state, exp_param_specs)
+
+        self.render_json({
+            'init_html': init_html,
+            'params': init_params,
+        })
+
+
+class ClassifyHandler(EditorHandler):
+    """Performs a classify() operation server-side and returns the result.
+    This is done while maintaining no state.
+    """
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # A domain object representing the old state.
+        old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
+        # The name of the rule handler triggered.
+        handler_name = self.payload.get('handler')
+        # The learner's raw answer.
+        answer = self.payload.get('answer')
+        # The learner's parameter values.
+        params = self.payload.get('params')
+
+        rule_spec, input_type = reader.classify(
+            exploration_id, exp_param_specs, old_state, handler_name,
+            answer, params)
+
+        self.render_json({
+            'rule_spec': rule_spec.to_dict(),
+            'input_type': input_type,
+        })
+
+
+class NextStateHandler(EditorHandler):
+    """Performs a get_new_state_dict() operation server-side and returns the
+    result. This is done while maintaining no state.
+    """
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # The old state name.
+        old_state_name = self.payload.get('old_state_name')
+        # The learner's parameter values.
+        params = self.payload.get('params')
+        # The input type of the answer.
+        input_type = self.payload.get('input_type')
+        # The rule spec matching the learner's answer.
+        rule_spec = exp_domain.RuleSpec.from_dict_and_obj_type(
+            self.payload.get('rule_spec'), input_type)
+        # A domain object representing the new state.
+        new_state_dict = self.payload.get('new_state')
+        new_state = (
+            exp_domain.State.from_dict(new_state_dict) if new_state_dict
+            else None)
+
+        self.render_json(reader.get_next_state_dict(
+            exp_param_specs, old_state_name, params, rule_spec, new_state))

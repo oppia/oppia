@@ -266,6 +266,17 @@ urls = [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
+    # Temporary handlers to support preview mode.
+    # TODO(sll): Remove this once we have support for client-side expressions.
+    get_redirect_route(
+        r'/createhandler/init_exploration/<exploration_id>',
+        editor.InitExplorationHandler, 'editor_init_exploration_handler'),
+    get_redirect_route(
+        r'/createhandler/classify/<exploration_id>', editor.ClassifyHandler,
+        'editor_classify_handler'),
+    get_redirect_route(
+        r'/createhandler/next_state/<exploration_id>', editor.NextStateHandler,
+        'editor_next_state_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,

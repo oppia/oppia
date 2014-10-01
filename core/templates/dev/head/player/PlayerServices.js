@@ -140,14 +140,14 @@ oppia.factory('oppiaPlayerService', [
 
   learnerParamsService.init({});
   var stateHistory = [];
-  var stateName = null;
+  var _currentStateName = null;
   var answerIsBeingProcessed = false;
 
   var _updateStatus = function(newParams, newStateName) {
     // TODO(sll): Do this more incrementally.
     learnerParamsService.init(newParams);
-    stateName = newStateName;
-    stateHistory.push(stateName);
+    _currentStateName = newStateName;
+    stateHistory.push(_currentStateName);
   };
 
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
@@ -206,7 +206,7 @@ oppia.factory('oppiaPlayerService', [
         subject: result.subject,
         feedback: result.feedback,
         include_author: !result.isSubmitterAnonymized && isLoggedIn,
-        state_name: result.isStateRelated ? stateName : null
+        state_name: result.isStateRelated ? _currentStateName : null
       });
 
       $modal.open({
@@ -225,24 +225,48 @@ oppia.factory('oppiaPlayerService', [
 
   return {
     init: function(successCallback) {
-      $http.get(explorationDataUrl).success(function(data) {
-        _exploration = data.exploration;
-        isLoggedIn = data.is_logged_in;
-        sessionId = data.sessionId;
-        stopwatch.resetStopwatch();
-        _updateStatus(data.params, data.state_name);
-        // TODO(sll): Restrict what is passed here to just the relevant blobs of content.
-        successCallback(data);
-      }).error(function(data) {
-        warningsData.addWarning(
-          data.error || 'There was an error loading the exploration.');
-      });
+      if (_editorPreviewMode) {
+        // Before calling init(), populateExploration() should be called.
+        var initExplorationUrl = '/createhandler/init_exploration/' + _explorationId;
+        $http.post(initExplorationUrl, {
+          exp_param_specs: _exploration.param_specs,
+          init_state: _exploration.states[_exploration.init_state_name],
+          exp_param_changes: _exploration.param_changes
+        }).success(function(initHtmlAndParamsData) {
+          stopwatch.resetStopwatch();
+          _updateStatus(initHtmlAndParamsData.params, _exploration.init_state_name);
+          successCallback({
+            exploration: _exploration,
+            isLoggedIn: false,
+            sessionId: null,
+            init_html: initHtmlAndParamsData.init_html,
+            params: initHtmlAndParamsData.params,
+            state_name: _exploration.init_state_name
+          });
+        });
+      } else {
+        $http.get(explorationDataUrl).success(function(data) {
+          _exploration = data.exploration;
+          isLoggedIn = data.is_logged_in;
+          sessionId = data.sessionId;
+          stopwatch.resetStopwatch();
+          _updateStatus(data.params, data.state_name);
+          // TODO(sll): Restrict what is passed here to just the relevant blobs of content.
+          successCallback(data);
+        }).error(function(data) {
+          warningsData.addWarning(
+            data.error || 'There was an error loading the exploration.');
+        });
+      }
     },
     getExplorationId: function() {
       return _explorationId;
     },
     getExplorationTitle: function() {
       return _exploration.title;
+    },
+    getCurrentStateName: function() {
+      return _currentStateName;
     },
     getInteractiveWidgetHtml: function(stateName) {
       return _getInteractiveWidgetHtml(
@@ -269,74 +293,138 @@ oppia.factory('oppiaPlayerService', [
 
       answerIsBeingProcessed = true;
 
-      var stateTransitionUrl = '/explorehandler/transition/' + _explorationId + '/' + encodeURIComponent(stateName);
-      $http.post(stateTransitionUrl, {
-        answer: answer,
-        handler: handler,
-        params: learnerParamsService.getAllParams(),
-        version: version,
-      }).success(function(data) {
-        answerIsBeingProcessed = false;
+      if (_editorPreviewMode) {
+        var classifyUrl = '/createhandler/classify/' + _explorationId;
+        var nextStateDictUrl = '/createhandler/next_state/' + _explorationId;
 
-        var oldStateName = stateName;
-        var newStateName = data.state_name;
-        var oldStateData = _exploration.states[oldStateName];
-        // NB: This may be undefined if newStateName === END_DEST.
-        var newStateData = _exploration.states[newStateName];
-        // TODO(sll): If the new state widget is the same as the old state widget,
-        // and the new state widget is sticky, do not render the reader response.
-        // The interactive widget in the frontend should take care of this.
-        // TODO(sll): This special-casing is not great; we should make the
-        // interface for updating the frontend more generic so that all the updates
-        // happen in the same place. Perhaps in the non-sticky case we should call
-        // a frontend method named appendFeedback() or similar.
-        var isSticky = (
-          newStateName !== _END_DEST && newStateData.widget.sticky &&
-          newStateData.widget.widget_id === oldStateData.widget.widget_id);
+        $http.post(classifyUrl, {
+          exp_param_specs: angular.copy(_exploration.param_specs),
+          old_state: angular.copy(_exploration.states[_currentStateName]),
+          handler: handler,
+          params: learnerParamsService.getAllParams(),
+          answer: answer,
+        }).success(function(data) {
+          var newStateName = null;
+          if (data.rule_spec.dest !== 'END') {
+            newStateName = data.rule_spec.dest;
+          }
+          $http.post(nextStateDictUrl, {
+            exp_param_specs: angular.copy(_exploration.param_specs),
+            old_state_name: _currentStateName,
+            input_type: data.input_type,
+            params: learnerParamsService.getAllParams(),
+            rule_spec: data.rule_spec,
+            new_state: newStateName ? _exploration.states[newStateName] : null
+          }).success(function(data) {
+            answerIsBeingProcessed = false;
+            var oldStateName = _currentStateName;
+            var newStateName = data.state_name;
+            var oldStateData = _exploration.states[oldStateName];
+            // NB: This may be undefined if newStateName === END_DEST.
+            var newStateData = _exploration.states[newStateName];
+            // TODO(sll): If the new state widget is the same as the old state widget,
+            // and the new state widget is sticky, do not render the reader response.
+            // The interactive widget in the frontend should take care of this.
+            // TODO(sll): This special-casing is not great; we should make the
+            // interface for updating the frontend more generic so that all the updates
+            // happen in the same place. Perhaps in the non-sticky case we should call
+            // a frontend method named appendFeedback() or similar.
+            var isSticky = (
+              newStateName !== _END_DEST && newStateData.widget.sticky &&
+              newStateData.widget.widget_id === oldStateData.widget.widget_id);
 
-        if (!_editorPreviewMode) {
-          // Record the state hit to the event handler.
-          var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
-          $http.post(stateHitEventHandlerUrl, {
-            new_state_name: newStateName,
-            first_time: stateHistory.indexOf(newStateName) === -1,
-            exploration_version: version,
-            session_id: sessionId,
-            client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-            old_params: learnerParamsService.getAllParams()
+            _updateStatus(data.params, data.state_name);
+            stopwatch.resetStopwatch();
+
+            // TODO(sll): Get rid of this special case for multiple choice.
+            var oldWidgetChoices = null;
+            if (_exploration.states[oldStateName].widget.customization_args.choices) {
+              oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
+            }
+
+            var readerResponseHtml = _getReaderResponseHtml(
+              _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
+            if (newStateData) {
+              learnerParamsService.init(data.params);
+            }
+
+            successCallback(
+              newStateName, isSticky, data.question_html, readerResponseHtml,
+              data.feedback_html);
           });
+        });
+      } else {
+        var stateTransitionUrl = (
+          '/explorehandler/transition/' + _explorationId + '/' +
+          encodeURIComponent(_currentStateName));
+        $http.post(stateTransitionUrl, {
+          answer: answer,
+          handler: handler,
+          params: learnerParamsService.getAllParams(),
+          version: version,
+        }).success(function(data) {
+          answerIsBeingProcessed = false;
 
-          // Broadcast the state hit to the parent page.
-          messengerService.sendMessage(messengerService.STATE_TRANSITION, {
-            oldStateName: stateName,
-            jsonAnswer: JSON.stringify(answer),
-            newStateName: data.state_name
-          });
-        }
+          var oldStateName = _currentStateName;
+          var newStateName = data.state_name;
+          var oldStateData = _exploration.states[oldStateName];
+          // NB: This may be undefined if newStateName === END_DEST.
+          var newStateData = _exploration.states[newStateName];
+          // TODO(sll): If the new state widget is the same as the old state widget,
+          // and the new state widget is sticky, do not render the reader response.
+          // The interactive widget in the frontend should take care of this.
+          // TODO(sll): This special-casing is not great; we should make the
+          // interface for updating the frontend more generic so that all the updates
+          // happen in the same place. Perhaps in the non-sticky case we should call
+          // a frontend method named appendFeedback() or similar.
+          var isSticky = (
+            newStateName !== _END_DEST && newStateData.widget.sticky &&
+            newStateData.widget.widget_id === oldStateData.widget.widget_id);
 
-        _updateStatus(data.params, data.state_name);
-        stopwatch.resetStopwatch();
+          if (!_editorPreviewMode) {
+            // Record the state hit to the event handler.
+            var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
+            $http.post(stateHitEventHandlerUrl, {
+              new_state_name: newStateName,
+              first_time: stateHistory.indexOf(newStateName) === -1,
+              exploration_version: version,
+              session_id: sessionId,
+              client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+              old_params: learnerParamsService.getAllParams()
+            });
 
-        // TODO(sll): Get rid of this special case for multiple choice.
-        var oldWidgetChoices = null;
-        if (_exploration.states[oldStateName].widget.customization_args.choices) {
-          oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
-        }
+            // Broadcast the state hit to the parent page.
+            messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+              oldStateName: _currentStateName,
+              jsonAnswer: JSON.stringify(answer),
+              newStateName: data.state_name
+            });
+          }
 
-        var readerResponseHtml = _getReaderResponseHtml(
-          _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
-        if (newStateData) {
-          learnerParamsService.init(data.params);
-        }
+          _updateStatus(data.params, data.state_name);
+          stopwatch.resetStopwatch();
 
-        successCallback(
-          newStateName, isSticky, data.question_html, readerResponseHtml,
-          data.feedback_html);
-      }).error(function(data) {
-        answerIsBeingProcessed = false;
-        warningsData.addWarning(
-          data.error || 'There was an error processing your input.');
-      });
+          // TODO(sll): Get rid of this special case for multiple choice.
+          var oldWidgetChoices = null;
+          if (_exploration.states[oldStateName].widget.customization_args.choices) {
+            oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
+          }
+
+          var readerResponseHtml = _getReaderResponseHtml(
+            _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
+          if (newStateData) {
+            learnerParamsService.init(data.params);
+          }
+
+          successCallback(
+            newStateName, isSticky, data.question_html, readerResponseHtml,
+            data.feedback_html);
+        }).error(function(data) {
+          answerIsBeingProcessed = false;
+          warningsData.addWarning(
+            data.error || 'There was an error processing your input.');
+        });
+      }
     },
     showFeedbackModal: function() {
       if (_editorPreviewMode) {
@@ -349,7 +437,7 @@ oppia.factory('oppiaPlayerService', [
         backdrop: 'static',
         resolve: {
           currentStateName: function() {
-            return stateName;
+            return _currentStateName;
           },
           isLoggedIn: function() {
             return isLoggedIn;
@@ -357,6 +445,14 @@ oppia.factory('oppiaPlayerService', [
         },
         controller: _feedbackModalCtrl
       }).result.then(_feedbackModalCallback);
+    },
+    // This should only be used in editor preview mode.
+    populateExploration: function(exploration) {
+      if (_editorPreviewMode) {
+        _exploration = exploration;
+      } else {
+        throw 'Error: cannot populate exploration in learner mode.';
+      }
     }
   };
 }]);

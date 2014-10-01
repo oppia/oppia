@@ -65,9 +65,18 @@ def _get_updated_param_dict(param_dict, param_changes, exp_param_specs):
     return new_param_dict
 
 
-def _classify(
+def get_init_html_and_params(exp_param_changes, init_state, exp_param_specs):
+    """Gets the HTML and parameters when an exploration is first started."""
+    init_params = _get_updated_param_dict(
+        {}, exp_param_changes + init_state.param_changes, exp_param_specs)
+    return init_state.content[0].to_html(init_params), init_params
+
+
+def classify(
         exp_id, exp_param_specs, state, handler_name, answer, params):
-    """Normalize the answer and return the first rule that it satisfies."""
+    """Normalize the answer and return the first rule that it satisfies
+    as well as the input_type.
+    """
     widget_instance = widget_registry.Registry.get_widget_by_id(
         feconf.INTERACTIVE_PREFIX, state.widget.widget_id)
     normalized_answer = widget_instance.normalize_answer(
@@ -81,7 +90,7 @@ def _classify(
         if rule_domain.evaluate_rule(
                 rule_spec.definition, exp_param_specs, input_type, params,
                 normalized_answer, fs):
-            return rule_spec
+            return rule_spec, input_type
 
     raise Exception(
         'No matching rule found for handler %s. Rule specs are %s.' % (
@@ -91,7 +100,7 @@ def _classify(
     )
 
 
-def _get_next_state_dict(
+def get_next_state_dict(
         exp_param_specs, old_state_name, old_params, rule_spec, new_state):
     """Given state transition information, returns a dict containing
     the new state name, response HTML, and updated parameters.
@@ -196,19 +205,15 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        init_params = _get_updated_param_dict(
-            {},
-            exploration.param_changes + exploration.states[
-                exploration.init_state_name].param_changes,
+        init_html, init_params = get_init_html_and_params(
+            exploration.param_changes, exploration.init_state,
             exploration.param_specs)
-
-        init_state = exploration.init_state
         session_id = utils.generate_random_string(24)
 
         self.values.update({
             'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
-            'init_html': init_state.content[0].to_html(init_params),
+            'init_html': init_html,
             'params': init_params,
             'session_id': session_id,
             'state_name': exploration.init_state_name,
@@ -246,8 +251,8 @@ class FeedbackHandler(base.BaseHandler):
         exp_param_specs = exploration.param_specs
         old_state = exploration.states[old_state_name]
 
-        # The editor preview mode will call _classify() directly.
-        rule_spec = _classify(
+        # The editor preview mode will call classify() directly.
+        rule_spec, _ = classify(
             exploration_id, exp_param_specs, old_state, handler_name,
             answer, old_params)
 
@@ -270,8 +275,8 @@ class FeedbackHandler(base.BaseHandler):
             None if rule_spec.dest == feconf.END_DEST
             else exploration.states[rule_spec.dest])
 
-        # The editor preview mode will call _get_next_state_dict() directly.
-        self.render_json(_get_next_state_dict(
+        # The editor preview mode will call get_next_state_dict() directly.
+        self.render_json(get_next_state_dict(
             exp_param_specs, old_state_name, old_params, rule_spec, new_state))
 
 
