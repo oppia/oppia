@@ -138,6 +138,12 @@ oppia.controller('StateEditor', [
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'content',
         angular.copy($scope.content), angular.copy($scope.contentMemento));
+
+      var _stateData = explorationStatesService.getState(
+        editorContextService.getActiveStateName());
+      _stateData.content = angular.copy($scope.content);
+      explorationStatesService.setState(
+        editorContextService.getActiveStateName(), _stateData);
     }
     $scope.contentMemento = null;
   };
@@ -147,6 +153,12 @@ oppia.controller('StateEditor', [
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'param_changes',
         newValue, oldValue);
+
+      var _stateData = explorationStatesService.getState(
+        editorContextService.getActiveStateName());
+      _stateData.param_changes = angular.copy(newValue);
+      explorationStatesService.setState(
+        editorContextService.getActiveStateName(), _stateData);
     }
   };
 }]);
