@@ -107,15 +107,18 @@ var editRule = function(ruleNum) {
   });
 
   return {
+    // Note: this does NOT save the rule after the feedback is entered.
     editFeedback: function() {
       var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
       return forms.editList(feedbackElement);
     },
     // Enter 'END' for the end state.
+    // NB: This saves the rule after the destination is selected.
     setDestination: function(destinationName) {
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
       forms.editAutocompleteDropdown(destinationElement).
         setText(destinationName + '\n');
+      elem.element(by.css('.protractor-test-save-rule')).click();
     }
   }
 };
