@@ -106,9 +106,6 @@ oppia.controller('StateInteraction', [
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
     $scope.hasLoaded = false;
 
-    // TODO(sll): Remove this; it is needed for the rules.
-    $scope.states = explorationStatesService.getStates();
-
     // TODO(sll): Build a file containing this data and serve it statically,
     // since it rarely changes. (But don't cache it, since it does change.)
     widgetDefinitionsService.getInteractiveDefinitions().then(function(widgetDefinitions) {

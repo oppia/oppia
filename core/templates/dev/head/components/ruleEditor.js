@@ -87,8 +87,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$attrs', 'editorContextService',
-      function($scope, $attrs, editorContextService) {
+      '$scope', '$attrs', 'editorContextService', 'explorationStatesService',
+      function($scope, $attrs, editorContextService, explorationStatesService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
@@ -180,9 +180,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.deleteRule();
         };
 
+
+
         $scope.createRuleDestIfNecessary = function() {
           var foundInExistingStateList = false;
-          for (var stateName in $scope.states) {
+          for (var stateName in explorationStatesService.getStates()) {
             if (stateName === $scope.rule.dest) {
               foundInExistingStateList = true;
             }
@@ -212,11 +214,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.destChoices = [];
-        $scope.$watch('states', function(newValue) {
+        $scope.$watch(explorationStatesService.getStates, function(newValue) {
           // Returns a list of objects, each with an ID and name. These
           // represent all states in alphabetical order, followed by 'END'.
           $scope.destChoices = [];
-          var stateNames = Object.keys($scope.states).sort();
+          var stateNames = Object.keys(explorationStatesService.getStates()).sort();
           stateNames.push(END_DEST);
           for (var i = 0; i < stateNames.length; i++) {
             $scope.destChoices.push({
