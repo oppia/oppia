@@ -22,7 +22,6 @@ import urllib
 import zipfile
 
 import common
-import subprocess
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
