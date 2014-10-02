@@ -87,8 +87,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$attrs', 'editorContextService', 'explorationStatesService',
-      function($scope, $attrs, editorContextService, explorationStatesService) {
+      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService',
+      function($scope, $attrs, editorContextService, explorationStatesService, routerService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
@@ -334,8 +334,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDescriptionFragments = result;
         };
 
-        $scope.getEscapedDest = function() {
-          return encodeURIComponent($scope.rule.dest);
+        $scope.navigateToRuleDest = function() {
+          editorContextService.setActiveStateName($scope.rule.dest);
+          routerService.navigateToState($scope.rule.dest);
         };
 
         $scope.getExtendedChoiceArray = function(choices) {

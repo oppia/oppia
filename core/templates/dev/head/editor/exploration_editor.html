@@ -376,7 +376,7 @@
 
       <div class="row" ng-if="!isInPreviewMode">
         <tabset>
-          <tab heading="Main" active="mainTabActive" select="selectMainTab()">
+          <tab heading="Main" active="getTabStatuses().main.active" select="showStateEditor()">
             <div class="row">
               <div class="col-lg-9 col-md-9 col-sm-9" ng-controller="StateEditor">
                 {% include 'editor/state_editor.html' %}
@@ -388,19 +388,19 @@
             </div>
           </tab>
 
-          <tab heading="Statistics" active="statsTabActive" select="selectStatsTab()">
+          <tab heading="Statistics" active="getTabStatuses().stats.active" select="selectStatsTab()">
             {% include 'editor/exploration_statistics.html' %}
           </tab>
 
-          <tab heading="Settings" active="settingsTabActive" select="selectSettingsTab()">
+          <tab heading="Settings" active="getTabStatuses().settings.active" select="selectSettingsTab()">
             {% include 'editor/exploration_settings.html' %}
           </tab>
 
-          <tab heading="History" active="historyTabActive" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
+          <tab heading="History" active="getTabStatuses().history.active" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
             {% include 'editor/exploration_history.html' %}
           </tab>
 
-          <tab heading="<[feedbackTabHeader]>" active="feedbackTabActive" select="selectFeedbackTab()">
+          <tab heading="<[feedbackTabHeader]>" active="getTabStatuses().feedback.active" select="selectFeedbackTab()">
             {% include 'editor/exploration_feedback.html' %}
           </tab>
         </tabset>
@@ -450,6 +450,7 @@
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}
     {{ object_editors_js }}
+    {{ include_js_file('editor/RouterServices.js') }}
     {{ include_js_file('editor/ExplorationStatistics.js') }}
     {{ include_js_file('editor/ExplorationSettings.js') }}
     {{ include_js_file('editor/ExplorationHistory.js') }}

@@ -22,21 +22,21 @@
 var END_DEST = 'END';
 
 oppia.controller('ExplorationEditor', [
-  '$scope', '$http', '$location', '$modal', '$window', '$filter', '$rootScope',
+  '$scope', '$http', '$modal', '$window', '$filter', '$rootScope',
   '$log', '$timeout', 'explorationData', 'warningsData', 'activeInputData',
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
-  'explorationStatesService',
+  'explorationStatesService', 'routerService',
   function(
-    $scope, $http, $location, $modal, $window, $filter, $rootScope,
+    $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
-    newStateTemplateService, oppiaPlayerService, explorationStatesService) {
+    newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -60,7 +60,7 @@ oppia.controller('ExplorationEditor', [
     $scope.isInPreviewMode = false;
     $timeout(function() {
       editorContextService.setActiveStateName(oppiaPlayerService.getCurrentStateName());
-      $location.path('/gui/' + editorContextService.getActiveStateName());
+      $scope.showStateEditor(editorContextService.getActiveStateName());
       $scope.$broadcast('refreshStateEditor');
     });
   };
@@ -86,7 +86,7 @@ oppia.controller('ExplorationEditor', [
     return editorContextService.getActiveStateName();
   };
 
-  $scope.saveActiveState = function() {
+  $scope.saveActiveState = function(postSaveHook) {
     try {
       $rootScope.$broadcast('externalSave');
     } catch (e) {
@@ -96,11 +96,44 @@ oppia.controller('ExplorationEditor', [
         $rootScope.$broadcast('externalSave');
       });
     }
+
+    if (postSaveHook) {
+      postSaveHook();
+    }
   };
 
   $scope.saveAndChangeActiveState = function(newStateName) {
     $scope.saveActiveState();
     editorContextService.setActiveStateName(newStateName);
+  };
+
+  $scope.showStateEditor = function(stateName) {
+    warningsData.clear();
+    if (stateName) {
+      $scope.saveAndChangeActiveState(stateName);
+    } else {
+      stateName = editorContextService.getActiveStateName();
+    }
+
+    if (stateName) {
+      routerService.navigateToState(stateName);
+    }
+  };
+
+  $scope.getTabStatuses = routerService.getTabStatuses;
+  $scope.selectStatsTab = function() {
+    $scope.saveActiveState(routerService.navigateToStatsTab);
+  };
+  $scope.selectSettingsTab = function() {
+    $scope.saveActiveState(routerService.navigateToSettingsTab);
+  };
+  $scope.selectHistoryTab = function() {
+    // TODO(sll): Do this on-hover rather than on-click.
+    $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
+    $scope.saveActiveState(routerService.navigateToHistoryTab);
+  };
+  $scope.selectFeedbackTab = function() {
+    $scope.saveActiveState(routerService.navigateToFeedbackTab);
   };
 
   /**************************************************
@@ -124,7 +157,6 @@ oppia.controller('ExplorationEditor', [
 
       $scope.isDiscardInProgress = true;
       changeListService.discardAllChanges();
-      $scope.doFullRefresh = true;
       $scope.initExplorationPage(function() {
         // The $apply() is needed to call all the exploration field $watch()
         // methods before flipping isDiscardInProgress.
@@ -343,118 +375,6 @@ oppia.controller('ExplorationEditor', [
   };
 
   /********************************************
-  * Methods affecting the URL location hash.
-  ********************************************/
-  var resetActiveTags = function() {
-    $scope.mainTabActive = false;
-    $scope.statsTabActive = false;
-    $scope.settingsTabActive = false;
-    $scope.historyTabActive = false;
-    $scope.feedbackTabActive = false;
-  };
-
-  $scope.location = $location;
-
-  var GUI_EDITOR_URL = '/gui';
-  var STATS_VIEWER_URL = '/stats';
-  var SETTINGS_URL = '/settings';
-  var HISTORY_URL = '/history';
-  var FEEDBACK_URL = '/feedback';
-
-  $scope.selectMainTab = function() {
-    $scope.showStateEditor(editorContextService.getActiveStateName());
-  };
-
-  $scope.selectStatsTab = function() {
-    $location.path(STATS_VIEWER_URL);
-  };
-
-  $scope.selectSettingsTab = function() {
-    $location.path(SETTINGS_URL);
-  };
-
-  $scope.selectHistoryTab = function() {
-    $location.path(HISTORY_URL);
-  };
-
-  $scope.selectFeedbackTab = function() {
-    $location.path(FEEDBACK_URL);
-  };
-
-  $scope.showStateEditor = function(stateName) {
-    warningsData.clear();
-    if (stateName) {
-      $scope.saveAndChangeActiveState(stateName);
-      $location.path('/gui/' + stateName);
-    }
-  };
-
-  // When the URL path changes, reroute to the appropriate tab in the
-  // exploration editor page.
-  $scope.$watch(function() {
-    return $location.path();
-  }, function(newPath, oldPath) {
-    var path = newPath;
-    $log.info('Path is now ' + path);
-
-    if (newPath === '') {
-      $location.path(oldPath);
-      return;
-    }
-
-    $rootScope.$broadcast('externalSave');
-
-    if (path === STATS_VIEWER_URL) {
-      $scope.saveActiveState();
-      resetActiveTags();
-      $scope.statsTabActive = true;
-    } else if (path === SETTINGS_URL) {
-      $scope.saveActiveState();
-      resetActiveTags();
-      $scope.settingsTabActive = true;
-    } else if (path === HISTORY_URL) {
-      $scope.saveActiveState();
-      resetActiveTags();
-      $scope.historyTabActive = true;
-      // TODO(sll): Do this on-hover rather than on-click.
-      $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
-    } else if (path === FEEDBACK_URL) {
-      $scope.saveActiveState();
-      resetActiveTags();
-      $scope.feedbackTabActive = true;
-    } else {
-      if (path.indexOf('/gui/') != -1) {
-        $scope.saveAndChangeActiveState(path.substring('/gui/'.length));
-      } else if (explorationInitStateNameService.displayed) {
-        $location.path('/gui/' + explorationInitStateNameService.displayed);
-      } else {
-        return;
-      }
-
-      var callback = function() {
-        var stateName = editorContextService.getActiveStateName();
-        var stateData = explorationStatesService.getState(stateName);
-        if (stateData === null || stateData === undefined || $.isEmptyObject(stateData)) {
-          // This state does not exist. Redirect to the initial state.
-          $scope.showStateEditor(explorationInitStateNameService.displayed);
-          warningsData.addWarning('State ' + stateName + ' does not exist.');
-          return;
-        } else {
-          resetActiveTags();
-          $scope.mainTabActive = true;
-          $scope.$broadcast('refreshStateEditor');
-        }
-      };
-
-      if (!$.isEmptyObject(explorationStatesService.getStates())) {
-        callback();
-      } else {
-        $scope.initExplorationPage(callback);
-      }
-    }
-  });
-
-  /********************************************
   * Methods affecting the graph visualization.
   ********************************************/
   $scope.refreshGraph = function() {
@@ -647,10 +567,6 @@ oppia.controller('ExplorationEditor', [
     return explorationId ? ('/explore/' + explorationId) : '';
   };
 
-  // This is true on the initial page load and on clicking 'Discard changes'.
-  // It ensures that the user is taken to the initial state.
-  $scope.doFullRefresh = true;
-
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
@@ -691,13 +607,14 @@ oppia.controller('ExplorationEditor', [
 
       $scope.refreshGraph();
 
-      if ($scope.doFullRefresh) {
-        if (!editorContextService.getActiveStateName() ||
-            !explorationStatesService.getState(editorContextService.getActiveStateName())) {
-          editorContextService.setActiveStateName(explorationInitStateNameService.displayed);
-        }
+      if (!editorContextService.getActiveStateName() ||
+          !explorationStatesService.getState(editorContextService.getActiveStateName())) {
+        editorContextService.setActiveStateName(explorationInitStateNameService.displayed);
+      }
+
+      if (!routerService.isLocationSetToNonStateEditorTab() && 
+          !data.states.hasOwnProperty(routerService.getCurrentStateFromLocationPath())) {
         $scope.showStateEditor(editorContextService.getActiveStateName());
-        $scope.doFullRefresh = false;
       }
 
       $scope.updateWarningsList();

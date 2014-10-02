@@ -19,8 +19,8 @@
  */
 
 oppia.controller('ExplorationStatistics', [
-    '$scope', '$http', '$location', '$modal', 'warningsData', 'explorationStatesService',
-    function($scope, $http, $location, $modal, warningsData, explorationStatesService) {
+    '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService',
+    function($scope, $http, $modal, warningsData, explorationStatesService) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -142,10 +142,6 @@ oppia.controller('ExplorationStatistics', [
               }
             }
             return false;
-          };
-
-          $scope.gotoStateEditor = function(locationHash) {
-            $modalInstance.close({});
           };
 
           $scope.cancel = function() {

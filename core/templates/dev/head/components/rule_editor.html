@@ -48,7 +48,7 @@
                 Destination: <br />
                 <span ng-if="rule.dest !== getActiveStateName()">
                   <span class="glyphicon glyphicon-arrow-right"></span>
-                  <a href="/create/<[explorationId]>#/gui/<[getEscapedDest()]>" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
+                  <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
                     <[rule.dest]>
                   </a>
                   <span ng-if="rule.dest === 'END'">END</span>
