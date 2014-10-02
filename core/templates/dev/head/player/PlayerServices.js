@@ -223,6 +223,67 @@ oppia.factory('oppiaPlayerService', [
 
   var stopwatch = stopwatchProviderService.getInstance();
 
+  var _onStateTransitionProcessed = function(data, answer, handler, successCallback) {
+    answerIsBeingProcessed = false;
+
+    var oldStateName = _currentStateName;
+    var newStateName = data.state_name;
+    var oldStateData = _exploration.states[oldStateName];
+    // NB: This may be undefined if newStateName === END_DEST.
+    var newStateData = _exploration.states[newStateName];
+    // TODO(sll): If the new state widget is the same as the old state widget,
+    // and the new state widget is sticky, do not render the reader response.
+    // The interactive widget in the frontend should take care of this.
+    // TODO(sll): This special-casing is not great; we should make the
+    // interface for updating the frontend more generic so that all the updates
+    // happen in the same place. Perhaps in the non-sticky case we should call
+    // a frontend method named appendFeedback() or similar.
+    var isSticky = (
+      newStateName !== _END_DEST && newStateData.widget.sticky &&
+      newStateData.widget.widget_id === oldStateData.widget.widget_id);
+
+    if (!_editorPreviewMode) {
+      // Record the state hit to the event handler.
+      var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
+      $http.post(stateHitEventHandlerUrl, {
+        new_state_name: newStateName,
+        first_time: stateHistory.indexOf(newStateName) === -1,
+        exploration_version: version,
+        session_id: sessionId,
+        client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+        old_params: learnerParamsService.getAllParams()
+      });
+
+      // Broadcast the state hit to the parent page.
+      messengerService.sendMessage(messengerService.STATE_TRANSITION, {
+        oldStateName: _currentStateName,
+        jsonAnswer: JSON.stringify(answer),
+        newStateName: data.state_name
+      });
+    }
+
+    _updateStatus(data.params, data.state_name);
+    stopwatch.resetStopwatch();
+
+    // TODO(sll): Get rid of this special case for multiple choice.
+    var oldWidgetChoices = null;
+    if (_exploration.states[oldStateName].widget.customization_args.choices) {
+      oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
+    }
+
+    var readerResponseHtml = _getReaderResponseHtml(
+      _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
+    if (newStateData) {
+      learnerParamsService.init(data.params);
+    }
+
+    $rootScope.$broadcast('playerStateChange');
+
+    successCallback(
+      newStateName, isSticky, data.question_html, readerResponseHtml,
+      data.feedback_html);
+  };
+
   return {
     init: function(successCallback) {
       if (_editorPreviewMode) {
@@ -318,42 +379,7 @@ oppia.factory('oppiaPlayerService', [
             rule_spec: data.rule_spec,
             new_state: newStateName ? _exploration.states[newStateName] : null
           }).success(function(data) {
-            answerIsBeingProcessed = false;
-            var oldStateName = _currentStateName;
-            var newStateName = data.state_name;
-            var oldStateData = _exploration.states[oldStateName];
-            // NB: This may be undefined if newStateName === END_DEST.
-            var newStateData = _exploration.states[newStateName];
-            // TODO(sll): If the new state widget is the same as the old state widget,
-            // and the new state widget is sticky, do not render the reader response.
-            // The interactive widget in the frontend should take care of this.
-            // TODO(sll): This special-casing is not great; we should make the
-            // interface for updating the frontend more generic so that all the updates
-            // happen in the same place. Perhaps in the non-sticky case we should call
-            // a frontend method named appendFeedback() or similar.
-            var isSticky = (
-              newStateName !== _END_DEST && newStateData.widget.sticky &&
-              newStateData.widget.widget_id === oldStateData.widget.widget_id);
-
-            _updateStatus(data.params, data.state_name);
-            stopwatch.resetStopwatch();
-
-            // TODO(sll): Get rid of this special case for multiple choice.
-            var oldWidgetChoices = null;
-            if (_exploration.states[oldStateName].widget.customization_args.choices) {
-              oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
-            }
-
-            var readerResponseHtml = _getReaderResponseHtml(
-              _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
-            if (newStateData) {
-              learnerParamsService.init(data.params);
-            }
-
-            $rootScope.$broadcast('playerStateChange');
-            successCallback(
-              newStateName, isSticky, data.question_html, readerResponseHtml,
-              data.feedback_html);
+            _onStateTransitionProcessed(data, answer, handler, successCallback);
           });
         });
       } else {
@@ -366,64 +392,7 @@ oppia.factory('oppiaPlayerService', [
           params: learnerParamsService.getAllParams(),
           version: version,
         }).success(function(data) {
-          answerIsBeingProcessed = false;
-
-          var oldStateName = _currentStateName;
-          var newStateName = data.state_name;
-          var oldStateData = _exploration.states[oldStateName];
-          // NB: This may be undefined if newStateName === END_DEST.
-          var newStateData = _exploration.states[newStateName];
-          // TODO(sll): If the new state widget is the same as the old state widget,
-          // and the new state widget is sticky, do not render the reader response.
-          // The interactive widget in the frontend should take care of this.
-          // TODO(sll): This special-casing is not great; we should make the
-          // interface for updating the frontend more generic so that all the updates
-          // happen in the same place. Perhaps in the non-sticky case we should call
-          // a frontend method named appendFeedback() or similar.
-          var isSticky = (
-            newStateName !== _END_DEST && newStateData.widget.sticky &&
-            newStateData.widget.widget_id === oldStateData.widget.widget_id);
-
-          if (!_editorPreviewMode) {
-            // Record the state hit to the event handler.
-            var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
-            $http.post(stateHitEventHandlerUrl, {
-              new_state_name: newStateName,
-              first_time: stateHistory.indexOf(newStateName) === -1,
-              exploration_version: version,
-              session_id: sessionId,
-              client_time_spent_in_secs: stopwatch.getTimeInSecs(),
-              old_params: learnerParamsService.getAllParams()
-            });
-
-            // Broadcast the state hit to the parent page.
-            messengerService.sendMessage(messengerService.STATE_TRANSITION, {
-              oldStateName: _currentStateName,
-              jsonAnswer: JSON.stringify(answer),
-              newStateName: data.state_name
-            });
-          }
-
-          _updateStatus(data.params, data.state_name);
-          stopwatch.resetStopwatch();
-
-          // TODO(sll): Get rid of this special case for multiple choice.
-          var oldWidgetChoices = null;
-          if (_exploration.states[oldStateName].widget.customization_args.choices) {
-            oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
-          }
-
-          var readerResponseHtml = _getReaderResponseHtml(
-            _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
-          if (newStateData) {
-            learnerParamsService.init(data.params);
-          }
-
-          $rootScope.$broadcast('playerStateChange');
-
-          successCallback(
-            newStateName, isSticky, data.question_html, readerResponseHtml,
-            data.feedback_html);
+          _onStateTransitionProcessed(data, answer, handler, successCallback);
         }).error(function(data) {
           answerIsBeingProcessed = false;
           warningsData.addWarning(

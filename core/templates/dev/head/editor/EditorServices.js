@@ -492,12 +492,12 @@ oppia.factory('explorationStatesService', ['$log', function($log) {
       _states[stateName] = angular.copy(stateData);
     },
     deleteState: function(stateName) {
-      delete _states[deleteStateName];
+      delete _states[stateName];
       for (var otherStateName in _states) {
         var handlers = _states[otherStateName].widget.handlers;
         for (var i = 0; i < handlers.length; i++) {
           for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === deleteStateName) {
+            if (handlers[i].rule_specs[j].dest === stateName) {
               handlers[i].rule_specs[j].dest = otherStateName;
             }
           }

@@ -71,13 +71,8 @@ oppia.controller('ExplorationEditor', [
   $rootScope.loadingMessage = 'Loading';
 
   // The pathname should be: .../create/{exploration_id}
-  $scope.pathnameArray = window.location.pathname.split('/');
-  for (var i = 0; i < $scope.pathnameArray.length; i++) {
-    if ($scope.pathnameArray[i] === 'create') {
-      $scope.explorationId = $scope.pathnameArray[i + 1];
-      break;
-    }
-  }
+  var _pathnameArray = window.location.pathname.split('/');
+  $scope.explorationId = _pathnameArray[_pathnameArray.length - 1];
   // The exploration id needs to be attached to the root scope in order for
   // the file picker widget to work. (Note that an alternative approach might
   // also be to replicate this URL-based calculation in the file picker widget.)
