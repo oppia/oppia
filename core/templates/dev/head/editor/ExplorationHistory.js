@@ -19,11 +19,16 @@
  */
 
 oppia.controller('ExplorationHistory', [
-    '$scope', '$http', '$location', '$anchorScroll', 'explorationData', function(
-    $scope, $http, $location, $anchorScroll, explorationData) {
+    '$scope', '$http', '$location', '$anchorScroll', 'explorationData',
+    'versionsTreeService' , function(
+    $scope, $http, $location, $anchorScroll, explorationData, versionsTreeService) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.$parent.explorationId;
+  // explorationSnapshots is a list of snapshots for the displayed version history list (max 30)
+  // allExplorationSnapshots is a list of all snapshots for the exploration
   $scope.explorationSnapshots = null;
+  var allExplorationSnapshots = null;
+  var versionTreeParents = [];
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
     if (data.forceRefresh || $scope.explorationSnapshots === null) {
@@ -33,6 +38,10 @@ oppia.controller('ExplorationHistory', [
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
+    $scope.currentVersion = explorationData.data.version;
+    $scope.explorationAllSnapshotsUrl =
+        '/createhandler/snapshots/' + $scope.$parent.explorationId +
+        '?num_snapshots=' + $scope.currentVersion;
     $scope.compareVersion = {};
     $scope.compareSnapshot = {};
 
@@ -55,6 +64,10 @@ oppia.controller('ExplorationHistory', [
           'versionNumber': data.snapshots[i].version_number
         });
       }
+    });
+    $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
+      allExplorationSnapshots = response.data.snapshots;
+      versionTreeParents = versionsTreeService.getVersionTree(allExplorationSnapshots);
     });
   };
 

@@ -557,9 +557,12 @@ class ExplorationSnapshotsHandler(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
+
+        num_snapshots = int(self.request.get(
+            'num_snapshots', default_value=DEFAULT_NUM_SNAPSHOTS))
         try:
             snapshots = exp_services.get_exploration_snapshots_metadata(
-                exploration_id, DEFAULT_NUM_SNAPSHOTS)
+                exploration_id, num_snapshots)
         except:
             raise self.PageNotFoundException
 
