@@ -49,12 +49,12 @@
                       </td>
                       <td>
                         <span ng-if="update.type === 'exploration_commit'">
-                          <a href="/create/<[update.activity_id]>">
+                          <a ng-href="<[getEditorPageUrl(update.activity_id)]>">
                             <[update.activity_title]>
                           </a>
                         </span>
                         <span ng-if="update.type === 'feedback_thread'">
-                          <a href="/create/<[update.activity_id]>#/feedback">
+                          <a ng-href="<[getEditorPageUrl(update.activity_id, '/feedback')]>">
                             <[update.activity_title]>
                           </a>
                         </span>
