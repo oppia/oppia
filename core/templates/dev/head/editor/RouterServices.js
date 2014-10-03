@@ -80,7 +80,22 @@ oppia.factory('routerService', [
     }
   });
 
-  return {
+  var _savePendingChanges = function() {
+    try {
+      $rootScope.$broadcast('externalSave');
+    } catch (e) {
+      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
+      // null" error. To get around this we must use $apply().
+      $rootScope.$apply(function() {
+        $rootScope.$broadcast('externalSave');
+      });
+    }
+  };
+
+  var routerService = {
+    savePendingChanges: function() {
+      _savePendingChanges();
+    },
     getTabStatuses: function() {
       return _tabs;
     },
@@ -97,20 +112,30 @@ oppia.factory('routerService', [
         return null;
       }
     },
-    navigateToState: function(stateName) {
-      $location.path('/gui/' + stateName);
+    navigateToMainTab: function(stateName) {
+      _savePendingChanges();
+      if (stateName) {
+        editorContextService.setActiveStateName(stateName);
+      }
+      $location.path('/gui/' + editorContextService.getActiveStateName());
     },
     navigateToStatsTab: function() {
+      _savePendingChanges();
       $location.path('/stats');
     },
     navigateToSettingsTab: function() {
+      _savePendingChanges();
       $location.path('/settings');
     },
     navigateToHistoryTab: function() {
+      _savePendingChanges();
       $location.path('/history');
     },
     navigateToFeedbackTab: function() {
+      _savePendingChanges();
       $location.path('/feedback');
     }
   };
+
+  return routerService;
 }]);

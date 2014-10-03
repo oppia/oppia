@@ -21,9 +21,13 @@
 oppia.controller('ExplorationHistory', [
     '$scope', '$http', '$location', '$anchorScroll', 'explorationData', function(
     $scope, $http, $location, $anchorScroll, explorationData) {
-  $scope.explorationId = explorationData.explorationId;
-  $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.$parent.explorationId;
+  $scope.explorationSnapshotsUrl = (
+    '/createhandler/snapshots/' + explorationData.explorationId);
   $scope.explorationSnapshots = null;
+
+  $scope.getExplorationUrl = function(version) {
+    return '/explore/' + explorationData.explorationId + '?v=' + version;
+  };
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
     if (data.forceRefresh || $scope.explorationSnapshots === null) {

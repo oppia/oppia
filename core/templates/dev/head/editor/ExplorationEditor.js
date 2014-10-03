@@ -59,8 +59,7 @@ oppia.controller('ExplorationEditor', [
   $scope.exitPreviewMode = function() {
     $scope.isInPreviewMode = false;
     $timeout(function() {
-      editorContextService.setActiveStateName(oppiaPlayerService.getCurrentStateName());
-      $scope.showStateEditor(editorContextService.getActiveStateName());
+      routerService.navigateToMainTab(oppiaPlayerService.getCurrentStateName());
       $scope.$broadcast('refreshStateEditor');
     });
   };
@@ -82,59 +81,16 @@ oppia.controller('ExplorationEditor', [
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
-  $scope.getActiveStateName = function() {
-    return editorContextService.getActiveStateName();
-  };
-
-  $scope.saveActiveState = function(postSaveHook) {
-    try {
-      $rootScope.$broadcast('externalSave');
-    } catch (e) {
-      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-      // null" error. To get around this we must use $apply().
-      $rootScope.$apply(function() {
-        $rootScope.$broadcast('externalSave');
-      });
-    }
-
-    if (postSaveHook) {
-      postSaveHook();
-    }
-  };
-
-  $scope.saveAndChangeActiveState = function(newStateName) {
-    $scope.saveActiveState();
-    editorContextService.setActiveStateName(newStateName);
-  };
-
-  $scope.showStateEditor = function(stateName) {
-    warningsData.clear();
-    if (stateName) {
-      $scope.saveAndChangeActiveState(stateName);
-    } else {
-      stateName = editorContextService.getActiveStateName();
-    }
-
-    if (stateName) {
-      routerService.navigateToState(stateName);
-    }
-  };
-
   $scope.getTabStatuses = routerService.getTabStatuses;
-  $scope.selectStatsTab = function() {
-    $scope.saveActiveState(routerService.navigateToStatsTab);
-  };
-  $scope.selectSettingsTab = function() {
-    $scope.saveActiveState(routerService.navigateToSettingsTab);
-  };
+  $scope.selectMainTab = routerService.navigateToMainTab;
+  $scope.selectStatsTab = routerService.navigateToStatsTab;
+  $scope.selectSettingsTab = routerService.navigateToSettingsTab;
   $scope.selectHistoryTab = function() {
     // TODO(sll): Do this on-hover rather than on-click.
     $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
-    $scope.saveActiveState(routerService.navigateToHistoryTab);
+    routerService.navigateToHistoryTab();
   };
-  $scope.selectFeedbackTab = function() {
-    $scope.saveActiveState(routerService.navigateToFeedbackTab);
-  };
+  $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 
   /**************************************************
   * Methods affecting the saving of explorations.
@@ -193,7 +149,7 @@ oppia.controller('ExplorationEditor', [
   });
 
   $scope.saveChanges = function() {
-    $scope.saveActiveState();
+    routerService.savePendingChanges();
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
@@ -616,7 +572,7 @@ oppia.controller('ExplorationEditor', [
 
       if (!routerService.isLocationSetToNonStateEditorTab() && 
           !data.states.hasOwnProperty(routerService.getCurrentStateFromLocationPath())) {
-        $scope.showStateEditor(editorContextService.getActiveStateName());
+        routerService.navigateToMainTab();
       }
 
       $scope.updateWarningsList();
@@ -717,89 +673,6 @@ oppia.controller('ExplorationEditor', [
         };
       }]
     });
-  };
-
-  /********************************************
-  * Methods for operations on states.
-  ********************************************/
-  $scope.isNewStateNameValid = function(newStateName) {
-    return (
-      validatorsService.isValidEntityName(newStateName) &&
-      newStateName.toUpperCase() !== END_DEST &&
-      !explorationStatesService.getState(newStateName));
-  };
-
-  // Adds a new state to the list of states, and updates the backend.
-  $scope.addState = function(newStateName, successCallback) {
-    explorationStatesService.addState(newStateName, function() {
-      $scope.newStateDesc = '';
-      if (successCallback) {
-        successCallback(newStateName);
-      }
-    });
-  };
-
-  $scope.deleteState = function(deleteStateName) {
-    explorationStatesService.deleteState(deleteStateName);
-  };
-
-  $scope.openStateGraphModal = function() {
-    warningsData.clear();
-
-    $modal.open({
-      templateUrl: 'modals/stateGraph',
-      backdrop: 'static',
-      resolve: {
-        currentStateName: function() {
-          return editorContextService.getActiveStateName();
-        },
-        graphData: function() {
-          return $scope.graphData;
-        }
-      },
-      controller: [
-        '$scope', '$modalInstance', 'currentStateName', 'graphData',
-        function($scope, $modalInstance, currentStateName, graphData) {
-          $scope.currentStateName = currentStateName;
-          $scope.graphData = graphData;
-
-          $scope.deleteState = function(stateName) {
-            $modalInstance.close({
-              action: 'delete',
-              stateName: stateName
-            });
-          };
-
-          $scope.selectState = function(stateName) {
-            if (stateName !== END_DEST) {
-              $modalInstance.close({
-                action: 'navigate',
-                stateName: stateName
-              });
-            }
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function(closeDict) {
-      if (closeDict.action === 'delete') {
-        $scope.deleteState(closeDict.stateName);
-      } else if (closeDict.action === 'navigate') {
-        $scope.onClickStateInMinimap(closeDict.stateName);
-      } else {
-        console.error('Invalid closeDict action: ' + closeDict.action);
-      }
-    });
-  };
-
-  $scope.onClickStateInMinimap = function(stateName) {
-    if (stateName !== END_DEST) {
-      $scope.showStateEditor(stateName);
-    }
   };
 
   $scope.feedbackTabHeader = 'Feedback';

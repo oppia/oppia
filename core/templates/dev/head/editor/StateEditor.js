@@ -22,11 +22,11 @@ oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
   'explorationInitStateNameService', 'focusService', 'editabilityService',
-  'explorationStatesService', function(
+  'explorationStatesService', 'routerService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
     explorationInitStateNameService, focusService, editabilityService,
-    explorationStatesService) {
+    explorationStatesService, routerService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -75,7 +75,7 @@ oppia.controller('StateEditor', [
     var normalizedStateName = $scope._getNormalizedStateName(newStateName);
     var valid = $scope.saveStateName(normalizedStateName);
     if (valid) {
-      $scope.$parent.showStateEditor(normalizedStateName);
+      routerService.navigateToMainTab(normalizedStateName);
     }
   };
 

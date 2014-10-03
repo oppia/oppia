@@ -19,8 +19,8 @@
  */
 
 oppia.controller('ExplorationStatistics', [
-    '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService',
-    function($scope, $http, $modal, warningsData, explorationStatesService) {
+    '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService', 'explorationData',
+    function($scope, $http, $modal, warningsData, explorationStatesService, explorationData) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -36,7 +36,7 @@ oppia.controller('ExplorationStatistics', [
 
   $scope.hasExplorationBeenVisited = false;
   $scope.refreshExplorationStatistics = function() {
-    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.$parent.explorationId;
+    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId;
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
       var data = response.data;
       var numVisits = data.num_starts;
@@ -107,11 +107,10 @@ oppia.controller('ExplorationStatistics', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'editabilityService', 'stateName',
+          '$scope', '$modalInstance', 'stateName',
           'stateStats', 'improvementType', 'rulesStats', function(
-             $scope, $modalInstance, editabilityService, stateName,
+             $scope, $modalInstance, stateName,
              stateStats, improvementType, rulesStats) {
-          $scope.editabilityService = editabilityService;
           $scope.stateName = stateName;
           $scope.stateStats = stateStats;
           $scope.improvementType = improvementType;
@@ -149,8 +148,6 @@ oppia.controller('ExplorationStatistics', [
             warningsData.clear();
           };
         }]
-      }).result.then(function(result) {
-        $scope.$parent.showStateEditor(stateName);
       });
     });
   };

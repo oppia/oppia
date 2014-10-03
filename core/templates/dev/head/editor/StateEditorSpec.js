@@ -41,10 +41,6 @@ describe('State Editor controller', function() {
 
       GLOBALS = {INVALID_NAME_CHARS: '#@&^%$'};
 
-      // Without this added, saveStateName
-      // cannot check for an initStateName property.
-      scope.$parent.$parent = {};
-
       mockWarningsData = {
         addWarning: function(warning) {}
       };

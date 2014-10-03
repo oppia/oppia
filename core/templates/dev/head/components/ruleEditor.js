@@ -73,9 +73,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     scope: {
       rule: '=',
       answerChoices: '=',
-      explorationId: '=',
-      states: '=',
-      addState: '=',
       widgetHandlerSpecs: '=',
       isTmpRule: '&',
       saveRule: '=',
@@ -192,7 +189,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
           if (!foundInExistingStateList && $scope.rule.dest !== 'END') {
             try {
-              $scope.addState($scope.rule.dest);
+              explorationStatesService.addState($scope.rule.dest);
               $scope.ruleDestMemento = $scope.rule.dest;
               $scope.destChoices.push({
                 id: $scope.rule.dest,
@@ -335,8 +332,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.navigateToRuleDest = function() {
-          editorContextService.setActiveStateName($scope.rule.dest);
-          routerService.navigateToState($scope.rule.dest);
+          routerService.navigateToMainTab($scope.rule.dest);
         };
 
         $scope.getExtendedChoiceArray = function(choices) {

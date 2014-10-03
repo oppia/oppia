@@ -16,7 +16,7 @@
 
           <div class="container-fluid">
             <div class="row oppia-readonly-rule-tile">
-              <div class="col-lg-9 col-md-9 col-sm-9" style="margin-left: -5px;">
+              <div class="col-lg-8 col-md-8 col-sm-8" style="margin-left: -5px;">
                 <span>
                   <span ng-if="rule.description !== 'Default'">
                     If <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>...
@@ -44,8 +44,8 @@
                 </ul>
               </div>
 
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                Destination: <br />
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                Destination: <br>
                 <span ng-if="rule.dest !== getActiveStateName()">
                   <span class="glyphicon glyphicon-arrow-right"></span>
                   <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">

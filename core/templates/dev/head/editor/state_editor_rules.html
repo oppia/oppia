@@ -13,7 +13,7 @@
         and this element should have an ng-repeat defined on it. See the
         ui-sortable documentation for more details. -->
         <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-sortable-rule-block">
-          <rule-editor rule="rule" heading="Rule #<[$index + 1]>" num-rules="handler.length" answer-choices="answerChoices" exploration-id="explorationId" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
+          <rule-editor rule="rule" heading="Rule #<[$index + 1]>" num-rules="handler.length" answer-choices="answerChoices" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
           </rule-editor>
         </div>
       </div>
@@ -28,7 +28,7 @@
         </div>
         <div ng-if="tmpRule" class="protractor-test-temporary-rule">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <rule-editor rule="tmpRule" answer-choices="answerChoices" exploration-id="explorationId" add-state="addState" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-rule="saveTmpRule" cancel-edit="cancelTmpRule()" is-editable="editabilityService.isEditable()">
+            <rule-editor rule="tmpRule" answer-choices="answerChoices" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="true" save-rule="saveTmpRule" cancel-edit="cancelTmpRule()" is-editable="editabilityService.isEditable()">
             </rule-editor>
           </div>
         </div>
@@ -36,7 +36,7 @@
 
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12 protractor-test-default-rule">
-          <rule-editor rule="handler[handler.length - 1]" heading="Default Rule" answer-choices="answerChoices" exploration-id="explorationId" add-state="addState" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
+          <rule-editor rule="handler[handler.length - 1]" heading="Default Rule" answer-choices="answerChoices" all-rule-types="allRuleTypes" widget-handler-specs="widgetHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
           </rule-editor>
         </div>
       </div>
