@@ -24,26 +24,26 @@ oppia.factory('versionsTreeService', [function() {
     return {
       /**
        * Generate the version tree of an exploration from its snapshots
-       * Returns a object whose keys are the version number and value is
+       * Returns a object whose keys are the version number and whose value is
        * the parent of each version, where parent points to previous version
        * in general or reverted version if commit is a reversion.
-       * The parent of the root (version 1) is -1
+       * The parent of the root (version 1) is -1.
        */
       getVersionTree: function(snapshotsData) {
         var treeParents = {};
-        var noOfVersions = snapshotsData.length;
+        var numberOfVersions = snapshotsData.length;
 
         // Populate snapshots so snapshots[i] corresponds to version i
-        for (var i = 0; i < noOfVersions; i++) {
+        for (var i = 0; i < numberOfVersions; i++) {
           snapshots[i + 1] = snapshotsData[i];
         }
 
-        for (var i = 2; i <= noOfVersions; i++) {
-          var versionNumber = snapshots[i].version_number;
-          if (snapshots[i].commit_type == 'revert') {
-            for (var j = 0; j < snapshots[i].commit_cmds.length; j++) {
-              if (snapshots[i].commit_cmds[j] == 'AUTO_revert_version_number') {
-                treeParents[versionNumber] = snapshots[i].commit_cmds[j].version_number;
+        for (var versionNumber = 2; versionNumber <= numberOfVersions; versionNumber++) {
+          if (snapshots[versionNumber].commit_type == 'revert') {
+            for (var i = 0; i < snapshots[versionNumber].commit_cmds.length; i++) {
+              if (snapshots[versionNumber].commit_cmds[i].cmd == 'AUTO_revert_version_number') {
+                treeParents[versionNumber] =
+                    snapshots[versionNumber].commit_cmds[i].version_number;
               }
             }
           } else {
@@ -54,14 +54,14 @@ oppia.factory('versionsTreeService', [function() {
         return treeParents;
       },
       /**
-       * Finds lowest common ancestor of v1 and v2 in the version tree
-       * treeParents is an object whose keys are the version number and values
-       * are the parent of each version, where parent points to previous
+       * Finds lowest common ancestor of v1 and v2 in the version tree.
+       * treeParents is an object whose keys are the version number and whose
+       * values are the parent of each version, where parent points to previous
        * version in general or reverted version if commit is a reversion.
-       * The parent of the root (version 1) is -1
+       * The parent of the root (version 1) is -1.
        */
       findLCA: function(treeParents, v1, v2) {
-        // Find paths from root to v1 and v2, not including 1
+        // Find paths from root to v1 and v2
         var pathToV1 = [];
         var pathToV2 = [];
         while (treeParents[v1] != -1) {
@@ -71,6 +71,7 @@ oppia.factory('versionsTreeService', [function() {
           }
           v1 = treeParents[v1];
         }
+        pathToV1.push(1);
         pathToV1.reverse();
 
         while (treeParents[v2] != -1) {
@@ -80,16 +81,17 @@ oppia.factory('versionsTreeService', [function() {
           }
           v2 = treeParents[v2];
         }
+        pathToV2.push(1);
         pathToV2.reverse();
 
         // Compare paths
-        var lca = 1;
-        var index = 0;
-        var maxIndex = Math.min(pathToV1.length, pathToV2.length);
-        while (pathToV1[index] == pathToV2[index] && index < maxIndex) {
-          lca = pathToV1[index];
-          index++;
-          break;
+        var maxIndex = Math.min(pathToV1.length, pathToV2.length) - 1;
+        var lca = null;
+        for (var i = maxIndex; i >= 0; i--) {
+          if (pathToV1[i] == pathToV2[i]) {
+            lca = pathToV1[i];
+            break;
+          }
         }
         return lca;
       }

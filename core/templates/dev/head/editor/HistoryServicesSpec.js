@@ -18,7 +18,7 @@
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
-ddescribe('Versions tree service', function() {
+describe('Versions tree service', function() {
   beforeEach(module('oppia'));
 
   describe('versions tree service', function() {
@@ -70,7 +70,7 @@ ddescribe('Versions tree service', function() {
       vts = $injector.get('versionsTreeService');
     }));
 
-    iit('should get correct list of parents', function() {
+    it('should get correct list of parents', function() {
       var expectedParents = {
         1: -1,
         2: 1,

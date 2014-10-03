@@ -41,8 +41,6 @@ import utils
 
 import jinja2
 
-# The maximum number of exploration history snapshots to show by default.
-DEFAULT_NUM_SNAPSHOTS = 30
 # The frontend template for a new state. It is sent to the frontend when the
 # exploration editor page is first loaded, so that new states can be
 # added in a way that is completely client-side.

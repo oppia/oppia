@@ -24,14 +24,18 @@ oppia.controller('ExplorationHistory', [
     $scope, $http, $location, $anchorScroll, explorationData, versionsTreeService) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationAllSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
-  // explorationSnapshots is a list of snapshots for the displayed version history list (max 30)
-  // allExplorationSnapshots is a list of all snapshots for the exploration
-  $scope.explorationSnapshots = null;
+
+  /* displayedExplorationSnapshots is a list of snapshots (in descending order)
+   * for the displayed version history list (max 30)
+   * allExplorationSnapshots is a list of all snapshots for the exploration in
+   * ascending order
+   */
+  $scope.displayedExplorationSnapshots = null;
   var allExplorationSnapshots = null;
   var versionTreeParents = null;
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
-    if (data.forceRefresh || $scope.explorationSnapshots === null) {
+    if (data.forceRefresh || $scope.displayedExplorationSnapshots === null) {
       $scope.refreshVersionHistory();
     }
   });
@@ -53,9 +57,9 @@ oppia.controller('ExplorationHistory', [
       allExplorationSnapshots = response.data.snapshots;
       versionTreeParents = versionsTreeService.getVersionTree(allExplorationSnapshots);
 
-      $scope.explorationSnapshots = [];
+      $scope.displayedExplorationSnapshots = [];
       for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
-        $scope.explorationSnapshots.push({
+        $scope.displayedExplorationSnapshots.push({
           'committerId': allExplorationSnapshots[i].committer_id,
           'createdOn': allExplorationSnapshots[i].created_on,
           'commitMessage': allExplorationSnapshots[i].commit_message,
@@ -67,7 +71,7 @@ oppia.controller('ExplorationHistory', [
 
   // Functions to set snapshot and download YAML when selection is changed
   $scope.changeCompareVersion1 = function(versionNumber) {
-    $scope.compareSnapshot.v1 = $scope.explorationSnapshots[
+    $scope.compareSnapshot.v1 = $scope.displayedExplorationSnapshots[
         $scope.currentVersion - $scope.compareVersion.v1];
 
     $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v1 +
@@ -82,7 +86,7 @@ oppia.controller('ExplorationHistory', [
   };
 
   $scope.changeCompareVersion2 = function(versionNumber) {
-    $scope.compareSnapshot.v2 = $scope.explorationSnapshots[
+    $scope.compareSnapshot.v2 = $scope.displayedExplorationSnapshots[
         $scope.currentVersion - $scope.compareVersion.v2];
 
     $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion.v2 +
