@@ -102,19 +102,7 @@ oppia.controller('StateEditor', [
       return false;
     } else {
       explorationStatesService.renameState(activeStateName, newStateName);
-
-      editorContextService.setActiveStateName(newStateName);
-      changeListService.renameState(newStateName, $scope.stateNameMemento);
-      // Amend initStateName appropriately, if necessary. Note that this
-      // must come after the state renaming, otherwise saving will lead to
-      // a complaint that the new name is not a valid state name.
-      if (explorationInitStateNameService.displayed === activeStateName) {
-        explorationInitStateNameService.displayed = newStateName;
-        explorationInitStateNameService.saveDisplayedValue(newStateName);
-      }
-
       $scope.stateNameEditorIsShown = false;
-      $scope.refreshGraph();
       $scope.initStateEditor();
       return true;
     }

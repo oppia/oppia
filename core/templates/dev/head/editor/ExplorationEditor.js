@@ -383,6 +383,8 @@ oppia.controller('ExplorationEditor', [
       explorationInitStateNameService.displayed);
   };
 
+  $scope.$on('refreshGraph', $scope.refreshGraph);
+
   $scope.areExplorationWarningsVisible = false;
   $scope.toggleExplorationWarningVisibility = function() {
     $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
@@ -729,90 +731,19 @@ oppia.controller('ExplorationEditor', [
 
   // Adds a new state to the list of states, and updates the backend.
   $scope.addState = function(newStateName, successCallback) {
-    newStateName = $filter('normalizeWhitespace')(newStateName);
-    if (!validatorsService.isValidEntityName(newStateName, true)) {
-      return;
-    }
-    if (newStateName.toUpperCase() == END_DEST) {
-      warningsData.addWarning('Please choose a state name that is not \'END\'.');
-      return;
-    }
-    if (explorationStatesService.getState(newStateName)) {
-      warningsData.addWarning('A state with this name already exists.');
-      return;
-    }
-
-    warningsData.clear();
-
-    explorationStatesService.setState(
-      newStateName,
-      newStateTemplateService.getNewStateTemplate(newStateName));
-
-    changeListService.addState(newStateName);
-    $scope.refreshGraph();
-    $scope.newStateDesc = '';
-    if (successCallback) {
-      successCallback(newStateName);
-    }
-  };
-
-  $scope.deleteState = function(deleteStateName) {
-    warningsData.clear();
-
-    var initStateName = explorationInitStateNameService.displayed;
-
-    if (deleteStateName === initStateName || deleteStateName === END_DEST) {
-      return;
-    }
-
-    $modal.open({
-      templateUrl: 'modals/deleteState',
-      backdrop: 'static',
-      resolve: {
-        deleteStateName: function() {
-          return deleteStateName;
-        }
-      },
-      controller: [
-        '$scope', '$modalInstance', 'deleteStateName',
-        function($scope, $modalInstance, deleteStateName) {
-          $scope.deleteStateName = deleteStateName;
-
-          $scope.reallyDelete = function() {
-            $modalInstance.close(deleteStateName);
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function(deleteStateName) {
-      if (deleteStateName == initStateName) {
-        warningsData.addWarning(
-          'Deleting the initial state of a question is not supported. ' +
-          'Perhaps edit it instead?');
-        return;
+    explorationStatesService.addState(newStateName, function() {
+      $scope.newStateDesc = '';
+      if (successCallback) {
+        successCallback(newStateName);
       }
-
-      if (!explorationStatesService.getState(deleteStateName)) {
-        warningsData.addWarning('No state with name ' + deleteStateName + ' exists.');
-        return;
-      }
-
-      explorationStatesService.deleteState(deleteStateName);
-
-      if (editorContextService.getActiveStateName() === deleteStateName) {
-        $scope.showStateEditor(initStateName);
-      }
-
-      changeListService.deleteState(deleteStateName);
-      $scope.refreshGraph();
     });
   };
 
-  $scope.openStateGraphModal = function(deleteStateName) {
+  $scope.deleteState = function(deleteStateName) {
+    explorationStatesService.deleteState(deleteStateName);
+  };
+
+  $scope.openStateGraphModal = function() {
     warningsData.clear();
 
     $modal.open({
@@ -820,7 +751,7 @@ oppia.controller('ExplorationEditor', [
       backdrop: 'static',
       resolve: {
         currentStateName: function() {
-          return $scope.getActiveStateName();
+          return editorContextService.getActiveStateName();
         },
         graphData: function() {
           return $scope.graphData;
