@@ -101,10 +101,6 @@ describe('State Editor controller', function() {
         }
       });      
 
-      scope.refreshGraph = function() {
-        return true;
-      };
-
       scope.getContent = function(contentString) {
         return [{type: 'text', value: contentString}];
       };

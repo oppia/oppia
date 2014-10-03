@@ -20,7 +20,9 @@
 
 oppia.controller('ExplorationStatistics', [
     '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService', 'explorationData',
-    function($scope, $http, $modal, warningsData, explorationStatesService, explorationData) {
+    'graphDataService',
+    function($scope, $http, $modal, warningsData, explorationStatesService, explorationData,
+             graphDataService) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -38,6 +40,8 @@ oppia.controller('ExplorationStatistics', [
   $scope.refreshExplorationStatistics = function() {
     $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId;
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      $scope.graphData = graphDataService.getGraphData();
+
       var data = response.data;
       var numVisits = data.num_starts;
       var numCompletions = data.num_completions;

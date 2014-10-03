@@ -28,7 +28,7 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
-  'explorationStatesService', 'routerService',
+  'explorationStatesService', 'routerService', 'graphDataService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -36,7 +36,8 @@ oppia.controller('ExplorationEditor', [
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
-    newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService) {
+    newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
+    graphDataService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -150,6 +151,8 @@ oppia.controller('ExplorationEditor', [
 
   $scope.saveChanges = function() {
     routerService.savePendingChanges();
+
+    console.log(changeListService.getChangeList());
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
@@ -333,14 +336,6 @@ oppia.controller('ExplorationEditor', [
   /********************************************
   * Methods affecting the graph visualization.
   ********************************************/
-  $scope.refreshGraph = function() {
-    $scope.graphData = $scope.getNodesAndLinks(
-      explorationStatesService.getStates(),
-      explorationInitStateNameService.displayed);
-  };
-
-  $scope.$on('refreshGraph', $scope.refreshGraph);
-
   $scope.areExplorationWarningsVisible = false;
   $scope.toggleExplorationWarningVisibility = function() {
     $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
@@ -407,14 +402,19 @@ oppia.controller('ExplorationEditor', [
     return problematicStates;
   };
 
+  $scope.$on('refreshGraph', function() {
+    graphDataService.recompute()
+    $scope.updateWarningsList();
+  });
+
   $scope.updateWarningsList = function() {
-    $scope.refreshGraph();
+    graphDataService.recompute();
     $scope.warningsList = [];
 
-    if ($scope.graphData) {
+    var _graphData = graphDataService.getGraphData();
+    if (_graphData) {
       var unreachableStateNames = $scope._getUnreachableNodeNames(
-        $scope.graphData.initStateName, $scope.graphData.nodes,
-        $scope.graphData.links);
+        _graphData.initStateName, _graphData.nodes, _graphData.links);
       if (unreachableStateNames.length) {
         $scope.warningsList.push(
           'The following state(s) are unreachable: ' +
@@ -422,8 +422,8 @@ oppia.controller('ExplorationEditor', [
       } else {
         // Only perform this check if all states are reachable.
         var deadEndStates = $scope._getUnreachableNodeNames(
-          $scope.graphData.finalStateName, $scope.graphData.nodes,
-          $scope._getReversedLinks($scope.graphData.links));
+          _graphData.finalStateName, _graphData.nodes,
+          $scope._getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
           $scope.warningsList.push(
             'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
@@ -444,7 +444,6 @@ oppia.controller('ExplorationEditor', [
   };
 
   $scope.warningsList = [];
-  changeListService.setPostChangeHook($scope.updateWarningsList);
 
   $scope.showEmbedExplorationModal = function() {
     warningsData.clear();
@@ -563,7 +562,7 @@ oppia.controller('ExplorationEditor', [
         editabilityService.markEditable();
       }
 
-      $scope.refreshGraph();
+      graphDataService.recompute();
 
       if (!editorContextService.getActiveStateName() ||
           !explorationStatesService.getState(editorContextService.getActiveStateName())) {
@@ -595,39 +594,6 @@ oppia.controller('ExplorationEditor', [
 
   $scope.initExplorationPage();
 
-  // Returns an object which can be treated as the input to a visualization
-  // for a directed graph. The returned object has the following keys:
-  //   - nodes: a list of node names
-  //   - links: a list of objects. Each object represents a directed link between
-  //      two notes, and has keys 'source' and 'target', the values of which are
-  //      the names of the corresponding nodes.
-  //   - initStateName: the name of the initial state.
-  //   - finalStateName: the name of the final state.
-  $scope.getNodesAndLinks = function(states, initStateName) {
-    var nodeList = [];
-    for (stateName in states) {
-      nodeList.push(stateName);
-    }
-    nodeList.push(END_DEST);
-
-    var links = [];
-    for (var stateName in states) {
-      handlers = states[stateName].widget.handlers;
-      for (h = 0; h < handlers.length; h++) {
-        ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
-          links.push({
-            source: stateName,
-            target: ruleSpecs[i].dest,
-          });
-        }
-      }
-    }
-
-    return {
-      nodes: nodeList, links: links, initStateName: initStateName,
-      finalStateName: END_DEST};
-  };
 
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
     $log.info('Adding a param spec to the exploration.');

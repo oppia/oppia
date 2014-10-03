@@ -30,8 +30,6 @@ var createExploration = function(name, category) {
   element(by.model('newExplorationTitle')).sendKeys(name);
   forms.editAutocompleteDropdown(element(by.tagName('select2-dropdown'))).
     setText(category);
-  element(by.css('.select2-container')).click();
-  element(by.css('.select2-input')).sendKeys(category + '\n');
   element(by.buttonText('Add New Exploration')).click();
 
   // We now want to wait for the editor to fully load.

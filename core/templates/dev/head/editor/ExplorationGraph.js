@@ -18,15 +18,15 @@
  * @author sll@google.com (Sean Lip)
  */
 
-// TODO(sll): Only graphData is inherited from the parent $scope at the moment.
-// Factor it out into a service so that this is no longer the case.
 oppia.controller('ExplorationGraph', [
     '$scope', '$modal', 'editorContextService', 'warningsData',
     'explorationStatesService', 'editabilityService', 'validatorsService',
-    'routerService',
+    'routerService', 'graphDataService',
     function($scope, $modal, editorContextService, warningsData,
              explorationStatesService, editabilityService, validatorsService,
-             routerService) {
+             routerService, graphDataService) {
+
+  $scope.getGraphData = graphDataService.getGraphData;
 
   $scope.isEditable = editabilityService.isEditable;
 
@@ -41,6 +41,7 @@ oppia.controller('ExplorationGraph', [
   $scope.addState = function(newStateName) {
     explorationStatesService.addState(newStateName, function() {
       $scope.newStateName = '';
+      routerService.navigateToMainTab(stateName);
     });
   };
 
@@ -64,16 +65,12 @@ oppia.controller('ExplorationGraph', [
     $modal.open({
       templateUrl: 'modals/stateGraph',
       backdrop: 'static',
-      resolve: {
-        graphData: function() {
-          return $scope.graphData;
-        }
-      },
+      resolve: {},
       controller: [
-        '$scope', '$modalInstance', 'editorContextService', 'graphData',
-        function($scope, $modalInstance, graphData) {
+        '$scope', '$modalInstance', 'editorContextService', 'graphDataService',
+        function($scope, $modalInstance, editorContextService, graphDataService) {
           $scope.currentStateName = editorContextService.getActiveStateName();
-          $scope.graphData = graphData;
+          $scope.graphData = graphDataService.getGraphData();
 
           $scope.deleteState = function(stateName) {
             $modalInstance.close({

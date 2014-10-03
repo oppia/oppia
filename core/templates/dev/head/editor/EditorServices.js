@@ -188,17 +188,12 @@ oppia.factory('changeListService', [
   };
 
   return {
-    _postChangeHook: null,
     _addChange: function(changeDict) {
       if ($rootScope.loadingMessage) {
         return;
       }
       explorationChangeList.push(changeDict);
       undoneChangeStack = [];
-
-      if (this._postChangeHook) {
-        this._postChangeHook();
-      }
     },
     /**
      * Saves a change dict that represents adding a new state.
@@ -298,9 +293,6 @@ oppia.factory('changeListService', [
     discardAllChanges: function() {
       explorationChangeList = [];
       undoneChangeStack = [];
-      if (this._postChangeHook) {
-        this._postChangeHook();
-      }
     },
     getChangeList: function() {
       return angular.copy(explorationChangeList);
@@ -312,13 +304,6 @@ oppia.factory('changeListService', [
       }
       var lastChange = explorationChangeList.pop();
       undoneChangeStack.push(lastChange);
-      if (this._postChangeHook) {
-        this._postChangeHook();
-      }
-    },
-    setPostChangeHook: function(postChangeHookFunction) {
-      // Sets a function to be called after any edit to the changelist.
-      this._postChangeHook = postChangeHookFunction;
     }
   };
 }]);
@@ -651,6 +636,9 @@ oppia.factory('explorationStatesService', [
       }
 
       editorContextService.setActiveStateName(newStateName);
+      // The 'rename state' command must come before the 'change init_state_name'
+      // command in the change list, otherwise the backend will raise an error
+      // because the new initial state name does not exist.
       changeListService.renameState(newStateName, oldStateName);
       // Amend initStateName appropriately, if necessary. Note that this
       // must come after the state renaming, otherwise saving will lead to
@@ -792,6 +780,65 @@ oppia.factory('newStateTemplateService', [function() {
         });
       });
       return newStateTemplate;
+    }
+  };
+}]);
+
+
+// Service for computing graph data.
+oppia.factory('graphDataService', [
+    'explorationStatesService', 'explorationInitStateNameService',
+    function(explorationStatesService, explorationInitStateNameService) {
+
+  var _graphData = null;
+
+  // Returns an object which can be treated as the input to a visualization
+  // for a directed graph. The returned object has the following keys:
+  //   - nodes: a list of node names
+  //   - links: a list of objects. Each object represents a directed link between
+  //      two notes, and has keys 'source' and 'target', the values of which are
+  //      the names of the corresponding nodes.
+  //   - initStateName: the name of the initial state.
+  //   - finalStateName: the name of the final state.
+  var _recomputeGraphData = function() {
+    if (!explorationInitStateNameService.savedMemento) {
+      return;
+    }
+
+    var states = explorationStatesService.getStates();
+
+    var nodeList = [];
+    var links = [];
+    for (stateName in states) {
+      nodeList.push(stateName);
+
+      var handlers = states[stateName].widget.handlers;
+      for (h = 0; h < handlers.length; h++) {
+        ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          links.push({
+            source: stateName,
+            target: ruleSpecs[i].dest,
+          });
+        }
+      }
+    }
+    nodeList.push(END_DEST);
+
+    _graphData = {
+      nodes: nodeList,
+      links: links,
+      initStateName: explorationInitStateNameService.savedMemento,
+      finalStateName: END_DEST
+    };
+  };
+
+  return {
+    recompute: function() {
+      _recomputeGraphData();
+    },
+    getGraphData: function() {
+      return angular.copy(_graphData);
     }
   };
 }]);
