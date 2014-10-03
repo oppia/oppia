@@ -53,6 +53,7 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.editContent().open();
+    editor.editContent().clear();
     editor.editContent().appendBoldText('bold text ');
     editor.editContent().appendItalicText('italic text ');
     editor.editContent().appendUnderlineText('underline text');

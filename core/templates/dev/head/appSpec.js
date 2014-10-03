@@ -106,13 +106,6 @@ describe('Datetime Formatter', function() {
       });
     }));
 
-    it('should correctly return date time string', function() {
-      expect(df.getHumanReadableDatetime(NOW_MILLIS)).toBe(
-        'Fri, 21 Nov 2014 09:45:00 GMT');
-      expect(df.getHumanReadableDatetime(YESTERDAY_MILLIS)).toBe(
-        'Thu, 20 Nov 2014 09:45:00 GMT');
-    });
-
     it('should show only the time for a datetime occurring today', function() {
       // In any timezone, 10 minutes before xx:45:00 should still fall within the
       // same date as xx:45:00.

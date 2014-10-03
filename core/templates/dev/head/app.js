@@ -170,10 +170,6 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', [function() {
   return {
-    getHumanReadableDatetime: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toUTCString();
-    },
     // Returns just the time if the local datetime representation has the
     // same date as the current date. Otherwise, returns just the date.
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {

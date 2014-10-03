@@ -191,16 +191,17 @@
               </div>
 
               <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
-                This exploration is <strong>private</strong>. Anyone with the link can play it.
+                This exploration is <strong>private</strong>. Anyone with the link can access it.
               </p>
               <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
-                This exploration is <strong>private</strong>. Only invited playtesters and contributors can play it.
+                This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
+                access it.
               </p>
               <p ng-if="explorationRightsService.isPublic()">
-                This exploration is <strong>public</strong>: anyone can play it.
+                This exploration is <strong>public</strong>: anyone can access it.
               </p>
               <p ng-if="explorationRightsService.isPublicized()">
-                This exploration is <strong>public</strong>: anyone can play it.
+                This exploration is <strong>public</strong>: anyone can access it.
               </p>
 
               <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">

@@ -48,9 +48,16 @@
                               title="Feedback thread"></span>
                       </td>
                       <td>
-                        <a href="/create/<[update.activity_id]>">
-                          <[update.activity_title]>
-                        </a>
+                        <span ng-if="update.type === 'exploration_commit'">
+                          <a href="/create/<[update.activity_id]>">
+                            <[update.activity_title]>
+                          </a>
+                        </span>
+                        <span ng-if="update.type === 'feedback_thread'">
+                          <a href="/create/<[update.activity_id]>#/feedback">
+                            <[update.activity_title]>
+                          </a>
+                        </span>
                       </td>
                       <td><[getLocaleAbbreviatedDatetimeString(update.last_updated_ms)]></td>
                       <td><[update.author_username]></td>
