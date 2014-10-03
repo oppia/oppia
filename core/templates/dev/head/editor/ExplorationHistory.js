@@ -20,15 +20,15 @@
 
 oppia.controller('ExplorationHistory', [
     '$scope', '$http', '$location', '$anchorScroll', 'explorationData',
-    'versionsTreeService' , function(
+    'versionsTreeService', function(
     $scope, $http, $location, $anchorScroll, explorationData, versionsTreeService) {
   $scope.explorationId = explorationData.explorationId;
-  $scope.explorationSnapshotsUrl = '/createhandler/snapshots/' + $scope.$parent.explorationId;
+  $scope.explorationAllSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
   // explorationSnapshots is a list of snapshots for the displayed version history list (max 30)
   // allExplorationSnapshots is a list of all snapshots for the exploration
   $scope.explorationSnapshots = null;
   var allExplorationSnapshots = null;
-  var versionTreeParents = [];
+  var versionTreeParents = null;
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
     if (data.forceRefresh || $scope.explorationSnapshots === null) {
@@ -38,10 +38,7 @@ oppia.controller('ExplorationHistory', [
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
-    $scope.currentVersion = explorationData.data.version;
-    $scope.explorationAllSnapshotsUrl =
-        '/createhandler/snapshots/' + $scope.$parent.explorationId +
-        '?num_snapshots=' + $scope.currentVersion;
+    var currentVersion = explorationData.data.version;
     $scope.compareVersion = {};
     $scope.compareSnapshot = {};
 
@@ -52,22 +49,19 @@ oppia.controller('ExplorationHistory', [
     $scope.hideCodemirror = true;
     $scope.hideCompareVersionsButton = false;
 
-    $http.get($scope.explorationSnapshotsUrl).then(function(response) {
-      var data = response.data;
-
-      $scope.explorationSnapshots = [];
-      for (var i = 0; i < data.snapshots.length; i++) {
-        $scope.explorationSnapshots.push({
-          'committerId': data.snapshots[i].committer_id,
-          'createdOn': data.snapshots[i].created_on,
-          'commitMessage': data.snapshots[i].commit_message,
-          'versionNumber': data.snapshots[i].version_number
-        });
-      }
-    });
     $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
       allExplorationSnapshots = response.data.snapshots;
       versionTreeParents = versionsTreeService.getVersionTree(allExplorationSnapshots);
+
+      $scope.explorationSnapshots = [];
+      for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
+        $scope.explorationSnapshots.push({
+          'committerId': allExplorationSnapshots[i].committer_id,
+          'createdOn': allExplorationSnapshots[i].created_on,
+          'commitMessage': allExplorationSnapshots[i].commit_message,
+          'versionNumber': allExplorationSnapshots[i].version_number
+        });
+      }
     });
   };
 

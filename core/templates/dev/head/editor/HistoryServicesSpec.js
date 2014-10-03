@@ -18,31 +18,23 @@
  * @author wxyxinyu@gmail.com (Xinyu Wu)
  */
 
-describe('Versions tree service', function() {
+ddescribe('Versions tree service', function() {
   beforeEach(module('oppia'));
 
   describe('versions tree service', function() {
     var vts = null;
     var snapshots = [
       {
-        'commit_type': 'edit',
-        'version_number': 8
+        'commit_type': 'create',
+        'version_number': 1
       },
       {
         'commit_type': 'edit',
-        'version_number': 7
-      },
-      {
-        'commit_type': 'revert',
-        'commit_cmds': [{
-          'version_number': 3,
-          'cmd': 'AUTO_revert_version_number'
-        }],
-        'version_number': 6
+        'version_number': 2
       },
       {
         'commit_type': 'edit',
-        'version_number': 5
+        'version_number': 3
       },
       {
         'commit_type': 'revert',
@@ -54,15 +46,23 @@ describe('Versions tree service', function() {
       },
       {
         'commit_type': 'edit',
-        'version_number': 3
+        'version_number': 5
+      },
+      {
+        'commit_type': 'revert',
+        'commit_cmds': [{
+          'version_number': 3,
+          'cmd': 'AUTO_revert_version_number'
+        }],
+        'version_number': 6
       },
       {
         'commit_type': 'edit',
-        'version_number': 2
+        'version_number': 7
       },
       {
-        'commit_type': 'create',
-        'version_number': 1
+        'commit_type': 'edit',
+        'version_number': 8
       }
     ];
 
@@ -70,8 +70,17 @@ describe('Versions tree service', function() {
       vts = $injector.get('versionsTreeService');
     }));
 
-    it('should get correct list of parents', function() {
-      var expectedParents = [undefined, -1, 1, 2, 2, 4, 3, 6, 7];
+    iit('should get correct list of parents', function() {
+      var expectedParents = {
+        1: -1,
+        2: 1,
+        3: 2,
+        4: 2,
+        5: 4,
+        6: 3,
+        7: 6,
+        8: 7
+      };
       expect(vts.getVersionTree(snapshots)).toEqual(expectedParents);
     });
 
