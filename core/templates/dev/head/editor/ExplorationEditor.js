@@ -689,7 +689,7 @@ oppia.controller('ExplorationEditor', [
         'responds. You can edit details of the interaction by clicking on it.<br><br>' +
         'In this case, you might want them to type a string of text ' +
         'giving the desired time, such as "1:15" -- so you might choose a ' +
-        'text interaction and set its placeholder text to "Type the time here."')
+        '"Text input" interaction and set its placeholder text to "Type the time here."')
     }, {
       element: '#tutorialStateRules',
       intro: (
