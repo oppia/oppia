@@ -47,6 +47,7 @@ oppia.controller('StateEditor', [
     $scope.stateNameEditorIsShown = false;
 
     $scope.stateName = editorContextService.getActiveStateName();
+
     var stateData = explorationStatesService.getState($scope.stateName);
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
@@ -71,6 +72,13 @@ oppia.controller('StateEditor', [
     return $filter('normalizeWhitespace')(newStateName);
   };
 
+  $scope.isNewStateNameValid = function(stateName) {
+    if (stateName === editorContextService.getActiveStateName()) {
+      return true;
+    }
+    return explorationStatesService.isNewStateNameValid(stateName);
+  };
+
   $scope.saveStateNameAndRefresh = function(newStateName) {
     var normalizedStateName = $scope._getNormalizedStateName(newStateName);
     var valid = $scope.saveStateName(normalizedStateName);
@@ -81,19 +89,7 @@ oppia.controller('StateEditor', [
 
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope._getNormalizedStateName(newStateName);
-    if (!validatorsService.isValidEntityName(newStateName, true)) {
-      return false;
-    }
-    if (newStateName.length > 50) {
-      warningsData.addWarning(
-        'State names should be at most 50 characters long.');
-      return false;
-    }
-    var activeStateName = editorContextService.getActiveStateName();
-    if (newStateName !== activeStateName &&
-        explorationStatesService.getState(newStateName)) {
-      warningsData.addWarning(
-        'The name \'' + newStateName + '\' is already in use.');
+    if (!$scope.isNewStateNameValid(newStateName)) {
       return false;
     }
 
@@ -101,7 +97,8 @@ oppia.controller('StateEditor', [
       $scope.stateNameEditorIsShown = false;
       return false;
     } else {
-      explorationStatesService.renameState(activeStateName, newStateName);
+      explorationStatesService.renameState(
+        editorContextService.getActiveStateName(), newStateName);
       $scope.stateNameEditorIsShown = false;
       $scope.initStateEditor();
       return true;

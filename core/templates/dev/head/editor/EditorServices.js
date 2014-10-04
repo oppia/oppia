@@ -521,10 +521,10 @@ oppia.factory('explorationInitStateNameService', [
 oppia.factory('explorationStatesService', [
     '$log', '$modal', '$filter', '$location', '$rootScope', 'explorationInitStateNameService',
     'warningsData', 'changeListService', 'editorContextService', 'validatorsService',
-    'newStateTemplateService',
+    'newStateTemplateService', 'validatorsService',
     function($log, $modal, $filter, $location, $rootScope, explorationInitStateNameService,
              warningsData, changeListService, editorContextService, validatorsService,
-             newStateTemplateService) {
+             newStateTemplateService, validatorsService) {
   var _states = null;
   return {
     setStates: function(value) {
@@ -539,13 +539,14 @@ oppia.factory('explorationStatesService', [
     setState: function(stateName, stateData) {
       _states[stateName] = angular.copy(stateData);
     },
+    isNewStateNameValid: function(newStateName) {
+      return (
+        validatorsService.isValidStateName(newStateName) &&
+        !_states[newStateName]);
+    },
     addState: function(newStateName, successCallback) {
       newStateName = $filter('normalizeWhitespace')(newStateName);
-      if (!validatorsService.isValidEntityName(newStateName, true)) {
-        return;
-      }
-      if (newStateName.toUpperCase() == END_DEST) {
-        warningsData.addWarning('Please choose a state name that is not \'END\'.');
+      if (!validatorsService.isValidStateName(newStateName, true)) {
         return;
       }
       if (!!_states[newStateName]) {
@@ -621,6 +622,16 @@ oppia.factory('explorationStatesService', [
       });
     },
     renameState: function(oldStateName, newStateName) {
+      newStateName = $filter('normalizeWhitespace')(newStateName);
+      if (!validatorsService.isValidStateName(newStateName, true)) {
+        return;
+      }
+      if (!!_states[newStateName]) {
+        warningsData.addWarning('A state with this name already exists.');
+        return;
+      }
+      warningsData.clear();
+
       _states[newStateName] = angular.copy(_states[oldStateName]);
       delete _states[oldStateName];
 

@@ -27,15 +27,8 @@ oppia.controller('ExplorationGraph', [
              routerService, graphDataService) {
 
   $scope.getGraphData = graphDataService.getGraphData;
-
   $scope.isEditable = editabilityService.isEditable;
-
-  $scope.isNewStateNameValid = function(newStateName) {
-    return (
-      validatorsService.isValidEntityName(newStateName) &&
-      newStateName.toUpperCase() !== END_DEST &&
-      !explorationStatesService.getState(newStateName));
-  };
+  $scope.isNewStateNameValid = explorationStatesService.isNewStateNameValid;
 
   $scope.newStateName = '';
   $scope.addState = function(newStateName) {
