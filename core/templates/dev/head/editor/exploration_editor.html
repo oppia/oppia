@@ -175,23 +175,6 @@
       </div>
     </script>
 
-    <script type="text/ng-template" id="modals/deleteState">
-      <div class="modal-header">
-        <h3>Delete State</h3>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          Are you sure you want to delete the state "<[deleteStateName]>"?
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-danger" ng-click="reallyDelete()">Delete State</button>
-      </div>
-    </script>
-
     <script type="text/ng-template" id="modals/saveExploration">
       <div class="modal-header">
         <h3>Save Exploration</h3>
@@ -376,7 +359,7 @@
 
       <div class="row" ng-if="!isInPreviewMode">
         <tabset>
-          <tab heading="Main" active="getTabStatuses().main.active" select="showStateEditor()">
+          <tab heading="Main" active="getTabStatuses().main.active" select="selectMainTab()">
             <div class="row">
               <div class="col-lg-9 col-md-9 col-sm-9" ng-controller="StateEditor">
                 {% include 'editor/state_editor.html' %}
@@ -445,6 +428,7 @@
   <script>
     {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationEditor.js') }}
+    {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}

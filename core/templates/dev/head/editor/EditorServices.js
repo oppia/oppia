@@ -188,17 +188,12 @@ oppia.factory('changeListService', [
   };
 
   return {
-    _postChangeHook: null,
     _addChange: function(changeDict) {
       if ($rootScope.loadingMessage) {
         return;
       }
       explorationChangeList.push(changeDict);
       undoneChangeStack = [];
-
-      if (this._postChangeHook) {
-        this._postChangeHook();
-      }
     },
     /**
      * Saves a change dict that represents adding a new state.
@@ -298,9 +293,6 @@ oppia.factory('changeListService', [
     discardAllChanges: function() {
       explorationChangeList = [];
       undoneChangeStack = [];
-      if (this._postChangeHook) {
-        this._postChangeHook();
-      }
     },
     getChangeList: function() {
       return angular.copy(explorationChangeList);
@@ -312,13 +304,62 @@ oppia.factory('changeListService', [
       }
       var lastChange = explorationChangeList.pop();
       undoneChangeStack.push(lastChange);
-      if (this._postChangeHook) {
-        this._postChangeHook();
-      }
+    }
+  };
+}]);
+
+
+// A data service that stores data about the rights for this exploration.
+oppia.factory('explorationRightsService', [
+    '$http', 'explorationData', 'warningsData',
+    function($http, explorationData, warningsData) {
+  return {
+    init: function(
+        ownerNames, editorNames, viewerNames, status, clonedFrom,
+        isCommunityOwned, viewableIfPrivate) {
+      this.ownerNames = ownerNames;
+      this.editorNames = editorNames;
+      this.viewerNames = viewerNames;
+      this._status = status;
+      // This is null if the exploration was not cloned from anything,
+      // otherwise it is the exploration ID of the source exploration.
+      this._clonedFrom = clonedFrom;
+      this._isCommunityOwned = isCommunityOwned;
+      this._viewableIfPrivate = viewableIfPrivate;
     },
-    setPostChangeHook: function(postChangeHookFunction) {
-      // Sets a function to be called after any edit to the changelist.
-      this._postChangeHook = postChangeHookFunction;
+    clonedFrom: function() {
+      return this._clonedFrom;
+    },
+    isPrivate: function() {
+      return this._status === GLOBALS.EXPLORATION_STATUS_PRIVATE;
+    },
+    isPublic: function() {
+      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLIC;
+    },
+    isPublicized: function() {
+      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED;
+    },
+    isCloned: function() {
+      return Boolean(this._clonedFrom);
+    },
+    isCommunityOwned: function() {
+      return this._isCommunityOwned;
+    },
+    viewableIfPrivate: function() {
+      return this._viewableIfPrivate;
+    },
+    saveChangeToBackend: function(requestParameters) {
+      var that = this;
+
+      requestParameters.version = explorationData.data.version;
+      var explorationRightsUrl = '/createhandler/rights/' + explorationData.explorationId;
+      $http.put(explorationRightsUrl, requestParameters).success(function(data) {
+        warningsData.clear();
+        that.init(
+          data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
+          data.rights.status, data.rights.cloned_from, data.rights.community_owned,
+          data.rights.viewable_if_private);
+      });
     }
   };
 }]);
@@ -473,10 +514,17 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
+
 // Data service for keeping track of the exploration's states. Note that this
-// is unlike the other exploration property services, in that it does not
-// add anything to the changelog and keeps no mementos.
-oppia.factory('explorationStatesService', ['$log', function($log) {
+// is unlike the other exploration property services, in that it keeps no
+// mementos.
+oppia.factory('explorationStatesService', [
+    '$log', '$modal', '$filter', '$location', '$rootScope', 'explorationInitStateNameService',
+    'warningsData', 'changeListService', 'editorContextService', 'validatorsService',
+    'newStateTemplateService', 'validatorsService',
+    function($log, $modal, $filter, $location, $rootScope, explorationInitStateNameService,
+             warningsData, changeListService, editorContextService, validatorsService,
+             newStateTemplateService, validatorsService) {
   var _states = null;
   return {
     setStates: function(value) {
@@ -491,20 +539,104 @@ oppia.factory('explorationStatesService', ['$log', function($log) {
     setState: function(stateName, stateData) {
       _states[stateName] = angular.copy(stateData);
     },
-    deleteState: function(stateName) {
-      delete _states[stateName];
-      for (var otherStateName in _states) {
-        var handlers = _states[otherStateName].widget.handlers;
-        for (var i = 0; i < handlers.length; i++) {
-          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === stateName) {
-              handlers[i].rule_specs[j].dest = otherStateName;
+    isNewStateNameValid: function(newStateName, showWarnings) {
+      if (_states[newStateName]) {
+        if (showWarnings) {
+          warningsData.addWarning('A state with this name already exists.');
+        }
+        return false;
+      }
+      return (
+        validatorsService.isValidStateName(newStateName, showWarnings));
+    },
+    addState: function(newStateName, successCallback) {
+      newStateName = $filter('normalizeWhitespace')(newStateName);
+      if (!validatorsService.isValidStateName(newStateName, true)) {
+        return;
+      }
+      if (!!_states[newStateName]) {
+        warningsData.addWarning('A state with this name already exists.');
+        return;
+      }
+      warningsData.clear();
+
+      _states[newStateName] = newStateTemplateService.getNewStateTemplate(
+        newStateName);
+      changeListService.addState(newStateName);
+      $rootScope.$broadcast('refreshGraph');
+      if (successCallback) {
+        successCallback(newStateName);
+      }
+    },
+    deleteState: function(deleteStateName) {
+      warningsData.clear();
+
+      var initStateName = explorationInitStateNameService.displayed;
+      if (deleteStateName === initStateName || deleteStateName === END_DEST) {
+        return;
+      }
+      if (!_states[deleteStateName]) {
+        warningsData.addWarning('No state with name ' + deleteStateName + ' exists.');
+        return;
+      }
+
+      $modal.open({
+        templateUrl: 'modals/deleteState',
+        backdrop: 'static',
+        resolve: {
+          deleteStateName: function() {
+            return deleteStateName;
+          }
+        },
+        controller: [
+          '$scope', '$modalInstance', 'deleteStateName',
+          function($scope, $modalInstance, deleteStateName) {
+            $scope.deleteStateName = deleteStateName;
+
+            $scope.reallyDelete = function() {
+              $modalInstance.close(deleteStateName);
+            };
+
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+              warningsData.clear();
+            };
+          }
+        ]
+      }).result.then(function(deleteStateName) {
+        delete _states[deleteStateName];
+        for (var otherStateName in _states) {
+          var handlers = _states[otherStateName].widget.handlers;
+          for (var i = 0; i < handlers.length; i++) {
+            for (var j = 0; j < handlers[i].rule_specs.length; j++) {
+              if (handlers[i].rule_specs[j].dest === deleteStateName) {
+                handlers[i].rule_specs[j].dest = otherStateName;
+              }
             }
           }
         }
-      }
+        changeListService.deleteState(deleteStateName);
+
+        if (editorContextService.getActiveStateName() === deleteStateName) {
+          editorContextService.setActiveStateName(
+            explorationInitStateNameService.savedMemento);
+        }
+
+        $location.path('/gui/' + editorContextService.getActiveStateName());
+        $rootScope.$broadcast('refreshGraph');
+      });
     },
     renameState: function(oldStateName, newStateName) {
+      newStateName = $filter('normalizeWhitespace')(newStateName);
+      if (!validatorsService.isValidStateName(newStateName, true)) {
+        return;
+      }
+      if (!!_states[newStateName]) {
+        warningsData.addWarning('A state with this name already exists.');
+        return;
+      }
+      warningsData.clear();
+
       _states[newStateName] = angular.copy(_states[oldStateName]);
       delete _states[oldStateName];
 
@@ -518,66 +650,23 @@ oppia.factory('explorationStatesService', ['$log', function($log) {
           }
         }
       }
+
+      editorContextService.setActiveStateName(newStateName);
+      // The 'rename state' command must come before the 'change init_state_name'
+      // command in the change list, otherwise the backend will raise an error
+      // because the new initial state name does not exist.
+      changeListService.renameState(newStateName, oldStateName);
+      // Amend initStateName appropriately, if necessary. Note that this
+      // must come after the state renaming, otherwise saving will lead to
+      // a complaint that the new name is not a valid state name.
+      if (explorationInitStateNameService.displayed === oldStateName) {
+        explorationInitStateNameService.displayed = newStateName;
+        explorationInitStateNameService.saveDisplayedValue(newStateName);
+      }
+      $rootScope.$broadcast('refreshGraph');
     }
   };
 }]);
-
-
-// A data service that stores data about the rights for this exploration.
-oppia.factory('explorationRightsService', [
-    '$http', 'explorationData', 'warningsData',
-    function($http, explorationData, warningsData) {
-  return {
-    init: function(
-        ownerNames, editorNames, viewerNames, status, clonedFrom,
-        isCommunityOwned, viewableIfPrivate) {
-      this.ownerNames = ownerNames;
-      this.editorNames = editorNames;
-      this.viewerNames = viewerNames;
-      this._status = status;
-      // This is null if the exploration was not cloned from anything,
-      // otherwise it is the exploration ID of the source exploration.
-      this._clonedFrom = clonedFrom;
-      this._isCommunityOwned = isCommunityOwned;
-      this._viewableIfPrivate = viewableIfPrivate;
-    },
-    clonedFrom: function() {
-      return this._clonedFrom;
-    },
-    isPrivate: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PRIVATE;
-    },
-    isPublic: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLIC;
-    },
-    isPublicized: function() {
-      return this._status === GLOBALS.EXPLORATION_STATUS_PUBLICIZED;
-    },
-    isCloned: function() {
-      return Boolean(this._clonedFrom);
-    },
-    isCommunityOwned: function() {
-      return this._isCommunityOwned;
-    },
-    viewableIfPrivate: function() {
-      return this._viewableIfPrivate;
-    },
-    saveChangeToBackend: function(requestParameters) {
-      var that = this;
-
-      requestParameters.version = explorationData.data.version;
-      var explorationRightsUrl = '/createhandler/rights/' + explorationData.explorationId;
-      $http.put(explorationRightsUrl, requestParameters).success(function(data) {
-        warningsData.clear();
-        that.init(
-          data.rights.owner_names, data.rights.editor_names, data.rights.viewer_names,
-          data.rights.status, data.rights.cloned_from, data.rights.community_owned,
-          data.rights.viewable_if_private);
-      });
-    }
-  };
-}]);
-
 
 oppia.factory('statePropertyService', [
     '$log', 'changeListService', 'warningsData', function($log, changeListService, warningsData) {
@@ -707,6 +796,65 @@ oppia.factory('newStateTemplateService', [function() {
         });
       });
       return newStateTemplate;
+    }
+  };
+}]);
+
+
+// Service for computing graph data.
+oppia.factory('graphDataService', [
+    'explorationStatesService', 'explorationInitStateNameService',
+    function(explorationStatesService, explorationInitStateNameService) {
+
+  var _graphData = null;
+
+  // Returns an object which can be treated as the input to a visualization
+  // for a directed graph. The returned object has the following keys:
+  //   - nodes: a list of node names
+  //   - links: a list of objects. Each object represents a directed link between
+  //      two notes, and has keys 'source' and 'target', the values of which are
+  //      the names of the corresponding nodes.
+  //   - initStateName: the name of the initial state.
+  //   - finalStateName: the name of the final state.
+  var _recomputeGraphData = function() {
+    if (!explorationInitStateNameService.savedMemento) {
+      return;
+    }
+
+    var states = explorationStatesService.getStates();
+
+    var nodeList = [];
+    var links = [];
+    for (stateName in states) {
+      nodeList.push(stateName);
+
+      var handlers = states[stateName].widget.handlers;
+      for (h = 0; h < handlers.length; h++) {
+        ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          links.push({
+            source: stateName,
+            target: ruleSpecs[i].dest,
+          });
+        }
+      }
+    }
+    nodeList.push(END_DEST);
+
+    _graphData = {
+      nodes: nodeList,
+      links: links,
+      initStateName: explorationInitStateNameService.savedMemento,
+      finalStateName: END_DEST
+    };
+  };
+
+  return {
+    recompute: function() {
+      _recomputeGraphData();
+    },
+    getGraphData: function() {
+      return angular.copy(_graphData);
     }
   };
 }]);

@@ -117,7 +117,7 @@ var editRule = function(ruleNum) {
     setDestination: function(destinationName) {
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
       forms.editAutocompleteDropdown(destinationElement).
-        setText(destinationName + '\n');
+        setText(destinationName);
       elem.element(by.css('.protractor-test-save-rule')).click();
     }
   }

@@ -217,6 +217,31 @@ oppia.factory('validatorsService', [
       }
       return true;
     },
+    // NB: this does not check whether the state name already exists in the
+    // states dict.
+    isValidStateName: function(input, showWarnings) {
+      if (!this.isValidEntityName(input, showWarnings)) {
+        return false;
+      }
+
+      if (input.length > 50) {
+        if (showWarnings) {
+          warningsData.addWarning(
+            'State names should be at most 50 characters long.');
+        }
+        return false;
+      }
+
+      if (input.toUpperCase() === END_DEST) {
+        if (showWarnings) {
+          warningsData.addWarning(
+            'Please choose a state name that is not \'END\'.');
+        }
+        return false;
+      }
+
+      return true;
+    },
     isNonempty: function(input, showWarnings) {
       if (!input) {
         if (showWarnings) {

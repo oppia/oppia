@@ -22,11 +22,11 @@ oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
   'explorationInitStateNameService', 'focusService', 'editabilityService',
-  'explorationStatesService', function(
+  'explorationStatesService', 'routerService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
     explorationInitStateNameService, focusService, editabilityService,
-    explorationStatesService) {
+    explorationStatesService, routerService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -47,6 +47,7 @@ oppia.controller('StateEditor', [
     $scope.stateNameEditorIsShown = false;
 
     $scope.stateName = editorContextService.getActiveStateName();
+
     var stateData = explorationStatesService.getState($scope.stateName);
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
@@ -71,29 +72,24 @@ oppia.controller('StateEditor', [
     return $filter('normalizeWhitespace')(newStateName);
   };
 
+  var _isNewStateNameValid = function(stateName) {
+    if (stateName === editorContextService.getActiveStateName()) {
+      return true;
+    }
+    return explorationStatesService.isNewStateNameValid(stateName, true);
+  };
+
   $scope.saveStateNameAndRefresh = function(newStateName) {
     var normalizedStateName = $scope._getNormalizedStateName(newStateName);
     var valid = $scope.saveStateName(normalizedStateName);
     if (valid) {
-      $scope.$parent.showStateEditor(normalizedStateName);
+      routerService.navigateToMainTab(normalizedStateName);
     }
   };
 
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope._getNormalizedStateName(newStateName);
-    if (!validatorsService.isValidEntityName(newStateName, true)) {
-      return false;
-    }
-    if (newStateName.length > 50) {
-      warningsData.addWarning(
-        'State names should be at most 50 characters long.');
-      return false;
-    }
-    var activeStateName = editorContextService.getActiveStateName();
-    if (newStateName !== activeStateName &&
-        explorationStatesService.getState(newStateName)) {
-      warningsData.addWarning(
-        'The name \'' + newStateName + '\' is already in use.');
+    if (!_isNewStateNameValid(newStateName)) {
       return false;
     }
 
@@ -101,20 +97,9 @@ oppia.controller('StateEditor', [
       $scope.stateNameEditorIsShown = false;
       return false;
     } else {
-      explorationStatesService.renameState(activeStateName, newStateName);
-
-      editorContextService.setActiveStateName(newStateName);
-      changeListService.renameState(newStateName, $scope.stateNameMemento);
-      // Amend initStateName appropriately, if necessary. Note that this
-      // must come after the state renaming, otherwise saving will lead to
-      // a complaint that the new name is not a valid state name.
-      if (explorationInitStateNameService.displayed === activeStateName) {
-        explorationInitStateNameService.displayed = newStateName;
-        explorationInitStateNameService.saveDisplayedValue(newStateName);
-      }
-
+      explorationStatesService.renameState(
+        editorContextService.getActiveStateName(), newStateName);
       $scope.stateNameEditorIsShown = false;
-      $scope.refreshGraph();
       $scope.initStateEditor();
       return true;
     }

@@ -21,10 +21,10 @@
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
     'oppiaHtmlEscaper', 'widgetDefinitionsService', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
-    'editabilityService', 'explorationStatesService',
+    'editabilityService', 'explorationStatesService', 'graphDataService',
     function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
       oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService,
-      editabilityService, explorationStatesService) {
+      editabilityService, explorationStatesService, graphDataService) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -183,7 +183,7 @@ oppia.controller('StateInteraction', [
 
     $scope.tmpRule = null;
     $scope.updateStateWidgetHandlerData();
-    $scope.refreshGraph();
+    graphDataService.recompute();
     $scope.resetInteractiveWidgetEditor();
   };
 
@@ -270,7 +270,7 @@ oppia.controller('StateInteraction', [
         editorContextService.getActiveStateName(), 'widget_handlers',
         angular.copy(newHandlers), angular.copy(oldHandlers));
       $scope.updateStateWidgetHandlerData();
-      $scope.refreshGraph();
+      graphDataService.recompute();
       $scope.widgetHandlersMemento = angular.copy(newHandlers);
     }
   };

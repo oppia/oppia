@@ -41,10 +41,6 @@ describe('State Editor controller', function() {
 
       GLOBALS = {INVALID_NAME_CHARS: '#@&^%$'};
 
-      // Without this added, saveStateName
-      // cannot check for an initStateName property.
-      scope.$parent.$parent = {};
-
       mockWarningsData = {
         addWarning: function(warning) {}
       };
@@ -103,11 +99,7 @@ describe('State Editor controller', function() {
             }
           }]
         }
-      });      
-
-      scope.refreshGraph = function() {
-        return true;
-      };
+      });
 
       scope.getContent = function(contentString) {
         return [{type: 'text', value: contentString}];
@@ -151,7 +143,6 @@ describe('State Editor controller', function() {
       expect(scope._getNormalizedStateName('    ')).toEqual('');
       expect(scope._getNormalizedStateName('Z    ')).toEqual('Z');
       expect(scope._getNormalizedStateName('    .')).toEqual('.');
-
     });
 
     it('should not save state names longer than 50 characters', function() {
@@ -159,10 +150,6 @@ describe('State Editor controller', function() {
         scope.saveStateName(
           'babababababababababababababababababababababababababab')
       ).toBe(false);
-      expect(mockWarningsData.addWarning)
-        .toHaveBeenCalledWith(
-          'State names should be at most 50 characters long.'
-        );
     });
 
     it('should not save invalid names', function() {
@@ -170,13 +157,14 @@ describe('State Editor controller', function() {
       scope.initStateEditor();
       expect(scope.saveStateName('#')).toBe(false);
       expect(vs.isValidEntityName('#', true)).toBe(false);
+      expect(scope.saveStateName('END')).toBe(false);
+      expect(scope.saveStateName('enD')).toBe(false);
+      expect(scope.saveStateName('end')).toBe(false);
       expect(ecs.getActiveStateName()).toBe('Third State');
     });
 
     it('should not save duplicate state names', function() {
       expect(scope.saveStateName('Second State')).toBe(false);
-      expect(mockWarningsData.addWarning)
-        .toHaveBeenCalledWith("The name 'Second State' is already in use.");
     });
 
     it('should check that state names are changeable', function() {

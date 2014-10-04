@@ -22,8 +22,8 @@ oppia.controller('ExplorationHistory', [
     '$scope', '$http', '$location', '$anchorScroll', 'explorationData',
     'versionsTreeService', function(
     $scope, $http, $location, $anchorScroll, explorationData, versionsTreeService) {
-  $scope.explorationId = explorationData.explorationId;
-  $scope.explorationAllSnapshotsUrl = '/createhandler/snapshots/' + $scope.explorationId;
+  $scope.explorationAllSnapshotsUrl = (
+    '/createhandler/snapshots/' + explorationData.explorationId);
 
   /* displayedExplorationSnapshots is a list of snapshots (in descending order)
    * for the displayed version history list (max 30)
@@ -33,6 +33,10 @@ oppia.controller('ExplorationHistory', [
   $scope.displayedExplorationSnapshots = null;
   var allExplorationSnapshots = null;
   var versionTreeParents = null;
+
+  $scope.getExplorationUrl = function(version) {
+    return '/explore/' + explorationData.explorationId + '?v=' + version;
+  };
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
     if (data.forceRefresh || $scope.displayedExplorationSnapshots === null) {

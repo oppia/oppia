@@ -28,7 +28,7 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
-  'explorationStatesService', 'routerService',
+  'explorationStatesService', 'routerService', 'graphDataService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -36,7 +36,8 @@ oppia.controller('ExplorationEditor', [
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
-    newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService) {
+    newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
+    graphDataService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -59,8 +60,7 @@ oppia.controller('ExplorationEditor', [
   $scope.exitPreviewMode = function() {
     $scope.isInPreviewMode = false;
     $timeout(function() {
-      editorContextService.setActiveStateName(oppiaPlayerService.getCurrentStateName());
-      $scope.showStateEditor(editorContextService.getActiveStateName());
+      routerService.navigateToMainTab(oppiaPlayerService.getCurrentStateName());
       $scope.$broadcast('refreshStateEditor');
     });
   };
@@ -82,59 +82,16 @@ oppia.controller('ExplorationEditor', [
   $scope.explorationDownloadUrl = '/createhandler/download/' + $scope.explorationId;
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
-  $scope.getActiveStateName = function() {
-    return editorContextService.getActiveStateName();
-  };
-
-  $scope.saveActiveState = function(postSaveHook) {
-    try {
-      $rootScope.$broadcast('externalSave');
-    } catch (e) {
-      // Sometimes, AngularJS throws a "Cannot read property $$nextSibling of
-      // null" error. To get around this we must use $apply().
-      $rootScope.$apply(function() {
-        $rootScope.$broadcast('externalSave');
-      });
-    }
-
-    if (postSaveHook) {
-      postSaveHook();
-    }
-  };
-
-  $scope.saveAndChangeActiveState = function(newStateName) {
-    $scope.saveActiveState();
-    editorContextService.setActiveStateName(newStateName);
-  };
-
-  $scope.showStateEditor = function(stateName) {
-    warningsData.clear();
-    if (stateName) {
-      $scope.saveAndChangeActiveState(stateName);
-    } else {
-      stateName = editorContextService.getActiveStateName();
-    }
-
-    if (stateName) {
-      routerService.navigateToState(stateName);
-    }
-  };
-
   $scope.getTabStatuses = routerService.getTabStatuses;
-  $scope.selectStatsTab = function() {
-    $scope.saveActiveState(routerService.navigateToStatsTab);
-  };
-  $scope.selectSettingsTab = function() {
-    $scope.saveActiveState(routerService.navigateToSettingsTab);
-  };
+  $scope.selectMainTab = routerService.navigateToMainTab;
+  $scope.selectStatsTab = routerService.navigateToStatsTab;
+  $scope.selectSettingsTab = routerService.navigateToSettingsTab;
   $scope.selectHistoryTab = function() {
     // TODO(sll): Do this on-hover rather than on-click.
     $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
-    $scope.saveActiveState(routerService.navigateToHistoryTab);
+    routerService.navigateToHistoryTab();
   };
-  $scope.selectFeedbackTab = function() {
-    $scope.saveActiveState(routerService.navigateToFeedbackTab);
-  };
+  $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 
   /**************************************************
   * Methods affecting the saving of explorations.
@@ -193,7 +150,9 @@ oppia.controller('ExplorationEditor', [
   });
 
   $scope.saveChanges = function() {
-    $scope.saveActiveState();
+    routerService.savePendingChanges();
+
+    console.log(changeListService.getChangeList());
 
     $scope.changeListSummaryUrl = '/createhandler/change_list_summary/' + $scope.explorationId;
 
@@ -377,12 +336,6 @@ oppia.controller('ExplorationEditor', [
   /********************************************
   * Methods affecting the graph visualization.
   ********************************************/
-  $scope.refreshGraph = function() {
-    $scope.graphData = $scope.getNodesAndLinks(
-      explorationStatesService.getStates(),
-      explorationInitStateNameService.displayed);
-  };
-
   $scope.areExplorationWarningsVisible = false;
   $scope.toggleExplorationWarningVisibility = function() {
     $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
@@ -449,14 +402,19 @@ oppia.controller('ExplorationEditor', [
     return problematicStates;
   };
 
+  $scope.$on('refreshGraph', function() {
+    graphDataService.recompute()
+    $scope.updateWarningsList();
+  });
+
   $scope.updateWarningsList = function() {
-    $scope.refreshGraph();
+    graphDataService.recompute();
     $scope.warningsList = [];
 
-    if ($scope.graphData) {
+    var _graphData = graphDataService.getGraphData();
+    if (_graphData) {
       var unreachableStateNames = $scope._getUnreachableNodeNames(
-        $scope.graphData.initStateName, $scope.graphData.nodes,
-        $scope.graphData.links);
+        _graphData.initStateName, _graphData.nodes, _graphData.links);
       if (unreachableStateNames.length) {
         $scope.warningsList.push(
           'The following state(s) are unreachable: ' +
@@ -464,8 +422,8 @@ oppia.controller('ExplorationEditor', [
       } else {
         // Only perform this check if all states are reachable.
         var deadEndStates = $scope._getUnreachableNodeNames(
-          $scope.graphData.finalStateName, $scope.graphData.nodes,
-          $scope._getReversedLinks($scope.graphData.links));
+          _graphData.finalStateName, _graphData.nodes,
+          $scope._getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
           $scope.warningsList.push(
             'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
@@ -486,7 +444,6 @@ oppia.controller('ExplorationEditor', [
   };
 
   $scope.warningsList = [];
-  changeListService.setPostChangeHook($scope.updateWarningsList);
 
   $scope.showEmbedExplorationModal = function() {
     warningsData.clear();
@@ -605,7 +562,7 @@ oppia.controller('ExplorationEditor', [
         editabilityService.markEditable();
       }
 
-      $scope.refreshGraph();
+      graphDataService.recompute();
 
       if (!editorContextService.getActiveStateName() ||
           !explorationStatesService.getState(editorContextService.getActiveStateName())) {
@@ -614,7 +571,7 @@ oppia.controller('ExplorationEditor', [
 
       if (!routerService.isLocationSetToNonStateEditorTab() && 
           !data.states.hasOwnProperty(routerService.getCurrentStateFromLocationPath())) {
-        $scope.showStateEditor(editorContextService.getActiveStateName());
+        routerService.navigateToMainTab();
       }
 
       $scope.updateWarningsList();
@@ -637,39 +594,6 @@ oppia.controller('ExplorationEditor', [
 
   $scope.initExplorationPage();
 
-  // Returns an object which can be treated as the input to a visualization
-  // for a directed graph. The returned object has the following keys:
-  //   - nodes: a list of node names
-  //   - links: a list of objects. Each object represents a directed link between
-  //      two notes, and has keys 'source' and 'target', the values of which are
-  //      the names of the corresponding nodes.
-  //   - initStateName: the name of the initial state.
-  //   - finalStateName: the name of the final state.
-  $scope.getNodesAndLinks = function(states, initStateName) {
-    var nodeList = [];
-    for (stateName in states) {
-      nodeList.push(stateName);
-    }
-    nodeList.push(END_DEST);
-
-    var links = [];
-    for (var stateName in states) {
-      handlers = states[stateName].widget.handlers;
-      for (h = 0; h < handlers.length; h++) {
-        ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
-          links.push({
-            source: stateName,
-            target: ruleSpecs[i].dest,
-          });
-        }
-      }
-    }
-
-    return {
-      nodes: nodeList, links: links, initStateName: initStateName,
-      finalStateName: END_DEST};
-  };
 
   $scope.addExplorationParamSpec = function(name, type, successCallback) {
     $log.info('Adding a param spec to the exploration.');
@@ -715,160 +639,6 @@ oppia.controller('ExplorationEditor', [
         };
       }]
     });
-  };
-
-  /********************************************
-  * Methods for operations on states.
-  ********************************************/
-  $scope.isNewStateNameValid = function(newStateName) {
-    return (
-      validatorsService.isValidEntityName(newStateName) &&
-      newStateName.toUpperCase() !== END_DEST &&
-      !explorationStatesService.getState(newStateName));
-  };
-
-  // Adds a new state to the list of states, and updates the backend.
-  $scope.addState = function(newStateName, successCallback) {
-    newStateName = $filter('normalizeWhitespace')(newStateName);
-    if (!validatorsService.isValidEntityName(newStateName, true)) {
-      return;
-    }
-    if (newStateName.toUpperCase() == END_DEST) {
-      warningsData.addWarning('Please choose a state name that is not \'END\'.');
-      return;
-    }
-    if (explorationStatesService.getState(newStateName)) {
-      warningsData.addWarning('A state with this name already exists.');
-      return;
-    }
-
-    warningsData.clear();
-
-    explorationStatesService.setState(
-      newStateName,
-      newStateTemplateService.getNewStateTemplate(newStateName));
-
-    changeListService.addState(newStateName);
-    $scope.refreshGraph();
-    $scope.newStateDesc = '';
-    if (successCallback) {
-      successCallback(newStateName);
-    }
-  };
-
-  $scope.deleteState = function(deleteStateName) {
-    warningsData.clear();
-
-    var initStateName = explorationInitStateNameService.displayed;
-
-    if (deleteStateName === initStateName || deleteStateName === END_DEST) {
-      return;
-    }
-
-    $modal.open({
-      templateUrl: 'modals/deleteState',
-      backdrop: 'static',
-      resolve: {
-        deleteStateName: function() {
-          return deleteStateName;
-        }
-      },
-      controller: [
-        '$scope', '$modalInstance', 'deleteStateName',
-        function($scope, $modalInstance, deleteStateName) {
-          $scope.deleteStateName = deleteStateName;
-
-          $scope.reallyDelete = function() {
-            $modalInstance.close(deleteStateName);
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function(deleteStateName) {
-      if (deleteStateName == initStateName) {
-        warningsData.addWarning(
-          'Deleting the initial state of a question is not supported. ' +
-          'Perhaps edit it instead?');
-        return;
-      }
-
-      if (!explorationStatesService.getState(deleteStateName)) {
-        warningsData.addWarning('No state with name ' + deleteStateName + ' exists.');
-        return;
-      }
-
-      explorationStatesService.deleteState(deleteStateName);
-
-      if (editorContextService.getActiveStateName() === deleteStateName) {
-        $scope.showStateEditor(initStateName);
-      }
-
-      changeListService.deleteState(deleteStateName);
-      $scope.refreshGraph();
-    });
-  };
-
-  $scope.openStateGraphModal = function(deleteStateName) {
-    warningsData.clear();
-
-    $modal.open({
-      templateUrl: 'modals/stateGraph',
-      backdrop: 'static',
-      resolve: {
-        currentStateName: function() {
-          return $scope.getActiveStateName();
-        },
-        graphData: function() {
-          return $scope.graphData;
-        }
-      },
-      controller: [
-        '$scope', '$modalInstance', 'currentStateName', 'graphData',
-        function($scope, $modalInstance, currentStateName, graphData) {
-          $scope.currentStateName = currentStateName;
-          $scope.graphData = graphData;
-
-          $scope.deleteState = function(stateName) {
-            $modalInstance.close({
-              action: 'delete',
-              stateName: stateName
-            });
-          };
-
-          $scope.selectState = function(stateName) {
-            if (stateName !== END_DEST) {
-              $modalInstance.close({
-                action: 'navigate',
-                stateName: stateName
-              });
-            }
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function(closeDict) {
-      if (closeDict.action === 'delete') {
-        $scope.deleteState(closeDict.stateName);
-      } else if (closeDict.action === 'navigate') {
-        $scope.onClickStateInMinimap(closeDict.stateName);
-      } else {
-        console.error('Invalid closeDict action: ' + closeDict.action);
-      }
-    });
-  };
-
-  $scope.onClickStateInMinimap = function(stateName) {
-    if (stateName !== END_DEST) {
-      $scope.showStateEditor(stateName);
-    }
   };
 
   $scope.feedbackTabHeader = 'Feedback';
