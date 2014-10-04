@@ -539,10 +539,15 @@ oppia.factory('explorationStatesService', [
     setState: function(stateName, stateData) {
       _states[stateName] = angular.copy(stateData);
     },
-    isNewStateNameValid: function(newStateName) {
+    isNewStateNameValid: function(newStateName, showWarnings) {
+      if (_states[newStateName]) {
+        if (showWarnings) {
+          warningsData.addWarning('A state with this name already exists.');
+        }
+        return false;
+      }
       return (
-        validatorsService.isValidStateName(newStateName) &&
-        !_states[newStateName]);
+        validatorsService.isValidStateName(newStateName, showWarnings));
     },
     addState: function(newStateName, successCallback) {
       newStateName = $filter('normalizeWhitespace')(newStateName);

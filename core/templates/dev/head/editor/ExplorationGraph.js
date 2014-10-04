@@ -28,10 +28,13 @@ oppia.controller('ExplorationGraph', [
 
   $scope.getGraphData = graphDataService.getGraphData;
   $scope.isEditable = editabilityService.isEditable;
-  $scope.isNewStateNameValid = explorationStatesService.isNewStateNameValid;
 
   $scope.newStateName = '';
   $scope.addState = function(newStateName) {
+    if (!explorationStatesService.isNewStateNameValid(newStateName, true)) {
+      $scope.newStateName = '';
+      return;
+    }
     explorationStatesService.addState(newStateName, function() {
       $scope.newStateName = '';
       routerService.navigateToMainTab(stateName);

@@ -72,11 +72,11 @@ oppia.controller('StateEditor', [
     return $filter('normalizeWhitespace')(newStateName);
   };
 
-  $scope.isNewStateNameValid = function(stateName) {
+  var _isNewStateNameValid = function(stateName) {
     if (stateName === editorContextService.getActiveStateName()) {
       return true;
     }
-    return explorationStatesService.isNewStateNameValid(stateName);
+    return explorationStatesService.isNewStateNameValid(stateName, true);
   };
 
   $scope.saveStateNameAndRefresh = function(newStateName) {
@@ -89,7 +89,7 @@ oppia.controller('StateEditor', [
 
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope._getNormalizedStateName(newStateName);
-    if (!$scope.isNewStateNameValid(newStateName)) {
+    if (!_isNewStateNameValid(newStateName)) {
       return false;
     }
 
