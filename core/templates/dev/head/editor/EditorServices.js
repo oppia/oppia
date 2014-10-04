@@ -478,7 +478,7 @@ oppia.factory('explorationObjectiveService', [
   child.propertyName = 'objective';
   child._normalize = $filter('normalizeWhitespace');
   child._isValid = function(value) {
-    return validatorsService.isNonempty(value, true);
+    return validatorsService.isNonempty(value, false);
   };
   return child;
 }]);

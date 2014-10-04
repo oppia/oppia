@@ -23,10 +23,12 @@ from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import utils
 
 import jinja2
 
@@ -59,6 +61,8 @@ class GalleryPage(base.BaseHandler):
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             'noninteractive_widget_html': jinja2.utils.Markup(
                 noninteractive_widget_html),
+            'gallery_redirect_url': current_user_services.create_login_url(
+                feconf.GALLERY_REDIRECT_URL),
         })
         self.render_template('galleries/gallery.html')
 
@@ -141,6 +145,24 @@ class GalleryHandler(base.BaseHandler):
             'private': private_explorations_list,
         })
         self.render_json(self.values)
+
+
+class GalleryRedirector(base.BaseHandler):
+    """Redirects a logged-in user to the editor prerequisites page or the
+    gallery, according as to whether they are logged in or not.
+    """
+
+    @base.require_user
+    def get(self):
+        """Handles GET requests."""
+        if not user_services.has_user_registered_as_editor(self.user_id):
+            redirect_url = utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL,
+                'return_url', feconf.GALLERY_URL)
+        else:
+            redirect_url = feconf.GALLERY_URL
+
+        self.redirect(redirect_url)
 
 
 class NewExploration(base.BaseHandler):

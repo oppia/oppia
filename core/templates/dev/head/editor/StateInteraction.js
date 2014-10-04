@@ -159,8 +159,6 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.saveInteractiveWidget = function(tmpWidget) {
-    $scope.$broadcast('externalSave');
-
     var newWidget = angular.copy(tmpWidget);
     if (!angular.equals(newWidget.widget_id, stateWidgetIdService.displayed)) {
       stateWidgetIdService.displayed = angular.copy(newWidget.widget_id);
@@ -186,6 +184,12 @@ oppia.controller('StateInteraction', [
     graphDataService.recompute();
     $scope.resetInteractiveWidgetEditor();
   };
+
+  $scope.$on('externalSave', function() {
+    if ($scope.interactiveWidgetEditorIsShown) {
+      $scope.saveInteractiveWidget($scope.tmpWidget);
+    }
+  });
 
   $scope.setNewTmpWidget = function(newWidgetId, newWidgetCustomizationArgs) {
     $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[newWidgetId]);

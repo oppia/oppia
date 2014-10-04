@@ -35,9 +35,6 @@ oppia.directive('oppiaInteractiveNumericInput', [
         };
 
         $scope.submitAnswer = function(answer) {
-          if (!answer) {
-            return;
-          }
           $scope.$parent.$parent.submitAnswer(Number(answer), 'submit');
         };
       }]
