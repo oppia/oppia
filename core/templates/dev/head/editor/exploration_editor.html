@@ -8,8 +8,6 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
-    GLOBALS.ALL_LANGUAGE_CODES = JSON.parse(
-      '{{ALL_LANGUAGE_CODES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
   </script>

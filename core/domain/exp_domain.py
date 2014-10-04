@@ -730,7 +730,7 @@ class Exploration(object):
 
     @classmethod
     def create_default_exploration(
-            cls, exploration_id, title, category,
+            cls, exploration_id, title, category, objective='',
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
             feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
@@ -740,7 +740,7 @@ class Exploration(object):
         }
 
         return cls(
-            exploration_id, title, category, '', language_code, [], '', '',
+            exploration_id, title, category, objective, language_code, [], '', '',
             'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [],
             0)
 
@@ -1262,8 +1262,8 @@ class Exploration(object):
 
         exploration = cls.create_default_exploration(
             exploration_id, title, category,
+            objective=exploration_dict['objective'],
             language_code=exploration_dict['language_code'])
-        exploration.objective = exploration_dict['objective']
         exploration.skill_tags = exploration_dict['skill_tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']

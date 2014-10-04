@@ -2,7 +2,7 @@
   <div class="modal-header">
     <h3>
       <span ng-if="isUploadModal">Upload Exploration</span>
-      <span ng-if="!isUploadModal">Add New Exploration</span>
+      <span ng-if="!isUploadModal">Create New Exploration</span>
     </h3>
   </div>
 
@@ -26,6 +26,20 @@
           </div>
         </div>
 
+        <div ng-hide="isUploadModal">
+          <div class="form-group">
+            <label for="newExplorationObjective" class="col-lg-2 col-md-2 col-sm-2">
+              Objective
+            </label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <input id="newExplorationObjective" type="text" class="form-control" ng-model="newExplorationObjective" placeholder="Learn how to ..." name="newExplorationObjective">
+              <span class="help-block" style="font-size: smaller">
+                What will this exploration help people to learn?
+              </span>
+            </div>
+          </div>
+        </div>
+
         <div class="form-group" ng-class="{'has-error': !newExplorationCategory}">
           <label for="newExplorationCategory" class="col-lg-2 col-md-2 col-sm-2">
             Category
@@ -33,6 +47,18 @@
           <div class="col-lg-10 col-md-10 col-sm-10">
             <select2-dropdown item="newExplorationCategory" choices="categoriesForDropdown" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px">
             </select2-dropdown>
+          </div>
+        </div>
+
+        <div ng-hide="isUploadModal">
+          <div class="form-group">
+            <label for="newExplorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">
+              Language
+            </label>
+            <div class="col-lg-10 col-md-10 col-sm-10">
+              <select id="newExplorationLanguageCode" class="form-control" ng-model="newExplorationLanguageCode" ng-options="lc.code as lc.description for lc in getAllLanguageCodes()">
+              </select>
+            </div>
           </div>
         </div>
 
@@ -49,6 +75,9 @@
   </div>
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory)" ng-disabled="!newExplorationTitle || !newExplorationCategory">Add New Exploration</button>
+    <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory, newExplorationObjective, newExplorationLanguageCode)"
+      ng-disabled="!newExplorationTitle || !newExplorationCategory || !newExplorationLanguageCode">
+        Create New Exploration
+    </button>
   </div>
 </script>

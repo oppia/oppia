@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import collections
 import logging
 
 from core.controllers import base
@@ -154,15 +153,20 @@ class NewExploration(base.BaseHandler):
         """Handles POST requests."""
         title = self.payload.get('title')
         category = self.payload.get('category')
+        objective = self.payload.get('objective')
+        language_code = self.payload.get('language_code')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
         if not category:
             raise self.InvalidInputException('No category chosen.')
+        if not language_code:
+            raise self.InvalidInputException('No language chosen.')
 
         new_exploration_id = exp_services.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, title, category)
+            new_exploration_id, title, category,
+            objective=objective, language_code=language_code)
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({EXPLORATION_ID_KEY: new_exploration_id})
