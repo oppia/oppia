@@ -2,7 +2,7 @@
   <div class="modal-header">
     <h3>
       <span ng-if="isUploadModal">Upload Exploration</span>
-      <span ng-if="!isUploadModal">Add New Exploration</span>
+      <span ng-if="!isUploadModal">Create New Exploration</span>
     </h3>
   </div>
 
@@ -77,7 +77,7 @@
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory, newExplorationObjective, newExplorationLanguageCode)"
       ng-disabled="!newExplorationTitle || !newExplorationCategory || !newExplorationLanguageCode">
-        Add New Exploration
+        Create New Exploration
     </button>
   </div>
 </script>
