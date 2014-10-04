@@ -77,4 +77,11 @@ oppia.controller('Base', [
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
   };
+
+  // This method is here because the trigger for the tutorial is in the site
+  // navbar. It broadcasts an event to tell the exploration editor to open the
+  // editor tutorial.
+  $scope.openEditorTutorial = function() {
+    $scope.$broadcast('openEditorTutorial');
+  };
 }]);

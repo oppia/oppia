@@ -234,6 +234,12 @@ UI_SORTABLE_ZIP_URL = (
 UI_SORTABLE_ZIP_ROOT_NAME = 'ui-sortable-src%s' % UI_SORTABLE_REV
 UI_SORTABLE_TARGET_ROOT_NAME = 'ui-sortable-%s' % UI_SORTABLE_REV
 
+INTRO_JS_REV = '0.9.0'
+INTRO_JS_ZIP_URL = (
+    'https://github.com/usablica/intro.js/archive/v%s.zip' % INTRO_JS_REV)
+INTRO_JS_ZIP_ROOT_NAME = 'intro.js-%s' % INTRO_JS_REV
+INTRO_JS_TARGET_ROOT_NAME = 'intro-js-%s' % INTRO_JS_REV
+
 BOOTSTRAP_REV = '3.1.1'
 BOOTSTRAP_ROOT_NAME = 'bootstrap-%s-dist' % BOOTSTRAP_REV
 BOOTSTRAP_ZIP_URL = (
@@ -274,6 +280,9 @@ download_and_unzip_files(
 download_and_unzip_files(
     UI_SORTABLE_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     UI_SORTABLE_ZIP_ROOT_NAME, UI_SORTABLE_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    INTRO_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    INTRO_JS_ZIP_ROOT_NAME, INTRO_JS_TARGET_ROOT_NAME)
 download_and_unzip_files(
     BOOTSTRAP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOOTSTRAP_ZIP_ROOT_NAME, BOOTSTRAP_TARGET_ROOT_NAME)

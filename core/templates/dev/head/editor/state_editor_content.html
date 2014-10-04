@@ -7,21 +7,24 @@
 {% block cls %}oppia-state-content{% endblock %}
 
 {% block center %}
-  <div ng-if="!contentMemento" class="oppia-content-section protractor-test-edit-content"
-       ng-click="openStateContentEditor()" ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
-    <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <h3>Content <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Content"></span></h3>
+  <div id="tutorialStateContent">
+    <div ng-if="!contentMemento" class="oppia-content-section protractor-test-edit-content"
+         ng-click="openStateContentEditor()"
+         ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <h3>Content <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Content"></span></h3>
+        </div>
       </div>
-    </div>
-    <div class="row">
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <div class="oppia-state-content-display well">
-          <span ng-show="content[0].value == ''" class="oppia-placeholder">
-            You can give context to the learner here, and ask a question -- then,
-            in the space below, choose a suitable way for the learner to respond.
-          </span>
-          <span angular-html-bind="content[0].value"></span>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="oppia-state-content-display well">
+            <span ng-show="content[0].value == ''" class="oppia-placeholder">
+              You can give context to the learner here, and ask a question -- then,
+              in the space below, choose a suitable way for the learner to respond.
+            </span>
+            <span angular-html-bind="content[0].value"></span>
+          </div>
         </div>
       </div>
     </div>

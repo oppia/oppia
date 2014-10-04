@@ -32,6 +32,9 @@
     </a>
     <ul class="dropdown-menu">
       <li class="dropdown">
+        <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
+      </li>
+      <li class="dropdown">
         <a href="https://code.google.com/p/oppia/wiki/CustomizingStates" target="_blank">
           How to Create An Exploration
         </a>
@@ -355,11 +358,11 @@
         </div>
       </div>
 
-      <div class="row" ng-if="!isInPreviewMode">
+      <div ng-if="!isInPreviewMode">
         <tabset>
           <tab heading="Main" active="getTabStatuses().main.active" select="selectMainTab()">
             <div class="row">
-              <div class="col-lg-9 col-md-9 col-sm-9" ng-controller="StateEditor">
+              <div class="col-lg-9 col-md-9 col-sm-9">
                 {% include 'editor/state_editor.html' %}
               </div>
               <div class="col-lg-3 col-md-3 col-sm-3">

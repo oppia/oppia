@@ -1,42 +1,46 @@
-<div class="row">
-  <div class="col-lg-2 col-md-2 col-sm-2">
-  </div>
+<div ng-controller="StateEditor">
+  <div class="row">
+    <div class="col-lg-2 col-md-2 col-sm-2">
+    </div>
 
-  <div class="col-lg-10 col-md-10 col-sm-10">
-    <div class="oppia-state-editor-header oppia-editable-section">
-      <div class="oppia-state-name-container">
-        <div ng-if="editabilityService.isEditable()">
-          <h4 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable-section">
-            <[stateName]>
-            <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Name"></span>
-          </h4>
+    <div class="col-lg-10 col-md-10 col-sm-10">
+      <div class="oppia-state-editor-header oppia-editable-section">
+        <div class="oppia-state-name-container">
+          <div ng-if="editabilityService.isEditable()">
+            <h4 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable-section">
+              <[stateName]>
+              <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Name"></span>
+            </h4>
 
-          <div ng-if="stateNameEditorIsShown">
-            <form class="form-horizontal" role="form" ng-submit="saveStateNameAndRefresh(tmpStateName)">
-              <input type="text" ng-model="tmpStateName" focus-on="stateNameEditorOpened">
-              <button type="submit" class="btn btn-default btn-sm">Done</button>
-            </form>
+            <div ng-if="stateNameEditorIsShown">
+              <form class="form-horizontal" role="form" ng-submit="saveStateNameAndRefresh(tmpStateName)">
+                <input type="text" ng-model="tmpStateName" focus-on="stateNameEditorOpened">
+                <button type="submit" class="btn btn-default btn-sm">Done</button>
+              </form>
+            </div>
           </div>
-        </div>
 
-        <div ng-if="!editabilityService.isEditable()">
-          <h4><[stateName]></h4>
+          <div ng-if="!editabilityService.isEditable()">
+            <h4><[stateName]></h4>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 
-<div class="oppia-state-editor-body">
-  <div class="oppia-editor" ng-show="!!stateName">
-    {% include 'editor/state_editor_parameters.html' %}
-    <div style="margin-bottom: -15px;">
-      {% include 'editor/state_editor_content.html' %}
+  <div class="oppia-state-editor-body">
+    <div class="oppia-editor" ng-show="!!stateName">
+      {% include 'editor/state_editor_parameters.html' %}
+      <div style="margin-bottom: -15px;">
+        {% include 'editor/state_editor_content.html' %}
+      </div>
+      <div ng-controller="StateInteraction">
+        {% include 'editor/state_editor_interaction.html' %}
+        <div id="tutorialStateRules">
+          {% include 'editor/state_editor_rules.html' %}
+        </div>
+      </div>
+      <div style="height: 100px;"></div>
     </div>
-    <div ng-controller="StateInteraction">
-      {% include 'editor/state_editor_interaction.html' %}
-      {% include 'editor/state_editor_rules.html' %}
-    </div>
-    <div style="height: 100px;"></div>
   </div>
 </div>

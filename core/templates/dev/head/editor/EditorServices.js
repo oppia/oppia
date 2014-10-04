@@ -131,9 +131,16 @@ oppia.factory('editorContextService', ['$log', function($log) {
 // the current active version? Previous versions should not be editable.
 oppia.factory('editabilityService', [function() {
   var isEditable = false;
+  var inTutorialMode = false;
   return {
+    onStartTutorial: function() {
+      inTutorialMode = true;
+    },
+    onEndTutorial: function() {
+      inTutorialMode = false;
+    },
     isEditable: function() {
-      return isEditable;
+      return isEditable && !inTutorialMode;
     },
     markEditable: function() {
       isEditable = true;
