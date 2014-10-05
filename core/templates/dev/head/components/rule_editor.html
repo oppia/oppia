@@ -15,7 +15,7 @@
           </div>
 
           <div class="container-fluid">
-            <div class="row oppia-readonly-rule-tile">
+            <div class="row oppia-readonly-rule-tile well well-sm">
               <div class="col-lg-8 col-md-8 col-sm-8" style="margin-left: -5px;">
                 <span>
                   <span ng-if="rule.description !== 'Default'">
@@ -72,7 +72,7 @@
           <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="onSelectNewRuleType()">
           </rule-type-selector>
 
-          <span ng-repeat="item in ruleDescriptionFragments track by $index">
+          <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group">
             <span ng-if="item.type == 'select'" style="color: black;">
               <select class="form-control" ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices)">
               </select>
