@@ -17,8 +17,10 @@
 import itertools
 import os
 import shutil
+import StringIO
 import tarfile
 import urllib
+import urllib2
 import zipfile
 
 import common
@@ -81,9 +83,23 @@ def download_and_unzip_files(
         common.ensure_directory_exists(target_parent_dir)
 
         urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as z:
-            z.extractall(target_parent_dir)
-        os.remove(TMP_UNZIP_PATH)
+
+        try:
+            with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as z:
+                z.extractall(target_parent_dir)
+            os.remove(TMP_UNZIP_PATH)
+        except:
+            if os.path.exists(TMP_UNZIP_PATH):
+                os.remove(TMP_UNZIP_PATH)
+
+            # Some downloads (like jqueryui-themes) may require a user-agent.
+            req = urllib2.Request(source_url)
+            req.add_header('User-agent', 'python')
+            # This is needed to get a seekable filestream that can be used
+            # by zipfile.ZipFile.
+            file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
+            with zipfile.ZipFile(file_stream, 'r') as z:
+                z.extractall(target_parent_dir)
 
         # Rename the target directory.
         os.rename(
