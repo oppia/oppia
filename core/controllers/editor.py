@@ -333,7 +333,8 @@ class ExplorationHandler(EditorHandler):
             raise self.PageNotFoundException
 
         version = self.request.get('v', default_value=None)
-        self.values.update(self._get_exploration_data(exploration_id, version))
+        self.values.update(
+            self._get_exploration_data(exploration_id, version=version))
         self.render_json(self.values)
 
     @require_editor
