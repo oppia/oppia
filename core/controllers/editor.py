@@ -283,10 +283,11 @@ class ExplorationHandler(EditorHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def _get_exploration_data(self, exploration_id):
+    def _get_exploration_data(self, exploration_id, version=None):
         """Returns a description of the given exploration."""
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(
+                exploration_id, version=version)
         except:
             raise self.PageNotFoundException
 
@@ -331,7 +332,8 @@ class ExplorationHandler(EditorHandler):
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
-        self.values.update(self._get_exploration_data(exploration_id))
+        version = self.request.get('v', default_value=None)
+        self.values.update(self._get_exploration_data(exploration_id, version))
         self.render_json(self.values)
 
     @require_editor

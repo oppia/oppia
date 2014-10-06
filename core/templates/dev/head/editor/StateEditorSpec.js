@@ -103,7 +103,7 @@ describe('State Editor controller', function() {
             }
           }]
         }
-      });      
+      });
 
       scope.refreshGraph = function() {
         return true;
@@ -128,7 +128,7 @@ describe('State Editor controller', function() {
           isEditable: function() {
             return true;
           }
-        }        
+        }
       });
     }));
 
