@@ -471,40 +471,6 @@ oppia.controller('ExplorationEditor', [
     });
   };
 
-  $scope.showRevertExplorationModal = function(version) {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/revertExploration',
-      backdrop: 'static',
-      resolve: {
-        version: function() {
-          return version;
-        }
-      },
-      controller: ['$scope', '$modalInstance', 'version',
-        function($scope, $modalInstance, version) {
-          $scope.version = version;
-
-          $scope.revert = function() {
-            $modalInstance.close(version);
-          };
-
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-            warningsData.clear();
-          };
-        }
-      ]
-    }).result.then(function(version) {
-      $http.post($scope.revertExplorationUrl, {
-        current_version: explorationData.data.version,
-        revert_to_version: version
-      }).success(function(response) {
-        location.reload();
-      });
-    });
-  };
-
   $scope.initializeNewActiveInput = function(newActiveInput) {
     // TODO(sll): Rework this so that in general it saves the current active
     // input, if any, first. If it is bad input, display a warning and cancel
@@ -567,7 +533,7 @@ oppia.controller('ExplorationEditor', [
         editorContextService.setActiveStateName(explorationInitStateNameService.displayed);
       }
 
-      if (!routerService.isLocationSetToNonStateEditorTab() && 
+      if (!routerService.isLocationSetToNonStateEditorTab() &&
           !data.states.hasOwnProperty(routerService.getCurrentStateFromLocationPath())) {
         routerService.navigateToMainTab();
       }

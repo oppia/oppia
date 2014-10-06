@@ -120,6 +120,14 @@
                             <a href="{{logout_url}}">Logout</a>
                           </li>
 
+                          {% if is_moderator %}
+                            <li>
+                              <a href="/moderator" target="_blank">
+                                Moderator Page
+                              </a>
+                            </li>
+                          {% endif %}
+
                           {% if is_super_admin %}
                             <li>
                               <a href="/admin" target="_blank">

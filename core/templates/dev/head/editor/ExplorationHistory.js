@@ -19,9 +19,9 @@
  */
 
 oppia.controller('ExplorationHistory', [
-    '$scope', '$http', '$location', '$anchorScroll', 'explorationData',
+    '$scope', '$http', '$location', '$anchorScroll', '$modal', 'explorationData',
     'versionsTreeService', function(
-    $scope, $http, $location, $anchorScroll, explorationData, versionsTreeService) {
+    $scope, $http, $location, $anchorScroll, $modal, explorationData, versionsTreeService) {
   $scope.explorationAllSnapshotsUrl = (
     '/createhandler/snapshots/' + explorationData.explorationId);
 
@@ -34,10 +34,6 @@ oppia.controller('ExplorationHistory', [
   var allExplorationSnapshots = null;
   var versionTreeParents = null;
 
-  $scope.getExplorationUrl = function(version) {
-    return '/explore/' + explorationData.explorationId + '?v=' + version;
-  };
-
   $scope.$on('refreshVersionHistory', function(evt, data) {
     if (data.forceRefresh || $scope.displayedExplorationSnapshots === null) {
       $scope.refreshVersionHistory();
@@ -46,30 +42,32 @@ oppia.controller('ExplorationHistory', [
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
-    var currentVersion = explorationData.data.version;
-    $scope.compareVersion = {};
-    $scope.compareSnapshot = {};
+    explorationData.getData().then(function(expData) {
+      var currentVersion = expData.version;
+      $scope.compareVersion = {};
+      $scope.compareSnapshot = {};
 
-    // Note: if initial strings are empty CodeMirror won't initialize correctly
-    $scope.yamlStrV1 = ' ';
-    $scope.yamlStrV2 = ' ';
+      // Note: if initial strings are empty CodeMirror won't initialize correctly
+      $scope.yamlStrV1 = ' ';
+      $scope.yamlStrV2 = ' ';
 
-    $scope.hideCodemirror = true;
-    $scope.hideCompareVersionsButton = false;
+      $scope.hideCodemirror = true;
+      $scope.hideCompareVersionsButton = false;
 
-    $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
-      allExplorationSnapshots = response.data.snapshots;
-      versionTreeParents = versionsTreeService.getVersionTree(allExplorationSnapshots);
+      $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
+        allExplorationSnapshots = response.data.snapshots;
+        versionTreeParents = versionsTreeService.getVersionTree(allExplorationSnapshots);
 
-      $scope.displayedExplorationSnapshots = [];
-      for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
-        $scope.displayedExplorationSnapshots.push({
-          'committerId': allExplorationSnapshots[i].committer_id,
-          'createdOn': allExplorationSnapshots[i].created_on,
-          'commitMessage': allExplorationSnapshots[i].commit_message,
-          'versionNumber': allExplorationSnapshots[i].version_number
-        });
-      }
+        $scope.displayedExplorationSnapshots = [];
+        for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
+          $scope.displayedExplorationSnapshots.push({
+            'committerId': allExplorationSnapshots[i].committer_id,
+            'createdOn': allExplorationSnapshots[i].created_on,
+            'commitMessage': allExplorationSnapshots[i].commit_message,
+            'versionNumber': allExplorationSnapshots[i].version_number
+          });
+        }
+      });
     });
   };
 
@@ -147,6 +145,43 @@ oppia.controller('ExplorationHistory', [
     readOnly: true,
     mode: 'yaml',
     viewportMargin: 20
+  };
+
+  $scope.showRevertExplorationModal = function(version) {
+    $modal.open({
+      templateUrl: 'modals/revertExploration',
+      backdrop: 'static',
+      resolve: {
+        version: function() {
+          return version;
+        }
+      },
+      controller: ['$scope', '$modalInstance', 'version', 'explorationData',
+        function($scope, $modalInstance, version, explorationData) {
+          $scope.version = version;
+
+          $scope.getExplorationUrl = function(version) {
+              return '/explore/' + explorationData.explorationId + '?v=' + version;
+          };
+
+          $scope.revert = function() {
+            $modalInstance.close(version);
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+            warningsData.clear();
+          };
+        }
+      ]
+    }).result.then(function(version) {
+      $http.post($scope.revertExplorationUrl, {
+        current_version: explorationData.data.version,
+        revert_to_version: version
+      }).success(function(response) {
+        location.reload();
+      });
+    });
   };
 }]);
 

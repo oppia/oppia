@@ -420,6 +420,17 @@ oppia.factory('oppiaPlayerService', [
         controller: _feedbackModalCtrl
       }).result.then(_feedbackModalCallback);
     },
+    openExplorationEditorPage: function() {
+      if (_editorPreviewMode) {
+        warningsData.addWarning(
+          'The \'Look Inside\' functionality is not available in preview mode. ' +
+          'In non-preview mode, it will open the exploration editor page in a ' +
+          'new tab.');
+        return;
+      }
+
+      window.open('/create/' + _explorationId, '_blank');
+    },
     // This should only be used in editor preview mode.
     populateExploration: function(exploration) {
       if (_editorPreviewMode) {

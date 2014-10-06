@@ -30,6 +30,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.showPage = !$scope.iframed;
       $scope.hasInteractedAtLeastOnce = false;
       $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
+      $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
 
       $window.addEventListener('beforeunload', function(e) {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
@@ -120,8 +121,13 @@ oppia.directive('conversationSkin', [function() {
 
           // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
           // and 'question', so that the aria-live attribute will read it out.
+          // Note that we have to explicitly check for the 'Continue' widget
+          // (which has no corresopnding learner response text), otherwise a
+          // thin sliver of blue will appear.
           $scope.responseLog.push({
-            previousReaderAnswer: readerResponseHtml + oppiaPlayerService.getRandomSuffix(),
+            previousReaderAnswer: (
+              readerResponseHtml.indexOf('oppia-response-continue') === -1 ?
+              readerResponseHtml + oppiaPlayerService.getRandomSuffix() : ''),
             feedback: feedbackHtml + oppiaPlayerService.getRandomSuffix(),
             question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : ''),
             isMostRecentQuestion: isQuestion
@@ -174,4 +180,4 @@ oppia.directive('conversationSkin', [function() {
       };
     }]
   };
-}]); 
+}]);

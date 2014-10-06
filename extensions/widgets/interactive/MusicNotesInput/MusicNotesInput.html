@@ -8,15 +8,13 @@
   <div class="oppia-music-input-control-buttons">
     <button type="button" class="btn btn-default" ng-click="submitAnswer(noteSequence)">Submit</button>
     <button type="button" class="btn btn-default" ng-click="clearSequence()">Clear Staff</button>
-    <button type="button" class="btn btn-default" ng-click="playSequenceToGuess()">Play Desired Sequence</button>
+    <button type="button" class="btn btn-default" ng-click="playSequenceToGuess()">Play Target Sequence</button>
     <button type="button" class="btn btn-default" ng-click="playCurrentSequence()">Play Current Sequence</button>
   </div>
 </script>
 
 <script type="text/ng-template" id="response/MusicNotesInput">
-  <div class="oppia-reader-response-container">
-    <span class="oppia-reader-response">
-      <[displayedAnswer]>
-    </span>
+  <div>
+    <[displayedAnswer]>
   </div>
 </script>

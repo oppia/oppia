@@ -20,22 +20,20 @@
     <button type="button" class="btn btn-default" ng-click="submitAnswer(answer)">
       Submit
     </button>
-  </div>  
+  </div>
 </script>
 
 <script type="text/ng-template" id="response/SetInput">
-  <div class="oppia-reader-response-container">
-    <span class="oppia-reader-response">
-      <span ng-if="answer.length === 0">
-        No answer given.
-      </span>
-      <span ng-if="answer.length > 0">
-        <ul style="padding-left: 40px">
-          <li ng-repeat="item in answer">
-            <[item]>
-          </li>
-        </ul>
-      </span>
+  <div>
+    <span ng-if="answer.length === 0">
+      No answer given.
+    </span>
+    <span ng-if="answer.length > 0">
+      <ul style="padding-left: 40px">
+        <li ng-repeat="item in answer">
+          <[item]>
+        </li>
+      </ul>
     </span>
   </div>
 </script>

@@ -12,7 +12,7 @@
         <span class="glyphicon glyphicon-envelope"></span>
         Feedback
       </button>
-      <a class="btn btn-default" ng-href="/create/<[explorationId]>" style="text-align: left;" target="_blank">
+      <a class="btn btn-default" ng-click="openExplorationEditorPage()" style="text-align: left;" target="_blank">
         <span class="glyphicon glyphicon-cog"></span>
         Look Inside
       </a>
@@ -29,9 +29,10 @@
              aria-live="<[$last ? 'polite' : 'off']>"
              aria-atomic="true">
 
-          <div class="conversation-skin-conversation-log"
-               angular-html-bind="response.previousReaderAnswer">
+          <div ng-if="response.previousReaderAnswer" class="conversation-skin-learner-answer"
+              angular-html-bind="response.previousReaderAnswer">
           </div>
+
           <div class="conversation-skin-conversation-log protractor-test-conversation-feedback"
                angular-html-bind="response.feedback">
           </div>

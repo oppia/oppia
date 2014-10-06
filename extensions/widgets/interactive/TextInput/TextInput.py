@@ -33,7 +33,8 @@ class TextInput(widget_domain.BaseWidget):
         'default_value': 'Type your answer here.'
     }, {
         'name': 'rows',
-        'description': 'The number of rows for the text input field.',
+        'description': (
+            'How long the learner\'s answer is expected to be (in rows).'),
         'schema': {
             'type': 'int',
             'validators': [{
