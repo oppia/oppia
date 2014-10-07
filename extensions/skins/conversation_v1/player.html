@@ -33,13 +33,17 @@
               angular-html-bind="response.previousReaderAnswer">
           </div>
 
-          <div class="conversation-skin-conversation-log protractor-test-conversation-feedback"
-               angular-html-bind="response.feedback">
+          <div class="conversation-skin-oppia-feedback protractor-test-conversation-feedback"
+               ng-class="{'conversation-skin-old-content': !$last}">
+            <div angular-html-bind="response.feedback">
+            </div>
           </div>
 
           <div ng-if="response.question">
             <div class="conversation-skin-response well protractor-test-conversation-content"
-                 angular-html-bind="response.question">
+                 ng-class="{'conversation-skin-old-content': $index !== mostRecentQuestionIndex}">
+              <div angular-html-bind="response.question">
+              </div>
             </div>
           </div>
         </div>

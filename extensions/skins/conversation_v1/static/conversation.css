@@ -15,25 +15,19 @@
 */
 
 /* Additional CSS for the conversation_v1 skin. */
-@media (max-width: 500px) {
-  .conversation-skin-feedback-button {
-    display: none;
-  }
-}
-
 .conversation-skin-exploration-header {
   padding-left: 7px;
-}
-.conversation-skin-exploration-header-sublink {
-  padding-top: 5px;
 }
 
 .conversation-skin-iframe-container {
   -webkit-overflow-scrolling: touch;
 }
 
-.conversation-skin-conversation-log {
+.conversation-skin-oppia-feedback {
   margin-top: 30px;
+}
+
+.conversation-skin-old-content {
   opacity: 0.7;
 }
 
@@ -42,6 +36,7 @@
   border-radius: 6px;
   font-style: italic;
   margin: 35px 0;
+  opacity: 0.7;
   padding: 5px 20px;
 }
 

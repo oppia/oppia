@@ -62,6 +62,7 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.isLoggedIn = false;
+      $scope.mostRecentQuestionIndex = null;
 
       $scope.initializePage = function() {
         $scope.responseLog = [];
@@ -73,16 +74,18 @@ oppia.directive('conversationSkin', [function() {
 
           $scope.finished = data.finished;
           $scope.stateName = data.state_name;
-          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml($scope.stateName);
+          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
+            $scope.stateName);
 
           $scope.responseLog = [{
             previousReaderAnswer: '',
             feedback: '',
             question: data.init_html,
-            isMostRecentQuestion: true
           }];
+          $scope.mostRecentQuestionIndex = 0;
 
-          messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
+          messengerService.sendMessage(
+            messengerService.EXPLORATION_LOADED, null);
           $scope.showPage = true;
           $scope.adjustPageHeight(false, null);
 
@@ -107,16 +110,11 @@ oppia.directive('conversationSkin', [function() {
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }
 
-          $scope.responseLog = $scope.responseLog || [];
-
           // TODO(sll): Check the state change instead of question_html so that it
           // works correctly when the new state doesn't have a question string.
           var isQuestion = !!questionHtml;
           if (isQuestion) {
-            // Clean up the previous isMostRecentQuestion marker.
-            $scope.responseLog.forEach(function(log) {
-              log.isMostRecentQuestion = false;
-            });
+            $scope.mostRecentQuestionIndex = $scope.responseLog.length;
           }
 
           // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
@@ -129,8 +127,7 @@ oppia.directive('conversationSkin', [function() {
               readerResponseHtml.indexOf('oppia-response-continue') === -1 ?
               readerResponseHtml + oppiaPlayerService.getRandomSuffix() : ''),
             feedback: feedbackHtml + oppiaPlayerService.getRandomSuffix(),
-            question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : ''),
-            isMostRecentQuestion: isQuestion
+            question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : '')
           });
 
           var lastEntryEls = document.getElementsByClassName(

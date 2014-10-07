@@ -63,7 +63,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, TEXT_INPUT_ID)
         self.assertEqual(widget.id, TEXT_INPUT_ID)
-        self.assertEqual(widget.name, 'Text input')
+        self.assertEqual(widget.name, 'Text')
 
         self.assertIn('id="interactiveWidget/TextInput"', widget.html_body)
         self.assertIn('id="response/TextInput"', widget.html_body)
