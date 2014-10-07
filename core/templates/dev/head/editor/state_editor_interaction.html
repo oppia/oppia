@@ -15,8 +15,8 @@
   <div id="tutorialStateInteraction">
     <div ng-if="hasLoaded">
       <div ng-if="!interactiveWidgetEditorIsShown"
-           class="oppia-interactive-section protractor-test-edit-interaction"
-           ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
+           class="protractor-test-edit-interaction"
+           ng-class="{'oppia-editable-section oppia-interactive-section': editabilityService.isEditable()}"
            ng-disabled="!hasLoaded">
 
         <!-- We use a transparent div overlay here so that buttons within the widget
@@ -26,7 +26,7 @@
 
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <h3>Interaction <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Interaction"></span></h3>
+            <h3>Interaction <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Interaction"></span></h3>
           </div>
         </div>
         <div class="row">

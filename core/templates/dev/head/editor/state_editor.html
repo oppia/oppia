@@ -4,12 +4,12 @@
     </div>
 
     <div class="col-lg-10 col-md-10 col-sm-10">
-      <div class="oppia-state-editor-header oppia-editable-section">
+      <div class="oppia-state-editor-header" ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
         <div class="oppia-state-name-container">
           <div ng-if="editabilityService.isEditable()">
             <h4 ng-if="!stateNameEditorIsShown" ng-click="openStateNameEditor()" class="oppia-editable-section">
               <[stateName]>
-              <span class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Name"></span>
+              <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Name"></span>
             </h4>
 
             <div ng-if="stateNameEditorIsShown">

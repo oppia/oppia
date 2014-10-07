@@ -670,6 +670,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-state-content-display {
   background: rgba(0, 0, 0, 0.04);
   border-radius: 6px;
+}
+
+.oppia-prevent-selection {
   -moz-user-select: none;
   -ms-user-select: none;
   -webkit-user-select: none;
@@ -719,10 +722,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 .oppia-editor-pencil {
   font-size: 16px;
-  display: none;
+  opacity: 0.4;
 }
 .oppia-editable-section:hover .oppia-editor-pencil {
-  display: inline;
+  opacity: 1.0;
 }
 
 .oppia-interactive-hint {
@@ -954,4 +957,8 @@ oppia-parameter {
   text-align: center;
   vertical-align: baseline;
   white-space: nowrap;
+}
+
+.oppia-tutorial-tooltip {
+  min-width: 300px !important;
 }

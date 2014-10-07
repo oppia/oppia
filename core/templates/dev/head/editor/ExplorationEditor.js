@@ -626,11 +626,14 @@ oppia.controller('ExplorationEditor', [
   // Constants and methods relating to the state editor tutorial.
   $scope.EDITOR_TUTORIAL_OPTIONS = {
     disableInteraction: true,
+    doneLabel: 'Let\'s go!',
     exitOnEsc: true,
     exitOnOverlayClick: true,
     keyboardNavigation: true,
     scrollToElement: true,
+    showStepNumbers: false,
     skipLabel: 'Exit',
+    tooltipClass: 'oppia-tutorial-tooltip',
     steps: [{
       intro: (
         'Welcome to the Oppia editor tutorial!<br><br>' +
@@ -682,9 +685,7 @@ oppia.controller('ExplorationEditor', [
     }]
   };
 
-  $scope.startTutorial = function() {
-    routerService.navigateToMainTab();
-
+  $scope._actuallyStartTutorial = function() {
     var intro = introJs();
     intro.setOptions($scope.EDITOR_TUTORIAL_OPTIONS);
     intro.onexit(function() {
@@ -698,6 +699,18 @@ oppia.controller('ExplorationEditor', [
 
     editabilityService.onStartTutorial();
     intro.start();
+  };
+
+  $scope.startTutorial = function() {
+    if ($scope.isInPreviewMode) {
+      $scope.exitPreviewMode();
+      $timeout(function() {
+        $scope._actuallyStartTutorial();
+      });
+    } else {
+      routerService.navigateToMainTab();
+      $scope._actuallyStartTutorial();
+    }
   };
 
   $scope.$on('openEditorTutorial', $scope.startTutorial);

@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License. 
+// limitations under the License.
 
 /**
  * @fileoverview End-to-end tests of the publication and release process, and
@@ -26,7 +26,7 @@ var player = require('../protractor_utils/player.js');
 var gallery = require('../protractor_utils/gallery.js');
 
 describe('Gallery view', function() {
-  it('should display private, published and released explorations', function() {
+  iit('should display private, published and released explorations', function() {
     users.createModerator('varda@example.com', 'Varda');
     users.createUser('feanor@exmple.com', 'Feanor');
     users.createUser('celebrimbor@example.com', 'Celebrimbor');
@@ -45,10 +45,7 @@ describe('Gallery view', function() {
     users.login('varda@example.com');
     browser.get('/gallery');
     gallery.tickCheckbox('status', 'Beta');
-    // TODO (Jacob) move directly to editor when issue 373 is fixed.
-    gallery.playExploration('Vingilot');
-    player.answerContinueWidget();
-    general.moveToEditor();
+    gallery.editExploration('Vingilot');
     // Moderators can edit and release explorations.
     editor.setLanguage('français');
     editor.saveChanges('change language');
