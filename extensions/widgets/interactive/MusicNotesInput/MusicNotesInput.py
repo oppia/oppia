@@ -5,7 +5,7 @@ class MusicNotesInput(widget_domain.BaseWidget):
     """Interactive widget for music note input."""
 
     # The human-readable name of the widget.
-    name = 'Music Notes Input'
+    name = 'Music Notes'
 
     # The category the widget falls under in the widget repository.
     category = 'Custom'

@@ -236,7 +236,7 @@
         </schema-based-editor>
       </td>
       <td ng-if="!len">
-        <button class="btn btn-default btn-xs" type="button" ng-click="deleteElement($index)"
+        <button class="btn btn-default btn-xs oppia-small-delete-button" type="button" ng-click="deleteElement($index)"
                 ng-disabled="disabled()">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>
@@ -247,7 +247,7 @@
 
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
   <button ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
-          type="button" class="btn btn-default btn-xs" ng-click="addElement()"
+          type="button" class="btn btn-default btn-sm" ng-click="addElement()"
           ng-disabled="disabled()" style="margin-left: 8px;">
     <[addElementText]>
   </button>

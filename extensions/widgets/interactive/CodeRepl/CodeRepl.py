@@ -5,7 +5,7 @@ class CodeRepl(widget_domain.BaseWidget):
     """Interactive widget that allows programs to be input."""
 
     # The human-readable name of the widget.
-    name = 'Code input'
+    name = 'Code'
 
     # The category the widget falls under in the widget repository.
     category = 'Custom'

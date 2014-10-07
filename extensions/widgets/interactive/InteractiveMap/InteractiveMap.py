@@ -6,7 +6,7 @@ class InteractiveMap(widget_domain.BaseWidget):
     """Interactive widget for pinpointing a location on a map."""
 
     # The human-readable name of the widget.
-    name = 'Interactive map'
+    name = 'World Map'
 
     # The category the widget falls under in the widget repository.
     category = 'Custom'

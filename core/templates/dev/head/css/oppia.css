@@ -725,10 +725,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-editable-section {
   cursor: pointer;
 }
+
 .oppia-editor-pencil {
   font-size: 16px;
   opacity: 0.4;
 }
+
 .oppia-editable-section:hover .oppia-editor-pencil {
   opacity: 1.0;
 }
@@ -796,7 +798,29 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-add-rule-button {
   margin-top: -10px;
   margin-bottom: 10px;
-  padding: 0 37px;
+  padding: 5px 40px;
+}
+
+.oppia-small-delete-button {
+  padding-top: 3px;
+}
+
+.oppia-map-expand-button {
+  margin-right: 2px;
+  margin-top: 1px;
+  padding: 9px 10px 6px 10px;
+  position: absolute; 
+  right: 15px;
+}
+
+.oppia-exploration-warnings-box {
+  cursor: pointer;
+  margin-bottom: 2px; 
+  opacity: 1; 
+  padding: 2px 5px; 
+  position: absolute;
+  right: 15px;
+  z-index: 5;
 }
 
 .oppia-readonly-rule-container {
@@ -814,6 +838,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-rule-editable-view {
   padding-bottom: 20px;
+}
+
+.oppia-rule-header {
+  margin-bottom: 10px !important;
 }
 
 .oppia-rule-dest-link {
