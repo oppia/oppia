@@ -5,8 +5,7 @@
     <div class="oppia-interactive-section-click-handler" ng-click="openRuleEditor()">
     </div>
 
-    <!-- NOTE: Pencil is currently not appearing for rules -->
-    <h3 class="oppia-rule-header" ng-if="heading"><[heading]> <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Rule"></span></h3>
+    <h3 style="margin-bottom: 10px;" ng-if="heading"><[heading]> <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Rule"></span></h3>
     <div>
       <div class="row oppia-readonly-rule-container">
         <div class="col-lg-12 col-md-12 col-sm-12">

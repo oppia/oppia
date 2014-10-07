@@ -696,7 +696,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-widget-selector {
-  bottom: -25px;
+  bottom: -24px;
   right: 15px;
   position: absolute;
   /* This must be larger than the z-index in
@@ -805,7 +805,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding-top: 3px;
 }
 
-.oppia-map-expand-button {
+.oppia-graph-resize-button {
   margin-right: 2px;
   margin-top: 1px;
   padding: 9px 10px 6px 10px;
@@ -838,10 +838,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-rule-editable-view {
   padding-bottom: 20px;
-}
-
-.oppia-rule-header {
-  margin-bottom: 10px !important;
 }
 
 .oppia-rule-dest-link {
