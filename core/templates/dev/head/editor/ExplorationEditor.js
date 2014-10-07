@@ -647,9 +647,10 @@ oppia.controller('ExplorationEditor', [
         'The <b>Content</b> section is where you type what you want to tell the ' +
         'learner. <br><br>' +
         '<em>Example:</em><br>' +
-        '<em>Jane bought a new alarm clock with a 12-hour display. It now shows ' +
-        '12:45pm and she wants to leave the house for lunch in half an hour. <br><br>' +
-        'What time should she set the alarm to?</em>.')
+        '<em>Introduce the problem and ask a question: "Jane bought a new alarm clock with ' +
+        'a 12-hour display. It now shows 12:45 and she wants to leave the ' +
+        'house for lunch in half an hour. <br><br>' +
+        'What time should she set the alarm to?"</em>')
     }, {
       element: '#tutorialStateInteraction',
       position: 'top',
@@ -657,7 +658,7 @@ oppia.controller('ExplorationEditor', [
         'The <b>Interaction</b> section allows you to choose how the learner ' +
         'responds. You can edit details of the interaction by clicking on it. <br><br>' +
         '<em>Example:</em><br>' +
-        '<em>Select a \'text\' input and set the placeholder text to \'Type the time here\'.')
+        '<em>Select a \'text\' input and set the placeholder text to \'Type the time here\'.</em>')
     }, {
       element: '#tutorialStateRules',
       position: 'top',
@@ -665,8 +666,8 @@ oppia.controller('ExplorationEditor', [
         'The <b>Rules</b> section allows you to choose what you want to do next ' +
         'based on the learner\'s response.<br><br>' +
         '<em>Example:</em><br>' +
-        '<em>If the learner types \'1:15\', send them to a new state that ' +    
-        'congratulates them on solving the problem and poses a follow-up question.<br><br>' +    
+        '<em>If the learner types \'1:15\', send them to a new state that ' +
+        'congratulates them on solving the problem and poses a follow-up question.<br><br>' +
         'If the learner types \'13:15\', say: ' +
         '"Remember, there is no \'13\' on a 12-hour clock. Try again?"</em>')
     }, {
