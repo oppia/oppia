@@ -1016,6 +1016,12 @@ oppia.directive('schemaBasedIntEditor', [function() {
         $scope.localValue = 0;
       }
 
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedIntForm');
+        }
+      };
+
       if ($scope.allowExpressions()) {
         $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
         $scope.expressionMode = angular.isString($scope.localValue);
@@ -1061,6 +1067,12 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           }
         }
       }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedFloatForm');
+        }
+      };
 
       if ($scope.localValue === undefined) {
         $scope.localValue = 0.0;
@@ -1139,6 +1151,12 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
           }, 200);
         });
       }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedUnicodeForm');
+        }
+      };
 
       $scope.getPlaceholder = function() {
         if (!$scope.uiConfig()) {
@@ -1251,6 +1269,18 @@ oppia.directive('schemaBasedListEditor', [
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
         };
+
+        $scope._onChildFormSubmit = function(evt) {
+          if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
+              !!$scope.localValue[$scope.localValue.length - 1]) {
+            $scope.addElement();
+          }
+          evt.stopPropagation();
+        };
+
+        $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
+        $scope.$on('submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
+        $scope.$on('submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
 
         $scope.deleteElement = function(index) {
           $scope.localValue.splice(index, 1);

@@ -62,7 +62,7 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/choices">
-  <select class="form-control" ng-model="$parent.$parent.localValue" 
+  <select class="form-control" ng-model="$parent.$parent.localValue"
           ng-options="choice as choice for choice in choices()" required
           ng-disabled="disabled()">
   </select>
@@ -112,6 +112,7 @@
       <schema-based-expression-editor ng-if="expressionMode" disabled="disabled()"
                                       local-value="$parent.$parent.localValue"
                                       param-names="paramNames" output-type="int"
+                                      ng-keypress="onKeypress($event)"
                                       label-for-focus-target="labelForFocusTarget()">
       </schema-based-expression-editor>
       <span class="input-group-btn">
@@ -130,7 +131,7 @@
       <span ng-if="!expressionMode">
         <input type="text" name="floatValue" ng-model="$parent.localValue" class="form-control"
                require-is-float apply-validation="validators()" ng-disabled="disabled()"
-               focus-on="<[labelForFocusTarget()]>">
+               focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)">
       </span>
 
       <span ng-if="allowExpressions()">
@@ -176,12 +177,15 @@
            ng-model="$parent.$parent.localValue"
            placeholder="<[getPlaceholder()]>"
            ng-disabled="disabled()"
+           ng-keypress="onKeypress($event)"
            class="form-control" focus-on="<[labelForFocusTarget()]>">
 
-    <div ng-if="getCodingMode()" ui-codemirror
-         ng-model="$parent.$parent.localValue"
-         ui-codemirror-opts="codemirrorOptions"
-         ui-refresh="codemirrorStatus" style="border: 1px solid black;">
+    <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
+      <div ui-codemirror
+           ng-model="$parent.$parent.localValue"
+           ui-codemirror-opts="codemirrorOptions"
+           ui-refresh="codemirrorStatus">
+      </div>
     </div>
   </span>
 
@@ -230,7 +234,7 @@
   <table class="table">
     <tr ng-repeat="item in localValue track by $index">
       <td>
-        <schema-based-editor schema="itemSchema()" disabled="disabled()" local-value="localValue[$index]" 
+        <schema-based-editor schema="itemSchema()" disabled="disabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
                              label-for-focus-target="getFocusLabel($index)">
         </schema-based-editor>

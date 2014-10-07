@@ -60,11 +60,11 @@ var _selectWidget = function(widgetName) {
 };
 
 var selectNumericWidget = function() {
-  _selectWidget('Numeric input');
+  _selectWidget('Numeric');
 };
 
 var selectContinueWidget = function(buttonText) {
-  _selectWidget('Continue');
+  _selectWidget('Continue Button');
 
   _openWidgetEditor();
   if (buttonText) {
@@ -76,7 +76,7 @@ var selectContinueWidget = function(buttonText) {
 
 // textArray should be a non-empty array of strings (to be the options)
 var selectSimpleMultipleChoiceWidget = function(textArray) {
-  _selectWidget('Multiple choice input');
+  _selectWidget('Multiple Choice');
 
   _openWidgetEditor();
   var customizer = forms.editList(
@@ -154,7 +154,7 @@ var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
         )).click();
       } else {
         throw Error(
-          'Unknown type ' + parameterArray[i].type + 
+          'Unknown type ' + parameterArray[i].type +
           ' sent to editor._editRuleType');
       }
     }

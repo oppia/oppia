@@ -26,7 +26,7 @@ var player = require('../protractor_utils/player.js');
 var gallery = require('../protractor_utils/gallery.js');
 
 describe('Gallery view', function() {
-  iit('should display private, published and released explorations', function() {
+  it('should display private, published and released explorations', function() {
     users.createModerator('varda@example.com', 'Varda');
     users.createUser('feanor@exmple.com', 'Feanor');
     users.createUser('celebrimbor@example.com', 'Celebrimbor');
