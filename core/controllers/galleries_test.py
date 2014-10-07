@@ -65,8 +65,10 @@ class GalleryPageTest(test_utils.GenericTestBase):
             self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
             self.assertEqual(self.count_jobs_in_taskqueue(), 0)
-            # need to stop computation here, otherwise cannot start new
-            # computation below. todo: undertand this better
+            # need to stop computation here manually because computation is never
+            # really stopped otherwise (ModifiedExpSummariesAggregator overwrites
+            # _kickoff_batch_job_after_previous_one_ends with pass, so no new 
+            # computation is started, but the computation is not properly stopped).
             exp_jobs_test.ModifiedExpSummariesAggregator.stop_computation(owner_id)
 
             response_dict = self.get_json(feconf.GALLERY_DATA_URL)

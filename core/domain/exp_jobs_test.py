@@ -185,13 +185,13 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
 
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
-                last_updated = None
+                exploration_model_last_updated = None
                 if exploration.last_updated:
-                    last_updated = exploration.last_updated
+                    exploration_model_last_updated = exploration.last_updated
 
-                created_on = None
+                exploration_model_created_on = None
                 if exploration.created_on:
-                    created_on = exploration.created_on
+                    exploration_model_created_on = exploration.created_on
 
                 # manually create the expectated summary specifying title, 
                 # category, etc
@@ -208,8 +208,8 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
                     exp_rights_model.editor_ids,
                     exp_rights_model.viewer_ids,
                     exploration.version,
-                    created_on=created_on,
-                    last_updated=last_updated)
+                    exploration_model_created_on,
+                    exploration_model_last_updated)
 
                 # calling constructor for fields that are not required
                 # and have no default value does not work b/c
@@ -243,10 +243,16 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
             # check job output
             self.assertEqual(actual_job_output.keys(),
                              expected_job_output.keys())
-            for key in actual_job_output.keys():
-                self.assertEqual(True,
-                                 actual_job_output[key].is_equal_to(
-                                     expected_job_output[key]))
+            simple_props = ['id', 'title', 'category', 'objective',
+                            'language_code','skill_tags', 'status',
+                            'community_owned', 'owner_ids',
+                            'editor_ids', 'viewer_ids', 'version',
+                            'exploration_model_created_on',
+                            'exploration_model_last_updated']
+            for exp_id in actual_job_output.keys():
+                for prop in simple_props:
+                    self.assertEqual(getattr(actual_job_output[exp_id], prop),
+                                     getattr(expected_job_output[exp_id], prop))
 
 
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):

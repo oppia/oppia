@@ -82,7 +82,8 @@ def get_exploration_summary_from_model(exp_summary_model):
         exp_summary_model.status, exp_summary_model.community_owned,
         exp_summary_model.owner_ids, exp_summary_model.editor_ids,
         exp_summary_model.viewer_ids, exp_summary_model.version,
-        exp_summary_model.created_on, exp_summary_model.last_updated)
+        exp_summary_model.exploration_model_created_on,
+        exp_summary_model.exploration_model_last_updated)
 
 
 def get_exploration_by_id(exploration_id, strict=True, version=None):
@@ -104,6 +105,18 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
             return exploration
         else:
             return None
+
+
+def get_exploration_summary_by_id(exploration_id):
+    """Returns a domain object representing an exploration summary."""
+    # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration_id)
+    if exp_summary_model:
+        exp_summary = get_exploration_summary_from_model(exp_summary_model)
+        return exp_summary
+    else:
+        return None
 
 
 def get_multiple_explorations_by_id(exp_ids, strict=True):
@@ -296,6 +309,14 @@ def get_private_at_least_viewable_exploration_summaries(user_id):
     at least viewable by given user. The dict is keyed by exploration id.""" 
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_private_at_least_viewable(
+            user_id=user_id))
+
+
+def get_at_least_editable_exploration_summaries(user_id):
+    """Returns a dict with all exploration summary domain objects that are
+    at least editable by given user. The dict is keyed by exploration id.""" 
+    return _get_exploration_summary_dicts_from_models(
+        exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id))
 
 
@@ -702,8 +723,8 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     search_services.delete_documents_from_index([exploration_id],
                                                 SEARCH_INDEX_EXPLORATIONS)
 
-    # delete summary of changed exploration
-    delete_exploration_summary(exploration_id)
+    # delete summary of exploration
+    delete_exploration_summary(exploration_id, force_deletion=force_deletion)
 
 
 # Operations on exploration snapshots.
@@ -816,13 +837,13 @@ def get_summary_of_exploration(exploration):
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
 
-    last_updated = None
+    exploration_model_last_updated = None
     if exploration.last_updated:
-        last_updated = exploration.last_updated
+        exploration_model_last_updated = exploration.last_updated
 
-    created_on = None
+    exploration_model_created_on = None
     if exploration.created_on:
-        created_on = exploration.created_on
+        exploration_model_created_on = exploration.created_on
 
     exp_summary = exp_domain.ExplorationSummary(
         exploration.id,
@@ -837,8 +858,8 @@ def get_summary_of_exploration(exploration):
         exp_rights.editor_ids,
         exp_rights.viewer_ids,
         exploration.version,
-        created_on=created_on,
-        last_updated=last_updated
+        exploration_model_created_on,
+        exploration_model_last_updated
     )
 
     return exp_summary
@@ -861,15 +882,19 @@ def _save_exploration_summary(exp_summary):
         editor_ids=exp_summary.editor_ids,
         viewer_ids=exp_summary.viewer_ids,
         version=exp_summary.version,
-        last_updated=exp_summary.last_updated,
-        created_on=exp_summary.created_on
+        exploration_model_last_updated=(
+            exp_summary.exploration_model_last_updated),
+        exploration_model_created_on=(
+            exp_summary.exploration_model_created_on)
     )
 
     exp_summary_model.put()
 
 
-def delete_exploration_summary(exploration_id):
-    exp_models.ExpSummaryModel.get(exploration_id).delete()
+def delete_exploration_summary(exploration_id, force_deletion=False):
+    """Delete an exploration summary model."""
+
+    exp_models.ExpSummaryModel.get(exploration_id).delete_summary()
 
 
 def revert_exploration(

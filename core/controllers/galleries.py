@@ -109,7 +109,7 @@ class GalleryHandler(base.BaseHandler):
             'language': language_codes_to_short_descs.get(
                 exp_summary.language_code, exp_summary.language_code),
             'last_updated': utils.get_time_in_millisecs(
-                exp_summary.last_updated),
+                exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
             'community_owned': exp_summary.community_owned,
             'is_editable': exp_services.exp_summary_is_editable(

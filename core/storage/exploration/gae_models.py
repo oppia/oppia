@@ -395,8 +395,14 @@ class ExpSummaryModel(base_models.BaseModel):
     # Skill tags associated with this exploration.
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
 
-    last_updated = ndb.DateTimeProperty(indexed=True)
-    created_on = ndb.DateTimeProperty(indexed=True)
+    # Time when the exploration model was last updated (not to be
+    # confused with last_updated, which is the time when the
+    # exploration *summary* model was last updated)
+    exploration_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    # Time when the exploration model was created (not to be confused
+    # with created_on, which is the time when the exploration *summary*
+    # model was created)
+    exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
 
     # The publication status of this exploration.
     status = ndb.StringProperty(
@@ -420,8 +426,6 @@ class ExpSummaryModel(base_models.BaseModel):
     # The version number of the exploration after this commit. Only populated
     # for commits to an exploration (as opposed to its rights, etc.)
     version = ndb.IntegerProperty()
-
-    # TODO(msl): below, only keep methods that are really used, omit others.
 
     @classmethod
     def get_public(cls):
@@ -475,6 +479,22 @@ class ExpSummaryModel(base_models.BaseModel):
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
 
     @classmethod
+    def get_at_least_editable(cls, user_id):
+        """Returns an iterable with exp summaries that are at least 
+        editable by the given user.
+        """
+        return ExpSummaryModel.query().filter(
+            ndb.OR(ExpSummaryModel.owner_ids == user_id,
+                   ExpSummaryModel.editor_ids == user_id)
+        ).filter(
+            ExpSummaryModel.deleted == False
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
         return cls.get_all().count()
+
+    def delete_summary(self):
+        """Deletes the summary of an exploration."""
+        super(base_models.BaseModel, self).key.delete()

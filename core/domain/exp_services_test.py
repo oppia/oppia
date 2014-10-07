@@ -198,7 +198,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         with self.assertRaises(Exception):
             exp_services.get_multiple_explorations_by_id(exp_ids + ['doesnt_exist'])
 
-
     def test_soft_deletion_of_explorations(self):
         """Test that soft deletion of explorations works correctly."""
         # TODO(sll): Add tests for deletion of states and version snapshots.
@@ -214,11 +213,45 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.get_at_least_editable_summary_dict(self.OWNER_ID),
             {})
 
+        self.assertEqual(
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID),
+            {})
+
         # But the models still exist in the backend.
         self.assertIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExplorationModel.get_all(
                 include_deleted_entities=True)]
+        )
+
+        # The exploration summary is deleted however
+        self.assertNotIn(
+            self.EXP_ID,
+            [exp.id for exp in exp_models.ExpSummaryModel.get_all()]
+        )
+
+    def test_summaries_of_soft_deleted_explorations(self):
+        """Test that exploration summaries are deleted correctly if
+        explorations are deleted the soft way."""
+        # TODO(sll): Add tests for deletion of states and version snapshots.
+
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+
+        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
+        with self.assertRaises(Exception):
+            exp_services.get_exploration_by_id(self.EXP_ID)
+
+        # The deleted exploration does not show up in any queries.
+        self.assertEqual(
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID),
+            {})
+
+        # The exploration summary model is deleted as well.
+        self.assertNotIn(
+            self.EXP_ID,
+            [exp.id for exp in exp_models.ExpSummaryModel.get_all()]
         )
 
     def test_hard_deletion_of_explorations(self):
@@ -242,6 +275,28 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 include_deleted_entities=True)]
         )
 
+    def test_summaries_of_hard_deleted_explorations(self):
+        """Test that summaries of hard deleted explorations are
+        correctly deleted."""
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+
+        exp_services.delete_exploration(
+            self.OWNER_ID, self.EXP_ID, force_deletion=True)
+        with self.assertRaises(Exception):
+            exp_services.get_exploration_by_id(self.EXP_ID)
+
+        # The deleted exploration summary does not show up in any queries.
+        self.assertEqual(
+            exp_services.get_at_least_editable_exploration_summaries(self.OWNER_ID),
+            {})
+
+        # The exploration summary model has been purged from the backend.
+        self.assertNotIn(
+            self.EXP_ID,
+            [exp.id for exp in exp_models.ExpSummaryModel.get_all(
+                include_deleted_entities=True)]
+        )
+
     def test_explorations_are_removed_from_index_when_deleted(self):
         """Tests that explorations are removed from the search index when deleted."""
 
@@ -256,7 +311,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         with delete_docs_swap:
             exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
-
 
 
     def test_create_new_exploration_error_cases(self):
@@ -284,6 +338,19 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
+
+    def test_save_and_retrieve_exploration_summary(self):
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
+        exploration.param_specs = {
+            'theParameter': param_domain.ParamSpec('Int')}
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+
+        retrieved_exp_summary = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID)
+
+        self.assertEqual(retrieved_exp_summary.title, 'A title')
+        self.assertEqual(retrieved_exp_summary.category, 'A category')
 
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
@@ -1762,3 +1829,248 @@ class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
 
         self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID,
                                         self.EXP_ID, self.EXP_ID])
+
+
+class ExplorationSummaryTests(ExplorationServicesUnitTests):
+    """Test exploration summaries."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    BOB_NAME = 'bob'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+    def test_exp_summary_is_editable(self):
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+
+        # Check that only the owner may edit.
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertTrue(exp_services.exp_summary_is_editable(
+            exp_summary, user_id=self.OWNER_ID))
+        self.assertFalse(exp_services.exp_summary_is_editable(
+            exp_summary, user_id=self.EDITOR_ID))
+        self.assertFalse(exp_services.exp_summary_is_editable(
+            exp_summary, user_id=self.VIEWER_ID))
+
+        # Owner makes viewer a viewer and editor an editor.
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
+            rights_manager.ROLE_EDITOR)
+
+        # Check that owner and editor may edit, but not viewer.
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertTrue(exp_services.exp_summary_is_editable(
+            exp_summary, user_id=self.OWNER_ID))
+        self.assertTrue(exp_services.exp_summary_is_editable(
+            exp_summary, user_id=self.EDITOR_ID))
+        self.assertFalse(exp_services.exp_summary_is_editable(
+            exp_summary, user_id=self.VIEWER_ID))
+
+
+    def setUp_Albert_Bob(self, delete_exploration_1=True):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Bob edits the title of EXP_ID_1.
+        - (3) Albert creates EXP_ID_2.
+        - (4) Albert edits the title of EXP_ID_1.
+        - (5) Albert edits the title of EXP_ID_2.
+        - (6) Bob reverts Albert's last edit to EXP_ID_1.
+        - (7) Albert deletes EXP_ID_1.
+        - Bob tries to publish EXP_ID_2, and is denied access.
+        - (8) Albert publishes EXP_ID_2.
+        """
+
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.register_editor(self.ALBERT_EMAIL, username=self.ALBERT_NAME)
+        self.register_editor(self.BOB_EMAIL, username=self.BOB_NAME)
+
+        exploration_1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.ALBERT_ID)
+
+        exploration_1.title = 'Exploration 1 title'
+        exp_services._save_exploration(
+            self.BOB_ID, exploration_1, 'Changed title.', [])
+
+        exploration_2 = self.save_new_valid_exploration(
+            self.EXP_ID_2, self.ALBERT_ID)
+
+        exploration_1.title = 'Exploration 1 Albert title'
+        exp_services._save_exploration(
+            self.ALBERT_ID, exploration_1,
+            'Changed title to Albert1 title.', [])
+
+        exploration_2.title = 'Exploration 2 Albert title'
+        exp_services._save_exploration(
+            self.ALBERT_ID, exploration_2, 'Changed title to Albert2.', [])
+
+        exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
+
+        if delete_exploration_1:
+            exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_1)
+
+        with self.assertRaisesRegexp(
+                Exception, 'This exploration cannot be published'):
+            rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
+
+        rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
+
+
+    def test_get_non_private_exploration_summaries(self):
+        self.setUp_Albert_Bob()
+
+        actual_summaries = exp_services.get_non_private_exploration_summaries()
+
+        expected_summaries = {
+            self.EXP_ID_2: exp_domain.ExplorationSummary(
+                self.EXP_ID_2, 'Exploration 2 Albert title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                False, [self.ALBERT_ID], [], [], 2,
+                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+                )}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code','skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+
+    def test_get_all_exploration_summaries(self):
+        self.setUp_Albert_Bob(delete_exploration_1=False)
+
+        actual_summaries = exp_services.get_all_exploration_summaries()
+
+        expected_summaries = {
+            self.EXP_ID_1: exp_domain.ExplorationSummary(
+                self.EXP_ID_1, 'Exploration 1 title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PRIVATE,
+                False, [self.ALBERT_ID], [], [], 2,
+                actual_summaries[self.EXP_ID_1].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_1].exploration_model_last_updated),
+            self.EXP_ID_2: exp_domain.ExplorationSummary(
+                self.EXP_ID_2, 'Exploration 2 Albert title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                False, [self.ALBERT_ID], [], [], 2,
+                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+                )}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code','skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+
+    def test_get_private_at_least_viewable_exploration_summaries(self):
+        self.setUp_Albert_Bob(delete_exploration_1=False)
+
+        actual_summaries = (
+            exp_services.get_private_at_least_viewable_exploration_summaries(
+                self.ALBERT_ID))
+
+        expected_summaries = {
+            self.EXP_ID_1: exp_domain.ExplorationSummary(
+                self.EXP_ID_1, 'Exploration 1 title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PRIVATE,
+                False, [self.ALBERT_ID], [], [], 2,
+                actual_summaries[self.EXP_ID_1].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_1].exploration_model_last_updated
+                )}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code','skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+        # do similar test for Bob
+        actual_summaries = (
+            exp_services.get_private_at_least_viewable_exploration_summaries(
+                self.BOB_ID))
+
+        expected_summaries = {}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries,
+                         expected_summaries)
+
+
+    def test_get_at_least_editable_exploration_summaries(self):
+        self.setUp_Albert_Bob(delete_exploration_1=True)
+
+        actual_summaries = (
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.ALBERT_ID))
+
+        expected_summaries = {
+            self.EXP_ID_2: exp_domain.ExplorationSummary(
+                self.EXP_ID_2, 'Exploration 2 Albert title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                False, [self.ALBERT_ID], [], [], 2,
+                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+        )}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code','skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+        # do similar test for Bob
+        actual_summaries = (
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.BOB_ID))
+
+        expected_summaries = {}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries,
+                         expected_summaries)

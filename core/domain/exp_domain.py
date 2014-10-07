@@ -1423,8 +1423,8 @@ class ExplorationSummary(object):
     def __init__(self, exploration_id, title, category, objective,
                  language_code, skill_tags, status,
                  community_owned, owner_ids, editor_ids,
-                 viewer_ids, version, created_on=None,
-                 last_updated=None):
+                 viewer_ids, version, exploration_model_created_on,
+                 exploration_model_last_updated):
         self.id = exploration_id
         self.title = title
         self.category = category
@@ -1437,17 +1437,5 @@ class ExplorationSummary(object):
         self.editor_ids = editor_ids
         self.viewer_ids = viewer_ids
         self.version = version
-        self.created_on = created_on
-        self.last_updated = last_updated
-
-    def is_equal_to(self, other):
-        simple_props = ['id', 'title', 'category', 'objective', 'language_code',
-                        'skill_tags', 'status', 'community_owned', 'owner_ids',
-                        'editor_ids', 'viewer_ids', 'version', 'created_on',
-                        'last_updated']
-
-        for prop in simple_props:
-            if getattr(self, prop) != getattr(other, prop):
-                return False
-
-        return True
+        self.exploration_model_created_on = exploration_model_created_on
+        self.exploration_model_last_updated = exploration_model_last_updated
