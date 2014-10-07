@@ -640,48 +640,38 @@ oppia.controller('ExplorationEditor', [
         'Oppia explorations mimic one-on-one conversations which are ' +
         'divided into \'states\'. A state consists of something you say, ' +
         'followed by the learner\'s response. Based on the response, ' +
-        'you would decide what to say next (as you would in real life if you ' +
-        'were having a conversation with a student).')
+        'you would decide what to say next.')
     }, {
       element: '#tutorialStateContent',
       intro: (
         'The \'content\' section is where you type what you want to tell the ' +
-        'learner.<br><br>' +
-        'For example, you might give some context behind a problem ' +
-        '(<em>Jane bought a new alarm clock with a 12-hour display. It now shows ' +
-        '12.45 pm and she wants to leave the house for lunch in half an hour</em>) ' +
-        'and then ask a question (<em>What time should she set the alarm to?</em>).')
+        'learner. For example, you might give some context behind a problem ' +
+        'and then ask a question.')
     }, {
       element: '#tutorialStateInteraction',
+      position: 'top',
       intro: (
         'The \'interaction\' section allows you to choose how the learner ' +
-        'responds. You can edit details of the interaction by clicking on it.<br><br>' +
-        'In this case, you might want them to type a string of text ' +
-        'giving the desired time, such as "1:15" -- so you might choose a ' +
-        '"Text input" interaction and set its placeholder text to "Type the time here."')
+        'responds. You can edit details of the interaction by clicking on it.')
     }, {
       element: '#tutorialStateRules',
+      position: 'top',
       intro: (
         'The \'rules\' section allows you to choose what you want to do next ' +
         'based on the learner\'s response. A reasonable rule of thumb is to try ' +
-        'and write down what you would say to a student in real life.<br><br>' +
-        'For example, if the learner types "1:15", you might want to send them on ' +
-        'to a new state that congratulates them on solving the problem and ' +
-        'poses a follow-up question. You can also tackle specific misconceptions -- ' +
-        'for example, if the learner types "13:15" you could give them more specific ' +
-        'feedback (<em>Jane tries to set the alarm to "13:15", but the display shows ' +
-        'an error. She then remembers that there is no \'13\' on a 12-hour clock. ' +
-        'Try again?</em>)')
+        'and write down what you would say to a student in real life.')
     }, {
       element: '#tutorialExplorationGraph',
+      position: 'left',
       intro: (
         'The exploration graph shows how your states relate to one another. You can ' +
         'click the button in the top-right to see a larger version, and click ' +
-        'on individual states to navigate to them.<br><br>' +
-        'That\'s the end of the tutorial! Click \'Done\' to close this tooltip, ' +
-        'then you can start creating an exploration by clicking on the \'Content\' ' +
-        'section.'
-      )
+        'on individual states to navigate to them.')
+    }, {
+      intro: (
+        'That\'s the end of the tutorial! ' +
+        'You can find additional information and design tips in the \'Help\' menu at the top of this page.<br><br> ' +
+        'Have fun!')
     }]
   };
 
