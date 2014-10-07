@@ -14,19 +14,22 @@
 
   <div id="tutorialStateInteraction">
     <div ng-if="hasLoaded">
-      <div ng-if="!interactiveWidgetEditorIsShown"
+      <div ng-if="!interactionCustomizerIsShown"
            class="protractor-test-edit-interaction"
            ng-class="{'oppia-editable-section oppia-interactive-section': editabilityService.isEditable()}"
            ng-disabled="!hasLoaded">
 
         <!-- We use a transparent div overlay here so that buttons within the widget
         do not receive the click events. -->
-        <div class="oppia-interactive-section-click-handler" ng-click="showInteractiveWidgetEditor()">
+        <div class="oppia-interactive-section-click-handler" ng-click="showInteractionCustomizer()">
         </div>
 
         <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="col-lg-8 col-md-8 col-sm-8">
             <h3>Interaction <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Interaction"></span></h3>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4">
+            <select class="form-control oppia-widget-selector protractor-test-select-interaction-id" ng-model="$parent.$parent.widgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="onChangeInteractionType(widgetId)"></select>
           </div>
         </div>
         <div class="row">
@@ -34,56 +37,30 @@
             <div angular-html-bind="widgetPreviewHtml" class="oppia-interaction-preview well"></div>
           </div>
         </div>
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <div ng-if="showInteractiveWidgetUsageHint"
-                 class="oppia-interactive-hint">
-              <button type="button" class="btn btn-default btn-xs pull-right" ng-click="dismissInteractiveWidgetUsageHint()">
-                <span class="glyphicon glyphicon-remove" title="Dismiss Hint"></span>
-              </button>
-              <p>
-                You've just submitted an answer, as a learner would!
-              </p>
-              <p>
-                If you want to edit this form instead, just click the 'Edit Interaction' button above.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
 
-    <div ng-if="interactiveWidgetEditorIsShown" class="oppia-state-item-editor-div">
+    <div ng-if="interactionCustomizerIsShown" class="oppia-state-item-editor-div">
       <div class="oppia-interactive-widget-editor">
-        <form class="form-inline" role="form">
-          <span class="pull-right oppia-widget-selector">
-            Interaction type:
-            <select class="form-control" ng-model="tmpWidgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="setNewTmpWidget(tmpWidgetId, {})"></select>
-          </span>
-        </form>
-
         <h3>Customize Interaction</h3>
         <br>
 
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <div ng-if="isEmpty(tmpWidget.customization_args)">
-              <em>There are no customization options for this interaction.</em>
-            </div>
-            <div ng-if="!isEmpty(tmpWidget.customization_args)">
-              <form name="form.schemaForm" class="protractor-test-widget-args">
-                <div ng-repeat="customizationArg in tmpWidget.customization_args">
-                  <span><[customizationArg.description]></span>
-                  <div>
-                    <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
-                    </schema-based-editor>
-                    <div style="margin-bottom: 15px;"></div>
-                  </div>
+            <form name="form.schemaForm" class="protractor-test-widget-args">
+              <div ng-repeat="customizationArg in tmpWidget.customization_args">
+                <span><[customizationArg.description]></span>
+                <div>
+                  <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+                  </schema-based-editor>
+                  <div style="margin-bottom: 15px;"></div>
                 </div>
-              </form>
-            </div>
+              </div>
+            </form>
 
-            <hr>
+            <div ng-if="!isEmpty(tmpWidget.customization_args)">
+              <hr>
+            </div>
 
             <div class="checkbox">
               <label>
@@ -99,10 +76,10 @@
       </div>
 
       <div ng-if="tmpWidget">
-        <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-interaction" ng-click="saveInteractiveWidget(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
+        <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-interaction" ng-click="saveInteractionCustomizations(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
           Save Interaction
         </button>
-        <button type="button" class="btn btn-default" ng-click="resetInteractiveWidgetEditor()">
+        <button type="button" class="btn btn-default" ng-click="resetInteractionCustomizer()">
           Cancel
         </button>
       </div>

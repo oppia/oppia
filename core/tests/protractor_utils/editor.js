@@ -55,19 +55,18 @@ var _closeWidgetEditor = function() {
 };
 
 var _selectWidget = function(widgetName) {
-  element(by.model('tmpWidgetId')).
+  element(by.css('.protractor-test-select-interaction-id')).
     element(by.cssContainingText('option', widgetName)).click();
 };
 
 var selectNumericWidget = function() {
-  _openWidgetEditor();
   _selectWidget('Numeric input');
-  _closeWidgetEditor();
 };
 
 var selectContinueWidget = function(buttonText) {
-  _openWidgetEditor();
   _selectWidget('Continue');
+
+  _openWidgetEditor();
   if (buttonText) {
     forms.editUnicode(element(by.css('.protractor-test-widget-args'))).
       setText(buttonText);
@@ -77,8 +76,9 @@ var selectContinueWidget = function(buttonText) {
 
 // textArray should be a non-empty array of strings (to be the options)
 var selectSimpleMultipleChoiceWidget = function(textArray) {
-  _openWidgetEditor();
   _selectWidget('Multiple choice input');
+
+  _openWidgetEditor();
   var customizer = forms.editList(
     element(by.css('.protractor-test-widget-args')));
   customizer.editRichTextEntry(0).setPlainText(textArray[0]);

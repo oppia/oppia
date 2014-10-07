@@ -32,15 +32,9 @@ oppia.controller('StateInteraction', [
 
   $scope.form = {};
 
-  $scope.showInteractiveWidgetUsageHint = false;
-  $scope.dismissInteractiveWidgetUsageHint = function() {
-    $scope.showInteractiveWidgetUsageHint = false;
-  };
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the widget
   // preview.
-  $scope.submitAnswer = function(answer, handler) {
-    $scope.showInteractiveWidgetUsageHint = true;
-  };
+  $scope.submitAnswer = function(answer, handler) {};
   $scope.adjustPageHeight = function(scroll) {};
 
   $scope.hasLoaded = false;
@@ -56,7 +50,7 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.getCurrentWidgetId = function() {
-    return stateWidgetIdService.displayed;
+    return stateWidgetIdService.savedMemento;
   };
 
   $scope._getWidgetPreviewTag = function(widgetId, widgetCustomizationArgsList) {
@@ -69,11 +63,11 @@ oppia.controller('StateInteraction', [
     return el.get(0).outerHTML;
   };
 
-  $scope.resetInteractiveWidgetEditor = function() {
-    var widgetId = stateWidgetIdService.displayed;
-    var stateCustomizationArgs = stateCustomizationArgsService.displayed;
+  $scope.resetInteractionCustomizer = function() {
+    $scope.widgetId = $scope.getCurrentWidgetId();
+    var stateCustomizationArgs = stateCustomizationArgsService.savedMemento;
 
-    var widgetTemplate = angular.copy($scope.allInteractiveWidgets[widgetId]);
+    var widgetTemplate = angular.copy($scope.allInteractiveWidgets[$scope.widgetId]);
     for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
       var caName = widgetTemplate.customization_args[i].name;
       widgetTemplate.customization_args[i].value = (
@@ -85,7 +79,7 @@ oppia.controller('StateInteraction', [
 
     // Special-case for multiple choice input.
     $scope.answerChoices = null;
-    if (widgetId == 'MultipleChoiceInput') {
+    if ($scope.widgetId == 'MultipleChoiceInput') {
       for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
         if (widgetTemplate.customization_args[i].name == 'choices') {
           $scope.answerChoices = widgetTemplate.customization_args[i].value;
@@ -97,8 +91,8 @@ oppia.controller('StateInteraction', [
 
     $scope.widgetHandlerSpecs = widgetTemplate.handler_specs;
     $scope.widgetPreviewHtml = $scope._getWidgetPreviewTag(
-      widgetId, widgetTemplate.customization_args);
-    $scope.interactiveWidgetEditorIsShown = false;
+      $scope.widgetId, widgetTemplate.customization_args);
+    $scope.interactionCustomizerIsShown = false;
     $scope.tmpWidget = null;
     $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
   };
@@ -138,40 +132,34 @@ oppia.controller('StateInteraction', [
           stateData.widget.handlers[i].rule_specs);
       }
 
-      $scope.resetInteractiveWidgetEditor(stateData.widget);
+      $scope.resetInteractionCustomizer(stateData.widget);
       $scope.hasLoaded = true;
     });
   });
 
-  $scope.showInteractiveWidgetEditor = function() {
+  $scope.showInteractionCustomizer = function() {
     if (editabilityService.isEditable()) {
       warningsData.clear();
-      $scope.dismissInteractiveWidgetUsageHint();
 
-      $scope.interactiveWidgetEditorIsShown = true;
+      $scope.interactionCustomizerIsShown = true;
       $scope.widgetHandlersMemento = angular.copy($scope.widgetHandlers);
       $scope.$broadcast('schemaBasedFormsShown');
 
-      $scope.tmpWidgetId = stateWidgetIdService.displayed;
-      $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[$scope.tmpWidgetId]);
-      $scope.setNewTmpWidget($scope.tmpWidgetId, stateCustomizationArgsService.displayed);
+      $scope.tmpWidget = angular.copy(
+        $scope.allInteractiveWidgets[$scope.getCurrentWidgetId()]);
+      for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
+        var caName = $scope.tmpWidget.customization_args[i].name;
+        $scope.tmpWidget.customization_args[i].value = (
+          stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
+          angular.copy(stateCustomizationArgsService.displayed[caName].value) :
+          $scope.tmpWidget.customization_args[i].default_value
+        );
+      }
     }
   };
 
-  $scope.saveInteractiveWidget = function(tmpWidget) {
+  $scope.saveInteractionCustomizations = function(tmpWidget) {
     var newWidget = angular.copy(tmpWidget);
-    if (!angular.equals(newWidget.widget_id, stateWidgetIdService.displayed)) {
-      stateWidgetIdService.displayed = angular.copy(newWidget.widget_id);
-      stateWidgetIdService.saveDisplayedValue();
-
-      // Change the widget handlers, but preserve the old default rule.
-      $scope.widgetHandlers = {
-        'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
-      };
-      changeListService.editStateProperty(
-        editorContextService.getActiveStateName(), 'widget_handlers', $scope.widgetHandlers,
-        $scope.widgetHandlersMemento);
-    }
 
     stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromWidgetCustArgs(
       newWidget.customization_args);
@@ -182,25 +170,40 @@ oppia.controller('StateInteraction', [
     $scope.tmpRule = null;
     $scope.updateStateWidgetHandlerData();
     graphDataService.recompute();
-    $scope.resetInteractiveWidgetEditor();
+    $scope.resetInteractionCustomizer();
   };
 
   $scope.$on('externalSave', function() {
-    if ($scope.interactiveWidgetEditorIsShown) {
-      $scope.saveInteractiveWidget($scope.tmpWidget);
+    if ($scope.interactionCustomizerIsShown) {
+      $scope.saveInteractionCustomizations($scope.tmpWidget);
     }
   });
 
-  $scope.setNewTmpWidget = function(newWidgetId, newWidgetCustomizationArgs) {
-    $scope.tmpWidget = angular.copy($scope.allInteractiveWidgets[newWidgetId]);
-    for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
-      var caName = $scope.tmpWidget.customization_args[i].name;
-      $scope.tmpWidget.customization_args[i].value = (
-        newWidgetCustomizationArgs.hasOwnProperty(caName) ?
-        angular.copy(newWidgetCustomizationArgs[caName].value) :
-        $scope.tmpWidget.customization_args[i].default_value
-      );
+  $scope.onChangeInteractionType = function(newWidgetId) {
+    stateWidgetIdService.displayed = newWidgetId;
+    stateWidgetIdService.saveDisplayedValue();
+
+    var newWidget = angular.copy($scope.allInteractiveWidgets[newWidgetId]);
+    for (var i = 0; i < newWidget.customization_args.length; i++) {
+      newWidget.customization_args[i].value = (
+        newWidget.customization_args[i].default_value);
     }
+    stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromWidgetCustArgs(
+      newWidget.customization_args);
+    stateCustomizationArgsService.saveDisplayedValue();
+
+    // Change the widget handlers, but preserve the old default rule.
+    $scope.widgetHandlers = {
+      'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
+    };
+    changeListService.editStateProperty(
+      editorContextService.getActiveStateName(), 'widget_handlers', $scope.widgetHandlers,
+      $scope.widgetHandlersMemento);
+
+    $scope.tmpRule = null;
+    $scope.updateStateWidgetHandlerData();
+    graphDataService.recompute();
+    $scope.resetInteractionCustomizer();
   };
 
   $scope.createTmpRule = function() {

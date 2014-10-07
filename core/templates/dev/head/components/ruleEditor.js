@@ -279,21 +279,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
-
-        // TODO(sll): Remove the need for this special case for multiple-choice
-        // input.
-        $scope.choices = null;
-        var isMultipleChoice = false;
-        $scope.$watch('answerChoices', function(newValue, oldValue) {
-          if (newValue) {
-            $scope.choices = angular.copy(newValue);
-            isMultipleChoice = true;
-          } else {
-            $scope.choices = null;
-            isMultipleChoice = false;
-          }
-        }, true);
-
         $scope.ruleDescriptionFragments = [];
         $scope.computeRuleDescriptionFragments = function() {
           if (!$scope.rule.description) {
@@ -319,7 +304,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               break;
             }
 
-            if (isMultipleChoice) {
+            if ($scope.answerChoices && $scope.answerChoices.length) {
+              // This rule is for a multiple-choice widget.
+              // TODO(sll): Remove the need for this special case for multiple-choice
+              // input.
+              $scope.choices = angular.copy($scope.answerChoices);
               result.push({'type': 'select', 'varName': finalInputArray[i+1]});
             } else {
               result.push({

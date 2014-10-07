@@ -545,6 +545,7 @@ oppia.factory('explorationStatesService', [
     },
     setState: function(stateName, stateData) {
       _states[stateName] = angular.copy(stateData);
+      $rootScope.$broadcast('refreshGraph');
     },
     isNewStateNameValid: function(newStateName, showWarnings) {
       if (_states[newStateName]) {

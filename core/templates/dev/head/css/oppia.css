@@ -696,8 +696,13 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-widget-selector {
-  position: relative;
-  bottom: 7px;
+  bottom: -25px;
+  right: 15px;
+  position: absolute;
+  /* This must be larger than the z-index in
+     .oppia-interactive-section-click-handler, so that the rule does not
+     switch to edit mode when the destination link is clicked. */
+  z-index: 200;
 }
 
 .oppia-customize-widget-arg-description {
@@ -755,10 +760,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-add-state-container {
   margin-top: 10px;
-}
-
-.oppia-add-state-input {
-  width: 87%;
 }
 
 .oppia-rule {

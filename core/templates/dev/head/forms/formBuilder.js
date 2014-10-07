@@ -591,6 +591,8 @@ oppia.directive('richTextEditor', [
                 };
 
                 $scope.save = function(customizationArgs) {
+                  $scope.$broadcast('externalSave');
+
                   var customizationArgsDict = {};
                   for (var i = 0; i < $scope.customizationArgsList.length; i++) {
                     var caName = $scope.customizationArgsList[i].name;

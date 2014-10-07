@@ -9,9 +9,9 @@
   <div ng-show="isEditable()" class="oppia-add-state-container">
     <form role="form" class="form-inline" ng-submit="addState(newStateName, onClickStateInMinimap)">
       <div class="form-group">
-        <input type="text" class="form-control" ng-model="newStateName" class="oppia-add-state-input" placeholder="New State Name">
+        <input type="text" class="form-control" ng-model="newStateName" placeholder="New State Name">
       </div>
-      <button type="submit" class="btn btn-default">Create</button>
+      <button type="submit" class="btn btn-default" ng-class="{'btn-success': !!newStateName}">Create</button>
     </form>
   </div>
 
