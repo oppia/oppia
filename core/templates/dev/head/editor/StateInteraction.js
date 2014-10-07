@@ -18,13 +18,42 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// A state-specific cache for widget details. It stores customization and
+// handlers corresponding to a widget id so that they can be restored if the
+// widget is changed back while the user is still in this state. This cache
+// should be reset each time the state editor is initialized.
+oppia.factory('widgetDetailsCache', [function() {
+  var _cache = {};
+  return {
+    reset: function() {
+      _cache = {};
+    },
+    contains: function(widgetId) {
+      return _cache.hasOwnProperty(widgetId);
+    },
+    set: function(widgetId, widgetCustomizationArgs, widgetHandlers) {
+      _cache[widgetId] = {
+        customization: angular.copy(widgetCustomizationArgs),
+        handlers: angular.copy(widgetHandlers)
+      };
+    },
+    get: function(widgetId) {
+      if (!_cache.hasOwnProperty(widgetId)) {
+        return null;
+      }
+      return angular.copy(_cache[widgetId]);
+    }
+  };
+}]);
+
+
 oppia.controller('StateInteraction', [
     '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
     'oppiaHtmlEscaper', 'widgetDefinitionsService', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
-    'editabilityService', 'explorationStatesService', 'graphDataService',
+    'editabilityService', 'explorationStatesService', 'graphDataService', 'widgetDetailsCache',
     function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
       oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService,
-      editabilityService, explorationStatesService, graphDataService) {
+      editabilityService, explorationStatesService, graphDataService, widgetDetailsCache) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -99,6 +128,8 @@ oppia.controller('StateInteraction', [
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
     $scope.hasLoaded = false;
+
+    widgetDetailsCache.reset();
 
     // TODO(sll): Build a file containing this data and serve it statically,
     // since it rarely changes. (But don't cache it, since it does change.)
@@ -180,22 +211,34 @@ oppia.controller('StateInteraction', [
   });
 
   $scope.onChangeInteractionType = function(newWidgetId) {
+    widgetDetailsCache.set(
+      stateWidgetIdService.savedMemento,
+      stateCustomizationArgsService.savedMemento,
+      $scope.widgetHandlers);
+
     stateWidgetIdService.displayed = newWidgetId;
     stateWidgetIdService.saveDisplayedValue();
 
-    var newWidget = angular.copy($scope.allInteractiveWidgets[newWidgetId]);
-    for (var i = 0; i < newWidget.customization_args.length; i++) {
-      newWidget.customization_args[i].value = (
-        newWidget.customization_args[i].default_value);
-    }
-    stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromWidgetCustArgs(
-      newWidget.customization_args);
-    stateCustomizationArgsService.saveDisplayedValue();
+    if (widgetDetailsCache.contains(newWidgetId)) {
+      var _cachedCustomizationAndHandlers = widgetDetailsCache.get(newWidgetId);
+      stateCustomizationArgsService.displayed = _cachedCustomizationAndHandlers.customization;
+      $scope.widgetHandlers = _cachedCustomizationAndHandlers.handlers;
+    } else {
+      var newWidget = angular.copy($scope.allInteractiveWidgets[newWidgetId]);
+      for (var i = 0; i < newWidget.customization_args.length; i++) {
+        newWidget.customization_args[i].value = (
+          newWidget.customization_args[i].default_value);
+      }
+      stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromWidgetCustArgs(
+        newWidget.customization_args);
 
-    // Change the widget handlers, but preserve the old default rule.
-    $scope.widgetHandlers = {
-      'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
-    };
+      // Change the widget handlers, but preserve the old default rule.
+      $scope.widgetHandlers = {
+        'submit': [$scope.widgetHandlers['submit'][$scope.widgetHandlers['submit'].length - 1]]
+      };
+    }
+
+    stateCustomizationArgsService.saveDisplayedValue();
     changeListService.editStateProperty(
       editorContextService.getActiveStateName(), 'widget_handlers', $scope.widgetHandlers,
       $scope.widgetHandlersMemento);
