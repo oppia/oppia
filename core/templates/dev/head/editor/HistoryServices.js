@@ -189,7 +189,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
             stateData[currentStateId].stateProperty = STATE_PROPERTY_CHANGED;
             stateData[currentStateId].newestStateName = change.state_name;
           } else {
-            stateData[stateIds[change.state_name]] = {
+            stateData[currentStateId] = {
               'newestStateName': change.state_name,
               'originalStateName': change.state_name,
               'stateProperty': STATE_PROPERTY_ADDED
@@ -219,6 +219,8 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           if (stateData[stateIds[change.state_name]].stateProperty == STATE_PROPERTY_UNCHANGED) {
             stateData[stateIds[change.state_name]].stateProperty = STATE_PROPERTY_CHANGED;
           }
+        } else if (change.cmd != 'revert') {
+          throw new Error('Invalid change command.');
         }
       }
     }
@@ -260,12 +262,12 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           stateIds[stateName] = stateId;
         }
 
-        // Find changes from v1 to LCA and from LCA to v2
+        // Populate statesData with changes from v1 to LCA and from LCA to v2
         var lca = versionsTreeService.findLCA(v1, v2);
         _trackChanges(lca, v1, stateIds, statesData, false);
         _trackChanges(lca, v2, stateIds, statesData, true);
 
-        // Remove changes back to original
+        // Ignore changes that were canceled out by later changes
         for (var stateId in statesData) {
           if (statesData[stateId].stateProperty == STATE_PROPERTY_CHANGED &&
               v1States.hasOwnProperty(statesData[stateId].originalStateName) &&

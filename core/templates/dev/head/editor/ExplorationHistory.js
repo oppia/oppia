@@ -45,13 +45,22 @@ oppia.controller('ExplorationHistory', [
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
     var currentVersion = explorationData.data.version;
-    $scope.compareVersion = {};
+    /**
+     * $scope.comparePanesVersions is an object with keys 'leftPane' and
+     * 'rightPane', whose values are the version numbers of the versions
+     * displayed in the left and right codemirror panes.
+     * $scope.compareSnapshot is an object with keys 'leftPane' and 'rightPane'
+     * whose values are the snapshots of the compared versions.
+     * $scope.yamrStrs is an object with keys 'leftPane' and 'rightPane',
+     * whose values are the YAML representations of the compared versions
+     */
+    $scope.comparePanesVersions = {};
     $scope.compareSnapshot = {};
-    $scope.yamlStr = {};
-
     // Note: if initial strings are empty CodeMirror won't initialize correctly
-    $scope.yamlStr[1] = ' ';
-    $scope.yamlStr[2] = ' ';
+    $scope.yamlStrs = {
+      'leftPane': ' ',
+      'rightPane': ' '
+    };
 
     $scope.hideCodemirror = true;
     $scope.hideCompareVersionsButton = false;
@@ -75,22 +84,22 @@ oppia.controller('ExplorationHistory', [
   // TODO(wxy): Restrict choices for version comparison so that v1 < v2
   // Functions to set snapshot and download YAML when selection is changed
   var stateData = null;
-  $scope.changeCompareVersion = function(versionNumber, changedVersion) {
-    $scope.compareSnapshot[changedVersion] =
-      $scope.displayedExplorationSnapshots[$scope.currentVersion -
-      $scope.compareVersion[changedVersion]];
+  $scope.changeCompareVersion = function(versionNumber, changedPane) {
+    $scope.compareSnapshot[changedPane] =
+      $scope.displayedExplorationSnapshots[
+        $scope.currentVersion - $scope.comparePanesVersions[changedPane]];
 
     $http.get($scope.explorationDownloadUrl + '?v=' +
-        $scope.compareVersion[changedVersion] + '&output_format=json')
+        $scope.comparePanesVersions[changedPane] + '&output_format=json')
         .then(function(response) {
-      $scope.yamlStr[changedVersion] = response.data.yaml;
+      $scope.yamlStrs[changedPane] = response.data.yaml;
     });
 
-    if ($scope.compareVersion[1] !== undefined &&
-        $scope.compareVersion[2] !== undefined &&
-        $scope.compareVersion[1] < $scope.compareVersion[2]) {
-      compareVersionsService.getStatesDiff($scope.compareVersion[1],
-          $scope.compareVersion[2]).then(function(response) {
+    if ($scope.comparePanesVersions.leftPane !== undefined &&
+        $scope.comparePanesVersions.rightPane !== undefined &&
+        $scope.comparePanesVersions.leftPane < $scope.comparePanesVersions.rightPane) {
+      compareVersionsService.getStatesDiff($scope.comparePanesVersions.leftPane,
+          $scope.comparePanesVersions.rightPane).then(function(response) {
         stateData = response;
         $log.info('Retrieved version comparison data');
         $log.info(stateData);
@@ -106,9 +115,9 @@ oppia.controller('ExplorationHistory', [
   // Check if valid versions were selected
   $scope.areCompareVersionsSelected = function() {
     return (
-      $scope.compareVersion &&
-      $scope.compareVersion.hasOwnProperty(1) &&
-      $scope.compareVersion.hasOwnProperty(2));
+      $scope.comparePanesVersions &&
+      $scope.comparePanesVersions.hasOwnProperty('leftPane') &&
+      $scope.comparePanesVersions.hasOwnProperty('rightPane'));
   };
 
   // Downloads the zip file for an exploration.
@@ -124,15 +133,15 @@ oppia.controller('ExplorationHistory', [
     $scope.hideCompareVersionsButton = true;
 
     // Force refresh of codemirror
-    $scope.yamlStr[1] = ' ';
-    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion[1] +
+    $scope.yamlStrs.leftPane = ' ';
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.comparePanesVersions.leftPane +
         '&output_format=json').then(function(response) {
-      $scope.yamlStr[1] = response.data.yaml;
+      $scope.yamlStrs.leftPane = response.data.yaml;
     });
-    $scope.yamlStr[2] = ' ';
-    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.compareVersion[2] +
+    $scope.yamlStrs.rightPane = ' ';
+    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.comparePanesVersions.rightPane +
         '&output_format=json').then(function(response) {
-      $scope.yamlStr[2] = response.data.yaml;
+      $scope.yamlStrs.rightPane = response.data.yaml;
     });
 
     // Scroll to CodeMirror MergeView instance
