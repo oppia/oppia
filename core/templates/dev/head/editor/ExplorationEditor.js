@@ -636,37 +636,46 @@ oppia.controller('ExplorationEditor', [
     tooltipClass: 'oppia-tutorial-tooltip',
     steps: [{
       intro: (
-        'Welcome to the Oppia editor tutorial!<br><br>' +
+        '<b>Welcome to the Oppia editor tutorial!</b><br><br>' +
         'Oppia explorations mimic one-on-one conversations which are ' +
-        'divided into \'states\'. A state consists of something you say, ' +
+        'divided into \'states\'. <br><br>A state consists of something you say, ' +
         'followed by the learner\'s response. Based on the response, ' +
-        'you would decide what to say next.')
+        'you can decide what to say next.')
     }, {
       element: '#tutorialStateContent',
       intro: (
-        'The \'content\' section is where you type what you want to tell the ' +
-        'learner. For example, you might give some context behind a problem ' +
-        'and then ask a question.')
+        'The <b>Content</b> section is where you type what you want to tell the ' +
+        'learner. <br><br>' +
+        '<em>Example:</em><br>' +
+        '<em>Jane bought a new alarm clock with a 12-hour display. It now shows ' +
+        '12:45pm and she wants to leave the house for lunch in half an hour. <br><br>' +
+        'What time should she set the alarm to?</em>.')
     }, {
       element: '#tutorialStateInteraction',
       position: 'top',
       intro: (
-        'The \'interaction\' section allows you to choose how the learner ' +
-        'responds. You can edit details of the interaction by clicking on it.')
+        'The <b>Interaction</b> section allows you to choose how the learner ' +
+        'responds. You can edit details of the interaction by clicking on it. <br><br>' +
+        '<em>Example:</em><br>' +
+        '<em>Select a \'text\' input and set the placeholder text to \'Type the time here\'.')
     }, {
       element: '#tutorialStateRules',
       position: 'top',
       intro: (
-        'The \'rules\' section allows you to choose what you want to do next ' +
-        'based on the learner\'s response. A reasonable rule of thumb is to try ' +
-        'and write down what you would say to a student in real life.')
+        'The <b>Rules</b> section allows you to choose what you want to do next ' +
+        'based on the learner\'s response.<br><br>' +
+        '<em>Example:</em><br>' +
+        '<em>If the learner types \'1:15\', send them to a new state that ' +    
+        'congratulates them on solving the problem and poses a follow-up question.<br><br>' +    
+        'If the learner types \'13:15\', say: ' +
+        '"Remember, there is no \'13\' on a 12-hour clock. Try again?"</em>')
     }, {
       element: '#tutorialExplorationGraph',
       position: 'left',
       intro: (
-        'The exploration graph shows how your states relate to one another. You can ' +
-        'click the button in the top-right to see a larger version, and click ' +
-        'on individual states to navigate to them.')
+        'The <b>exploration graph</b> shows how your states relate to one another.<br><br>' +
+        'You can click on individual states to navigate to them. You can also click ' +
+        'the button in the top-right to expand the graph.')
     }, {
       intro: (
         'That\'s the end of the tutorial! ' +
