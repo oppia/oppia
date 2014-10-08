@@ -750,10 +750,11 @@ div.wysiwyg iframe.wysiwyg-content-large {
 /* Styles for the state graph vizualization. */
 
 .oppia-graph-viz-container {
-  height: 250px;
   border-radius: 4px;
   border: 1px solid #ccc;
+  height: 250px;
   margin-top: 5px;
+  overflow-y: hidden;
 }
 
 .oppia-graph-and-stats-separator {
