@@ -56,6 +56,9 @@ handlers:
   # NB: not minified. TODO(sll): fix.
   static_dir: core/templates/dev/head/css
   secure: always
+- url: /expressions
+  static_dir: core/templates/dev/head/expressions
+  secure: always
 - url: /third_party/static
   static_dir: third_party/static
   secure: always

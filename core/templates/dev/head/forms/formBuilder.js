@@ -50,6 +50,13 @@ oppia.factory('parameterSpecsService', ['$log', function($log) {
         }
       }
       return names.sort();
+    },
+    getAllParams: function() {
+      var names = [];
+      for (var paramName in paramSpecs) {
+        names.push(paramName);
+      }
+      return names.sort();
     }
   };
 }]);
@@ -849,6 +856,31 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
   };
 }]);
 
+oppia.directive('requireIsValidExpression', ['parameterSpecsService',
+    function(parameterSpecsService) {
+  // Create a namescope environment from the parameter names. The values of the
+  // parameters do not matter.
+  var params = {};
+  parameterSpecsService.getAllParams().forEach(function(name) {
+    params[name] = true;
+  });
+
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs, ctrl) {
+      var validator = function(value) {
+        ctrl.$setValidity('isValidExpression',
+            expressions.validateExpression(value, [params]));
+        return value;
+      };
+
+      ctrl.$parsers.unshift(validator);
+      ctrl.$formatters.unshift(validator);
+    }
+  };
+}]);
+
 // Prevents timeouts due to recursion in nested directives. See:
 //
 //   http://stackoverflow.com/questions/14430655/recursion-in-angular-directives
@@ -935,8 +967,6 @@ oppia.directive('schemaBasedChoicesEditor', ['recursionHelper', function(recursi
   };
 }]);
 
-// TODO(kashiad): Add a validator so that only syntactically valid expressions
-// can be entered.
 oppia.directive('schemaBasedExpressionEditor', [function() {
   return {
     scope: {
