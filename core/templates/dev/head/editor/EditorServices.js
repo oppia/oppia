@@ -528,10 +528,10 @@ oppia.factory('explorationInitStateNameService', [
 oppia.factory('explorationStatesService', [
     '$log', '$modal', '$filter', '$location', '$rootScope', 'explorationInitStateNameService',
     'warningsData', 'changeListService', 'editorContextService', 'validatorsService',
-    'newStateTemplateService', 'validatorsService',
+    'newStateTemplateService',
     function($log, $modal, $filter, $location, $rootScope, explorationInitStateNameService,
              warningsData, changeListService, editorContextService, validatorsService,
-             newStateTemplateService, validatorsService) {
+             newStateTemplateService) {
   var _states = null;
   return {
     setStates: function(value) {
