@@ -120,7 +120,7 @@ describe('State Editor controller', function() {
           isEditable: function() {
             return true;
           }
-        }        
+        }
       });
     }));
 

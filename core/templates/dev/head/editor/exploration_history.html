@@ -20,8 +20,8 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Version History</h4>
         <div ng-repeat="snapshot in displayedExplorationSnapshots">
-          <input type="radio" name="compareVer1" ng-model="compareVersion.v1" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion1(snapshot.versionNumber)">
-          <input type="radio" name="compareVer2" ng-model="compareVersion.v2" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion2(snapshot.versionNumber)">
+          <input type="radio" name="compareVer1" ng-model="comparePanesVersions.leftPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'leftPane')">
+          <input type="radio" name="compareVer2" ng-model="comparePanesVersions.rightPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'rightPane')">
           [<[snapshot.versionNumber]>]
           <strong><[snapshot.committerId]></strong>
           <[snapshot.commitMessage]>
@@ -47,26 +47,26 @@
             <!-- Table ratios 53:47 is to ensure text above right pane is aligned to codemirror gutter -->
             <td style="width: 53%">
               <div>
-                <strong>Revision #<[compareSnapshot.v1.versionNumber]></strong>
+                <strong>Revision #<[compareSnapshot.leftPane.versionNumber]></strong>
                 by
-                <strong><[compareSnapshot.v1.committerId]></strong>
+                <strong><[compareSnapshot.leftPane.committerId]></strong>
                 on
-                <strong><[compareSnapshot.v1.createdOn]></strong>
+                <strong><[compareSnapshot.leftPane.createdOn]></strong>
               </div>
-              <[compareSnapshot.v1.commitMessage]>
+              <[compareSnapshot.leftPane.commitMessage]>
             </td>
             <td style="width: 47%">
               <div>
-                <strong>Revision #<[compareSnapshot.v2.versionNumber]></strong>
+                <strong>Revision #<[compareSnapshot.rightPane.versionNumber]></strong>
                 by
-                <strong><[compareSnapshot.v2.committerId]></strong>
+                <strong><[compareSnapshot.rightPane.committerId]></strong>
                 on
-                <strong><[compareSnapshot.v2.createdOn]></strong>
+                <strong><[compareSnapshot.rightPane.createdOn]></strong>
               </div>
-              <[compareSnapshot.v2.commitMessage]>
+              <[compareSnapshot.rightPane.commitMessage]>
             </td>
           </table>
-          <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrV1" right-value="yamlStrV2"></codemirror-mergeview>
+          <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrs.leftPane" right-value="yamlStrs.rightPane"></codemirror-mergeview>
           <div align="center" style="margin-bottom: 20px">
             <strong>Click arrows to synchronize scrolling</strong>
           </div>
