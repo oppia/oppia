@@ -29,7 +29,11 @@
             <h3>Interaction <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit Interaction"></span></h3>
           </div>
           <div class="col-lg-4 col-md-4 col-sm-4">
-            <select class="form-control oppia-widget-selector protractor-test-select-interaction-id" ng-model="$parent.$parent.widgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets" ng-change="onChangeInteractionType(widgetId)"></select>
+            <select ng-show="editabilityService.isEditable()"
+                    class="form-control oppia-widget-selector protractor-test-select-interaction-id"
+                    ng-model="$parent.$parent.widgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets"
+                    ng-change="onChangeInteractionType(widgetId)">
+            </select>
           </div>
         </div>
         <div class="row">
