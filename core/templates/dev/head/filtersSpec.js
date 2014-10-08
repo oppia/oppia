@@ -24,7 +24,8 @@ describe('Testing filters', function() {
     'underscoresToCamelCase',
     'truncate',
     'round1',
-    'bracesToText',
+    'replaceInputsWithEllipses',
+    'truncateAtFirstInput',
     'parameterizeRuleDescription',
     'camelCaseToHyphens'
   ];
@@ -78,19 +79,31 @@ describe('Testing filters', function() {
     expect(filter(1.55)).toEqual(1.6);
   }));
 
-  it('should convert {{...}} tags to INPUT indicators', inject(function($filter) {
-    var filter = $filter('bracesToText');
+  it('should convert {{...}} tags to ...', inject(function($filter) {
+    var filter = $filter('replaceInputsWithEllipses');
 
     expect(filter('')).toEqual('');
     expect(filter(null)).toEqual('');
     expect(filter(undefined)).toEqual('');
 
     expect(filter('hello')).toEqual('hello');
-    expect(filter('{{hello}}')).toEqual('<code>INPUT</code>');
-    expect(filter('{{hello}} and {{goodbye}}')).toEqual(
-      '<code>INPUT</code> and <code>INPUT</code>');
-    expect(filter('{{}}{{hello}}')).toEqual(
-      '{{}}<code>INPUT</code>');
+    expect(filter('{{hello}}')).toEqual('...');
+    expect(filter('{{hello}} and {{goodbye}}')).toEqual('... and ...');
+    expect(filter('{{}}{{hello}}')).toEqual('{{}}...');
+  }));
+
+  it('should truncate a string when it first sees a {{...}}', inject(function($filter) {
+    var filter = $filter('truncateAtFirstInput');
+
+    expect(filter('')).toEqual('');
+    expect(filter(null)).toEqual('');
+    expect(filter(undefined)).toEqual('');
+
+    expect(filter('hello')).toEqual('hello');
+    expect(filter('{{hello}}')).toEqual('');
+    expect(filter('say {{hello}} and {{goodbye}}')).toEqual('say ');
+    expect(filter('{{hello}} and {{goodbye}}')).toEqual('');
+    expect(filter('{{}}{{hello}}')).toEqual('{{}}');
   }));
 
   it('should correctly normalize whitespace', inject(function($filter) {

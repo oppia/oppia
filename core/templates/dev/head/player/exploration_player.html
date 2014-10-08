@@ -16,12 +16,12 @@
 {% endblock header_js %}
 
 {% block content %}
-  {{ skin_html }}
+  {{ skin_tag }}
   <br><br><br>
 
   <script type="text/ng-template" id="modals/playerFeedback">
     <div class="modal-header">
-      <h3>Give Feedback to the Exploration Editors</h3>
+      <h3>Give Feedback to the Exploration Editor</h3>
     </div>
 
     <div class="modal-body">
@@ -66,8 +66,8 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+      <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
     </div>
   </script>
 
@@ -95,7 +95,9 @@
   {{ super() }}
   <script>
     {{ include_js_file('player/PlayerServices.js') }}
+    {{ include_skins_js_file(skin_js_url) }}
   </script>
 
-  {{ widget_js_directives }}
+  {{ skin_templates }}
+  {{ widget_templates }}
 {% endblock footer_js %}

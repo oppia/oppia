@@ -591,6 +591,8 @@ oppia.directive('richTextEditor', [
                 };
 
                 $scope.save = function(customizationArgs) {
+                  $scope.$broadcast('externalSave');
+
                   var customizationArgsDict = {};
                   for (var i = 0; i < $scope.customizationArgsList.length; i++) {
                     var caName = $scope.customizationArgsList[i].name;
@@ -739,6 +741,7 @@ oppia.directive('richTextEditor', [
             // Disable jquery.ui.dialog so that the link control works correctly.
             $.fn.dialog = null;
 
+            $(rteNode).wysiwyg('focus');
             $scope.hasFullyLoaded = true;
           });
         };
@@ -1009,6 +1012,16 @@ oppia.directive('schemaBasedIntEditor', [function() {
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      if ($scope.localValue === undefined) {
+        $scope.localValue = 0;
+      }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedIntForm');
+        }
+      };
+
       if ($scope.allowExpressions()) {
         $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
         $scope.expressionMode = angular.isString($scope.localValue);
@@ -1053,6 +1066,16 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             return $scope.validators()[i].max_value;
           }
         }
+      }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedFloatForm');
+        }
+      };
+
+      if ($scope.localValue === undefined) {
+        $scope.localValue = 0.0;
       }
 
       if ($scope.allowExpressions()) {
@@ -1128,6 +1151,12 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
           }, 200);
         });
       }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedUnicodeForm');
+        }
+      };
 
       $scope.getPlaceholder = function() {
         if (!$scope.uiConfig()) {
@@ -1225,12 +1254,33 @@ oppia.directive('schemaBasedListEditor', [
         $scope.addElementText = $scope.uiConfig().add_element_text;
       }
 
+      $scope.maxListLength = null;
+      if ($scope.validators()) {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'has_length_at_most') {
+            $scope.maxListLength = $scope.validators()[i].max_value;
+          }
+        }
+      }
+
       if ($scope.len === undefined) {
         $scope.addElement = function() {
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
         };
+
+        $scope._onChildFormSubmit = function(evt) {
+          if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
+              !!$scope.localValue[$scope.localValue.length - 1]) {
+            $scope.addElement();
+          }
+          evt.stopPropagation();
+        };
+
+        $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
+        $scope.$on('submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
+        $scope.$on('submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
 
         $scope.deleteElement = function(index) {
           $scope.localValue.splice(index, 1);

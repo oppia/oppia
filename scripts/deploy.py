@@ -69,7 +69,7 @@ RELEASE_DIR_NAME = '%s-deploy-%s' % (
 RELEASE_DIR_PATH = os.path.join(os.getcwd(), '..', RELEASE_DIR_NAME)
 
 APPCFG_PATH = os.path.join(
-    '..', 'oppia_tools', 'google_appengine_1.9.10', 'google_appengine',
+    '..', 'oppia_tools', 'google_appengine_1.9.11', 'google_appengine',
     'appcfg.py')
 
 LOG_FILE_PATH = os.path.join('..', 'deploy.log')

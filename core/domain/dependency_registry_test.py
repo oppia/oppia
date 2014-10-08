@@ -53,8 +53,8 @@ class DependencyControllerTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Register and login as an editor.
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         # Verify that the exploration does not have a jsrepl dependency.
         exploration = exp_services.get_exploration_by_id('0')

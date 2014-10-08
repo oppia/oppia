@@ -55,38 +55,23 @@ class AnswerHandlerUnitTests(test_utils.GenericTestBase):
 class WidgetUnitTests(test_utils.GenericTestBase):
     """Test the widget domain object and registry."""
 
-    def test_parameterized_widget(self):
-        """Test that parameterized widgets are correctly handled."""
+    def test_widget_properties(self):
+        """Test the standard properties of widgets."""
 
         TEXT_INPUT_ID = 'TextInput'
 
         widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, TEXT_INPUT_ID)
         self.assertEqual(widget.id, TEXT_INPUT_ID)
-        self.assertEqual(widget.name, 'Text input')
+        self.assertEqual(widget.name, 'Text')
 
         self.assertIn('id="interactiveWidget/TextInput"', widget.html_body)
         self.assertIn('id="response/TextInput"', widget.html_body)
 
-        tag = widget.get_interactive_widget_tag({})
-        self.assertEqual(
-            '<oppia-interactive-text-input '
-            'placeholder-with-value="&#34;Type your answer here.&#34;" '
-            'rows-with-value="1">'
-            '</oppia-interactive-text-input>', tag)
-
-        tag = widget.get_interactive_widget_tag({
-            'placeholder': {'value': 'F4'}
-        })
-        self.assertEqual(
-            '<oppia-interactive-text-input '
-            'placeholder-with-value="&#34;F4&#34;" rows-with-value="1">'
-            '</oppia-interactive-text-input>', tag)
-
         widget_dict = widget.to_dict()
         self.assertItemsEqual(widget_dict.keys(), [
             'widget_id', 'name', 'category', 'description',
-            'handler_specs', 'customization_args', 'tag'])
+            'handler_specs', 'customization_args'])
         self.assertEqual(widget_dict['widget_id'], TEXT_INPUT_ID)
         self.assertEqual(widget_dict['customization_args'], [{
             'name': 'placeholder',
@@ -95,7 +80,8 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'default_value': 'Type your answer here.',
         }, {
             'name': 'rows',
-            'description': 'The number of rows for the text input field.',
+            'description': (
+                'How long the learner\'s answer is expected to be (in rows).'),
             'schema': {
                 'type': 'int',
                 'validators': [{

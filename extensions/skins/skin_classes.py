@@ -39,22 +39,46 @@ class BaseSkin(object):
     # This path is relative to /extensions/skins/{{SKIN_ID}}. It defaults to
     # player.html.
     entry_point_path = DEFAULT_ENTRY_POINT_PATH
+    js_path = None
+    # This tag name should match the name of the directive pointed to by
+    # js_path.
+    tag_name = None
     options = {}
 
     @classmethod
     def get_html(cls):
         if cls.entry_point_path is None:
             raise Exception(
-                'No entry-point specified for skin %s.' % cls().skin_id)
+                'No entry-point specified for skin %s.' % cls.skin_id)
         return jinja2.Markup(jinja_utils.get_jinja_env(
             feconf.SKINS_TEMPLATES_DIR).get_template('%s/%s' % (
-                cls().skin_id, cls.entry_point_path)).render())
+                cls.skin_id, cls.entry_point_path)).render())
+
+    @classmethod
+    def get_js_url(cls):
+        """Returns the relative path of the skin JS template from
+        feconf.SKINS_TEMPLATES_DIR.
+        """
+        if cls.js_path is None:
+            raise Exception(
+                'No JS path specified for skin %s.' % cls.skin_id)
+        return '%s/%s' % (cls.skin_id, cls.js_path)
+
+    @classmethod
+    def get_tag(cls):
+        """Returns a tag used to load the skin template."""
+        if cls.tag_name is None:
+            raise Exception(
+                'No tag name specified for skin %s.' % cls.skin_id)
+        return '<%s></%s>' % (cls.tag_name, cls.tag_name)
 
 
 class ConversationV1(BaseSkin):
     skin_id = 'conversation_v1'
     skin_name = 'Conversation'
     description = 'A vertically-scrolling conversation.'
+    js_path = 'Conversation.js'
+    tag_name = 'conversation-skin'
 
     options = [{
         'name': 'show_feedback_button',
@@ -68,6 +92,8 @@ class SnapshotsV1(BaseSkin):
     skin_id = 'snapshots_v1'
     skin_name = 'Snapshots'
     description = 'A sequence of snapshots.'
+    js_path = 'Snapshots.js'
+    tag_name = 'snapshots-skin'
 
     options = [{
         'name': 'show_back_button',

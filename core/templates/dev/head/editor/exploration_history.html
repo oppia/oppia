@@ -8,7 +8,7 @@
 </style>
 <div ng-controller="ExplorationHistory">
 
-  <div ng-hide="explorationSnapshots" class="oppia-align-center">
+  <div ng-hide="displayedExplorationSnapshots" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
     <span class="oppia-loading-dot-two">.</span>
@@ -19,7 +19,7 @@
     <div class="oppia-main-content">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Version History</h4>
-        <div ng-repeat="snapshot in explorationSnapshots">
+        <div ng-repeat="snapshot in displayedExplorationSnapshots">
           <input type="radio" name="compareVer1" ng-model="compareVersion.v1" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion1(snapshot.versionNumber)">
           <input type="radio" name="compareVer2" ng-model="compareVersion.v2" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion2(snapshot.versionNumber)">
           [<[snapshot.versionNumber]>]
@@ -38,11 +38,11 @@
 
         <br>
 
-        <div ng-hide="!explorationSnapshots || hideCompareVersionsButton">
+        <div ng-hide="!displayedExplorationSnapshots || hideCompareVersionsButton">
           <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showMergeview()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
         </div>
 
-        <div ng-hide="hideCodemirror || !explorationSnapshots" id="codemirrorMergeviewInstance">
+        <div ng-hide="hideCodemirror || !displayedExplorationSnapshots" id="codemirrorMergeviewInstance">
           <table class="table" style="margin-top: 15px">
             <!-- Table ratios 53:47 is to ensure text above right pane is aligned to codemirror gutter -->
             <td style="width: 53%">
@@ -85,7 +85,7 @@
         You are about to revert this exploration to version <[version]>. All changes made since that older version will be retracted.
       </p>
       <p>
-        Before reverting, you can preview the exploration you are reverting to by following <a href="/explore/<[explorationId]>?v=<[version]>" target="_blank">this link</a>. (It opens in a new window.)
+        Before reverting, you can preview the exploration you are reverting to by following <a ng-href="<[getExplorationUrl(version)]>" target="_blank">this link</a>. (It opens in a new window.)
       </p>
       <p>
         Are you sure you want to revert this exploration to version <[version]>?

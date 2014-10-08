@@ -1,21 +1,26 @@
 <style>
-  .mistake-message {
-    color: red;
+  .logic-proof-input-box {
+    border: 1px solid #ccc;
   }
-  .erroneous-line {
+  .logic-proof-erroneous-line {
     font-weight: bold;
+  }
+  .logic-proof-mistake-message {
+    color: red;
   }
 </style>
 
 <script type="text/ng-template" id="interactiveWidget/LogicProof">
   <div>
     <[questionString]>
-    <div ui-codemirror="{onLoad: codeEditor}">
-      <textarea ng-trim="false" rows="10"></textarea>
+    <div class="logic-proof-input-box">
+      <div ui-codemirror="{onLoad: codeEditor}">
+        <textarea ng-trim="false" rows="10"></textarea>
+      </div>
     </div>
     <button class="btn btn-default" ng-click="submitProof()">Submit</button>
     <button class="btn btn-default" ng-click="showHelp()">Possible lines</button>
-    <p class="mistake-message"> <[proofError]>  </p>
+    <p class="logic-proof-mistake-message"> <[proofError]>  </p>
   </div>
 </script>
 
@@ -28,9 +33,9 @@
 
     <div ng-if="!answer.correct">
       <div>
-        <pre><[answer.displayed_proof[0]]><div class="erroneous-line"><[answer.displayed_proof[1]]></div><[answer.displayed_proof[2]]></pre>
+        <pre><[answer.displayed_proof[0]]><div class="logic-proof-erroneous-line"><[answer.displayed_proof[1]]></div><[answer.displayed_proof[2]]></pre>
       </div>
-      <p class="mistake-message"><[answer.displayed_message]></p>
+      <p class="logic-proof-mistake-message"><[answer.displayed_message]></p>
     </div>
   </div>
 </script>

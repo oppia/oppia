@@ -16,10 +16,12 @@
 
 __author__ = 'Sean Lip'
 
+from core.controllers import reader
 from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import param_domain
 from core.tests import test_utils
 import feconf
 
@@ -33,17 +35,14 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         """Before each individual test, create a dummy exploration."""
         super(ReaderPermissionsTest, self).setUp()
 
-        self.first_editor_email = 'editor@example.com'
-        self.first_editor_id = self.get_user_id_from_email(
-            self.first_editor_email)
-
-        self.register_editor(self.first_editor_email)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.register_editor(self.EDITOR_EMAIL)
 
         exploration = exp_domain.Exploration.create_default_exploration(
-            self.EXP_ID, 'A title', 'A category')
+            self.EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
         exploration.states[exploration.init_state_name].widget.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
-        exp_services.save_new_exploration(self.first_editor_id, exploration)
+        exp_services.save_new_exploration(self.editor_id, exploration)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
@@ -60,13 +59,13 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_invisible_to_other_editors(self):
-        other_editor = 'another@example.com'
+        other_editor_email = 'another@example.com'
 
         other_exploration = exp_domain.Exploration.create_default_exploration(
             'eid2', 'A title', 'A category')
-        exp_services.save_new_exploration(other_editor, other_exploration)
+        exp_services.save_new_exploration(other_editor_email, other_exploration)
 
-        self.login(other_editor)
+        self.login(other_editor_email)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -74,24 +73,22 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_their_editors(self):
-        self.login(self.first_editor_email)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
-
-        self.login('admin@example.com')
+        self.set_admins([self.ADMIN_EMAIL])
+        self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID))
         self.assertEqual(response.status_int, 200)
         self.logout()
 
     def test_published_explorations_are_visible_to_anyone(self):
-        rights_manager.publish_exploration(self.first_editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
@@ -112,13 +109,10 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             self.EXP_ID, self.last_state_name)
         reader_dict = self.post_json(url, {
             'answer': answer, 'handler': 'submit', 'params': self.last_params,
-            'state_history': self.state_history,
         })
 
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
-        self.state_history += [self.last_state_name]
-        self.assertEqual(reader_dict['state_history'], self.state_history)
 
         return reader_dict
 
@@ -149,11 +143,9 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
-        self.state_history = [self.last_state_name]
 
-        self.assertEqual(reader_dict['state_history'], self.state_history)
         self.assertRegexpMatches(reader_dict['init_html'], expected_response)
-        self.assertEqual(reader_dict['title'], expected_title)
+        self.assertEqual(reader_dict['exploration']['title'], expected_title)
 
     def test_welcome_exploration(self):
         """Test a reader's progression through the default exploration."""
@@ -236,12 +228,8 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         # Viewer submits answer '0'
         exploration_dict = self.post_json(
             '%s/%s/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX,
-                          EXP_ID,
-                          state_name_1),
-            {
-                'answer': '0', 'handler': 'submit',
-                'state_history': exploration_dict['state_history']
-            }
+                          EXP_ID, state_name_1),
+            {'answer': '0', 'handler': 'submit'}
         )
         state_name_2 = exploration_dict['state_name']
 
@@ -254,3 +242,60 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
             }
         )
         self.logout()
+
+
+class ExplorationParametersUnitTests(test_utils.GenericTestBase):
+    """Test methods relating to exploration parameters."""
+
+    def test_get_init_params(self):
+        """Test the get_init_params() method."""
+        independent_pc = param_domain.ParamChange(
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
+        dependent_pc = param_domain.ParamChange(
+            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
+
+        exp_param_specs = {
+            'a': param_domain.ParamSpec('UnicodeString'),
+            'b': param_domain.ParamSpec('UnicodeString'),
+        }
+        new_params = reader._get_updated_param_dict(
+            {}, [independent_pc, dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
+
+        # Jinja string evaluation fails gracefully on dependencies that do not
+        # exist.
+        new_params = reader._get_updated_param_dict(
+            {}, [dependent_pc, independent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': ''})
+
+    def test_update_learner_params(self):
+        """Test the update_learner_params() method."""
+        independent_pc = param_domain.ParamChange(
+            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
+        dependent_pc = param_domain.ParamChange(
+            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
+
+        exp_param_specs = {
+            'a': param_domain.ParamSpec('UnicodeString'),
+            'b': param_domain.ParamSpec('UnicodeString'),
+        }
+
+        old_params = {}
+        new_params = reader._get_updated_param_dict(
+            old_params, [independent_pc, dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
+        self.assertEqual(old_params, {})
+
+        old_params = {'a': 'secondValue'}
+        new_params = reader._get_updated_param_dict(
+            old_params, [dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'a': 'secondValue', 'b': 'secondValue'})
+        self.assertEqual(old_params, {'a': 'secondValue'})
+
+        # Jinja string evaluation fails gracefully on dependencies that do not
+        # exist.
+        old_params = {}
+        new_params = reader._get_updated_param_dict(
+            old_params, [dependent_pc], exp_param_specs)
+        self.assertEqual(new_params, {'b': ''})
+        self.assertEqual(old_params, {})

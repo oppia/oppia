@@ -121,7 +121,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             $scope.mistakeMark = editor.doc.markText(
               {line: err.line, ch: 0}, 
               {line: err.line, ch: 100}, 
-              {className: 'erroneous-line'});
+              {className: 'logic-proof-erroneous-line'});
           }
           // NOTE: this line is necessary to force angular to refresh the
           // displayed proofError.

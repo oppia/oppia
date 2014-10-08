@@ -40,7 +40,7 @@
                 <th>Community-owned?</th>
               </tr>
               <tr ng-repeat="commit in allCommits track by $index">
-                <td><[getHumanReadableDate(commit.last_updated)]></td>
+                <td><[getDatetimeAsString(commit.last_updated)]></td>
                 <td>
                   <a ng-href="<[getExplorationCreateUrl(commit.exploration_id)]>">
                     <[explorationData[commit.exploration_id].title]>
@@ -69,7 +69,7 @@
                 <th>Username</th>
               </tr>
               <tr ng-repeat="message in allFeedbackMessages track by $index">
-                <td><[getHumanReadableDate(message.created_on)]></td>
+                <td><[getDatetimeAsString(message.created_on)]></td>
                 <td>
                   <a ng-href="<[getExplorationCreateUrl(message.exploration_id)]>">
                     <[message.exploration_id]>

@@ -14,19 +14,19 @@
                     <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
                   </div>
                 </div>
+                <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
+                  <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
+                  <div class="col-lg-10 col-md-10 col-sm-10">
+                    <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
+                    <span class="help-block" style="font-size: smaller">
+                      What does this exploration help people to do?
+                    </span>
+                  </div>
+                </div>
                 <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
                   <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
                     <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
-                  </div>
-                </div>
-                <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
-                  <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Objective</label>
-                  <div class="col-lg-10 col-md-10 col-sm-10">
-                    <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to multiply two numbers">
-                    <span class="help-block" style="font-size: smaller">
-                      What does this exploration help learners to do?
-                    </span>
                   </div>
                 </div>
                 <div class="form-group">
@@ -39,6 +39,13 @@
                         Don't see the language you want? <a href="https://code.google.com/p/oppia/issues/entry?template=Enhancement%20request" target="_blank">Tell us.</a>
                       </em>
                     </span>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
+                  <div class="col-lg-10 col-md-10 col-sm-10">
+                    <select id="explorationInitStateName" class="form-control" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for (name, _) in explorationStatesService.getStates()">
+                    </select>
                   </div>
                 </div>
               </div>
@@ -60,6 +67,19 @@
 
               <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationObjective">
+                    Goal
+                  </label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  <span id="explorationObjective" type="text">
+                    <[explorationObjectiveService.displayed]>
+                  </span>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
                   <label for="explorationCategory">
                     Category
                   </label>
@@ -73,13 +93,19 @@
 
               <div class="row">
                 <div class="col-lg-2 col-md-2 col-sm-2">
-                  <label for="explorationObjective">
-                    Objective
-                  </label>
+                  <label for="explorationLanguageCode">Language</label>
                 </div>
                 <div class="col-lg-10 col-md-10 col-sm-10">
-                  This exploration helps learners to
-                  <span id="explorationObjective" type="text"><[explorationObjectiveService.displayed]></span>.
+                  <[explorationLanguageCodeService.getCurrentLanguageDescription()]>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                  <label for="explorationInitStateName">First State</label>
+                </div>
+                <div class="col-lg-10 col-md-10 col-sm-10">
+                  <[explorationInitStateNameService.displayed]>
                 </div>
               </div>
             </div>
@@ -89,9 +115,9 @@
         <div ng-if="explorationRightsService.ownerNames.length > 0 && !explorationRightsService.isCloned()">
           <hr>
 
-          <h4>Roles</h4>
           <div class="row">
-            <div class="col-lg-6 col-md-6 col-sm-6">
+            <div class="col-lg-5 col-md-5 col-sm-5">
+              <h4>Roles</h4>
               <div ng-show="explorationRightsService.ownerNames.length > 0">
                 <strong>Managers</strong>
                 <ul>
@@ -118,36 +144,34 @@
                   </li>
                 </ul>
               </div>
-            </div>
 
-            <div class="col-lg-6 col-md-6 col-sm-6">
+
               {% if can_modify_roles %}
                 <div ng-hide="activeInputData.name == 'explorationMetadata.editRoles'">
-                  <button type="button" class="btn btn-default" ng-click="openEditRolesForm()">
+                  <button type="button" class="btn btn-default protractor-test-edit-roles" ng-click="openEditRolesForm()">
                     Edit Roles
                   </button>
                 </div>
 
                 <div ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
                   <strong>Add or Change Role</strong>
-                  <br><br>
                   <div class="form-group">
                     <form ng-submit="editRole(newMemberUsername, newMemberRole.value)">
                       <label for="newMemberUsername">Username of invited user</label>
                       <div>
-                        <input type="text" id="newMemberUsername" class="form-control" ng-model="newMemberUsername" placeholder="{{username}}">
+                        <input type="text" id="newMemberUsername" class="form-control protractor-test-role-username" ng-model="newMemberUsername" placeholder="{{username}}">
                       </div>
                       <br>
                       <label for="newMemberRole">Role of invited user</label>
                       <div>
-                        <select ng-model="newMemberRole" class="form-control" ng-options="r.name for r in ROLES" style="width: 250px;">
+                        <select ng-model="newMemberRole" class="form-control protractor-test-role-select" ng-options="r.name for r in ROLES" style="width: 250px;">
                         </select>
                         <span class="help-block">
                           Note that managers also have the permissions of collaborators, and collaborators also have the permissions of viewers. Please note that assigning roles is irreversible (though you can always assign somebody to a higher role).
                         </span>
                       </div>
 
-                      <input type="submit" class="btn btn-default" value="Save">
+                      <input type="submit" class="btn btn-default protractor-test-save-role" value="Save">
                       <button type="button" class="btn btn-default" ng-click="closeEditRolesForm()"
                         ng-show="activeInputData.name == 'explorationMetadata.editRoles'">
                         Cancel
@@ -156,6 +180,44 @@
                   </div>
                 </div>
               {% endif %}
+            </div>
+
+            <div class="col-lg-7 col-md-7 col-sm-7">
+              <h4>Permissions</h4>
+              <div class="pull-right">
+                <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
+                  Toggle visibility
+                </button>
+              </div>
+
+              <p ng-if="explorationRightsService.isPrivate() &&explorationRightsService.viewableIfPrivate()">
+                This exploration is <strong>private</strong>. Anyone with the link can access it.
+              </p>
+              <p ng-if="explorationRightsService.isPrivate() &&!explorationRightsService.viewableIfPrivate()">
+                This exploration is <strong>private</strong>. Only invited users, moderators and site admins can
+                access it.
+              </p>
+              <p ng-if="explorationRightsService.isPublic()">
+                This exploration is <strong>public</strong>: anyone can access it.
+              </p>
+              <p ng-if="explorationRightsService.isPublicized()">
+                This exploration is <strong>public</strong>: anyone can access it.
+              </p>
+
+              <p ng-if="!explorationRightsService.isPrivate() || explorationRightsService.viewableIfPrivate()">
+                <em>Link to share:</em>
+                <input class="form-control" type="text" value="<[getExplorePageUrl(explorationId)]>" readonly="readonly" onClick="this.select();">
+              </p>
+
+              <p ng-if="explorationRightsService.isPrivate()">
+                It is <strong>not shown</strong> in the gallery.
+              </p>
+              <p ng-if="explorationRightsService.isPublic()">
+                It is <strong>shown</strong> in the gallery (in Beta mode).
+              </p>
+              <p ng-if="explorationRightsService.isPublicized()">
+                It is <strong>shown</strong> in the gallery.
+              </p>
             </div>
           </div>
         </div>
@@ -195,7 +257,7 @@
 
               {% if can_publicize %}
                 <p ng-show="explorationRightsService.isPublic()">
-                  <button type="button" class="btn btn-default" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                  <button type="button" class="btn btn-default protractor-test-release-exploration" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
                     Move out of beta
                     <span ng-if="currentUserIsAdmin">(as admin)</span>
                     <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
