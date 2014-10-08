@@ -333,7 +333,11 @@ oppia.directive('stateGraphViz', [
           bottom: bottomEdge,
           right: rightEdge
         };
-      }
+      };
+
+      $scope.getGraphHeightInPixels = function() {
+        return Math.max($scope.GRAPH_HEIGHT, 300);
+      };
 
       $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {
         var nodeData = stateGraphArranger.computeLayout(
