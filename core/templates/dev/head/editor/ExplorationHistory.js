@@ -98,7 +98,7 @@ oppia.controller('ExplorationHistory', [
     if ($scope.comparePanesVersions.leftPane !== undefined &&
         $scope.comparePanesVersions.rightPane !== undefined &&
         $scope.comparePanesVersions.leftPane < $scope.comparePanesVersions.rightPane) {
-      compareVersionsService.getStatesDiff($scope.comparePanesVersions.leftPane,
+      compareVersionsService.getDiffGraphData($scope.comparePanesVersions.leftPane,
           $scope.comparePanesVersions.rightPane).then(function(response) {
         stateData = response;
         $log.info('Retrieved version comparison data');

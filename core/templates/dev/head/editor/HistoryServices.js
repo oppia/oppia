@@ -219,25 +219,99 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           if (stateData[stateIds[change.state_name]].stateProperty == STATE_PROPERTY_UNCHANGED) {
             stateData[stateIds[change.state_name]].stateProperty = STATE_PROPERTY_CHANGED;
           }
-        } else if (change.cmd != 'revert') {
-          throw new Error('Invalid change command.');
+        } else if (change.cmd != 'revert' && change.cmd != 'edit_exploration_property') {
+          throw new Error('Invalid change command: ' + change.cmd);
         }
       }
     }
   }
+  /**
+   * Returns a O/1 adjacency matrix of links in state, indexed by id.
+   * END_DEST is assigned an id maxId + 1.
+   */
+  function _getAdjMatrix(states, stateIds) {
+    adjMatrix = {};
+    for (var state = 1; state <= _maxId; state++) {
+      adjMatrix[state] = {};
+    }
+    for (var state1 = 1; state1 <= _maxId; state1++) {
+      for (var state2 = 1; state2 <= _maxId; state2++) {
+        adjMatrix[state1][state2] = 0;
+      }
+    }
+    for (var state in states) {
+      var handlers = states[state].widget.handlers;
+      for (h = 0; h < handlers.length; h++) {
+        ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          adjMatrix[stateIds[state]][stateIds[ruleSpecs[i].dest]] = 1;
+        }
+      }
+    }
+    return adjMatrix;
+  }
+  /**
+   * Returns a list of objects representing links in the diff graph.
+   * Each object represents one link, and has keys:
+   *  - 'source': source state of link
+   *  - 'target': target state of link
+   *  - 'linkProperty': 'added', 'deleted' or 'unchanged'
+   */
+  function _compareLinks(v1States, originalStateIds, v2States, newestStateIds) {
+    links = [];
+    originalStateIds[END_DEST] = _generateNewId();
+    newestStateIds[END_DEST] = _maxId;
+    var adjMatrixV1 = _getAdjMatrix(v1States, originalStateIds);
+    var adjMatrixV2 = _getAdjMatrix(v2States, newestStateIds);
+
+    for (var i = 1; i <= _maxId; i++) {
+      for (var j = 1; j <= _maxId; j++) {
+        if (i == j) continue;
+        if (adjMatrixV1[i][j] == 1 && adjMatrixV2[i][j] == 1) {
+          links.push({
+            source: i,
+            target: j,
+            linkProperty: 'unchanged'
+          });
+        } else if (adjMatrixV1[i][j] == 0 && adjMatrixV2[i][j] == 1) {
+          links.push({
+            source: i,
+            target: j,
+            linkProperty: 'added'
+          });
+        } else if (adjMatrixV1[i][j] == 1 && adjMatrixV2[i][j] == 0) {
+          links.push({
+            source: i,
+            target: j,
+            linkProperty: 'deleted'
+          });
+        }
+      }
+    }
+
+    return links;
+  }
   return {
     /**
-     * Summarize changes to each state between v1 and v2.
-     * Returns a promise for an object whose keys are state IDs (assigned
+     * Summarize changes between to states and rules v1 and v2.
+     * Returns a promise for an object whose keys are 'initStateName',
+     * 'finalStateName', 'nodes' and 'links'.
+     *
+     * 'nodes' is an object whose keys are state IDs (assigned
      * within the function) and whose value is an object with these keys:
      *  - 'newestStateName': the latest name of the state
      *  - 'originalStateName': the first encountered name for the state
      *  - 'stateProperty': 'changed', 'unchanged', 'added' or 'deleted'
      *
+     * 'links' is a list of objects representing rules. The objects have keys:
+     *  - 'source': source state of link
+     *  - 'target': target state of link
+     *  - 'linkProperty': 'added', 'deleted' or 'unchanged'
+     *
      * Should be called after versionsTreeService.generateVersionTree is called.
      * Should satisfy v1 < v2.
      */
-    getStatesDiff: function(v1, v2) {
+    getDiffGraphData: function(v1, v2) {
       if (v1 > v2) throw new Error('Tried to compare v1 > v2.');
       var explorationDataUrl = '/createhandler/data/' +
         explorationData.explorationId + '?v=';
@@ -261,6 +335,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           };
           stateIds[stateName] = stateId;
         }
+        var originalStateIds = angular.copy(stateIds);
 
         // Populate statesData with changes from v1 to LCA and from LCA to v2
         var lca = versionsTreeService.findLCA(v1, v2);
@@ -278,7 +353,15 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           }
         }
 
-        return statesData;
+        var links = _compareLinks(v1States, originalStateIds, v2States, stateIds);
+
+        return {
+          'nodes': statesData,
+          'links': links,
+          'v1InitStateName': response.v1Data.data.init_state_name,
+          'v2InitStateName': response.v2Data.data.init_state_name,
+          'finalStateName': END_DEST
+        };
       });
     }
   };

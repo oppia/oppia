@@ -308,10 +308,10 @@ describe('Compare versions service', function() {
           'state_name': 'D'
         }],
         'version_number': 13
-      },
+      }
     ];
 
-    // Mock state data for getStatesDiff(). The states are represented as
+    // Mock state data for getDiffGraphData(). The states are represented as
     // strings for simplicity.
     var testExplorationData1 = [
       {
@@ -321,17 +321,17 @@ describe('Compare versions service', function() {
       },
       {
         'states': {
-          'A': 'new_dummy_state_data',
+          'A': 'new_dummy_state_data'
         }
       },
       {
         'states': {
-          'B': 'new_dummy_state_data',
+          'B': 'new_dummy_state_data'
         }
       },
       {
         'states': {
-          'A': 'new_dummy_state_data',
+          'A': 'new_dummy_state_data'
         }
       },
       {
@@ -389,20 +389,20 @@ describe('Compare versions service', function() {
       {
         'states': {
           'B': 'some_dummy_state_data',
-          'C': 'another_dummy_state_data',
+          'C': 'another_dummy_state_data'
         }
       }
     ];
 
-    // Tests for getStatesDiff on linear commits
+    // Tests for getDiffGraphData on linear commits
     it('should detect changed, renamed and added states', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=1')
         .respond(testExplorationData1[0]);
       $httpBackend.expect('GET', '/createhandler/data/0?v=7')
         .respond(testExplorationData1[6]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(1, 7).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(1, 7).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'changed',
@@ -424,8 +424,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=8')
         .respond(testExplorationData1[7]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(5, 8).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(5, 8).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -452,8 +452,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=9')
         .respond(testExplorationData1[8]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(7, 9).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(7, 9).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -480,8 +480,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=10')
         .respond(testExplorationData1[9]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(8, 10).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(8, 10).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -508,8 +508,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=13')
         .respond(testExplorationData1[12]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(11, 13).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(11, 13).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'D',
             'stateProperty': 'deleted',
@@ -537,8 +537,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=11')
         .respond(testExplorationData1[10]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(1, 11).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(1, 11).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -566,8 +566,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=4')
         .respond(testExplorationData1[3]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(2, 4).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(2, 4).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -585,8 +585,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=13')
         .respond(testExplorationData1[12]);
       vts.init(testSnapshots1);
-      cvs.getStatesDiff(1, 13).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(1, 13).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'D',
             'stateProperty': 'deleted',
@@ -724,15 +724,15 @@ describe('Compare versions service', function() {
       }
     ];
 
-    // Tests for getStatesDiff with reversions
+    // Tests for getDiffGraphData with reversions
     it('should mark states correctly when there is 1 reversion', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=1')
         .respond(testExplorationData2[0]);
       $httpBackend.expect('GET', '/createhandler/data/0?v=5')
         .respond(testExplorationData2[4]);
       vts.init(testSnapshots2);
-      cvs.getStatesDiff(1, 5).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(1, 5).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -754,8 +754,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=5')
         .respond(testExplorationData2[4]);
       vts.init(testSnapshots2);
-      cvs.getStatesDiff(3, 5).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(3, 5).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -777,8 +777,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=5')
         .respond(testExplorationData2[4]);
       vts.init(testSnapshots2);
-      cvs.getStatesDiff(4, 5).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(4, 5).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -800,8 +800,8 @@ describe('Compare versions service', function() {
       $httpBackend.expect('GET', '/createhandler/data/0?v=8')
         .respond(testExplorationData2[7]);
       vts.init(testSnapshots2);
-      cvs.getStatesDiff(5, 8).then(function(data) {
-        expect(data).toEqual({
+      cvs.getDiffGraphData(5, 8).then(function(data) {
+        expect(data.nodes).toEqual({
           1: {
             'newestStateName': 'A',
             'stateProperty': 'unchanged',
@@ -818,6 +818,369 @@ describe('Compare versions service', function() {
             'originalStateName': 'D'
           }
         });
+      });
+      $httpBackend.flush();
+    });
+
+    // Represents snapshots and exploration data for tests for links
+    // Only includes information accessed by the function
+    var testSnapshots3 = [
+      {
+        'commit_type': 'create',
+        'version_number': 1
+      },
+      {
+        'commit_type': 'edit',
+        'commit_cmds': [{
+          'cmd': 'add_state',
+          'state_name': 'B'
+        }],
+        'version_number': 2
+      },
+      {
+        'commit_type': 'edit',
+        'commit_cmds': [{
+          'cmd': 'add_state',
+          'state_name': 'C'
+        }],
+        'version_number': 3
+      },
+      {
+        'commit_type': 'edit',
+        'commit_cmds': [{
+          'cmd': 'rename_state',
+          'old_state_name': 'C',
+          'new_state_name': 'D'
+        }],
+        'version_number': 4
+      },
+      {
+        'commit_type': 'edit',
+        'commit_cmds': [{
+          'cmd': 'edit_state_property',
+          'state_name': 'D'
+        }],
+        'version_number': 5
+      },
+      {
+        'commit_type': 'edit',
+        'commit_cmds': [{
+          'cmd': 'edit_state_property',
+          'state_name': 'D'
+        }],
+        'version_number': 6
+      },
+      {
+        'commit_type': 'edit',
+        'commit_cmds': [{
+          'cmd': 'delete_state',
+          'state_name': 'D'
+        }],
+        'version_number': 7
+      },
+      {
+        'commit_type': 'edit',
+        'commit_cmds': [{
+          'cmd': 'add_state',
+          'state_name': 'D',
+        }],
+        'version_number': 8
+      }
+    ];
+
+    var testExplorationData3 = [
+      {
+        'states': {
+          'A': 'dummy_state_data'
+        }
+      },
+      {
+        'states': {
+          'A': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'}
+            ]}]}
+          },
+          'B': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'END'}
+            ]}]}
+          }
+        }
+      },
+      {
+        'states': {
+          'A': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'},
+              {'dest': 'C'}
+            ]}]}
+          },
+          'B': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'END'}
+            ]}]}
+          },
+          'C': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'A'}
+            ]}]}
+          }
+        }
+      },
+      {
+        'states': {
+          'A': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'},
+              {'dest': 'D'}
+            ]}]}
+          },
+          'B': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'END'}
+            ]}]}
+          },
+          'D': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'A'}
+            ]}]}
+          }
+        }
+      },
+      {
+        'states': {
+          'A': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'},
+              {'dest': 'D'}
+            ]}]}
+          },
+          'B': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'D'},
+              {'dest': 'END'}
+            ]}]}
+          },
+          'D': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'A'}
+            ]}]}
+          }
+        }
+      },
+      {
+        'states': {
+          'A': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'}
+            ]}]}
+          },
+          'B': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'D'},
+              {'dest': 'END'}
+            ]}]}
+          },
+          'D': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'A'}
+            ]}]}
+          }
+        }
+      },
+      {
+        'states': {
+          'A': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'}
+            ]}]}
+          },
+          'B': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'END'}
+            ]}]}
+          }
+        }
+      },
+      {
+        'states': {
+          'A': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'}
+            ]}]}
+          },
+          'B': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'D'},
+              {'dest': 'END'}
+            ]}]}
+          },
+          'D': {
+            'widget': {'handlers': [{ 'rule_specs': [
+              {'dest': 'B'}
+            ]}]}
+          }
+        }
+      }
+    ];
+
+    it('should correctly display added links', function() {
+      $httpBackend.expect('GET', '/createhandler/data/0?v=1')
+        .respond(testExplorationData3[0]);
+      $httpBackend.expect('GET', '/createhandler/data/0?v=2')
+        .respond(testExplorationData3[1]);
+      vts.init(testSnapshots3);
+      cvs.getDiffGraphData(1, 2).then(function(data) {
+        expect(data.links).toEqual([
+          {
+            'source': 1,
+            'target': 2,
+            'linkProperty': 'added'
+          },
+          {
+            'source': 2,
+            'target': 3,
+            'linkProperty': 'added'
+          }
+        ]);
+      });
+      $httpBackend.flush();
+    });
+
+    it('should correctly display deleted links', function() {
+      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+        .respond(testExplorationData3[4]);
+      $httpBackend.expect('GET', '/createhandler/data/0?v=6')
+        .respond(testExplorationData3[5]);
+      vts.init(testSnapshots3);
+      cvs.getDiffGraphData(5, 6).then(function(data) {
+        expect(data.links).toEqual([
+          {
+            'source': 1,
+            'target': 2,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 1,
+            'target': 3,
+            'linkProperty': 'deleted'
+          },
+          {
+            'source': 2,
+            'target': 3,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 2,
+            'target': 4,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 3,
+            'target': 1,
+            'linkProperty': 'unchanged'
+          }
+        ]);
+      });
+      $httpBackend.flush();
+    });
+
+    it('should correctly display links on renamed states', function() {
+      $httpBackend.expect('GET', '/createhandler/data/0?v=3')
+        .respond(testExplorationData3[2]);
+      $httpBackend.expect('GET', '/createhandler/data/0?v=5')
+        .respond(testExplorationData3[4]);
+      vts.init(testSnapshots3);
+      cvs.getDiffGraphData(3, 5).then(function(data) {
+        expect(data.links).toEqual([
+          {
+            'source': 1,
+            'target': 2,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 1,
+            'target': 3,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 2,
+            'target': 3,
+            'linkProperty': 'added'
+          },
+          {
+            'source': 2,
+            'target': 4,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 3,
+            'target': 1,
+            'linkProperty': 'unchanged'
+          }
+        ]);
+      });
+      $httpBackend.flush();
+    });
+
+    it('should correctly display added, then deleted links', function() {
+      $httpBackend.expect('GET', '/createhandler/data/0?v=2')
+        .respond(testExplorationData3[1]);
+      $httpBackend.expect('GET', '/createhandler/data/0?v=7')
+        .respond(testExplorationData3[6]);
+      vts.init(testSnapshots3);
+      cvs.getDiffGraphData(2, 7).then(function(data) {
+        expect(data.links).toEqual([
+          {
+            'source': 1,
+            'target': 2,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 2,
+            'target': 4,
+            'linkProperty': 'unchanged'
+          }
+        ]);
+      });
+      $httpBackend.flush();
+    });
+
+    it('should correctly display deleted, then added links', function() {
+      $httpBackend.expect('GET', '/createhandler/data/0?v=6')
+        .respond(testExplorationData3[5]);
+      $httpBackend.expect('GET', '/createhandler/data/0?v=8')
+        .respond(testExplorationData3[7]);
+      vts.init(testSnapshots3);
+      cvs.getDiffGraphData(6, 8).then(function(data) {
+        expect(data.links).toEqual([
+          {
+            'source': 1,
+            'target': 2,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 2,
+            'target': 3,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 2,
+            'target': 4,
+            'linkProperty': 'unchanged'
+          },
+          {
+            'source': 3,
+            'target': 1,
+            'linkProperty': 'deleted'
+          },
+          {
+            'source': 3,
+            'target': 2,
+            'linkProperty': 'added'
+          }
+        ]);
       });
       $httpBackend.flush();
     });
