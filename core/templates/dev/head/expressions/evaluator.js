@@ -58,9 +58,9 @@
 // Constraints on the input arguments (number, types, and any other
 // constraints) as well as the output value and type should be documented.
 
-
-// TODO(kashida): Wrap this in a angular service.
-var expressions = (function() {
+// Service for expression evaluation.
+oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
+    function($log, expressionParserService) {
 
 // Exceptions that can be thrown from the evaluation of expressions.
 var ExpressionError = function() {
@@ -94,7 +94,8 @@ ExprWrongNumArgsError.prototype.toString = function() {
 
 
 var evaluateExpression = function(expression, envs) {
-  return evaluate(parser.parse(expression), envs.concat(system));
+  return evaluate(expressionParserService.parse(expression),
+      envs.concat(system));
 };
 
 /**
@@ -129,7 +130,8 @@ var evaluate = function(parsed, envs) {
 
 var validateExpression = function(expression, envs) {
   try {
-    return validate(parser.parse(expression), envs.concat(system));
+    return validate(expressionParserService.parse(expression),
+        envs.concat(system));
   } catch(err) {
     return false;
   }
@@ -288,4 +290,4 @@ return {
   'validate': validate,
   'validateExpression': validateExpression,
 };
-})();
+}]);

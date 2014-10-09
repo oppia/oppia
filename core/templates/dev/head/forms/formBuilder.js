@@ -856,8 +856,9 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
   };
 }]);
 
-oppia.directive('requireIsValidExpression', ['parameterSpecsService',
-    function(parameterSpecsService) {
+oppia.directive('requireIsValidExpression',
+    ['parameterSpecsService', 'expressionEvaluatorService',
+        function(parameterSpecsService, expressionEvaluatorService) {
   // Create a namescope environment from the parameter names. The values of the
   // parameters do not matter.
   var params = {};
@@ -871,7 +872,7 @@ oppia.directive('requireIsValidExpression', ['parameterSpecsService',
     link: function(scope, elm, attrs, ctrl) {
       var validator = function(value) {
         ctrl.$setValidity('isValidExpression',
-            expressions.validateExpression(value, [params]));
+            expressionEvaluatorService.validateExpression(value, [params]));
         return value;
       };
 
