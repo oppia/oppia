@@ -219,7 +219,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           if (stateData[stateIds[change.state_name]].stateProperty == STATE_PROPERTY_UNCHANGED) {
             stateData[stateIds[change.state_name]].stateProperty = STATE_PROPERTY_CHANGED;
           }
-        } else if (change.cmd != 'revert' && change.cmd != 'edit_exploration_property') {
+        } else if (change.cmd != 'AUTO_revert_version_number' && change.cmd != 'edit_exploration_property') {
           throw new Error('Invalid change command: ' + change.cmd);
         }
       }
@@ -295,7 +295,10 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
     /**
      * Summarize changes between to states and rules v1 and v2.
      * Returns a promise for an object whose keys are 'initStateName',
-     * 'finalStateName', 'nodes' and 'links'.
+     * 'v2InitStateName', 'finalStateName', 'nodes', 'nodeList' and 'links'.
+     *
+     * 'initStateName' and 'v2InitStateName' are the IDs of the initial states
+     * of v1 and v2 respectively. 'finalStateName' is the ID of the final state.
      *
      * 'nodes' is an object whose keys are state IDs (assigned
      * within the function) and whose value is an object with these keys:
@@ -303,12 +306,14 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
      *  - 'originalStateName': the first encountered name for the state
      *  - 'stateProperty': 'changed', 'unchanged', 'added' or 'deleted'
      *
+     * 'nodeList' is a list of IDs of all states to be displayed.
+     *
      * 'links' is a list of objects representing rules. The objects have keys:
      *  - 'source': source state of link
      *  - 'target': target state of link
      *  - 'linkProperty': 'added', 'deleted' or 'unchanged'
      *
-     * Should be called after versionsTreeService.generateVersionTree is called.
+     * Should be called after versionsTreeService.init() is called.
      * Should satisfy v1 < v2.
      */
     getDiffGraphData: function(v1, v2) {
@@ -353,14 +358,28 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           }
         }
 
+        // Delete states not present in both v1 and v2
+        for (var stateId in statesData) {
+          if (!v1States.hasOwnProperty(statesData[stateId].originalStateName) &&
+              !v2States.hasOwnProperty(statesData[stateId].newestStateName)) {
+            delete statesData[stateId];
+          }
+        }
+
         var links = _compareLinks(v1States, originalStateIds, v2States, stateIds);
+        var stateList = [];
+        for (var nodeId in statesData) {
+          stateList.push(nodeId);
+        }
+        stateList.push(stateIds[END_DEST]);
 
         return {
           'nodes': statesData,
+          'nodeList': stateList,
           'links': links,
-          'v1InitStateName': response.v1Data.data.init_state_name,
-          'v2InitStateName': response.v2Data.data.init_state_name,
-          'finalStateName': END_DEST
+          'initStateName': originalStateIds[response.v1Data.data.init_state_name],
+          'v2InitStateName': stateIds[response.v2Data.data.init_state_name],
+          'finalStateName': stateIds[END_DEST]
         };
       });
     }
