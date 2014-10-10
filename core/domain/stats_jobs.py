@@ -148,7 +148,11 @@ class StateCounterTranslationOneOffJob(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def reduce(key, stringified_values):
-        exp_model = exp_models.ExplorationModel.get(key) 
+        exp_model = None
+        try:
+            exp_model = exp_models.ExplorationModel.get(key) 
+        except base_models.BaseModel.EntityNotFoundError:
+            return
         start_counter = stats_models.StateCounterModel.get_or_create(
             key, exp_model.init_state_name)
         complete_counter = stats_models.StateCounterModel.get_or_create(
@@ -192,6 +196,12 @@ class StatisticsMRJobManager(
 
     @staticmethod
     def reduce(key, stringified_values):
+        exp_model = None
+        try:
+            exp_model = exp_models.ExplorationModel.get(key)
+        except base_models.BaseModel.EntityNotFoundError:
+            return
+            
         # Number of times exploration was started
         new_models_start_count = 0
         # Number of times exploration was completed
@@ -258,8 +268,7 @@ class StatisticsMRJobManager(
             (_, state_name) = session_id_to_latest_leave_event[session_id]
             state_hit_counts[state_name]['no_answer_count'] += 1
 
-        # Update the statistics values with data from the old counter models.
-        exp_model = exp_models.ExplorationModel.get(key) 
+        # Update all stats with old model values
         old_models_start_count = stats_models.StateCounterModel.get_or_create(
             key, exp_model.init_state_name).first_entry_count
         old_models_complete_count = (
