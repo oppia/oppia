@@ -134,41 +134,6 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
         }
 
 
-class StateCounterTranslationOneOffJob(jobs.BaseMapReduceJobManager):
-    @classmethod
-    def entity_classes_to_map_over(cls):
-        return [stats_models.StartExplorationEventLogEntryModel,
-                stats_models.MaybeLeaveExplorationEventLogEntryModel]
-
-    @staticmethod
-    def map(item):
-        yield (item.exploration_id, {
-            'event_type': item.event_type,
-            'state_name': item.state_name})
-
-    @staticmethod
-    def reduce(key, stringified_values):
-        exp_model = None
-        try:
-            exp_model = exp_models.ExplorationModel.get(key) 
-        except base_models.BaseModel.EntityNotFoundError:
-            return
-        start_counter = stats_models.StateCounterModel.get_or_create(
-            key, exp_model.init_state_name)
-        complete_counter = stats_models.StateCounterModel.get_or_create(
-            key, feconf.END_DEST)
-        for value_str in stringified_values:
-            value = ast.literal_eval(value_str)
-            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
-                start_counter.first_entry_count -= 1
-            elif (value['event_type'] ==
-                feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION):
-                if value['state_name'] == feconf.END_DEST:
-                    complete_counter.first_entry_count -= 1
-        start_counter.put()
-        complete_counter.put()
-
-
 class StatisticsMRJobManager(
         jobs.BaseMapReduceJobManagerForContinuousComputations):
     """Job that calculates and creates stats models for exploration view.
