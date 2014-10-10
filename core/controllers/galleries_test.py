@@ -28,10 +28,8 @@ CAN_EDIT_STR = 'can_edit'
 
 class GalleryPageTest(test_utils.GenericTestBase):
 
-    EDITOR_EMAIL = 'editor@example.com'
     EXP_ID = 'eid'
     EXP_TITLE = 'title'
-    OWNER_EMAIL = 'owner@example.com'
 
     def test_gallery_page(self):
         """Test access to the gallery page."""
@@ -70,7 +68,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'Welcome',
             'title': 'Welcome to Oppia!',
-            'language_code': 'en',
+            'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
         }, response_dict['beta'][0])
@@ -84,7 +82,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'Welcome',
             'title': 'Welcome to Oppia!',
-            'language_code': 'en',
+            'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['released'][0])
@@ -97,7 +95,11 @@ class GalleryPageTest(test_utils.GenericTestBase):
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
-        EXP_A_DICT = {'title': 'A', 'category': 'Test Explorations'}
+        EXP_A_DICT = {
+            'title': self.UNICODE_TEST_STRING,
+            'category': self.UNICODE_TEST_STRING,
+            'objective': 'Learn how to generate exploration ids.',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE}
         exp_a_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, EXP_A_DICT, csrf_token
         )[galleries.EXPLORATION_ID_KEY]
@@ -105,8 +107,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
     def test_exploration_upload_button(self):
         """Test that the exploration upload button appears when appropriate."""
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)

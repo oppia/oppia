@@ -99,28 +99,17 @@ oppia.directive('checkboxGroup', function() {
 });
 
 oppia.controller('Gallery', [
-    '$scope', '$http', '$rootScope', 'createExplorationButtonService',
+    '$scope', '$http', '$rootScope', '$window', 'createExplorationButtonService',
     'oppiaDatetimeFormatter',
-    function($scope, $http, $rootScope, createExplorationButtonService,
+    function($scope, $http, $rootScope, $window, createExplorationButtonService,
              oppiaDatetimeFormatter) {
   $scope.galleryDataUrl = '/galleryhandler/data';
+  $scope.currentUserIsModerator = false;
 
   $scope.selectedStatuses = {
     'publicized': true,
     'public': false,
     'private': false
-  };
-  $scope.selectedCategories = {};
-  $scope.selectedLanguages = {};
-
-  var _navigated = false;
-  // Prevent trying to navigate to two places at once when the user clicks on the
-  // "See inside" button within the main gallery tile.
-  $scope.navigateTo = function(url) {
-    if (!_navigated) {
-      _navigated = true;
-      window.location.href = url;
-    }
   };
 
   $scope.getCategoryList = function() {
@@ -145,6 +134,10 @@ oppia.controller('Gallery', [
 
   // Retrieves gallery data from the server.
   $http.get($scope.galleryDataUrl).success(function(data) {
+    if (data.is_moderator) {
+      $scope.currentUserIsModerator = true;
+    }
+
     $scope.releasedExplorations = data.released;
     $scope.betaExplorations = data.beta;
     $scope.privateExplorations = data['private'];
@@ -153,12 +146,30 @@ oppia.controller('Gallery', [
       $scope.betaExplorations).concat($scope.privateExplorations);
 
     $scope.selectedCategories = {};
-    $scope.selectedLanguageCodes = {};
+    $scope.selectedLanguages = {};
     $scope.allExplorationsInOrder.map(function(expDict) {
       $scope.selectedCategories[expDict.category] = true;
-      $scope.selectedLanguageCodes[expDict.language_code] = true;
+      $scope.selectedLanguages[expDict.language] = true;
     });
 
     $rootScope.loadingMessage = '';
+  });
+
+  $scope.gallerySidebarIsActive = false;
+  $scope.toggleGallerySidebar = function() {
+    $scope.gallerySidebarIsActive = !$scope.gallerySidebarIsActive;
+  };
+
+  $scope.isScreenLarge = function() {
+    return Math.max(document.documentElement.clientWidth, $window.innerWidth || 0) > 768;
+  };
+
+  $scope.screenIsLarge = $scope.isScreenLarge();
+  $window.addEventListener('resize', function() {
+    $scope.screenIsLarge = $scope.isScreenLarge();
+    if ($scope.screenIsLarge) {
+      $scope.gallerySidebarIsActive = false;
+    }
+    $scope.$apply();
   });
 }]);

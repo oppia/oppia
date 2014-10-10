@@ -8,66 +8,70 @@
 </style>
 <div ng-controller="ExplorationHistory">
 
-  <h4>Version History</h4>
-
-  <div ng-hide="explorationSnapshots" class="oppia-align-center">
+  <div ng-hide="displayedExplorationSnapshots" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
     <span class="oppia-loading-dot-two">.</span>
     <span class="oppia-loading-dot-three">.</span>
   </div>
 
-  <div style="margin-bottom: 10px">
-    <div ng-repeat="snapshot in explorationSnapshots">
-      <input type="radio" name="compareVer1" ng-model="compareVersion.v1" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion1(snapshot.versionNumber)">
-      <input type="radio" name="compareVer2" ng-model="compareVersion.v2" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion2(snapshot.versionNumber)">
-      [<[snapshot.versionNumber]>]
-      <strong><[snapshot.committerId]></strong>
-      <[snapshot.commitMessage]>
-      <span class="pull-right">
-        <em><[snapshot.createdOn]></em>
-        <span ng-if="snapshot.versionNumber !== currentVersion && editabilityService.isEditable()">
-          | <a href="#" ng-click="showRevertExplorationModal(snapshot.versionNumber)">Revert</a>
-        </span>
-        <span>
-          | <a href="#" ng-click="downloadExplorationWithVersion(snapshot.versionNumber)" title="Download exploration as a zip file.">Download</a>
-        </span>
-      </span>
-    </div>
-  </div>
-
-  <div ng-hide="!explorationSnapshots || hideCompareVersionsButton">
-    Please select two versions to compare:
-    <button class="btn btn-default" ng-click="showMergeview()" ng-disabled="areCompareVersionsSelected()">Compare selected revisions</button>
-  </div>
-
-  <div ng-hide="hideCodemirror || !explorationSnapshots" id="codemirrorMergeviewInstance">
-    <table class="table" style="margin-top: 15px">
-      <!-- Table ratios 53:47 is to ensure text above right pane is aligned to codemirror gutter -->
-      <td style="width: 53%">
-        <div>
-          <strong>Revision #<[compareSnapshot.v1.versionNumber]></strong>
-          by
-          <strong><[compareSnapshot.v1.committerId]></strong>
-          on
-          <strong><[compareSnapshot.v1.createdOn]></strong>
+  <div class="row">
+    <div class="oppia-main-content">
+      <div class="col-lg-12 col-md-12 col-sm-12">
+        <h4>Version History</h4>
+        <div ng-repeat="snapshot in displayedExplorationSnapshots">
+          <input type="radio" name="compareVer1" ng-model="comparePanesVersions.leftPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'leftPane')">
+          <input type="radio" name="compareVer2" ng-model="comparePanesVersions.rightPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'rightPane')">
+          [<[snapshot.versionNumber]>]
+          <strong><[snapshot.committerId]></strong>
+          <[snapshot.commitMessage]>
+          <span class="pull-right">
+            <em><[snapshot.createdOn]></em>
+            <span ng-if="snapshot.versionNumber !== currentVersion && editabilityService.isEditable()">
+              | <a href="#" ng-click="showRevertExplorationModal(snapshot.versionNumber)">Revert</a>
+            </span>
+            <span>
+              | <a href="#" ng-click="downloadExplorationWithVersion(snapshot.versionNumber)" title="Download exploration as a zip file.">Download</a>
+            </span>
+          </span>
         </div>
-        <[compareSnapshot.v1.commitMessage]>
-      </td>
-      <td style="width: 47%">
-        <div>
-          <strong>Revision #<[compareSnapshot.v2.versionNumber]></strong>
-          by
-          <strong><[compareSnapshot.v2.committerId]></strong>
-          on
-          <strong><[compareSnapshot.v2.createdOn]></strong>
+
+        <br>
+
+        <div ng-hide="!displayedExplorationSnapshots || hideCompareVersionsButton">
+          <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showMergeview()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
         </div>
-        <[compareSnapshot.v2.commitMessage]>
-      </td>
-    </table>
-    <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrV1" right-value="yamlStrV2"></codemirror-mergeview>
-    <div align="center" style="margin-bottom: 20px">
-      <strong>Click arrows to synchronize scrolling</strong>
+
+        <div ng-hide="hideCodemirror || !displayedExplorationSnapshots" id="codemirrorMergeviewInstance">
+          <table class="table" style="margin-top: 15px">
+            <!-- Table ratios 53:47 is to ensure text above right pane is aligned to codemirror gutter -->
+            <td style="width: 53%">
+              <div>
+                <strong>Revision #<[compareSnapshot.leftPane.versionNumber]></strong>
+                by
+                <strong><[compareSnapshot.leftPane.committerId]></strong>
+                on
+                <strong><[compareSnapshot.leftPane.createdOn]></strong>
+              </div>
+              <[compareSnapshot.leftPane.commitMessage]>
+            </td>
+            <td style="width: 47%">
+              <div>
+                <strong>Revision #<[compareSnapshot.rightPane.versionNumber]></strong>
+                by
+                <strong><[compareSnapshot.rightPane.committerId]></strong>
+                on
+                <strong><[compareSnapshot.rightPane.createdOn]></strong>
+              </div>
+              <[compareSnapshot.rightPane.commitMessage]>
+            </td>
+          </table>
+          <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrs.leftPane" right-value="yamlStrs.rightPane"></codemirror-mergeview>
+          <div align="center" style="margin-bottom: 20px">
+            <strong>Click arrows to synchronize scrolling</strong>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -81,7 +85,7 @@
         You are about to revert this exploration to version <[version]>. All changes made since that older version will be retracted.
       </p>
       <p>
-        Before reverting, you can preview the exploration you are reverting to by following <a href="/explore/<[explorationId]>?v=<[version]>" target="_blank">this link</a>. (It opens in a new window.)
+        Before reverting, you can preview the exploration you are reverting to by following <a ng-href="<[getExplorationUrl(version)]>" target="_blank">this link</a>. (It opens in a new window.)
       </p>
       <p>
         Are you sure you want to revert this exploration to version <[version]>?

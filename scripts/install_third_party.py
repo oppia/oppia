@@ -17,12 +17,13 @@
 import itertools
 import os
 import shutil
+import StringIO
 import tarfile
 import urllib
+import urllib2
 import zipfile
 
 import common
-import subprocess
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -82,9 +83,23 @@ def download_and_unzip_files(
         common.ensure_directory_exists(target_parent_dir)
 
         urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as z:
-            z.extractall(target_parent_dir)
-        os.remove(TMP_UNZIP_PATH)
+
+        try:
+            with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as z:
+                z.extractall(target_parent_dir)
+            os.remove(TMP_UNZIP_PATH)
+        except:
+            if os.path.exists(TMP_UNZIP_PATH):
+                os.remove(TMP_UNZIP_PATH)
+
+            # Some downloads (like jqueryui-themes) may require a user-agent.
+            req = urllib2.Request(source_url)
+            req.add_header('User-agent', 'python')
+            # This is needed to get a seekable filestream that can be used
+            # by zipfile.ZipFile.
+            file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
+            with zipfile.ZipFile(file_stream, 'r') as z:
+                z.extractall(target_parent_dir)
 
         # Rename the target directory.
         os.rename(
@@ -163,11 +178,11 @@ ANGULAR_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'angularjs-%s' % ANGULAR_REV)
 ANGULAR_FILES = [
     'angular%s.%s' % (part1, part2) for (part1, part2) in itertools.product(
-        ['', '-resource', '-route', '-sanitize'],
+        ['', '-animate', '-resource', '-route', '-sanitize'],
         ['js', 'min.js', 'min.js.map'])]
 ANGULAR_TEST_FILES = ['angular-mocks.js', 'angular-scenario.js']
 
-D3_REV = '3.2.8'
+D3_REV = '3.4.11'
 D3_URL = 'https://raw.github.com/mbostock/d3/v%s' % D3_REV
 D3_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'd3js-%s' % D3_REV)
 D3_FILES = ['d3.min.js']
@@ -183,7 +198,7 @@ download_files(D3_URL, D3_DST, D3_FILES)
 
 # Download all the frontend library zip files.
 
-SELECT2_REV = '3.4.1'
+SELECT2_REV = '3.5.1'
 SELECT2_ZIP_URL = (
     'https://github.com/ivaynberg/select2/archive/%s.zip' % SELECT2_REV)
 SELECT2_ZIP_ROOT_NAME = 'select2-%s' % SELECT2_REV
@@ -235,6 +250,12 @@ UI_SORTABLE_ZIP_URL = (
 UI_SORTABLE_ZIP_ROOT_NAME = 'ui-sortable-src%s' % UI_SORTABLE_REV
 UI_SORTABLE_TARGET_ROOT_NAME = 'ui-sortable-%s' % UI_SORTABLE_REV
 
+INTRO_JS_REV = '0.9.0'
+INTRO_JS_ZIP_URL = (
+    'https://github.com/usablica/intro.js/archive/v%s.zip' % INTRO_JS_REV)
+INTRO_JS_ZIP_ROOT_NAME = 'intro.js-%s' % INTRO_JS_REV
+INTRO_JS_TARGET_ROOT_NAME = 'intro-js-%s' % INTRO_JS_REV
+
 BOOTSTRAP_REV = '3.1.1'
 BOOTSTRAP_ROOT_NAME = 'bootstrap-%s-dist' % BOOTSTRAP_REV
 BOOTSTRAP_ZIP_URL = (
@@ -275,6 +296,9 @@ download_and_unzip_files(
 download_and_unzip_files(
     UI_SORTABLE_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     UI_SORTABLE_ZIP_ROOT_NAME, UI_SORTABLE_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    INTRO_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    INTRO_JS_ZIP_ROOT_NAME, INTRO_JS_TARGET_ROOT_NAME)
 download_and_unzip_files(
     BOOTSTRAP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOOTSTRAP_ZIP_ROOT_NAME, BOOTSTRAP_TARGET_ROOT_NAME)
@@ -348,23 +372,12 @@ download_and_untar_files(
     GAE_CLOUD_STORAGE_TAR_URL, THIRD_PARTY_DIR,
     GAE_CLOUD_STORAGE_TAR_ROOT_NAME, GAE_CLOUD_STORAGE_TARGET_ROOT_NAME)
 
-MIDI_JS_REV = '09335aa7078be606f6d2389a3defb6d616db9ff7'
+MIDI_JS_REV = '2ef687b47e5f478f1506b47238f3785d9ea8bd25'
 MIDI_JS_ZIP_URL = (
     'https://github.com/mudcube/MIDI.js/archive/%s.zip' % MIDI_JS_REV)
 MIDI_JS_ZIP_ROOT_NAME = 'MIDI.js-%s' % MIDI_JS_REV
-MIDI_JS_TARGET_ROOT_NAME = 'midi-js-09335a'
-MIDI_JS_PATCH_ROOT_NAME = 'midi-js-09335a-patched'
+MIDI_JS_TARGET_ROOT_NAME = 'midi-js-2ef687'
 
 download_and_unzip_files(
     MIDI_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     MIDI_JS_ZIP_ROOT_NAME, MIDI_JS_TARGET_ROOT_NAME)
-
-# Copy Midi files to new directory and add patch for updated chrome api.
-if not os.path.exists(
-    os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME)):
-    shutil.copytree(
-        os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_TARGET_ROOT_NAME),
-        os.path.join(THIRD_PARTY_STATIC_DIR, MIDI_JS_PATCH_ROOT_NAME))
-    # Apply the patch.
-    subprocess.check_call(
-        ['git', 'apply', os.path.join('scripts', 'data', 'MIDI.js.patch')])

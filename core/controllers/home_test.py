@@ -35,7 +35,7 @@ class HomePageTest(test_utils.GenericTestBase):
             'Login', 'Create an Oppia account',
             # No navbar tabs should be highlighted.
             no=['class="active"',
-                'Profile', 'Logout', 'Create an exploration', 'Dashboard'])
+                'Logout', 'Create an exploration', 'Dashboard'])
 
     def test_logged_in_but_not_registered_as_editor_homepage(self):
         """Test the logged-in-but-not-editor version of the home page."""
@@ -50,7 +50,7 @@ class HomePageTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'Bite-sized learning journeys',
-            'Gallery', 'Profile', 'Logout', 'Create an exploration',
+            'Gallery', 'Logout', 'Create an exploration',
             self.get_expected_logout_url('/'),
             no=['Login', 'Create an Oppia account', 'Dashboard',
                 self.get_expected_login_url('/')])
@@ -64,13 +64,12 @@ class HomePageTest(test_utils.GenericTestBase):
             'Login', self.get_expected_login_url('/'),
             no=['Logout', self.get_expected_logout_url('/')])
 
-        self.register_editor('editor@example.com')
-        self.login('editor@example.com')
-
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Dashboard', 'Gallery', 'Profile', 'Logout',
+            'Dashboard', 'Gallery', 'Logout',
             self.get_expected_logout_url('/'),
             no=['Login', 'Create an Oppia account',
                 'Bite-sized learning journeys',
@@ -80,13 +79,8 @@ class HomePageTest(test_utils.GenericTestBase):
 
 class DashboardHandlerTest(test_utils.GenericTestBase):
 
-    OWNER_EMAIL = 'editor@example.com'
     COLLABORATOR_EMAIL = 'collaborator@example.com'
-    VIEWER_EMAIL = 'viewer@example.com'
-
-    OWNER_USERNAME = 'owner'
     COLLABORATOR_USERNAME = 'collaborator'
-    VIEWER_USERNAME = 'viewer'
 
     EXP_ID = 'exp_id'
     EXP_TITLE = 'Exploration title'
@@ -195,25 +189,25 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def _get_recent_updates_mock_by_viewer(self, unused_user_id):
         """Returns a single feedback thread by VIEWER_ID."""
-        return [{
+        return (100000, [{
             'activity_id': 'exp_id',
             'activity_title': 'exp_title',
             'author_id': self.viewer_id,
             'last_updated_ms': 100000,
             'subject': 'Feedback Message Subject',
             'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-        }]
+        }])
 
     def _get_recent_updates_mock_by_anonymous_user(self, unused_user_id):
         """Returns a single feedback thread by an anonymous user."""
-        return [{
+        return (200000, [{
             'activity_id': 'exp_id',
             'activity_title': 'exp_title',
             'author_id': None,
             'last_updated_ms': 100000,
             'subject': 'Feedback Message Subject',
             'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
-        }]
+        }])
 
     def test_author_ids_are_handled_correctly(self):
         """Test that author ids are converted into author usernames

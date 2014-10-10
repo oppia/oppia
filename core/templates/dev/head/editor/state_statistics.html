@@ -1,4 +1,6 @@
 <div ng-controller="StateStatistics">
+  <hr ng-if="unresolvedAnswersList.length" class="oppia-graph-and-stats-separator">
+
   <h4 ng-if="unresolvedAnswersList.length">
     <strong>Unhandled responses</strong>
   </h4>
@@ -20,7 +22,7 @@
 
       <td style="width: 10%;">
         <span ng-if="item.count > 0 && editabilityService.isEditable()">
-          <button class="btn btn-default btn-xs" ng-click="deleteUnresolvedAnswer(item.answer)">
+          <button class="btn btn-default btn-xs oppia-small-delete-button" ng-click="deleteUnresolvedAnswer(item.answer)">
             <span class="glyphicon glyphicon-remove"></span>
           </button>
         </span>

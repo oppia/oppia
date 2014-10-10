@@ -19,10 +19,10 @@
  */
 
 oppia.controller('ExplorationStatistics', [
-    '$scope', '$http', '$location', '$modal', 'warningsData',
-    'oppiaDatetimeFormatter',
-    function($scope, $http, $location, $modal, warningsData,
-             oppiaDatetimeFormatter) {
+    '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService', 'explorationData',
+    'graphDataService', 'oppiaDatetimeFormatter',
+    function($scope, $http, $modal, warningsData, explorationStatesService, explorationData,
+             graphDataService, oppiaDatetimeFormatter) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -43,8 +43,10 @@ oppia.controller('ExplorationStatistics', [
 
   $scope.hasExplorationBeenVisited = false;
   $scope.refreshExplorationStatistics = function() {
-    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + $scope.$parent.explorationId;
+    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId;
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
+      $scope.graphData = graphDataService.getGraphData();
+
       var data = response.data;
       var numVisits = data.num_starts;
       var numCompletions = data.num_completions;
@@ -64,7 +66,7 @@ oppia.controller('ExplorationStatistics', [
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'
       };
-      for (var stateName in $scope.states) {
+      for (var stateName in explorationStatesService.getStates()) {
         var visits = $scope.stateStats[stateName].firstEntryCount;
         $scope.statsGraphOpacities[stateName] = Math.max(
           visits / numVisits, 0.05);
@@ -115,11 +117,10 @@ oppia.controller('ExplorationStatistics', [
           }
         },
         controller: [
-          '$scope', '$modalInstance', 'editabilityService', 'stateName',
+          '$scope', '$modalInstance', 'stateName',
           'stateStats', 'improvementType', 'rulesStats', function(
-             $scope, $modalInstance, editabilityService, stateName,
+             $scope, $modalInstance, stateName,
              stateStats, improvementType, rulesStats) {
-          $scope.editabilityService = editabilityService;
           $scope.stateName = stateName;
           $scope.stateStats = stateStats;
           $scope.improvementType = improvementType;
@@ -152,17 +153,11 @@ oppia.controller('ExplorationStatistics', [
             return false;
           };
 
-          $scope.gotoStateEditor = function(locationHash) {
-            $modalInstance.close({});
-          };
-
           $scope.cancel = function() {
             $modalInstance.dismiss('cancel');
             warningsData.clear();
           };
         }]
-      }).result.then(function(result) {
-        $scope.$parent.showStateEditor(stateName);
       });
     });
   };

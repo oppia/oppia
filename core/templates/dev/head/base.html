@@ -6,6 +6,8 @@
     </noscript>
     <meta charset=utf-8>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="msapplication-config" content="none">
+    <link rel="apple-touch-icon" href="/images/logo.png">
     <title>Oppia - {% block subtitle %}{% endblock %}</title>
 
     {% block header_css %}
@@ -29,7 +31,11 @@
         EXPLORATION_STATUS_PUBLIC: JSON.parse(
           '{{EXPLORATION_STATUS_PUBLIC|js_string}}'),
         EXPLORATION_STATUS_PUBLICIZED: JSON.parse(
-          '{{EXPLORATION_STATUS_PUBLICIZED|js_string}}')
+          '{{EXPLORATION_STATUS_PUBLICIZED|js_string}}'),
+        ALL_LANGUAGE_CODES: JSON.parse(
+          '{{ALL_LANGUAGE_CODES|js_string}}'),
+        DEFAULT_LANGUAGE_CODE: JSON.parse(
+          '{{DEFAULT_LANGUAGE_CODE|js_string}}')
       };
 
       {% if additional_angular_modules %}
@@ -70,12 +76,17 @@
                     <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
                       <a href="/gallery">Gallery</a>
                     </li>
+                    {% if SHOW_FORUM_PAGE %}
+                      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+                        <a href="/forum">Forum</a>
+                      </li>
+                    {% endif %}
                     <li class="dropdown">
-                      <a class="dropdown-toggle" data-toggle="dropdown">
+                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         About
-                        <b class="caret"></b>
+                        <span class="caret"></span>
                       </a>
-                      <ul class="dropdown-menu">
+                      <ul class="dropdown-menu" role="menu">
                         {% for page in ABOUT_PAGES %}
                           <li>
                             <a href="{{page['url']}}">{{page['name']}}</a>
@@ -89,9 +100,6 @@
 
                   <ul class="nav navbar-nav navbar-right">
                     {% if user_email %}
-                      <li {% if nav_mode == 'profile' %} class="active" {% endif %}>
-                        <a href="/profile">Profile</a>
-                      </li>
                       <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown">
                           {% if username %}
@@ -105,12 +113,20 @@
                           {% elif is_moderator %}
                             (Moderator)
                           {% endif %}
-                          <b class="caret"></b>
+                          <span class="caret"></span>
                         </a>
-                        <ul class="dropdown-menu">
+                        <ul class="dropdown-menu" role="menu">
                           <li>
                             <a href="{{logout_url}}">Logout</a>
                           </li>
+
+                          {% if is_moderator %}
+                            <li>
+                              <a href="/moderator" target="_blank">
+                                Moderator Page
+                              </a>
+                            </li>
+                          {% endif %}
 
                           {% if is_super_admin %}
                             <li>

@@ -71,5 +71,13 @@ export PATH=$TOOLS_DIR/node-0.10.1/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
 
-export NPM_INSTALL="$TOOLS_DIR/node-0.10.1/bin/npm install"
-export CHROME_BIN="/usr/bin/google-chrome"
+export NPM_CMD="$TOOLS_DIR/node-0.10.1/bin/npm"
+export NPM_INSTALL="$NPM_CMD install"
+
+# Adjust path to support the default Chrome locations for Unix and Mac OS.
+if [ -f "/usr/bin/google-chrome" ]; then
+  export CHROME_BIN="/usr/bin/google-chrome"
+else
+  export CHROME_BIN="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+fi
+

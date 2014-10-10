@@ -7,27 +7,33 @@
 {% block cls %}oppia-state-content{% endblock %}
 
 {% block center %}
-  <param-change-editor param-changes="stateParamChanges"
-      param-specs="paramSpecs" save-param-changes="saveStateParamChanges"
-      add-exploration-param-spec="addExplorationParamSpec"
-      is-editable="editabilityService.isEditable()">
-  </param-change-editor>
-
-  <hr class="oppia-param-and-content-separator">
-
-  <div ng-if="!contentMemento">
-    <button type="button" class="btn btn-default btn-xs pull-right" ng-click="editContent()" ng-if="editabilityService.isEditable()">
-      <span class="glyphicon glyphicon-pencil" title="Edit Content"></span>
-    </button>
-    <span ng-show="content[0].value == ''" class="oppia-placeholder">
-      Click the <span class="glyphicon glyphicon-pencil"></span> button on the right to add content.
-    </span>
-    <span angular-html-bind="content[0].value"></span>
+  <div id="tutorialStateContent">
+    <div ng-if="!contentMemento" class="oppia-content-section protractor-test-edit-content"
+         ng-click="openStateContentEditor()"
+         ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <h3>Content <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-pencil" title="Edit State Content"></span></h3>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+          <div class="oppia-state-content-display well" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}">
+            <span ng-show="content[0].value == ''" class="oppia-placeholder">
+              You can give context to the learner here, and ask a question -- then,
+              in the space below, choose a suitable way for the learner to respond.
+            </span>
+            <span angular-html-bind="content[0].value"></span>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div ng-if="!!contentMemento">
+  <!-- The margin-bottom here preserves parity with the 'well' in the readonly mode. -->
+  <div ng-if="!!contentMemento" class="oppia-state-item-editor-div">
     <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
     </schema-based-editor>
-    <button type="button" class="btn btn-default" ng-click="saveTextContent()">Close</button>
+    <button type="button" class="btn btn-success oppia-save-state-item-button" ng-click="saveTextContent()">Save Content</button>
   </div>
 {% endblock %}

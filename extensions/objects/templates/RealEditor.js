@@ -26,7 +26,7 @@ oppia.directive('realEditor', function($compile, warningsData) {
     template: '<span ng-include="getTemplateUrl()"></span>',
     controller: function($scope) {
       $scope.schema = {
-        type: 'float',
+        type: 'float'
       };
 
       if ($scope.$parent.value === '') {

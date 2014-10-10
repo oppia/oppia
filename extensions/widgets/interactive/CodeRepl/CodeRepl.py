@@ -5,7 +5,7 @@ class CodeRepl(widget_domain.BaseWidget):
     """Interactive widget that allows programs to be input."""
 
     # The human-readable name of the widget.
-    name = 'Code REPL'
+    name = 'Code'
 
     # The category the widget falls under in the widget repository.
     category = 'Custom'
@@ -16,14 +16,15 @@ class CodeRepl(widget_domain.BaseWidget):
 
     # Customization args and their descriptions, schemas and default
     # values.
+    # Language options 'lua' and 'scheme' have been removed for possible
+    # later re-release.
     _customization_arg_specs = [{
         'name': 'language',
         'description': 'Programming language to evaluate the code in.',
         'schema': {
             'type': 'unicode',
             'choices': [
-                'coffeescript', 'javascript', 'lua', 'python', 'ruby',
-                'scheme',
+                'coffeescript', 'javascript', 'python', 'ruby',
             ]
         },
         'default_value': 'python'

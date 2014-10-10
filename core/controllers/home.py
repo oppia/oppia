@@ -84,7 +84,7 @@ class DashboardHandler(base.BaseHandler):
         if self.user_id is None:
             raise self.PageNotFoundException
 
-        recent_updates = (
+        job_queued_msec, recent_updates = (
             user_jobs.DashboardRecentUpdatesAggregator.get_recent_updates(
                 self.user_id))
 
@@ -107,6 +107,7 @@ class DashboardHandler(base.BaseHandler):
         self.values.update({
             'explorations': exp_services.get_at_least_editable_summary_dict(
                 self.user_id),
+            'job_queued_msec': job_queued_msec,
             'recent_updates': recent_updates,
         })
         self.render_json(self.values)

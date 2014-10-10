@@ -74,6 +74,9 @@ class JobModel(base_models.BaseModel):
     # The error message, if applicable. Only populated if the job has status
     # code STATUS_CODE_FAILED or STATUS_CODE_CANCELED; None otherwise.
     error = ndb.TextProperty(indexed=False)
+    # Whether the datastore models associated with this job have been cleaned
+    # up (i.e., deleted).
+    has_been_cleaned_up = ndb.BooleanProperty(default=False, indexed=True)
 
     @property
     def is_cancelable(self):

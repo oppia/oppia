@@ -71,3 +71,6 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     """
     # The output of the batch job.
     output = ndb.JsonProperty(indexed=False)
+    # The time, in milliseconds since the epoch, when the job that computed
+    # this batch model was queued.
+    job_queued_msec = ndb.FloatProperty(indexed=False)

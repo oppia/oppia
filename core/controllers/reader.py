@@ -16,12 +16,16 @@
 
 __author__ = 'Sean Lip'
 
+import copy
+
 from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import event_services
 from core.domain import exp_services
 from core.domain import feedback_services
+from core.domain import fs_domain
 from core.domain import rights_manager
+from core.domain import rule_domain
 from core.domain import skins_services
 from core.domain import widget_registry
 import feconf
@@ -41,6 +45,83 @@ def require_playable(handler):
             raise self.PageNotFoundException
 
     return test_can_play
+
+
+def _get_updated_param_dict(param_dict, param_changes, exp_param_specs):
+    """Updates a param dict using the given list of param_changes.
+
+    Note that the list of parameter changes is ordered. Parameter
+    changes later in the list may depend on parameter changes that have
+    been set earlier in the same list.
+    """
+    new_param_dict = copy.deepcopy(param_dict)
+    for pc in param_changes:
+        try:
+            obj_type = exp_param_specs[pc.name].obj_type
+        except:
+            raise Exception('Parameter %s not found' % pc.name)
+        new_param_dict[pc.name] = pc.get_normalized_value(
+            obj_type, new_param_dict)
+    return new_param_dict
+
+
+def get_init_html_and_params(exp_param_changes, init_state, exp_param_specs):
+    """Gets the HTML and parameters when an exploration is first started."""
+    init_params = _get_updated_param_dict(
+        {}, exp_param_changes + init_state.param_changes, exp_param_specs)
+    return init_state.content[0].to_html(init_params), init_params
+
+
+def classify(
+        exp_id, exp_param_specs, state, handler_name, answer, params):
+    """Normalize the answer and return the first rule that it satisfies
+    as well as the input_type.
+    """
+    widget_instance = widget_registry.Registry.get_widget_by_id(
+        feconf.INTERACTIVE_PREFIX, state.widget.widget_id)
+    normalized_answer = widget_instance.normalize_answer(
+        answer, handler_name)
+
+    handler = next(
+        h for h in state.widget.handlers if h.name == handler_name)
+    fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
+    input_type = widget_instance.get_handler_by_name(handler_name).obj_type
+    for rule_spec in handler.rule_specs:
+        if rule_domain.evaluate_rule(
+                rule_spec.definition, exp_param_specs, input_type, params,
+                normalized_answer, fs):
+            return rule_spec, input_type
+
+    raise Exception(
+        'No matching rule found for handler %s. Rule specs are %s.' % (
+            handler.name,
+            [rule_spec.to_dict() for rule_spec in handler.rule_specs]
+        )
+    )
+
+
+def get_next_state_dict(
+        exp_param_specs, old_state_name, old_params, rule_spec, new_state):
+    """Given state transition information, returns a dict containing
+    the new state name, response HTML, and updated parameters.
+    """
+    finished = (rule_spec.dest == feconf.END_DEST)
+    new_params = (
+        {} if finished
+        else _get_updated_param_dict(
+            old_params, new_state.param_changes, exp_param_specs))
+
+    return {
+        'feedback_html': '<div>%s</div>' % jinja_utils.parse_string(
+            rule_spec.get_feedback_string(), old_params),
+        'finished': finished,
+        'params': new_params,
+        'question_html': (
+            new_state.content[0].to_html(new_params)
+            if not finished and old_state_name != rule_spec.dest
+            else ''),
+        'state_name': rule_spec.dest,
+    }
 
 
 class ExplorationPage(base.BaseHandler):
@@ -76,7 +157,7 @@ class ExplorationPage(base.BaseHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 widget_dependency_ids))
 
-        widget_js_directives = (
+        widget_templates = (
             widget_registry.Registry.get_noninteractive_widget_html() +
             widget_registry.Registry.get_interactive_widget_html(
                 interactive_widget_ids))
@@ -88,11 +169,17 @@ class ExplorationPage(base.BaseHandler):
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
-            'skin_html': skins_services.Registry.get_skin_html(
+            'skin_templates': jinja2.utils.Markup(
+                skins_services.Registry.get_skin_templates(
+                    [exploration.default_skin])),
+            'skin_js_url': skins_services.Registry.get_skin_js_url(
                 exploration.default_skin),
+            'skin_tag': jinja2.utils.Markup(
+                skins_services.Registry.get_skin_tag(exploration.default_skin)
+            ),
             'widget_dependencies_html': jinja2.utils.Markup(
                 widget_dependencies_html),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
+            'widget_templates': jinja2.utils.Markup(widget_templates),
         })
 
         if is_iframed:
@@ -118,82 +205,34 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        init_params = exploration.get_init_params()
-        reader_params = exploration.update_with_state_params(
-            exploration.init_state_name, init_params)
-
-        init_state = exploration.init_state
-
-        interactive_widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, init_state.widget.widget_id)
-        interactive_html = interactive_widget.get_interactive_widget_tag(
-            init_state.widget.customization_args)
+        init_html, init_params = get_init_html_and_params(
+            exploration.param_changes, exploration.init_state,
+            exploration.param_specs)
         session_id = utils.generate_random_string(24)
 
         self.values.update({
+            'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
-            'init_html': init_state.content[0].to_html(reader_params),
-            'interactive_html': interactive_html,
-            'params': reader_params,
-            'state_history': [exploration.init_state_name],
-            'state_name': exploration.init_state_name,
-            'title': exploration.title,
+            'init_html': init_html,
+            'params': init_params,
             'session_id': session_id,
+            'state_name': exploration.init_state_name,
         })
         self.render_json(self.values)
 
         event_services.StartExplorationEventHandler.record(
             exploration_id, version, exploration.init_state_name,
-            session_id, reader_params, feconf.PLAY_TYPE_NORMAL)
+            session_id, init_params, feconf.PLAY_TYPE_NORMAL)
 
         event_services.StateHitEventHandler.record(
             exploration_id, version, exploration.init_state_name,
-            session_id, reader_params, feconf.PLAY_TYPE_NORMAL)
+            session_id, init_params, feconf.PLAY_TYPE_NORMAL)
 
 
 class FeedbackHandler(base.BaseHandler):
     """Handles feedback to readers."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    def _append_answer_to_stats_log(
-            self, old_state, answer, exploration_id, exploration_version,
-            old_state_name, old_params, handler, rule):
-        """Append the reader's answer to the statistics log."""
-        widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
-
-        # TODO(sll): Should this also depend on old_params?
-        recorded_answer = widget.get_stats_log_html(
-            old_state.widget.customization_args, answer)
-        event_services.AnswerSubmissionEventHandler.record(
-            exploration_id, 1, old_state_name, handler, rule,
-            recorded_answer)
-
-    def _append_content(self, exploration, sticky, finished, old_params,
-                        new_state, new_state_name, state_has_changed):
-        """Appends content for the new state to the output variables."""
-        if finished:
-            return {}, '', ''
-
-        # Populate new parameters.
-        new_params = exploration.update_with_state_params(
-            new_state_name, old_params)
-
-        question_html = ''
-        if state_has_changed:
-            # Append the content for the new state.
-            question_html = exploration.states[
-                new_state_name].content[0].to_html(new_params)
-
-        interactive_html = (
-            '' if sticky else
-            widget_registry.Registry.get_widget_by_id(
-                feconf.INTERACTIVE_PREFIX, new_state.widget.widget_id
-            ).get_interactive_widget_tag(new_state.widget.customization_args)
-        )
-
-        return (new_params, question_html, interactive_html)
 
     @require_playable
     def post(self, exploration_id, escaped_state_name):
@@ -202,96 +241,71 @@ class FeedbackHandler(base.BaseHandler):
         # The reader's answer.
         answer = self.payload.get('answer')
         # The answer handler (submit, click, etc.)
-        handler = self.payload.get('handler')
-        # Parameters associated with the reader.
+        handler_name = self.payload.get('handler')
+        # Parameters associated with the learner.
         old_params = self.payload.get('params', {})
-        # The reader's state history.
-        state_history = self.payload['state_history']
+        old_params['answer'] = answer
         # The version of the exploration.
         version = self.payload.get('version')
-        # Current session id.
-        session_id = self.payload.get('session_id')
-        # Time spent in state.
-        client_time_spent_in_secs = self.payload.get(
-            'client_time_spent_in_secs')
 
-        values = {}
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
+        exp_param_specs = exploration.param_specs
         old_state = exploration.states[old_state_name]
-        old_widget = widget_registry.Registry.get_widget_by_id(
+
+        # The editor preview mode will call classify() directly.
+        rule_spec, _ = classify(
+            exploration_id, exp_param_specs, old_state, handler_name,
+            answer, old_params)
+
+        # This next block of code will not be replicated in the editor preview
+        # mode.
+        widget_instance = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
+        normalized_answer = widget_instance.normalize_answer(
+            answer, handler_name)
+        # TODO(sll): Should this also depend on `params`?
+        event_services.AnswerSubmissionEventHandler.record(
+            exploration_id, version, old_state_name, handler_name, rule_spec,
+            widget_instance.get_stats_log_html(
+                old_state.widget.customization_args, normalized_answer))
+        # This is the end of the block of code referenced in the comment above.
 
-        answer = old_widget.normalize_answer(answer, handler)
-
-        rule = exploration.classify(
-            old_state_name, handler, answer, old_params)
-        feedback = rule.get_feedback_string()
-        new_state_name = rule.dest
+        # In the editor preview mode, this line of code will be replicated
+        # client-side.
         new_state = (
-            None if new_state_name == feconf.END_DEST
-            else exploration.states[new_state_name])
+            None if rule_spec.dest == feconf.END_DEST
+            else exploration.states[rule_spec.dest])
+
+        # The editor preview mode will call get_next_state_dict() directly.
+        self.render_json(get_next_state_dict(
+            exp_param_specs, old_state_name, old_params, rule_spec, new_state))
+
+
+class StateHitEventHandler(base.BaseHandler):
+    """Tracks a learner hitting a new state."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @require_playable
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        new_state_name = self.payload.get('new_state_name')
+        first_time = self.payload.get('first_time')
+        exploration_version = self.payload.get('exploration_version')
+        session_id = self.payload.get('session_id')
+        client_time_spent_in_secs = self.payload.get('client_time_spent_in_secs')
+        old_params = self.payload.get('old_params')
 
         if new_state_name == feconf.END_DEST:
             event_services.MaybeLeaveExplorationEventHandler.record(
-                exploration_id, version, feconf.END_DEST,
+                exploration_id, exploration_version, feconf.END_DEST,
                 session_id, client_time_spent_in_secs, old_params,
                 feconf.PLAY_TYPE_NORMAL)
         else:
             event_services.StateHitEventHandler.record(
-                exploration_id, version, new_state_name,
+                exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
-
-        state_history.append(new_state_name)
-
-        # If the new state widget is the same as the old state widget, and the
-        # new state widget is sticky, do not render the reader response. The
-        # interactive widget in the frontend should take care of this.
-        # TODO(sll): This special-casing is not great; we should
-        # make the interface for updating the frontend more generic so that
-        # all the updates happen in the same place. Perhaps in the non-sticky
-        # case we should call a frontend method named appendFeedback() or
-        # similar.
-        sticky = (
-            new_state_name != feconf.END_DEST and
-            new_state.widget.sticky and
-            new_state.widget.widget_id == old_state.widget.widget_id
-        )
-
-        self._append_answer_to_stats_log(
-            old_state, answer, exploration_id, exploration.version,
-            old_state_name, old_params, handler, rule)
-
-        # Append the reader's answer to the response HTML.
-        reader_response_html = old_widget.get_reader_response_html(
-            old_state.widget.customization_args, answer, sticky)
-        values['reader_response_html'] = reader_response_html
-
-        # Add Oppia's feedback to the response HTML.
-        old_params['answer'] = answer
-        feedback_html = '<div>%s</div>' % jinja_utils.parse_string(
-            feedback, old_params)
-
-        # Add the content for the new state to the response HTML.
-        finished = (new_state_name == feconf.END_DEST)
-        state_has_changed = (old_state_name != new_state_name)
-        new_params, question_html, interactive_html = (
-            self._append_content(
-                exploration, sticky, finished, old_params, new_state,
-                new_state_name, state_has_changed))
-
-        values.update({
-            'interactive_html': interactive_html,
-            'exploration_id': exploration_id,
-            'state_name': new_state_name,
-            'feedback_html': feedback_html,
-            'question_html': question_html,
-            'params': new_params,
-            'finished': finished,
-            'state_history': state_history,
-        })
-
-        self.render_json(values)
 
 
 class ReaderFeedbackHandler(base.BaseHandler):

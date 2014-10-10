@@ -5,7 +5,7 @@ class SetInput(widget_domain.BaseWidget):
     """Interactive widget for set input."""
 
     # The human-readable name of the widget.
-    name = 'Set input'
+    name = 'Set'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'

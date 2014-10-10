@@ -27,6 +27,9 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
     scope: true,
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: ['$scope', '$rootScope', function($scope, $rootScope) {
+      // The maximum number of notes allowed in a music phrase.
+      var _MAX_NOTES_IN_PHRASE = 8;
+
       $scope.schema = {
         type: 'list',
         items: {
@@ -37,8 +40,12 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
           ]
         },
         ui_config: {
-          add_element_text: 'Add Note'
-        }
+          add_element_text: 'Add Note ♩'
+        },
+        validators: [{
+          id: 'has_length_at_most',
+          max_value: _MAX_NOTES_IN_PHRASE
+        }]
       };
 
       // Reset the component each time the value changes (e.g. if this is part
@@ -55,14 +62,19 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
 
       $scope.$watch('localValue', function(newValue, oldValue) {
         if (newValue && oldValue) {
-          var parentValues = [];
-          for (var i = 0; i < newValue.length; i++) {
-            parentValues.push({
-              readableNoteName: newValue[i],
-              noteDuration: {'num': 1, 'den': 1}
-            });
+          if (newValue.length > _MAX_NOTES_IN_PHRASE) {
+            warningsData.addWarning('There are too many notes on the staff.');
           }
-          $scope.$parent.value = parentValues;
+          else {
+            var parentValues = [];
+            for (var i = 0; i < newValue.length; i++) {
+              parentValues.push({
+                readableNoteName: newValue[i],
+                noteDuration: {'num': 1, 'den': 1}
+              });
+            }
+            $scope.$parent.value = parentValues;
+          }
         }
       }, true);
     }]

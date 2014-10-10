@@ -37,11 +37,15 @@ from mapreduce import base_handler
 from mapreduce import context
 from mapreduce import input_readers
 from mapreduce import mapreduce_pipeline
+from mapreduce import model as mapreduce_model
 from mapreduce.lib.pipeline import pipeline
 from mapreduce import util as mapreduce_util
 
 MAPPER_PARAM_KEY_ENTITY_KINDS = 'entity_kinds'
 MAPPER_PARAM_KEY_QUEUED_TIME_MSECS = 'queued_time_msecs'
+# Name of an additional parameter to pass into the MR job for cleaning up
+# old auxiliary job models.
+MAPPER_PARAM_MAX_START_TIME_MSEC = 'max_start_time_msec'
 
 STATUS_CODE_NEW = job_models.STATUS_CODE_NEW
 STATUS_CODE_QUEUED = job_models.STATUS_CODE_QUEUED
@@ -111,7 +115,7 @@ class BaseJobManager(object):
         return transaction_services.run_in_transaction(_create_new_job)
 
     @classmethod
-    def enqueue(cls, job_id):
+    def enqueue(cls, job_id, additional_job_params=None):
         """Marks a job as queued and adds it to a queue for processing."""
         # Ensure that preconditions are met.
         model = job_models.JobModel.get(job_id, strict=True)
@@ -121,7 +125,7 @@ class BaseJobManager(object):
 
         # Enqueue the job.
         cls._pre_enqueue_hook(job_id)
-        cls._real_enqueue(job_id)
+        cls._real_enqueue(job_id, additional_job_params)
 
         model.status_code = STATUS_CODE_QUEUED
         model.time_queued_msec = utils.get_current_time_in_millisecs()
@@ -218,7 +222,7 @@ class BaseJobManager(object):
             cls.cancel(model.id, user_id)
 
     @classmethod
-    def _real_enqueue(cls, job_id):
+    def _real_enqueue(cls, job_id, additional_job_params):
         """Does the actual work of enqueueing a job for deferred execution.
 
         Must be implemented by subclasses.
@@ -355,7 +359,7 @@ class BaseDeferredJobManager(BaseJobManager):
             (job_id, utils.get_current_time_in_millisecs()))
 
     @classmethod
-    def _real_enqueue(cls, job_id):
+    def _real_enqueue(cls, job_id, unused_additional_job_params):
         taskqueue_services.defer(cls._run_job, job_id)
 
 
@@ -363,7 +367,7 @@ class MapReduceJobPipeline(base_handler.PipelineBase):
 
     def run(self, job_id, job_class_str, kwargs):
         job_class = mapreduce_util.for_name(job_class_str)
-        job_class.register_start(job_id, {
+        job_class.register_start(job_id, metadata={
             job_class._OUTPUT_KEY_ROOT_PIPELINE_ID: self.root_pipeline_id
         })
 
@@ -411,6 +415,14 @@ class BaseMapReduceJobManager(BaseJobManager):
     # as known to the mapreduce/lib/pipeline internals. This is used
     # to generate URLs pointing at the pipeline support UI.
     _OUTPUT_KEY_ROOT_PIPELINE_ID = 'root_pipeline_id'
+
+    @staticmethod
+    def get_mapper_param(param_name):
+        mapper_params = context.get().mapreduce_spec.mapper.params
+        if param_name not in mapper_params:
+            raise Exception(
+                'Could not find %s in %s' % (param_name, mapper_params))
+        return context.get().mapreduce_spec.mapper.params[param_name]
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -462,7 +474,7 @@ class BaseMapReduceJobManager(BaseJobManager):
             'reduce as a @staticmethod.')
 
     @classmethod
-    def _real_enqueue(cls, job_id):
+    def _real_enqueue(cls, job_id, additional_job_params):
         entity_class_types = cls.entity_classes_to_map_over()
         entity_class_names = [
             '%s.%s' % (
@@ -487,6 +499,16 @@ class BaseMapReduceJobManager(BaseJobManager):
                     utils.get_current_time_in_millisecs()),
             }
         }
+
+        if additional_job_params is not None:
+            for param_name in additional_job_params:
+                if param_name in kwargs['mapper_params']:
+                    raise Exception(
+                        'Additional job param %s shadows an existing mapper '
+                        'param' % param_name)
+                kwargs['mapper_params'][param_name] = copy.deepcopy(
+                    additional_job_params[param_name])
+
         mr_pipeline = MapReduceJobPipeline(
             job_id, '%s.%s' % (cls.__module__, cls.__name__), kwargs)
         mr_pipeline.start(base_path='/mapreduce/worker/pipeline')
@@ -555,6 +577,11 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
             'must implement the _get_continuous_computation_class() method.')
 
     @staticmethod
+    def _get_job_queued_msec():
+        return float(context.get().mapreduce_spec.mapper.params[
+            MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
+
+    @staticmethod
     def _entity_created_before_job_queued(entity):
         """Checks that the given entity was created before the MR job was queued.
 
@@ -562,10 +589,10 @@ class BaseMapReduceJobManagerForContinuousComputations(BaseMapReduceJobManager):
         especially if the datastore classes being iterated over are append-only
         event logs.
         """
-        created_on_msecs = utils.get_time_in_millisecs(entity.created_on)
-        job_queued_msecs = float(context.get().mapreduce_spec.mapper.params[
+        created_on_msec = utils.get_time_in_millisecs(entity.created_on)
+        job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
             MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
-        return job_queued_msecs >= created_on_msecs
+        return job_queued_msec >= created_on_msec
 
     @classmethod
     def _post_completed_hook(cls, job_id):
@@ -1085,6 +1112,71 @@ def get_continuous_computations_info(cc_classes):
         result.append(cc_dict)
 
     return result
+
+
+def get_stuck_jobs(recency_msecs):
+    """Returns a list of jobs which were last updated at most recency_msecs
+    milliseconds ago and have experienced more than one retry."""
+    threshold_time = (
+        datetime.datetime.utcnow() -
+        datetime.timedelta(0, 0, 0, recency_msecs))
+    shard_state_model_class = mapreduce_model.ShardState
+
+    # TODO(sll): Clean up old jobs so that this query does not have to iterate
+    # over so many elements in a full table scan.
+    recent_job_models = shard_state_model_class.all()
+
+    stuck_jobs = []
+    for job_model in recent_job_models:
+        if job_model.update_time > threshold_time and job_model.retries > 0:
+            stuck_jobs.append(job_model)
+
+    return stuck_jobs
+
+
+class JobCleanupManager(BaseMapReduceJobManager):
+    """One-off job for cleaning up old auxiliary entities for MR jobs."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [
+            mapreduce_model.MapreduceState,
+            mapreduce_model.ShardState
+        ]
+
+    @staticmethod
+    def map(item):
+        max_start_time_msec = JobCleanupManager.get_mapper_param(
+            MAPPER_PARAM_MAX_START_TIME_MSEC)
+
+        if isinstance(item, mapreduce_model.MapreduceState):
+            if (item.result_status == 'success' and
+                    utils.get_time_in_millisecs(item.start_time) <
+                    max_start_time_msec):
+                item.delete()
+                yield ('mr_state_deleted', 1)
+            else:
+                yield ('mr_state_remaining', 1)
+
+        if isinstance(item, mapreduce_model.ShardState):
+            if (item.result_status == 'success' and
+                    utils.get_time_in_millisecs(item.update_time) <
+                    max_start_time_msec):
+                item.delete()
+                yield ('shard_state_deleted', 1)
+            else:
+                yield ('shard_state_remaining', 1)
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        values = [ast.literal_eval(v) for v in stringified_values]
+        if key.endswith('_deleted'):
+            logging.warning(
+                'Delete count: %s entities (%s)' % (sum(values), key))
+        else:
+            logging.warning(
+                'Entities remaining count: %s entities (%s)' %
+                (sum(values), key))
 
 
 ABSTRACT_BASE_CLASSES = frozenset([

@@ -50,12 +50,17 @@ oppia.controller('Dashboard', [
     'Statistics'
   ];
 
-  $scope.getLocaleStringForDatetime = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getLocaleString(millisSinceEpoch);
+  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch);
   };
 
   $scope.dashboardDataUrl = '/dashboardhandler/data';
   $rootScope.loadingMessage = 'Loading';
+
+  $scope.getEditorPageUrl = function(activityId, locationHash) {
+    return '/create/' + activityId + (locationHash ? '#' + locationHash : '');
+  };
 
   $scope.showCreateExplorationModal = function() {
     createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
@@ -64,6 +69,7 @@ oppia.controller('Dashboard', [
   // Retrieves dashboard data from the server.
   $http.get($scope.dashboardDataUrl).success(function(data) {
     $scope.recentUpdates = data.recent_updates;
+    $scope.jobQueuedMsec = data.job_queued_msec;
 
     $scope.privateExplorationIds = [];
     $scope.betaExplorationIds = [];

@@ -24,6 +24,7 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
+import datetime
 
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
@@ -83,9 +84,20 @@ class BaseModel(ndb.Model):
         super(BaseModel, self).put()
 
     @classmethod
-    def get_multi(cls, entity_ids):
+    def get_multi(cls, entity_ids, include_deleted=False):
+        """Returns a list, each entry of which is the instance model
+        corresponding to the entity_id, except for the following two cases (in
+        which the corresponding entry is None instead):
+          - the instance is not found
+          - the instance has been deleted, and `include_deleted` is True.
+        """
         entity_keys = [ndb.Key(cls, entity_id) for entity_id in entity_ids]
-        return ndb.get_multi(entity_keys)
+        entities = ndb.get_multi(entity_keys)
+        if not include_deleted:
+            for i in xrange(len(entities)):
+                if entities[i] and entities[i].deleted:
+                    entities[i] = None
+        return entities
 
     @classmethod
     def put_multi(cls, entities):
@@ -370,14 +382,19 @@ class VersionedModel(BaseModel):
             return cls.get_version(entity_id, version)
 
     @classmethod
-    def get_snapshots_metadata(cls, model_instance_id, version_numbers):
+    def get_snapshots_metadata(
+            cls, model_instance_id, version_numbers, allow_deleted=False):
         """Returns a list of dicts, each representing a model snapshot.
 
         One dict is returned for each version number in the list of version
         numbers requested. If any of the version numbers does not exist, an
         error is raised.
+
+        If `allow_deleted` is False, an error is raised if the current model
+        has been deleted.
         """
-        cls.get(model_instance_id)._require_not_marked_deleted()
+        if not allow_deleted:
+            cls.get(model_instance_id)._require_not_marked_deleted()
 
         snapshot_ids = [
             cls._get_snapshot_id(model_instance_id, version_number)

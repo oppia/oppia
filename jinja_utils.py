@@ -19,6 +19,7 @@ import logging
 import os
 import math
 
+import feconf
 import jinja2
 from jinja2 import meta
 import json
@@ -54,15 +55,24 @@ class JinjaConfig(object):
 def get_jinja_env(dir_path):
     loader = jinja2.FileSystemLoader(os.path.join(
         os.path.dirname(__file__), dir_path))
-
     env = jinja2.Environment(autoescape=True, loader=loader)
+
+    skins_loader = jinja2.FileSystemLoader(os.path.join(
+        os.path.dirname(__file__), feconf.SKINS_TEMPLATES_DIR))
+    skins_env = jinja2.Environment(autoescape=True, loader=skins_loader)
 
     def include_js_file(name):
         """Include a raw JS file in the template without evaluating it."""
         assert name.endswith('.js')
         return jinja2.Markup(loader.get_source(env, name)[0])
 
+    def include_skins_js_file(name):
+        """Include a raw JS file from extensions/skins in the template."""
+        assert name.endswith('.js')
+        return jinja2.Markup(skins_loader.get_source(skins_env, name)[0])
+
     env.globals['include_js_file'] = include_js_file
+    env.globals['include_skins_js_file'] = include_skins_js_file
     env.filters.update(JinjaConfig.FILTERS)
     return env
 

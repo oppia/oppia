@@ -6,6 +6,7 @@ module.exports = function(config) {
       'third_party/static/jquery-2.0.3/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.2.0-rc.3/angular.js',
+      'third_party/static/angularjs-1.2.0-rc.3/angular-animate.min.js',
       'third_party/static/angularjs-1.2.0-rc.3/angular-resource.min.js',
       'third_party/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js',
       'third_party/static/angularjs-1.2.0-rc.3/angular-mocks.js',
@@ -24,7 +25,8 @@ module.exports = function(config) {
       'extensions/widgets/interactive/**/*.html'
     ],
     exclude: [
-      'core/templates/dev/head/**/*-e2e.js'
+      'core/templates/dev/head/**/*-e2e.js',
+      'core/templates/dev/head/expressions/*.js'
     ],
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],

@@ -143,7 +143,9 @@ def normalize_against_schema(obj, schema):
         for validator in schema[SCHEMA_KEY_VALIDATORS]:
             kwargs = dict(validator)
             del kwargs['id']
-            assert _Validators.get(validator['id'])(normalized_obj, **kwargs)
+            assert _Validators.get(validator['id'])(normalized_obj, **kwargs), (
+                'Validation failed: %s (%s) for object %s' % (
+                    validator['id'], kwargs, normalized_obj))
 
     return normalized_obj
 
@@ -220,6 +222,13 @@ class _Validators(object):
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
         return getattr(cls, validator_id)
+
+    @staticmethod
+    def has_length_at_most(obj, max_value):
+        """Returns True iff the given object (a list) has at most
+        `max_value` elements.
+        """
+        return len(obj) <= max_value
 
     @staticmethod
     def is_nonempty(obj):

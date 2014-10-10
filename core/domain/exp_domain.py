@@ -26,7 +26,6 @@ import copy
 import logging
 import re
 import string
-import time
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
@@ -55,7 +54,7 @@ class ExplorationChange(object):
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'skill_tags',
         'blurb', 'author_notes', 'param_specs', 'param_changes',
-        'default_skin_id')
+        'default_skin_id', 'init_state_name')
 
     def __init__(self, change_dict):
         """Initializes an ExplorationChange object from a dict.
@@ -389,10 +388,25 @@ class AnswerHandlerInstance(object):
 class WidgetInstance(object):
     """Value object for a widget instance."""
 
+    def _get_full_customization_args(self):
+        """Populates the customization_args dict of the widget with default
+        values, if any of the expected customization_args are missing.
+        """
+        full_customization_args_dict = copy.deepcopy(self.customization_args)
+
+        widget = widget_registry.Registry.get_widget_by_id(
+            feconf.INTERACTIVE_PREFIX, self.widget_id)
+        for ca_spec in widget.customization_arg_specs:
+            if ca_spec.name not in full_customization_args_dict:
+                full_customization_args_dict[ca_spec.name] = {
+                    'value': ca_spec.default_value
+                }
+        return full_customization_args_dict
+
     def to_dict(self):
         return {
             'widget_id': self.widget_id,
-            'customization_args': self.customization_args,
+            'customization_args': self._get_full_customization_args(),
             'handlers': [handler.to_dict() for handler in self.handlers],
             'sticky': self.sticky
         }
@@ -457,16 +471,20 @@ class WidgetInstance(object):
                     'Invalid widget customization arg name: %s' % arg_name)
             if arg_name not in widget_customization_arg_names:
                 extra_args.append(arg_name)
-                logging.error(
+                logging.warning(
                     'Parameter %s for widget %s is invalid.'
                     % (arg_name, self.widget_id))
-            # TODO(sll): Find a way to verify that the arg_values have the
-            # correct type. Can we get sample values for the state context
-            # parameters?
         for extra_arg in extra_args:
             del self.customization_args[extra_arg]
 
-        # TODO(sll): Shouldn't this be a dict?
+        try:
+            widget.validate_customization_arg_values(self.customization_args)
+        except Exception:
+            # TODO(sll): Raise an exception here if parameters are not
+            # involved. (If they are, can we get sample values for the state
+            # context parameters?)
+            pass
+
         if not isinstance(self.handlers, list):
             raise utils.ValidationError(
                 'Expected widget answer handlers to be a list, received %s'
@@ -640,9 +658,11 @@ class State(object):
         )
 
     @classmethod
-    def create_default_state(cls, default_dest_state_name):
+    def create_default_state(cls, default_dest_state_name, is_initial_state=False):
+        text_str = (
+            feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
-            [Content('text', '')], [],
+            [Content('text', text_str)], [],
             WidgetInstance.create_default_widget(default_dest_state_name))
 
 
@@ -681,19 +701,47 @@ class Exploration(object):
         self.created_on = created_on
         self.last_updated = last_updated
 
+    def is_equal_to(self, other):
+        simple_props = ['id', 'title', 'category', 'objective', 'language_code',
+                        'skill_tags', 'blurb', 'author_notes', 'default_skin',
+                        'init_state_name', 'version']
+
+        for prop in simple_props:
+            if getattr(self, prop) != getattr(other, prop):
+                return False
+
+        for (state_name, state_obj) in self.states.iteritems():
+            if state_name not in other.states:
+                return False
+            if state_obj.to_dict() != other.states[state_name].to_dict():
+                return False
+
+        for (ps_name, ps_obj) in self.param_specs.iteritems():
+            if ps_name not in other.param_specs:
+                return False
+            if ps_obj.to_dict() != other.param_specs[ps_name].to_dict():
+                return False
+
+        for i in xrange(len(self.param_changes)):
+            if self.param_changes[i].to_dict() != other.param_changes[i].to_dict():
+                return False
+
+        return True
+
     @classmethod
     def create_default_exploration(
-            cls, exploration_id, title, category,
+            cls, exploration_id, title, category, objective='',
             language_code=feconf.DEFAULT_LANGUAGE_CODE):
         init_state_dict = State.create_default_state(
-            feconf.DEFAULT_STATE_NAME).to_dict()
+            feconf.DEFAULT_INIT_STATE_NAME, is_initial_state=True).to_dict()
+
         states_dict = {
-            feconf.DEFAULT_STATE_NAME: init_state_dict
+            feconf.DEFAULT_INIT_STATE_NAME: init_state_dict
         }
 
         return cls(
-            exploration_id, title, category, '', language_code, [], '', '',
-            'conversation_v1', feconf.DEFAULT_STATE_NAME, states_dict, {}, [],
+            exploration_id, title, category, objective, language_code, [], '', '',
+            'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [],
             0)
 
     @classmethod
@@ -807,8 +855,9 @@ class Exploration(object):
                 'This exploration has no initial state name specified.')
         if self.init_state_name not in self.states:
             raise utils.ValidationError(
-                'There is no state corresponding to the exploration\'s '
-                'initial state name.')
+                'There is no state in %s corresponding to the exploration\'s '
+                'initial state name %s.' %
+                (self.states.keys(), self.init_state_name))
 
         if not isinstance(self.param_specs, dict):
             raise utils.ValidationError(
@@ -1061,48 +1110,13 @@ class Exploration(object):
     def update_default_skin_id(self, default_skin_id):
         self.default_skin = default_skin_id
 
-    # Methods relating to parameters.
-    def get_obj_type_for_param(self, param_name):
-        """Returns the obj_type for the given parameter."""
-        try:
-            return self.param_specs[param_name].obj_type
-        except:
-            raise Exception('Exploration %s has no parameter named %s' %
-                            (self.title, param_name))
-
-    def _get_updated_param_dict(self, param_dict, param_changes):
-        """Updates a param dict using the given list of param_changes.
-
-        Note that the list of parameter changes is ordered. Parameter
-        changes later in the list may depend on parameter changes that have
-        been set earlier in the same list.
-        """
-        new_param_dict = copy.deepcopy(param_dict)
-        for pc in param_changes:
-            obj_type = self.get_obj_type_for_param(pc.name)
-            new_param_dict[pc.name] = pc.get_normalized_value(
-                obj_type, new_param_dict)
-        return new_param_dict
-
-    def get_init_params(self):
-        """Returns an initial set of exploration parameters for a reader."""
-        return self._get_updated_param_dict({}, self.param_changes)
-
-    def update_with_state_params(self, state_name, param_dict):
-        """Updates a reader's params using the params for the given state.
-
-        Args:
-          - state_name: str. The name of the state.
-          - param_dict: dict. A dict containing parameter names and their
-              values. This dict represents the current context which is to
-              be updated.
-
-        Returns:
-          dict. An updated param dict after the changes in the state's
-            param_changes list have been applied in sequence.
-        """
-        state = self.states[state_name]
-        return self._get_updated_param_dict(param_dict, state.param_changes)
+    def update_init_state_name(self, init_state_name):
+        if init_state_name not in self.states:
+            raise Exception(
+                'Invalid new initial state name: %s; '
+                'it is not in the list of states %s for this '
+                'exploration.' % (init_state_name, self.states.keys()))
+        self.init_state_name = init_state_name
 
     # Methods relating to states.
     def add_states(self, state_names):
@@ -1127,12 +1141,12 @@ class Exploration(object):
 
         self._require_valid_state_name(new_state_name)
 
-        if self.init_state_name == old_state_name:
-            self.init_state_name = new_state_name
-
         self.states[new_state_name] = copy.deepcopy(
             self.states[old_state_name])
         del self.states[old_state_name]
+
+        if self.init_state_name == old_state_name:
+            self.update_init_state_name(new_state_name)
 
         # Find all destinations in the exploration which equal the renamed
         # state, and change the name appropriately.
@@ -1182,33 +1196,6 @@ class Exploration(object):
                 )
 
         return state_dict
-
-    def classify(self, state_name, handler_name, answer, params):
-        """Return the first rule that is satisfied by a reader's answer."""
-        state = self.states[state_name]
-
-        # Get the widget to determine the input type.
-        generic_handler = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, state.widget.widget_id
-        ).get_handler_by_name(handler_name)
-
-        handler = next(
-            h for h in state.widget.handlers if h.name == handler_name)
-        fs = fs_domain.AbstractFileSystem(
-            fs_domain.ExplorationFileSystem(self.id))
-
-        for rule_spec in handler.rule_specs:
-            if rule_domain.evaluate_rule(
-                    rule_spec.definition, self.param_specs,
-                    generic_handler.obj_type, params, answer, fs):
-                return rule_spec
-
-        raise Exception(
-            'No matching rule found for handler %s. Rule specs are %s.' % (
-                handler.name,
-                [rule_spec.to_dict() for rule_spec in handler.rule_specs]
-            )
-        )
 
     # The current version of the exploration schema. If any backward-
     # incompatible changes are made to the exploration schema in the YAML
@@ -1275,8 +1262,8 @@ class Exploration(object):
 
         exploration = cls.create_default_exploration(
             exploration_id, title, category,
+            objective=exploration_dict['objective'],
             language_code=exploration_dict['language_code'])
-        exploration.objective = exploration_dict['objective']
         exploration.skill_tags = exploration_dict['skill_tags']
         exploration.blurb = exploration_dict['blurb']
         exploration.author_notes = exploration_dict['author_notes']
@@ -1352,6 +1339,20 @@ class Exploration(object):
                        for (state_name, state) in self.states.iteritems()},
             'schema_version': self.CURRENT_EXPLORATION_SCHEMA_VERSION
         })
+
+    def to_player_dict(self):
+        """Returns a copy of the exploration suitable for inclusion in the
+        learner view."""
+        return {
+            'init_state_name': self.init_state_name,
+            'title': self.title,
+            'states': {
+                state_name: self.export_state_to_frontend_dict(state_name)
+                for state_name in self.states
+            },
+            'param_changes': self.param_change_dicts,
+            'param_specs': self.param_specs_dict,
+        }
 
     def get_interactive_widget_ids(self):
         """Get all interactive widget ids used in this exploration."""

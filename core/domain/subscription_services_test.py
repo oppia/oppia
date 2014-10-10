@@ -33,14 +33,7 @@ from core.tests import test_utils
 class SubscriptionsTest(test_utils.GenericTestBase):
     """Tests for subscription management."""
 
-    OWNER_EMAIL = 'owner@example.com'
-    EDITOR_EMAIL = 'editor@example.com'
-    VIEWER_EMAIL = 'editor@example.com'
     OWNER_2_EMAIL = 'owner2@example.com'
-
-    OWNER_USERNAME = 'owner'
-    EDITOR_USERNAME = 'editor'
-    VIEWER_USERNAME = 'viewer'
     OWNER2_USERNAME = 'owner2'
 
     def setUp(self):

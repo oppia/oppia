@@ -21,26 +21,19 @@ import feconf
 from core.controllers import cron
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
+import feconf
+import main
 
 import webapp2
-from webapp2_extras.routes import RedirectRoute
 
-
-def get_redirect_route(regex_route, handler, name, defaults=None):
-    """Returns a route that redirects /foo/ to /foo.
-
-    Warning: this method strips off parameters after the trailing slash. URLs
-    with parameters should be formulated without the trailing slash.
-    """
-    if defaults is None:
-        defaults = {}
-    return RedirectRoute(
-        regex_route, handler, name, strict_slash=True, defaults=defaults)
-
-
-# Register the URL with the responsible classes
+# Register the URLs with the classes responsible for handling them.
 urls = [
-
+    main.get_redirect_route(
+        r'/cron/mail/admin/job_status', cron.JobStatusMailerHandler,
+        'job_failure_mailer'),
+    main.get_redirect_route(
+        r'/cron/jobs/cleanup', cron.CronMapreduceCleanupHandler,
+        'job_cleanup_handler'),
 ]
 
 

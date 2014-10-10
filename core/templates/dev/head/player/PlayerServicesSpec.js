@@ -94,3 +94,42 @@ describe('Stopwatch service', function() {
     });
   });
 });
+
+describe('Learner parameters service', function() {
+  beforeEach(module('oppia'));
+
+  describe('learner params service', function() {
+    var learnerParamsService = null;
+
+    beforeEach(inject(function($injector) {
+      learnerParamsService = $injector.get('learnerParamsService');
+    }));
+
+    it('should correctly initialize parameters', function() {
+      expect(learnerParamsService.getAllParams()).toEqual({});
+      learnerParamsService.init({'a': 'b'});
+      expect(learnerParamsService.getAllParams()).toEqual({'a': 'b'});
+    });
+
+    it('should correctly get and set parameters', function() {
+      learnerParamsService.init({'a': 'b'});
+      expect(learnerParamsService.getValue('a')).toEqual('b');
+      learnerParamsService.setValue('a', 'c');
+      expect(learnerParamsService.getValue('a')).toEqual('c');
+    });
+
+    it('should not get an invalid parameter', function() {
+      learnerParamsService.init({'a': 'b'});
+      expect(function() {
+        learnerParamsService.getValue('b');
+      }).toThrow(new Error('Invalid parameter name: b'));
+    });
+
+    it('should not set an invalid parameter', function() {
+      learnerParamsService.init({'a': 'b'});
+      expect(function() {
+        learnerParamsService.setValue('b', 'c');
+      }).toThrow(new Error('Cannot set unknown parameter: b'));
+    });
+  });
+});

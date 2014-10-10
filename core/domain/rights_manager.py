@@ -22,12 +22,14 @@ __author__ = 'Sean Lip'
 import logging
 
 from core.domain import config_domain
+from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import subscription_services
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+import feconf
 import utils
 
 
@@ -37,6 +39,8 @@ import utils
 CMD_CREATE_NEW = 'create_new'
 CMD_CHANGE_ROLE = 'change_role'
 CMD_CHANGE_EXPLORATION_STATUS = 'change_exploration_status'
+CMD_CHANGE_PRIVATE_VIEWABILITY = 'change_private_viewability'
+CMD_RELEASE_OWNERSHIP = 'release_ownership'
 
 EXPLORATION_STATUS_PRIVATE = 'private'
 EXPLORATION_STATUS_PUBLIC = 'public'
@@ -56,7 +60,8 @@ class ExplorationRights(object):
 
     def __init__(self, exploration_id, owner_ids, editor_ids, viewer_ids,
                  community_owned=False, cloned_from=None,
-                 status=EXPLORATION_STATUS_PRIVATE):
+                 status=EXPLORATION_STATUS_PRIVATE,
+                 viewable_if_private=False):
         self.id = exploration_id
         self.owner_ids = owner_ids
         self.editor_ids = editor_ids
@@ -64,6 +69,7 @@ class ExplorationRights(object):
         self.community_owned = community_owned
         self.cloned_from = cloned_from
         self.status = status
+        self.viewable_if_private = viewable_if_private
 
     def validate(self):
         """Validates an ExplorationRights object.
@@ -112,7 +118,8 @@ class ExplorationRights(object):
                 'community_owned': True,
                 'owner_names': [],
                 'editor_names': [],
-                'viewer_names': []
+                'viewer_names': [],
+                'viewable_if_private': self.viewable_if_private,
             }
         else:
             return {
@@ -125,6 +132,7 @@ class ExplorationRights(object):
                     self.editor_ids),
                 'viewer_names': user_services.get_human_readable_user_ids(
                     self.viewer_ids),
+                'viewable_if_private': self.viewable_if_private,
             }
 
 
@@ -136,7 +144,8 @@ def _get_exploration_rights_from_model(exploration_rights_model):
         exploration_rights_model.viewer_ids,
         community_owned=exploration_rights_model.community_owned,
         cloned_from=exploration_rights_model.cloned_from,
-        status=exploration_rights_model.status
+        status=exploration_rights_model.status,
+        viewable_if_private=exploration_rights_model.viewable_if_private,
     )
 
 
@@ -154,6 +163,7 @@ def _save_exploration_rights(
     model.community_owned = exploration_rights.community_owned
     model.cloned_from = exploration_rights.cloned_from
     model.status = exploration_rights.status
+    model.viewable_if_private = exploration_rights.viewable_if_private
 
     model.commit(committer_id, commit_message, commit_cmds)
 
@@ -169,7 +179,8 @@ def create_new_exploration_rights(exploration_id, committer_id):
         editor_ids=exploration_rights.editor_ids,
         viewer_ids=exploration_rights.viewer_ids,
         community_owned=exploration_rights.community_owned,
-        status=exploration_rights.status
+        status=exploration_rights.status,
+        viewable_if_private=exploration_rights.viewable_if_private,
     ).commit(committer_id, 'Created new exploration', commit_cmds)
 
     subscription_services.subscribe_to_activity(
@@ -202,6 +213,15 @@ def get_non_private_exploration_rights():
             exp_models.ExplorationRightsModel.get_non_private()]
 
 
+def get_page_of_non_private_exploration_rights(
+        page_size=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    """Returns a page of rights domain objects non-private explorations."""
+    results, cursor, more = exp_models.ExplorationRightsModel.get_page_of_non_private_exploration_rights(
+        page_size=page_size, cursor=cursor
+    )
+    return [_get_exploration_rights_from_model(result) for result in results], cursor, more
+
+
 def get_community_owned_exploration_rights():
     """Returns a list of rights objects for community-owned explorations."""
     return [_get_exploration_rights_from_model(model) for model in
@@ -231,8 +251,8 @@ def get_viewable_exploration_rights(user_id):
     it, and cannot edit it.
 
     There may be other explorations that this user can view -- namely, those
-    that he/she owns or is allowed to edit -- that are not returned by this
-    query.
+    that he/she owns or is allowed to edit, or private explorations that are
+    viewable by anyone -- that are not returned by this query.
     """
     return [_get_exploration_rights_from_model(model) for model in
             exp_models.ExplorationRightsModel.get_viewable(user_id)]
@@ -311,6 +331,7 @@ class Actor(object):
 
         if exp_rights.status == EXPLORATION_STATUS_PRIVATE:
             return (self.has_explicit_viewing_rights(exploration_id)
+                    or exp_rights.viewable_if_private
                     or self.is_moderator())
         else:
             return True
@@ -352,6 +373,12 @@ class Actor(object):
         return (
             is_deleting_own_private_exploration or
             is_moderator_deleting_public_exploration)
+
+    def can_change_private_viewability(self, exploration_id):
+        """Note that this requires the exploration in question
+        to be private.
+        """
+        return self.can_publish(exploration_id)
 
     def can_publish(self, exploration_id):
         if exp_domain.Exploration.is_demo_exploration_id(exploration_id):
@@ -543,7 +570,7 @@ def release_ownership(committer_id, exploration_id):
     exploration_rights.editor_ids = []
     exploration_rights.viewer_ids = []
     commit_cmds = [{
-        'cmd': 'release_ownership',
+        'cmd': CMD_RELEASE_OWNERSHIP,
     }]
 
     _save_exploration_rights(
@@ -566,13 +593,48 @@ def _change_exploration_status(
     old_status = exploration_rights.status
     exploration_rights.status = new_status
     commit_cmds = [{
-        'cmd': 'change_exploration_status',
+        'cmd': CMD_CHANGE_EXPLORATION_STATUS,
         'old_status': old_status,
         'new_status': new_status
     }]
 
     if new_status != EXPLORATION_STATUS_PRIVATE:
         exploration_rights.viewer_ids = []
+
+    _save_exploration_rights(
+        committer_id, exploration_rights, commit_message, commit_cmds)
+    event_services.ExplorationStatusChangeEventHandler.record(exploration_id)
+
+
+def set_private_viewability(committer_id, exploration_id, viewable_if_private):
+    """Sets the viewable_if_private attribute for an exploration's rights
+    object. If viewable_if_private is True, this allows an private exploration
+    to be viewed by anyone with the link.
+    """
+    if not Actor(committer_id).can_change_private_viewability(exploration_id):
+        logging.error(
+            'User %s tried to change private viewability of exploration %s '
+            'but was refused permission.' % (committer_id, exploration_id))
+        raise Exception(
+            'The viewability status of this exploration cannot be changed.')
+
+    exploration_rights = get_exploration_rights(exploration_id)
+    old_viewable_if_private = exploration_rights.viewable_if_private
+    if old_viewable_if_private == viewable_if_private:
+        raise Exception(
+            'Trying to change viewability status of this exploration to %s, '
+            'but that is already the current value.' % viewable_if_private)
+
+    exploration_rights.viewable_if_private = viewable_if_private
+    commit_cmds = [{
+        'cmd': CMD_CHANGE_PRIVATE_VIEWABILITY,
+        'old_viewable_if_private': old_viewable_if_private,
+        'new_viewable_if_private': viewable_if_private,
+    }]
+    commit_message = (
+        'Made exploration viewable to anyone with the link.'
+        if viewable_if_private else
+        'Made exploration viewable only to invited playtesters.')
 
     _save_exploration_rights(
         committer_id, exploration_rights, commit_message, commit_cmds)
@@ -636,3 +698,6 @@ def unpublicize_exploration(committer_id, exploration_id):
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
         'Exploration unpublicized.')
+
+
+

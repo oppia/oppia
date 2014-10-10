@@ -16,17 +16,19 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import collections
+import logging
 
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
+import utils
 
 import jinja2
 
@@ -59,12 +61,21 @@ class GalleryPage(base.BaseHandler):
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             'noninteractive_widget_html': jinja2.utils.Markup(
                 noninteractive_widget_html),
+            'gallery_redirect_url': current_user_services.create_login_url(
+                feconf.GALLERY_REDIRECT_URL),
         })
         self.render_template('galleries/gallery.html')
 
 
 class GalleryHandler(base.BaseHandler):
     """Provides data for the exploration gallery page."""
+
+    def _get_short_language_description(self, full_language_description):
+        if ' (' not in full_language_description:
+            return full_language_description
+        else:
+            ind = full_language_description.find(' (')
+            return full_language_description[:ind]
 
     def get(self):
         """Handles GET requests."""
@@ -73,6 +84,11 @@ class GalleryHandler(base.BaseHandler):
         # TODO(sll): Precompute and cache gallery categories. Or have a fixed
         # list of categories and 'Other', and gradually classify the
         # explorations in 'Other'.
+
+        language_codes_to_short_descs = {
+            lc['code']: self._get_short_language_description(lc['description'])
+            for lc in feconf.ALL_LANGUAGE_CODES
+        }
 
         explorations_dict = (
             exp_services.get_non_private_explorations_summary_dict(
@@ -87,27 +103,40 @@ class GalleryHandler(base.BaseHandler):
             'title': exp_data['title'],
             'category': exp_data['category'],
             'objective': exp_data['objective'],
-            'language_code': exp_data['language_code'],
+            'language': language_codes_to_short_descs.get(
+                exp_data['language_code'], exp_data['language_code']),
             'last_updated': exp_data['last_updated'],
             'status': exp_data['status'],
             'community_owned': exp_data['community_owned'],
             'is_editable': exp_data['is_editable'],
         } for (exp_id, exp_data) in explorations_dict.iteritems()]
 
+        if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
+            logging.error(
+                '%s explorations were fetched to load the gallery page. '
+                'You may be running up against the default query limits.'
+                % feconf.DEFAULT_QUERY_LIMIT)
+
+        private_explorations_list = []
+        beta_explorations_list = []
+        released_explorations_list = []
+
+        for e_dict in explorations_list:
+            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE:
+                private_explorations_list.append(e_dict)
+            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
+                beta_explorations_list.append(e_dict)
+            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+                released_explorations_list.append(e_dict)
+
         private_explorations_list = sorted(
-            [e_dict for e_dict in explorations_list
-             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE],
-            key=lambda x: x['last_updated'],
+            private_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
         beta_explorations_list = sorted(
-            [e_dict for e_dict in explorations_list 
-             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC],
-            key=lambda x: x['last_updated'],
+            beta_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
         publicized_explorations_list = sorted(
-            [e_dict for e_dict in explorations_list 
-             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED],
-            key=lambda x: x['last_updated'],
+            released_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
 
         self.values.update({
@@ -116,6 +145,24 @@ class GalleryHandler(base.BaseHandler):
             'private': private_explorations_list,
         })
         self.render_json(self.values)
+
+
+class GalleryRedirector(base.BaseHandler):
+    """Redirects a logged-in user to the editor prerequisites page or the
+    gallery, according as to whether they are logged in or not.
+    """
+
+    @base.require_user
+    def get(self):
+        """Handles GET requests."""
+        if not user_services.has_user_registered_as_editor(self.user_id):
+            redirect_url = utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL,
+                'return_url', feconf.GALLERY_URL)
+        else:
+            redirect_url = feconf.GALLERY_URL
+
+        self.redirect(redirect_url)
 
 
 class NewExploration(base.BaseHandler):
@@ -128,15 +175,20 @@ class NewExploration(base.BaseHandler):
         """Handles POST requests."""
         title = self.payload.get('title')
         category = self.payload.get('category')
+        objective = self.payload.get('objective')
+        language_code = self.payload.get('language_code')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
         if not category:
             raise self.InvalidInputException('No category chosen.')
+        if not language_code:
+            raise self.InvalidInputException('No language chosen.')
 
         new_exploration_id = exp_services.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, title, category)
+            new_exploration_id, title, category,
+            objective=objective, language_code=language_code)
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({EXPLORATION_ID_KEY: new_exploration_id})

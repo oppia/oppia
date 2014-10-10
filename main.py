@@ -138,7 +138,7 @@ for path, handler_class in mapreduce_main.create_handlers_map():
 mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 
 
-# Register the URL with the responsible classes
+# Register the URLs with the classes responsible for handling them.
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
@@ -149,6 +149,7 @@ urls = [
         'dashboard_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
+    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(
         r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
     get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
@@ -183,6 +184,9 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
+    get_redirect_route(
+        r'%s' % feconf.GALLERY_REDIRECT_URL, galleries.GalleryRedirector,
+        'gallery_redirect'),
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
@@ -220,6 +224,9 @@ urls = [
          % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
         reader.FeedbackHandler, 'feedback_handler'),
     get_redirect_route(
+        r'/explorehandler/state_hit_event/<exploration_id>',
+        reader.StateHitEventHandler, 'state_hit_event_handler'),
+    get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
     get_redirect_route(
@@ -242,9 +249,6 @@ urls = [
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(
-        r'/createhandler/new_state_template/<exploration_id>',
-        editor.NewStateTemplateHandler, 'new_state_template'),
-    get_redirect_route(
         r'/createhandler/resolved_answers/<exploration_id>/<escaped_state_name>',
         editor.ResolvedAnswersHandler, 'resolved_answers_handler'),
     get_redirect_route(
@@ -265,6 +269,17 @@ urls = [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
+    # Temporary handlers to support preview mode.
+    # TODO(sll): Remove this once we have support for client-side expressions.
+    get_redirect_route(
+        r'/createhandler/init_exploration/<exploration_id>',
+        editor.InitExplorationHandler, 'editor_init_exploration_handler'),
+    get_redirect_route(
+        r'/createhandler/classify/<exploration_id>', editor.ClassifyHandler,
+        'editor_classify_handler'),
+    get_redirect_route(
+        r'/createhandler/next_state/<exploration_id>', editor.NextStateHandler,
+        'editor_next_state_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
