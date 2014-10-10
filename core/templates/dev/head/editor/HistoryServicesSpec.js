@@ -203,29 +203,29 @@ describe('Compare versions service', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    // Helper function to get states data to pass to getDiffGraphData()
+    // Helper function to get states data to pass to getDiffGraphData().
     // states is an object whose keys are state names and whose values are
     //  - contentStr: string which is the text content of the state
     //  - ruleDests: a list of strings which are state names of destinations of
     //    links
-    // Only information accessed by getDiffGraphData is included
-    function _getStatesData(states) {
+    // Only information accessed by getDiffGraphData is included in the return
+    // value
+    function _getStatesData(statesDetails) {
       var statesData = {
         'states': {}
       };
-      for (var stateName in states) {
+      for (var stateName in statesDetails) {
         var newStateData = {
           'widget': {'handlers': [{ 'rule_specs': []}]},
           'content': [{
             'type': 'text',
-            'value': states[stateName].contentStr
+            'value': statesDetails[stateName].contentStr
           }]
         };
-        for (var i = 0; i < states[stateName].ruleDests.length; i++) {
-          newStateData.widget.handlers[0].rule_specs.push(
-            {'dest': states[stateName].ruleDests[i]}
-          );
-        }
+        newStateData.widget.handlers[0].rule_specs =
+          statesDetails[stateName].ruleDests.map(function(ruleDestName) {
+            return {'dest': ruleDestName};
+          });
         statesData.states[stateName] = newStateData;
       }
       return statesData;

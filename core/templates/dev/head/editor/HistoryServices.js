@@ -226,13 +226,15 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
     }
   }
   /**
-   * Returns an adjacency matrix of links in state, indexed by id.
-   * adjMatrix[state1Id][state2Id] is true if there is a link from state 1 to
-   * state 2 and false otherwise.
-   * states an object whose keys are state names and values are objects
-   * representing the state
-   * stateIds is an object whose keys are state names and values are state ids
-   * END_DEST is included in both states and stateIds
+   * Returns an adjacency matrix, adjMatrix, of links between states
+   * (represented by ids). adjMatrix[state1Id][state2Id] is true if there
+   * is a link from state 1 to state 2 and false otherwise.
+   *
+   * Args:
+   *   - states: an object whose keys are state names and values are objects
+   *             representing the state
+   *   - stateIds: an object whose keys are state names and values are state ids
+   *   - maxId: the maximum id in states and stateIds
    */
   function _getAdjMatrix(states, stateIds, maxId) {
     adjMatrix = {};
@@ -274,19 +276,19 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
         if (i == j) {
           continue;
         }
-        if (adjMatrixV1[i][j] === true && adjMatrixV2[i][j] === true) {
+        if (adjMatrixV1[i][j] && adjMatrixV2[i][j]) {
           links.push({
             source: i,
             target: j,
             linkProperty: 'unchanged'
           });
-        } else if (adjMatrixV1[i][j] === false && adjMatrixV2[i][j] === true) {
+        } else if (!adjMatrixV1[i][j] && adjMatrixV2[i][j]) {
           links.push({
             source: i,
             target: j,
             linkProperty: 'added'
           });
-        } else if (adjMatrixV1[i][j] === true && adjMatrixV2[i][j] === false) {
+        } else if (adjMatrixV1[i][j] && !adjMatrixV2[i][j]) {
           links.push({
             source: i,
             target: j,
@@ -300,7 +302,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
   }
   return {
     /**
-     * Summarize changes between to states and rules v1 and v2.
+     * Summarize changes to states and rules between v1 and v2.
      * Returns a promise for an object whose keys are 'initStateName',
      * 'v2InitStateName', 'finalStateName', 'nodes', 'nodeList' and 'links'.
      *
@@ -386,7 +388,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           'links': links,
           'v1InitStateId': originalStateIds[response.v1Data.data.init_state_name],
           'v2InitStateId': stateIds[response.v2Data.data.init_state_name],
-          'finalStateName': stateIds[END_DEST]
+          'finalStateId': stateIds[END_DEST]
         };
       });
     }
