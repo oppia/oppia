@@ -3,6 +3,15 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.10.patch (10 Oct 2014)
+--------------------
+Editor improvements:
+* In noneditable mode, hide the widget selector in the state editor.
+* Fix a bug relating to the graph visualization height in Firefox.
+
+Infrastructure:
+* Allow exploration statistics datastore models to be migrated.
+
 v1.2.10 (7 Oct 2014)
 --------------------
 General editor improvements:
