@@ -226,25 +226,30 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
     }
   }
   /**
-   * Returns a O/1 adjacency matrix of links in state, indexed by id.
-   * END_DEST is assigned an id maxId + 1.
+   * Returns an adjacency matrix of links in state, indexed by id.
+   * adjMatrix[state1Id][state2Id] is true if there is a link from state 1 to
+   * state 2 and false otherwise.
+   * states an object whose keys are state names and values are objects
+   * representing the state
+   * stateIds is an object whose keys are state names and values are state ids
+   * END_DEST is included in both states and stateIds
    */
-  function _getAdjMatrix(states, stateIds) {
+  function _getAdjMatrix(states, stateIds, maxId) {
     adjMatrix = {};
-    for (var state = 1; state <= _maxId; state++) {
-      adjMatrix[state] = {};
+    for (var stateId = 1; stateId <= maxId; stateId++) {
+      adjMatrix[stateId] = {};
     }
-    for (var state1 = 1; state1 <= _maxId; state1++) {
-      for (var state2 = 1; state2 <= _maxId; state2++) {
-        adjMatrix[state1][state2] = 0;
+    for (var state1Id = 1; state1Id <= maxId; state1Id++) {
+      for (var state2Id = 1; state2Id <= maxId; state2Id++) {
+        adjMatrix[state1Id][state2Id] = false;
       }
     }
-    for (var state in states) {
-      var handlers = states[state].widget.handlers;
-      for (h = 0; h < handlers.length; h++) {
+    for (var stateName in states) {
+      var handlers = states[stateName].widget.handlers;
+      for (var h = 0; h < handlers.length; h++) {
         ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
-          adjMatrix[stateIds[state]][stateIds[ruleSpecs[i].dest]] = 1;
+        for (var i = 0; i < ruleSpecs.length; i++) {
+          adjMatrix[stateIds[stateName]][stateIds[ruleSpecs[i].dest]] = true;
         }
       }
     }
@@ -261,25 +266,27 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
     links = [];
     originalStateIds[END_DEST] = _generateNewId();
     newestStateIds[END_DEST] = _maxId;
-    var adjMatrixV1 = _getAdjMatrix(v1States, originalStateIds);
-    var adjMatrixV2 = _getAdjMatrix(v2States, newestStateIds);
+    var adjMatrixV1 = _getAdjMatrix(v1States, originalStateIds, _maxId);
+    var adjMatrixV2 = _getAdjMatrix(v2States, newestStateIds, _maxId);
 
     for (var i = 1; i <= _maxId; i++) {
       for (var j = 1; j <= _maxId; j++) {
-        if (i == j) continue;
-        if (adjMatrixV1[i][j] == 1 && adjMatrixV2[i][j] == 1) {
+        if (i == j) {
+          continue;
+        }
+        if (adjMatrixV1[i][j] === true && adjMatrixV2[i][j] === true) {
           links.push({
             source: i,
             target: j,
             linkProperty: 'unchanged'
           });
-        } else if (adjMatrixV1[i][j] == 0 && adjMatrixV2[i][j] == 1) {
+        } else if (adjMatrixV1[i][j] === false && adjMatrixV2[i][j] === true) {
           links.push({
             source: i,
             target: j,
             linkProperty: 'added'
           });
-        } else if (adjMatrixV1[i][j] == 1 && adjMatrixV2[i][j] == 0) {
+        } else if (adjMatrixV1[i][j] === true && adjMatrixV2[i][j] === false) {
           links.push({
             source: i,
             target: j,
@@ -377,8 +384,8 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           'nodes': statesData,
           'nodeList': stateList,
           'links': links,
-          'initStateName': originalStateIds[response.v1Data.data.init_state_name],
-          'v2InitStateName': stateIds[response.v2Data.data.init_state_name],
+          'v1InitStateId': originalStateIds[response.v1Data.data.init_state_name],
+          'v2InitStateId': stateIds[response.v2Data.data.init_state_name],
           'finalStateName': stateIds[END_DEST]
         };
       });
