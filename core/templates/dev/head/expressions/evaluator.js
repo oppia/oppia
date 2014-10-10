@@ -94,8 +94,11 @@ ExprWrongNumArgsError.prototype.toString = function() {
 
 
 var evaluateExpression = function(expression, envs) {
-  return evaluate(expressionParserService.parse(expression),
-      envs.concat(system));
+  return evaluatePraseTree(expressionParserService.parse(expression), env);
+};
+
+var evaluateParseTree = function(parsed, envs) {
+  return evaluate(parsed, envs.concat(system));
 };
 
 /**
@@ -287,6 +290,7 @@ return {
   'ExprWrongNumArgsError': ExprWrongNumArgsError,
   'evaluate': evaluate,
   'evaluateExpression': evaluateExpression,
+  'evaluateParseTree': evaluateParseTree,
   'validate': validate,
   'validateExpression': validateExpression,
 };
