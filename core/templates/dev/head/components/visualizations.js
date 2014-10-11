@@ -150,13 +150,16 @@ oppia.factory('stateGraphArranger', [
       // necessary.
       maxOffsetInEachLevel[maxDepth + 1] = 0;
       maxDepth += 1;
+      var changed = false;
       for (var nodeName in nodeData) {
         if (nodeData[nodeName].depth === SENTINEL_DEPTH) {
+          changed = true;
           nodeData[nodeName].depth = maxDepth;
           nodeData[nodeName].offset = maxOffsetInEachLevel[maxDepth];
           maxOffsetInEachLevel[maxDepth] += 1;
         }
       }
+      if (changed) maxDepth++;
 
       // Calculate the width and height of each grid rectangle.
       var totalRows = maxDepth + 1;
@@ -230,8 +233,8 @@ oppia.factory('stateGraphArranger', [
       }
 
       // Mark nodes that are reachable from the END state via backward links.
-      queue = [END_DEST];
-      nodeData[END_DEST].reachableFromEnd = true;
+      queue = [finalStateName];
+      nodeData[finalStateName].reachableFromEnd = true;
       while (queue.length > 0) {
         var currNodeName = queue[0];
         queue.shift();
@@ -267,7 +270,13 @@ oppia.directive('stateGraphViz', [
       onClickFunction: '=',
       onDeleteFunction: '=',
       onMaximizeFunction: '=',
-      isEditable: '='
+      isEditable: '=',
+      // Object whose keys are node ids and whose values are node labels
+      nodeLabels: '=',
+      // Object whose keys are node ids and whose values are node colors
+      nodeColors: '=',
+      // Object mapping node ids to secondary label (if present),
+      nodeSecondaryLabels: '='
     },
     templateUrl: 'visualizations/stateGraphViz',
     controller: ['$scope', '$element', function($scope, $element) {
@@ -340,6 +349,7 @@ oppia.directive('stateGraphViz', [
       };
 
       $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {
+        $scope.finalStateName = finalStateName;
         var nodeData = stateGraphArranger.computeLayout(
           nodes, links, initStateName, finalStateName);
 
@@ -358,6 +368,14 @@ oppia.directive('stateGraphViz', [
               $scope.GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]]);
             nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]] = (
               $scope.GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]]);
+          }
+
+          // Add secondary label if it exists
+          if ($scope.nodeSecondaryLabels) {
+            if ($scope.nodeSecondaryLabels.hasOwnProperty(nodeName)) {
+              nodeData[nodeName].secondaryLabel = $scope.nodeSecondaryLabels[nodeName];
+              nodeData[nodeName].height *= 1.1;
+            }
           }
         }
 
@@ -448,13 +466,13 @@ oppia.directive('stateGraphViz', [
 
         for (var i = 0; i < $scope.augmentedLinks.length; i++) {
           var link = $scope.augmentedLinks[i];
-          if (link.source.name !== link.target.name) {
+          if (link.source.name != link.target.name) {
             var sourcex = link.source.xLabel;
             var sourcey = link.source.yLabel;
             var targetx = link.target.xLabel;
             var targety = link.target.yLabel;
 
-            if (sourcex === targetx && sourcey === targety) {
+            if (sourcex == targetx && sourcey == targety) {
               // TODO(sll): Investigate why this happens.
               return;
             }
@@ -495,12 +513,27 @@ oppia.directive('stateGraphViz', [
             $scope.augmentedLinks[i].d = (
               'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
               ' ' + endx + ' ' + endy);
+
+            // Color links if link properties are provided
+            if (links[i].hasOwnProperty('linkProperty')) {
+              if (links[i].linkProperty == 'added') {
+                $scope.augmentedLinks[i].style = ('stroke: #1F7D1F;');
+                $scope.augmentedLinks[i].style += ('stroke-opacity: 0.8;');
+                $scope.augmentedLinks[i].style += ('marker-end: url(#arrowhead-green);');
+              } else if (links[i].linkProperty == 'deleted') {
+                $scope.augmentedLinks[i].style = ('stroke: #B22222;');
+                $scope.augmentedLinks[i].style += ('stroke-opacity: 0.8;');
+                $scope.augmentedLinks[i].style += ('marker-end: url(#arrowhead-red);');
+              } else if (links[i].linkProperty != 'unchanged') {
+                throw new Error('Invalid link property ' + links[i].linkProperty);
+              }
+            }
           }
         }
 
         var _getNodeStrokeWidth = function(nodeName) {
           return nodeName == $scope.currentStateName() ? '4' :
-                 (nodeName == initStateName || nodeName == END_DEST) ? '2' : '1';
+                 (nodeName == initStateName || nodeName == finalStateName) ? '2' : '1';
         };
 
         var _getNodeFillOpacity = function(nodeName) {
@@ -527,7 +560,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.onNodeDeletionClick = function(nodeName) {
-          if (nodeName !== initStateName && nodeName !== END_DEST) {
+          if (nodeName != initStateName && nodeName != finalStateName) {
             $scope.onDeleteFunction(nodeName);
           }
         };
@@ -541,7 +574,11 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.canNavigateToNode = function(nodeName) {
-          return nodeName !== END_DEST && nodeName !== $scope.currentStateName();
+          return nodeName != finalStateName && nodeName != $scope.currentStateName();
+        };
+
+        $scope.islargeNode = function(nodeName) {
+          return $scope.nodeSecondaryLabels && $scope.nodeSecondaryLabels.hasOwnProperty(nodeName);
         };
 
         // Update the nodes.
@@ -555,16 +592,27 @@ oppia.directive('stateGraphViz', [
             nodeData[nodeName].style += ('fill: ' + $scope.nodeFill + '; ');
           }
 
-          nodeData[nodeName].isInitNode = (nodeName === initStateName);
-          nodeData[nodeName].isEndNode = (nodeName === END_DEST);
+          // Relabel nodes if node labels are provided
+          if ($scope.nodeLabels) {
+            nodeData[nodeName].label = $filter('truncate')(
+              $scope.nodeLabels[nodeName], MAX_NODE_LABEL_LENGTH);
+          }
+
+          // Color nodes
+          if ($scope.nodeColors) {
+            nodeData[nodeName].style += ('fill: ' + $scope.nodeColors[nodeName] + '; ');
+          }
+
+          nodeData[nodeName].isInitNode = (nodeName == initStateName);
+          nodeData[nodeName].isEndNode = (nodeName == finalStateName);
           nodeData[nodeName].isBadNode = (
-            nodeName !== initStateName && nodeName !== END_DEST &&
+            nodeName != initStateName && nodeName != finalStateName &&
             !(nodeData[nodeName].reachable && nodeData[nodeName].reachableFromEnd));
           nodeData[nodeName].isNormalNode = (
-            nodeName !== initStateName && nodeName !== END_DEST &&
+            nodeName != initStateName && nodeName != finalStateName &&
             nodeData[nodeName].reachable && nodeData[nodeName].reachableFromEnd);
 
-          nodeData[nodeName].canDelete = (nodeName !== initStateName && nodeName !== END_DEST);
+          nodeData[nodeName].canDelete = (nodeName != initStateName && nodeName != finalStateName);
           $scope.nodeList.push(nodeData[nodeName]);
         }
       }

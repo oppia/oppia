@@ -20,8 +20,8 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Version History</h4>
         <div ng-repeat="snapshot in displayedExplorationSnapshots">
-          <input type="radio" name="compareVer1" ng-model="comparePanesVersions.leftPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'leftPane')">
-          <input type="radio" name="compareVer2" ng-model="comparePanesVersions.rightPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'rightPane')">
+          <input type="radio" name="compareVer1" ng-model="comparePanesVersions.leftPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'leftPane')" ng-disabled="checkLeftPaneDisabled(snapshot.versionNumber)">
+          <input type="radio" name="compareVer2" ng-model="comparePanesVersions.rightPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'rightPane')" ng-disabled="checkRightPaneDisabled(snapshot.versionNumber)">
           [<[snapshot.versionNumber]>]
           <strong><[snapshot.committerId]></strong>
           <[snapshot.commitMessage]>
@@ -40,6 +40,12 @@
 
         <div ng-hide="!displayedExplorationSnapshots || hideCompareVersionsButton">
           <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showMergeview()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+        </div>
+
+        <div ng-hide="hideCodemirror || !displayedExplorationSnapshots">
+          <h4>Exploration Graph</h4>
+          <div state-graph-viz align="center" val="diffGraphData" node-labels="diffGraphNodeLabels" node-colors="     diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels">
+          </div>
         </div>
 
         <div ng-hide="hideCodemirror || !displayedExplorationSnapshots" id="codemirrorMergeviewInstance">

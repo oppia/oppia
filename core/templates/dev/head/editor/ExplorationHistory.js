@@ -20,9 +20,9 @@
 
 oppia.controller('ExplorationHistory', [
     '$scope', '$http', '$location', '$anchorScroll', '$log', 'explorationData',
-    'versionsTreeService', 'compareVersionsService', function(
+    'versionsTreeService', 'compareVersionsService', 'graphDataService', function(
     $scope, $http, $location, $anchorScroll, $log, explorationData,
-    versionsTreeService, compareVersionsService) {
+    versionsTreeService, compareVersionsService, graphDataService) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationAllSnapshotsUrl =
       '/createhandler/snapshots/' + $scope.explorationId;
@@ -81,9 +81,8 @@ oppia.controller('ExplorationHistory', [
     });
   };
 
-  // TODO(wxy): Restrict choices for version comparison so that v1 < v2
   // Functions to set snapshot and download YAML when selection is changed
-  var stateData = null;
+  $scope.diffGraphData = null;
   $scope.changeCompareVersion = function(versionNumber, changedPane) {
     $scope.compareSnapshot[changedPane] =
       $scope.displayedExplorationSnapshots[
@@ -96,19 +95,66 @@ oppia.controller('ExplorationHistory', [
     });
 
     if ($scope.comparePanesVersions.leftPane !== undefined &&
-        $scope.comparePanesVersions.rightPane !== undefined &&
-        $scope.comparePanesVersions.leftPane < $scope.comparePanesVersions.rightPane) {
+        $scope.comparePanesVersions.rightPane !== undefined) {
       compareVersionsService.getDiffGraphData($scope.comparePanesVersions.leftPane,
           $scope.comparePanesVersions.rightPane).then(function(response) {
-        stateData = response;
         $log.info('Retrieved version comparison data');
-        $log.info(stateData);
-      });
-    }
+        $log.info(response);
 
-    if (!$scope.hideCodemirror) {
-      $location.hash('codemirrorMergeviewInstance');
-      $anchorScroll();
+        var STATE_PROPERTY_ADDED = 'added';
+        var STATE_PROPERTY_DELETED = 'deleted';
+        var STATE_PROPERTY_CHANGED = 'changed';
+        var STATE_PROPERTY_UNCHANGED = 'unchanged';
+        var COLOR_ADDED = ' #4EA24E';
+        var COLOR_DELETED = '#DC143C';
+        var COLOR_CHANGED = '#1E90FF';
+        var COLOR_UNCHANGED = 'beige';
+        var COLOR_RENAMED_UNCHANGED = '#FFD700';
+
+        $scope.diffGraphNodeLabels = {};
+        $scope.diffGraphSecondaryLabels = {};
+        $scope.diffGraphNodeColors = {};
+
+        var nodesData = response.nodes;
+        nodesData[response.finalStateId] = {
+          'newestStateName': END_DEST,
+          'originalStateName': END_DEST,
+          'stateProperty': STATE_PROPERTY_UNCHANGED
+        };
+        for (var nodeId in nodesData) {
+          if (nodesData[nodeId].stateProperty == STATE_PROPERTY_ADDED) {
+            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].newestStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
+          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_DELETED) {
+            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].originalStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
+          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_CHANGED) {
+            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].originalStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
+            if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
+              $scope.diffGraphSecondaryLabels[nodeId] = nodesData[nodeId].originalStateName;
+              $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].newestStateName;
+            }
+          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_UNCHANGED) {
+            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].originalStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
+            if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
+              $scope.diffGraphSecondaryLabels[nodeId] = nodesData[nodeId].originalStateName;
+              $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].newestStateName;
+              $scope.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
+            }
+          } else {
+            throw new Error('Invalid state property.');
+          }
+        }
+
+        $scope.diffGraphData = {
+          'nodes': response.nodeList,
+          'links': response.links,
+          'initStateName': response.v1InitStateId,
+          'finalStateName': response.finalStateId
+        };
+      });
     }
   };
 
@@ -118,6 +164,26 @@ oppia.controller('ExplorationHistory', [
       $scope.comparePanesVersions &&
       $scope.comparePanesVersions.hasOwnProperty('leftPane') &&
       $scope.comparePanesVersions.hasOwnProperty('rightPane'));
+  };
+
+  // Returns true if left pane version selection radio button is disabled
+  $scope.checkLeftPaneDisabled = function(versionNumber) {
+    if (!$scope.comparePanesVersions.hasOwnProperty('rightPane')) return false;
+    if ($scope.comparePanesVersions.rightPane > versionNumber) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  // Returns true if right pane version selection radio button is disabled
+  $scope.checkRightPaneDisabled = function(versionNumber) {
+    if (!$scope.comparePanesVersions.hasOwnProperty('leftPane')) return false;
+    if ($scope.comparePanesVersions.leftPane < versionNumber) {
+      return false;
+    } else {
+      return true;
+    }
   };
 
   // Downloads the zip file for an exploration.

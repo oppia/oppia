@@ -90,7 +90,7 @@
           <g>
             <g class="pannable-child" ng-attr-transform="<[innerTransformStr]>">
               <g ng-repeat="link in augmentedLinks">
-                <path class="link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)">
+                <path class="link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
                 </path>
               </g>
 
@@ -103,7 +103,8 @@
                 </rect>
                 <title><[getNodeTitle(node)]></title>
                 <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>">
-                  <[node.label]>
+                  <tspan><[node.label]></tspan>
+                  <tspan ng-attr-x="<[node.xLabel]>" dy="1em" style="fill:gray"><[node.secondaryLabel]></tspan>
                 </text>
                 <g ng-if="isEditable && onDeleteFunction && node.canDelete">
                   <rect height="15" width="15" opacity="0" stroke-width="0"
@@ -119,7 +120,7 @@
                 <g ng-if="highlightStates && isStateFlagged(node.name)">
                   <rect ng-click="onClickFunction(node.name)" class="highlight"
                         width="22" height="22" ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                        ng-class="{clickable: node.name !== 'END'}"
+                        ng-class="{clickable: node.name != finalStateName}"
                         ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
                   </rect>
                   <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"
