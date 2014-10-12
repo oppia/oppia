@@ -47,7 +47,7 @@ describe('State editor', function() {
     users.logout();
   });
 
-  iit('should create content and working multiple choice widgets', function() {
+  it('should create content and working multiple choice widgets', function() {
     users.createUser('user2@example.com', 'user2');
     users.login('user2@example.com');
 
@@ -101,7 +101,7 @@ describe('State editor', function() {
 });
 
 describe('Full exploration editor', function() {
-  iit('should navigate multiple states correctly', function() {
+  it('should navigate multiple states correctly', function() {
     users.createUser('user4@example.com', 'user4');
     users.login('user4@example.com');
 

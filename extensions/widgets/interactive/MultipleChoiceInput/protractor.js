@@ -17,7 +17,7 @@
  * interaction.
  */
 
-// `answerChoices` is a list of strings that correspond to the various
+// 'answerChoices' is a list of strings that correspond to the various
 // multiple-choice options.
 var expectInteractionDetailsToMatch = function(answerChoices) {
   expect(
@@ -28,7 +28,7 @@ var expectInteractionDetailsToMatch = function(answerChoices) {
   ).toEqual(answerChoices);
 };
 
-// `answer` {String} is the text on the multiple-choice item to select.
+// 'answer' {String} is the text on the multiple-choice item to select.
 var submitAnswer = function(answer) {
   element(by.tagName('oppia-interactive-multiple-choice-input')).
     element(by.buttonText(answer)).click();

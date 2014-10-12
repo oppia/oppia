@@ -17,12 +17,11 @@
  * interaction.
  */
 
-// `data` is a string whose value is the text of the Continue button.
-var expectInteractionDetailsToMatch = function(data) {
+var expectInteractionDetailsToMatch = function(buttonText) {
   expect(
     element(by.tagName('oppia-interactive-continue')).
     element(by.tagName('button')).getText()
-  ).toBe(data);
+  ).toBe(buttonText);
 };
 
 var submitAnswer = function() {

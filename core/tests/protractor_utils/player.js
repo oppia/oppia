@@ -48,11 +48,11 @@ var getLatestFeedbackText = function() {
 };
 
 
-// `data` is a variable that is passed to the corresponding widget's protractor
-// utilities. Its definition and type are widget-specific.
-var expectInteractionToMatch = function(widgetName, data) {
+// 'widgetCustomizations' is a variable that is passed to the corresponding
+// widget's protractor utilities. Its definition and type are widget-specific.
+var expectInteractionToMatch = function(widgetName, widgetCustomizations) {
   if (widgetUtils.hasOwnProperty(widgetName)) {
-    widgetUtils[widgetName].expectInteractionDetailsToMatch(data);
+    widgetUtils[widgetName].expectInteractionDetailsToMatch(widgetCustomizations);
   } else {
     throw 'Unknown widget: ' + widgetName;
   }

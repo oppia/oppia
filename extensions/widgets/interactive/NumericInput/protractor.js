@@ -23,7 +23,7 @@ var expectInteractionDetailsToMatch = function() {
   ).toBe(true);
 };
 
-// `answer` {Number} is the number to submit.
+// 'answer' {Number} is the number to submit.
 var submitAnswer = function(answer) {
   element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer + '\n');
