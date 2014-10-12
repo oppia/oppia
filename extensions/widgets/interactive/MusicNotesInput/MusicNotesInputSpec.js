@@ -41,8 +41,8 @@ describe('MusicNotesInput interactive widget', function() {
       scope = $rootScope.$new();
       elt = angular.element('<' + TAG_NAME + '></' + TAG_NAME + '>');
       $compile(elt)(scope);
-      ctrlScope = elt.scope();
       scope.$digest();
+      ctrlScope = elt.isolateScope();
     }));
 
     afterEach(function() {

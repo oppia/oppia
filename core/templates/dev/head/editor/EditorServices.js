@@ -34,7 +34,8 @@ oppia.factory('explorationData', [
 
     if (!explorationId) {
       $log.error('Unexpected call to explorationData for pathname ', pathnameArray[i]);
-      return;
+      // Note: if we do not return anything, Karma unit tests fail.
+      return {};
     }
 
     var explorationUrl = '/create/' + explorationId;
@@ -511,8 +512,7 @@ oppia.factory('explorationLanguageCodeService', [
 // should ensure that new initial state names passed to the service are
 // valid.
 oppia.factory('explorationInitStateNameService', [
-    'explorationPropertyService', 'explorationData',
-    function(explorationPropertyService, explorationData) {
+    'explorationPropertyService', function(explorationPropertyService) {
   var child = Object.create(explorationPropertyService);
   child.propertyName = 'init_state_name';
   child._isValid = function(value) {

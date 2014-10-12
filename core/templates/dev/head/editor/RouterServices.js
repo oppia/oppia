@@ -58,6 +58,7 @@ oppia.factory('routerService', [
       _tabs.stats.active = true;
     } else if (newPath === '/settings') {
       _tabs.settings.active = true;
+      $rootScope.$broadcast('refreshSettingsTab');
     } else if (newPath === '/history') {
       _tabs.history.active = true;
     } else if (newPath === '/feedback') {
