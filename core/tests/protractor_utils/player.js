@@ -19,6 +19,17 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+// Each widget should declare a checkExistence() function and a submitAnswer()
+// function.
+var widgetUtils = {
+  Continue: require(
+    '../../../extensions/widgets/interactive/Continue/protractor.js'),
+  MultipleChoiceInput: require(
+    '../../../extensions/widgets/interactive/MultipleChoiceInput/protractor.js'),
+  NumericInput: require(
+    '../../../extensions/widgets/interactive/NumericInput/protractor.js'),
+};
+
 // The get functions return promises rather than values.
 
 var getExplorationName = function() {
@@ -37,32 +48,24 @@ var getLatestFeedbackText = function() {
 };
 
 
-var getContinueButtonText = function() {
-  return element(by.tagName('oppia-interactive-continue')).
-    element(by.tagName('button')).getText();
+// 'widgetCustomizations' is a variable that is passed to the corresponding
+// widget's protractor utilities. Its definition and type are widget-specific.
+var expectInteractionToMatch = function(widgetName, widgetCustomizations) {
+  if (widgetUtils.hasOwnProperty(widgetName)) {
+    widgetUtils[widgetName].expectInteractionDetailsToMatch(widgetCustomizations);
+  } else {
+    throw 'Unknown widget: ' + widgetName;
+  }
 };
 
-var answerContinueWidget = function() {
-  element(by.tagName('oppia-interactive-continue')).click();
-};
-
-
-var answerNumericWidget = function(answer) {
-  element(by.tagName('oppia-interactive-numeric-input')).
-    element(by.tagName('input')).sendKeys(answer + '\n');
-};
-
-
-var getMultipleChoiceOptions = function() {
-  return element.all(by.repeater('choice in choices track by $index')).
-      map(function(elem) {
-    return elem.getText();
-  })
-};
-
-var answerMultipleChoiceWidget = function(answerText) {
-  element(by.tagName('oppia-interactive-multiple-choice-input')).
-    element(by.buttonText(answerText)).click();
+// `answerData` is a variable that is passed to the corresponding widget's
+// protractor utilities. Its definition and type are widget-specific.
+var submitAnswer = function(widgetName, answerData) {
+  if (widgetUtils.hasOwnProperty(widgetName)) {
+    widgetUtils[widgetName].submitAnswer(answerData);
+  } else {
+    throw 'Cannot submit answer to unknown widget: ' + widgetName;
+  }
 };
 
 
@@ -80,13 +83,8 @@ exports.getExplorationName = getExplorationName;
 exports.getCurrentQuestionText = getCurrentQuestionText;
 exports.getLatestFeedbackText = getLatestFeedbackText;
 
-exports.getContinueButtonText = getContinueButtonText;
-exports.answerContinueWidget = answerContinueWidget;
-
-exports.answerNumericWidget = answerNumericWidget;
-
-exports.getMultipleChoiceOptions = getMultipleChoiceOptions;
-exports.answerMultipleChoiceWidget = answerMultipleChoiceWidget;
+exports.expectInteractionToMatch = expectInteractionToMatch;
+exports.submitAnswer = submitAnswer;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
 exports.expectExplorationToNotBeOver = expectExplorationToNotBeOver;
