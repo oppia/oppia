@@ -1,3 +1,29 @@
+{% macro warnings_and_loader() -%}
+  <div ng-cloak>
+    <div class="oppia-alert-blocks">
+      <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
+        <p class="alert alert-warning">
+          <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
+          <strong>Warning!</strong>
+          <[warning]>
+        </p>
+      </div>
+    </div>
+
+    <div ng-show="loadingMessage" class="oppia-loading-fullpage">
+      <div class="oppia-align-center">
+        <[loadingMessage]>
+        <span class="oppia-loading-dot-one">.</span>
+        <span class="oppia-loading-dot-two">.</span>
+        <span class="oppia-loading-dot-three">.</span>
+      </div>
+    </div>
+    <div ng-show="!loadingMessage">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+{%- endmacro %}
+
 <!DOCTYPE html>
 <html ng-app="oppia">
   <head>
@@ -51,7 +77,9 @@
   </head>
 
   <body ng-controller="Base">
-    {% if not iframed %}
+    {% if iframed %}
+      {{ warnings_and_loader() }}
+    {% else %}
       <div id="wrapper">
         <div class="oppia-main-body">
           <!-- nav bar -->
@@ -64,116 +92,93 @@
                   <span class="icon-bar"></span>
                 </button>
 
-                <div class="navbar-header">
-                  <a class="navbar-brand" href="/">
-                    <img src="/images/logo.png" class="oppia-logo">
-                    Oppia&nbsp;<sup>beta</sup>
-                  </a>
-                </div>
+                {% block navbar %}
+                  <div class="navbar-header">
+                    <a class="navbar-brand" href="/">
+                      <img src="/images/logo.png" class="oppia-logo">
+                      Oppia&nbsp;<sup>beta</sup>
+                    </a>
+                  </div>
 
-                <div class="collapse navbar-collapse">
-                  <ul class="nav navbar-nav">
-                    <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
-                      <a href="/gallery">Gallery</a>
-                    </li>
-                    {% if SHOW_FORUM_PAGE %}
-                      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-                        <a href="/forum">Forum</a>
+                  <div class="collapse navbar-collapse">
+                    <ul class="nav navbar-nav">
+                      <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
+                        <a href="/gallery">Gallery</a>
                       </li>
-                    {% endif %}
-                    <li class="dropdown">
-                      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                        About
-                        <span class="caret"></span>
-                      </a>
-                      <ul class="dropdown-menu" role="menu">
-                        {% for page in ABOUT_PAGES %}
-                          <li>
-                            <a href="{{page['url']}}">{{page['name']}}</a>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    </li>
-                    {% block navbar_additions %}
-                    {% endblock %}
-                  </ul>
-
-                  <ul class="nav navbar-nav navbar-right">
-                    {% if user_email %}
+                      {% if SHOW_FORUM_PAGE %}
+                        <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+                          <a href="/forum">Forum</a>
+                        </li>
+                      {% endif %}
                       <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown">
-                          {% if username %}
-                            {{username}}
-                          {% else %}
-                            {{user_email}}
-                          {% endif %}
-
-                          {% if is_admin %}
-                            (Admin)
-                          {% elif is_moderator %}
-                            (Moderator)
-                          {% endif %}
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                          About
                           <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                          <li>
-                            <a href="{{logout_url}}">Logout</a>
-                          </li>
-
-                          {% if is_moderator %}
+                          {% for page in ABOUT_PAGES %}
                             <li>
-                              <a href="/moderator" target="_blank">
-                                Moderator Page
-                              </a>
+                              <a href="{{page['url']}}">{{page['name']}}</a>
                             </li>
-                          {% endif %}
-
-                          {% if is_super_admin %}
-                            <li>
-                              <a href="/admin" target="_blank">
-                                Admin Page
-                              </a>
-                            </li>
-                          {% endif %}
+                          {% endfor %}
                         </ul>
                       </li>
-                    {% else %}
-                      <li>
-                        <a href="{{login_url}}">Login</a>
-                      </li>
-                    {% endif %}
-                  </ul>
-                </div>
+                      {% block navbar_additions %}
+                      {% endblock %}
+                    </ul>
+
+                    <ul class="nav navbar-nav navbar-right">
+                      {% if user_email %}
+                        <li class="dropdown">
+                          <a class="dropdown-toggle" data-toggle="dropdown">
+                            {% if username %}
+                              {{username}}
+                            {% else %}
+                              {{user_email}}
+                            {% endif %}
+
+                            {% if is_admin %}
+                              (Admin)
+                            {% elif is_moderator %}
+                              (Moderator)
+                            {% endif %}
+                            <span class="caret"></span>
+                          </a>
+                          <ul class="dropdown-menu" role="menu">
+                            <li>
+                              <a href="{{logout_url}}">Logout</a>
+                            </li>
+
+                            {% if is_moderator %}
+                              <li>
+                                <a href="/moderator" target="_blank">
+                                  Moderator Page
+                                </a>
+                              </li>
+                            {% endif %}
+
+                            {% if is_super_admin %}
+                              <li>
+                                <a href="/admin" target="_blank">
+                                  Admin Page
+                                </a>
+                              </li>
+                            {% endif %}
+                          </ul>
+                        </li>
+                      {% else %}
+                        <li>
+                          <a href="{{login_url}}">Login</a>
+                        </li>
+                      {% endif %}
+                    </ul>
+                  </div>
+                {% endblock navbar %}
+
               </div>
             </div>
           </nav>
-    {% endif %}
-
-    <div ng-cloak>
-      <div class="oppia-alert-blocks">
-        <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
-          <p class="alert alert-warning">
-            <button type="button" class="close" ng-click="warningsData.deleteWarning($index)">&times;</button>
-            <strong>Warning!</strong>
-            <[warning]>
-          </p>
-        </div>
-      </div>
-
-      <div ng-show="loadingMessage" class="oppia-loading-fullpage">
-        <div class="oppia-align-center">
-          <[loadingMessage]>
-          <span class="oppia-loading-dot-one">.</span>
-          <span class="oppia-loading-dot-two">.</span>
-          <span class="oppia-loading-dot-three">.</span>
-        </div>
-      </div>
-      <div ng-show="!loadingMessage">
-        {% block content %}{% endblock %}
-      </div>
-    </div>
-
-    {% if not iframed %}
+          {{ warnings_and_loader() }}
         </div>
 
         <div class="oppia-footer" role="contentinfo">
