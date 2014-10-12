@@ -39,15 +39,15 @@ describe('State editor', function() {
 
     general.moveToPlayer();
     expect(player.getCurrentQuestionText()).toBe('plain text');
-    expect(player.getContinueButtonText()).toBe('click here');
     player.expectExplorationToNotBeOver();
-    player.answerContinueWidget();
+    player.expectInteractionToMatch('Continue', 'click here');
+    player.submitAnswer('Continue', null);
     player.expectExplorationToBeOver();
 
     users.logout();
   });
 
-  it('should create content and working multiple choice widgets', function() {
+  iit('should create content and working multiple choice widgets', function() {
     users.createUser('user2@example.com', 'user2');
     users.login('user2@example.com');
 
@@ -67,8 +67,8 @@ describe('State editor', function() {
 
     general.moveToPlayer();
     player.expectExplorationToNotBeOver();
-    expect(player.getMultipleChoiceOptions()).toEqual(['option A', 'option B']);
-    player.answerMultipleChoiceWidget('option B');
+    player.expectInteractionToMatch('MultipleChoiceInput', ['option A', 'option B']);
+    player.submitAnswer('MultipleChoiceInput', 'option B');
     player.expectExplorationToBeOver();
 
     users.logout();
@@ -89,10 +89,10 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.answerNumericWidget(7);
+    player.submitAnswer('NumericInput', 7);
     expect(player.getLatestFeedbackText()).toBe('out of bounds');
     player.expectExplorationToNotBeOver();
-    player.answerNumericWidget(4);
+    player.submitAnswer('NumericInput', 4);
     expect(player.getLatestFeedbackText()).toBe('correct');
     player.expectExplorationToBeOver();
 
@@ -101,7 +101,7 @@ describe('State editor', function() {
 });
 
 describe('Full exploration editor', function() {
-  it('should navigate multiple states correctly', function() {
+  iit('should navigate multiple states correctly', function() {
     users.createUser('user4@example.com', 'user4');
     users.login('user4@example.com');
 
@@ -126,15 +126,15 @@ describe('Full exploration editor', function() {
 
     general.moveToPlayer();
     expect(player.getCurrentQuestionText()).toBe('this is state 1');
-    player.answerNumericWidget(19);
-    player.answerNumericWidget(21);
+    player.submitAnswer('NumericInput', 19);
+    player.submitAnswer('NumericInput', 21);
     expect(player.getCurrentQuestionText()).toBe('this is state 2');
-    player.answerMultipleChoiceWidget('return');
+    player.submitAnswer('MultipleChoiceInput', 'return');
     expect(player.getCurrentQuestionText()).toBe('this is state 1');
-    player.answerNumericWidget(21);
+    player.submitAnswer('NumericInput', 21);
     expect(player.getCurrentQuestionText()).toBe('this is state 2');
     player.expectExplorationToNotBeOver();
-    player.answerMultipleChoiceWidget('complete');
+    player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
   });
 });

@@ -93,7 +93,7 @@ describe('Gallery view', function() {
       'Preserve the works of the elves');
     gallery.playExploration('silmarils');
     expect(player.getExplorationName()).toBe('silmarils');
-    player.answerContinueWidget();
+    player.submitAnswer('Continue');
 
     users.logout();
   });
