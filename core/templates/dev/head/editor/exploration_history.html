@@ -43,8 +43,15 @@
         </div>
 
         <div ng-hide="hideCodemirror || !displayedExplorationSnapshots">
-          <h4>Exploration Graph</h4>
-          <div state-graph-viz align="center" val="diffGraphData" node-labels="diffGraphNodeLabels" node-colors="     diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels">
+          <hr>
+          <div class="col-lg-8 col-md-8 col-sm-8">
+            <h4>Exploration Graph</h4>
+            <div state-graph-viz val="diffGraphData" node-labels="diffGraphNodeLabels" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels">
+            </div>
+          </div>
+          <div class="col-lg-4 col-md-4 col-sm-4">
+            <h4>Exploration Graph Legend</h4>
+            <div state-graph-viz val="LEGEND_GRAPH" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SEC_LABELS"></div>
           </div>
         </div>
 

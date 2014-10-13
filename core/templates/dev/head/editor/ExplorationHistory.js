@@ -19,10 +19,10 @@
  */
 
 oppia.controller('ExplorationHistory', [
-    '$scope', '$http', '$location', '$anchorScroll', '$log', 'explorationData',
-    'versionsTreeService', 'compareVersionsService', 'graphDataService', function(
-    $scope, $http, $location, $anchorScroll, $log, explorationData,
-    versionsTreeService, compareVersionsService, graphDataService) {
+    '$scope', '$http', '$location', '$log', 'explorationData', 'versionsTreeService',
+    'compareVersionsService', 'graphDataService', function(
+    $scope, $http, $location, $log, explorationData, versionsTreeService,
+    compareVersionsService, graphDataService) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationAllSnapshotsUrl =
       '/createhandler/snapshots/' + $scope.explorationId;
@@ -81,6 +81,12 @@ oppia.controller('ExplorationHistory', [
     });
   };
 
+  var COLOR_ADDED = ' #4EA24E';
+  var COLOR_DELETED = '#DC143C';
+  var COLOR_CHANGED = '#1E90FF';
+  var COLOR_UNCHANGED = 'beige';
+  var COLOR_RENAMED_UNCHANGED = '#FFD700';
+
   // Functions to set snapshot and download YAML when selection is changed
   $scope.diffGraphData = null;
   $scope.changeCompareVersion = function(versionNumber, changedPane) {
@@ -105,11 +111,6 @@ oppia.controller('ExplorationHistory', [
         var STATE_PROPERTY_DELETED = 'deleted';
         var STATE_PROPERTY_CHANGED = 'changed';
         var STATE_PROPERTY_UNCHANGED = 'unchanged';
-        var COLOR_ADDED = ' #4EA24E';
-        var COLOR_DELETED = '#DC143C';
-        var COLOR_CHANGED = '#1E90FF';
-        var COLOR_UNCHANGED = 'beige';
-        var COLOR_RENAMED_UNCHANGED = '#FFD700';
 
         $scope.diffGraphNodeLabels = {};
         $scope.diffGraphSecondaryLabels = {};
@@ -156,6 +157,35 @@ oppia.controller('ExplorationHistory', [
         };
       });
     }
+  };
+
+  // Define the legend graph
+  $scope.LEGEND_GRAPH = {
+    'nodes': ['Start state', 'Added state', 'Deleted state', 'Changed state',
+      'Changed + renamed', 'New name', 'END'],
+    'links': [
+      {'source': 'Start state', 'target': 'Added state'},
+      {'source': 'Added state', 'target': 'Deleted state'},
+      {'source': 'Deleted state', 'target': 'Changed state'},
+      {'source': 'Changed state', 'target': 'Changed + renamed'},
+      {'source': 'Changed + renamed', 'target': 'New name'},
+      {'source': 'New name', 'target': 'END'}
+    ],
+    'initStateName': 'Start state',
+    'finalStateName': 'END'
+  };
+  $scope.LEGEND_GRAPH_COLORS = {
+    'Start state': COLOR_UNCHANGED,
+    'Added state': COLOR_ADDED,
+    'Deleted state': COLOR_DELETED,
+    'Changed state': COLOR_CHANGED,
+    'Changed + renamed': COLOR_CHANGED,
+    'New name': COLOR_RENAMED_UNCHANGED,
+    'END': COLOR_UNCHANGED
+  };
+  $scope.LEGEND_GRAPH_SEC_LABELS = {
+    'Changed + renamed': 'Old name',
+    'New name': 'Old name'
   };
 
   // Check if valid versions were selected
@@ -209,10 +239,6 @@ oppia.controller('ExplorationHistory', [
         '&output_format=json').then(function(response) {
       $scope.yamlStrs.rightPane = response.data.yaml;
     });
-
-    // Scroll to CodeMirror MergeView instance
-    $location.hash('codemirrorMergeviewInstance');
-    $anchorScroll();
   };
 
   // Options for the ui-codemirror display.
