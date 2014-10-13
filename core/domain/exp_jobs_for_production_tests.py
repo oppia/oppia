@@ -20,12 +20,12 @@ the moment they are not displayed there to avoid accidental use)."""
 
 __author__ = 'Marcel Schmittfull'
 
-from core.domain import exp_domain
-import feconf
 from core import jobs
+from core.domain import exp_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
+import feconf
 
 from google.appengine.ext import ndb
 

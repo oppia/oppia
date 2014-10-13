@@ -184,14 +184,8 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
                 exp_rights_model = exp_models.ExplorationRightsModel.get(exp_id)
 
                 exploration = exp_services.get_exploration_by_id(exp_id)
-
-                exploration_model_last_updated = None
-                if exploration.last_updated:
-                    exploration_model_last_updated = exploration.last_updated
-
-                exploration_model_created_on = None
-                if exploration.created_on:
-                    exploration_model_created_on = exploration.created_on
+                exploration_model_last_updated = exploration.last_updated
+                exploration_model_created_on = exploration.created_on
 
                 # manually create the expectated summary specifying title, 
                 # category, etc
@@ -249,7 +243,7 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
                             'editor_ids', 'viewer_ids', 'version',
                             'exploration_model_created_on',
                             'exploration_model_last_updated']
-            for exp_id in actual_job_output.keys():
+            for exp_id in actual_job_output:
                 for prop in simple_props:
                     self.assertEqual(getattr(actual_job_output[exp_id], prop),
                                      getattr(expected_job_output[exp_id], prop))

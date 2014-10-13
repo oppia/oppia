@@ -169,7 +169,7 @@ def get_new_exploration_id():
     return exp_models.ExplorationModel.get_new_id('')
 
 
-def exp_summary_is_editable(exp_summary, user_id=None):
+def is_exp_summary_editable(exp_summary, user_id=None):
     """Checks if a given user may edit an exploration by checking
     the given domain object."""
     return user_id is not None and (
@@ -285,7 +285,7 @@ def _get_exploration_summary_dicts_from_models(exp_summary_models):
         get_exploration_summary_from_model(exp_summary_model)
         for exp_summary_model in exp_summary_models]
     result = {}
-    for ind, exp_summary in enumerate(exploration_summaries):
+    for exp_summary in exploration_summaries:
         result[exp_summary.id] = exp_summary
     return result
 
@@ -348,7 +348,7 @@ def get_at_least_editable_summary_dict(user_id):
 
 def count_explorations():
     """Returns the total number of explorations."""
-    return exp_models.ExpSummaryModel.get_exploration_count()
+    return exp_models.ExplorationModel.get_exploration_count()
 
 
 # Methods for exporting states and explorations to other formats.
@@ -894,7 +894,7 @@ def _save_exploration_summary(exp_summary):
 def delete_exploration_summary(exploration_id, force_deletion=False):
     """Delete an exploration summary model."""
 
-    exp_models.ExpSummaryModel.get(exploration_id).delete_summary()
+    exp_models.ExpSummaryModel.get(exploration_id).delete()
 
 
 def revert_exploration(

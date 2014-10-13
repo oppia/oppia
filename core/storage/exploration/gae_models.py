@@ -494,7 +494,3 @@ class ExpSummaryModel(base_models.BaseModel):
     def get_exploration_count(cls):
         """Returns the total number of explorations."""
         return cls.get_all().count()
-
-    def delete_summary(self):
-        """Deletes the summary of an exploration."""
-        super(base_models.BaseModel, self).key.delete()

@@ -112,7 +112,7 @@ class GalleryHandler(base.BaseHandler):
                 exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
             'community_owned': exp_summary.community_owned,
-            'is_editable': exp_services.exp_summary_is_editable(
+            'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
                 user_id=self.user_id)
         } for exp_summary in exp_summaries_dict.values()]

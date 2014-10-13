@@ -228,30 +228,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # The exploration summary is deleted however
         self.assertNotIn(
             self.EXP_ID,
-            [exp.id for exp in exp_models.ExpSummaryModel.get_all()]
-        )
-
-    def test_summaries_of_soft_deleted_explorations(self):
-        """Test that exploration summaries are deleted correctly if
-        explorations are deleted the soft way."""
-        # TODO(sll): Add tests for deletion of states and version snapshots.
-
-        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
-
-        exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
-        with self.assertRaises(Exception):
-            exp_services.get_exploration_by_id(self.EXP_ID)
-
-        # The deleted exploration does not show up in any queries.
-        self.assertEqual(
-            exp_services.get_at_least_editable_exploration_summaries(
-                self.OWNER_ID),
-            {})
-
-        # The exploration summary model is deleted as well.
-        self.assertNotIn(
-            self.EXP_ID,
-            [exp.id for exp in exp_models.ExpSummaryModel.get_all()]
+            [exp.id for exp in exp_models.ExpSummaryModel.get_all(
+                include_deleted_entities=True)]
         )
 
     def test_hard_deletion_of_explorations(self):
@@ -346,11 +324,24 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'theParameter': param_domain.ParamSpec('Int')}
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
+        # change title
+        exp_services.update_exploration(
+            self.OWNER_ID, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'A new title'
+            }, {
+                'cmd': 'edit_exploration_property',
+                'property_name': 'category',
+                'new_value': 'A new category'
+            }],
+            'Change title and category')
+        
         retrieved_exp_summary = exp_services.get_exploration_summary_by_id(
             self.EXP_ID)
 
-        self.assertEqual(retrieved_exp_summary.title, 'A title')
-        self.assertEqual(retrieved_exp_summary.category, 'A category')
+        self.assertEqual(retrieved_exp_summary.title, 'A new title')
+        self.assertEqual(retrieved_exp_summary.category, 'A new category')
 
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
@@ -1842,16 +1833,16 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
 
-    def test_exp_summary_is_editable(self):
+    def test_is_exp_summary_editable(self):
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
 
         # Check that only the owner may edit.
         exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
-        self.assertTrue(exp_services.exp_summary_is_editable(
+        self.assertTrue(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.OWNER_ID))
-        self.assertFalse(exp_services.exp_summary_is_editable(
+        self.assertFalse(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.EDITOR_ID))
-        self.assertFalse(exp_services.exp_summary_is_editable(
+        self.assertFalse(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.VIEWER_ID))
 
         # Owner makes viewer a viewer and editor an editor.
@@ -1864,15 +1855,27 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         # Check that owner and editor may edit, but not viewer.
         exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
-        self.assertTrue(exp_services.exp_summary_is_editable(
+        self.assertTrue(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.OWNER_ID))
-        self.assertTrue(exp_services.exp_summary_is_editable(
+        self.assertTrue(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.EDITOR_ID))
-        self.assertFalse(exp_services.exp_summary_is_editable(
+        self.assertFalse(exp_services.is_exp_summary_editable(
             exp_summary, user_id=self.VIEWER_ID))
 
 
-    def setUp_Albert_Bob(self, delete_exploration_1=True):
+class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
+    """Test exploration summaries get_* functions."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    BOB_NAME = 'bob'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+
+    def setUp(self):
         """Populate the database of explorations and their summaries.
 
         The sequence of events is:
@@ -1886,6 +1889,7 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
         - Bob tries to publish EXP_ID_2, and is denied access.
         - (8) Albert publishes EXP_ID_2.
         """
+        super(ExplorationServicesUnitTests, self).setUp()
 
         self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
@@ -1913,9 +1917,6 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
         exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
 
-        if delete_exploration_1:
-            exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_1)
-
         with self.assertRaisesRegexp(
                 Exception, 'This exploration cannot be published'):
             rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
@@ -1924,7 +1925,6 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 
     def test_get_non_private_exploration_summaries(self):
-        self.setUp_Albert_Bob()
 
         actual_summaries = exp_services.get_non_private_exploration_summaries()
 
@@ -1954,7 +1954,6 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 
     def test_get_all_exploration_summaries(self):
-        self.setUp_Albert_Bob(delete_exploration_1=False)
 
         actual_summaries = exp_services.get_all_exploration_summaries()
 
@@ -1991,7 +1990,6 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 
     def test_get_private_at_least_viewable_exploration_summaries(self):
-        self.setUp_Albert_Bob(delete_exploration_1=False)
 
         actual_summaries = (
             exp_services.get_private_at_least_viewable_exploration_summaries(
@@ -2034,7 +2032,8 @@ class ExplorationSummaryTests(ExplorationServicesUnitTests):
 
 
     def test_get_at_least_editable_exploration_summaries(self):
-        self.setUp_Albert_Bob(delete_exploration_1=True)
+
+        exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_1)
 
         actual_summaries = (
             exp_services.get_at_least_editable_exploration_summaries(
