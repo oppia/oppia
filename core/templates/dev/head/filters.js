@@ -87,7 +87,7 @@ oppia.filter('truncateAtFirstInput', [function() {
 }]);
 
 // Filter that changes {{...}} tags into the corresponding parameter input values.
-oppia.filter('parameterizeRuleDescription', [function() {
+oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
   return function(input, choices) {
     if (!input || !(input.description)) {
       return '';
@@ -117,7 +117,12 @@ oppia.filter('parameterizeRuleDescription', [function() {
 
       var replacementText = inputs[varName];
       if (choices) {
-        replacementText = '\'' + choices[inputs[varName]] + '\'';
+        replacementText = $filter(
+          'convertRuleChoiceToPlainText')(choices[inputs[varName]]);
+        if (replacementText.length > 100) {
+          replacementText = replacementText.substring(0, 97) + '...';
+        }
+        replacementText = '\'' + replacementText + '\'';
       }
       // TODO(sll): Generalize this to use the inline string representation of
       // an object type.
@@ -154,5 +159,11 @@ oppia.filter('normalizeWhitespace', [function() {
     } else {
       return input;
     }
+  };
+}]);
+
+oppia.filter('convertRuleChoiceToPlainText', [function() {
+  return function(input) {
+    return input.replace(/(<([^>]+)>)/ig, '');
   };
 }]);

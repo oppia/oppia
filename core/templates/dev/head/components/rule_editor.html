@@ -18,7 +18,7 @@
               <div class="col-lg-8 col-md-8 col-sm-8" style="margin-left: -5px;">
                 <span>
                   <span ng-if="rule.description !== 'Default'">
-                    If <span angular-html-bind="rule | parameterizeRuleDescription: choices"></span>...
+                    If <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
                   </span>
                   <span ng-if="rule.description === 'Default'">
                     If no other rules apply...
@@ -73,7 +73,7 @@
 
           <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group">
             <span ng-if="item.type == 'select'" style="color: black;">
-              <select class="form-control" ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as choice.val for choice in getExtendedChoiceArray(choices)">
+              <select class="form-control" ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in  getExtendedChoiceArray(choices)">
               </select>
             </span>
 

@@ -177,8 +177,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.deleteRule();
         };
 
-
-
         $scope.createRuleDestIfNecessary = function() {
           var foundInExistingStateList = false;
           for (var stateName in explorationStatesService.getStates()) {
@@ -203,7 +201,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.$watch('widgetHandlerSpecs', function() {
-          $scope.generateAllRuleTypes();          
+          $scope.generateAllRuleTypes();
         });
 
         $scope.isDefaultRule = function() {
