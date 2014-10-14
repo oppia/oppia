@@ -678,7 +678,7 @@ def _create_exploration(
     exploration.version += 1
 
     # create summary of exploration
-    create_exploration_summary(exploration)
+    create_exploration_summary(exploration.id)
 
 
 def save_new_exploration(committer_id, exploration):
@@ -816,17 +816,19 @@ def update_exploration(
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
     # update summary of changed exploration
-    update_exploration_summary(exploration)
+    update_exploration_summary(exploration.id)
 
 
-def create_exploration_summary(exploration):
+def create_exploration_summary(exploration_id):
     """Create summary of an exploration and store in datastore."""
+    exploration = get_exploration_by_id(exploration_id)
     exp_summary = get_summary_of_exploration(exploration)
     _save_exploration_summary(exp_summary)
 
 
-def update_exploration_summary(exploration):
+def update_exploration_summary(exploration_id):
     """Update the summary of an exploration."""
+    exploration = get_exploration_by_id(exploration_id)
     exp_summary = get_summary_of_exploration(exploration)
     _save_exploration_summary(exp_summary)
 
@@ -837,14 +839,13 @@ def get_summary_of_exploration(exploration):
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
 
-    exploration_model_last_updated = None
-    if exploration.last_updated:
-        exploration_model_last_updated = exploration.last_updated
+    exploration_model_last_updated = exploration.last_updated
+    exploration_model_created_on = exploration.created_on
 
-    exploration_model_created_on = None
-    if exploration.created_on:
-        exploration_model_created_on = exploration.created_on
-
+    if exploration_model_last_updated == None:
+        raise Exception(
+            'Unexpected error: exploration_model_last_updated is None')
+    
     exp_summary = exp_domain.ExplorationSummary(
         exploration.id,
         exploration.title,
@@ -929,7 +930,7 @@ def revert_exploration(
         revert_to_version)
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
 
-    update_exploration_summary(exploration)
+    update_exploration_summary(exploration_id)
 
 
 # Creation and deletion methods.

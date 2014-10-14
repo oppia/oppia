@@ -163,8 +163,7 @@ def _save_exploration_rights(
     # is the same as exploration id)
     # TODO(msl): get rid of inline import by refactoring code
     from core.domain import exp_services
-    exploration = exp_services.get_exploration_by_id(exploration_rights.id)
-    exp_services.update_exploration_summary(exploration)
+    exp_services.update_exploration_summary(exploration_rights.id)
 
 
 def create_new_exploration_rights(exploration_id, committer_id):

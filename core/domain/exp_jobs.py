@@ -32,7 +32,6 @@ import utils
 from google.appengine.ext import ndb
 
 
-# TODO(msl): only batch job implemented so far, still need realtime layer
 
 class ExpSummaryRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
@@ -40,7 +39,7 @@ class ExpSummaryRealtimeModel(
 
 
 class ExpSummariesAggregator(jobs.BaseContinuousComputationManager):
-    """A continuous-computation job computing summaries of all explorations.
+    """A one-off-computation job computing summaries of all explorations.
     The summaries store the following information:
 
         title, category, objective, language_code, skill_tags,
@@ -85,8 +84,7 @@ class ExpSummaryMRJobManager(
         from core.domain import exp_services
         if ExpSummaryMRJobManager._entity_created_before_job_queued(
 				exploration_model):
-            exploration = exp_services.get_exploration_from_model(exploration_model)
-            exp_services.create_exploration_summary(exploration)
+            exp_services.create_exploration_summary(exploration_model.id)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):

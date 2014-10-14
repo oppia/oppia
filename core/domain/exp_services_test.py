@@ -1962,7 +1962,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], 2,
+                False, [self.ALBERT_ID], [], [], 4,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated),
             self.EXP_ID_2: exp_domain.ExplorationSummary(
@@ -2000,7 +2000,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], 2,
+                False, [self.ALBERT_ID], [], [], 4,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated
                 )}
