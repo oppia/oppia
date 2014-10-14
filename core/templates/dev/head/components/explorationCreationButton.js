@@ -59,8 +59,7 @@ oppia.factory('createExplorationButtonService', [
             }
 
             $scope.save = function(title, newCategory, objective, languageCode) {
-              if (!title) {
-                warningsData.addWarning('Please specify an exploration title.');
+              if(!$scope.checkTitleValidity(title)) {
                 return;
               }
 
@@ -87,6 +86,31 @@ oppia.factory('createExplorationButtonService', [
               }
 
               $modalInstance.close(returnObj);
+            };
+
+            // Checks the validity of exploration title.
+            $scope.checkTitleValidity = function(title) {
+              // This should ideally be the same as INVALID_CHARS in feconf.
+              var invalidChars = [':','#','/','|','_','%','<','>','[',']','{','}'];
+              invalidChars[invalidChars.length] = String.fromCharCode(127);
+              for (var i =0; i < 32; i++) {
+                invalidChars[invalidChars.length] = String.fromCharCode(i);
+              }
+
+              if (!title) {
+                $scope.warningText = 'Please specify an exploration title.';
+                return false;
+              }
+
+              for (var i = 0; i < invalidChars.length; i++) {
+                if (title.indexOf(invalidChars[i]) > -1) {
+                  $scope.warningText = 'Invalid character ' + invalidChars[i] + ' in title';
+                  return false;
+                }
+              }
+
+              $scope.warningText = '';
+              return true;
             };
 
             $scope.cancel = function() {
