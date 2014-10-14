@@ -324,7 +324,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             'theParameter': param_domain.ParamSpec('Int')}
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
-        # change title
+        # change title and category
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, [{
                 'cmd': 'edit_exploration_property',

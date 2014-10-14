@@ -489,8 +489,3 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ExpSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_exploration_count(cls):
-        """Returns the total number of explorations."""
-        return cls.get_all().count()
