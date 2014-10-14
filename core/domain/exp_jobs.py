@@ -65,7 +65,7 @@ class ExpSummariesAggregator(jobs.BaseContinuousComputationManager):
 
 
 class ExpSummaryMRJobManager(
-        jobs.BaseMapReduceJobManagerForContinuousComputations):
+        jobs.BaseMapReduceJobManager):
     """Job that calculates summaries of explorations, which can be
     used to get e.g. the gallery. For every ExplorationModel entity,
     create a ExpSummaryModel entity containing information described
