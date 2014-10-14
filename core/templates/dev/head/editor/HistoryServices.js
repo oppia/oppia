@@ -315,8 +315,6 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
      *  - 'originalStateName': the first encountered name for the state
      *  - 'stateProperty': 'changed', 'unchanged', 'added' or 'deleted'
      *
-     * 'nodeList' is a list of IDs of all states to be displayed.
-     *
      * 'links' is a list of objects representing rules. The objects have keys:
      *  - 'source': source state of link
      *  - 'target': target state of link
@@ -376,15 +374,9 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
         }
 
         var links = _compareLinks(v1States, originalStateIds, v2States, stateIds);
-        var stateList = [];
-        for (var nodeId in statesData) {
-          stateList.push(nodeId);
-        }
-        stateList.push(stateIds[END_DEST]);
 
         return {
           'nodes': statesData,
-          'nodeList': stateList,
           'links': links,
           'v1InitStateId': originalStateIds[response.v1Data.data.init_state_name],
           'v2InitStateId': stateIds[response.v2Data.data.init_state_name],

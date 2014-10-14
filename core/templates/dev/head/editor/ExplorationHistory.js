@@ -112,7 +112,7 @@ oppia.controller('ExplorationHistory', [
         var STATE_PROPERTY_CHANGED = 'changed';
         var STATE_PROPERTY_UNCHANGED = 'unchanged';
 
-        $scope.diffGraphNodeLabels = {};
+        var diffGraphNodes = {};
         $scope.diffGraphSecondaryLabels = {};
         $scope.diffGraphNodeColors = {};
 
@@ -124,24 +124,24 @@ oppia.controller('ExplorationHistory', [
         };
         for (var nodeId in nodesData) {
           if (nodesData[nodeId].stateProperty == STATE_PROPERTY_ADDED) {
-            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].newestStateName;
+            diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
           } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_DELETED) {
-            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].originalStateName;
+            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
           } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_CHANGED) {
-            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].originalStateName;
+            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
             if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
               $scope.diffGraphSecondaryLabels[nodeId] = nodesData[nodeId].originalStateName;
-              $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].newestStateName;
+              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
             }
           } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_UNCHANGED) {
-            $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].originalStateName;
+            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
             if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
               $scope.diffGraphSecondaryLabels[nodeId] = nodesData[nodeId].originalStateName;
-              $scope.diffGraphNodeLabels[nodeId] = nodesData[nodeId].newestStateName;
+              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
               $scope.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
             }
           } else {
@@ -149,11 +149,13 @@ oppia.controller('ExplorationHistory', [
           }
         }
 
+        $scope.v2InitStateId = response.v2InitStateId;
+
         $scope.diffGraphData = {
-          'nodes': response.nodeList,
+          'nodes': diffGraphNodes,
           'links': response.links,
-          'initStateName': response.v1InitStateId,
-          'finalStateName': response.finalStateId
+          'initStateId': response.v1InitStateId,
+          'finalStateId': response.finalStateId
         };
       });
     }
@@ -161,8 +163,15 @@ oppia.controller('ExplorationHistory', [
 
   // Define the legend graph
   $scope.LEGEND_GRAPH = {
-    'nodes': ['Start state', 'Added state', 'Deleted state', 'Changed state',
-      'Changed + renamed', 'New name', 'END'],
+    'nodes': {
+      'Start state': 'Start state',
+      'Added state': 'Added state',
+      'Deleted state': 'Deleted state',
+      'Changed state': 'Changed state',
+      'Changed + renamed': 'Changed + renamed',
+      'New name': 'New name',
+      'END': 'END'
+    },
     'links': [
       {'source': 'Start state', 'target': 'Added state'},
       {'source': 'Added state', 'target': 'Deleted state'},
@@ -171,8 +180,8 @@ oppia.controller('ExplorationHistory', [
       {'source': 'Changed + renamed', 'target': 'New name'},
       {'source': 'New name', 'target': 'END'}
     ],
-    'initStateName': 'Start state',
-    'finalStateName': 'END'
+    'initStateId': 'Start state',
+    'finalStateId': 'END'
   };
   $scope.LEGEND_GRAPH_COLORS = {
     'Start state': COLOR_UNCHANGED,
