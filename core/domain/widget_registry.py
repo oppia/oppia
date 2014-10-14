@@ -20,7 +20,6 @@ __author__ = 'Sean Lip'
 
 import pkgutil
 
-from core.domain import dependency_registry
 import feconf
 import utils
 
@@ -118,7 +117,7 @@ class Registry(object):
         widget_tags = {}
         for widget in widget_list:
             tag_name = 'oppia-%s-%s' % (
-                widget_type, utils.camelcase_to_hyphenated(widget.name))
+                widget_type, utils.camelcase_to_hyphenated(widget.id))
 
             widget_tags[tag_name] = [
                 '%s-with-value' % ca_spec.name
