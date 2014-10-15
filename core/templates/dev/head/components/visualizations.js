@@ -83,8 +83,7 @@ oppia.factory('stateGraphArranger', [
     //   - reachable: whether there is a path from the start node to this node.
     //   - reachableFromEnd: whether there is a path from this node to the END node.
     //   - id: a unique id for the node.
-    //   - name: the full name of the node.
-    //   - label: the label of the node that is shown in the graph UI.
+    //   - label: the full label of the node.
     computeLayout: function(nodes, links, initStateId, finalStateId) {
       // In this implementation, nodes are snapped to a grid. We first compute
       // two additional internal variables for each node:
@@ -112,16 +111,16 @@ oppia.factory('stateGraphArranger', [
       var queue = [initStateId];
 
       while (queue.length > 0) {
-        var currNodeName = queue[0];
+        var currNodeId = queue[0];
         queue.shift();
 
-        nodeData[currNodeName].reachable = true;
+        nodeData[currNodeId].reachable = true;
 
         for (var i = 0; i < links.length; i++) {
           // Assign depths and offsets to nodes only when they are first encountered.
-          if (links[i].source == currNodeName && seenNodes.indexOf(links[i].target) == -1) {
+          if (links[i].source == currNodeId && seenNodes.indexOf(links[i].target) == -1) {
             seenNodes.push(links[i].target);
-            nodeData[links[i].target].depth = nodeData[currNodeName].depth + 1;
+            nodeData[links[i].target].depth = nodeData[currNodeId].depth + 1;
             nodeData[links[i].target].offset = (
               nodeData[links[i].target].depth in maxOffsetInEachLevel ?
               maxOffsetInEachLevel[nodeData[links[i].target].depth] + 1 : 0
@@ -150,16 +149,18 @@ oppia.factory('stateGraphArranger', [
       // necessary.
       maxOffsetInEachLevel[maxDepth + 1] = 0;
       maxDepth += 1;
-      var changed = false;
+      var orphanedNodesExist = false;
       for (var nodeId in nodeData) {
         if (nodeData[nodeId].depth === SENTINEL_DEPTH) {
-          changed = true;
+          orphanedNodesExist = true;
           nodeData[nodeId].depth = maxDepth;
           nodeData[nodeId].offset = maxOffsetInEachLevel[maxDepth];
           maxOffsetInEachLevel[maxDepth] += 1;
         }
       }
-      if (changed) maxDepth++;
+      if (orphanedNodesExist) {
+        maxDepth++;
+      }
 
       // Calculate the width and height of each grid rectangle.
       var totalRows = maxDepth + 1;
@@ -223,23 +224,21 @@ oppia.factory('stateGraphArranger', [
         ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2);
       }
 
-      // Assign id, name and label to each node.
+      // Assign id and label to each node.
       for (var nodeId in nodeData) {
         nodeData[nodeId].id = nodeId;
-        nodeData[nodeId].name = nodes[nodeId];
-        nodeData[nodeId].label = $filter('truncate')(
-          nodeData[nodeId].name, MAX_NODE_LABEL_LENGTH);
+        nodeData[nodeId].label = nodes[nodeId];
       }
 
       // Mark nodes that are reachable from the END state via backward links.
       queue = [finalStateId];
       nodeData[finalStateId].reachableFromEnd = true;
       while (queue.length > 0) {
-        var currNodeName = queue[0];
+        var currNodeId = queue[0];
         queue.shift();
 
         for (var i = 0; i < links.length; i++) {
-          if (links[i].target == currNodeName &&
+          if (links[i].target == currNodeId &&
               !nodeData[links[i].source].reachableFromEnd) {
             nodeData[links[i].source].reachableFromEnd = true;
             queue.push(links[i].source);
@@ -260,12 +259,15 @@ oppia.directive('stateGraphViz', [
     restrict: 'A',
     scope: {
       // A function returning an object with these keys:
-      //  - 'nodes': An object whose keys are node ids and whose values are node names
+      //  - 'nodes': An object whose keys are node ids and whose values are
+      //             node labels
       //  - 'links': A list of objects with keys:
       //            'source': id of source node
       //            'target': id of target node
-      //            'linkProperty': (may be undefined) 'added', 'deleted' or 'unchanged'
-      //              (defaults to 'unchanged')
+      //            'linkProperty': property of link which determines how it is
+      //              styled (styles in linkPropertyMapping). If linkProperty or
+      //              corresponding linkPropertyMatching is undefined,
+      //              link style defaults to the gray arrow.
       //  - 'initStateId': The initial state id
       //  - 'finalStateId': The end state id
       graphData: '&',
@@ -284,10 +286,14 @@ oppia.directive('stateGraphViz', [
       isEditable: '=',
       // Object whose keys are node ids and whose values are node colors
       nodeColors: '=',
-      // Object mapping node ids to secondary label (if present)
+      // Object whose keys are node ids with secondary labels and whose values
+      // are secondary labels. If this is undefined, it means no nodes have
+      // secondary labels.
       nodeSecondaryLabels: '=',
-      // Id of a second initial state
+      // Id of a second initial state, which will be styled as an initial state
       initStateId2: '=',
+      // Object which maps linkProperty to a style
+      linkPropertyMapping: '='
     },
     templateUrl: 'visualizations/stateGraphViz',
     controller: ['$scope', '$element', function($scope, $element) {
@@ -469,7 +475,7 @@ oppia.directive('stateGraphViz', [
 
         for (var i = 0; i < $scope.augmentedLinks.length; i++) {
           var link = $scope.augmentedLinks[i];
-          if (link.source.name != link.target.name) {
+          if (link.source.label != link.target.label) {
             var sourcex = link.source.xLabel;
             var sourcey = link.source.yLabel;
             var targetx = link.target.xLabel;
@@ -517,18 +523,11 @@ oppia.directive('stateGraphViz', [
               'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
               ' ' + endx + ' ' + endy);
 
-            // Color links if link properties are provided
+            // Style links if link properties and style mappings are provided
             if (links[i].hasOwnProperty('linkProperty')) {
-              if (links[i].linkProperty == 'added') {
-                $scope.augmentedLinks[i].style = ('stroke: #1F7D1F;');
-                $scope.augmentedLinks[i].style += ('stroke-opacity: 0.8;');
-                $scope.augmentedLinks[i].style += ('marker-end: url(#arrowhead-green);');
-              } else if (links[i].linkProperty == 'deleted') {
-                $scope.augmentedLinks[i].style = ('stroke: #B22222;');
-                $scope.augmentedLinks[i].style += ('stroke-opacity: 0.8;');
-                $scope.augmentedLinks[i].style += ('marker-end: url(#arrowhead-red);');
-              } else if (links[i].linkProperty != 'unchanged') {
-                throw new Error('Invalid link property ' + links[i].linkProperty);
+              if ($scope.linkPropertyMapping.hasOwnProperty(links[i].linkProperty)) {
+                $scope.augmentedLinks[i].style =
+                  $scope.linkPropertyMapping[links[i].linkProperty];
               }
             }
           }
@@ -556,7 +555,12 @@ oppia.directive('stateGraphViz', [
             warning = 'Warning: there is no path from this state to the END state.';
           }
 
-          var tooltip = node.name;
+          var tooltip = node.label;
+
+          if (node.hasOwnProperty('secondaryLabel')) {
+            tooltip += ' | ' + node.secondaryLabel;
+          }
+
           if (warning) {
             tooltip += ' (' + warning + ')';
           }
@@ -581,8 +585,8 @@ oppia.directive('stateGraphViz', [
           return nodeId != finalStateId && nodeId != $scope.currentStateId();
         };
 
-        $scope.islargeNode = function(nodeId) {
-          return $scope.nodeSecondaryLabels && $scope.nodeSecondaryLabels.hasOwnProperty(nodeId);
+        $scope.getTruncatedLabel = function(nodeLabel) {
+          return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
         };
 
         // Update the nodes.

@@ -101,7 +101,9 @@ oppia.controller('ExplorationHistory', [
     });
 
     if ($scope.comparePanesVersions.leftPane !== undefined &&
-        $scope.comparePanesVersions.rightPane !== undefined) {
+        $scope.comparePanesVersions.rightPane !== undefined &&
+        $scope.comparePanesVersions.leftPane <
+        $scope.comparePanesVersions.rightPane) {
       compareVersionsService.getDiffGraphData($scope.comparePanesVersions.leftPane,
           $scope.comparePanesVersions.rightPane).then(function(response) {
         $log.info('Retrieved version comparison data');
@@ -161,6 +163,11 @@ oppia.controller('ExplorationHistory', [
     }
   };
 
+  $scope.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
+    'added': 'stroke: #1F7D1F; stroke-opacity: 0.8; marker-end: url(#arrowhead-green)',
+    'deleted': 'stroke: #B22222; stroke-opacity: 0.8; marker-end: url(#arrowhead-red)'
+  };
+
   // Define the legend graph
   $scope.LEGEND_GRAPH = {
     'nodes': {
@@ -192,7 +199,7 @@ oppia.controller('ExplorationHistory', [
     'New name': COLOR_RENAMED_UNCHANGED,
     'END': COLOR_UNCHANGED
   };
-  $scope.LEGEND_GRAPH_SEC_LABELS = {
+  $scope.LEGEND_GRAPH_SECONDARY_LABELS = {
     'Changed + renamed': 'Old name',
     'New name': 'Old name'
   };
@@ -207,21 +214,19 @@ oppia.controller('ExplorationHistory', [
 
   // Returns true if left pane version selection radio button is disabled
   $scope.checkLeftPaneDisabled = function(versionNumber) {
-    if (!$scope.comparePanesVersions.hasOwnProperty('rightPane')) return false;
-    if ($scope.comparePanesVersions.rightPane > versionNumber) {
+    if (!$scope.comparePanesVersions.hasOwnProperty('rightPane')) {
       return false;
     } else {
-      return true;
+      return ($scope.comparePanesVersions.rightPane <= versionNumber);
     }
   };
 
   // Returns true if right pane version selection radio button is disabled
   $scope.checkRightPaneDisabled = function(versionNumber) {
-    if (!$scope.comparePanesVersions.hasOwnProperty('leftPane')) return false;
-    if ($scope.comparePanesVersions.leftPane < versionNumber) {
+    if (!$scope.comparePanesVersions.hasOwnProperty('leftPane')) {
       return false;
     } else {
-      return true;
+      return ($scope.comparePanesVersions.leftPane >= versionNumber);
     }
   };
 
