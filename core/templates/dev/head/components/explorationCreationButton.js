@@ -53,13 +53,14 @@ oppia.factory('createExplorationButtonService', [
             $scope.newExplorationObjective = '';
             $scope.newExplorationLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
             $scope.isUploadModal = isUploadModal;
+            $scope.changedAtLeastOnce = false;
 
             $scope.getAllLanguageCodes = function() {
               return GLOBALS.ALL_LANGUAGE_CODES;
             }
 
             $scope.save = function(title, newCategory, objective, languageCode) {
-              if(!$scope.checkTitleValidity(title)) {
+              if (!$scope.isTitleValid(title)) {
                 return;
               }
 
@@ -89,12 +90,10 @@ oppia.factory('createExplorationButtonService', [
             };
 
             // Checks the validity of exploration title.
-            $scope.checkTitleValidity = function(title) {
-              // This should ideally be the same as INVALID_CHARS in feconf.
-              var invalidChars = [':','#','/','|','_','%','<','>','[',']','{','}'];
-              invalidChars[invalidChars.length] = String.fromCharCode(127);
-              for (var i =0; i < 32; i++) {
-                invalidChars[invalidChars.length] = String.fromCharCode(i);
+            $scope.isTitleValid = function(title, changedAtLeastOnce) {
+
+              if (changedAtLeastOnce) {
+                $scope.changedAtLeastOnce = true;
               }
 
               if (!title) {
@@ -102,11 +101,10 @@ oppia.factory('createExplorationButtonService', [
                 return false;
               }
 
-              for (var i = 0; i < invalidChars.length; i++) {
-                if (title.indexOf(invalidChars[i]) > -1) {
-                  $scope.warningText = 'Invalid character ' + invalidChars[i] + ' in title';
-                  return false;
-                }
+              if (!validatorsService.isValidEntityName(title, false)) {
+                $scope.warningText = 'Invalid exploration title. Please do not\
+                use alphanumeric characters, underscores, spaces and/or hyphens';
+                return false;
               }
 
               $scope.warningText = '';

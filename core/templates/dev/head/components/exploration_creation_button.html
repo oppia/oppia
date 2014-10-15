@@ -17,15 +17,12 @@
 
     <form role="form" class="form-horizontal">
       <fieldset>
-        <div class="form-group" style="color: red;" aria-live="assertive" ng-show="true">
-          <[warningText]>
-        </div>
         <div class="form-group" ng-class="{'has-error': !newExplorationTitle}">
           <label for="newExplorationTitle" class="col-lg-2 col-md-2 col-sm-2">
             Title
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="checkTitleValidity(newExplorationTitle)" autofocus required>
+            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="isTitleValid(newExplorationTitle, true)" autofocus required>
           </div>
         </div>
 
@@ -62,6 +59,10 @@
           </div>
         </div>
 
+        <div class="form-group" style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
+          <[warningText]>
+        </div>
+
         <div ng-if="isUploadModal" class="form-group">
           <label for="newFileInput" class="col-lg-2 col-md-2 col-sm-2">
             Upload YAML file
@@ -76,7 +77,7 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory, newExplorationObjective, newExplorationLanguageCode)"
-      ng-disabled="!checkTitleValidity(newExplorationTitle) || !newExplorationCategory || !newExplorationLanguageCode">
+      ng-disabled="!isTitleValid(newExplorationTitle, false) || !newExplorationCategory || !newExplorationLanguageCode">
         Create New Exploration
     </button>
   </div>
