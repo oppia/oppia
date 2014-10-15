@@ -23,6 +23,11 @@
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
             <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="isTitleValid(newExplorationTitle, true)" autofocus required>
+            <span style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
+              <[warningText]>
+            </span>
+            <div ng-show="!warningText || !changedAtLeastOnce" style="height: 20px;">
+            </div>
           </div>
         </div>
 
@@ -57,10 +62,6 @@
               </select>
             </div>
           </div>
-        </div>
-
-        <div class="form-group" style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
-          <[warningText]>
         </div>
 
         <div ng-if="isUploadModal" class="form-group">

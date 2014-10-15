@@ -102,8 +102,8 @@ oppia.factory('createExplorationButtonService', [
               }
 
               if (!validatorsService.isValidEntityName(title, false)) {
-                $scope.warningText = 'Invalid exploration title. Please do not\
-                use alphanumeric characters, underscores, spaces and/or hyphens';
+                $scope.warningText = 'Exploration titles should only consist of ' +
+                  'letters, numbers, hyphens and spaces.';
                 return false;
               }
 
