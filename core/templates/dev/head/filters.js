@@ -117,10 +117,17 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
 
       var replacementText = inputs[varName];
       if (choices) {
-        replacementText = $filter(
+        var strippedText = $filter(
           'convertRuleChoiceToPlainText')(choices[inputs[varName]]);
+        strippedText = strippedText.trim();
+        if (strippedText.length > 0) {
+          replacementText = strippedText;
+        } else {
+          replacementText = choices[inputs[varName]];
+        }
+
         if (replacementText.length > 100) {
-          replacementText = replacementText.substring(0, 97) + '...';
+          replacementText = replacementText.substring(0, 100);
         }
         replacementText = '\'' + replacementText + '\'';
       }
