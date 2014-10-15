@@ -118,9 +118,7 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
 
       var replacementText = inputs[varName];
       if (choices) {
-        replacementText = $filter(
-          'convertRuleChoiceToPlainText')(choices[inputs[varName]]);
-        replacementText = '\'' + replacementText + '\'';
+        replacementText = '\'' + choices[inputs[varName]] + '\'';
       }
       // TODO(sll): Generalize this to use the inline string representation of
       // an object type.
