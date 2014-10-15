@@ -87,6 +87,7 @@ oppia.filter('truncateAtFirstInput', [function() {
 }]);
 
 // Filter that changes {{...}} tags into the corresponding parameter input values.
+// Note that this returns an HTML string.
 oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
   return function(input, choices) {
     if (!input || !(input.description)) {
@@ -119,9 +120,6 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
       if (choices) {
         replacementText = $filter(
           'convertRuleChoiceToPlainText')(choices[inputs[varName]]);
-        if (replacementText.length > 100) {
-          replacementText = replacementText.substring(0, 100);
-        }
         replacementText = '\'' + replacementText + '\'';
       }
       // TODO(sll): Generalize this to use the inline string representation of
