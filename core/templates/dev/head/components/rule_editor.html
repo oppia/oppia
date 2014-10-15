@@ -17,7 +17,7 @@
             <div class="row oppia-readonly-rule-tile well well-sm">
               <div class="col-lg-8 col-md-8 col-sm-8" style="margin-left: -5px;">
                 <span>
-                  <span ng-if="rule.description !== 'Default'">
+                  <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
                     If <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
                   </span>
                   <span ng-if="rule.description === 'Default'">
@@ -33,7 +33,7 @@
                         Please provide a feedback message.
                       </span>
                     </span>
-                    <span ng-if="rule.feedback.length > 0">
+                    <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
                       <span angular-html-bind="rule.feedback[0]"></span>
                       <span ng-if="rule.feedback.length > 1">(+ <[rule.feedback.length - 1]> more feedback option<span ng-if="rule.feedback.length > 2">s</span>)</span>
                     </span>

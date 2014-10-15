@@ -117,15 +117,8 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
 
       var replacementText = inputs[varName];
       if (choices) {
-        var strippedText = $filter(
+        replacementText = $filter(
           'convertRuleChoiceToPlainText')(choices[inputs[varName]]);
-        strippedText = strippedText.trim();
-        if (strippedText.length > 0) {
-          replacementText = strippedText;
-        } else {
-          replacementText = choices[inputs[varName]];
-        }
-
         if (replacementText.length > 100) {
           replacementText = replacementText.substring(0, 100);
         }
@@ -171,6 +164,12 @@ oppia.filter('normalizeWhitespace', [function() {
 
 oppia.filter('convertRuleChoiceToPlainText', [function() {
   return function(input) {
-    return input.replace(/(<([^>]+)>)/ig, '');
+    var strippedText = input.replace(/(<([^>]+)>)/ig, '');
+    strippedText = strippedText.trim();
+    if (strippedText.length === 0) {
+      return input;
+    } else {
+      return strippedText;
+    }
   };
 }]);
