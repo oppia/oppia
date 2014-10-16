@@ -101,11 +101,13 @@ oppia.controller('ExplorationHistory', [
     });
 
     if ($scope.comparePanesVersions.leftPane !== undefined &&
-        $scope.comparePanesVersions.rightPane !== undefined &&
-        $scope.comparePanesVersions.leftPane <
-        $scope.comparePanesVersions.rightPane) {
-      compareVersionsService.getDiffGraphData($scope.comparePanesVersions.leftPane,
-          $scope.comparePanesVersions.rightPane).then(function(response) {
+        $scope.comparePanesVersions.rightPane !== undefined) {
+      var comparedVersion1 = Math.min($scope.comparePanesVersions.leftPane,
+        $scope.comparePanesVersions.rightPane);
+      var comparedVersion2 = Math.max($scope.comparePanesVersions.leftPane,
+        $scope.comparePanesVersions.rightPane);
+      compareVersionsService.getDiffGraphData(comparedVersion1,
+          comparedVersion2).then(function(response) {
         $log.info('Retrieved version comparison data');
         $log.info(response);
 
@@ -151,12 +153,12 @@ oppia.controller('ExplorationHistory', [
           }
         }
 
-        $scope.v2InitStateId = response.v2InitStateId;
+        $scope.v1InitStateId = response.v1InitStateId;
 
         $scope.diffGraphData = {
           'nodes': diffGraphNodes,
           'links': response.links,
-          'initStateId': response.v1InitStateId,
+          'initStateId': response.v2InitStateId,
           'finalStateId': response.finalStateId
         };
       });
@@ -180,12 +182,12 @@ oppia.controller('ExplorationHistory', [
       'END': 'END'
     },
     'links': [
-      {'source': 'Start state', 'target': 'Added state'},
-      {'source': 'Added state', 'target': 'Deleted state'},
-      {'source': 'Deleted state', 'target': 'Changed state'},
-      {'source': 'Changed state', 'target': 'Changed + renamed'},
-      {'source': 'Changed + renamed', 'target': 'New name'},
-      {'source': 'New name', 'target': 'END'}
+      {'source': 'Start state', 'target': 'Added state', 'linkProperty': 'hidden'},
+      {'source': 'Added state', 'target': 'Deleted state', 'linkProperty': 'hidden'},
+      {'source': 'Deleted state', 'target': 'Changed state', 'linkProperty': 'hidden'},
+      {'source': 'Changed state', 'target': 'Changed + renamed', 'linkProperty': 'hidden'},
+      {'source': 'Changed + renamed', 'target': 'New name', 'linkProperty': 'hidden'},
+      {'source': 'New name', 'target': 'END', 'linkProperty': 'hidden'}
     ],
     'initStateId': 'Start state',
     'finalStateId': 'END'
@@ -203,6 +205,9 @@ oppia.controller('ExplorationHistory', [
     'Changed + renamed': 'Old name',
     'New name': 'Old name'
   };
+  $scope.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
+    'hidden': 'stroke: none; marker-end: none;'
+  };
 
   // Check if valid versions were selected
   $scope.areCompareVersionsSelected = function() {
@@ -210,24 +215,6 @@ oppia.controller('ExplorationHistory', [
       $scope.comparePanesVersions &&
       $scope.comparePanesVersions.hasOwnProperty('leftPane') &&
       $scope.comparePanesVersions.hasOwnProperty('rightPane'));
-  };
-
-  // Returns true if left pane version selection radio button is disabled
-  $scope.checkLeftPaneDisabled = function(versionNumber) {
-    if (!$scope.comparePanesVersions.hasOwnProperty('rightPane')) {
-      return false;
-    } else {
-      return ($scope.comparePanesVersions.rightPane <= versionNumber);
-    }
-  };
-
-  // Returns true if right pane version selection radio button is disabled
-  $scope.checkRightPaneDisabled = function(versionNumber) {
-    if (!$scope.comparePanesVersions.hasOwnProperty('leftPane')) {
-      return false;
-    } else {
-      return ($scope.comparePanesVersions.leftPane >= versionNumber);
-    }
   };
 
   // Downloads the zip file for an exploration.

@@ -524,7 +524,7 @@ oppia.directive('stateGraphViz', [
               ' ' + endx + ' ' + endy);
 
             // Style links if link properties and style mappings are provided
-            if (links[i].hasOwnProperty('linkProperty')) {
+            if (links[i].hasOwnProperty('linkProperty') && $scope.linkPropertyMapping) {
               if ($scope.linkPropertyMapping.hasOwnProperty(links[i].linkProperty)) {
                 $scope.augmentedLinks[i].style =
                   $scope.linkPropertyMapping[links[i].linkProperty];

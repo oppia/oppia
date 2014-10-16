@@ -20,8 +20,8 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Version History</h4>
         <div ng-repeat="snapshot in displayedExplorationSnapshots">
-          <input type="radio" name="compareVer1" ng-model="comparePanesVersions.leftPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'leftPane')" ng-disabled="checkLeftPaneDisabled(snapshot.versionNumber)">
-          <input type="radio" name="compareVer2" ng-model="comparePanesVersions.rightPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'rightPane')" ng-disabled="checkRightPaneDisabled(snapshot.versionNumber)">
+          <input type="radio" name="compareVer1" ng-model="comparePanesVersions.leftPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'leftPane')">
+          <input type="radio" name="compareVer2" ng-model="comparePanesVersions.rightPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'rightPane')">
           [<[snapshot.versionNumber]>]
           <strong><[snapshot.committerId]></strong>
           <[snapshot.commitMessage]>
@@ -44,14 +44,18 @@
 
         <div ng-hide="hideCodemirror || !displayedExplorationSnapshots">
           <hr>
-          <div class="col-lg-8 col-md-8 col-sm-8">
-            <h4>Exploration Graph</h4>
-            <div state-graph-viz graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v2InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING">
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 col-md-8 col-sm-8">
+                <h4>Exploration Graph</h4>
+                <div state-graph-viz graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING">
+                </div>
+              </div>
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <h4>Exploration Graph Legend</h4>
+                <div state-graph-viz graph-data="LEGEND_GRAPH" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
+              </div>
             </div>
-          </div>
-          <div class="col-lg-4 col-md-4 col-sm-4">
-            <h4>Exploration Graph Legend</h4>
-            <div state-graph-viz graph-data="LEGEND_GRAPH" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS"></div>
           </div>
         </div>
 
