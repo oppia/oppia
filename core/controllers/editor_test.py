@@ -79,9 +79,9 @@ class EditorTest(BaseEditorControllerTest):
         """Test the validity of the NEW_STATE_TEMPLATE."""
         exp_services.load_demo('0')
         exploration = exp_services.get_exploration_by_id('0')
-        exploration.add_states([feconf.DEFAULT_STATE_NAME])
+        exploration.add_states([feconf.DEFAULT_INIT_STATE_NAME])
         new_state_dict = exploration.export_state_to_frontend_dict(
-            '(untitled state)')
+            feconf.DEFAULT_INIT_STATE_NAME)
         new_state_dict['unresolved_answers'] = {}
         self.assertEqual(new_state_dict, editor.NEW_STATE_TEMPLATE)
 
@@ -310,7 +310,7 @@ class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
 {"yaml": "author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: (untitled state)
+init_state_name: %s
 language_code: en
 objective: Test JSON download
 param_changes: []
@@ -318,10 +318,12 @@ param_specs: {}
 schema_version: 3
 skill_tags: []
 states:
-  (untitled state):
+  %s:
     content:
     - type: text
-      value: ''
+      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
+        to the learner playing your exploration.<br><br>If you need more help getting
+        started, check out the Help link in the navigation bar.
     param_changes: []
     widget:
       customization_args:
@@ -334,7 +336,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: (untitled state)
+          dest: %s
           feedback: []
           param_changes: []
       sticky: false
@@ -381,7 +383,12 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
-"}""")
+"}""" % (
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME
+)).replace('<', '\\u003c').replace('>', '\\u003e')
+
 
     def test_exploration_download_handler_for_default_exploration(self):
 

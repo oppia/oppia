@@ -121,11 +121,13 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         """Test that the correct role indicators show up on app pages."""
 
         # Navigate to any page. The role is not set.
-        self.testapp.get('/').mustcontain(no=['Moderator', 'Admin'])
+        self.testapp.get('/').mustcontain(
+            no=['(Moderator)', '(Admin)', '/moderator', '/admin'])
 
-        # Log in as a superadmin. The role is set.
+        # Log in as a superadmin. This gives access to /admin.
         self.login('superadmin@example.com', is_super_admin=True)
-        self.testapp.get('/').mustcontain('Admin', no=['Moderator'])
+        self.testapp.get('/').mustcontain(
+            '/admin', no=['(Moderator)', '(Admin)', '/moderator'])
 
         # Add a moderator, an admin, and a person with both roles, then log
         # out.
@@ -146,17 +148,18 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         # Log in as a moderator.
         self.login(self.MODERATOR_EMAIL)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-            'Moderator', no=['Admin'])
+            '(Moderator)', '/moderator', no=['(Admin)', '/admin'])
         self.logout()
 
         # Log in as an admin.
         self.login(self.ADMIN_EMAIL)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-            'Admin', no=['Moderator'])
+            '(Admin)', '/moderator', no=['(Moderator)', '/admin'])
         self.logout()
 
-        # Log in as a both-moderator-and-admin.
+        # Log in as a both-moderator-and-admin. Only '(Admin)' is shown in the
+        # navbar.
         self.login(BOTH_MODERATOR_AND_ADMIN_EMAIL)
         self.testapp.get(feconf.GALLERY_URL).mustcontain(
-            'Admin', no=['Moderator'])
+             '(Admin)', '/moderator', no=['(Moderator)', '/admin'])
         self.logout()

@@ -24,56 +24,6 @@ from core.domain import stats_services
 from core.tests import test_utils
 
 
-class StateCounterUnitTests(test_utils.GenericTestBase):
-    """Test the state counter domain object."""
-
-    def test_state_entry_counts(self):
-        exp = exp_domain.Exploration.create_default_exploration(
-            'eid', 'title', 'category')
-        exp.add_states(['State 2'])
-        exp_services.save_new_exploration('user_id', exp)
-
-        state1_name = exp.init_state_name
-        state2_name = 'State 2'
-
-        state1_counter = stats_domain.StateCounter.get('eid', state1_name)
-        self.assertEquals(state1_counter.first_entry_count, 0)
-        self.assertEquals(state1_counter.subsequent_entries_count, 0)
-        self.assertEquals(state1_counter.total_entry_count, 0)
-        self.assertEquals(state1_counter.resolved_answer_count, 0)
-        self.assertEquals(state1_counter.active_answer_count, 0)
-        self.assertEquals(state1_counter.no_answer_count, 0)
-
-        event_services.StateHitEventHandler.record('eid', state1_name, True)
-
-        state1_counter = stats_domain.StateCounter.get('eid', state1_name)
-        self.assertEquals(state1_counter.first_entry_count, 1)
-        self.assertEquals(state1_counter.subsequent_entries_count, 0)
-        self.assertEquals(state1_counter.total_entry_count, 1)
-        self.assertEquals(state1_counter.resolved_answer_count, 0)
-        self.assertEquals(state1_counter.active_answer_count, 0)
-        self.assertEquals(state1_counter.no_answer_count, 1)
-
-        event_services.StateHitEventHandler.record('eid', state2_name, True)
-        event_services.StateHitEventHandler.record('eid', state2_name, False)
-
-        state1_counter = stats_domain.StateCounter.get('eid', state1_name)
-        self.assertEquals(state1_counter.first_entry_count, 1)
-        self.assertEquals(state1_counter.subsequent_entries_count, 0)
-        self.assertEquals(state1_counter.total_entry_count, 1)
-        self.assertEquals(state1_counter.resolved_answer_count, 0)
-        self.assertEquals(state1_counter.active_answer_count, 0)
-        self.assertEquals(state1_counter.no_answer_count, 1)
-
-        state2_counter = stats_domain.StateCounter.get('eid', state2_name)
-        self.assertEquals(state2_counter.first_entry_count, 1)
-        self.assertEquals(state2_counter.subsequent_entries_count, 1)
-        self.assertEquals(state2_counter.total_entry_count, 2)
-        self.assertEquals(state2_counter.resolved_answer_count, 0)
-        self.assertEquals(state2_counter.active_answer_count, 0)
-        self.assertEquals(state2_counter.no_answer_count, 2)
-
-
 class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
     """Test the state rule answer log domain object."""
 
@@ -88,9 +38,6 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
         exp_services.save_new_exploration('user_id', exp)
 
         state_name = exp.init_state_name
-
-        event_services.StateHitEventHandler.record(
-            'eid', state_name, True)
 
         answer_log = stats_domain.StateRuleAnswerLog.get(
             'eid', state_name, self.SUBMIT_HANDLER, self.DEFAULT_RULESPEC_STR)

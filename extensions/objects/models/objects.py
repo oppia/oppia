@@ -18,11 +18,8 @@
 
 __author__ = 'Sean Lip'
 
-import base64
 import copy
 import os
-import StringIO
-import tarfile
 
 import feconf
 import schema_utils

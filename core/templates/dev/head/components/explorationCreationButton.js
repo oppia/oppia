@@ -50,9 +50,15 @@ oppia.factory('createExplorationButtonService', [
             $scope.categoriesForDropdown = categoriesForDropdown;
             $scope.newExplorationTitle = '';
             $scope.newExplorationCategory = '';
+            $scope.newExplorationObjective = '';
+            $scope.newExplorationLanguageCode = GLOBALS.DEFAULT_LANGUAGE_CODE;
             $scope.isUploadModal = isUploadModal;
 
-            $scope.save = function(title, newCategory) {
+            $scope.getAllLanguageCodes = function() {
+              return GLOBALS.ALL_LANGUAGE_CODES;
+            }
+
+            $scope.save = function(title, newCategory, objective, languageCode) {
               if (!title) {
                 warningsData.addWarning('Please specify an exploration title.');
                 return;
@@ -65,7 +71,7 @@ oppia.factory('createExplorationButtonService', [
 
               var returnObj = {
                 title: title,
-                category: newCategory
+                category: newCategory,
               };
 
               if ($scope.isUploadModal) {
@@ -75,6 +81,9 @@ oppia.factory('createExplorationButtonService', [
                   return;
                 }
                 returnObj.yamlFile = file;
+              } else {
+                returnObj.objective = objective;
+                returnObj.languageCode = languageCode;
               }
 
               $modalInstance.close(returnObj);
@@ -93,7 +102,6 @@ oppia.factory('createExplorationButtonService', [
 
       createExplorationButtonService._getCreateModalInstance(
           categoryList, false).result.then(function(result) {
-        var title = result.title;
         var category = $filter('normalizeWhitespace')(result.category);
         if (!validatorsService.isValidEntityName(category, true)) {
           return;
@@ -101,7 +109,10 @@ oppia.factory('createExplorationButtonService', [
 
         $rootScope.loadingMessage = 'Creating exploration';
         $http.post('/contributehandler/create_new', {
-          title: title, category: category
+          title: result.title,
+          category: category,
+          objective: $filter('normalizeWhitespace')(result.objective),
+          language_code: result.languageCode
         }).success(function(data) {
           window.location = '/create/' + data.explorationId;
         }).error(function(data) {

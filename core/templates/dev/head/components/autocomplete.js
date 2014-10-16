@@ -27,7 +27,8 @@ oppia.directive('select2Dropdown', [function() {
       item: '=',
       newChoiceRegex: '@',
       placeholder: '@',
-      width: '@'
+      width: '@',
+      onSelectionChange: '&'
     },
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
@@ -57,6 +58,8 @@ oppia.directive('select2Dropdown', [function() {
       // Update $scope.item when the selection changes.
       $(select2Node).on('change', function(e) {
         $scope.item = e.val;
+        $scope.$apply();
+        $scope.onSelectionChange();
         $scope.$apply();
       });
     }]

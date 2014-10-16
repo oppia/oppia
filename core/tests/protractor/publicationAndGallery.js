@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License. 
+// limitations under the License.
 
 /**
  * @fileoverview End-to-end tests of the publication and release process, and
@@ -45,10 +45,7 @@ describe('Gallery view', function() {
     users.login('varda@example.com');
     browser.get('/gallery');
     gallery.tickCheckbox('status', 'Beta');
-    // TODO (Jacob) move directly to editor when issue 373 is fixed.
-    gallery.playExploration('Vingilot');
-    player.answerContinueWidget();
-    general.moveToEditor();
+    gallery.editExploration('Vingilot');
     // Moderators can edit and release explorations.
     editor.setLanguage('français');
     editor.saveChanges('change language');
@@ -96,7 +93,7 @@ describe('Gallery view', function() {
       'Preserve the works of the elves');
     gallery.playExploration('silmarils');
     expect(player.getExplorationName()).toBe('silmarils');
-    player.answerContinueWidget();
+    player.submitAnswer('Continue');
 
     users.logout();
   });

@@ -14,7 +14,7 @@
             {% if not user_email %}
               <!-- User must log in. -->
               <span class="pull-right">
-                <a class="btn btn-success btn-lg protractor-test-create-exploration" href="{{login_url}}">
+                <a class="btn btn-success btn-lg protractor-test-create-exploration" href="{{gallery_redirect_url}}">
                   Create New Exploration
                 </a>
               </span>
@@ -120,6 +120,12 @@
                   <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
                   Edit
                 </a>
+                {% if is_moderator %}
+                  <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="!exploration.is_editable && currentUserIsModerator" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 5px;">
+                    <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit (as moderator)"></span>
+                    Edit (as moderator)
+                  </a>
+                {% endif %}
 
                 <a ng-href="/explore/<[exploration.id]>" style="margin-bottom: 2px; text-decoration: none;">
                   <div class="oppia-gallery-tile-top">

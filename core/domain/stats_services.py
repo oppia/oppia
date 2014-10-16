@@ -21,6 +21,7 @@ __author__ = 'Sean Lip'
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import stats_domain
+from core.domain import stats_jobs
 from core.platform import models
 (stats_models,) = models.Registry.import_models([models.NAMES.statistics])
 import feconf
@@ -29,22 +30,6 @@ import feconf
 IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
 SUBMIT_HANDLER_NAME = 'submit'
-
-
-def get_exploration_start_count(exploration_id):
-    """Returns the number of times this exploration has been accessed."""
-    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-    return stats_domain.StateCounter.get(
-        exploration_id, exploration.init_state_name).first_entry_count
-
-
-def get_exploration_completed_count(exploration_id):
-    """Returns the number of times this exploration has been completed."""
-    # Note that the subsequent_entries_count for END_DEST should be 0.
-    # TODO(sll): Delete this when we move to the new MapReduce infrastructure.
-    return stats_domain.StateCounter.get(
-        exploration_id, feconf.END_DEST).first_entry_count
 
 
 def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
@@ -90,24 +75,6 @@ def get_state_rules_stats(exploration_id, state_name):
     return results
 
 
-def get_state_stats_for_exploration(exploration_id):
-    """Returns a dict with state statistics for the given exploration id."""
-    exploration = exp_services.get_exploration_by_id(exploration_id)
-
-    state_stats = {}
-    for state_name in exploration.states:
-        state_counts = stats_domain.StateCounter.get(
-            exploration_id, state_name)
-
-        state_stats[state_name] = {
-            'name': state_name,
-            'firstEntryCount': state_counts.first_entry_count,
-            'totalEntryCount': state_counts.total_entry_count,
-        }
-
-    return state_stats
-
-
 def get_state_improvements(exploration_id):
     """Returns a list of dicts, each representing a suggestion for improvement
     to a particular state.
@@ -115,26 +82,32 @@ def get_state_improvements(exploration_id):
     ranked_states = []
 
     exploration = exp_services.get_exploration_by_id(exploration_id)
-    state_list = exploration.states.keys()
+    state_names = exploration.states.keys()
 
     default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
         exploration_id, [{
             'state_name': state_name,
             'handler_name': SUBMIT_HANDLER_NAME,
             'rule_str': exp_domain.DEFAULT_RULESPEC_STR
-        } for state_name in state_list])
+        } for state_name in state_names])
 
-    for ind, state_name in enumerate(state_list):
-        state_counts = stats_domain.StateCounter.get(
-            exploration_id, state_name)
-        total_entry_count = state_counts.total_entry_count
+    state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
+        exploration_id)['state_hit_counts']
+
+    for ind, state_name in enumerate(state_names):
+        total_entry_count = 0
+        no_answer_submitted_count = 0
+        if state_name in state_hit_counts:
+            total_entry_count = state_hit_counts[state_name]['total_entry_count']
+            no_answer_submitted_count = state_hit_counts[state_name].get(
+                'no_answer_count', 0)
+
         if total_entry_count == 0:
             continue
 
         threshold = 0.2 * total_entry_count
         default_rule_answer_log = default_rule_answer_logs[ind]
         default_count = default_rule_answer_log.total_answer_count
-        no_answer_submitted_count = state_counts.no_answer_count
 
         eligible_flags = []
         state = exploration.states[state_name]
@@ -150,8 +123,7 @@ def get_state_improvements(exploration_id):
 
         if eligible_flags:
             eligible_flags = sorted(
-                eligible_flags, key=lambda flag: flag['rank'],
-                reverse=True)
+                eligible_flags, key=lambda flag: flag['rank'], reverse=True)
             ranked_states.append({
                 'rank': eligible_flags[0]['rank'],
                 'state_name': state_name,
@@ -161,3 +133,30 @@ def get_state_improvements(exploration_id):
     return sorted(
         [state for state in ranked_states if state['rank'] != 0],
         key=lambda x: -x['rank'])
+
+
+def get_exploration_stats(exploration_id):
+    """Returns a dict with state statistics for the given exploration id."""
+    exploration = exp_services.get_exploration_by_id(exploration_id)
+    exp_stats = stats_jobs.StatisticsAggregator.get_statistics(exploration_id)
+
+    last_updated = exp_stats['last_updated']
+    state_hit_counts = exp_stats['state_hit_counts']
+
+    return {
+        'improvements': get_state_improvements(exploration_id),
+        'last_updated': last_updated,
+        'num_completions': exp_stats['complete_exploration_count'],
+        'num_starts': exp_stats['start_exploration_count'],
+        'state_stats': {
+            state_name: {
+                'name': state_name,
+                'firstEntryCount': (
+                    state_hit_counts[state_name]['first_entry_count']
+                    if state_name in state_hit_counts else 0),
+                'totalEntryCount': (
+                    state_hit_counts[state_name]['total_entry_count']
+                    if state_name in state_hit_counts else 0),
+            } for state_name in exploration.states
+        },
+    }

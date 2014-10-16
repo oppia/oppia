@@ -31,8 +31,9 @@ oppia.controller('Moderator', [
     });
   };
 
-  $scope.getHumanReadableDatetime = function(millisSinceEpoch) {
-    return oppiaDatetimeFormatter.getHumanReadableDatetime(millisSinceEpoch);
+  $scope.getDatetimeAsString = function(millisSinceEpoch) {
+    return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
+      millisSinceEpoch);
   };
 
   $scope.getExplorationCreateUrl = function(explorationId) {

@@ -22,11 +22,14 @@ import imghdr
 import logging
 
 from core.controllers import base
+from core.controllers import reader
 from core.domain import config_domain
 from core.domain import dependency_registry
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import obj_services
 from core.domain import skins_services
@@ -41,8 +44,6 @@ import utils
 
 import jinja2
 
-# The maximum number of exploration history snapshots to show by default.
-DEFAULT_NUM_SNAPSHOTS = 30
 # The frontend template for a new state. It is sent to the frontend when the
 # exploration editor page is first loaded, so that new states can be
 # added in a way that is completely client-side.
@@ -59,7 +60,7 @@ NEW_STATE_TEMPLATE = {
         'handlers': [{
             'name': 'submit',
             'rule_specs': [{
-                'dest': feconf.DEFAULT_STATE_NAME,
+                'dest': feconf.DEFAULT_INIT_STATE_NAME,
                 'definition': {
                     'rule_type': 'default'
                 },
@@ -232,10 +233,13 @@ class ExplorationPage(EditorHandler):
             dependency_registry.Registry.get_deps_html_and_angular_modules(
                 widget_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
-        widget_js_directives = (
+        widget_templates = (
             widget_registry.Registry.get_noninteractive_widget_html() +
             widget_registry.Registry.get_interactive_widget_html(
                 all_interactive_widget_ids))
+
+        skin_templates = skins_services.Registry.get_skin_templates(
+            skins_services.Registry.get_all_skin_ids())
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
@@ -261,10 +265,14 @@ class ExplorationPage(EditorHandler):
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'widget_js_directives': jinja2.utils.Markup(widget_js_directives),
-            'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
+            'widget_templates': jinja2.utils.Markup(widget_templates),
+            'skin_js_urls': [
+                skins_services.Registry.get_skin_js_url(skin_id)
+                for skin_id in skins_services.Registry.get_all_skin_ids()],
+            'skin_templates': jinja2.utils.Markup(skin_templates),
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
+            'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
 
         self.render_template('editor/exploration_editor.html')
@@ -275,10 +283,11 @@ class ExplorationHandler(EditorHandler):
 
     PAGE_NAME_FOR_CSRF = 'editor'
 
-    def _get_exploration_data(self, exploration_id):
+    def _get_exploration_data(self, exploration_id, version=None):
         """Returns a description of the given exploration."""
         try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(
+                exploration_id, version=version)
         except:
             raise self.PageNotFoundException
 
@@ -323,7 +332,9 @@ class ExplorationHandler(EditorHandler):
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
-        self.values.update(self._get_exploration_data(exploration_id))
+        version = self.request.get('v', default_value=None)
+        self.values.update(
+            self._get_exploration_data(exploration_id, version=version))
         self.render_json(self.values)
 
     @require_editor
@@ -550,9 +561,9 @@ class ExplorationSnapshotsHandler(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
+
         try:
-            snapshots = exp_services.get_exploration_snapshots_metadata(
-                exploration_id, DEFAULT_NUM_SNAPSHOTS)
+            snapshots = exp_services.get_exploration_snapshots_metadata(exploration_id)
         except:
             raise self.PageNotFoundException
 
@@ -605,16 +616,8 @@ class ExplorationStatisticsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        self.render_json({
-            'num_starts': stats_services.get_exploration_start_count(
-                exploration_id),
-            'num_completions': stats_services.get_exploration_completed_count(
-                exploration_id),
-            'state_stats': stats_services.get_state_stats_for_exploration(
-                exploration_id),
-            'improvements': stats_services.get_state_improvements(
-                exploration_id),
-        })
+        self.render_json(stats_services.get_exploration_stats(
+            exploration_id))
 
 
 class StateRulesStatsHandler(EditorHandler):
@@ -641,8 +644,6 @@ class StateRulesStatsHandler(EditorHandler):
 
 class ImageUploadHandler(EditorHandler):
     """Handles image uploads."""
-
-    PAGE_NAME_FOR_CSRF = 'editor'
 
     @require_editor
     def post(self, exploration_id):
@@ -735,3 +736,96 @@ class ChangeListSummaryHandler(EditorHandler):
                 'summary': summary,
                 'warning_message': warning_message
             })
+
+
+class InitExplorationHandler(EditorHandler):
+    """Performs a get_init_html_and_params() operation server-side and
+    returns the result. This is done while maintaining no state.
+    """
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # A domain object representing the old state.
+        init_state = exp_domain.State.from_dict(self.payload.get('init_state'))
+        # A domain object representing the exploration-level parameter changes.
+        exp_param_changes = [
+            param_domain.ParamChange.from_dict(param_change_dict)
+            for param_change_dict in self.payload.get('exp_param_changes')]
+
+        init_html, init_params = reader.get_init_html_and_params(
+            exp_param_changes, init_state, exp_param_specs)
+
+        self.render_json({
+            'init_html': init_html,
+            'params': init_params,
+        })
+
+
+class ClassifyHandler(EditorHandler):
+    """Performs a classify() operation server-side and returns the result.
+    This is done while maintaining no state.
+    """
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # A domain object representing the old state.
+        old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
+        # The name of the rule handler triggered.
+        handler_name = self.payload.get('handler')
+        # The learner's raw answer.
+        answer = self.payload.get('answer')
+        # The learner's parameter values.
+        params = self.payload.get('params')
+
+        rule_spec, input_type = reader.classify(
+            exploration_id, exp_param_specs, old_state, handler_name,
+            answer, params)
+
+        self.render_json({
+            'rule_spec': rule_spec.to_dict(),
+            'input_type': input_type,
+        })
+
+
+class NextStateHandler(EditorHandler):
+    """Performs a get_new_state_dict() operation server-side and returns the
+    result. This is done while maintaining no state.
+    """
+
+    @require_editor
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # The old state name.
+        old_state_name = self.payload.get('old_state_name')
+        # The learner's parameter values.
+        params = self.payload.get('params')
+        # The input type of the answer.
+        input_type = self.payload.get('input_type')
+        # The rule spec matching the learner's answer.
+        rule_spec = exp_domain.RuleSpec.from_dict_and_obj_type(
+            self.payload.get('rule_spec'), input_type)
+        # A domain object representing the new state.
+        new_state_dict = self.payload.get('new_state')
+        new_state = (
+            exp_domain.State.from_dict(new_state_dict) if new_state_dict
+            else None)
+
+        self.render_json(reader.get_next_state_dict(
+            exp_param_specs, old_state_name, params, rule_spec, new_state))

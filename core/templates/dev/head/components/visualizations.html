@@ -72,11 +72,10 @@
     }
   </style>
 
-  <div style="height: 100%">
-    <button ng-if="onMaximizeFunction" ng-click="onMaximizeFunction()"
-            class="btn btn-default btn-xs" style="position: absolute; right: 15px;">
-      <span title="Expand Map">
-        <strong style="font-size: larger;">+</strong>
+  <div style="height: <[getGraphHeightInPixels()]>px">
+    <button ng-if="!!onMaximizeFunction" ng-click="onMaximizeFunction()"
+            class="btn btn-default btn-sm oppia-graph-resize-button">
+      <span title="Expand Map" class="glyphicon glyphicon-fullscreen" style="font-size: larger;">
       </span>
     </button>
 

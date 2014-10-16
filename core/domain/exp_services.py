@@ -700,8 +700,8 @@ def _get_simple_changelist_summary(
         return '; '.join(short_summary_fragments)
 
 
-def get_exploration_snapshots_metadata(exploration_id, limit):
-    """Returns the most recent snapshots for this exploration, as dicts.
+def get_exploration_snapshots_metadata(exploration_id):
+    """Returns the snapshots for this exploration, as dicts.
 
     Args:
         exploration_id: str. The id of the exploration in question.
@@ -711,13 +711,12 @@ def get_exploration_snapshots_metadata(exploration_id, limit):
         list of dicts, each representing a recent snapshot. Each dict has the
         following keys: committer_id, commit_message, commit_cmds, commit_type,
         created_on, version_number. The version numbers are consecutive and in
-        descending order. There are max(limit, exploration.version_number)
-        items in the returned list.
+        ascending order. There are exploration.version_number items in the
+        returned list.
     """
     exploration = get_exploration_by_id(exploration_id)
-    oldest_version = max(exploration.version - limit, 0) + 1
     current_version = exploration.version
-    version_nums = range(current_version, oldest_version - 1, -1)
+    version_nums = range(1, current_version + 1)
 
     return exp_models.ExplorationModel.get_snapshots_metadata(
         exploration_id, version_nums)

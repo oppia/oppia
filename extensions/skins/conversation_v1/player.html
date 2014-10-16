@@ -12,8 +12,8 @@
         <span class="glyphicon glyphicon-envelope"></span>
         Feedback
       </button>
-      <a class="btn btn-default" ng-href="/create/<[explorationId]>" style="text-align: left;" target="_blank">
-        <span class="glyphicon glyphicon-eye-open"></span>
+      <a class="btn btn-default" ng-click="openExplorationEditorPage()" style="text-align: left;" target="_blank">
+        <span class="glyphicon glyphicon-cog"></span>
         Look Inside
       </a>
     </div>
@@ -29,16 +29,21 @@
              aria-live="<[$last ? 'polite' : 'off']>"
              aria-atomic="true">
 
-          <div class="conversation-skin-conversation-log"
-               angular-html-bind="response.previousReaderAnswer">
+          <div ng-if="response.previousReaderAnswer" class="conversation-skin-learner-answer"
+              angular-html-bind="response.previousReaderAnswer">
           </div>
-          <div class="conversation-skin-conversation-log protractor-test-conversation-feedback"
-               angular-html-bind="response.feedback">
+
+          <div class="conversation-skin-oppia-feedback protractor-test-conversation-feedback"
+               ng-class="{'conversation-skin-old-content': !$last}">
+            <div angular-html-bind="response.feedback">
+            </div>
           </div>
 
           <div ng-if="response.question">
-            <div class="conversation-skin-response protractor-test-conversation-content"
-                 angular-html-bind="response.question">
+            <div class="conversation-skin-response well protractor-test-conversation-content"
+                 ng-class="{'conversation-skin-old-content': $index !== mostRecentQuestionIndex}">
+              <div angular-html-bind="response.question">
+              </div>
             </div>
           </div>
         </div>

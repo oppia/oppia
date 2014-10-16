@@ -17,12 +17,13 @@
 import itertools
 import os
 import shutil
+import StringIO
 import tarfile
 import urllib
+import urllib2
 import zipfile
 
 import common
-import subprocess
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
@@ -82,9 +83,23 @@ def download_and_unzip_files(
         common.ensure_directory_exists(target_parent_dir)
 
         urllib.urlretrieve(source_url, TMP_UNZIP_PATH)
-        with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as z:
-            z.extractall(target_parent_dir)
-        os.remove(TMP_UNZIP_PATH)
+
+        try:
+            with zipfile.ZipFile(TMP_UNZIP_PATH, 'r') as z:
+                z.extractall(target_parent_dir)
+            os.remove(TMP_UNZIP_PATH)
+        except:
+            if os.path.exists(TMP_UNZIP_PATH):
+                os.remove(TMP_UNZIP_PATH)
+
+            # Some downloads (like jqueryui-themes) may require a user-agent.
+            req = urllib2.Request(source_url)
+            req.add_header('User-agent', 'python')
+            # This is needed to get a seekable filestream that can be used
+            # by zipfile.ZipFile.
+            file_stream = StringIO.StringIO(urllib2.urlopen(req).read())
+            with zipfile.ZipFile(file_stream, 'r') as z:
+                z.extractall(target_parent_dir)
 
         # Rename the target directory.
         os.rename(
@@ -143,7 +158,8 @@ UI_BOOTSTRAP_FILES = [
     'ui-bootstrap-tpls-%s.%s' % (UI_BOOTSTRAP_REV, suffix)
     for suffix in ['js', 'min.js']]
 
-JQUERY_REV = '2.0.3'
+# Note that Angular 1.3.0 requires a jQuery version that is >= 2.1.1.
+JQUERY_REV = '2.1.1'
 JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/%s' % JQUERY_REV
 JQUERY_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'jquery-%s' % JQUERY_REV)
 JQUERY_FILES = ['jquery.%s' % suffix for suffix in ['js', 'min.js', 'min.map']]
@@ -155,7 +171,7 @@ JQUERYUI_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'jqueryui-%s' % JQUERYUI_REV)
 JQUERYUI_FILES = ['jquery-ui.min.js']
 
-ANGULAR_REV = '1.2.0-rc.3'
+ANGULAR_REV = '1.3.0-rc.5'
 ANGULAR_URL = (
     'https://ajax.googleapis.com/ajax/libs/angularjs/%s' % ANGULAR_REV)
 ANGULAR_TEST_URL = 'http://code.angularjs.org/%s' % ANGULAR_REV
@@ -235,6 +251,12 @@ UI_SORTABLE_ZIP_URL = (
 UI_SORTABLE_ZIP_ROOT_NAME = 'ui-sortable-src%s' % UI_SORTABLE_REV
 UI_SORTABLE_TARGET_ROOT_NAME = 'ui-sortable-%s' % UI_SORTABLE_REV
 
+INTRO_JS_REV = '0.9.0'
+INTRO_JS_ZIP_URL = (
+    'https://github.com/usablica/intro.js/archive/v%s.zip' % INTRO_JS_REV)
+INTRO_JS_ZIP_ROOT_NAME = 'intro.js-%s' % INTRO_JS_REV
+INTRO_JS_TARGET_ROOT_NAME = 'intro-js-%s' % INTRO_JS_REV
+
 BOOTSTRAP_REV = '3.1.1'
 BOOTSTRAP_ROOT_NAME = 'bootstrap-%s-dist' % BOOTSTRAP_REV
 BOOTSTRAP_ZIP_URL = (
@@ -275,6 +297,9 @@ download_and_unzip_files(
 download_and_unzip_files(
     UI_SORTABLE_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     UI_SORTABLE_ZIP_ROOT_NAME, UI_SORTABLE_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    INTRO_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    INTRO_JS_ZIP_ROOT_NAME, INTRO_JS_TARGET_ROOT_NAME)
 download_and_unzip_files(
     BOOTSTRAP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOOTSTRAP_ZIP_ROOT_NAME, BOOTSTRAP_TARGET_ROOT_NAME)

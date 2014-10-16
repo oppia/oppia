@@ -22,7 +22,7 @@ describe('State Editor controller', function() {
 
   describe('StateEditor', function() {
     var scope, filter, ctrl, explorationData,
-        mockWarningsData, q, cls, ecs, vs, fs;
+        mockWarningsData, q, cls, ecs, vs, fs, ess;
 
     beforeEach(function() {
       module('oppia');
@@ -37,12 +37,9 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       vs = $injector.get('validatorsService');
       fs = $injector.get('focusService');
+      ess = $injector.get('explorationStatesService');
 
       GLOBALS = {INVALID_NAME_CHARS: '#@&^%$'};
-
-      // Without this added, saveStateName
-      // cannot check for an initStateName property.
-      scope.$parent.$parent = {};
 
       mockWarningsData = {
         addWarning: function(warning) {}
@@ -60,7 +57,7 @@ describe('State Editor controller', function() {
         }
       };
 
-      scope.$parent.states = {
+      ess.setStates({
         'First State': {
           widget: {
             handlers: [{
@@ -102,11 +99,7 @@ describe('State Editor controller', function() {
             }
           }]
         }
-      };
-
-      scope.refreshGraph = function() {
-        return true;
-      };
+      });
 
       scope.getContent = function(contentString) {
         return [{type: 'text', value: contentString}];
@@ -121,7 +114,13 @@ describe('State Editor controller', function() {
         editorContextService: ecs,
         changeListService: cls,
         validatorsService: vs,
-        focusService: fs
+        focusService: fs,
+        explorationStatesService: ess,
+        editabilityService: {
+          isEditable: function() {
+            return true;
+          }
+        }
       });
     }));
 
@@ -144,7 +143,6 @@ describe('State Editor controller', function() {
       expect(scope._getNormalizedStateName('    ')).toEqual('');
       expect(scope._getNormalizedStateName('Z    ')).toEqual('Z');
       expect(scope._getNormalizedStateName('    .')).toEqual('.');
-
     });
 
     it('should not save state names longer than 50 characters', function() {
@@ -152,10 +150,6 @@ describe('State Editor controller', function() {
         scope.saveStateName(
           'babababababababababababababababababababababababababab')
       ).toBe(false);
-      expect(mockWarningsData.addWarning)
-        .toHaveBeenCalledWith(
-          'State names should be at most 50 characters long.'
-        );
     });
 
     it('should not save invalid names', function() {
@@ -163,13 +157,14 @@ describe('State Editor controller', function() {
       scope.initStateEditor();
       expect(scope.saveStateName('#')).toBe(false);
       expect(vs.isValidEntityName('#', true)).toBe(false);
+      expect(scope.saveStateName('END')).toBe(false);
+      expect(scope.saveStateName('enD')).toBe(false);
+      expect(scope.saveStateName('end')).toBe(false);
       expect(ecs.getActiveStateName()).toBe('Third State');
     });
 
     it('should not save duplicate state names', function() {
       expect(scope.saveStateName('Second State')).toBe(false);
-      expect(mockWarningsData.addWarning)
-        .toHaveBeenCalledWith("The name 'Second State' is already in use.");
     });
 
     it('should check that state names are changeable', function() {
@@ -191,13 +186,13 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('Third State');
       scope.saveStateName('Fourth State');
       expect(ecs.getActiveStateName()).toEqual('Fourth State');
-      expect(scope.$parent.states.hasOwnProperty('Fourth State')).toBe(true);
-      expect(scope.$parent.states.hasOwnProperty('Third State')).toBe(false);
+      expect(ess.getState('Fourth State')).toBeTruthy();
+      expect(ess.getState('Third State')).toBeFalsy();
 
       ecs.setActiveStateName('First State');
       scope.saveStateName('Fifth State');
-      expect(scope.$parent.states.hasOwnProperty('Fifth State')).toBe(true);
-      expect(scope.$parent.states.hasOwnProperty('First State')).toBe(false);
+      expect(ess.getState('Fifth State')).toBeTruthy();
+      expect(ess.getState('First State')).toBeFalsy();
     });
 
     it('should not re-save unedited state names', function() {
@@ -231,7 +226,7 @@ describe('State Editor controller', function() {
       expect(ecs.getActiveStateName()).toEqual('Third State');
     });
 
-    it('should save content correctly', function() {
+    it('should correctly handle no-op edits', function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
       expect(scope.contentMemento).toBeNull();
@@ -239,12 +234,12 @@ describe('State Editor controller', function() {
       scope.content = scope.getContent(
         'And now for something completely different.'
       );
-      scope.editContent();
+      scope.openStateContentEditor();
       expect(scope.contentMemento[0].value)
         .toEqual('And now for something completely different.');
       scope.saveTextContent();
       expect(scope.contentMemento).toEqual(null);
-      expect(cls.getChangeList()).not.toEqual([]);
+      expect(cls.getChangeList()).toEqual([]);
     });
 
 
@@ -253,14 +248,14 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('Third State');
       expect(cls.getChangeList()).toEqual([]);
       scope.content = scope.getContent('abababab');
-      scope.editContent();
+      scope.openStateContentEditor();
       scope.content = scope.getContent('babababa');
       scope.saveTextContent();
       expect(cls.getChangeList().length).toBe(1);
       expect(cls.getChangeList()[0].new_value[0].value).toEqual('babababa');
       expect(cls.getChangeList()[0].old_value[0].value).toEqual('abababab');
 
-      scope.editContent();
+      scope.openStateContentEditor();
       scope.content = scope.getContent(
         'And now for something completely different.'
       );

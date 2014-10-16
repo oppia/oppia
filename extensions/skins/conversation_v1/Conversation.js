@@ -30,6 +30,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.showPage = !$scope.iframed;
       $scope.hasInteractedAtLeastOnce = false;
       $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
+      $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
 
       $window.addEventListener('beforeunload', function(e) {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
@@ -61,27 +62,30 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.isLoggedIn = false;
+      $scope.mostRecentQuestionIndex = null;
 
       $scope.initializePage = function() {
         $scope.responseLog = [];
         $scope.inputTemplate = '';
-        oppiaPlayerService.loadInitialState(function(data) {
+        oppiaPlayerService.init(function(data) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
           $scope.hasInteractedAtLeastOnce = false;
 
           $scope.finished = data.finished;
           $scope.stateName = data.state_name;
-          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml($scope.stateName);
+          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
+            $scope.stateName);
 
           $scope.responseLog = [{
             previousReaderAnswer: '',
             feedback: '',
             question: data.init_html,
-            isMostRecentQuestion: true
           }];
+          $scope.mostRecentQuestionIndex = 0;
 
-          messengerService.sendMessage(messengerService.EXPLORATION_LOADED, null);
+          messengerService.sendMessage(
+            messengerService.EXPLORATION_LOADED, null);
           $scope.showPage = true;
           $scope.adjustPageHeight(false, null);
 
@@ -106,25 +110,24 @@ oppia.directive('conversationSkin', [function() {
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }
 
-          $scope.responseLog = $scope.responseLog || [];
-
           // TODO(sll): Check the state change instead of question_html so that it
           // works correctly when the new state doesn't have a question string.
           var isQuestion = !!questionHtml;
           if (isQuestion) {
-            // Clean up the previous isMostRecentQuestion marker.
-            $scope.responseLog.forEach(function(log) {
-              log.isMostRecentQuestion = false;
-            });
+            $scope.mostRecentQuestionIndex = $scope.responseLog.length;
           }
 
           // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
           // and 'question', so that the aria-live attribute will read it out.
+          // Note that we have to explicitly check for the 'Continue' widget
+          // (which has no corresopnding learner response text), otherwise a
+          // thin sliver of blue will appear.
           $scope.responseLog.push({
-            previousReaderAnswer: readerResponseHtml + oppiaPlayerService.getRandomSuffix(),
+            previousReaderAnswer: (
+              readerResponseHtml.indexOf('oppia-response-continue') === -1 ?
+              readerResponseHtml + oppiaPlayerService.getRandomSuffix() : ''),
             feedback: feedbackHtml + oppiaPlayerService.getRandomSuffix(),
-            question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : ''),
-            isMostRecentQuestion: isQuestion
+            question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : '')
           });
 
           var lastEntryEls = document.getElementsByClassName(
@@ -174,4 +177,4 @@ oppia.directive('conversationSkin', [function() {
       };
     }]
   };
-}]); 
+}]);

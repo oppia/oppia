@@ -170,10 +170,6 @@ oppia.factory('oppiaHtmlEscaper', ['$log', function($log) {
 // human-readable dates.
 oppia.factory('oppiaDatetimeFormatter', [function() {
   return {
-    getHumanReadableDatetime: function(millisSinceEpoch) {
-      var date = new Date(millisSinceEpoch);
-      return date.toUTCString();
-    },
     // Returns just the time if the local datetime representation has the
     // same date as the current date. Otherwise, returns just the date.
     getLocaleAbbreviatedDatetimeString: function(millisSinceEpoch) {
@@ -219,6 +215,31 @@ oppia.factory('validatorsService', [
           return false;
         }
       }
+      return true;
+    },
+    // NB: this does not check whether the state name already exists in the
+    // states dict.
+    isValidStateName: function(input, showWarnings) {
+      if (!this.isValidEntityName(input, showWarnings)) {
+        return false;
+      }
+
+      if (input.length > 50) {
+        if (showWarnings) {
+          warningsData.addWarning(
+            'State names should be at most 50 characters long.');
+        }
+        return false;
+      }
+
+      if (input.toUpperCase() === END_DEST) {
+        if (showWarnings) {
+          warningsData.addWarning(
+            'Please choose a state name that is not \'END\'.');
+        }
+        return false;
+      }
+
       return true;
     },
     isNonempty: function(input, showWarnings) {

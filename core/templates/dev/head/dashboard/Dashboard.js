@@ -58,6 +58,10 @@ oppia.controller('Dashboard', [
   $scope.dashboardDataUrl = '/dashboardhandler/data';
   $rootScope.loadingMessage = 'Loading';
 
+  $scope.getEditorPageUrl = function(activityId, locationHash) {
+    return '/create/' + activityId + (locationHash ? '#' + locationHash : '');
+  };
+
   $scope.showCreateExplorationModal = function() {
     createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
   };

@@ -207,7 +207,7 @@ class YamlCreationUnitTests(test_utils.GenericTestBase):
 """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: (untitled state)
+init_state_name: %s
 language_code: en
 objective: ''
 param_changes: []
@@ -215,10 +215,12 @@ param_specs: {}
 schema_version: 3
 skill_tags: []
 states:
-  (untitled state):
+  %s:
     content:
     - type: text
-      value: ''
+      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
+        to the learner playing your exploration.<br><br>If you need more help getting
+        started, check out the Help link in the navigation bar.
     param_changes: []
     widget:
       customization_args:
@@ -231,7 +233,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: (untitled state)
+          dest: %s
           feedback: []
           param_changes: []
       sticky: false
@@ -257,7 +259,9 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
-""")
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME)
 
     def test_yaml_import_and_export(self):
         """Test the from_yaml() and to_yaml() methods."""
@@ -464,11 +468,11 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             'eid', EXP_TITLE, 'A category')
         exploration.add_states([SECOND_STATE_NAME])
 
-        def _get_default_state_dict(dest_name):
+        def _get_default_state_dict(content_str, dest_name):
             return {
                 'content': [{
                     'type': 'text',
-                    'value': ''
+                    'value': content_str,
                 }],
                 'param_changes': [],
                 'widget': {
@@ -498,12 +502,14 @@ class ConversionUnitTests(test_utils.GenericTestBase):
             }
 
         self.assertEqual(exploration.to_player_dict(), {
-            'init_state_name': feconf.DEFAULT_STATE_NAME,
+            'init_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'title': EXP_TITLE,
             'states': {
-                feconf.DEFAULT_STATE_NAME: _get_default_state_dict(
-                    feconf.DEFAULT_STATE_NAME),
-                SECOND_STATE_NAME: _get_default_state_dict(SECOND_STATE_NAME),
+                feconf.DEFAULT_INIT_STATE_NAME: _get_default_state_dict(
+                    feconf.DEFAULT_INIT_STATE_CONTENT_STR,
+                    feconf.DEFAULT_INIT_STATE_NAME),
+                SECOND_STATE_NAME: _get_default_state_dict(
+                    '', SECOND_STATE_NAME),
             },
             'param_changes': [],
             'param_specs': {},
@@ -566,71 +572,3 @@ class StateOperationsUnitTests(test_utils.GenericTestBase):
         self.assertNotIn(default_state_name, exploration.states)
         self.assertIn('Renamed state', exploration.states)
         self.assertIn('State 2', exploration.states)
-
-
-class ExplorationParametersUnitTests(test_utils.GenericTestBase):
-    """Test methods relating to exploration parameters."""
-
-    def test_get_init_params(self):
-        """Test the get_init_params() method."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
-
-        independent_pc = param_domain.ParamChange(
-            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
-        dependent_pc = param_domain.ParamChange(
-            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
-
-        exploration.param_specs = {
-            'a': param_domain.ParamSpec('UnicodeString'),
-            'b': param_domain.ParamSpec('UnicodeString'),
-        }
-        exploration.param_changes = [independent_pc, dependent_pc]
-
-        new_params = exploration.get_init_params()
-        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
-
-        exploration.param_changes = [dependent_pc, independent_pc]
-
-        # Jinja string evaluation fails gracefully on dependencies that do not
-        # exist.
-        new_params = exploration.get_init_params()
-        self.assertEqual(new_params, {'a': 'firstValue', 'b': ''})
-
-    def test_update_with_state_params(self):
-        """Test the update_with_state_params() method."""
-        exploration = exp_domain.Exploration.create_default_exploration(
-            'eid', 'A title', 'A category')
-
-        independent_pc = param_domain.ParamChange(
-            'a', 'Copier', {'value': 'firstValue', 'parse_with_jinja': False})
-        dependent_pc = param_domain.ParamChange(
-            'b', 'Copier', {'value': '{{a}}', 'parse_with_jinja': True})
-
-        exploration.param_specs = {
-            'a': param_domain.ParamSpec('UnicodeString'),
-            'b': param_domain.ParamSpec('UnicodeString'),
-        }
-        exploration.init_state.param_changes = [independent_pc, dependent_pc]
-
-        reader_params = {}
-        new_params = exploration.update_with_state_params(
-            exploration.init_state_name, reader_params)
-        self.assertEqual(new_params, {'a': 'firstValue', 'b': 'firstValue'})
-        self.assertEqual(reader_params, {})
-
-        exploration.init_state.param_changes = [dependent_pc]
-
-        reader_params = {'a': 'secondValue'}
-        new_params = exploration.update_with_state_params(
-            exploration.init_state_name, reader_params)
-        self.assertEqual(new_params, {'a': 'secondValue', 'b': 'secondValue'})
-        self.assertEqual(reader_params, {'a': 'secondValue'})
-
-        # Jinja string evaluation fails gracefully on dependencies that do not
-        # exist.
-        reader_params = {}
-        new_params = exploration.update_with_state_params(
-            exploration.init_state_name, reader_params)
-        self.assertEqual(new_params, {'b': ''})
-        self.assertEqual(reader_params, {})

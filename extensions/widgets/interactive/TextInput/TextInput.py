@@ -5,7 +5,7 @@ class TextInput(widget_domain.BaseWidget):
     """Interactive widget for entering text strings."""
 
     # The human-readable name of the widget.
-    name = 'Text input'
+    name = 'Text'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'
@@ -33,7 +33,8 @@ class TextInput(widget_domain.BaseWidget):
         'default_value': 'Type your answer here.'
     }, {
         'name': 'rows',
-        'description': 'The number of rows for the text input field.',
+        'description': (
+            'How long the learner\'s answer is expected to be (in rows).'),
         'schema': {
             'type': 'int',
             'validators': [{

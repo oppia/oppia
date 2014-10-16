@@ -40,7 +40,7 @@ oppia.directive('musicPhraseEditor', function($compile, warningsData) {
           ]
         },
         ui_config: {
-          add_element_text: 'Add Note'
+          add_element_text: 'Add Note ♩'
         },
         validators: [{
           id: 'has_length_at_most',

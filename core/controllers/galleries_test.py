@@ -97,7 +97,9 @@ class GalleryPageTest(test_utils.GenericTestBase):
         csrf_token = self.get_csrf_token_from_response(response)
         EXP_A_DICT = {
             'title': self.UNICODE_TEST_STRING,
-            'category': self.UNICODE_TEST_STRING}
+            'category': self.UNICODE_TEST_STRING,
+            'objective': 'Learn how to generate exploration ids.',
+            'language_code': feconf.DEFAULT_LANGUAGE_CODE}
         exp_a_id = self.post_json(
             feconf.NEW_EXPLORATION_URL, EXP_A_DICT, csrf_token
         )[galleries.EXPLORATION_ID_KEY]
