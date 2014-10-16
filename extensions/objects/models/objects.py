@@ -496,8 +496,8 @@ class Graph(BaseObject):
             assert raw['isLabeled'] in [True, False]
             
             for vertex in raw['vertices']:
-                assert isinstance(vertex['x'], float)
-                assert isinstance(vertex['y'], float)
+                assert isinstance(vertex['x'], float) or isinstance(vertex['x'], int)
+                assert isinstance(vertex['y'], float) or isinstance(vertex['y'], int)
                 assert isinstance(vertex['label'], basestring)
                 if not raw['isLabeled']:
                     vertex['label'] = ''

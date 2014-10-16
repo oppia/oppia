@@ -113,6 +113,9 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
         $scope.openRuleDescriptionEditorIfNotDefault = function() {
+          // Disables sortability when open, as it may interfere with draggable elements
+          // (specifically, the graph widget)
+          $scope.$parent.RULE_LIST_SORTABLE_OPTIONS.disabled = true;
           if ($scope.isDefaultRule()) {
             return;
           }
@@ -123,6 +126,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.computeRuleDescriptionFragments();
         };
         $scope.closeRuleDescriptionEditor = function() {
+          $scope.$parent.RULE_LIST_SORTABLE_OPTIONS.disabled = false;
           $scope.closeRuleDescriptionPicker();
           $scope.activeEditor = null;
           $scope.ruleDescriptionMemento = null;
