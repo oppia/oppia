@@ -238,7 +238,8 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_of_widgets.yaml', 'Test of widgets', 'Test')
+    ('test_of_widgets.yaml', 'Test of widgets', 'Test'),
+    ('modeling_graphs.yaml', 'Graph Modeling', 'Mathematics')
 ]
 
 # TODO(sll): Add all other URLs here.

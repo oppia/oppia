@@ -41,6 +41,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
         }
         
         $scope.submitGraph = function() {
+          console.log($scope.graph);
           $scope.$parent.$parent.submitAnswer($scope.graph, 'submit');
         };
         
@@ -311,6 +312,7 @@ oppia.directive('graphViz', function() {
         $scope.state.selectVertex = $index;
         var $inputElement = $($element).find('.graph-vertex-label');
         $inputElement.val($scope.graph.vertices[$index].label);
+        $inputElement.focus();
       }
 
       function deleteEdge($index) {

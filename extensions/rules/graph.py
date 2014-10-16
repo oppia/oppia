@@ -46,13 +46,13 @@ class IsIsomorphicTo(base.GraphRule):
         for perm in itertools.permutations(range(num_vertices)):
             # Test matching labels
             if subject['isLabeled']:
-                if any([self.g['vertices'][perm[i]]['label'] != subject['vertices'][i]['label'] for i in xrange(num_vertices)]):
+                if any([self.g['vertices'][i]['label'] != subject['vertices'][perm[i]]['label'] for i in xrange(num_vertices)]):
                     continue
 
             # Test isomorphism
             found_isomorphism = True
             for edge in self.g['edges']:
-                weight = edge['weight'] if subject['isWeighted'] else 1
+                weight = edge['weight'] if self.g['isWeighted'] else 1
                 if adj[perm[edge['src']]][perm[edge['dst']]] != weight:
                     found_isomorphism = False
                     break

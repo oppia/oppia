@@ -87,6 +87,31 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
                 {'label': 'c', 'x': 3.0, 'y': 3.0}
             ],
             'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1}, 
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': True
+        }).eval({
+            'vertices': [
+                {'label': 'c', 'x': 1.0, 'y': 1.0}, 
+                {'label': 'a', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'b', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
+                {'src': 2, 'dst': 1, 'weight': 1}, 
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': True
+        }))
+        self.assertTrue(graph.IsIsomorphicTo({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0}, 
+                {'label': 'b', 'x': 2.0, 'y': 2.0}, 
+                {'label': 'c', 'x': 3.0, 'y': 3.0}
+            ],
+            'edges': [
                 {'src': 0, 'dst': 1, 'weight': 2}, 
                 {'src': 1, 'dst': 2, 'weight': 1}
             ],
