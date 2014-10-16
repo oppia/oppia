@@ -331,6 +331,7 @@ oppia.directive('graphViz', function() {
           return edge;
         }); 
         $scope.graph.vertices.splice($index,1);
+        $scope.state.hoverVertex = null;
       }
 
       // Styling functions
