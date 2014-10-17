@@ -37,7 +37,7 @@ oppia.controller('ExplorationGraph', [
     }
     explorationStatesService.addState(newStateName, function() {
       $scope.newStateName = '';
-      routerService.navigateToMainTab(stateName);
+      routerService.navigateToMainTab(newStateName);
     });
   };
 

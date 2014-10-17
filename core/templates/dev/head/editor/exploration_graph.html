@@ -1,7 +1,7 @@
 <div ng-controller="ExplorationGraph">
   <div id="tutorialExplorationGraph">
     <div class="oppia-graph-viz-container">
-      <div state-graph-viz val="getGraphData()" current-state-name="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" allow-panning="true" center-at-current-state="true" style="height: 100%;" is-editable="isEditable()">
+      <div state-graph-viz graph-data="getGraphData()" current-state-id="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" allow-panning="true" center-at-current-state="true" style="height: 100%;" is-editable="isEditable()">
       </div>
     </div>
   </div>
@@ -21,7 +21,7 @@
     </div>
 
     <div class="modal-body" style="overflow-y: hidden; padding-bottom: 0;">
-      <div state-graph-viz style="height: 300px;" val="graphData" allow-panning="true" current-state-name="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true">
+      <div state-graph-viz style="height: 300px;" graph-data="graphData" allow-panning="true" current-state-id="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true">
       </div>
     </div>
 

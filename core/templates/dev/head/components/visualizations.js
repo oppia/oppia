@@ -83,9 +83,8 @@ oppia.factory('stateGraphArranger', [
     //   - reachable: whether there is a path from the start node to this node.
     //   - reachableFromEnd: whether there is a path from this node to the END node.
     //   - id: a unique id for the node.
-    //   - name: the full name of the node.
-    //   - label: the label of the node that is shown in the graph UI.
-    computeLayout: function(nodes, links, initStateName, finalStateName) {
+    //   - label: the full label of the node.
+    computeLayout: function(nodes, links, initStateId, finalStateId) {
       // In this implementation, nodes are snapped to a grid. We first compute
       // two additional internal variables for each node:
       //   - depth: its depth in the graph.
@@ -95,8 +94,8 @@ oppia.factory('stateGraphArranger', [
       var SENTINEL_OFFSET = -1;
 
       var nodeData = {};
-      for (var i = 0; i < nodes.length; i++) {
-        nodeData[nodes[i]] = {
+      for (var nodeId in nodes) {
+        nodeData[nodeId] = {
           depth: SENTINEL_DEPTH,
           offset: SENTINEL_OFFSET,
           reachable: false
@@ -106,22 +105,22 @@ oppia.factory('stateGraphArranger', [
       // Do a breadth-first search to calculate the depths and offsets.
       var maxDepth = 0;
       var maxOffsetInEachLevel = {0: 0};
-      nodeData[initStateName].depth = 0;
-      nodeData[initStateName].offset = 0;
-      var seenNodes = [initStateName];
-      var queue = [initStateName];
+      nodeData[initStateId].depth = 0;
+      nodeData[initStateId].offset = 0;
+      var seenNodes = [initStateId];
+      var queue = [initStateId];
 
       while (queue.length > 0) {
-        var currNodeName = queue[0];
+        var currNodeId = queue[0];
         queue.shift();
 
-        nodeData[currNodeName].reachable = true;
+        nodeData[currNodeId].reachable = true;
 
         for (var i = 0; i < links.length; i++) {
           // Assign depths and offsets to nodes only when they are first encountered.
-          if (links[i].source == currNodeName && seenNodes.indexOf(links[i].target) == -1) {
+          if (links[i].source == currNodeId && seenNodes.indexOf(links[i].target) == -1) {
             seenNodes.push(links[i].target);
-            nodeData[links[i].target].depth = nodeData[currNodeName].depth + 1;
+            nodeData[links[i].target].depth = nodeData[currNodeId].depth + 1;
             nodeData[links[i].target].offset = (
               nodeData[links[i].target].depth in maxOffsetInEachLevel ?
               maxOffsetInEachLevel[nodeData[links[i].target].depth] + 1 : 0
@@ -150,12 +149,17 @@ oppia.factory('stateGraphArranger', [
       // necessary.
       maxOffsetInEachLevel[maxDepth + 1] = 0;
       maxDepth += 1;
-      for (var nodeName in nodeData) {
-        if (nodeData[nodeName].depth === SENTINEL_DEPTH) {
-          nodeData[nodeName].depth = maxDepth;
-          nodeData[nodeName].offset = maxOffsetInEachLevel[maxDepth];
+      var orphanedNodesExist = false;
+      for (var nodeId in nodeData) {
+        if (nodeData[nodeId].depth === SENTINEL_DEPTH) {
+          orphanedNodesExist = true;
+          nodeData[nodeId].depth = maxDepth;
+          nodeData[nodeId].offset = maxOffsetInEachLevel[maxDepth];
           maxOffsetInEachLevel[maxDepth] += 1;
         }
+      }
+      if (orphanedNodesExist) {
+        maxDepth++;
       }
 
       // Calculate the width and height of each grid rectangle.
@@ -203,41 +207,38 @@ oppia.factory('stateGraphArranger', [
         return VERTICAL_EDGE_PADDING_FRACTION + fractionalGridHeight * offsetInGridRectangles;
       }
 
-      for (var nodeName in nodeData) {
-        nodeData[nodeName].y0 = getVerticalPosition(
-          nodeData[nodeName].depth + GRID_NODE_Y_PADDING_FRACTION);
-        nodeData[nodeName].x0 = getHorizontalPosition(
-          nodeData[nodeName].offset + GRID_NODE_X_PADDING_FRACTION);
+      for (var nodeId in nodeData) {
+        nodeData[nodeId].y0 = getVerticalPosition(
+          nodeData[nodeId].depth + GRID_NODE_Y_PADDING_FRACTION);
+        nodeData[nodeId].x0 = getHorizontalPosition(
+          nodeData[nodeId].offset + GRID_NODE_X_PADDING_FRACTION);
 
-        nodeData[nodeName].yLabel = getVerticalPosition(nodeData[nodeName].depth + 0.5);
-        nodeData[nodeName].xLabel = getHorizontalPosition(nodeData[nodeName].offset + 0.5);
+        nodeData[nodeId].yLabel = getVerticalPosition(nodeData[nodeId].depth + 0.5);
+        nodeData[nodeId].xLabel = getHorizontalPosition(nodeData[nodeId].offset + 0.5);
 
-        nodeData[nodeName].height = (
+        nodeData[nodeId].height = (
           (1.0 - VERTICAL_EDGE_PADDING_FRACTION * 2) / totalRows
         ) * (1.0 - GRID_NODE_Y_PADDING_FRACTION * 2);
-        nodeData[nodeName].width = (
+        nodeData[nodeId].width = (
           (1.0 - HORIZONTAL_EDGE_PADDING_FRACTION * 2) / totalColumns
         ) * (1.0 - GRID_NODE_X_PADDING_FRACTION * 2);
       }
 
-      // Assign unique IDs to each node.
-      var idCount = 0;
-      for (var nodeName in nodeData) {
-        nodeData[nodeName].id = idCount;
-        nodeData[nodeName].name = nodeName;
-        nodeData[nodeName].label = $filter('truncate')(nodeName, MAX_NODE_LABEL_LENGTH);
-        idCount++;
+      // Assign id and label to each node.
+      for (var nodeId in nodeData) {
+        nodeData[nodeId].id = nodeId;
+        nodeData[nodeId].label = nodes[nodeId];
       }
 
       // Mark nodes that are reachable from the END state via backward links.
-      queue = [END_DEST];
-      nodeData[END_DEST].reachableFromEnd = true;
+      queue = [finalStateId];
+      nodeData[finalStateId].reachableFromEnd = true;
       while (queue.length > 0) {
-        var currNodeName = queue[0];
+        var currNodeId = queue[0];
         queue.shift();
 
         for (var i = 0; i < links.length; i++) {
-          if (links[i].target == currNodeName &&
+          if (links[i].target == currNodeId &&
               !nodeData[links[i].source].reachableFromEnd) {
             nodeData[links[i].source].reachableFromEnd = true;
             queue.push(links[i].source);
@@ -257,31 +258,56 @@ oppia.directive('stateGraphViz', [
   return {
     restrict: 'A',
     scope: {
-      val: '&',
+      // A function returning an object with these keys:
+      //  - 'nodes': An object whose keys are node ids and whose values are
+      //             node labels
+      //  - 'links': A list of objects with keys:
+      //            'source': id of source node
+      //            'target': id of target node
+      //            'linkProperty': property of link which determines how it is
+      //              styled (styles in linkPropertyMapping). If linkProperty or
+      //              corresponding linkPropertyMatching is undefined,
+      //              link style defaults to the gray arrow.
+      //  - 'initStateId': The initial state id
+      //  - 'finalStateId': The end state id
+      graphData: '&',
+      // Object whose keys are ids of nodes to display a warning tooltip over
       highlightStates: '=',
+      // A value which is the color of all nodes
       nodeFill: '@',
+      // Object whose keys are ids of nodes, and values are the opacity of the node
       opacityMap: '=',
       allowPanning: '@',
-      currentStateName: '&',
+      currentStateId: '&',
       centerAtCurrentState: '@',
       onClickFunction: '=',
       onDeleteFunction: '=',
       onMaximizeFunction: '=',
-      isEditable: '='
+      isEditable: '=',
+      // Object whose keys are node ids and whose values are node colors
+      nodeColors: '=',
+      // Object whose keys are node ids with secondary labels and whose values
+      // are secondary labels. If this is undefined, it means no nodes have
+      // secondary labels.
+      nodeSecondaryLabels: '=',
+      // Id of a second initial state, which will be styled as an initial state
+      initStateId2: '=',
+      // Object which maps linkProperty to a style
+      linkPropertyMapping: '='
     },
     templateUrl: 'visualizations/stateGraphViz',
     controller: ['$scope', '$element', function($scope, $element) {
       var _redrawGraph = function() {
-        if ($scope.val()) {
+        if ($scope.graphData()) {
           $scope.drawGraph(
-            $scope.val().nodes, $scope.val().links,
-            $scope.val().initStateName, $scope.val().finalStateName
+            $scope.graphData().nodes, $scope.graphData().links,
+            $scope.graphData().initStateId, $scope.graphData().finalStateId
           );
         }
       };
 
-      $scope.$watch('val()', _redrawGraph, true);
-      $scope.$watch('currentStateName()', _redrawGraph);
+      $scope.$watch('graphData()', _redrawGraph, true);
+      $scope.$watch('currentStateId()', _redrawGraph);
       $(window).resize(_redrawGraph);
 
       // A rough upper bound for the width of a single letter, in pixels, to use
@@ -316,14 +342,14 @@ oppia.directive('stateGraphViz', [
         var bottomEdge = -INFINITY;
         var rightEdge = -INFINITY;
 
-        for (var nodeName in nodeData) {
-          leftEdge = Math.min(nodeData[nodeName].x0 - BORDER_PADDING, leftEdge);
-          topEdge = Math.min(nodeData[nodeName].y0 - BORDER_PADDING, topEdge);
+        for (var nodeId in nodeData) {
+          leftEdge = Math.min(nodeData[nodeId].x0 - BORDER_PADDING, leftEdge);
+          topEdge = Math.min(nodeData[nodeId].y0 - BORDER_PADDING, topEdge);
           rightEdge = Math.max(
-            nodeData[nodeName].x0 + BORDER_PADDING + nodeData[nodeName].width,
+            nodeData[nodeId].x0 + BORDER_PADDING + nodeData[nodeId].width,
             rightEdge);
           bottomEdge = Math.max(
-            nodeData[nodeName].y0 + BORDER_PADDING + nodeData[nodeName].height,
+            nodeData[nodeId].y0 + BORDER_PADDING + nodeData[nodeId].height,
             bottomEdge);
         }
 
@@ -339,25 +365,26 @@ oppia.directive('stateGraphViz', [
         return Math.max($scope.GRAPH_HEIGHT, 300);
       };
 
-      $scope.drawGraph = function(nodes, links, initStateName, finalStateName) {
+      $scope.drawGraph = function(nodes, links, initStateId, finalStateId) {
+        $scope.finalStateId = finalStateId;
         var nodeData = stateGraphArranger.computeLayout(
-          nodes, links, initStateName, finalStateName);
+          nodes, links, initStateId, finalStateId);
 
         var maxDepth = 0;
-        for (var nodeName in nodeData) {
-          maxDepth = Math.max(maxDepth, nodeData[nodeName].depth);
+        for (var nodeId in nodeData) {
+          maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);
         }
         $scope.GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
 
         var dimensions = _getElementDimensions();
 
         // Change the position values in nodeData to use pixels.
-        for (var nodeName in nodeData) {
+        for (var nodeId in nodeData) {
           for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
-            nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]] = (
-              $scope.GRAPH_WIDTH * nodeData[nodeName][HORIZONTAL_NODE_PROPERTIES[i]]);
-            nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]] = (
-              $scope.GRAPH_HEIGHT * nodeData[nodeName][VERTICAL_NODE_PROPERTIES[i]]);
+            nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]] = (
+              $scope.GRAPH_WIDTH * nodeData[nodeId][HORIZONTAL_NODE_PROPERTIES[i]]);
+            nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]] = (
+              $scope.GRAPH_HEIGHT * nodeData[nodeId][VERTICAL_NODE_PROPERTIES[i]]);
           }
         }
 
@@ -379,11 +406,11 @@ oppia.directive('stateGraphViz', [
         if ($scope.centerAtCurrentState) {
           // Center the graph at the node representing the current state.
           originalTranslationAmounts[0] = (
-            dimensions.w / 2 - nodeData[$scope.currentStateName()].x0 -
-            nodeData[$scope.currentStateName()].width / 2);
+            dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
+            nodeData[$scope.currentStateId()].width / 2);
           originalTranslationAmounts[1] = (
-            dimensions.h / 2 - nodeData[$scope.currentStateName()].y0 -
-            nodeData[$scope.currentStateName()].height / 2);
+            dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
+            nodeData[$scope.currentStateId()].height / 2);
 
           if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
             originalTranslationAmounts[0] = (
@@ -448,13 +475,13 @@ oppia.directive('stateGraphViz', [
 
         for (var i = 0; i < $scope.augmentedLinks.length; i++) {
           var link = $scope.augmentedLinks[i];
-          if (link.source.name !== link.target.name) {
+          if (link.source.label != link.target.label) {
             var sourcex = link.source.xLabel;
             var sourcey = link.source.yLabel;
             var targetx = link.target.xLabel;
             var targety = link.target.yLabel;
 
-            if (sourcex === targetx && sourcey === targety) {
+            if (sourcex == targetx && sourcey == targety) {
               // TODO(sll): Investigate why this happens.
               return;
             }
@@ -495,20 +522,29 @@ oppia.directive('stateGraphViz', [
             $scope.augmentedLinks[i].d = (
               'M' + startx + ' ' + starty + ' Q ' + midx + ' ' + midy +
               ' ' + endx + ' ' + endy);
+
+            // Style links if link properties and style mappings are provided
+            if (links[i].hasOwnProperty('linkProperty') && $scope.linkPropertyMapping) {
+              if ($scope.linkPropertyMapping.hasOwnProperty(links[i].linkProperty)) {
+                $scope.augmentedLinks[i].style =
+                  $scope.linkPropertyMapping[links[i].linkProperty];
+              }
+            }
           }
         }
 
-        var _getNodeStrokeWidth = function(nodeName) {
-          return nodeName == $scope.currentStateName() ? '4' :
-                 (nodeName == initStateName || nodeName == END_DEST) ? '2' : '1';
+        var _getNodeStrokeWidth = function(nodeId) {
+          return nodeId == $scope.currentStateId() ? '4' :
+                 (nodeId == initStateId || nodeId == $scope.initStateId2 ||
+                 nodeId == finalStateId) ? '2' : '1';
         };
 
-        var _getNodeFillOpacity = function(nodeName) {
-          return $scope.opacityMap ? $scope.opacityMap[nodeName] : 0.5;
+        var _getNodeFillOpacity = function(nodeId) {
+          return $scope.opacityMap ? $scope.opacityMap[nodeId] : 0.5;
         };
 
-        $scope.isStateFlagged = function(nodeName) {
-          return $scope.highlightStates && $scope.highlightStates.hasOwnProperty(nodeName);
+        $scope.isStateFlagged = function(nodeId) {
+          return $scope.highlightStates && $scope.highlightStates.hasOwnProperty(nodeId);
         };
 
         $scope.getNodeTitle = function(node) {
@@ -519,16 +555,21 @@ oppia.directive('stateGraphViz', [
             warning = 'Warning: there is no path from this state to the END state.';
           }
 
-          var tooltip = node.name;
+          var tooltip = node.label;
+
+          if (node.hasOwnProperty('secondaryLabel')) {
+            tooltip += ' | ' + node.secondaryLabel;
+          }
+
           if (warning) {
             tooltip += ' (' + warning + ')';
           }
           return tooltip;
         };
 
-        $scope.onNodeDeletionClick = function(nodeName) {
-          if (nodeName !== initStateName && nodeName !== END_DEST) {
-            $scope.onDeleteFunction(nodeName);
+        $scope.onNodeDeletionClick = function(nodeId) {
+          if (nodeId != initStateId && nodeId != finalStateId) {
+            $scope.onDeleteFunction(nodeId);
           }
         };
 
@@ -540,34 +581,51 @@ oppia.directive('stateGraphViz', [
           return 'rotate(-10,' + x0 + ',' + (y0 - 4) + ')';
         };
 
-        $scope.canNavigateToNode = function(nodeName) {
-          return nodeName !== END_DEST && nodeName !== $scope.currentStateName();
+        $scope.canNavigateToNode = function(nodeId) {
+          return nodeId != finalStateId && nodeId != $scope.currentStateId();
+        };
+
+        $scope.getTruncatedLabel = function(nodeLabel) {
+          return $filter('truncate')(nodeLabel, MAX_NODE_LABEL_LENGTH);
         };
 
         // Update the nodes.
         $scope.nodeList = [];
-        for (var nodeName in nodeData) {
-          nodeData[nodeName].style = (
-            'stroke-width: ' + _getNodeStrokeWidth(nodeName) + '; ' +
-            'fill-opacity: ' + _getNodeFillOpacity(nodeName) + ';');
+        for (var nodeId in nodeData) {
+          nodeData[nodeId].style = (
+            'stroke-width: ' + _getNodeStrokeWidth(nodeId) + '; ' +
+            'fill-opacity: ' + _getNodeFillOpacity(nodeId) + ';');
 
           if ($scope.nodeFill) {
-            nodeData[nodeName].style += ('fill: ' + $scope.nodeFill + '; ');
+            nodeData[nodeId].style += ('fill: ' + $scope.nodeFill + '; ');
           }
 
-          nodeData[nodeName].isInitNode = (nodeName === initStateName);
-          nodeData[nodeName].isEndNode = (nodeName === END_DEST);
-          nodeData[nodeName].isBadNode = (
-            nodeName !== initStateName && nodeName !== END_DEST &&
-            !(nodeData[nodeName].reachable && nodeData[nodeName].reachableFromEnd));
-          nodeData[nodeName].isNormalNode = (
-            nodeName !== initStateName && nodeName !== END_DEST &&
-            nodeData[nodeName].reachable && nodeData[nodeName].reachableFromEnd);
+          // Color nodes
+          if ($scope.nodeColors) {
+            nodeData[nodeId].style += ('fill: ' + $scope.nodeColors[nodeId] + '; ');
+          }
 
-          nodeData[nodeName].canDelete = (nodeName !== initStateName && nodeName !== END_DEST);
-          $scope.nodeList.push(nodeData[nodeName]);
+          // Add secondary label if it exists
+          if ($scope.nodeSecondaryLabels) {
+            if ($scope.nodeSecondaryLabels.hasOwnProperty(nodeId)) {
+              nodeData[nodeId].secondaryLabel = $scope.nodeSecondaryLabels[nodeId];
+              nodeData[nodeId].height *= 1.1;
+            }
+          }
+
+          nodeData[nodeId].isInitNode = (nodeId == initStateId);
+          nodeData[nodeId].isEndNode = (nodeId == finalStateId);
+          nodeData[nodeId].isBadNode = (
+            nodeId != initStateId && nodeId != finalStateId &&
+            !(nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd));
+          nodeData[nodeId].isNormalNode = (
+            nodeId != initStateId && nodeId != finalStateId &&
+            nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd);
+
+          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId != finalStateId);
+          $scope.nodeList.push(nodeData[nodeId]);
         }
-      }
+      };
     }]
   };
 }]);
