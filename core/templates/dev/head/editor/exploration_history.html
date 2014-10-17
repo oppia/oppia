@@ -42,23 +42,6 @@
           <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showMergeview()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
         </div>
 
-        <div ng-hide="hideCodemirror || !displayedExplorationSnapshots">
-          <hr>
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-8 col-md-8 col-sm-8">
-                <h4>Exploration Graph</h4>
-                <div state-graph-viz graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING">
-                </div>
-              </div>
-              <div class="col-lg-4 col-md-4 col-sm-4">
-                <h4>Exploration Graph Legend</h4>
-                <div state-graph-viz graph-data="LEGEND_GRAPH" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-
         <div ng-hide="hideCodemirror || !displayedExplorationSnapshots" id="codemirrorMergeviewInstance">
           <table class="table" style="margin-top: 15px">
             <!-- Table ratios 53:47 is to ensure text above right pane is aligned to codemirror gutter -->
