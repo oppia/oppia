@@ -19,10 +19,10 @@
  */
 
 oppia.controller('ExplorationHistory', [
-    '$scope', '$http', '$location', '$anchorScroll', '$log', 'explorationData',
-    'versionsTreeService', 'compareVersionsService', function(
-    $scope, $http, $location, $anchorScroll, $log, explorationData,
-    versionsTreeService, compareVersionsService) {
+    '$scope', '$http', '$location', '$log', 'explorationData', 'versionsTreeService',
+    'compareVersionsService', 'graphDataService', function(
+    $scope, $http, $location, $log, explorationData, versionsTreeService,
+    compareVersionsService, graphDataService) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationAllSnapshotsUrl =
       '/createhandler/snapshots/' + $scope.explorationId;
@@ -81,9 +81,14 @@ oppia.controller('ExplorationHistory', [
     });
   };
 
-  // TODO(wxy): Restrict choices for version comparison so that v1 < v2
+  var COLOR_ADDED = ' #4EA24E';
+  var COLOR_DELETED = '#DC143C';
+  var COLOR_CHANGED = '#1E90FF';
+  var COLOR_UNCHANGED = 'beige';
+  var COLOR_RENAMED_UNCHANGED = '#FFD700';
+
   // Functions to set snapshot and download YAML when selection is changed
-  var stateData = null;
+  $scope.diffGraphData = null;
   $scope.changeCompareVersion = function(versionNumber, changedPane) {
     $scope.compareSnapshot[changedPane] =
       $scope.displayedExplorationSnapshots[
@@ -96,20 +101,112 @@ oppia.controller('ExplorationHistory', [
     });
 
     if ($scope.comparePanesVersions.leftPane !== undefined &&
-        $scope.comparePanesVersions.rightPane !== undefined &&
-        $scope.comparePanesVersions.leftPane < $scope.comparePanesVersions.rightPane) {
-      compareVersionsService.getStatesDiff($scope.comparePanesVersions.leftPane,
-          $scope.comparePanesVersions.rightPane).then(function(response) {
-        stateData = response;
+        $scope.comparePanesVersions.rightPane !== undefined) {
+      var comparedVersion1 = Math.min($scope.comparePanesVersions.leftPane,
+        $scope.comparePanesVersions.rightPane);
+      var comparedVersion2 = Math.max($scope.comparePanesVersions.leftPane,
+        $scope.comparePanesVersions.rightPane);
+      compareVersionsService.getDiffGraphData(comparedVersion1,
+          comparedVersion2).then(function(response) {
         $log.info('Retrieved version comparison data');
-        $log.info(stateData);
+        $log.info(response);
+
+        var STATE_PROPERTY_ADDED = 'added';
+        var STATE_PROPERTY_DELETED = 'deleted';
+        var STATE_PROPERTY_CHANGED = 'changed';
+        var STATE_PROPERTY_UNCHANGED = 'unchanged';
+
+        var diffGraphNodes = {};
+        $scope.diffGraphSecondaryLabels = {};
+        $scope.diffGraphNodeColors = {};
+
+        var nodesData = response.nodes;
+        nodesData[response.finalStateId] = {
+          'newestStateName': END_DEST,
+          'originalStateName': END_DEST,
+          'stateProperty': STATE_PROPERTY_UNCHANGED
+        };
+        for (var nodeId in nodesData) {
+          if (nodesData[nodeId].stateProperty == STATE_PROPERTY_ADDED) {
+            diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
+          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_DELETED) {
+            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
+          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_CHANGED) {
+            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
+            if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
+              $scope.diffGraphSecondaryLabels[nodeId] = nodesData[nodeId].originalStateName;
+              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+            }
+          } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_UNCHANGED) {
+            diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
+            $scope.diffGraphNodeColors[nodeId] = COLOR_UNCHANGED;
+            if (nodesData[nodeId].originalStateName != nodesData[nodeId].newestStateName) {
+              $scope.diffGraphSecondaryLabels[nodeId] = nodesData[nodeId].originalStateName;
+              diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
+              $scope.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
+            }
+          } else {
+            throw new Error('Invalid state property.');
+          }
+        }
+
+        $scope.v1InitStateId = response.v1InitStateId;
+
+        $scope.diffGraphData = {
+          'nodes': diffGraphNodes,
+          'links': response.links,
+          'initStateId': response.v2InitStateId,
+          'finalStateId': response.finalStateId
+        };
       });
     }
+  };
 
-    if (!$scope.hideCodemirror) {
-      $location.hash('codemirrorMergeviewInstance');
-      $anchorScroll();
-    }
+  $scope.DIFF_GRAPH_LINK_PROPERTY_MAPPING = {
+    'added': 'stroke: #1F7D1F; stroke-opacity: 0.8; marker-end: url(#arrowhead-green)',
+    'deleted': 'stroke: #B22222; stroke-opacity: 0.8; marker-end: url(#arrowhead-red)'
+  };
+
+  // Define the legend graph
+  $scope.LEGEND_GRAPH = {
+    'nodes': {
+      'Start state': 'Start state',
+      'Added state': 'Added state',
+      'Deleted state': 'Deleted state',
+      'Changed state': 'Changed state',
+      'Changed + renamed': 'Changed + renamed',
+      'New name': 'New name',
+      'END': 'END'
+    },
+    'links': [
+      {'source': 'Start state', 'target': 'Added state', 'linkProperty': 'hidden'},
+      {'source': 'Added state', 'target': 'Deleted state', 'linkProperty': 'hidden'},
+      {'source': 'Deleted state', 'target': 'Changed state', 'linkProperty': 'hidden'},
+      {'source': 'Changed state', 'target': 'Changed + renamed', 'linkProperty': 'hidden'},
+      {'source': 'Changed + renamed', 'target': 'New name', 'linkProperty': 'hidden'},
+      {'source': 'New name', 'target': 'END', 'linkProperty': 'hidden'}
+    ],
+    'initStateId': 'Start state',
+    'finalStateId': 'END'
+  };
+  $scope.LEGEND_GRAPH_COLORS = {
+    'Start state': COLOR_UNCHANGED,
+    'Added state': COLOR_ADDED,
+    'Deleted state': COLOR_DELETED,
+    'Changed state': COLOR_CHANGED,
+    'Changed + renamed': COLOR_CHANGED,
+    'New name': COLOR_RENAMED_UNCHANGED,
+    'END': COLOR_UNCHANGED
+  };
+  $scope.LEGEND_GRAPH_SECONDARY_LABELS = {
+    'Changed + renamed': 'Old name',
+    'New name': 'Old name'
+  };
+  $scope.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
+    'hidden': 'stroke: none; marker-end: none;'
   };
 
   // Check if valid versions were selected
@@ -143,10 +240,6 @@ oppia.controller('ExplorationHistory', [
         '&output_format=json').then(function(response) {
       $scope.yamlStrs.rightPane = response.data.yaml;
     });
-
-    // Scroll to CodeMirror MergeView instance
-    $location.hash('codemirrorMergeviewInstance');
-    $anchorScroll();
   };
 
   // Options for the ui-codemirror display.
