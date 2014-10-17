@@ -66,7 +66,7 @@ describe('Expression evaluator service', function() {
       var parsed_json = JSON.stringify(parsed);
       var failed = false;
 
-      var failure = function(result, exception) {
+      var recordFailure = function(result, exception) {
         console.error('input     : ' + expression);
         console.error('parsed    : ' + parsed_json);
         if (result !== undefined) {
@@ -83,12 +83,12 @@ describe('Expression evaluator service', function() {
       try {
         var evaled = ees.evaluateParseTree(parsed, ENVS);
         if (expected instanceof Error || evaled !== expected) {
-          failure(evaled, undefined);
+          recordFailure(evaled, undefined);
         }
       } catch (e) {
         if (!(e instanceof expected)) {
           // Wrong or unexpected exception.
-          failure(undefined, e);
+          recordFailure(undefined, e);
         }
       }
       expect(failed).toBe(false);
@@ -96,16 +96,17 @@ describe('Expression evaluator service', function() {
       if (typeof(expression) != 'string') {
         return;
       }
+
       failed = false;
       try {
         evaled = ees.evaluateExpression(expression, ENVS);
         if (expected instanceof Error || evaled !== expected) {
-          failure(evaled, undefined);
+          recordFailure(evaled, undefined);
         }
       } catch (e) {
         if (!(e instanceof expected)) {
           // Wrong or unexpected exception.
-          failure(undefined, e);
+          recordFailure(undefined, e);
         }
       }
       expect(failed).toBe(false);
