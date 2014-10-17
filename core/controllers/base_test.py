@@ -168,7 +168,7 @@ class EscapingTest(test_utils.GenericTestBase):
             """Handles GET requests."""
             self.values.update({
                 'ADMIN_EMAIL_ADDRESS': ['<[angular_tag]>'],
-                'SITE_NAME': '{{51 * 3}}',
+                'SITE_NAME': 'x{{51 * 3}}y',
             })
             self.render_template('pages/about.html')
 
@@ -190,8 +190,8 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertIn('&lt;[angular_tag]&gt;', response.body)
         self.assertNotIn('<[angular_tag]>', response.body)
 
-        self.assertIn('{{51 * 3}}', response.body)
-        self.assertNotIn('153', response.body)
+        self.assertIn('x{{51 * 3}}y', response.body)
+        self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
         response = self.testapp.post('/fake', {})
