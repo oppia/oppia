@@ -65,23 +65,47 @@ describe('Expression evaluator service', function() {
           eps.parse(expression) : expression;
       var parsed_json = JSON.stringify(parsed);
       var failed = false;
+
+      var failure = function(result, exception) {
+        console.error('input     : ' + expression);
+        console.error('parsed    : ' + parsed_json);
+        if (result !== undefined) {
+          console.error('evaluated : ' + result);
+          console.error('expected  : ' + expected);
+        }
+        if (exception !== undefined) {
+          console.error('exception : ' + exception);
+          console.error('expected  : (exception)');
+        }
+        failed = true;
+      }
+
       try {
         var evaled = ees.evaluateParseTree(parsed, ENVS);
         if (expected instanceof Error || evaled !== expected) {
-          console.error('input     : ' + expression);
-          console.error('parsed    : ' + parsed_json);
-          console.error('evaluated : ' + evaled);
-          console.error('expected  : ' + expected);
-          failed = true;
+          failure(evaled, undefined);
         }
       } catch (e) {
         if (!(e instanceof expected)) {
           // Wrong or unexpected exception.
-          console.error('input     : ' + expression);
-          console.error('parsed    : ' + parsed_json);
-          console.error('exception : ' + e);
-          console.error('expected  : ' + expected);
-          failed = true;
+          failure(undefined, e);
+        }
+      }
+      expect(failed).toBe(false);
+
+      if (typeof(expression) != 'string') {
+        return;
+      }
+      failed = false;
+      try {
+        evaled = ees.evaluateExpression(expression, ENVS);
+        if (expected instanceof Error || evaled !== expected) {
+          failure(evaled, undefined);
+        }
+      } catch (e) {
+        if (!(e instanceof expected)) {
+          // Wrong or unexpected exception.
+          failure(undefined, e);
         }
       }
       expect(failed).toBe(false);
