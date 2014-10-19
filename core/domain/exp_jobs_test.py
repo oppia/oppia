@@ -40,31 +40,11 @@ search_services = models.Registry.import_search_services()
 import utils
 
 
-class ModifiedExpSummariesAggregator(exp_jobs.ExpSummariesAggregator):
-    """A modified ExpSummariesAggregator that does not start a new batch
-    job when the previous one has finished.
-    """
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return ModifiedExpSummaryMRJobManager
 
-    @classmethod
-    def _kickoff_batch_job_after_previous_one_ends(cls):
-        pass
-
-
-class ModifiedExpSummaryMRJobManager(exp_jobs.ExpSummaryMRJobManager):
-
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return ModifiedExpSummariesAggregator
-
-
-class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
+class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     """Tests for ExpSummary aggregations."""
 
-    ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS = [
-        ModifiedExpSummariesAggregator]
+    ONE_OFF_JOB_MANAGERS_FOR_TESTS = [exp_jobs.ExpSummariesCreationOneOffJob]
 
     def test_all_exps_publicized(self):
         """Test exploration summary batch job if all explorations are publicized."""
@@ -82,6 +62,7 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
             {'category': 'Category C',
              'title': 'Title 5'}
             ]
+        self.process_and_flush_pending_tasks()
 
         self._run_batch_job_once_and_verify_output(
             exp_specs,
@@ -142,8 +123,8 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
         """
         from core.domain import exp_services
         with self.swap(
-                jobs_registry, 'ALL_CONTINUOUS_COMPUTATION_MANAGERS',
-                self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
+                jobs_registry, 'ONE_OFF_JOB_MANAGERS',
+                self.ONE_OFF_JOB_MANAGERS_FOR_TESTS):
 
             # default specs
             default_specs = {'title': default_title,
@@ -227,8 +208,8 @@ class ExpSummariesAggregatorUnitTests(test_utils.GenericTestBase):
                         exploration.version)
 
             # run batch job
-            ModifiedExpSummariesAggregator.start_computation()
-            self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+            job_id = (exp_jobs.ExpSummariesCreationOneOffJob.create_new())
+            exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
             # get job output

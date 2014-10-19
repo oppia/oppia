@@ -32,48 +32,21 @@ import utils
 from google.appengine.ext import ndb
 
 
+class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that calculates summaries of explorations, which can be
+    used to get e.g. the gallery. For every ExplorationModel entity,
+    create a ExpSummaryModel entity containing information described
+    in ExpSummariesAggregator.
 
-class ExpSummaryRealtimeModel(
-        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
-    pass
-
-
-class ExpSummariesAggregator(jobs.BaseContinuousComputationManager):
-    """A one-off-computation job computing summaries of all explorations.
     The summaries store the following information:
-
         title, category, objective, language_code, skill_tags,
         last_updated, created_on, status (private, public or
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.
     """
-    @classmethod
-    def get_event_types_listened_to(cls):
-        return []
-
-    @classmethod
-    def _get_realtime_datastore_class(cls):
-        return ExpSummaryRealtimeModel
-
-    @classmethod
-    def _get_batch_job_manager_class(cls):
-        return ExpSummaryMRJobManager
-
-    @classmethod
-    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
-        pass
-
-
-class ExpSummaryMRJobManager(
-        jobs.BaseMapReduceJobManager):
-    """Job that calculates summaries of explorations, which can be
-    used to get e.g. the gallery. For every ExplorationModel entity,
-    create a ExpSummaryModel entity containing information described
-    in ExpSummariesAggregator.
-    """
-    @classmethod
-    def _get_continuous_computation_class(cls):
-        return ExpSummariesAggregator
+    # @classmethod
+    # def _get_continuous_computation_class(cls):
+    #     return ExpSummariesAggregator
 
     @classmethod
     def entity_classes_to_map_over(cls):
@@ -82,9 +55,7 @@ class ExpSummaryMRJobManager(
     @staticmethod
     def map(exploration_model):
         from core.domain import exp_services
-        if ExpSummaryMRJobManager._entity_created_before_job_queued(
-				exploration_model):
-            exp_services.create_exploration_summary(exploration_model.id)
+        exp_services.create_exploration_summary(exploration_model.id)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
