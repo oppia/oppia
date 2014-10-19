@@ -16,7 +16,6 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import collections
 import logging
 
 from core.controllers import base
@@ -25,6 +24,7 @@ from core.domain import exp_domain
 from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import rights_manager
+from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
@@ -65,6 +65,8 @@ class GalleryPage(base.BaseHandler):
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             'noninteractive_widget_html': jinja2.utils.Markup(
                 noninteractive_widget_html),
+            'gallery_redirect_url': current_user_services.create_login_url(
+                feconf.GALLERY_REDIRECT_URL),
         })
         self.render_template('galleries/gallery.html')
 
@@ -156,6 +158,24 @@ class GalleryHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class GalleryRedirector(base.BaseHandler):
+    """Redirects a logged-in user to the editor prerequisites page or the
+    gallery, according as to whether they are logged in or not.
+    """
+
+    @base.require_user
+    def get(self):
+        """Handles GET requests."""
+        if not user_services.has_user_registered_as_editor(self.user_id):
+            redirect_url = utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL,
+                'return_url', feconf.GALLERY_URL)
+        else:
+            redirect_url = feconf.GALLERY_URL
+
+        self.redirect(redirect_url)
+
+
 class NewExploration(base.BaseHandler):
     """Creates a new exploration."""
 
@@ -166,15 +186,20 @@ class NewExploration(base.BaseHandler):
         """Handles POST requests."""
         title = self.payload.get('title')
         category = self.payload.get('category')
+        objective = self.payload.get('objective')
+        language_code = self.payload.get('language_code')
 
         if not title:
             raise self.InvalidInputException('No title supplied.')
         if not category:
             raise self.InvalidInputException('No category chosen.')
+        if not language_code:
+            raise self.InvalidInputException('No language chosen.')
 
         new_exploration_id = exp_services.get_new_exploration_id()
         exploration = exp_domain.Exploration.create_default_exploration(
-            new_exploration_id, title, category)
+            new_exploration_id, title, category,
+            objective=objective, language_code=language_code)
         exp_services.save_new_exploration(self.user_id, exploration)
 
         self.render_json({EXPLORATION_ID_KEY: new_exploration_id})

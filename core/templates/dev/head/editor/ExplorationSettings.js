@@ -22,13 +22,21 @@ oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
-    'changeListService', 'warningsData', function(
+    'explorationInitStateNameService', 'changeListService', 'warningsData', 
+    'explorationStatesService', function(
       $scope, $http, $window, $modal, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
-      changeListService, warningsData) {
+      explorationInitStateNameService, changeListService, warningsData, explorationStatesService) {
 
   var GALLERY_PAGE_URL = '/gallery';
+  var EXPLORE_PAGE_PREFIX = '/explore/';
+
+  $scope.getExplorePageUrl = function() {
+    return (
+      window.location.protocol + '//' + window.location.host +
+      EXPLORE_PAGE_PREFIX + $scope.explorationId);
+  };
 
   $scope.initSettingsTab = function() {
     $scope.explorationTitleService = explorationTitleService;
@@ -36,12 +44,20 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationObjectiveService = explorationObjectiveService;
     $scope.explorationLanguageCodeService = explorationLanguageCodeService;
     $scope.explorationRightsService = explorationRightsService;
+    $scope.explorationInitStateNameService = explorationInitStateNameService;
 
     explorationData.getData().then(function(data) {
       $scope.paramSpecs = data.param_specs || {};
       $scope.explorationParamChanges = data.param_changes || [];
+      $scope.refreshSettingsTab();
     });
   };
+
+  $scope.refreshSettingsTab = function() {
+    $scope.stateNames = Object.keys(explorationStatesService.getStates());
+  };
+
+  $scope.$on('refreshSettingsTab', $scope.refreshSettingsTab);
 
   $scope.initSettingsTab();
 
@@ -65,6 +81,18 @@ oppia.controller('ExplorationSettings', [
 
   $scope.saveExplorationLanguageCode = function() {
     explorationLanguageCodeService.saveDisplayedValue();
+  };
+
+  $scope.saveExplorationInitStateName = function() {
+    var newInitStateName = explorationInitStateNameService.displayed;
+
+    if (!explorationStatesService.getState(newInitStateName)) {
+      warningsData.addWarning('Invalid initial state name: ' + newInitStateName);
+      explorationInitStateNameService.restoreFromMemento();
+      return;
+    }
+
+    explorationInitStateNameService.saveDisplayedValue();
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
@@ -94,21 +122,27 @@ oppia.controller('ExplorationSettings', [
   ********************************************/
   $scope.openEditRolesForm = function() {
     activeInputData.name = 'explorationMetadata.editRoles';
-    $scope.newMemberEmail = '';
+    $scope.newMemberUsername = '';
     $scope.newMemberRole = $scope.ROLES[0];
   };
 
   $scope.closeEditRolesForm = function() {
-    $scope.newMemberEmail = '';
+    $scope.newMemberUsername = '';
     $scope.newMemberRole = $scope.ROLES[0];
     activeInputData.clear();
   };
 
-  $scope.editRole = function(newMemberEmail, newMemberRole) {
+  $scope.editRole = function(newMemberUsername, newMemberRole) {
     activeInputData.clear();
     explorationRightsService.saveChangeToBackend({
-      new_member_email: newMemberEmail,
+      new_member_username: newMemberUsername,
       new_member_role: newMemberRole
+    });
+  };
+
+  $scope.toggleViewabilityIfPrivate = function() {
+    explorationRightsService.saveChangeToBackend({
+      viewable_if_private: !explorationRightsService.viewableIfPrivate()
     });
   };
 

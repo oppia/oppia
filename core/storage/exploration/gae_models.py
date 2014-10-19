@@ -165,6 +165,10 @@ class ExplorationRightsModel(base_models.VersionedModel):
     # The exploration id which this exploration was cloned from. If None, this
     # exploration was created from scratch.
     cloned_from = ndb.StringProperty()
+    # For private explorations, whether this exploration can be viewed
+    # by anyone who has the URL. If the exploration is not private, this
+    # setting is ignored.
+    viewable_if_private = ndb.BooleanProperty(indexed=True, default=False)
 
     # The publication status of this exploration.
     status = ndb.StringProperty(

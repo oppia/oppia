@@ -50,6 +50,13 @@ oppia.factory('parameterSpecsService', ['$log', function($log) {
         }
       }
       return names.sort();
+    },
+    getAllParams: function() {
+      var names = [];
+      for (var paramName in paramSpecs) {
+        names.push(paramName);
+      }
+      return names.sort();
     }
   };
 }]);
@@ -591,6 +598,8 @@ oppia.directive('richTextEditor', [
                 };
 
                 $scope.save = function(customizationArgs) {
+                  $scope.$broadcast('externalSave');
+
                   var customizationArgsDict = {};
                   for (var i = 0; i < $scope.customizationArgsList.length; i++) {
                     var caName = $scope.customizationArgsList[i].name;
@@ -739,6 +748,7 @@ oppia.directive('richTextEditor', [
             // Disable jquery.ui.dialog so that the link control works correctly.
             $.fn.dialog = null;
 
+            $(rteNode).wysiwyg('focus');
             $scope.hasFullyLoaded = true;
           });
         };
@@ -849,6 +859,32 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
   };
 }]);
 
+oppia.directive('requireIsValidExpression',
+    ['parameterSpecsService', 'expressionEvaluatorService',
+        function(parameterSpecsService, expressionEvaluatorService) {
+  // Create a namescope environment from the parameter names. The values of the
+  // parameters do not matter.
+  var params = {};
+  parameterSpecsService.getAllParams().forEach(function(name) {
+    params[name] = true;
+  });
+
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs, ctrl) {
+      var validator = function(value) {
+        ctrl.$setValidity('isValidExpression',
+            expressionEvaluatorService.validateExpression(value, [params]));
+        return value;
+      };
+
+      ctrl.$parsers.unshift(validator);
+      ctrl.$formatters.unshift(validator);
+    }
+  };
+}]);
+
 // Prevents timeouts due to recursion in nested directives. See:
 //
 //   http://stackoverflow.com/questions/14430655/recursion-in-angular-directives
@@ -940,32 +976,13 @@ oppia.directive('schemaBasedExpressionEditor', [function() {
     scope: {
       localValue: '=',
       disabled: '&',
-      paramNames: '&',
       // TODO(sll): Currently only takes a string which is either 'bool', 'int' or 'float'.
       // May need to generalize.
       outputType: '&',
       labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/expression',
-    restrict: 'E',
-    controller: ['$scope', function($scope) {
-      $scope.paramNameOptions = $scope.paramNames().map(function(paramName) {
-        return {
-          name: paramName,
-          value: paramName
-        };
-      });
-
-      $scope.$watch('localValue', function(newValue, oldValue) {
-        // Because JS objects are passed by reference, the current value needs
-        // to be set manually to an object in the list of options.
-        $scope.paramNameOptions.forEach(function(option) {
-          if (angular.equals(option.value, newValue)) {
-            $scope.localValue = option.value;
-          }
-        });
-      });
-    }]
+    restrict: 'E'
   };
 }]);
 
@@ -1009,6 +1026,16 @@ oppia.directive('schemaBasedIntEditor', [function() {
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
     controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+      if ($scope.localValue === undefined) {
+        $scope.localValue = 0;
+      }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedIntForm');
+        }
+      };
+
       if ($scope.allowExpressions()) {
         $scope.paramNames = parameterSpecsService.getAllParamsOfType('int');
         $scope.expressionMode = angular.isString($scope.localValue);
@@ -1053,6 +1080,16 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             return $scope.validators()[i].max_value;
           }
         }
+      }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedFloatForm');
+        }
+      };
+
+      if ($scope.localValue === undefined) {
+        $scope.localValue = 0.0;
       }
 
       if ($scope.allowExpressions()) {
@@ -1128,6 +1165,12 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
           }, 200);
         });
       }
+
+      $scope.onKeypress = function(evt) {
+        if (evt.keyCode === 13) {
+          $scope.$emit('submittedSchemaBasedUnicodeForm');
+        }
+      };
 
       $scope.getPlaceholder = function() {
         if (!$scope.uiConfig()) {
@@ -1225,12 +1268,33 @@ oppia.directive('schemaBasedListEditor', [
         $scope.addElementText = $scope.uiConfig().add_element_text;
       }
 
+      $scope.maxListLength = null;
+      if ($scope.validators()) {
+        for (var i = 0; i < $scope.validators().length; i++) {
+          if ($scope.validators()[i].id === 'has_length_at_most') {
+            $scope.maxListLength = $scope.validators()[i].max_value;
+          }
+        }
+      }
+
       if ($scope.len === undefined) {
         $scope.addElement = function() {
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
         };
+
+        $scope._onChildFormSubmit = function(evt) {
+          if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
+              !!$scope.localValue[$scope.localValue.length - 1]) {
+            $scope.addElement();
+          }
+          evt.stopPropagation();
+        };
+
+        $scope.$on('submittedSchemaBasedIntForm', $scope._onChildFormSubmit);
+        $scope.$on('submittedSchemaBasedFloatForm', $scope._onChildFormSubmit);
+        $scope.$on('submittedSchemaBasedUnicodeForm', $scope._onChildFormSubmit);
 
         $scope.deleteElement = function(index) {
           $scope.localValue.splice(index, 1);

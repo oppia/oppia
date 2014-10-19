@@ -5,7 +5,7 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
     """Interactive widget for multiple choice input."""
 
     # The human-readable name of the widget.
-    name = 'Multiple choice input'
+    name = 'Multiple Choice'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'

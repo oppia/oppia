@@ -15,13 +15,15 @@
 """Jobs for statistics views."""
 
 import ast
+import collections
 
 from core import jobs
 from core.platform import models
-(base_models, stats_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.statistics])
+(base_models, stats_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration])
 transaction_services = models.Registry.import_transaction_services()
 import feconf
+import utils
 
 from google.appengine.ext import ndb
 
@@ -92,32 +94,79 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_statistics(cls, exploration_id):
-        """Returns a dict with two keys: 'start_exploration_count' and
-        'complete_exploration_count'. The corresponding values are the
-        number of times the given exploration was started and completed,
-        respectively.
+        """Returns a dict with the following keys:
+        - 'start_exploration_count': # of times exploration was started
+        - 'complete_exploration_count': # of times exploration was completed
+        - 'state_hit_counts': a dict containing the hit counts for the states
+           in the exploration. It is formatted as follows:
+            {
+                state_name: {
+                    'first_entry_count': # of sessions state which hit this state
+                    'total_entry_count': # of total hits for this state
+                    'no_answer_count': # of hits with no answer for this state
+                }
+            }
         """
+        num_starts = 0
+        num_completions = 0
+        state_hit_counts = {}
+        last_updated = None
+
         mr_model = stats_models.ExplorationAnnotationsModel.get(
             exploration_id, strict=False)
-        realtime_model = cls._get_realtime_datastore_class().get(
-            cls.get_active_realtime_layer_id(exploration_id), strict=False)
-
-        num_starts = 0
         if mr_model is not None:
             num_starts += mr_model.num_starts
+            num_completions += mr_model.num_completions
+            state_hit_counts = mr_model.state_hit_counts
+            last_updated = utils.get_time_in_millisecs(mr_model.last_updated)
+
+        realtime_model = cls._get_realtime_datastore_class().get(
+            cls.get_active_realtime_layer_id(exploration_id), strict=False)
         if realtime_model is not None:
             num_starts += realtime_model.num_starts
-
-        num_completions = 0
-        if mr_model is not None:
-            num_completions += mr_model.num_completions
-        if realtime_model is not None:
             num_completions += realtime_model.num_completions
 
         return {
             'start_exploration_count': num_starts,
             'complete_exploration_count': num_completions,
+            'state_hit_counts': state_hit_counts,
+            'last_updated': last_updated,
         }
+
+
+class StateCounterTranslationOneOffJob(jobs.BaseMapReduceJobManager):
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [stats_models.StartExplorationEventLogEntryModel,
+                stats_models.MaybeLeaveExplorationEventLogEntryModel]
+
+    @staticmethod
+    def map(item):
+        yield (item.exploration_id, {
+            'event_type': item.event_type,
+            'state_name': item.state_name})
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        exp_model = None
+        try:
+            exp_model = exp_models.ExplorationModel.get(key) 
+        except base_models.BaseModel.EntityNotFoundError:
+            return
+        start_counter = stats_models.StateCounterModel.get_or_create(
+            key, exp_model.init_state_name)
+        complete_counter = stats_models.StateCounterModel.get_or_create(
+            key, feconf.END_DEST)
+        for value_str in stringified_values:
+            value = ast.literal_eval(value_str)
+            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
+                start_counter.first_entry_count -= 1
+            elif (value['event_type'] ==
+                feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION):
+                if value['state_name'] == feconf.END_DEST:
+                    complete_counter.first_entry_count -= 1
+        start_counter.put()
+        complete_counter.put()
 
 
 class StatisticsMRJobManager(
@@ -133,7 +182,8 @@ class StatisticsMRJobManager(
     @classmethod
     def entity_classes_to_map_over(cls):
         return [stats_models.StartExplorationEventLogEntryModel,
-                stats_models.MaybeLeaveExplorationEventLogEntryModel]
+                stats_models.MaybeLeaveExplorationEventLogEntryModel,
+                stats_models.StateHitEventLogEntryModel]
 
     @staticmethod
     def map(item):
@@ -141,40 +191,110 @@ class StatisticsMRJobManager(
             yield (item.exploration_id, {
                 'event_type': item.event_type,
                 'session_id': item.session_id,
-                'state_name': item.state_name})
+                'state_name': item.state_name,
+                'created_on': utils.get_time_in_millisecs(item.created_on)})
 
     @staticmethod
     def reduce(key, stringified_values):
-        # We're inline importing here to break import loops like this: (-> means imports)
-        # stats_jobs -> exp_services -> event_services -> jobs_registry -> stats_jobs.
-        from core.domain import stats_services
-        # TODO(sll): Get this from
-        # stats_services.get_exploration_start_count(key) if the exp_id
-        # exists. (An exception will be thrown if it doesn't.)
-        old_models_start_count = 0
-
-        # TODO(sll): Get this from
-        # stats_services.get_exploration_completed_count(key) if the exp_id
-        # exists. (An exception will be thrown if it doesn't.)
-        old_models_complete_count = 0
-
+        exp_model = None
+        try:
+            exp_model = exp_models.ExplorationModel.get(key)
+        except base_models.BaseModel.EntityNotFoundError:
+            return
+            
+        # Number of times exploration was started
         new_models_start_count = 0
+        # Number of times exploration was completed
         new_models_complete_count = 0
+        # {state_name: {'total_entry_count': ...,
+        #               'first_entry_count': ...,
+        #               'no_answer_count': ...}}
+        state_hit_counts = collections.defaultdict(lambda: collections.defaultdict(int))
+        # {state_name: set(session ids that have reached this state)}
+        state_session_ids = collections.defaultdict(set)
+        # Session ids that have completed this state
+        new_models_end_sessions = set()
+        # {session_id: (created-on timestamp of last known maybe leave event, state_name)}
+        session_id_to_latest_leave_event = collections.defaultdict(lambda: (0, ''))
+
+        # Iterate and process each event for this exploration.
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value['event_type'] == feconf.EVENT_TYPE_START_EXPLORATION:
+            event_type = value['event_type']
+            state_name = value['state_name']
+            created_on = value['created_on']
+            session_id = value['session_id']
+
+            # If this is a start event, increment start count.
+            if event_type == feconf.EVENT_TYPE_START_EXPLORATION:
                 new_models_start_count += 1
-            elif (value['event_type'] ==
-                  feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION):
-                if value['state_name'] == feconf.END_DEST:
+            elif event_type == feconf.EVENT_TYPE_MAYBE_LEAVE_EXPLORATION:
+                # If this maybe-leave event is on the end state, it is a
+                # completion.
+                if state_name == feconf.END_DEST:
                     new_models_complete_count += 1
+                    # Track that we have seen a 'real' end for this session id
+                    new_models_end_sessions.add(session_id)
+                else:
+                    # If this is not on the end state, identify the last
+                    # learner event for this session.
+                    latest_timestamp_so_far, _ = (
+                        session_id_to_latest_leave_event[session_id])
+                    if latest_timestamp_so_far < created_on:
+                        latest_timestamp_so_far = created_on
+                        session_id_to_latest_leave_event[session_id] = (
+                            created_on, state_name)
+            # If this is a state hit, increment the total count and record that
+            # we have seen this session id.
+            elif event_type == feconf.EVENT_TYPE_STATE_HIT:
+                state_hit_counts[state_name]['total_entry_count'] += 1
+                state_session_ids[state_name].add(session_id)
+
+        # After iterating through all events, take the size of the set of 
+        # session ids as the first entry count.
+        for state_name in state_session_ids:
+            state_hit_counts[state_name]['first_entry_count'] = len(
+                state_session_ids[state_name])
+
+        # Get the set of session ids that left without completing. This is
+        # determined as the set of session ids with maybe-leave events at
+        # intermediate states, minus the ones that have a maybe-leave event
+        # at the END state.
+        leave_states = set(session_id_to_latest_leave_event.keys()).difference(
+            new_models_end_sessions)
+        for session_id in leave_states:
+            # Grab the state name of the state they left on and count that as a
+            # 'no answer' for that state.
+            (_, state_name) = session_id_to_latest_leave_event[session_id]
+            state_hit_counts[state_name]['no_answer_count'] += 1
+
+        # Update all stats with old model values
+        old_models_start_count = stats_models.StateCounterModel.get_or_create(
+            key, exp_model.init_state_name).first_entry_count
+        old_models_complete_count = (
+            stats_models.StateCounterModel.get_or_create(
+                key, feconf.END_DEST).first_entry_count)
 
         num_starts = (
             old_models_start_count + new_models_start_count)
-        num_completes = (
+        num_completions = (
             old_models_complete_count + new_models_complete_count)
+        for state_name in exp_model.states:
+            state_counter = stats_models.StateCounterModel.get_or_create(
+                key, state_name)
+            state_hit_counts[state_name]['no_answer_count'] += (
+                state_counter.first_entry_count
+                + state_counter.subsequent_entries_count
+                - state_counter.resolved_answer_count
+                - state_counter.active_answer_count)
+            state_hit_counts[state_name]['first_entry_count'] += (
+                state_counter.first_entry_count)
+            state_hit_counts[state_name]['total_entry_count'] += (
+                state_counter.first_entry_count
+                + state_counter.subsequent_entries_count)
 
         stats_models.ExplorationAnnotationsModel(
             id=key,
             num_starts=num_starts,
-            num_completions=num_completes).put()
+            num_completions=num_completions,
+            state_hit_counts=state_hit_counts).put()

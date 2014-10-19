@@ -63,7 +63,7 @@ class WidgetUnitTests(test_utils.GenericTestBase):
         widget = widget_registry.Registry.get_widget_by_id(
             feconf.INTERACTIVE_PREFIX, TEXT_INPUT_ID)
         self.assertEqual(widget.id, TEXT_INPUT_ID)
-        self.assertEqual(widget.name, 'Text input')
+        self.assertEqual(widget.name, 'Text')
 
         self.assertIn('id="interactiveWidget/TextInput"', widget.html_body)
         self.assertIn('id="response/TextInput"', widget.html_body)
@@ -80,7 +80,8 @@ class WidgetUnitTests(test_utils.GenericTestBase):
             'default_value': 'Type your answer here.',
         }, {
             'name': 'rows',
-            'description': 'The number of rows for the text input field.',
+            'description': (
+                'How long the learner\'s answer is expected to be (in rows).'),
             'schema': {
                 'type': 'int',
                 'validators': [{
@@ -262,10 +263,9 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
             # In this directory there should only be a config .py file, an
             # html file, a JS file, (optionally) a directory named 'static',
-            # (optionally) a widget JS test file, and (optionally) a
-            # stats_response.html file.
+            # (optionally) a widget JS test file, (optionally) a
+            # stats_response.html file and (optionally) a protractor.js file.
             dir_contents = self._listdir_omit_ignored(widget_dir)
-            self.assertLessEqual(len(dir_contents), 6)
 
             optional_dirs_and_files_count = 0
 
@@ -287,6 +287,13 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
                     widget_dir, '%sSpec.js' % widget_id)))
+                optional_dirs_and_files_count += 1
+            except Exception:
+                pass
+
+            try:
+                self.assertTrue(os.path.isfile(os.path.join(
+                    widget_dir, 'protractor.js')))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass

@@ -106,24 +106,19 @@ describe('Datetime Formatter', function() {
       });
     }));
 
-    it('should correctly return date time string', function() {
-      expect(df.getHumanReadableDatetime(NOW_MILLIS)).toBe(
-        'Fri, 21 Nov 2014 09:45:00 GMT');
-      expect(df.getHumanReadableDatetime(YESTERDAY_MILLIS)).toBe(
-        'Thu, 20 Nov 2014 09:45:00 GMT');
-    });
-
     it('should show only the time for a datetime occurring today', function() {
       // In any timezone, 10 minutes before xx:45:00 should still fall within the
       // same date as xx:45:00.
       expect(df.getLocaleAbbreviatedDatetimeString(
         NOW_MILLIS - 10 * 60 * 1000)).not.toBe('11/21/2014');
+      expect(df.getLocaleAbbreviatedDatetimeString(
+        NOW_MILLIS - 10 * 60 * 1000)).not.toBe('2014/11/21');
     });
 
     it('should show only the date for a datetime occurring before today', function() {
       // 72 hours ago. This is 18 Nov 2014 09:45:00 GMT, which corresponds to
       // 17 Nov 2014 in some parts of the world, and 18 Nov 2014 in others.
-      expect(['11/18/2014', '11/17/2014']).toContain(
+      expect(['11/18/2014', '11/17/2014', '2014/11/18', '2014/11/17']).toContain(
         df.getLocaleAbbreviatedDatetimeString(
           NOW_MILLIS - 72 * 60 * 60 * 1000));
     });

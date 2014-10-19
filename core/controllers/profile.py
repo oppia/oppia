@@ -25,7 +25,7 @@ import utils
 
 
 EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
-    'editor_prerequisites_agreement', 'UnicodeString',
+    'editor_prerequisites_agreement', 'Html',
     'The agreement that editors are asked to accept before making any '
     'contributions.',
     default_value=feconf.DEFAULT_EDITOR_PREREQUISITES_AGREEMENT

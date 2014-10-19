@@ -35,9 +35,6 @@ oppia.directive('oppiaInteractiveNumericInput', [
         };
 
         $scope.submitAnswer = function(answer) {
-          if (!answer) {
-            return;
-          }
           $scope.$parent.$parent.submitAnswer(Number(answer), 'submit');
         };
       }]
@@ -53,6 +50,10 @@ oppia.directive('oppiaResponseNumericInput', [
       templateUrl: 'response/NumericInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        // If the answer is an integer, omit the fractional part.
+        if ($scope.answer % 1 === 0) {
+          $scope.answer = Math.round($scope.answer);
+        }
       }]
     };
   }

@@ -5,7 +5,7 @@ class Continue(widget_domain.BaseWidget):
     """Interactive widget that takes the form of a simple 'Continue' button."""
 
     # The human-readable name of the widget.
-    name = 'Continue'
+    name = 'Continue Button'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'

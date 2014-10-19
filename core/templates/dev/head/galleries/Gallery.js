@@ -104,6 +104,7 @@ oppia.controller('Gallery', [
     function($scope, $http, $rootScope, $window, createExplorationButtonService,
              oppiaDatetimeFormatter) {
   $scope.galleryDataUrl = '/galleryhandler/data';
+  $scope.currentUserIsModerator = false;
 
   $scope.selectedStatuses = {
     'publicized': true,
@@ -133,6 +134,10 @@ oppia.controller('Gallery', [
 
   // Retrieves gallery data from the server.
   $http.get($scope.galleryDataUrl).success(function(data) {
+    if (data.is_moderator) {
+      $scope.currentUserIsModerator = true;
+    }
+
     $scope.releasedExplorations = data.released;
     $scope.betaExplorations = data.beta;
     $scope.privateExplorations = data['private'];

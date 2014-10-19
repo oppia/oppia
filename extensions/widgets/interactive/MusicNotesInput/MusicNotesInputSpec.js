@@ -41,8 +41,8 @@ describe('MusicNotesInput interactive widget', function() {
       scope = $rootScope.$new();
       elt = angular.element('<' + TAG_NAME + '></' + TAG_NAME + '>');
       $compile(elt)(scope);
-      ctrlScope = elt.scope();
       scope.$digest();
+      ctrlScope = elt.isolateScope();
     }));
 
     afterEach(function() {
@@ -53,7 +53,7 @@ describe('MusicNotesInput interactive widget', function() {
 
     it('loads the music widget template', function() {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
-      expect(elt.html()).toContain('Play Desired Sequence');
+      expect(elt.html()).toContain('Play Target Sequence');
       expect(elt.html()).toContain('Play Current Sequence');
     });
 

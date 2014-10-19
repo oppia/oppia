@@ -61,12 +61,33 @@ class Registry(object):
         return copy.deepcopy(cls._skins_dict)
 
     @classmethod
-    def get_skin_html(cls, skin_id):
-        """Returns the HTML for a given skin.
+    def get_skin_templates(cls, skin_ids):
+        """Returns the concatanated HTML for the given skins.
+
+        Raises an error if any of the skins is not found.
+        """
+        cls._refresh_registry()
+        return '\n'.join([
+            cls._skins_dict[skin_id].get_html() for skin_id in skin_ids])
+
+    @classmethod
+    def get_skin_js_url(cls, skin_id):
+        """Returns the URL to the directive JS code for a given skin.
 
         Refreshes once if the skin id is not found; subsequently, throws an
         error.
         """
         if skin_id not in cls._skins_dict:
             cls._refresh_registry()
-        return cls._skins_dict[skin_id].get_html()
+        return cls._skins_dict[skin_id].get_js_url()
+
+    @classmethod
+    def get_skin_tag(cls, skin_id):
+        """Returns an HTML tag corresponding to the given skin.
+
+        Refreshes once if the skin id is not found; subsequently, throws an
+        error.
+        """
+        if skin_id not in cls._skins_dict:
+            cls._refresh_registry()
+        return cls._skins_dict[skin_id].get_tag()

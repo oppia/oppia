@@ -1,3 +1,9 @@
+<style>
+  .code-repl-input-box {
+    border: 1px solid #ccc;
+  }
+</style>
+
 <script type="text/ng-template" id="interactiveWidget/CodeRepl">
   <div>
     <div>
@@ -5,7 +11,9 @@
     </div>
     <br>
     <form ng-submit="runCode(code)">
-      <div ui-codemirror="{onLoad: initCodeEditor}" style="border: 1px solid black;">
+      <div class="code-repl-input-box">
+        <div ui-codemirror="{onLoad: initCodeEditor}">
+        </div>
       </div>
       <button type="submit" class="btn btn-default" ng-disabled="!hasLoaded">Run</button>
     </form>
@@ -13,25 +21,21 @@
 </script>
 
 <script type="text/ng-template" id="response/CodeRepl">
-  <div class="oppia-reader-response-container">
-    <span class="oppia-reader-response">
-      <br>
+  <div>
+    <h5>Code</h5>
+    <pre><[answer.code]></pre>
 
-      <h5>Code</h5>
-      <pre><[answer.code]></pre>
+    <span ng-if="answer.output">
+      <h5>Output</h5>
+      <pre><[answer.output]></pre>
+    </span>
 
-      <span ng-if="answer.output">
-        <h5>Output</h5>
-        <pre><[answer.output]></pre>
-      </span>
+    <span ng-if="answer.error">
+      <font color=red>Error: <[answer.error]></font><br>
+    </span>
 
-      <span ng-if="answer.error">
-        <font color=red>Error: <[answer.error]></font><br>
-      </span>
-
-      <span ng-if="answer.evaluation">
-        &gt;&gt; <[answer.evaluation]>
-      </span>
+    <span ng-if="answer.evaluation">
+      &gt;&gt; <[answer.evaluation]>
     </span>
   </div>
 </script>

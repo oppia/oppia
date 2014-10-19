@@ -3,6 +3,88 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.10.patch (10 Oct 2014)
+--------------------
+Editor improvements:
+* In noneditable mode, hide the widget selector in the state editor.
+* Fix a bug relating to the graph visualization height in Firefox.
+
+Infrastructure:
+* Allow exploration statistics datastore models to be migrated.
+
+v1.2.10 (7 Oct 2014)
+--------------------
+General editor improvements:
+* Add a preview mode to enable changes to be previewed without saving.
+* Add a tutorial for the editor page.
+* Shorten the label for the 'Save Changes' button and make it clearer when an exploration has been saved.
+* Add a category label to the top of the page.
+* Simplify the inter-tab routing code, and allow sub-tabs in the editor page to be accessed directly.
+* Fix a routing bug causing errors when the user navigates to states whose names have trailing question marks.
+
+State editor improvements:
+* Make the overall state editor interface cleaner, friendlier and more responsive.
+* Fix the layout and panning behavior of the state graph.
+* Fix a couple of bugs involving graph elements (arrow tips and legends) not showing up in Firefox.
+* Allow the exploration creator to change which state is the initial one.
+* Change the default initial state name from '(untitled state)' to 'First State'.
+* Fix issue 166: allow states defined in rules to use periods in their names.
+* Show a warning when invalid new state names are entered, in order to explain why they are invalid.
+* Fix a bug in the state editor that allowed states to be renamed to 'END'.
+* Speed up the process of adding a new state by removing the need for a backend RPC.
+* Add unit tests for the state editor.
+
+Improvements to the editor settings tab:
+* Rename 'Objective' to 'Goal'.
+* Remove the helper text around the objective field, which does not make sense for non-English explorations.
+* Remove the obtrusive warning message that appears when the objective field is blurred.
+* Add a 'Permissions' section to clarify an exploration's sharing status, and add a field showing a link to the exploration that can be shared.
+* Add an option allowing private explorations to be viewed by anyone with the link.
+* Remove functionality for adding users by email, and add functionality for adding them by username instead.
+
+Improvements to the learner view:
+* Highlight the most recent content and feedback in the conversation skin view, and clean up the user interface slightly.
+
+Improvements to the dashboard and gallery pages:
+* Add objective and language fields to the exploration creation modal.
+* Slightly simplify the 'Create New Exploration' flow triggered by the button in the gallery page.
+* In the dashboard, make the links for feedback notifications point directly to the feedback tab in the exploration editor.
+
+Widget improvements:
+* Rename all interactive widget descriptions for consistency in the state editor dropdown.
+* Set input widget: create new elements automatically when the user hits the enter key.
+* Interactive map widget: fix an issue where the map width spills over that of its boundary container.
+* Music notes widget:
+  - rename 'play desired sequence' to 'play target sequence'
+  - add a note icon to the 'Add Note' button
+  - add functionality for specifying an initial sequence of notes
+* Numeric widget:
+  - in the learner view, do not show integers as floats
+  - fix a bug where inputs of 0 were not being accepted
+* Text widget: improve the description of the 'rows' field.
+* Code widget: add a border around the coding pane to separate it more clearly from the surrounding container.
+* Video widget: add autoplay functionality.
+* Link widget: show an error message when an invalid link is saved (issue 147).
+
+Moderator/Admin functionality:
+* Fix issue 373: for moderators, show edit buttons in the gallery.
+* Fix issue 374: fix broken timestamps in the moderator page, and add a moderator page to the profile menu where relevant.
+* Refactor the admin page to use the new schema-based forms framework.
+
+Infrastructure and testing improvements:
+* Create a framework for end-to-end testing in protractor, and add tests for the state editor page, settings tab, publication process and subsequent gallery display.
+* In the forms framework, add a validator for testing the maximum length of a list.
+* Downgrade error logging about unused widget customization arguments to a warning.
+
+Dependencies:
+* Use a local version of MathJax, since the CDN sometimes does not respond.
+* Upgrade GAE version to v1.9.11.
+* Update select2 version to v3.5.1.
+* Upgrade d3 version to v3.4.11.
+* Update protractor version to v1.2.0.
+* Update MIDI.js version to revision 2ef687.
+
+
 v1.2.9 (11 Sep 2014)
 --------------------
 Deprecations:

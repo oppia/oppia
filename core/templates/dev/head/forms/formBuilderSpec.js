@@ -173,7 +173,7 @@ describe('RTE directive', function() {
        '<img src="data:123" class="oppia-noninteractive-image" image_id-with-value="&amp;quot;T&amp;quot;">']
     ];
 
-    var rteControllerScope = elm.scope();
+    var rteControllerScope = elm.isolateScope();
 
     // TODO(sll): Why isn't this being auto-populated?
     rteControllerScope._NONINTERACTIVE_WIDGETS = [{

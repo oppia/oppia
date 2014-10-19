@@ -5,7 +5,7 @@ class NumericInput(widget_domain.BaseWidget):
     """Interactive widget for numeric input."""
 
     # The human-readable name of the widget.
-    name = 'Numeric input'
+    name = 'Numeric'
 
     # The category the widget falls under in the widget repository.
     category = 'Basic Input'

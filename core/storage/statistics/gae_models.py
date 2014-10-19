@@ -62,18 +62,6 @@ class StateCounterModel(base_models.BaseModel):
             counter = cls(id=instance_id)
         return counter
 
-    @classmethod
-    def inc(cls, exploration_id, state_name, first_time):
-        """Increments the relevant counter for state entries."""
-        counter = cls.get_or_create(exploration_id, state_name)
-
-        if first_time:
-            counter.first_entry_count += 1
-        else:
-            counter.subsequent_entries_count += 1
-
-        counter.put()
-
     def get_exploration_id_and_state_name(self):
         first_dot_loc = self.id.find('.')
         return self.id[:first_dot_loc], self.id[first_dot_loc + 1:]
@@ -153,24 +141,19 @@ class MaybeLeaveExplorationEventLogEntryModel(base_models.BaseModel):
 
     Event schema documentation
     --------------------------
-    V0: The attribute values are as follows:
+    V1: 
         event_type: 'leave' (there are no 'maybe leave' events in V0)
         exploration_id: id of exploration currently being played
-        exploration_version: approximate version of exploration
+        exploration_version: version of exploration
         state_name: Name of current state
         play_type: 'normal'
-        approximate_created_on date (probably not useful)
-        event_schema_version: 0
-
-    V1: As in V0 with the following modifications:
-      - The exploration_version and created_on dates are exact.
-      - The following additional fields were added:
-          session_id: ID of current student's session
-          params: current parameter values, in the form of a map of parameter name
-            to value
-          client_time_spent_in_secs: time spent in this state before the event was
-            triggered
-      - event_schema_version: 1
+        created_on date
+        event_schema_version: 1
+        session_id: ID of current student's session
+        params: current parameter values, in the form of a map of parameter name
+          to value
+        client_time_spent_in_secs: time spent in this state before the event was
+          triggered
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -229,23 +212,18 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
  
     Event schema documentation
     --------------------------
-    V0: The attribute values are as follows:
+    V1: 
         event_type: 'start'
         exploration_id: id of exploration currently being played
-        exploration_version: approximate version of exploration
+        exploration_version: version of exploration
         state_name: Name of current state
         client_time_spent_in_secs: 0
         play_type: 'normal'
-        approximate_created_on date (probably not useful)
-        event_schema_version: 0
-
-    V1: As in V0 with the following modifications:
-      - The exploration_version and created_on dates are exact.
-      - The following additional fields were added:
-          session_id: ID of current student's session
-          params: current parameter values, in the form of a map of parameter name
-            to value
-      - event_schema_version: 1
+        created_on date
+        event_schema_version: 1
+        session_id: ID of current student's session
+        params: current parameter values, in the form of a map of parameter name
+          to value
     """
     # This value should be updated in the event of any event schema change.
     CURRENT_EVENT_SCHEMA_VERSION = 1
@@ -299,6 +277,68 @@ class StartExplorationEventLogEntryModel(base_models.BaseModel):
         start_event_entity.put()
 
 
+class StateHitEventLogEntryModel(base_models.BaseModel):
+    """An event triggered by a student getting to a particular state. The
+    definitions of the fields are as follows:
+    - event_type: 'state_hit'
+    - exploration_id: id of exploration currently being played
+    - exploration_version: version of exploration
+    - state_name: Name of current state
+    - play_type: 'normal'
+    - created_on date
+    - event_schema_version: 1
+    - session_id: ID of current student's session
+    - params: current parameter values, in the form of a map of parameter name
+              to its value
+    """
+    # This value should be updated in the event of any event schema change.
+    CURRENT_EVENT_SCHEMA_VERSION = 1
+
+    # Which specific type of event this is
+    event_type = ndb.StringProperty(indexed=True)
+    # Id of exploration currently being played.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Current version of exploration.
+    exploration_version = ndb.IntegerProperty(indexed=True)
+    # Name of current state.
+    state_name = ndb.StringProperty(indexed=True)
+    # ID of current student's session
+    session_id = ndb.StringProperty(indexed=True)
+    # Current parameter values, map of parameter name to value
+    params = ndb.JsonProperty(indexed=False)
+    # Which type of play-through this is (preview, from gallery)
+    play_type = ndb.StringProperty(indexed=True,
+                                   choices=[feconf.PLAY_TYPE_PLAYTEST,
+                                            feconf.PLAY_TYPE_NORMAL])
+    # The version of the event schema used to describe an event of this type.
+    # Details on the schema are given in the docstring for this class.
+    event_schema_version = ndb.IntegerProperty(
+        indexed=True, default=CURRENT_EVENT_SCHEMA_VERSION)
+
+    @classmethod
+    def get_new_event_entity_id(cls, exp_id, session_id):
+        timestamp = datetime.datetime.utcnow()
+        return cls.get_new_id('%s:%s:%s' % (
+                              utils.get_time_in_millisecs(timestamp),
+                              exp_id,
+                              session_id))
+
+    @classmethod
+    def create(cls, exp_id, exp_version, state_name, session_id, params, play_type):
+        """Creates a new leave exploration event."""
+        entity_id = cls.get_new_event_entity_id(
+            exp_id, session_id)
+        state_event_entity = cls(
+            event_type=feconf.EVENT_TYPE_STATE_HIT,
+            exploration_id=exp_id,
+            exploration_version=exp_version,
+            state_name=state_name,
+            session_id=session_id,
+            params=params,
+            play_type=play_type)
+        state_event_entity.put()
+         
+
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics."""
@@ -306,6 +346,11 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     num_starts = ndb.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration
     num_completions = ndb.IntegerProperty(indexed=False)
+    # Keyed by state name that describes the numbers of hits for each state
+    # {state_name: {'first_entry_count': ...,
+    #               'total_entry_count': ...,
+    #               'no_answer_count': ...}}
+    state_hit_counts = ndb.JsonProperty(indexed=False)
 
 
 def process_submitted_answer(
@@ -320,8 +365,6 @@ def process_submitted_answer(
         rule: the rule
         answer: an HTML string representation of the answer
     """
-    # TODO(sll): Run these two updates in a transaction.
-
     answer_log = StateRuleAnswerLogModel.get_or_create(
         exploration_id, state_name, handler_name, str(rule))
     if answer in answer_log.answers:
@@ -336,10 +379,6 @@ def process_submitted_answer(
         logging.error(e)
         pass
 
-    counter = StateCounterModel.get_or_create(exploration_id, state_name)
-    counter.active_answer_count += 1
-    counter.put()
-
 
 def resolve_answers(
         exploration_id, state_name, handler_name, rule_str, answers):
@@ -352,13 +391,10 @@ def resolve_answers(
         rule_str: a string representation of the rule
         answers: a list of HTML string representations of the resolved answers
     """
-    # TODO(sll): Run this in a transaction (together with any updates to the
-    # state).
     assert isinstance(answers, list)
     answer_log = StateRuleAnswerLogModel.get_or_create(
         exploration_id, state_name, handler_name, rule_str)
 
-    resolved_count = 0
     for answer in answers:
         if answer not in answer_log.answers:
             logging.error(
@@ -367,11 +403,6 @@ def resolve_answers(
                     answer, rule_str, exploration_id, state_name,
                     handler_name))
         else:
-            resolved_count += answer_log.answers[answer]
             del answer_log.answers[answer]
     answer_log.put()
 
-    counter = StateCounterModel.get_or_create(exploration_id, state_name)
-    counter.active_answer_count -= resolved_count
-    counter.resolved_answer_count += resolved_count
-    counter.put()

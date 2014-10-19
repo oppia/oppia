@@ -3,13 +3,13 @@ module.exports = function(config) {
     basePath: '../../',
     frameworks: ['jasmine'],
     files: [
-      'third_party/static/jquery-2.0.3/jquery.min.js',
+      'third_party/static/jquery-2.1.1/jquery.min.js',
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
-      'third_party/static/angularjs-1.2.0-rc.3/angular.js',
-      'third_party/static/angularjs-1.2.0-rc.3/angular-animate.min.js',
-      'third_party/static/angularjs-1.2.0-rc.3/angular-resource.min.js',
-      'third_party/static/angularjs-1.2.0-rc.3/angular-sanitize.min.js',
-      'third_party/static/angularjs-1.2.0-rc.3/angular-mocks.js',
+      'third_party/static/angularjs-1.3.0-rc.5/angular.js',
+      'third_party/static/angularjs-1.3.0-rc.5/angular-animate.min.js',
+      'third_party/static/angularjs-1.3.0-rc.5/angular-resource.min.js',
+      'third_party/static/angularjs-1.3.0-rc.5/angular-sanitize.min.js',
+      'third_party/static/angularjs-1.3.0-rc.5/angular-mocks.js',
       'third_party/static/ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.js',
       'third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js',
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
@@ -25,7 +25,8 @@ module.exports = function(config) {
       'extensions/widgets/interactive/**/*.html'
     ],
     exclude: [
-      'core/templates/dev/head/**/*-e2e.js'
+      'core/templates/dev/head/**/*-e2e.js',
+      'extensions/widgets/interactive/**/protractor.js'
     ],
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],

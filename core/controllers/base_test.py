@@ -84,6 +84,8 @@ class CsrfTokenManagerTest(test_utils.GenericTestBase):
             base.CsrfTokenManager.is_csrf_token_valid('bad_user', page, token))
         self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
             uid, 'wrong_page', token))
+        self.assertFalse(base.CsrfTokenManager.is_csrf_token_valid(
+            uid, self.UNICODE_TEST_STRING, token))
         self.assertFalse(
             base.CsrfTokenManager.is_csrf_token_valid(uid, page, 'new_token'))
         self.assertFalse(
@@ -166,7 +168,7 @@ class EscapingTest(test_utils.GenericTestBase):
             """Handles GET requests."""
             self.values.update({
                 'ADMIN_EMAIL_ADDRESS': ['<[angular_tag]>'],
-                'SITE_NAME': '{{51 * 3}}',
+                'SITE_NAME': 'x{{51 * 3}}y',
             })
             self.render_template('pages/about.html')
 
@@ -188,8 +190,8 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertIn('&lt;[angular_tag]&gt;', response.body)
         self.assertNotIn('<[angular_tag]>', response.body)
 
-        self.assertIn('{{51 * 3}}', response.body)
-        self.assertNotIn('153', response.body)
+        self.assertIn('x{{51 * 3}}y', response.body)
+        self.assertNotIn('x153y', response.body)
 
     def test_special_char_escaping(self):
         response = self.testapp.post('/fake', {})

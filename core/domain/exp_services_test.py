@@ -49,14 +49,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 
     EXP_ID = 'An_exploration_id'
 
-    OWNER_EMAIL = 'owner@example.com'
-    EDITOR_EMAIL = 'editor@example.com'
-    VIEWER_EMAIL = 'viewer@example.com'
-
-    OWNER_NAME = 'owner'
-    EDITOR_NAME = 'editor'
-    VIEWER_NAME = 'viewer'
-
     def setUp(self):
         """Before each individual test, create a dummy exploration."""
         super(ExplorationServicesUnitTests, self).setUp()
@@ -69,14 +61,12 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
         user_services.get_or_create_user(self.VIEWER_ID, self.VIEWER_EMAIL)
 
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_NAME)
-        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_NAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_NAME)
+        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
+        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
+        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
 
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'admin_emails', ['admin@example.com'])
-        self.user_id_admin = self.get_user_id_from_email('admin@example.com')
-
+        self.set_admins([self.ADMIN_EMAIL])
+        self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
 
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
@@ -385,7 +375,7 @@ class ZipFileExportUnitTests(ExplorationServicesUnitTests):
 """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: (untitled state)
+init_state_name: %s
 language_code: en
 objective: The objective
 param_changes: []
@@ -393,10 +383,12 @@ param_specs: {}
 schema_version: 3
 skill_tags: []
 states:
-  (untitled state):
+  %s:
     content:
     - type: text
-      value: ''
+      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
+        to the learner playing your exploration.<br><br>If you need more help getting
+        started, check out the Help link in the navigation bar.
     param_changes: []
     widget:
       customization_args:
@@ -409,7 +401,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: (untitled state)
+          dest: %s
           feedback: []
           param_changes: []
       sticky: false
@@ -435,13 +427,15 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
-""")
+""" % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME))
 
     UPDATED_YAML_CONTENT = (
 """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: (untitled state)
+init_state_name: %s
 language_code: en
 objective: The objective
 param_changes: []
@@ -449,10 +443,12 @@ param_specs: {}
 schema_version: 3
 skill_tags: []
 states:
-  (untitled state):
+  %s:
     content:
     - type: text
-      value: ''
+      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
+        to the learner playing your exploration.<br><br>If you need more help getting
+        started, check out the Help link in the navigation bar.
     param_changes: []
     widget:
       customization_args:
@@ -465,7 +461,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: (untitled state)
+          dest: %s
           feedback: []
           param_changes: []
       sticky: false
@@ -491,7 +487,9 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
-""")
+""" % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME))
 
     def test_export_to_zip_file(self):
         """Test the export_to_zip_file() method."""
@@ -570,7 +568,7 @@ class DictExportUnitTests(ExplorationServicesUnitTests):
 """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: (untitled state)
+init_state_name: %s
 language_code: en
 objective: The objective
 param_changes: []
@@ -578,10 +576,12 @@ param_specs: {}
 schema_version: 3
 skill_tags: []
 states:
-  (untitled state):
+  %s:
     content:
     - type: text
-      value: ''
+      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
+        to the learner playing your exploration.<br><br>If you need more help getting
+        started, check out the Help link in the navigation bar.
     param_changes: []
     widget:
       customization_args:
@@ -594,7 +594,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: (untitled state)
+          dest: %s
           feedback: []
           param_changes: []
       sticky: false
@@ -620,13 +620,15 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
-""")
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME)
 
     UPDATED_YAML_CONTENT = (
 """author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: (untitled state)
+init_state_name: %s
 language_code: en
 objective: The objective
 param_changes: []
@@ -634,10 +636,12 @@ param_specs: {}
 schema_version: 3
 skill_tags: []
 states:
-  (untitled state):
+  %s:
     content:
     - type: text
-      value: ''
+      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
+        to the learner playing your exploration.<br><br>If you need more help getting
+        started, check out the Help link in the navigation bar.
     param_changes: []
     widget:
       customization_args:
@@ -650,7 +654,7 @@ states:
         rule_specs:
         - definition:
             rule_type: default
-          dest: (untitled state)
+          dest: %s
           feedback: []
           param_changes: []
       sticky: false
@@ -676,7 +680,9 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
-""")
+""") % (
+    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
+    feconf.DEFAULT_INIT_STATE_NAME)
 
     def test_export_to_dict(self):
         """Test the export_to_dict() method."""
@@ -781,26 +787,26 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [{
             'cmd': 'rename_state',
-            'old_state_name': '(untitled state)',
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'new_state_name': 'new name',
         }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn('new name', exploration.states)
-        self.assertNotIn('(untitled state)', exploration.states)
+        self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
     def test_update_state_name_with_unicode(self):
         """Test updating of state name to one that uses unicode characters."""
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         exp_services.update_exploration(self.OWNER_ID, self.EXP_ID, [{
             'cmd': 'rename_state',
-            'old_state_name': '(untitled state)',
+            'old_state_name': feconf.DEFAULT_INIT_STATE_NAME,
             'new_state_name': u'¡Hola! αβγ',
         }], 'Change state name')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertIn(u'¡Hola! αβγ', exploration.states)
-        self.assertNotIn('(untitled state)', exploration.states)
+        self.assertNotIn(feconf.DEFAULT_INIT_STATE_NAME, exploration.states)
 
     def test_update_param_changes(self):
         """Test updating of param_changes."""
@@ -1060,7 +1066,7 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(
-                self.EXP_ID, 1)[0]['commit_message'],
+                self.EXP_ID)[-1]['commit_message'],
             'A message')
 
     def test_demand_commit_message(self):
@@ -1098,7 +1104,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.EXP_ID, self.OWNER_ID)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 3)
+            self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 1)
         self.assertDictContainsSubset({
             'commit_cmds': [{
@@ -1119,7 +1125,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 3)
+            self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 1)
         self.assertDictContainsSubset({
             'commit_cmds': [{
@@ -1145,7 +1151,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             self.OWNER_ID, self.EXP_ID, change_list, 'Changed title.')
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 3)
+            self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 2)
         self.assertIn('created_on', snapshots_metadata[0])
         self.assertDictContainsSubset({
@@ -1154,7 +1160,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_message': 'Changed title.',
             'commit_type': 'edit',
             'version_number': 2,
-        }, snapshots_metadata[0])
+        }, snapshots_metadata[-1])
         self.assertDictContainsSubset({
             'commit_cmds': [{
                 'cmd': 'create_new',
@@ -1166,10 +1172,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'New exploration created with title \'A title\'.'),
             'commit_type': 'create',
             'version_number': 1
-        }, snapshots_metadata[1])
+        }, snapshots_metadata[-2])
         self.assertGreaterEqual(
-            snapshots_metadata[0]['created_on'],
-            snapshots_metadata[1]['created_on'])
+            snapshots_metadata[-1]['created_on'],
+            snapshots_metadata[-2]['created_on'])
 
         # Using the old version of the exploration should raise an error.
         with self.assertRaisesRegexp(Exception, 'version 1, which is too old'):
@@ -1186,7 +1192,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'committer_id_2', self.EXP_ID, new_change_list, 'Second commit.')
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 5)
+            self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 3)
         self.assertDictContainsSubset({
             'commit_cmds': new_change_list,
@@ -1194,14 +1200,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'commit_message': 'Second commit.',
             'commit_type': 'edit',
             'version_number': 3,
-        }, snapshots_metadata[0])
+        }, snapshots_metadata[-1])
         self.assertDictContainsSubset({
             'commit_cmds': change_list,
             'committer_id': self.OWNER_ID,
             'commit_message': 'Changed title.',
             'commit_type': 'edit',
             'version_number': 2,
-        }, snapshots_metadata[1])
+        }, snapshots_metadata[-2])
         self.assertDictContainsSubset({
             'commit_cmds': [{
                 'cmd': 'create_new',
@@ -1213,10 +1219,10 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
                 'New exploration created with title \'A title\'.'),
             'commit_type': 'create',
             'version_number': 1
-        }, snapshots_metadata[2])
+        }, snapshots_metadata[-3])
         self.assertGreaterEqual(
-            snapshots_metadata[0]['created_on'],
-            snapshots_metadata[1]['created_on'])
+            snapshots_metadata[-1]['created_on'],
+            snapshots_metadata[-2]['created_on'])
 
     def test_versioning_with_add_and_delete_states(self):
         exploration = self.save_new_valid_exploration(
@@ -1231,7 +1237,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 2,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 5)
+            self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 2)
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -1245,14 +1251,14 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 3,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 5)
+            self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 3)
         self.assertDictContainsSubset(
-            commit_dict_3, snapshots_metadata[0])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[1])
+            commit_dict_3, snapshots_metadata[-1])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[-2])
         self.assertGreaterEqual(
-            snapshots_metadata[0]['created_on'],
-            snapshots_metadata[1]['created_on'])
+            snapshots_metadata[-1]['created_on'],
+            snapshots_metadata[-2]['created_on'])
 
         # Perform an invalid action: delete a state that does not exist. This
         # should not create a new version.
@@ -1270,11 +1276,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
             'version_number': 4,
         }
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 5)
+            self.EXP_ID)
         self.assertEqual(len(snapshots_metadata), 4)
-        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[0])
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[1])
-        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[2])
+        self.assertDictContainsSubset(commit_dict_4, snapshots_metadata[-1])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[-2])
+        self.assertDictContainsSubset(commit_dict_2, snapshots_metadata[-3])
         self.assertGreaterEqual(
             snapshots_metadata[0]['created_on'],
             snapshots_metadata[1]['created_on'])
@@ -1316,7 +1322,7 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(exploration.version, 4)
 
         snapshots_metadata = exp_services.get_exploration_snapshots_metadata(
-            self.EXP_ID, 5)
+            self.EXP_ID)
 
         commit_dict_4 = {
             'committer_id': 'committer_id_v4',
@@ -1330,11 +1336,11 @@ class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):
         }
         self.assertEqual(len(snapshots_metadata), 4)
         self.assertDictContainsSubset(
-            commit_dict_4, snapshots_metadata[0])
-        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[1])
+            commit_dict_4, snapshots_metadata[-1])
+        self.assertDictContainsSubset(commit_dict_3, snapshots_metadata[-2])
         self.assertGreaterEqual(
-            snapshots_metadata[0]['created_on'],
-            snapshots_metadata[1]['created_on'])
+            snapshots_metadata[-1]['created_on'],
+            snapshots_metadata[-2]['created_on'])
 
 
 class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):

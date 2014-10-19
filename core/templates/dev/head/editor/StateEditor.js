@@ -21,10 +21,12 @@
 oppia.controller('StateEditor', [
   '$scope', '$filter', 'explorationData', 'warningsData',
   'editorContextService', 'changeListService', 'validatorsService',
-  'focusService', function(
+  'explorationInitStateNameService', 'focusService', 'editabilityService',
+  'explorationStatesService', 'routerService', function(
     $scope, $filter, explorationData, warningsData,
     editorContextService, changeListService, validatorsService,
-    focusService) {
+    explorationInitStateNameService, focusService, editabilityService,
+    explorationStatesService, routerService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -45,7 +47,8 @@ oppia.controller('StateEditor', [
     $scope.stateNameEditorIsShown = false;
 
     $scope.stateName = editorContextService.getActiveStateName();
-    var stateData = $scope.$parent.states[$scope.stateName];
+
+    var stateData = explorationStatesService.getState($scope.stateName);
     $scope.content = stateData.content || [];
     $scope.stateParamChanges = stateData.param_changes || [];
 
@@ -55,6 +58,7 @@ oppia.controller('StateEditor', [
     if ($scope.stateName && stateData) {
       $scope.$broadcast('stateEditorInitialized', stateData);
     }
+
   };
 
   $scope.openStateNameEditor = function() {
@@ -68,29 +72,24 @@ oppia.controller('StateEditor', [
     return $filter('normalizeWhitespace')(newStateName);
   };
 
+  var _isNewStateNameValid = function(stateName) {
+    if (stateName === editorContextService.getActiveStateName()) {
+      return true;
+    }
+    return explorationStatesService.isNewStateNameValid(stateName, true);
+  };
+
   $scope.saveStateNameAndRefresh = function(newStateName) {
     var normalizedStateName = $scope._getNormalizedStateName(newStateName);
     var valid = $scope.saveStateName(normalizedStateName);
     if (valid) {
-      $scope.$parent.showStateEditor(normalizedStateName);
+      routerService.navigateToMainTab(normalizedStateName);
     }
   };
 
   $scope.saveStateName = function(newStateName) {
     newStateName = $scope._getNormalizedStateName(newStateName);
-    if (!validatorsService.isValidEntityName(newStateName, true)) {
-      return false;
-    }
-    if (newStateName.length > 50) {
-      warningsData.addWarning(
-        'State names should be at most 50 characters long.');
-      return false;
-    }
-    var activeStateName = editorContextService.getActiveStateName();
-    if (newStateName !== activeStateName &&
-        $scope.states.hasOwnProperty(newStateName)) {
-      warningsData.addWarning(
-        'The name \'' + newStateName + '\' is already in use.');
+    if (!_isNewStateNameValid(newStateName)) {
       return false;
     }
 
@@ -98,38 +97,18 @@ oppia.controller('StateEditor', [
       $scope.stateNameEditorIsShown = false;
       return false;
     } else {
-      // Tidy up the rest of the states.
-      // TODO(sll): Pull initStateName out into a service.
-      if ($scope.$parent.$parent.initStateName == activeStateName) {
-        $scope.$parent.$parent.initStateName = newStateName;
-      }
-
-      $scope.states[newStateName] = angular.copy(
-        $scope.states[activeStateName]);
-      delete $scope.states[activeStateName];
-      for (var otherStateName in $scope.states) {
-        var handlers = $scope.states[otherStateName].widget.handlers;
-        for (var i = 0; i < handlers.length; i++) {
-          for (var j = 0; j < handlers[i].rule_specs.length; j++) {
-            if (handlers[i].rule_specs[j].dest === activeStateName) {
-              handlers[i].rule_specs[j].dest = newStateName;
-            }
-          }
-        }
-      }
-
-      editorContextService.setActiveStateName(newStateName);
-      changeListService.renameState(newStateName, $scope.stateNameMemento);
-
+      explorationStatesService.renameState(
+        editorContextService.getActiveStateName(), newStateName);
       $scope.stateNameEditorIsShown = false;
-      $scope.refreshGraph();
       $scope.initStateEditor();
       return true;
     }
   };
 
-  $scope.editContent = function() {
-    $scope.contentMemento = angular.copy($scope.content);
+  $scope.openStateContentEditor = function() {
+    if (editabilityService.isEditable()) {
+      $scope.contentMemento = angular.copy($scope.content);
+    }
   };
 
   $scope.$on('externalSave', function() {
@@ -140,10 +119,16 @@ oppia.controller('StateEditor', [
   });
 
   $scope.saveTextContent = function() {
-    if ($scope.contentMemento !== null && $scope.contentMemento !== $scope.content) {
+    if ($scope.contentMemento !== null && !angular.equals($scope.contentMemento, $scope.content)) {
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'content',
         angular.copy($scope.content), angular.copy($scope.contentMemento));
+
+      var _stateData = explorationStatesService.getState(
+        editorContextService.getActiveStateName());
+      _stateData.content = angular.copy($scope.content);
+      explorationStatesService.setState(
+        editorContextService.getActiveStateName(), _stateData);
     }
     $scope.contentMemento = null;
   };
@@ -153,6 +138,12 @@ oppia.controller('StateEditor', [
       changeListService.editStateProperty(
         editorContextService.getActiveStateName(), 'param_changes',
         newValue, oldValue);
+
+      var _stateData = explorationStatesService.getState(
+        editorContextService.getActiveStateName());
+      _stateData.param_changes = angular.copy(newValue);
+      explorationStatesService.setState(
+        editorContextService.getActiveStateName(), _stateData);
     }
   };
 }]);

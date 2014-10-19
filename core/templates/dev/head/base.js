@@ -30,15 +30,6 @@ oppia.controller('Base', [
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';
 
-  // Gets URL parameter values.
-  $scope.getUrlParams = function() {
-    var params = {};
-    var parts = $window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m, key, value) {
-      params[key] = value;
-    });
-    return params;
-  };
-
   /**
    * Checks if an object is empty.
    */
@@ -85,5 +76,12 @@ oppia.controller('Base', [
 
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
+  };
+
+  // This method is here because the trigger for the tutorial is in the site
+  // navbar. It broadcasts an event to tell the exploration editor to open the
+  // editor tutorial.
+  $scope.openEditorTutorial = function() {
+    $scope.$broadcast('openEditorTutorial');
   };
 }]);

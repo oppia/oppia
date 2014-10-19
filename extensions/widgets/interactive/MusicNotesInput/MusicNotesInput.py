@@ -5,7 +5,7 @@ class MusicNotesInput(widget_domain.BaseWidget):
     """Interactive widget for music note input."""
 
     # The human-readable name of the widget.
-    name = 'Music Notes Input'
+    name = 'Music Notes'
 
     # The category the widget falls under in the widget repository.
     category = 'Custom'
@@ -21,6 +21,14 @@ class MusicNotesInput(widget_domain.BaseWidget):
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
         'description': 'The sequence of notes that the reader should guess.',
+        'schema': {
+            'type': 'custom',
+            'obj_type': 'MusicPhrase',
+        },
+        'default_value': [],
+    }, {
+        'name': 'initialSequence',
+        'description': 'The sequence of notes that start on the staff.',
         'schema': {
             'type': 'custom',
             'obj_type': 'MusicPhrase',

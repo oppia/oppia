@@ -124,6 +124,15 @@ VALIDATOR_SPECS = {
         },
     },
     SCHEMA_TYPE_LIST: {
+        'has_length_at_most': {
+            'max_value': {
+                'type': SCHEMA_TYPE_INT,
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1,
+                }],
+            }
+        },
         'is_uniquified': {},
     },
     SCHEMA_TYPE_UNICODE: {
@@ -297,6 +306,15 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
             },
             'len': 0
         }, {
+            'type': 'list',
+            'items': {
+                'type': 'unicode'
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': 0
+            }]
+        }, {
             'type': 'dict',
             'items': {
                 'type': 'float'
@@ -366,6 +384,15 @@ class SchemaValidationUnitTests(test_utils.GenericTestBase):
                     'len': 100
                 }
             }
+        }, {
+            'type': 'list',
+            'items': {
+                'type': 'unicode'
+            },
+            'validators': [{
+                'id': 'has_length_at_most',
+                'max_value': 3
+            }]
         }, {
             'type': 'float',
             'validators': [{
