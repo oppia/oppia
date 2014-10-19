@@ -79,7 +79,7 @@ if [ ! -d "$NODE_MODULE_DIR/karma-ng-html2js-preprocessor" ]; then
 fi
 
 echo Checking whether Protractor is installed in $TOOLS_DIR
-CURRENT_PROTRACTOR_VERSION="$($NPM_CMD list protractor | grep protractor)"
+CURRENT_PROTRACTOR_VERSION="$($NPM_CMD list protractor)"
 EXPECTED_PROTRACTOR_VERSION="protractor@1.2.0"
 if [[ "$CURRENT_PROTRACTOR_VERSION" != *"$EXPECTED_PROTRACTOR_VERSION"* ]]; then
   echo Installing Protractor
