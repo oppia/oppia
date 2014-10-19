@@ -18,10 +18,13 @@
 
 __author__ = 'Sean Lip'
 
+import datetime
+
 from core.platform import models
 (user_models,) = models.Registry.import_models([
     models.NAMES.user
 ])
+import utils
 
 
 def subscribe_to_thread(user_id, feedback_thread_id):
@@ -58,3 +61,34 @@ def subscribe_to_activity(user_id, activity_id):
             subscriptions_model.activity_ids):
         subscriptions_model.activity_ids.append(activity_id)
         subscriptions_model.put()
+
+
+def get_last_seen_notifications_msec(user_id):
+    """Returns the last time, in milliseconds since the Epoch, when the user
+    checked their notifications in the dashboard page or the notifications
+    dropdown.
+
+    If the user has never checked the dashboard page or the notifications
+    dropdown, returns None.
+    """
+    subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+    return (
+        utils.get_time_in_millisecs(subscriptions_model.last_checked)
+        if (subscriptions_model and subscriptions_model.last_checked)
+        else None)
+
+
+def record_user_has_seen_notifications(user_id, last_seen_msecs):
+    """Updates the last_checked time for this user (which represents the time
+    the user last saw the notifications in the dashboard page or the
+    notifications dropdown.
+    """
+    subscriptions_model = user_models.UserSubscriptionsModel.get(
+        user_id, strict=False)
+    if not subscriptions_model:
+        subscriptions_model = user_models.UserSubscriptionsModel(id=user_id)
+
+    subscriptions_model.last_checked = datetime.datetime.utcfromtimestamp(
+        last_seen_msecs / 1000.0)
+    subscriptions_model.put()

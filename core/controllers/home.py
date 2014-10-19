@@ -20,6 +20,7 @@ from core.controllers import base
 from core.controllers import pages
 from core.domain import config_domain
 from core.domain import exp_services
+from core.domain import subscription_services
 from core.domain import user_jobs
 from core.domain import user_services
 
@@ -88,6 +89,10 @@ class DashboardHandler(base.BaseHandler):
             user_jobs.DashboardRecentUpdatesAggregator.get_recent_updates(
                 self.user_id))
 
+        last_seen_msec = (
+            subscription_services.get_last_seen_notifications_msec(
+                self.user_id))
+
         # Replace author_ids with their usernames.
         author_ids = [
             update['author_id'] for update in recent_updates
@@ -104,10 +109,17 @@ class DashboardHandler(base.BaseHandler):
                 author_id_to_username[update['author_id']])
             del update['author_id']
 
+        subscription_services.record_user_has_seen_notifications(
+            self.user_id, job_queued_msec if job_queued_msec else 0.0)
+
         self.values.update({
             'explorations': exp_services.get_at_least_editable_summary_dict(
                 self.user_id),
+            # This may be None if no job has ever run for this user.
             'job_queued_msec': job_queued_msec,
+            # This may be None if this is the first time the user has seen
+            # the dashboard.
+            'last_seen_msec': last_seen_msec,
             'recent_updates': recent_updates,
         })
         self.render_json(self.values)

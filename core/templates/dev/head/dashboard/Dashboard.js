@@ -70,6 +70,8 @@ oppia.controller('Dashboard', [
   $http.get($scope.dashboardDataUrl).success(function(data) {
     $scope.recentUpdates = data.recent_updates;
     $scope.jobQueuedMsec = data.job_queued_msec;
+    $scope.lastSeenMsec = data.last_seen_msec || 0.0;
+    $scope.currentUsername = data.username;
 
     $scope.privateExplorationIds = [];
     $scope.betaExplorationIds = [];
