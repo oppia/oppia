@@ -1,33 +1,49 @@
 <h2>v0.0.1 (minified)</h2>
 <p>For instructions: see the README file in /static/scripts.</p>
 <p>
-  NB: When you click the 'reset exploration' button, an alert message saying "Reset
-  exploration" should be displayed. This checks that events are being sent from the
-  Oppia iframe to the containing page.
+  NB: When you complete an exploration the text "Exploration completed" should
+  appear in the paragraph below it. This checks that events are being sent from
+  the Oppia iframe to the containing page.
 </p>
 
-<h3>Standard embedding of the latest version</h3>
-<oppia oppia-id="0"></oppia>
+<!-- This is for in-person testing -->
 <script src="http://localhost:8181/scripts/oppia-player-0.0.1.min.js"></script>
 
-<h3>Standard embedding of version 1 of the exploration with deferred loading</h3>
-<oppia oppia-id="0" autoload="false" exploration-version="1"></oppia>
-<script src="http://localhost:8181/scripts/oppia-player-0.0.1.min.js"></script>
-
-<h3>ERROR: No oppia id specified</h3>
-<oppia></oppia>
-<script src="http://localhost:8181/scripts/oppia-player-0.0.1.min.js"></script>
-
-<h3>ERROR: 404 error</h3>
-<oppia oppia-id="fake_id"></oppia>
-<script src="http://localhost:8181/scripts/oppia-player-0.0.1.min.js"></script>
-
-<h3>ERROR: 404 error with deferred loading</h3>
-<oppia oppia-id="fake_id" autoload="false"></oppia>
-<script src="http://localhost:8181/scripts/oppia-player-0.0.1.min.js"></script>
+<!-- This is for automated testing by protractor -->
+<script src="http://localhost:4445/scripts/oppia-player-0.0.1.min.js"></script>
 
 <script>
-  window.OPPIA_PLAYER.onExplorationResetPostHook = function(a, b) {
-    alert('Reset exploration');
+  window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
+    // We do not user alerts as they are not registered correctly by protractor
+    // whilst it is working within the oppia iframe.
+    document.evaluate("./../p", iframeNode, null, XPathResult.ANY_TYPE, null).
+      iterateNext().innerHTML = "Exploration completed"
   };
 </script>
+
+<div class="protractor-test-standard">
+  <h3>Standard embedding of the latest version</h3>
+  <oppia oppia-id="4"></oppia>
+  <p></p>
+</div>
+
+<div class="protractor-test-deferred">
+  <h3>Standard embedding of version 1 of the exploration with deferred loading</h3>
+  <oppia oppia-id="4" autoload="false" exploration-version="1"></oppia>
+  <p></p>
+</div>
+
+<div class="protractor-test-missing-id">
+  <h3>ERROR: No oppia id specified</h3>
+  <oppia></oppia>
+</div>
+
+<div class="protractor-test-invalid-id">
+  <h3>ERROR: 404 error</h3>
+  <oppia oppia-id="fake_id"></oppia>
+</div>
+
+<div class="protractor-test-invalid-id-deferred">
+  <h3>ERROR: 404 error with deferred loading</h3>
+  <oppia oppia-id="fake_id" autoload="false"></oppia>
+</div>
