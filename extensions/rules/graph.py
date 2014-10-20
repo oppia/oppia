@@ -45,9 +45,11 @@ class IsIsomorphicTo(base.GraphRule):
         num_vertices = len(self.g['vertices'])
         for perm in itertools.permutations(range(num_vertices)):
             # Test matching labels
-            if subject['isLabeled']:
-                if any([self.g['vertices'][i]['label'] != subject['vertices'][perm[i]]['label'] for i in xrange(num_vertices)]):
-                    continue
+            if subject['isLabeled'] and any([
+                    self.g['vertices'][perm[i]]['label'] !=
+                    subject['vertices'][i]['label']
+                    for i in xrange(num_vertices)]):
+                continue
 
             # Test isomorphism
             found_isomorphism = True

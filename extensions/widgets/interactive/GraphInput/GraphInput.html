@@ -30,8 +30,8 @@
   </style>
   <div style="height: 35px;">
     <div ng-if="state.selectVertex !== null && graph.isLabeled && vertexEditPermissions">
-      <input class="graph-vertex-label" type="text" ng-attr-value="<[graph.vertices[state.selectVertex].label]>"></input>
-      <button class="btn btn-default" ng-click="updateLabel()">Update Label</button>
+      <input class="graph-vertex-label" type="text" ng-model="selectedVertexLabel" ng-model-options="{getterSetter: true}"></input>
+      <button class="btn btn-default" ng-click="state.selectVertex = null;">Update Label</button>
     </div>
   </div>
   <div class="oppia-graph-viz-container">

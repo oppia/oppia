@@ -30,16 +30,6 @@ oppia.directive('oppiaInteractiveGraphInput', [
         $scope.errorMessage = '';
         $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
 
-        // Updates graph using json in input field
-        $scope.updateGraphFromInput = function() {
-          updateGraphFromJSON($($element).find('.json-graph-input').val());
-        }
-
-        // Updates graph using testGraph (for debugging)
-        $scope.updateTestGraph = function() {
-          $scope.graph = $.extend(true, {}, testGraph);
-        }
-        
         $scope.submitGraph = function() {
           console.log($scope.graph);
           $scope.$parent.$parent.submitAnswer($scope.graph, 'submit');
@@ -103,7 +93,7 @@ oppia.directive('graphViz', function() {
         $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
       }
       
-      $scope.MODES = {
+      var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
         ADD_VERTEX: 2,
@@ -112,8 +102,7 @@ oppia.directive('graphViz', function() {
 
       // The current state of the UI and stuff like that
       $scope.state = {
-        MODES: $scope.MODES,
-        currentMode: $scope.MODES.MOVE,
+        currentMode: _MODES.MOVE,
         // Vertex and/or edge currently being hovered over
         hoverVertex: null,
         hoverEdge: null,
@@ -140,7 +129,7 @@ oppia.directive('graphViz', function() {
       };
 
       $scope.onClickGraphSVG = function(event) {
-        if ($scope.state.currentMode === $scope.MODES.ADD_VERTEX && $scope.vertexEditPermissions) {
+        if ($scope.state.currentMode === _MODES.ADD_VERTEX && $scope.vertexEditPermissions) {
           $scope.graph.vertices.push({
             x: $scope.state.mouseX,
             y: $scope.state.mouseY,
@@ -148,15 +137,6 @@ oppia.directive('graphViz', function() {
           });
         }
         if ($scope.state.hoverVertex === null) {
-          $scope.state.selectVertex = null;
-        }
-      };
-
-      $scope.updateLabel = function() {
-        if ($scope.state.selectVertex != null && $scope.vertexEditPermissions) {
-          var newLabel = $($element).find('.graph-vertex-label').val();
-          $scope.graph.vertices[$scope.state.selectVertex].label = newLabel;
-          $($element).find('.graph-vertex-label').val('');
           $scope.state.selectVertex = null;
         }
       };
@@ -172,25 +152,28 @@ oppia.directive('graphViz', function() {
         if ($scope.movePermissions) {
           $scope.buttons.push({
             text: '\uE068',
-            mode: $scope.MODES.MOVE
+            mode: _MODES.MOVE
           });
         }
         $scope.buttons.push({
           text: '\uE144',
-          mode: $scope.MODES.ADD_EDGE
+          mode: _MODES.ADD_EDGE
         });
         if ($scope.vertexEditPermissions) {
           $scope.buttons.push({
             text: '\u002B',
-            mode: $scope.MODES.ADD_VERTEX
+            mode: _MODES.ADD_VERTEX
           });
         }
         $scope.buttons.push({
           text: '\u2212',
-          mode: $scope.MODES.DELETE
+          mode: _MODES.DELETE
         });
 
       }
+
+      // TODO(czx): When the graph area is too small (e.g. editing rules),
+      // this overlaps with the other buttons. Should try to rearrange this.
       $scope.graphOptions = [{
         text: 'Labeled',
         option: 'isLabeled'
@@ -217,55 +200,55 @@ oppia.directive('graphViz', function() {
       };
 
       // Vertex events
-      $scope.onClickVertex = function($index) {
-        if ($scope.state.currentMode === $scope.MODES.DELETE) {
+      $scope.onClickVertex = function(index) {
+        if ($scope.state.currentMode === _MODES.DELETE) {
           if ($scope.vertexEditPermissions) {
-            deleteVertex($index);
+            deleteVertex(index);
           }
         }
       };
-      $scope.onMousedownVertex = function($index) {
-        if ($scope.state.currentMode === $scope.MODES.ADD_EDGE) {
-          beginAddEdge($index);
-        } else if ($scope.state.currentMode === $scope.MODES.MOVE) {
+      $scope.onMousedownVertex = function(index) {
+        if ($scope.state.currentMode === _MODES.ADD_EDGE) {
+          beginAddEdge(index);
+        } else if ($scope.state.currentMode === _MODES.MOVE) {
           if ($scope.movePermissions) {
-            beginDragVertex($index);
+            beginDragVertex(index);
           }
         }
       };
       
-      $scope.onDoubleclickVertex = function($index) {
+      $scope.onDoubleclickVertex = function(index) {
         if ($scope.graph.isLabeled) {
-          beginEditVertexLabel($index);
+          beginEditVertexLabel(index);
         }
       };
-      $scope.onDoubleclickVertexLabel = function($index) {
-        if (scope.graph.isLabeled) {
-          beginEditVertexLabel($index);
+      $scope.onDoubleclickVertexLabel = function(index) {
+        if ($scope.graph.isLabeled) {
+          beginEditVertexLabel(index);
         }
       };
 
       // Edge events
-      $scope.onClickEdge = function($index) {
-        if ($scope.state.currentMode === $scope.MODES.DELETE) {
-          deleteEdge($index);
+      $scope.onClickEdge = function(index) {
+        if ($scope.state.currentMode === _MODES.DELETE) {
+          deleteEdge(index);
         }
       };
      
       // Document event
       $scope.onMouseupDocument = function() {
-        if ($scope.state.currentMode === $scope.MODES.ADD_EDGE) {
+        if ($scope.state.currentMode === _MODES.ADD_EDGE) {
           if ($scope.state.hoverVertex !== null) {
             tryAddEdge($scope.state.addEdgeVertex, $scope.state.hoverVertex);
           }
           endAddEdge();
-        } else if ($scope.state.currentMode === $scope.MODES.MOVE) {
+        } else if ($scope.state.currentMode === _MODES.MOVE) {
           if ($scope.state.dragVertex !== null) {
             endDragVertex();
           }
         }
       };
-      $document.on("mouseup",$scope.onMouseupDocument);
+      $document.on("mouseup", $scope.onMouseupDocument);
 
       // Actions
       function beginAddEdge(startIndex) {
@@ -276,20 +259,20 @@ oppia.directive('graphViz', function() {
       }
       function tryAddEdge(startIndex, endIndex) {
         if (
-          startIndex === null ||
-          endIndex === null ||
-          startIndex === endIndex ||
-          startIndex < 0 ||
-          endIndex < 0 ||
-          startIndex >= $scope.graph.vertices.length ||
-          endIndex >= $scope.graph.vertices.length) {
+            startIndex === null ||
+            endIndex === null ||
+            startIndex === endIndex ||
+            startIndex < 0 ||
+            endIndex < 0 ||
+            startIndex >= $scope.graph.vertices.length ||
+            endIndex >= $scope.graph.vertices.length) {
           return false;
         }
         for (var i = 0; i < $scope.graph.edges.length; i++) {
           if (startIndex === $scope.graph.edges[i].src && endIndex === $scope.graph.edges[i].dst) {
             return false;
           }
-          if ($scope.graph.isDirected === false) {
+          if (!$scope.graph.isDirected) {
             if (startIndex === $scope.graph.edges[i].dst && endIndex === $scope.graph.edges[i].src) {
               return false;
             }
@@ -302,51 +285,60 @@ oppia.directive('graphViz', function() {
         });
         return true;
       }
-      function beginDragVertex($index) {
-        $scope.state.dragVertex = $index;
+      function beginDragVertex(index) {
+        $scope.state.dragVertex = index;
       }
-      function endDragVertex($index) {
+      function endDragVertex() {
         $scope.state.dragVertex = null;
       }
-      function beginEditVertexLabel($index) {
-        $scope.state.selectVertex = $index;
-        var $inputElement = $($element).find('.graph-vertex-label');
-        $inputElement.val($scope.graph.vertices[$index].label);
-        $inputElement.focus();
+      function beginEditVertexLabel(index) {
+        $scope.state.selectVertex = index;
+        // TODO(czx): Is there an angular-ish way to do the focus?
+        var inputElement = $($element).find('.graph-vertex-label');
+        inputElement.focus();
       }
 
-      function deleteEdge($index) {
-        $scope.graph.edges.splice($index,1);
+      function deleteEdge(index) {
+        $scope.graph.edges.splice(index,1);
         $scope.state.hoverEdge = null;
       }
-      function deleteVertex($index) {
+      function deleteVertex(index) {
         $scope.graph.edges = $.map($scope.graph.edges, function(edge) {
-          if (edge.src === $index || edge.dst === $index) {
+          if (edge.src === index || edge.dst === index) {
             return null;
           }
-          if (edge.src > $index) {
+          if (edge.src > index) {
             edge.src--;
           }
-          if (edge.dst > $index) {
+          if (edge.dst > index) {
             edge.dst--;
           }
           return edge;
         }); 
-        $scope.graph.vertices.splice($index,1);
+        $scope.graph.vertices.splice(index, 1);
         $scope.state.hoverVertex = null;
       }
+      $scope.selectedVertexLabel = function(label) {
+        if ($scope.state.selectVertex === null) {
+          return '';
+        }
+        if (angular.isDefined(label)) {
+          $scope.graph.vertices[$scope.state.selectVertex].label = label;
+        }
+        return $scope.graph.vertices[$scope.state.selectVertex].label;
+      };
 
       // Styling functions
-      $scope.getEdgeColor = function($index) {
-        if ($scope.state.currentMode === $scope.MODES.DELETE && 
-            $index === $scope.state.hoverEdge) {
+      $scope.getEdgeColor = function(index) {
+        if ($scope.state.currentMode === _MODES.DELETE && 
+            index === $scope.state.hoverEdge) {
           return "red";
         } else {
           return "black";
         }
       };
       $scope.getHoverVertexColor = function() {
-        if ($scope.state.currentMode === $scope.MODES.DELETE &&
+        if ($scope.state.currentMode === _MODES.DELETE &&
             $scope.vertexEditPermissions) {
           return "red";
         } else {
