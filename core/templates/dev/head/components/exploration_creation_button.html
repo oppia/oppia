@@ -22,7 +22,12 @@
             Title
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
+            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="isTitleValid(newExplorationTitle, true)" autofocus required>
+            <span style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
+              <[warningText]>
+            </span>
+            <div ng-show="!warningText || !changedAtLeastOnce" style="height: 20px;">
+            </div>
           </div>
         </div>
 
@@ -73,7 +78,7 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory, newExplorationObjective, newExplorationLanguageCode)"
-      ng-disabled="!newExplorationTitle || !newExplorationCategory || !newExplorationLanguageCode">
+      ng-disabled="!isTitleValid(newExplorationTitle, false) || !newExplorationCategory || !newExplorationLanguageCode">
         Create New Exploration
     </button>
   </div>
