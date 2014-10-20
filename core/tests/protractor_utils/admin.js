@@ -43,9 +43,9 @@ var appendToConfigList = function(listName, textToAppend) {
 // The name should be as given in the admin page (not including '.yaml')
 var reloadExploration = function(name) {
   browser.get(general.ADMIN_URL_SUFFIX);
-  element.all(by.css('.protractor-test-exploration-entry')).
+  element.all(by.css('.protractor-test-reload-exploration-row')).
       map(function(explorationElement) {
-    explorationElement.element(by.css('.col-lg-4')).getText().
+    explorationElement.element(by.css('.protractor-test-reload-exploration-title')).getText().
         then(function(title) {
       if (title.match(name + '.yaml')) {
         explorationElement.element(by.buttonText('Reload')).click();

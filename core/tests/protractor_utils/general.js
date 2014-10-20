@@ -31,6 +31,7 @@ var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
+var SCRIPTS_URL_SLICE = '/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
 
@@ -89,6 +90,7 @@ exports.waitForSystem = waitForSystem;
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
+exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 
 exports.getExplorationIdFromEditor = getExplorationIdFromEditor;
 exports.getExplorationIdFromPlayer = getExplorationIdFromPlayer;

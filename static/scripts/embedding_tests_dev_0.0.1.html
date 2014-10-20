@@ -14,8 +14,6 @@
 
 <script>
   window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
-    // We do not user alerts as they are not registered correctly by protractor
-    // whilst it is working within the oppia iframe.
     document.evaluate("./../p", iframeNode, null, XPathResult.ANY_TYPE, null).
       iterateNext().innerHTML = "Exploration completed"
   };

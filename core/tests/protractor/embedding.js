@@ -18,9 +18,10 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var general = require('../protractor_utils/general.js')
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
+var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
 
 describe('Embedding', function() {
@@ -33,13 +34,15 @@ describe('Embedding', function() {
     // cannot be loaded.
     var LOADING_TIMEOUT = 10000;
 
-    var playCountingExploration = function() {
+    var playCountingExploration = function(version) {
       general.waitForSystem();
       protractor.getInstance().waitForAngular();
 
       expect(player.getCurrentQuestionText()).toBe(
-        'Suppose you were given three balls: one red, one blue, and one ' + 
-        'yellow. How many ways are there to arrange them in a straight line?');
+        (version === 1) ?
+          'Suppose you were given three balls: one red, one blue, and one ' +
+          'yellow. How many ways are there to arrange them in a straight line?':
+          'Version 2');
       player.submitAnswer('NumericInput', 6);
       expect(player.getCurrentQuestionText()).toBe(
         'Right! Why do you think it is 6?');
@@ -48,31 +51,39 @@ describe('Embedding', function() {
       player.expectExplorationToBeOver();
     };
 
+    users.createUser('embedder@example.com', 'Embedder');
     users.login('embedder@example.com', true);
     admin.reloadExploration('counting');
+
+    general.openEditor('4');
+    editor.editContent().open();
+    editor.editContent().setPlainText('Version 2');
+    editor.editContent().close();
+    editor.saveChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
 
       // This is necessary as the pages are non-angular; we need xpaths below
       // for the same reason.
       var driver = protractor.getInstance().driver;
-      driver.get(general.SERVER_URL_PREFIX + '/scripts/' + TEST_PAGES[i]);
+      driver.get(
+        general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE + TEST_PAGES[i]);
 
-      // Test of standard loading
+      // Test of standard loading (new version)
       protractor.getInstance().switchTo().frame(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-standard']/iframe")));
-      playCountingExploration();
+      playCountingExploration(2);
       browser.switchTo().defaultContent();
 
-      // Test of deferred loading
+      // Test of deferred loading (old version)
       driver.findElement(
         by.xpath(
           "//div[@class='protractor-test-deferred']/oppia/div/button")).click();
       protractor.getInstance().switchTo().frame(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-deferred']/iframe")));
-      playCountingExploration();
+      playCountingExploration(1);
       browser.switchTo().defaultContent();
 
       // Tests of failed loading
