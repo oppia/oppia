@@ -26,6 +26,7 @@ var player = require('../protractor_utils/player.js');
 
 describe('Embedding', function() {
   it('should display and play embedded explorations', function() {
+
     var TEST_PAGES = [
       'embedding_tests_dev_0.0.1.html', 
       'embedding_tests_dev_0.0.1.min.html',
@@ -51,6 +52,13 @@ describe('Embedding', function() {
       player.expectExplorationToBeOver();
     };
 
+    var PLAYTHROUGH_LOGS = [
+      'Exploration loaded',
+      'Transitioned from state Intro via answer 6 to state correct but why',
+      'Transitioned from state correct but why via answer "factorial" to state END',
+      'Exploration completed'
+    ];
+
     users.createUser('embedder@example.com', 'Embedder');
     users.login('embedder@example.com', true);
     admin.reloadExploration('counting');
@@ -69,14 +77,14 @@ describe('Embedding', function() {
       driver.get(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE + TEST_PAGES[i]);
 
-      // Test of standard loading (new version)
+      // Test of standard loading (new version):
       protractor.getInstance().switchTo().frame(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-standard']/iframe")));
       playCountingExploration(2);
       browser.switchTo().defaultContent();
 
-      // Test of deferred loading (old version)
+      // Test of deferred loading (old version):
       driver.findElement(
         by.xpath(
           "//div[@class='protractor-test-deferred']/oppia/div/button")).click();
@@ -86,7 +94,7 @@ describe('Embedding', function() {
       playCountingExploration(1);
       browser.switchTo().defaultContent();
 
-      // Tests of failed loading
+      // Tests of failed loading:
       expect(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-missing-id']/div/span")
@@ -107,5 +115,29 @@ describe('Embedding', function() {
           by.xpath("//div[@class='protractor-test-invalid-id']/div/div/span")
         ).getText()).toMatch('This exploration could not be loaded.');
     }
+
+    // Certain events in the exploration playthroughs should trigger hook
+    // functions in the outer page; these send logs to the console which we
+    // now check to ensure that the hooks work correctly.
+    browser.manage().logs().get('browser').then(function(browserLogs) {
+      var embeddingLogs = []
+      for (var i = 0; i < browserLogs.length; i++) {
+        // We ignore all logs that are not of the desired form.
+        try {
+          message = JSON.parse(browserLogs[i].message).message.parameters[0].value;
+          var EMBEDDING_PREFIX = 'Embedding test: ';
+          if (message.substring(0, EMBEDDING_PREFIX.length) === EMBEDDING_PREFIX) {
+            embeddingLogs.push(message.substring(EMBEDDING_PREFIX.length));
+          }
+        } catch(err) {}
+      }
+      
+      // We played the exploration twice for each test page.
+      var expectedLogs = [];
+      for (var i = 0; i < TEST_PAGES.length * 2; i ++) {
+        expectedLogs = expectedLogs.concat(PLAYTHROUGH_LOGS);
+      }
+      expect(embeddingLogs).toEqual(expectedLogs);
+    });
   });
 });

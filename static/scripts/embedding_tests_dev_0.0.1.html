@@ -6,18 +6,8 @@
   the Oppia iframe to the containing page.
 </p>
 
-<!-- This is for in-person testing -->
-<script src="http://localhost:8181/scripts/oppia-player-0.0.1.js"></script>
-
-<!-- This is for automated testing by protractor -->
-<script src="http://localhost:4445/scripts/oppia-player-0.0.1.js"></script>
-
-<script>
-  window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
-    document.evaluate("./../p", iframeNode, null, XPathResult.ANY_TYPE, null).
-      iterateNext().innerHTML = "Exploration completed"
-  };
-</script>
+<script src="oppia-player-0.0.1.js"></script>
+<script src="embedding_tests.js"></script>
 
 <div class="protractor-test-standard">
   <h3>Standard embedding of the latest version</h3>

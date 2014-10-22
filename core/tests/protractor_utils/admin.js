@@ -45,8 +45,10 @@ var reloadExploration = function(name) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(by.css('.protractor-test-reload-exploration-row')).
       map(function(explorationElement) {
-    explorationElement.element(by.css('.protractor-test-reload-exploration-title')).getText().
-        then(function(title) {
+    explorationElement.element(
+        by.css('.protractor-test-reload-exploration-title')
+      ).getText().then(function(title) {
+      // We use match here in case there is whitespace around the name
       if (title.match(name + '.yaml')) {
         explorationElement.element(by.buttonText('Reload')).click();
         browser.driver.switchTo().alert().accept();

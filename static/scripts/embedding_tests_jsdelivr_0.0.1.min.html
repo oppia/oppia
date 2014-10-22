@@ -10,14 +10,8 @@
   the Oppia iframe to the containing page.
 </p>
 
-<script src="https://cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"></script>
-
-<script>
-  window.OPPIA_PLAYER.onExplorationCompletedPostHook = function(iframeNode) {
-    document.evaluate("./../p", iframeNode, null, XPathResult.ANY_TYPE, null).
-      iterateNext().innerHTML = "Exploration completed"
-  };
-</script>
+<script src="oppia-player-0.0.1.js"></script>
+<script src="embedding_tests.js"></script>
 
 <div class="protractor-test-standard">
   <h3>Standard embedding of the latest version</h3>
