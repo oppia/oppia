@@ -26,6 +26,25 @@ var waitForSystem = function() {
   protractor.getInstance().sleep(WAIT_TIME);
 };
 
+// We will report all console logs of level greater than this.
+var CONSOLE_LOG_THRESHOLD = 900;
+var CONSOLE_ERRORS_TO_IGNORE = [];
+
+var checkForConsoleErrors = function() {
+  browser.manage().logs().get('browser').then(function(browserLogs) {
+    var fatalErrors = [];
+    for (var i = 0; i < browserLogs.length; i++) {
+      if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
+        if (CONSOLE_ERRORS_TO_IGNORE.indexOf(browserLogs[i].message) === -1) {
+          fatalErrors.push(browserLogs[i]);
+        }
+      }
+    }
+    expect(fatalErrors).toEqual([]);
+  });
+};
+
+
 var SERVER_URL_PREFIX = 'http://localhost:4445';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
@@ -86,7 +105,11 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
+
+
 exports.waitForSystem = waitForSystem;
+exports.checkForConsoleErrors = checkForConsoleErrors;
+
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;

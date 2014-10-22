@@ -139,5 +139,7 @@ describe('Embedding', function() {
       }
       expect(embeddingLogs).toEqual(expectedLogs);
     });
+
+    users.logout();
   });
 });
