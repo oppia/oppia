@@ -21,9 +21,11 @@ import copy
 from core.controllers import base
 from core.domain import dependency_registry
 from core.domain import event_services
+from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import param_domain
 from core.domain import rights_manager
 from core.domain import rule_domain
 from core.domain import skins_services
@@ -74,9 +76,7 @@ def get_init_html_and_params(exp_param_changes, init_state, exp_param_specs):
 
 def classify(
         exp_id, exp_param_specs, state, handler_name, answer, params):
-    """Normalize the answer and return the first rule that it satisfies
-    as well as the input_type.
-    """
+    """Normalize the answer and return the first rulespec that it satisfies."""
     widget_instance = widget_registry.Registry.get_widget_by_id(
         feconf.INTERACTIVE_PREFIX, state.widget.widget_id)
     normalized_answer = widget_instance.normalize_answer(
@@ -90,7 +90,7 @@ def classify(
         if rule_domain.evaluate_rule(
                 rule_spec.definition, exp_param_specs, input_type, params,
                 normalized_answer, fs):
-            return rule_spec, input_type
+            return rule_spec
 
     raise Exception(
         'No matching rule found for handler %s. Rule specs are %s.' % (
@@ -229,15 +229,14 @@ class ExplorationHandler(base.BaseHandler):
             session_id, init_params, feconf.PLAY_TYPE_NORMAL)
 
 
-class FeedbackHandler(base.BaseHandler):
-    """Handles feedback to readers."""
+class AnswerSubmittedEventHandler(base.BaseHandler):
+    """Tracks a learner submitting an answer."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
-    def post(self, exploration_id, escaped_state_name):
-        """Handles feedback interactions with readers."""
-        old_state_name = self.unescape_state_name(escaped_state_name)
+    def post(self, exploration_id):
+        old_state_name = self.payload.get('old_state_name')
         # The reader's answer.
         answer = self.payload.get('answer')
         # The answer handler (submit, click, etc.)
@@ -247,39 +246,22 @@ class FeedbackHandler(base.BaseHandler):
         old_params['answer'] = answer
         # The version of the exploration.
         version = self.payload.get('version')
+        rule_spec = self.payload.get('rule_spec')
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
         exp_param_specs = exploration.param_specs
-        old_state = exploration.states[old_state_name]
+        old_state_widget = exploration.states[old_state_name].widget
 
-        # The editor preview mode will call classify() directly.
-        rule_spec, _ = classify(
-            exploration_id, exp_param_specs, old_state, handler_name,
-            answer, old_params)
-
-        # This next block of code will not be replicated in the editor preview
-        # mode.
         widget_instance = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
+            feconf.INTERACTIVE_PREFIX, old_state_widget.widget_id)
         normalized_answer = widget_instance.normalize_answer(
             answer, handler_name)
         # TODO(sll): Should this also depend on `params`?
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name, handler_name, rule_spec,
             widget_instance.get_stats_log_html(
-                old_state.widget.customization_args, normalized_answer))
-        # This is the end of the block of code referenced in the comment above.
-
-        # In the editor preview mode, this line of code will be replicated
-        # client-side.
-        new_state = (
-            None if rule_spec.dest == feconf.END_DEST
-            else exploration.states[rule_spec.dest])
-
-        # The editor preview mode will call get_next_state_dict() directly.
-        self.render_json(get_next_state_dict(
-            exp_param_specs, old_state_name, old_params, rule_spec, new_state))
+                old_state_widget.customization_args, normalized_answer))
 
 
 class StateHitEventHandler(base.BaseHandler):
@@ -294,7 +276,8 @@ class StateHitEventHandler(base.BaseHandler):
         first_time = self.payload.get('first_time')
         exploration_version = self.payload.get('exploration_version')
         session_id = self.payload.get('session_id')
-        client_time_spent_in_secs = self.payload.get('client_time_spent_in_secs')
+        client_time_spent_in_secs = self.payload.get(
+            'client_time_spent_in_secs')
         old_params = self.payload.get('old_params')
 
         if new_state_name == feconf.END_DEST:
@@ -306,6 +289,74 @@ class StateHitEventHandler(base.BaseHandler):
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
+
+
+class ClassifyHandler(base.BaseHandler):
+    """Stateless handler that performs a classify() operation server-side and
+    returns the corresponding rule_spec (as a dict).
+    """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @require_playable
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # A domain object representing the old state.
+        old_state = exp_domain.State.from_dict(self.payload.get('old_state'))
+        # The name of the rule handler triggered.
+        handler_name = self.payload.get('handler')
+        # The learner's raw answer.
+        answer = self.payload.get('answer')
+        # The learner's parameter values.
+        params = self.payload.get('params')
+        params['answer'] = answer
+
+        rule_spec = classify(
+            exploration_id, exp_param_specs, old_state, handler_name,
+            answer, params)
+
+        self.render_json(rule_spec.to_dict())
+
+
+class NextStateHandler(base.BaseHandler):
+    """Stateless handler that performs a get_new_state_dict() operation
+    server-side and returns the result.
+    """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @require_playable
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # The old state name.
+        old_state_name = self.payload.get('old_state_name')
+        # The learner's parameter values.
+        params = self.payload.get('params')
+        answer = self.payload.get('answer')
+        params['answer'] = answer
+        # The input type of the answer.
+        input_type = self.payload.get('input_type')
+        # The rule spec matching the learner's answer.
+        rule_spec = exp_domain.RuleSpec.from_dict_and_obj_type(
+            self.payload.get('rule_spec'), input_type)
+        # A domain object representing the new state.
+        new_state_dict = self.payload.get('new_state')
+        new_state = (
+            exp_domain.State.from_dict(new_state_dict) if new_state_dict
+            else None)
+
+        self.render_json(get_next_state_dict(
+            exp_param_specs, old_state_name, params, rule_spec, new_state))
 
 
 class ReaderFeedbackHandler(base.BaseHandler):
@@ -346,3 +397,39 @@ class ReaderLeaveHandler(base.BaseHandler):
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),
             feconf.PLAY_TYPE_NORMAL)
+
+
+# TODO(sll): This is a placeholder function. It should be deleted and the
+# backend tests should submit directly to the handlers (to maintain parity with
+# production and to avoid code skew).
+def submit_answer_in_tests(
+        exploration_id, state_name, answer, params, handler_name, version):
+    """This function should only be used by tests."""
+    params['answer'] = answer
+
+    exploration = exp_services.get_exploration_by_id(
+        exploration_id, version=version)
+    exp_param_specs = exploration.param_specs
+    old_state = exploration.states[state_name]
+
+    rule_spec = classify(
+        exploration_id, exp_param_specs, old_state, handler_name,
+        answer, params)
+
+    widget_instance = widget_registry.Registry.get_widget_by_id(
+        feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
+    normalized_answer = widget_instance.normalize_answer(
+        answer, handler_name)
+    # TODO(sll): Should this also depend on `params`?
+    event_services.AnswerSubmissionEventHandler.record(
+        exploration_id, version, state_name, handler_name, rule_spec,
+        widget_instance.get_stats_log_html(
+            old_state.widget.customization_args, normalized_answer))
+
+    # This line of code is replicated client-side.
+    new_state = (
+        None if rule_spec.dest == feconf.END_DEST
+        else exploration.states[rule_spec.dest])
+
+    return get_next_state_dict(
+        exp_param_specs, state_name, params, rule_spec, new_state)

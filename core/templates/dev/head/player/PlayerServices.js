@@ -82,6 +82,29 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
   };
 }]);
 
+// A service that, given an answer, classifies it and returns the corresponding
+// ruleSpec.
+oppia.factory('answerClassificationService', [
+    '$http', '$q', 'learnerParamsService', function($http, $q, learnerParamsService) {
+  var _USE_CLIENT_SIDE_CLASSIFICATION = false;
+
+  return {
+    // Returns a promise with the corresponding ruleSpec.
+    getMatchingRuleSpec: function(explorationId, expParamSpecs, oldState, handler, answer) {
+      if (!_USE_CLIENT_SIDE_CLASSIFICATION) {
+        var classifyUrl = '/explorehandler/classify/' + explorationId;
+        return $http.post(classifyUrl, {
+          exp_param_specs: expParamSpecs,
+          old_state: oldState,
+          handler: handler,
+          params: learnerParamsService.getAllParams(),
+          answer: answer
+        });
+      }
+    }
+  };
+}]);
+
 // A service that provides a number of utility functions for JS used by
 // individual player skins.
 // Note that this service is used both in the learner and the editor views.
@@ -95,12 +118,19 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
-    'oppiaHtmlEscaper', function(
+    'oppiaHtmlEscaper', 'widgetDefinitionsService', 'answerClassificationService',
+    function(
       $http, $rootScope, $modal, $filter, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
-      oppiaHtmlEscaper) {
+      oppiaHtmlEscaper, widgetDefinitionsService, answerClassificationService) {
 
   var _END_DEST = 'END';
+
+  // Initializes the widget definitions, so that they are cached client-side.
+  // Otherwise, the first interaction will take a long time.
+  // TODO(sll): Speed this up further by returning just a dict with each widget
+  // id coupled to its obj_type, and nothing else.
+  widgetDefinitionsService.getInteractiveDefinitions();
 
   var _editorPreviewMode = null;
   var _explorationId = null;
@@ -224,8 +254,6 @@ oppia.factory('oppiaPlayerService', [
   var stopwatch = stopwatchProviderService.getInstance();
 
   var _onStateTransitionProcessed = function(data, answer, handler, successCallback) {
-    answerIsBeingProcessed = false;
-
     var oldStateName = _currentStateName;
     var newStateName = data.state_name;
     var oldStateData = _exploration.states[oldStateName];
@@ -355,50 +383,45 @@ oppia.factory('oppiaPlayerService', [
       }
 
       answerIsBeingProcessed = true;
+      var oldState = angular.copy(_exploration.states[_currentStateName]);
 
-      if (_editorPreviewMode) {
-        var classifyUrl = '/createhandler/classify/' + _explorationId;
-        var nextStateDictUrl = '/createhandler/next_state/' + _explorationId;
+      answerClassificationService.getMatchingRuleSpec(
+        _explorationId, _exploration.param_specs, oldState, handler, answer
+      ).success(function(ruleSpec) {
+        if (!_editorPreviewMode) {
+          var answerRecordingUrl = (
+            '/explorehandler/answer_submitted_event/' + _explorationId);
+          $http.post(answerRecordingUrl, {
+            answer: answer,
+            handler: handler,
+            params: learnerParamsService.getAllParams(),
+            version: version,
+            old_state_name: _currentStateName
+          });
+        }
 
-        $http.post(classifyUrl, {
-          exp_param_specs: angular.copy(_exploration.param_specs),
-          old_state: angular.copy(_exploration.states[_currentStateName]),
-          handler: handler,
-          params: learnerParamsService.getAllParams(),
-          answer: answer,
-        }).success(function(data) {
-          var newStateName = null;
-          if (data.rule_spec.dest !== 'END') {
-            newStateName = data.rule_spec.dest;
-          }
+        var nextStateDictUrl = '/explorehandler/next_state/' + _explorationId;
+        var newStateName = (ruleSpec.dest !== 'END') ? ruleSpec.dest : null;
+        widgetDefinitionsService.getObjTypeForWidget(
+            'submit', oldState.widget.widget_id).then(function(inputType) {
           $http.post(nextStateDictUrl, {
             exp_param_specs: angular.copy(_exploration.param_specs),
             old_state_name: _currentStateName,
-            input_type: data.input_type,
+            input_type: inputType,
             params: learnerParamsService.getAllParams(),
-            rule_spec: data.rule_spec,
-            new_state: newStateName ? _exploration.states[newStateName] : null
+            rule_spec: ruleSpec,
+            new_state: newStateName ? _exploration.states[newStateName] : null,
+            answer: answer
           }).success(function(data) {
+            answerIsBeingProcessed = false;
             _onStateTransitionProcessed(data, answer, handler, successCallback);
+          }).error(function(data) {
+            answerIsBeingProcessed = false;
+            warningsData.addWarning(
+              data.error || 'There was an error processing your input.');
           });
         });
-      } else {
-        var stateTransitionUrl = (
-          '/explorehandler/transition/' + _explorationId + '/' +
-          encodeURIComponent(_currentStateName));
-        $http.post(stateTransitionUrl, {
-          answer: answer,
-          handler: handler,
-          params: learnerParamsService.getAllParams(),
-          version: version,
-        }).success(function(data) {
-          _onStateTransitionProcessed(data, answer, handler, successCallback);
-        }).error(function(data) {
-          answerIsBeingProcessed = false;
-          warningsData.addWarning(
-            data.error || 'There was an error processing your input.');
-        });
-      }
+      });
     },
     showFeedbackModal: function() {
       if (_editorPreviewMode) {

@@ -303,6 +303,17 @@ oppia.factory('widgetDefinitionsService', ['$http', '$log', '$q', function($http
     // RPC to the backend.
     setInteractiveDefinitions: function(interactiveDefinitions) {
       _definitions['interactive'] = interactiveDefinitions;
+    },
+    // This is only used for interactive widgets. It returns a promise that
+    // returns the obj_type of the 'submit' handler for that widget.
+    getObjTypeForWidget: function(handlerSpecName, widgetId) {
+      return this.getInteractiveDefinitions().then(function() {
+        _definitions.interactive[widgetId].handler_specs.forEach(function(handlerSpec) {
+          if (handlerSpec.name === handlerSpecName) {
+            return handlerSpec.obj_type;
+          }
+        });
+      });
     }
   };
 }]);
