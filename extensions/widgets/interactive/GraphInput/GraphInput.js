@@ -31,8 +31,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
         $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
 
         $scope.submitGraph = function() {
-          console.log($scope.graph);
-          $scope.$parent.$parent.submitAnswer($scope.graph, 'submit');
+          $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph), 'submit');
         };
         
         $scope.init = function() {
