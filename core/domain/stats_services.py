@@ -29,14 +29,13 @@ import feconf
 
 IMPROVE_TYPE_DEFAULT = 'default'
 IMPROVE_TYPE_INCOMPLETE = 'incomplete'
-SUBMIT_HANDLER_NAME = 'submit'
 
 
 def get_top_unresolved_answers_for_default_rule(exploration_id, state_name):
     return {
         answer: count for (answer, count) in
         stats_domain.StateRuleAnswerLog.get(
-            exploration_id, state_name, SUBMIT_HANDLER_NAME,
+            exploration_id, state_name, feconf.SUBMIT_HANDLER_NAME,
             exp_domain.DEFAULT_RULESPEC_STR
         ).get_top_answers(10)
     }
@@ -87,7 +86,7 @@ def get_state_improvements(exploration_id):
     default_rule_answer_logs = stats_domain.StateRuleAnswerLog.get_multi(
         exploration_id, [{
             'state_name': state_name,
-            'handler_name': SUBMIT_HANDLER_NAME,
+            'handler_name': feconf.SUBMIT_HANDLER_NAME,
             'rule_str': exp_domain.DEFAULT_RULESPEC_STR
         } for state_name in state_names])
 

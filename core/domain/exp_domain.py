@@ -186,8 +186,13 @@ class RuleSpec(object):
             'dest': self.dest,
             'feedback': self.feedback,
             'param_changes': [param_change.to_dict()
-                              for param_change in self.param_changes]
+                              for param_change in self.param_changes],
         }
+
+    def to_dict_with_obj_type(self):
+        dict_with_obj_type = self.to_dict()
+        dict_with_obj_type['obj_type'] = self.obj_type
+        return dict_with_obj_type
 
     @classmethod
     def from_dict_and_obj_type(cls, rulespec_dict, obj_type):
@@ -346,7 +351,8 @@ class AnswerHandlerInstance(object):
     def from_dict_and_obj_type(cls, handler_dict, obj_type):
         return cls(
             handler_dict['name'],
-            [RuleSpec.from_dict_and_obj_type(rs, obj_type) for rs in handler_dict['rule_specs']],
+            [RuleSpec.from_dict_and_obj_type(rs, obj_type)
+             for rs in handler_dict['rule_specs']],
         )
 
     def __init__(self, name, rule_specs=None):
@@ -367,7 +373,8 @@ class AnswerHandlerInstance(object):
 
     @classmethod
     def get_default_handler(cls, state_name, obj_type):
-        return cls('submit', [RuleSpec.get_default_rule_spec(state_name, obj_type)])
+        return cls('submit', [
+            RuleSpec.get_default_rule_spec(state_name, obj_type)])
 
     def validate(self):
         if self.name != 'submit':
