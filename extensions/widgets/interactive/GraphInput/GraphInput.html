@@ -69,14 +69,17 @@
       <g ng-if="optionsEditPermissions" ng-repeat="button in graphOptions">
         <rect width="70"
           height="30"
-          ng-attr-x="<[10 + 110 * $index]>"
-          y="10"
+          x="10"
+          ng-attr-y="<[10 + 50 * $index]>"
           rx="5"
           ry="5"
           ng-attr-style="stroke: black; fill: white; stroke-width: <[graph[button.option] ? 3 : 1]>;"
           ng-click="toggleGraphOption(button.option)">
         </rect>
-        <text class="unselectable-text unclickable-text" ng-attr-x="<[20 + 108 * $index]>" y="30">
+        <text class="unselectable-text unclickable-text" 
+          x="45" 
+          ng-attr-y="<[30 + 50 * $index]>"
+          style="text-anchor: middle">
           <[button.text]>
         </text>
       </g>

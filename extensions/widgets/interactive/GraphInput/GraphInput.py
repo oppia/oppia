@@ -42,15 +42,15 @@ class GraphInput(widget_domain.BaseWidget):
         },
         'default_value': {
             'vertices': [{
-                'x': 50.0,
+                'x': 150.0,
                 'y': 50.0,
                 'label': '',
             }, {
-                'x': 100.0,
+                'x': 200.0,
                 'y': 50.0,
                 'label': '',
             }, {
-                'x': 50.0,
+                'x': 150.0,
                 'y': 100.0,
                 'label': '',
             }],
