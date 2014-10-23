@@ -38,7 +38,7 @@
   </style>
   <div style="height: 35px;">
     <div ng-if="state.selectVertex !== null && graph.isLabeled && vertexEditPermissions">
-      <input class="graph-vertex-label" type="text" ng-model="selectedVertexLabel" ng-model-options="{getterSetter: true}"></input>
+      <input class="graph-vertex-label" type="text" ng-model="selectedVertexLabel" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
       <button class="btn btn-default" ng-click="state.selectVertex = null;">Update Label</button>
     </div>
   </div>

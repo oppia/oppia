@@ -41,7 +41,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
         };
         $scope.init();
         
-        // TODO(czxcjx): Write this functio
+        // TODO(czxcjx): Write this function
         function checkValidGraph(graph) {
           return true;
         }
@@ -85,7 +85,7 @@ oppia.directive('graphViz', function() {
       optionsEditPermissions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', function($scope, $element, $attrs, $document) {
+    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', function($scope, $element, $attrs, $document, focusService) {
       var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
@@ -195,6 +195,9 @@ oppia.directive('graphViz', function() {
         $scope.state.selectVertex = null;
       };
 
+      // TODO(czx): Consider if there's a neat way to write a reset()
+      // function to clear bits of $scope.state (e.g. dragVertex, addEdgeVertex)
+
       // Vertex events
       $scope.onClickVertex = function(index) {
         if ($scope.state.currentMode === _MODES.DELETE) {
@@ -289,9 +292,7 @@ oppia.directive('graphViz', function() {
       }
       function beginEditVertexLabel(index) {
         $scope.state.selectVertex = index;
-        // TODO(czx): Is there an angular-ish way to do the focus?
-        var inputElement = $($element).find('.graph-vertex-label');
-        inputElement.focus();
+        focusService.setFocus('vertexLabelEditBegun');
       }
 
       function deleteEdge(index) {
