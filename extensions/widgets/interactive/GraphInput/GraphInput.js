@@ -168,8 +168,6 @@ oppia.directive('graphViz', function() {
 
       }
 
-      // TODO(czx): When the graph area is too small (e.g. editing rules),
-      // this overlaps with the other buttons. Should try to rearrange this.
       $scope.graphOptions = [{
         text: 'Labeled',
         option: 'isLabeled'
