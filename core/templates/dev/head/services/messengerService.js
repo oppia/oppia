@@ -84,7 +84,7 @@ oppia.factory('messengerService', ['$log', '$window', function($log, $window) {
           MESSAGE_VALIDATORS.hasOwnProperty(messageTitle)) {
         var rawHash = $window.location.hash.substring(1);
         // Protractor tests may prepend a / to this hash, which we remove:
-        var hash = (rawHash.charAt(0) === '/') ? rawHash.substring(1): rawHash;
+        var hash = (rawHash.charAt(0) === '/') ? rawHash.substring(1) : rawHash;
         var hashParts = hash.split('&');
         var hashDict = {};
         for (var i = 0; i < hashParts.length; i++) {

@@ -6,19 +6,17 @@
   the Oppia iframe to the containing page.
 </p>
 
-<script src="oppia-player-0.0.1.js"></script>
-<script src="embedding_tests.js"></script>
+<script src="/scripts/oppia-player-0.0.1.js"></script>
+<script src="/scripts/embedding_tests.js"></script>
 
 <div class="protractor-test-standard">
   <h3>Standard embedding of the latest version</h3>
   <oppia oppia-id="4"></oppia>
-  <p></p>
 </div>
 
 <div class="protractor-test-deferred">
   <h3>Standard embedding of version 1 of the exploration with deferred loading</h3>
   <oppia oppia-id="4" autoload="false" exploration-version="1"></oppia>
-  <p></p>
 </div>
 
 <div class="protractor-test-missing-id">

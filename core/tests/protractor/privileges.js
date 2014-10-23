@@ -51,4 +51,10 @@ describe('Permissions for private explorations', function() {
       users.logout();
     });
   });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([
+      'Failed to load resource: the server responded with a status of 404'
+    ]);
+  });
 });

@@ -28,14 +28,23 @@ var waitForSystem = function() {
 
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
-var CONSOLE_ERRORS_TO_IGNORE = [];
+var CONSOLE_ERRORS_TO_IGNORE = [
+  'http://localhost:4445/third_party/static/angularjs-1.3.0-rc.5/angular.js 11086:24'
+];
 
-var checkForConsoleErrors = function() {
+var checkForConsoleErrors = function(errorsToIgnore) {
+  var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
   browser.manage().logs().get('browser').then(function(browserLogs) {
     var fatalErrors = [];
     for (var i = 0; i < browserLogs.length; i++) {
       if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
-        if (CONSOLE_ERRORS_TO_IGNORE.indexOf(browserLogs[i].message) === -1) {
+        var errorFatal = true;
+        for (var j = 0; j < irrelevantErrors.length; j++) {
+          if (browserLogs[i].message.match(irrelevantErrors[j])) {
+            errorFatal = false;
+          }
+        }
+        if (errorFatal) {
           fatalErrors.push(browserLogs[i]);
         }
       }

@@ -35,4 +35,8 @@ describe('Account creation', function() {
   it('should create admins', function() {
     users.createAdmin('admin@example.com', 'adm1n');
   });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
 });

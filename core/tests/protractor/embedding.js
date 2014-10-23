@@ -77,14 +77,14 @@ describe('Embedding', function() {
       driver.get(
         general.SERVER_URL_PREFIX + general.SCRIPTS_URL_SLICE + TEST_PAGES[i]);
 
-      // Test of standard loading (new version):
+      // Test of standard loading (new version)
       protractor.getInstance().switchTo().frame(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-standard']/iframe")));
       playCountingExploration(2);
       browser.switchTo().defaultContent();
 
-      // Test of deferred loading (old version):
+      // Test of deferred loading (old version)
       driver.findElement(
         by.xpath(
           "//div[@class='protractor-test-deferred']/oppia/div/button")).click();
@@ -94,7 +94,7 @@ describe('Embedding', function() {
       playCountingExploration(1);
       browser.switchTo().defaultContent();
 
-      // Tests of failed loading:
+      // Tests of failed loading
       expect(
         driver.findElement(
           by.xpath("//div[@class='protractor-test-missing-id']/div/span")
@@ -124,7 +124,8 @@ describe('Embedding', function() {
       for (var i = 0; i < browserLogs.length; i++) {
         // We ignore all logs that are not of the desired form.
         try {
-          message = JSON.parse(browserLogs[i].message).message.parameters[0].value;
+          var message = JSON.parse(browserLogs[i].message).message.
+            parameters[0].value;
           var EMBEDDING_PREFIX = 'Embedding test: ';
           if (message.substring(0, EMBEDDING_PREFIX.length) === EMBEDDING_PREFIX) {
             embeddingLogs.push(message.substring(EMBEDDING_PREFIX.length));
@@ -141,5 +142,9 @@ describe('Embedding', function() {
     });
 
     users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });
