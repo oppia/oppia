@@ -186,8 +186,11 @@ oppia.directive('graphViz', function() {
         text: 'Weighted',
         option: 'isWeighted'
       }];
-      // TODO(czx): Handle what happens to pairs of edges if a directed graph becomes undirected
       $scope.toggleGraphOption = function(option) {
+        // Handle the case when we have two edges s -> d and d -> s
+        if (option === 'isDirected' && $scope.graph[option]) {
+          deleteRepeatedEdges();
+        }
         $scope.graph[option] = !$scope.graph[option];
       };
       $scope.setMode = function(mode, $event) {
@@ -301,6 +304,19 @@ oppia.directive('graphViz', function() {
       function deleteEdge(index) {
         $scope.graph.edges.splice(index,1);
         $scope.state.hoverEdge = null;
+      }
+      function deleteRepeatedEdges() {
+        for (var i = 0; i < $scope.graph.edges.length; i++) {
+          var edge1 = $scope.graph.edges[i];
+          for (var j = i + 1; j < $scope.graph.edges.length; j++) {
+            var edge2 = $scope.graph.edges[j];
+            if ((edge1.src === edge2.src && edge1.dst === edge2.dst) ||
+                (edge1.src === edge2.dst && edge1.dst === edge2.src)) {
+              deleteEdge(j);
+              j--;
+            }
+          }
+        }
       }
       function deleteVertex(index) {
         $scope.graph.edges = $.map($scope.graph.edges, function(edge) {
