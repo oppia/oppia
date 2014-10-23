@@ -320,7 +320,7 @@ class ClassifyHandler(base.BaseHandler):
             exploration_id, exp_param_specs, old_state, handler_name,
             answer, params)
 
-        self.render_json(rule_spec.to_dict())
+        self.render_json(rule_spec.to_dict_with_obj_type())
 
 
 class NextStateHandler(base.BaseHandler):

@@ -118,19 +118,13 @@ oppia.factory('answerClassificationService', [
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
-    'oppiaHtmlEscaper', 'widgetDefinitionsService', 'answerClassificationService',
+    'oppiaHtmlEscaper', 'answerClassificationService',
     function(
       $http, $rootScope, $modal, $filter, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
-      oppiaHtmlEscaper, widgetDefinitionsService, answerClassificationService) {
+      oppiaHtmlEscaper, answerClassificationService) {
 
   var _END_DEST = 'END';
-
-  // Initializes the widget definitions, so that they are cached client-side.
-  // Otherwise, the first interaction will take a long time.
-  // TODO(sll): Speed this up further by returning just a dict with each widget
-  // id coupled to its obj_type, and nothing else.
-  widgetDefinitionsService.getInteractiveDefinitions();
 
   var _editorPreviewMode = null;
   var _explorationId = null;
@@ -402,24 +396,21 @@ oppia.factory('oppiaPlayerService', [
 
         var nextStateDictUrl = '/explorehandler/next_state/' + _explorationId;
         var newStateName = (ruleSpec.dest !== 'END') ? ruleSpec.dest : null;
-        widgetDefinitionsService.getObjTypeForWidget(
-            'submit', oldState.widget.widget_id).then(function(inputType) {
-          $http.post(nextStateDictUrl, {
-            exp_param_specs: angular.copy(_exploration.param_specs),
-            old_state_name: _currentStateName,
-            input_type: inputType,
-            params: learnerParamsService.getAllParams(),
-            rule_spec: ruleSpec,
-            new_state: newStateName ? _exploration.states[newStateName] : null,
-            answer: answer
-          }).success(function(data) {
-            answerIsBeingProcessed = false;
-            _onStateTransitionProcessed(data, answer, handler, successCallback);
-          }).error(function(data) {
-            answerIsBeingProcessed = false;
-            warningsData.addWarning(
-              data.error || 'There was an error processing your input.');
-          });
+        $http.post(nextStateDictUrl, {
+          exp_param_specs: angular.copy(_exploration.param_specs),
+          old_state_name: _currentStateName,
+          input_type: ruleSpec.inputType,
+          params: learnerParamsService.getAllParams(),
+          rule_spec: ruleSpec,
+          new_state: newStateName ? _exploration.states[newStateName] : null,
+          answer: answer
+        }).success(function(data) {
+          answerIsBeingProcessed = false;
+          _onStateTransitionProcessed(data, answer, handler, successCallback);
+        }).error(function(data) {
+          answerIsBeingProcessed = false;
+          warningsData.addWarning(
+            data.error || 'There was an error processing your input.');
         });
       });
     },
