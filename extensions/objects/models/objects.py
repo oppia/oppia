@@ -485,29 +485,18 @@ class Graph(BaseObject):
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
         try:
-            assert isinstance(raw, dict)
-            assert isinstance(raw['vertices'], list)
-            assert isinstance(raw['edges'], list)
-            assert raw['isDirected'] in [True, False]
-            assert raw['isWeighted'] in [True, False]
-            assert raw['isLabeled'] in [True, False]
+            raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
             
             for vertex in raw['vertices']:
-                assert isinstance(vertex['x'], float) or isinstance(vertex['x'], int)
-                assert isinstance(vertex['y'], float) or isinstance(vertex['y'], int)
-                assert isinstance(vertex['label'], basestring)
                 if not raw['isLabeled']:
                     vertex['label'] = ''
             
             for edge in raw['edges']:
-                assert isinstance(edge['src'], int)
-                assert isinstance(edge['dst'], int)
-                assert isinstance(edge['weight'], int)
                 assert (edge['src'] != edge['dst'])
                 if not raw['isWeighted']:
                     edge['weight'] = 1
 
-            # Tests uniqueness of edge, is there a better way?s
+            # Tests uniqueness of edge, is there a better way?
             if raw['isDirected']:
                 edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
             else:

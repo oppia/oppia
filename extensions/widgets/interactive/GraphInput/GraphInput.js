@@ -75,24 +75,18 @@ oppia.directive('oppiaResponseGraphInput', [
 
 /*
  * Directive for graph-viz.
- * Attempts to inherit $scope.graph, $scope.vertexEditPermissions and
- * $scope.movePermissions if they exist.
  */
 oppia.directive('graphViz', function() {
   return {
     restrict: 'E',
     scope: {
-      graph: '=?',
-      vertexEditPermissions: '=?',
-      movePermissions: '=?',
-      optionsEditPermissions: '=?',
+      graph: '=',
+      vertexEditPermissions: '=',
+      movePermissions: '=',
+      optionsEditPermissions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
     controller: ['$scope', '$element', '$attrs', '$document', function($scope, $element, $attrs, $document) {
-      if ($scope.graph === undefined) {
-        $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
-      }
-      
       var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
@@ -269,15 +263,15 @@ oppia.directive('graphViz', function() {
             endIndex < 0 ||
             startIndex >= $scope.graph.vertices.length ||
             endIndex >= $scope.graph.vertices.length) {
-          return false;
+          return;
         }
         for (var i = 0; i < $scope.graph.edges.length; i++) {
           if (startIndex === $scope.graph.edges[i].src && endIndex === $scope.graph.edges[i].dst) {
-            return false;
+            return;
           }
           if (!$scope.graph.isDirected) {
             if (startIndex === $scope.graph.edges[i].dst && endIndex === $scope.graph.edges[i].src) {
-              return false;
+              return;
             }
           }
         }
@@ -286,7 +280,7 @@ oppia.directive('graphViz', function() {
           dst: endIndex,
           weight: 1
         });
-        return true;
+        return;
       }
       function beginDragVertex(index) {
         $scope.state.dragVertex = index;

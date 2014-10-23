@@ -29,16 +29,20 @@ class IsIsomorphicTo(base.GraphRule):
     def _evaluate(self, subject):
         if len(subject['vertices']) != len(self.g['vertices']):
             return False
-        if len(subject['edges']) != len(self.g['edges']):
-            return False
 
-        # Construct adjacency matrix
-        adj = [[None for v in subject['vertices']] for v in subject['vertices']]
-        for edge in subject['edges']:
-            weight = edge['weight'] if subject['isWeighted'] else 1
-            adj[edge['src']][edge['dst']] = weight
-            if not subject['isDirected']:
-                adj[edge['dst']][edge['src']] = weight
+        # Construct adjacency matrices
+        def construct_adjacency_matrix(graph):
+            ret = [[None for v in graph['vertices']] for v in graph['vertices']]
+            for edge in graph['edges']:
+                weight = edge['weight'] if graph['isWeighted'] else 1
+                ret[edge['src']][edge['dst']] = weight
+                if not graph['isDirected']:
+                    ret[edge['dst']][edge['src']] = weight
+            return ret
+        adj = construct_adjacency_matrix(subject)
+        adj2 = construct_adjacency_matrix(self.g)
+        print adj
+        print adj2
 
         # Check against every permutation of vertices. 
         # The new index of vertex i in self.g is perm[i].
@@ -46,17 +50,20 @@ class IsIsomorphicTo(base.GraphRule):
         for perm in itertools.permutations(range(num_vertices)):
             # Test matching labels
             if subject['isLabeled'] and any([
-                    self.g['vertices'][perm[i]]['label'] !=
-                    subject['vertices'][i]['label']
+                    self.g['vertices'][i]['label'] !=
+                    subject['vertices'][perm[i]]['label']
                     for i in xrange(num_vertices)]):
                 continue
 
             # Test isomorphism
+            print perm
             found_isomorphism = True
-            for edge in self.g['edges']:
-                weight = edge['weight'] if self.g['isWeighted'] else 1
-                if adj[perm[edge['src']]][perm[edge['dst']]] != weight:
-                    found_isomorphism = False
+            for i in xrange(num_vertices):
+                for j in xrange(num_vertices):
+                    if adj[perm[i]][perm[j]] != adj2[i][j]:
+                        found_isomorphism = False
+                        break
+                if not found_isomorphism:
                     break
             if found_isomorphism:
                 return True

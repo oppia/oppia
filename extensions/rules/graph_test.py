@@ -56,7 +56,7 @@ def _cycleGraph(n):
 def _completeGraph(n):
     ret = _nullGraph(n)
     for i in xrange(n):
-        for j in xrange(i,n):
+        for j in xrange(i+1,n):
             ret['edges'].append({
                 'src': i,
                 'dst': j,
@@ -155,7 +155,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isDirected': True,
             'isWeighted': False,
             'isLabeled': False
-        })
+        }))
         self.assertFalse(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_nullGraph(5)))
         self.assertFalse(graph.IsIsomorphicTo(_nullGraph(5)).eval(_cycleGraph(5)))
         self.assertFalse(graph.IsIsomorphicTo(_nullGraph(5)).eval(_nullGraph(6)))
@@ -210,7 +210,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': True,
             'isLabeled': False
-        })
+        }))
         self.assertFalse(graph.IsIsomorphicTo({
             'vertices': [
                 {'label': 'a', 'x': 1.0, 'y': 1.0},
@@ -233,4 +233,4 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': False,
             'isLabeled': True
-        })
+        }))
