@@ -105,6 +105,8 @@ oppia.directive('graphViz', function() {
         dragVertex: null,
         // Selected vertex for editing label
         selectVertex: null,
+        // Selected edge for editing weight
+        selectEdge: null,
         // Mouse position in SVG coordinates
         mouseX: 0,
         mouseY: 0,
@@ -132,6 +134,7 @@ oppia.directive('graphViz', function() {
         if ($scope.state.hoverVertex === null) {
           $scope.state.selectVertex = null;
         }
+        $scope.state.selectEdge = null;
       };
 
       $scope.init = function() {
@@ -193,6 +196,7 @@ oppia.directive('graphViz', function() {
         $scope.state.currentMode = mode;
         $scope.state.addEdgeVertex = null;
         $scope.state.selectVertex = null;
+        $scope.state.selectEdge = null;
       };
 
       // TODO(czx): Consider if there's a neat way to write a reset()
@@ -231,6 +235,11 @@ oppia.directive('graphViz', function() {
       $scope.onClickEdge = function(index) {
         if ($scope.state.currentMode === _MODES.DELETE) {
           deleteEdge(index);
+        }
+      };
+      $scope.onDoubleclickEdgeWeight = function(index) {
+        if ($scope.graph.isWeighted) {
+          beginEditEdgeWeight(index);
         }
       };
      
@@ -295,6 +304,10 @@ oppia.directive('graphViz', function() {
         focusService.setFocus('vertexLabelEditBegun');
       }
 
+      function beginEditEdgeWeight(index) {
+        $scope.state.selectEdge = index;
+        focusService.setFocus('edgeWeightEditBegun');
+      }
       function deleteEdge(index) {
         $scope.graph.edges.splice(index,1);
         $scope.state.hoverEdge = null;
@@ -337,6 +350,16 @@ oppia.directive('graphViz', function() {
         }
         return $scope.graph.vertices[$scope.state.selectVertex].label;
       };
+      $scope.selectedEdgeWeight = function(weight) {
+        if ($scope.state.selectEdge === null) {
+          return '';
+        }
+        if (angular.isDefined(weight) && angular.isNumber(weight)) {
+          $scope.graph.edges[$scope.state.selectEdge].weight = weight;
+        }
+        return $scope.graph.edges[$scope.state.selectEdge].weight;
+      };
+
 
       // Styling functions
       $scope.getEdgeColor = function(index) {
@@ -384,6 +407,15 @@ oppia.directive('graphViz', function() {
           (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' + 
           (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
         return ret;
+      };
+      $scope.getEdgeCentre = function(index) {
+        var edge = $scope.graph.edges[index];
+        var srcVertex = $scope.graph.vertices[edge.src];
+        var dstVertex = $scope.graph.vertices[edge.dst];
+        return {
+          x: (srcVertex.x + dstVertex.x) / 2.0,
+          y: (srcVertex.y + dstVertex.y) / 2.0
+        };
       };
     }]
   }

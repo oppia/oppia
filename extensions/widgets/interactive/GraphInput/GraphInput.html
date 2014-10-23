@@ -32,14 +32,20 @@
       -khtml-user-select: none;
       -webkit-user-select: none;
       -o-user-select: none;
-      pointer-events: none;
       cursor: default;
+    }
+    .unclickable-text {
+      pointer-events: none;
     }
   </style>
   <div style="height: 35px;">
     <div ng-if="state.selectVertex !== null && graph.isLabeled && vertexEditPermissions">
-      <input class="graph-vertex-label" type="text" ng-model="selectedVertexLabel" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
+      <input type="text" ng-model="selectedVertexLabel" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
       <button class="btn btn-default" ng-click="state.selectVertex = null;">Update Label</button>
+    </div>
+    <div ng-if="state.selectEdge !== null && graph.isWeighted">
+      <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
+      <button class="btn btn-default" ng-click="state.selectEdge = null;">Update Weight</button>
     </div>
   </div>
   <div class="oppia-graph-viz-container">
@@ -55,7 +61,7 @@
             ng-click="setMode(button.mode, $event)"
             ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
           </rect>
-          <text class="oppia-graph-button-label unselectable-text" x="8" ng-attr-y="<[42 + 50 * $index]>">
+          <text class="oppia-graph-button-label unselectable-text unclickable-text" x="8" ng-attr-y="<[42 + 50 * $index]>">
             <[button.text]>
           </text>
         </g>
@@ -70,7 +76,7 @@
           ng-attr-style="stroke: black; fill: white; stroke-width: <[graph[button.option] ? 3 : 1]>;"
           ng-click="toggleGraphOption(button.option)">
         </rect>
-        <text class="unselectable-text" ng-attr-x="<[20 + 108 * $index]>" y="30">
+        <text class="unselectable-text unclickable-text" ng-attr-x="<[20 + 108 * $index]>" y="30">
           <[button.text]>
         </text>
       </g>
@@ -114,6 +120,13 @@
           ng-attr-points="<[getDirectedEdgeArrowPoints($index)]>"
           ng-attr-style="fill: <[getEdgeColor($index)]>;">
         </polygon>
+        <text ng-if="graph.isWeighted"
+          ng-attr-x="<[getEdgeCentre($index).x]>"
+          ng-attr-y="<[getEdgeCentre($index).y - 12]>"
+          ng-dblclick="onDoubleclickEdgeWeight($index)"
+          class="unselectable-text">
+          <[edge.weight]>
+        </text>
       </g>
       <g
         ng-repeat="vertex in graph.vertices"
