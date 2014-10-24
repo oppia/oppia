@@ -33,7 +33,8 @@ oppia.directive('conversationSkin', [function() {
       $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
 
       $window.addEventListener('beforeunload', function(e) {
-        if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
+        if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
+            oppiaPlayerService.isInPreviewMode == false) {
           var confirmationMessage = (
             'If you navigate away from this page, your progress on the ' +
             'exploration will be lost.');
@@ -47,7 +48,8 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.resetPage = function() {
-        if ($scope.hasInteractedAtLeastOnce && !$scope.finished) {
+        if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
+            oppiaPlayerService.isInPreviewMode == false) {
           var confirmationMessage = (
             'Are you sure you want to restart this exploration? Your progress ' +
             'will be lost.');
