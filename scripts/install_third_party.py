@@ -158,7 +158,8 @@ UI_BOOTSTRAP_FILES = [
     'ui-bootstrap-tpls-%s.%s' % (UI_BOOTSTRAP_REV, suffix)
     for suffix in ['js', 'min.js']]
 
-JQUERY_REV = '2.0.3'
+# Note that Angular 1.3.0 requires a jQuery version that is >= 2.1.1.
+JQUERY_REV = '2.1.1'
 JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/%s' % JQUERY_REV
 JQUERY_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'jquery-%s' % JQUERY_REV)
 JQUERY_FILES = ['jquery.%s' % suffix for suffix in ['js', 'min.js', 'min.map']]
@@ -170,7 +171,7 @@ JQUERYUI_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'jqueryui-%s' % JQUERYUI_REV)
 JQUERYUI_FILES = ['jquery-ui.min.js']
 
-ANGULAR_REV = '1.2.0-rc.3'
+ANGULAR_REV = '1.3.0-rc.5'
 ANGULAR_URL = (
     'https://ajax.googleapis.com/ajax/libs/angularjs/%s' % ANGULAR_REV)
 ANGULAR_TEST_URL = 'http://code.angularjs.org/%s' % ANGULAR_REV

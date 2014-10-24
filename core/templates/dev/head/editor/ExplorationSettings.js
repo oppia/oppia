@@ -32,8 +32,6 @@ oppia.controller('ExplorationSettings', [
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
 
-  $scope.explorationStatesService = explorationStatesService;
-
   $scope.getExplorePageUrl = function() {
     return (
       window.location.protocol + '//' + window.location.host +
@@ -51,8 +49,15 @@ oppia.controller('ExplorationSettings', [
     explorationData.getData().then(function(data) {
       $scope.paramSpecs = data.param_specs || {};
       $scope.explorationParamChanges = data.param_changes || [];
+      $scope.refreshSettingsTab();
     });
   };
+
+  $scope.refreshSettingsTab = function() {
+    $scope.stateNames = Object.keys(explorationStatesService.getStates());
+  };
+
+  $scope.$on('refreshSettingsTab', $scope.refreshSettingsTab);
 
   $scope.initSettingsTab();
 

@@ -24,8 +24,8 @@
     <h3>Reload a single exploration</h3>
     <div class="container" style="margin-left: 0;">
       {% for exploration in demo_explorations %}
-        <div class="row">
-          <span class="col-lg-4 col-md-4 col-sm-4">
+        <div class="row protractor-test-reload-exploration-row">
+          <span class="col-lg-4 col-md-4 col-sm-4 protractor-test-reload-exploration-title">
             {{exploration[1]}}
           </span>
           <span class="col-lg-2 col-md-2 col-sm-2">
@@ -214,6 +214,8 @@
       {{ include_js_file('components/objectEditor.js') }}
       {{ include_js_file('components/valueGeneratorEditor.js') }}
       {{ include_js_file('forms/formBuilder.js') }}
+      {{ include_js_file('expressions/evaluator.js') }}
+      {{ include_js_file('expressions/parser.js') }}
       {{ object_editors_js }}
       {{ value_generators_js }}
     </script>

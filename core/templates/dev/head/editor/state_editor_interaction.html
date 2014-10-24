@@ -16,7 +16,7 @@
     <div ng-if="hasLoaded">
       <div ng-if="!interactionCustomizerIsShown"
            class="protractor-test-edit-interaction"
-           ng-class="{'oppia-editable-section oppia-interactive-section': editabilityService.isEditable()}"
+           ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
            ng-disabled="!hasLoaded">
 
         <!-- We use a transparent div overlay here so that buttons within the widget

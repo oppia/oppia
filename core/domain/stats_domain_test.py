@@ -22,6 +22,7 @@ from core.domain import event_services
 from core.domain import stats_domain
 from core.domain import stats_services
 from core.tests import test_utils
+import feconf
 
 
 class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
@@ -30,7 +31,7 @@ class StateRuleAnswerLogUnitTests(test_utils.GenericTestBase):
     DEFAULT_RULESPEC_STR = exp_domain.DEFAULT_RULESPEC_STR
     DEFAULT_RULESPEC = exp_domain.RuleSpec.get_default_rule_spec(
         'sid', 'NormalizedString')
-    SUBMIT_HANDLER = stats_services.SUBMIT_HANDLER_NAME
+    SUBMIT_HANDLER = feconf.SUBMIT_HANDLER_NAME
 
     def test_state_rule_answer_logs(self):
         exp = exp_domain.Exploration.create_default_exploration(

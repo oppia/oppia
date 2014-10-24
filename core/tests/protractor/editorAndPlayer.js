@@ -19,6 +19,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
@@ -39,9 +40,9 @@ describe('State editor', function() {
 
     general.moveToPlayer();
     expect(player.getCurrentQuestionText()).toBe('plain text');
-    expect(player.getContinueButtonText()).toBe('click here');
     player.expectExplorationToNotBeOver();
-    player.answerContinueWidget();
+    player.expectInteractionToMatch('Continue', 'click here');
+    player.submitAnswer('Continue', null);
     player.expectExplorationToBeOver();
 
     users.logout();
@@ -67,8 +68,8 @@ describe('State editor', function() {
 
     general.moveToPlayer();
     player.expectExplorationToNotBeOver();
-    expect(player.getMultipleChoiceOptions()).toEqual(['option A', 'option B']);
-    player.answerMultipleChoiceWidget('option B');
+    player.expectInteractionToMatch('MultipleChoiceInput', ['option A', 'option B']);
+    player.submitAnswer('MultipleChoiceInput', 'option B');
     player.expectExplorationToBeOver();
 
     users.logout();
@@ -89,10 +90,10 @@ describe('State editor', function() {
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.answerNumericWidget(7);
+    player.submitAnswer('NumericInput', 7);
     expect(player.getLatestFeedbackText()).toBe('out of bounds');
     player.expectExplorationToNotBeOver();
-    player.answerNumericWidget(4);
+    player.submitAnswer('NumericInput', 4);
     expect(player.getLatestFeedbackText()).toBe('correct');
     player.expectExplorationToBeOver();
 
@@ -126,15 +127,19 @@ describe('Full exploration editor', function() {
 
     general.moveToPlayer();
     expect(player.getCurrentQuestionText()).toBe('this is state 1');
-    player.answerNumericWidget(19);
-    player.answerNumericWidget(21);
+    player.submitAnswer('NumericInput', 19);
+    player.submitAnswer('NumericInput', 21);
     expect(player.getCurrentQuestionText()).toBe('this is state 2');
-    player.answerMultipleChoiceWidget('return');
+    player.submitAnswer('MultipleChoiceInput', 'return');
     expect(player.getCurrentQuestionText()).toBe('this is state 1');
-    player.answerNumericWidget(21);
+    player.submitAnswer('NumericInput', 21);
     expect(player.getCurrentQuestionText()).toBe('this is state 2');
     player.expectExplorationToNotBeOver();
-    player.answerMultipleChoiceWidget('complete');
+    player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

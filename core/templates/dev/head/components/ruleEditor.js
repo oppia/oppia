@@ -177,8 +177,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.deleteRule();
         };
 
-
-
         $scope.createRuleDestIfNecessary = function() {
           var foundInExistingStateList = false;
           for (var stateName in explorationStatesService.getStates()) {
@@ -203,7 +201,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         };
 
         $scope.$watch('widgetHandlerSpecs', function() {
-          $scope.generateAllRuleTypes();          
+          $scope.generateAllRuleTypes();
         });
 
         $scope.isDefaultRule = function() {
@@ -308,7 +306,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               // This rule is for a multiple-choice widget.
               // TODO(sll): Remove the need for this special case for multiple-choice
               // input.
-              $scope.choices = angular.copy($scope.answerChoices);
+              var _choices = angular.copy($scope.answerChoices);
+              $scope.ruleDescriptionChoices = $scope.answerChoices.map(function(choice, ind) {
+                return {
+                  id: ind,
+                  val: choice
+                };
+              });
+
               result.push({'type': 'select', 'varName': finalInputArray[i+1]});
             } else {
               result.push({
@@ -322,14 +327,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.navigateToRuleDest = function() {
           routerService.navigateToMainTab($scope.rule.dest);
-        };
-
-        $scope.getExtendedChoiceArray = function(choices) {
-          var result = [];
-          for (var i = 0; i < choices.length; i++) {
-            result.push({id: i, val: choices[i]});
-          }
-          return result;
         };
 
         if ($scope.isTmpRule()) {

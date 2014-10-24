@@ -19,6 +19,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
@@ -93,8 +94,12 @@ describe('Gallery view', function() {
       'Preserve the works of the elves');
     gallery.playExploration('silmarils');
     expect(player.getExplorationName()).toBe('silmarils');
-    player.answerContinueWidget();
+    player.submitAnswer('Continue');
 
     users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

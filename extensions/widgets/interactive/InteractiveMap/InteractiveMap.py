@@ -1,5 +1,4 @@
 from core.domain import widget_domain
-from extensions.value_generators.models import generators
 
 
 class InteractiveMap(widget_domain.BaseWidget):

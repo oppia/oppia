@@ -50,6 +50,13 @@ oppia.factory('parameterSpecsService', ['$log', function($log) {
         }
       }
       return names.sort();
+    },
+    getAllParams: function() {
+      var names = [];
+      for (var paramName in paramSpecs) {
+        names.push(paramName);
+      }
+      return names.sort();
     }
   };
 }]);
@@ -852,6 +859,32 @@ oppia.directive('requireIsFloat', ['$filter', function($filter) {
   };
 }]);
 
+oppia.directive('requireIsValidExpression',
+    ['parameterSpecsService', 'expressionEvaluatorService',
+        function(parameterSpecsService, expressionEvaluatorService) {
+  // Create a namescope environment from the parameter names. The values of the
+  // parameters do not matter.
+  var params = {};
+  parameterSpecsService.getAllParams().forEach(function(name) {
+    params[name] = true;
+  });
+
+  return {
+    require: 'ngModel',
+    restrict: 'A',
+    link: function(scope, elm, attrs, ctrl) {
+      var validator = function(value) {
+        ctrl.$setValidity('isValidExpression',
+            expressionEvaluatorService.validateExpression(value, [params]));
+        return value;
+      };
+
+      ctrl.$parsers.unshift(validator);
+      ctrl.$formatters.unshift(validator);
+    }
+  };
+}]);
+
 // Prevents timeouts due to recursion in nested directives. See:
 //
 //   http://stackoverflow.com/questions/14430655/recursion-in-angular-directives
@@ -943,32 +976,13 @@ oppia.directive('schemaBasedExpressionEditor', [function() {
     scope: {
       localValue: '=',
       disabled: '&',
-      paramNames: '&',
       // TODO(sll): Currently only takes a string which is either 'bool', 'int' or 'float'.
       // May need to generalize.
       outputType: '&',
       labelForFocusTarget: '&'
     },
     templateUrl: 'schemaBasedEditor/expression',
-    restrict: 'E',
-    controller: ['$scope', function($scope) {
-      $scope.paramNameOptions = $scope.paramNames().map(function(paramName) {
-        return {
-          name: paramName,
-          value: paramName
-        };
-      });
-
-      $scope.$watch('localValue', function(newValue, oldValue) {
-        // Because JS objects are passed by reference, the current value needs
-        // to be set manually to an object in the list of options.
-        $scope.paramNameOptions.forEach(function(option) {
-          if (angular.equals(option.value, newValue)) {
-            $scope.localValue = option.value;
-          }
-        });
-      });
-    }]
+    restrict: 'E'
   };
 }]);
 
