@@ -84,8 +84,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService',
-      function($scope, $attrs, editorContextService, explorationStatesService, routerService) {
+      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
+      function($scope, $attrs, editorContextService, explorationStatesService, routerService, validatorsService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
@@ -99,9 +99,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
-        $scope.ruleDestMemento = $scope.rule.dest;
+        $scope.ruleDestMemento = null;
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
+        $scope.ruleFeedbackMemento = null;
 
         $scope.allRuleTypes = {};
         $scope.generateAllRuleTypes = function() {
@@ -119,6 +120,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.ruleEditorIsOpen = false;
         $scope.openRuleEditor = function() {
           if ($scope.isEditable) {
+            $scope.ruleDescriptionMemento = angular.copy($scope.rule.description);
+            $scope.ruleDefinitionMemento = angular.copy($scope.rule.definition);
+            $scope.ruleFeedbackMemento = angular.copy($scope.rule.feedback);
+            $scope.ruleDestMemento = angular.copy($scope.rule.dest);
+
             $scope.ruleEditorIsOpen = true;
             if ($scope.rule.feedback.length === 0) {
               $scope.rule.feedback.push('');
@@ -135,8 +141,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               $scope.currentRuleDescription = $scope.rule.description;
             }
 
-            $scope.ruleDescriptionMemento = angular.copy($scope.rule.description);
-            $scope.ruleDefinitionMemento = angular.copy($scope.rule.definition);
             $scope.computeRuleDescriptionFragments();
           }
         };
@@ -157,19 +161,27 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleEditorIsOpen = false;
 
           // If a new state has been entered, create it.
-          $scope.createRuleDestIfNecessary();
+          $scope._createRuleDestIfNecessary();
 
           $scope.removeNullFeedback();
           $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
+          $scope.ruleFeedbackMemento = null;
+          $scope.ruleDestMemento = null;
 
           $scope.saveRule();
         };
         $scope.cancelThisEdit = function() {
           $scope.removeNullFeedback();
           $scope.ruleEditorIsOpen = false;
+          $scope.rule.description = angular.copy($scope.ruleDescriptionMemento);
+          $scope.rule.definition = angular.copy($scope.ruleDefinitionMemento);
+          $scope.rule.feedback = angular.copy($scope.ruleFeedbackMemento);
+          $scope.rule.dest = angular.copy($scope.ruleDestMemento);
           $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
+          $scope.ruleFeedbackMemento = null;
+          $scope.ruleDestMemento = null;
           $scope.cancelEdit();
         };
         $scope.deleteThisRule = function() {
@@ -177,7 +189,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.deleteRule();
         };
 
-        $scope.createRuleDestIfNecessary = function() {
+        $scope._createRuleDestIfNecessary = function() {
           var foundInExistingStateList = false;
           for (var stateName in explorationStatesService.getStates()) {
             if (stateName === $scope.rule.dest) {
@@ -323,6 +335,12 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           }
           $scope.ruleDescriptionFragments = result;
+        };
+
+        // Method that converts newly typed-in destination strings to text in the
+        // rule destination dropdown.
+        $scope.convertNewDestToText = function(term) {
+          return term + ' (new)';
         };
 
         $scope.navigateToRuleDest = function() {

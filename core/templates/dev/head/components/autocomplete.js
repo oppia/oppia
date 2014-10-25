@@ -28,14 +28,29 @@ oppia.directive('select2Dropdown', [function() {
       newChoiceRegex: '@',
       placeholder: '@',
       width: '@',
-      onSelectionChange: '&'
+      onSelectionChange: '&',
+      // The message shown when an invalid search term is entered. May be
+      // undefined, in which case this defaults to 'No matches found'.
+      invalidSearchTermMessage: '@',
+      // A function that formats a new selection. May be undefined.
+      formatNewSelection: '=',
+      // An additional CSS class to add to the select2 dropdown. May be
+      // undefined.
+      dropdownCssClass: '@'
     },
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
       $scope.newChoiceValidator = new RegExp($scope.newChoiceRegex);
 
-      var select2Node = $element[0].firstChild;
-      $(select2Node).select2({
+      var _defaultFormatNewSelection = function(id) {
+        return id;
+      };
+
+      var _convertNewSelectionToText = (
+        $scope.formatNewSelection ? $scope.formatNewSelection :
+        _defaultFormatNewSelection);
+
+      var select2Options = {
         data: $scope.choices,
         placeholder: $scope.placeholder,
         allowClear: false,
@@ -44,15 +59,40 @@ oppia.directive('select2Dropdown', [function() {
           if ($(data).filter(function() {
             return this.text.localeCompare(term) === 0;
           }).length === 0) {
-            return (
-              term.match($scope.newChoiceValidator) ?
-                  {id: term, text: term} : null
-            );
+            return term.match($scope.newChoiceValidator) ? {
+              id: term,
+              text: term
+            } : null;
+          }
+        },
+        formatResult: function(queryResult) {
+          var _doesChoiceMatchText = function(choice) {
+            return choice.id === queryResult.text;
+          };
+
+          if ($scope.choices.some(_doesChoiceMatchText)) {
+            return queryResult.text;
+          } else {
+            return _convertNewSelectionToText(queryResult.text)
+          }
+        },
+        formatNoMatches: function(searchTerm) {
+          if ($scope.invalidSearchTermMessage && !searchTerm.match($scope.newChoiceValidator)) {
+            return $scope.invalidSearchTermMessage;
+          } else {
+            return 'No matches found';
           }
         }
-      });
+      };
+
+      if ($scope.dropdownCssClass) {
+        select2Options.dropdownCssClass = $scope.dropdownCssClass;
+      }
+
+      var select2Node = $element[0].firstChild;
 
       // Initialize the dropdown.
+      $(select2Node).select2(select2Options);
       $(select2Node).select2('val', $scope.item);
 
       // Update $scope.item when the selection changes.
