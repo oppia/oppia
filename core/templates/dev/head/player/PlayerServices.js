@@ -372,7 +372,7 @@ oppia.factory('oppiaPlayerService', [
       return randomSuffix;
     },
     isInPreviewMode: function() {
-      return (_editorPreviewMode == true) ? true : false;
+      return !!_editorPreviewMode;
     },
     submitAnswer: function(answer, handler, successCallback) {
       if (answerIsBeingProcessed) {
