@@ -372,9 +372,7 @@ oppia.factory('oppiaPlayerService', [
       return randomSuffix;
     },
     isInPreviewMode: function() {
-      // Checking for explicit false because it may be 'undefined'
-      // while in preview mode.
-      return (_editorPreviewMode == false) ? false : true;
+      return (_editorPreviewMode == true) ? true : false;
     },
     submitAnswer: function(answer, handler, successCallback) {
       if (answerIsBeingProcessed) {

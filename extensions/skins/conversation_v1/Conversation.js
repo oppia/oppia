@@ -34,7 +34,7 @@ oppia.directive('conversationSkin', [function() {
 
       $window.addEventListener('beforeunload', function(e) {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
-            oppiaPlayerService.isInPreviewMode == false) {
+            !oppiaPlayerService.isInPreviewMode()) {
           var confirmationMessage = (
             'If you navigate away from this page, your progress on the ' +
             'exploration will be lost.');
