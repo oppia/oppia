@@ -39,7 +39,7 @@
                       <th>by</th>
                       <th>Subject</th>
                     </tr>
-                    <tr ng-repeat="update in recentUpdates" ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < update.last_updated_ms && update.author_username !== currentUsername}">
+                    <tr ng-repeat="update in recentUpdates" ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < update.last_updated_ms && update.author_username !== currentUsername, 'oppia-dashboard-row': !lastSeenMsec || lastSeenMsec >= update.last_updated_ms || update.author_username === currentUsername}" ng-click="navigateToItem(update.activity_id, update.type)">
                       <td>
                         <span class="label label-primary" ng-if="lastSeenMsec && lastSeenMsec < update.last_updated_ms && update.author_username !== currentUsername">
                           New
@@ -53,18 +53,7 @@
                               class="glyphicon glyphicon-comment"
                               title="Feedback thread"></span>
                       </td>
-                      <td>
-                        <span ng-if="update.type === 'exploration_commit'">
-                          <a ng-href="<[getEditorPageUrl(update.activity_id)]>">
-                            <[update.activity_title]>
-                          </a>
-                        </span>
-                        <span ng-if="update.type === 'feedback_thread'">
-                          <a ng-href="<[getEditorPageUrl(update.activity_id, '/feedback')]>">
-                            <[update.activity_title]>
-                          </a>
-                        </span>
-                      </td>
+                      <td><[update.activity_title]></td>
                       <td><[getLocaleAbbreviatedDatetimeString(update.last_updated_ms)]></td>
                       <td><[update.author_username]></td>
                       <td><[update.subject]></td>

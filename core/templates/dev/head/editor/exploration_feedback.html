@@ -57,7 +57,7 @@
                 <span ng-if="t.original_author_username"><[t.original_author_username]></span>
               </td>
               <td class="col-lg-3 col-md-3 col-sm-3">
-                <span><[getLocaleStringForDateWithoutSeconds(t.last_updated)]></span>
+                <span><[getLocaleAbbreviatedDatetimeString(t.last_updated)]></span>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
                 <button class="btn btn-default btn-xs" ng-click="setCurrentThread(t.thread_id)">View</button>
@@ -129,7 +129,7 @@
                     </div>
 
                     <div class="col-lg-3 col-md-3 col-sm-3">
-                      <span><[getLocaleStringForDateWithoutSeconds(m.created_on)]></span>
+                      <span><[getLocaleAbbreviatedDatetimeString(m.created_on)]></span>
                     </div>
                   </div>
 

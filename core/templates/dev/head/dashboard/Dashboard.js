@@ -50,6 +50,11 @@ oppia.controller('Dashboard', [
     'Statistics'
   ];
 
+  $scope.navigateToItem = function(activityId, updateType) {
+    window.location.href = (
+      '/create/' + activityId + (updateType === 'feedback_thread' ? '#/feedback': ''));
+  };
+
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);

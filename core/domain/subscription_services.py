@@ -82,7 +82,7 @@ def get_last_seen_notifications_msec(user_id):
 def record_user_has_seen_notifications(user_id, last_seen_msecs):
     """Updates the last_checked time for this user (which represents the time
     the user last saw the notifications in the dashboard page or the
-    notifications dropdown.
+    notifications dropdown).
     """
     subscriptions_model = user_models.UserSubscriptionsModel.get(
         user_id, strict=False)

@@ -989,6 +989,17 @@ oppia-parameter {
   min-width: 300px !important;
 }
 
-.oppia-dashboard-row-recent {
+.oppia-dashboard-row {
+  cursor: pointer;
+}
+.oppia-dashboard-row:hover {
   background: #eee;
+}
+
+.oppia-dashboard-row-recent {
+  background: #fff4ca;
+  cursor: pointer;
+}
+.oppia-dashboard-row-recent:hover {
+  background: #efda8d;
 }
