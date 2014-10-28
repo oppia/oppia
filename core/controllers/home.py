@@ -23,6 +23,7 @@ from core.domain import exp_services
 from core.domain import subscription_services
 from core.domain import user_jobs
 from core.domain import user_services
+import feconf
 
 
 BANNER_ALT_TEXT = config_domain.ConfigProperty(
@@ -123,3 +124,26 @@ class DashboardHandler(base.BaseHandler):
             'recent_updates': recent_updates,
         })
         self.render_json(self.values)
+
+
+class NotificationsHandler(base.BaseHandler):
+    """Provides data about unseen notifications."""
+
+    def get(self):
+        """Handles GET requests."""
+        num_unseen_notifications = 0
+        if self.user_id and self.username:
+            last_seen_msec = (
+                subscription_services.get_last_seen_notifications_msec(
+                    self.user_id))
+            _, recent_updates = (
+                user_jobs.DashboardRecentUpdatesAggregator.get_recent_updates(
+                    self.user_id))
+            for update in recent_updates:
+                if (update['last_updated_ms'] > last_seen_msec and
+                        update['author_id'] != self.user_id):
+                    num_unseen_notifications += 1
+
+        self.render_json({
+            'num_unseen_notifications': num_unseen_notifications,
+        })

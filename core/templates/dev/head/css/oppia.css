@@ -810,15 +810,15 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-right: 2px;
   margin-top: 1px;
   padding: 9px 10px 6px 10px;
-  position: absolute; 
+  position: absolute;
   right: 15px;
 }
 
 .oppia-exploration-warnings-box {
   cursor: pointer;
-  margin-bottom: 2px; 
-  opacity: 1; 
-  padding: 2px 5px; 
+  margin-bottom: 2px;
+  opacity: 1;
+  padding: 2px 5px;
   position: absolute;
   right: 15px;
   z-index: 5;
@@ -987,4 +987,8 @@ oppia-parameter {
 
 .oppia-tutorial-tooltip {
   min-width: 300px !important;
+}
+
+.oppia-dashboard-row-recent {
+  background: #eee;
 }

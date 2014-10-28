@@ -19,9 +19,9 @@
  */
 
 oppia.controller('ExplorationHistory', [
-    '$scope', '$http', '$location', '$log', 'explorationData', 'versionsTreeService',
+    '$scope', '$http', '$location', '$log', '$modal', 'explorationData', 'versionsTreeService',
     'compareVersionsService', 'graphDataService', function(
-    $scope, $http, $location, $log, explorationData, versionsTreeService,
+    $scope, $http, $location, $log, $modal, explorationData, versionsTreeService,
     compareVersionsService, graphDataService) {
   $scope.explorationId = explorationData.explorationId;
   $scope.explorationAllSnapshotsUrl =
@@ -44,40 +44,42 @@ oppia.controller('ExplorationHistory', [
 
   // Refreshes the displayed version history log.
   $scope.refreshVersionHistory = function() {
-    var currentVersion = explorationData.data.version;
-    /**
-     * $scope.comparePanesVersions is an object with keys 'leftPane' and
-     * 'rightPane', whose values are the version numbers of the versions
-     * displayed in the left and right codemirror panes.
-     * $scope.compareSnapshot is an object with keys 'leftPane' and 'rightPane'
-     * whose values are the snapshots of the compared versions.
-     * $scope.yamrStrs is an object with keys 'leftPane' and 'rightPane',
-     * whose values are the YAML representations of the compared versions
-     */
-    $scope.comparePanesVersions = {};
-    $scope.compareSnapshot = {};
-    // Note: if initial strings are empty CodeMirror won't initialize correctly
-    $scope.yamlStrs = {
-      'leftPane': ' ',
-      'rightPane': ' '
-    };
+    explorationData.getData().then(function(data) {
+      var currentVersion = data.version;
+      /**
+       * $scope.comparePanesVersions is an object with keys 'leftPane' and
+       * 'rightPane', whose values are the version numbers of the versions
+       * displayed in the left and right codemirror panes.
+       * $scope.compareSnapshot is an object with keys 'leftPane' and 'rightPane'
+       * whose values are the snapshots of the compared versions.
+       * $scope.yamrStrs is an object with keys 'leftPane' and 'rightPane',
+       * whose values are the YAML representations of the compared versions
+       */
+      $scope.comparePanesVersions = {};
+      $scope.compareSnapshot = {};
+      // Note: if initial strings are empty CodeMirror won't initialize correctly
+      $scope.yamlStrs = {
+        'leftPane': ' ',
+        'rightPane': ' '
+      };
 
-    $scope.hideCodemirror = true;
-    $scope.hideCompareVersionsButton = false;
+      $scope.hideCodemirror = true;
+      $scope.hideCompareVersionsButton = false;
 
-    $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
-      allExplorationSnapshots = response.data.snapshots;
-      versionsTreeService.init(allExplorationSnapshots);
+      $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
+        allExplorationSnapshots = response.data.snapshots;
+        versionsTreeService.init(allExplorationSnapshots);
 
-      $scope.displayedExplorationSnapshots = [];
-      for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
-        $scope.displayedExplorationSnapshots.push({
-          'committerId': allExplorationSnapshots[i].committer_id,
-          'createdOn': allExplorationSnapshots[i].created_on,
-          'commitMessage': allExplorationSnapshots[i].commit_message,
-          'versionNumber': allExplorationSnapshots[i].version_number
-        });
-      }
+        $scope.displayedExplorationSnapshots = [];
+        for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
+          $scope.displayedExplorationSnapshots.push({
+            'committerId': allExplorationSnapshots[i].committer_id,
+            'createdOn': allExplorationSnapshots[i].created_on,
+            'commitMessage': allExplorationSnapshots[i].commit_message,
+            'versionNumber': allExplorationSnapshots[i].version_number
+          });
+        }
+      });
     });
   };
 

@@ -39,11 +39,11 @@
                       <th>by</th>
                       <th>Subject</th>
                     </tr>
-                    <tr ng-repeat="update in recentUpdates">
+                    <tr ng-repeat="update in recentUpdates" ng-class="{'oppia-dashboard-row-recent': lastSeenMsec && lastSeenMsec < update.last_updated_ms && update.author_username !== currentUsername}">
                       <td>
-                        <strong ng-if="lastSeenMsec && lastSeenMsec < update.last_updated_ms && update.author_username !== currentUsername">
-                          NEW
-                        </strong>
+                        <span class="label label-primary" ng-if="lastSeenMsec && lastSeenMsec < update.last_updated_ms && update.author_username !== currentUsername">
+                          New
+                        </span>
                       </td>
                       <td>
                         <span ng-if="update.type === 'exploration_commit'"
