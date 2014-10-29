@@ -1,5 +1,5 @@
 {% macro warnings_and_loader() -%}
-  <div ng-cloak>
+  <div class="oppia-main-content-container" ng-cloak>
     <div class="oppia-alert-blocks">
       <div ng-repeat="warning in (warningsData.warnings | limitTo:5) track by $index">
         <p class="alert alert-warning">

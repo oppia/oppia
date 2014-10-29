@@ -6,17 +6,109 @@
 
 {% block content %}
 
-      <div>
-        <img src="/images/banner.png" alt="{{BANNER_ALT_TEXT}}" class="oppia-splash-image">
-        <div class="container">
-          <div class="row oppia-splash-btn-row">
-            <div class="col-lg-12 col-md-12 col-sm-12" align="center">
-              <a class="btn btn-lg oppia-splash-btn" href="/learn">View Gallery</a>
-              <a class="btn btn-lg oppia-splash-btn" href="/contribute">Create Exploration</a>
-            </div>
+
+<img src="/images/banner.png" alt="{{BANNER_ALT_TEXT}}" class="oppia-splash-image">
+
+<div class="oppia-splash-content">
+  <div class="container">
+    <div class="row oppia-splash-btn-row">
+      <div class="col-lg-12 col-md-12 col-sm-12" align="center">
+        <a class="btn btn-lg oppia-splash-btn" href="/learn">View Gallery</a>
+        <a class="btn btn-lg oppia-splash-btn" href="/contribute">Create Exploration</a>
+      </div>
+    </div>
+  </div>
+
+  <hr class="oppia-splash-hr" />
+  <div class="row oppia-splash-section">
+    <div class="col-lg-6 col-md-6 col-sm-6 oppia-splash-block-left oppia-vcenter">
+      <h2>Interactive</h2>
+      <h4>
+          Oppia strives to enable learning by doing. Research shows that students
+          learn more effectively when they have an opportunity to demonstrate their
+          understanding. With Oppia, you can create interactive content that makes
+          it easy for students to actively participate in the learning process.
+      </h4>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 .oppia-splash-block-right oppia-vcenter hidden-xs">
+      <div style="float:right;">
+        <img src="/images/adaptive-bike.png" class="oppia-splash-page-screenshot">
+      </div>
+    </div>
+  </div>
+
+  <hr class="oppia-splash-hr" />
+  <div class="row oppia-splash-section">
+    <div class="col-lg-6 col-md-6 col-sm-6 .oppia-splash-block-left oppia-vcenter hidden-xs">
+      <div align="center">
+        <img src="/images/adaptive-new.png" class="oppia-splash-page-screenshot">
+      </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 oppia-splash-block-right oppia-vcenter">
+      <h2>Adaptive</h2>
+      <h4>
+        Oppia explorations are designed to be non-linear: they can branch based
+        on students' answers, resulting in tailored learning paths. It's just like
+        any teacher/student conversation: what the teacher does is going to depend
+        on what the student says.
+      </h4>
+    </div>
+  </div>
+
+  <hr class="oppia-splash-hr" />
+  <div class="row oppia-splash-section">
+    <div class="col-lg-6 col-md-6 col-sm-6 oppia-splash-block-left oppia-vcenter">
+      <h2>Continuous Improvement</h2>
+      <h4>
+        You can create and publish an exploration in minutes using our online editor. As students play through your exploration, you (or others,
+        if you like) can improve the exploration on the fly. Oppia enables this by providing insights about where and why students may be stumbling.
+      </h4>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 oppia-splash-block-right oppia-vcenter hidden-xs">
+      <div align="center">
+        <img src="/images/improving-new.png" class="oppia-splash-page-screenshot">
+      </div>
+    </div>
+  </div>
+
+  <hr class="oppia-splash-hr" />
+  <div class="row oppia-splash-section">
+    <div class="col-lg-6 col-md-6 col-sm-6 oppia-splash-block-left oppia-vcenter hidden-xs">
+      <div align="center">
+        <img src="/images/free-pig.png" class="oppia-splash-page-screenshot">
+      </div>
+    </div>
+    <div class="col-lg-6 col-md-6 col-sm-6 oppia-splash-block-right oppia-vcenter">
+      <h2>100% Free</h2>
+      <h4>
+        You don’t have to pay anything to use Oppia. In addition, all explorations
+        on {{SITE_NAME}} are licensed under CC-BY-SA, which means that you can
+        freely copy, modify and reuse their content. Also, the <a href="https://code.google.com/p/oppia">code behind {{SITE_NAME}}</a> is open source, and you are welcome to
+        download, reuse and modify it!
+      </h4>
+    </div>
+  </div>
+
+  <hr class="oppia-splash-hr" />
+  <div class="oppia-splash-btn-section">
+    <div class="col-lg-12 col-md-12 col-sm-12 oppia-vcenter" align="center">
+      <div class="container">
+        <h2>Get started</h2>
+      </div>
+      <div class="container">
+        <div class="row oppia-splash-btn-row">
+          <div class="col-lg-12 col-md-12 col-sm-12" align="center">
+            <a class="btn btn-lg oppia-splash-btn" href="/learn">View Gallery</a>
+            <a class="btn btn-lg oppia-splash-btn" href="/contribute">Create Exploration</a>
           </div>
         </div>
       </div>
+    </div>
+  </div>
+  <br><br>
+</div>
+
+
 
 
 
