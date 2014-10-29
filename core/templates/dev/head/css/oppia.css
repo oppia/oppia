@@ -558,8 +558,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-top: 1pt solid #dde0FF;
   bottom: 5px;
   height: 3em;
-  margin-top: 30px;
-  margin-bottom: 10px;
   max-height: 3em;
   position: absolute;
   width: 100%;
@@ -992,4 +990,21 @@ oppia-parameter {
 /* Hide the search icon in the rule destination dropdown. */
 .oppia-rule-dest-select2 .select2-search input {
   background: none;
+}
+
+.oppia-splash-btn-row {
+  margin-top: 14px;
+}
+
+.oppia-splash-btn {
+  border: 1px solid #05A69A;
+  border-radius: 20px;
+  width: 200px;
+  margin: 0 10px;
+  color: #05A69A;
+}
+
+.oppia-splash-btn:hover {
+  background-color: #05A69A;
+  color: #fff;
 }
