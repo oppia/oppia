@@ -118,12 +118,11 @@ oppia.factory('answerClassificationService', [
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
-    'oppiaHtmlEscaper', 'answerClassificationService',
+    'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
     function(
       $http, $rootScope, $modal, $filter, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
-      oppiaHtmlEscaper, answerClassificationService) {
-
+      oppiaHtmlEscaper, answerClassificationService, stateTransitionService) {
   var _END_DEST = 'END';
 
   var _editorPreviewMode = null;
@@ -405,6 +404,16 @@ oppia.factory('oppiaPlayerService', [
           new_state: newStateName ? _exploration.states[newStateName] : null,
           answer: answer
         }).success(function(data) {
+          // Compare client and server evaluation results.
+          // TODO(kashida): Do client eval first and make server call only when
+          // client eval fails.
+          console.log('client:');
+          console.log(
+            stateTransitionService.next(ruleSpec,
+              newStateName ? _exploration.states[newStateName] : null,
+              answer));
+          console.log('server:');
+          console.log(data);
           answerIsBeingProcessed = false;
           _onStateTransitionProcessed(data, answer, handler, successCallback);
         }).error(function(data) {
@@ -412,6 +421,7 @@ oppia.factory('oppiaPlayerService', [
           warningsData.addWarning(
             data.error || 'There was an error processing your input.');
         });
+        }
       });
     },
     showFeedbackModal: function() {
