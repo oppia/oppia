@@ -121,6 +121,7 @@ oppia.controller('ExplorationFeedback', [
     }
   };
 
+  $scope.newMessageText = '';
   $scope.addMessage = function(threadId, newMessageText, updatedStatus) {
     if (threadId === null) {
       warningsData.addWarning(
@@ -137,6 +138,7 @@ oppia.controller('ExplorationFeedback', [
       $scope.currentThreadData.status = updatedStatus;
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
+      $scope.newMessageText = '';
       $scope.$parent.refreshFeedbackTabHeader();
     }).error(function(data) {
       $scope.messageSendingInProgress = false;
