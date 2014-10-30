@@ -271,6 +271,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             } else if (varType == 'NonnegativeInt') {
               // Set a default value.
               $scope.rule.definition.inputs[varName] = 0;
+            } else if (varType == "Graph") {
+              $scope.rule.definition.inputs[varName] = {
+                'vertices': [], 
+                'edges': [], 
+                'isDirected': false, 
+                'isWeighted': false, 
+                'isLabeled': false
+              };
             } else {
               $scope.rule.definition.inputs[varName] = '';
             }

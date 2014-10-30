@@ -41,8 +41,6 @@ class IsIsomorphicTo(base.GraphRule):
             return ret
         adj = construct_adjacency_matrix(subject)
         adj2 = construct_adjacency_matrix(self.g)
-        print adj
-        print adj2
 
         # Check against every permutation of vertices. 
         # The new index of vertex i in self.g is perm[i].
@@ -56,7 +54,6 @@ class IsIsomorphicTo(base.GraphRule):
                 continue
 
             # Test isomorphism
-            print perm
             found_isomorphism = True
             for i in xrange(num_vertices):
                 for j in xrange(num_vertices):

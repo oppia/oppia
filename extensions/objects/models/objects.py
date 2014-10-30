@@ -496,7 +496,6 @@ class Graph(BaseObject):
                 if not raw['isWeighted']:
                     edge['weight'] = 1
 
-            # Tests uniqueness of edge, is there a better way?
             if raw['isDirected']:
                 edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
             else:

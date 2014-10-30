@@ -31,6 +31,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
         $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
 
         $scope.submitGraph = function() {
+          // angular.copy needed to strip $$hashkey from the graph 
           $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph), 'submit');
         };
         
@@ -102,11 +103,11 @@ oppia.directive('graphViz', function() {
         // If in ADD_EDGE mode, source vertex of the new edge, if it exists
         addEdgeVertex: null,
         // Currently dragged vertex
-        dragVertex: null,
+        currentlyDraggedVertex: null,
         // Selected vertex for editing label
-        selectVertex: null,
+        selectedVertex: null,
         // Selected edge for editing weight
-        selectEdge: null,
+        selectedEdge: null,
         // Mouse position in SVG coordinates
         mouseX: 0,
         mouseY: 0,
@@ -117,9 +118,9 @@ oppia.directive('graphViz', function() {
       $scope.mousemoveGraphSVG = function(event) {
         $scope.state.mouseX = event.pageX - vizContainer.offset().left;
         $scope.state.mouseY = event.pageY - vizContainer.offset().top;
-        if ($scope.state.dragVertex !== null) {
-          $scope.graph.vertices[$scope.state.dragVertex].x = $scope.state.mouseX;
-          $scope.graph.vertices[$scope.state.dragVertex].y = $scope.state.mouseY;
+        if ($scope.state.currentlyDraggedVertex !== null) {
+          $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = $scope.state.mouseX;
+          $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = $scope.state.mouseY;
         }
       };
 
@@ -132,9 +133,9 @@ oppia.directive('graphViz', function() {
           });
         }
         if ($scope.state.hoverVertex === null) {
-          $scope.state.selectVertex = null;
+          $scope.state.selectedVertex = null;
         }
-        $scope.state.selectEdge = null;
+        $scope.state.selectedEdge = null;
       };
 
       $scope.init = function() {
@@ -183,7 +184,7 @@ oppia.directive('graphViz', function() {
       $scope.toggleGraphOption = function(option) {
         // Handle the case when we have two edges s -> d and d -> s
         if (option === 'isDirected' && $scope.graph[option]) {
-          deleteRepeatedEdges();
+          _deleteRepeatedUndirectedEdges();
         }
         $scope.graph[option] = !$scope.graph[option];
       };
@@ -193,12 +194,12 @@ oppia.directive('graphViz', function() {
         $event.stopPropagation();
         $scope.state.currentMode = mode;
         $scope.state.addEdgeVertex = null;
-        $scope.state.selectVertex = null;
-        $scope.state.selectEdge = null;
+        $scope.state.selectedVertex = null;
+        $scope.state.selectedEdge = null;
       };
 
       // TODO(czx): Consider if there's a neat way to write a reset()
-      // function to clear bits of $scope.state (e.g. dragVertex, addEdgeVertex)
+      // function to clear bits of $scope.state (e.g. currentlyDraggedVertex, addEdgeVertex)
 
       // Vertex events
       $scope.onClickVertex = function(index) {
@@ -249,7 +250,7 @@ oppia.directive('graphViz', function() {
           }
           endAddEdge();
         } else if ($scope.state.currentMode === _MODES.MOVE) {
-          if ($scope.state.dragVertex !== null) {
+          if ($scope.state.currentlyDraggedVertex !== null) {
             endDragVertex();
           }
         }
@@ -292,25 +293,25 @@ oppia.directive('graphViz', function() {
         return;
       }
       function beginDragVertex(index) {
-        $scope.state.dragVertex = index;
+        $scope.state.currentlyDraggedVertex = index;
       }
       function endDragVertex() {
-        $scope.state.dragVertex = null;
+        $scope.state.currentlyDraggedVertex = null;
       }
       function beginEditVertexLabel(index) {
-        $scope.state.selectVertex = index;
+        $scope.state.selectedVertex = index;
         focusService.setFocus('vertexLabelEditBegun');
       }
 
       function beginEditEdgeWeight(index) {
-        $scope.state.selectEdge = index;
+        $scope.state.selectedEdge = index;
         focusService.setFocus('edgeWeightEditBegun');
       }
       function deleteEdge(index) {
         $scope.graph.edges.splice(index,1);
         $scope.state.hoverEdge = null;
       }
-      function deleteRepeatedEdges() {
+      function _deleteRepeatedUndirectedEdges() {
         for (var i = 0; i < $scope.graph.edges.length; i++) {
           var edge1 = $scope.graph.edges[i];
           for (var j = i + 1; j < $scope.graph.edges.length; j++) {
@@ -339,23 +340,23 @@ oppia.directive('graphViz', function() {
         $scope.graph.vertices.splice(index, 1);
         $scope.state.hoverVertex = null;
       }
-      $scope.selectedVertexLabel = function(label) {
-        if ($scope.state.selectVertex === null) {
+      $scope.selectedVertexLabelGetterSetter = function(label) {
+        if ($scope.state.selectedVertex === null) {
           return '';
         }
         if (angular.isDefined(label)) {
-          $scope.graph.vertices[$scope.state.selectVertex].label = label;
+          $scope.graph.vertices[$scope.state.selectedVertex].label = label;
         }
-        return $scope.graph.vertices[$scope.state.selectVertex].label;
+        return $scope.graph.vertices[$scope.state.selectedVertex].label;
       };
       $scope.selectedEdgeWeight = function(weight) {
-        if ($scope.state.selectEdge === null) {
+        if ($scope.state.selectedEdge === null) {
           return '';
         }
         if (angular.isDefined(weight) && angular.isNumber(weight)) {
-          $scope.graph.edges[$scope.state.selectEdge].weight = weight;
+          $scope.graph.edges[$scope.state.selectedEdge].weight = weight;
         }
-        return $scope.graph.edges[$scope.state.selectEdge].weight;
+        return $scope.graph.edges[$scope.state.selectedEdge].weight;
       };
 
 

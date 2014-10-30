@@ -29,10 +29,6 @@ oppia.directive('graphEditor', function($compile, warningsData) {
     template: '<div ng-include="getTemplateUrl()"></div>',
     controller: function($scope, $element, $attrs) {
       $scope.alwaysEditable = true;
-      
-      // Otherwise, $scope.$parent.value will be "" and cause problems
-      // TODO(czx): Is there a better place to set/check this?
-      if (typeof $scope.$parent.value !== 'object') $scope.$parent.value = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
     }
   };
 });
