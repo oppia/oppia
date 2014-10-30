@@ -1007,7 +1007,7 @@ oppia-parameter {
 }
 
 .oppia-splash-btn:hover {
-  background-color: #05A69A;
+  background-color: #2569C2;
   color: #fff;
 }
 
@@ -1043,6 +1043,12 @@ oppia-parameter {
   margin: 0;
   padding: 48px 200px;
   background-color: #fff;
+}
+
+.oppia-splash-section p {
+  font-size: 1.8rem;
+  min-width: 300px;
+  max-width: 500px;
 }
 
 .oppia-vcenter {
@@ -1096,12 +1102,16 @@ oppia-parameter {
 }
 
 .oppia-splash-page-hr {
-  width: 90%;
+  width: 60%;
 }
 
 .oppia-splash-page-buttons h3 {
   color: #666;
   margin-bottom: 24px;
+}
+
+.oppia-splash-page-screenshot {
+  max-height: 250px;
 }
 
 .oppia-splash-hr {
