@@ -134,7 +134,10 @@ oppia.controller('StateEditor', [
   };
 
   $scope.cancelEdit = function() {
-    $scope.contentMemento = null;
+     var _stateData = explorationStatesService.getState(
+       editorContextService.getActiveStateName());
+     $scope.content = angular.copy(_stateData.content);
+     $scope.contentMemento = null;
   };
 
   $scope.saveStateParamChanges = function(newValue, oldValue) {
