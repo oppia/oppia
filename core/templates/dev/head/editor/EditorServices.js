@@ -632,6 +632,9 @@ oppia.factory('explorationStatesService', [
 
         $location.path('/gui/' + editorContextService.getActiveStateName());
         $rootScope.$broadcast('refreshGraph');
+        // This ensures that if the deletion changes rules in the current
+        // state, they get updated in the view.
+        $rootScope.$broadcast('refreshStateEditor');
       });
     },
     renameState: function(oldStateName, newStateName) {
