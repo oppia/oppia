@@ -80,7 +80,9 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # Publicize the demo exploration.
         rights_manager.publicize_exploration(owner_id, '0')
 
-        # run migration job to create exploration summaries
+        # Run migration job to create exploration summaries.
+        # This is not necessary, but serves as additional check that
+        # the migration job works well and gives correct galleries.
         self.process_and_flush_pending_tasks()
         job_id = (exp_jobs.ExpSummariesCreationOneOffJob.create_new())
         exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
@@ -121,14 +123,19 @@ class GalleryPageTest(test_utils.GenericTestBase):
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.set_admins([self.OWNER_EMAIL])
 
+        self.register_editor(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL)
+
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
         self.assertEqual({
-            'is_admin': False,
-            'is_moderator': False,
+            'is_admin': True,
+            'is_moderator': True,
             'is_super_admin': False,
             'private': [],
             'beta': [],
             'released': [],
+            'user_email': self.OWNER_EMAIL,
+            'username': 'defaultusername'
         }, response_dict)
 
         # Create exploration A
@@ -137,34 +144,22 @@ class GalleryPageTest(test_utils.GenericTestBase):
             objective='Objective A')
         exp_services._save_exploration(
             owner_id, exploration, 'Exploration A', [])
-        # TODO(msl): At the moment we only test published and publicized
-        # explorations. Maybe add a test for a private exploration in the 
-        # future.
-        rights_manager.publish_exploration(owner_id, 'A')
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['private'], [])
+        self.assertEqual(response_dict['beta'], [])
         self.assertEqual(response_dict['released'], [])
-        self.assertEqual(len(response_dict['beta']), 1)
+        self.assertEqual(len(response_dict['private']), 1)
         self.assertDictContainsSubset({
             'id': 'A',
             'category': 'Category A',
             'title': 'Title A',
             'language': 'English',
             'objective': 'Objective A',
-            'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
-        }, response_dict['beta'][0])
+            'status': rights_manager.EXPLORATION_STATUS_PRIVATE,
+        }, response_dict['private'][0])
 
-        # run migration job to create exploration summaries
-        self.process_and_flush_pending_tasks()
-        job_id = (exp_jobs.ExpSummariesCreationOneOffJob.create_new())
-        exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
-        self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
-        self.process_and_flush_pending_tasks()
-        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
-
-       # Create exploration B
+        # Create exploration B
         exploration = self.save_new_valid_exploration(
             'B', owner_id, title='Title B', category='Category B',
             objective='Objective B')
@@ -172,6 +167,9 @@ class GalleryPageTest(test_utils.GenericTestBase):
             owner_id, exploration, 'Exploration B', [])
         rights_manager.publish_exploration(owner_id, 'B')
         rights_manager.publicize_exploration(owner_id, 'B')
+
+        # Publish exploration A
+        rights_manager.publish_exploration(owner_id, 'A')
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)

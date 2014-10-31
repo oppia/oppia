@@ -843,10 +843,6 @@ def get_summary_of_exploration(exploration):
     exploration_model_last_updated = exploration.last_updated
     exploration_model_created_on = exploration.created_on
 
-    if exploration_model_last_updated == None:
-        raise Exception(
-            'Unexpected error: exploration_model_last_updated is None')
-    
     exp_summary = exp_domain.ExplorationSummary(
         exploration.id,
         exploration.title,

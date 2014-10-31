@@ -1880,6 +1880,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
     EXP_ID_1 = 'eid1'
     EXP_ID_2 = 'eid2'
 
+    EXPECTED_VERSION_1 = 4
+    EXPECTED_VERSION_2 = 2
 
     def setUp(self):
         """Populate the database of explorations and their summaries.
@@ -1939,7 +1941,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], 2,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
                 )}
@@ -1968,14 +1970,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], 4,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated),
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], 2,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
                 )}
@@ -2006,7 +2008,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
-                False, [self.ALBERT_ID], [], [], 4,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_1].exploration_model_last_updated
                 )}
@@ -2050,7 +2052,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
-                False, [self.ALBERT_ID], [], [], 2,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
         )}

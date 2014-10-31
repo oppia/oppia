@@ -44,10 +44,6 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
         publicized), community_owned, owner_ids, editor_ids,
         viewer_ids, version.
     """
-    # @classmethod
-    # def _get_continuous_computation_class(cls):
-    #     return ExpSummariesAggregator
-
     @classmethod
     def entity_classes_to_map_over(cls):
         return [exp_models.ExplorationModel]

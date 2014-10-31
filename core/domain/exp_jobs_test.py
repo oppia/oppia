@@ -62,7 +62,6 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             {'category': 'Category C',
              'title': 'Title 5'}
             ]
-        self.process_and_flush_pending_tasks()
 
         self._run_batch_job_once_and_verify_output(
             exp_specs,
@@ -208,7 +207,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                         exploration.version)
 
             # run batch job
-            job_id = (exp_jobs.ExpSummariesCreationOneOffJob.create_new())
+            job_id = exp_jobs.ExpSummariesCreationOneOffJob.create_new()
             exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
             self.process_and_flush_pending_tasks()
 
