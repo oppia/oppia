@@ -301,6 +301,10 @@ urls = [
         widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
 
     get_redirect_route(
+        r'/notificationshandler', home.NotificationsHandler,
+        'notifications_handler'),
+
+    get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
 
     get_redirect_route(
