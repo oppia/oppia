@@ -69,13 +69,8 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/expression">
-  <em ng-if="paramNameOptions.length === 0">No parameters to select from.</em>
-
-  <select class="form-control" ng-if="paramNameOptions.length > 0" ng-disabled="disabled()"
-          ng-model="$parent.localValue"
-          ng-options="o.value as o.name for o in paramNameOptions"
-          focus-on="<[labelForFocusTarget()]>">
-  </select>
+  <input type="text" ng-model="localValue" class="form-control" ng-disabled="disabled()"
+         required require-is-valid-expression focus-on="<[labelForFocusTarget()]>">
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">

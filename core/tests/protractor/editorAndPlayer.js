@@ -19,6 +19,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
@@ -136,5 +137,9 @@ describe('Full exploration editor', function() {
     player.expectExplorationToNotBeOver();
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

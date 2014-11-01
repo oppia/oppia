@@ -276,6 +276,17 @@ describe('State Editor controller', function() {
       expect(cls.getChangeList()).toEqual([]);
     });
 
+    it('should not save any changes to content when an edit is cancelled',
+       function() {
+      ecs.setActiveStateName('Third State');
+      scope.initStateEditor();
+      var contentBeforeEdit = angular.copy(scope.content);
+      scope.content = scope.getContent('Test Content');
+      scope.cancelEdit();
+      expect(scope.contentMemento).toBeNull();
+      expect(scope.content).toEqual(contentBeforeEdit);
+    }); 
+      
     it('should save parameter edits correctly', function() {
       ecs.setActiveStateName('First State');
 

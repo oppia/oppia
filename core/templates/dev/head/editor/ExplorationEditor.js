@@ -28,7 +28,7 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
-  'explorationStatesService', 'routerService', 'graphDataService',
+  'explorationStatesService', 'routerService', 'graphDataService', 'focusService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -37,7 +37,7 @@ oppia.controller('ExplorationEditor', [
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
-    graphDataService) {
+    graphDataService, focusService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -314,6 +314,14 @@ oppia.controller('ExplorationEditor', [
         ]
       });
 
+      modalInstance.opened.then(function(data) {
+        // The $timeout seems to be needed in order to give the modal time to
+        // render.
+        $timeout(function() {
+          focusService.setFocus('saveChangesModalOpened');
+        });
+      });
+
       modalInstance.result.then(function(commitMessage) {
         $scope.isSaveInProgress = true;
 
@@ -339,27 +347,32 @@ oppia.controller('ExplorationEditor', [
     $scope.areExplorationWarningsVisible = !$scope.areExplorationWarningsVisible;
   };
 
-  // Given an initial node name, a list of node names, and a list of edges
-  // (each of which is an object with keys 'source' and 'target', and values
-  // equal to the respective node names), returns a list of names of all nodes
-  // which are unreachable from the initial node.
-  $scope._getUnreachableNodeNames = function(initNodeName, nodes, edges) {
-    var queue = [initNodeName];
+  // Given an initial node id, a object with keys node ids, and values node
+  // names, and a list of edges (each of which is an object with keys 'source'
+  // and 'target', and values equal to the respective node names), returns a
+  // list of names of all nodes which are unreachable from the initial node.
+  $scope._getUnreachableNodeNames = function(initNodeId, nodes, edges) {
+    var queue = [initNodeId];
     var seen = {};
-    seen[initNodeName] = true;
+    seen[initNodeId] = true;
     while (queue.length > 0) {
-      var currNodeName = queue.shift();
+      var currNodeId = queue.shift();
       edges.forEach(function(edge) {
-        if (edge.source === currNodeName && !seen.hasOwnProperty(edge.target)) {
+        if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
           seen[edge.target] = true;
           queue.push(edge.target);
         }
       });
     }
 
-    return nodes.filter(function(node) {
-      return !seen.hasOwnProperty(node);
-    });
+    var unreachableNodeNames = [];
+    for (var nodeId in nodes) {
+      if (!(seen.hasOwnProperty(nodes[nodeId]))) {
+        unreachableNodeNames.push(nodes[nodeId]);
+      }
+    }
+
+    return unreachableNodeNames;
   };
 
   // Given an array of objects with two keys 'source' and 'target', returns
@@ -412,7 +425,7 @@ oppia.controller('ExplorationEditor', [
     var _graphData = graphDataService.getGraphData();
     if (_graphData) {
       var unreachableStateNames = $scope._getUnreachableNodeNames(
-        _graphData.initStateName, _graphData.nodes, _graphData.links);
+        _graphData.initStateId, _graphData.nodes, _graphData.links);
       if (unreachableStateNames.length) {
         $scope.warningsList.push(
           'The following state(s) are unreachable: ' +
@@ -420,7 +433,7 @@ oppia.controller('ExplorationEditor', [
       } else {
         // Only perform this check if all states are reachable.
         var deadEndStates = $scope._getUnreachableNodeNames(
-          _graphData.finalStateName, _graphData.nodes,
+          _graphData.finalStateId, _graphData.nodes,
           $scope._getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
           $scope.warningsList.push(

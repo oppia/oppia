@@ -632,6 +632,9 @@ oppia.factory('explorationStatesService', [
 
         $location.path('/gui/' + editorContextService.getActiveStateName());
         $rootScope.$broadcast('refreshGraph');
+        // This ensures that if the deletion changes rules in the current
+        // state, they get updated in the view.
+        $rootScope.$broadcast('refreshStateEditor');
       });
     },
     renameState: function(oldStateName, newStateName) {
@@ -818,7 +821,8 @@ oppia.factory('graphDataService', [
 
   // Returns an object which can be treated as the input to a visualization
   // for a directed graph. The returned object has the following keys:
-  //   - nodes: a list of node names
+  //   - nodes: an object whose keys are node ids (equal to node names) and whose
+  //      values are node names
   //   - links: a list of objects. Each object represents a directed link between
   //      two notes, and has keys 'source' and 'target', the values of which are
   //      the names of the corresponding nodes.
@@ -831,10 +835,10 @@ oppia.factory('graphDataService', [
 
     var states = explorationStatesService.getStates();
 
-    var nodeList = [];
+    var nodes = {};
     var links = [];
-    for (stateName in states) {
-      nodeList.push(stateName);
+    for (var stateName in states) {
+      nodes[stateName] = stateName;
 
       var handlers = states[stateName].widget.handlers;
       for (h = 0; h < handlers.length; h++) {
@@ -847,13 +851,13 @@ oppia.factory('graphDataService', [
         }
       }
     }
-    nodeList.push(END_DEST);
+    nodes[END_DEST] = END_DEST;
 
     _graphData = {
-      nodes: nodeList,
+      nodes: nodes,
       links: links,
-      initStateName: explorationInitStateNameService.savedMemento,
-      finalStateName: END_DEST
+      initStateId: explorationInitStateNameService.savedMemento,
+      finalStateId: END_DEST
     };
   };
 

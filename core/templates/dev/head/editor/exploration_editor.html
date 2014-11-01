@@ -182,7 +182,7 @@
         <p>
           <span ng-if="commitMessageIsOptional">(Optional)</span>
           Please enter a brief description of what you have changed:
-          <textarea rows="3" cols="50" ng-model="commitMessage" autofocus></textarea>
+          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened"></textarea>
         </p>
 
         <div ng-if="explorationChangesExist">
@@ -398,6 +398,14 @@
       <marker id="arrowhead" viewBox="-5 -5 18 18" refX="10" refY="6"
               markerWidth="6" markerHeight="9" orient="auto">
         <path d="M -5 0 L 12 6 L -5 12 z" fill="grey"></path>
+      </marker>
+      <marker id="arrowhead-green" viewBox="-5 -5 18 18" refX="10" refY="6"
+              markerWidth="6" markerHeight="9" orient="auto">
+        <path d="M -5 0 L 12 6 L -5 12 z" fill="#1F7D1F"></path>
+      </marker>
+      <marker id="arrowhead-red" viewBox="-5 -5 18 18" refX="10" refY="6"
+              markerWidth="6" markerHeight="9" orient="auto">
+        <path d="M -5 0 L 12 6 L -5 12 z" fill="#B22222"></path>
       </marker>
       <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
         <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>

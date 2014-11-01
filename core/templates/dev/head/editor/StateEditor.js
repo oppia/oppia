@@ -133,6 +133,13 @@ oppia.controller('StateEditor', [
     $scope.contentMemento = null;
   };
 
+  $scope.cancelEdit = function() {
+     var _stateData = explorationStatesService.getState(
+       editorContextService.getActiveStateName());
+     $scope.content = angular.copy(_stateData.content);
+     $scope.contentMemento = null;
+  };
+
   $scope.saveStateParamChanges = function(newValue, oldValue) {
     if (!angular.equals(newValue, oldValue)) {
       changeListService.editStateProperty(

@@ -709,9 +709,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-top: 40px;
 }
 
-.oppia-content-section:hover .oppia-state-content-display,
-.oppia-interactive-section:hover .oppia-interaction-preview,
-.oppia-interactive-section:hover .oppia-readonly-rule-tile {
+.oppia-editable-section:hover .oppia-state-content-display,
+.oppia-editable-section:hover .oppia-interaction-preview,
+.oppia-editable-section:hover .oppia-readonly-rule-tile {
   background: #eee;
 }
 
@@ -810,15 +810,15 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-right: 2px;
   margin-top: 1px;
   padding: 9px 10px 6px 10px;
-  position: absolute; 
+  position: absolute;
   right: 15px;
 }
 
 .oppia-exploration-warnings-box {
   cursor: pointer;
-  margin-bottom: 2px; 
-  opacity: 1; 
-  padding: 2px 5px; 
+  margin-bottom: 2px;
+  opacity: 1;
+  padding: 2px 5px;
   position: absolute;
   right: 15px;
   z-index: 5;
@@ -987,4 +987,9 @@ oppia-parameter {
 
 .oppia-tutorial-tooltip {
   min-width: 300px !important;
+}
+
+/* Hide the search icon in the rule destination dropdown. */
+.oppia-rule-dest-select2 .select2-search input {
+  background: none;
 }

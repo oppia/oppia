@@ -26,11 +26,41 @@ var waitForSystem = function() {
   protractor.getInstance().sleep(WAIT_TIME);
 };
 
+// We will report all console logs of level greater than this.
+var CONSOLE_LOG_THRESHOLD = 900;
+var CONSOLE_ERRORS_TO_IGNORE = [
+  // TODO (Jacob): fix error and remove this entry
+  'http://localhost:4445/third_party/static/angularjs-1.3.0-rc.5/angular.js 11086:24'
+];
+
+var checkForConsoleErrors = function(errorsToIgnore) {
+  var irrelevantErrors = errorsToIgnore.concat(CONSOLE_ERRORS_TO_IGNORE);
+  browser.manage().logs().get('browser').then(function(browserLogs) {
+    var fatalErrors = [];
+    for (var i = 0; i < browserLogs.length; i++) {
+      if (browserLogs[i].level.value > CONSOLE_LOG_THRESHOLD) {
+        var errorFatal = true;
+        for (var j = 0; j < irrelevantErrors.length; j++) {
+          if (browserLogs[i].message.match(irrelevantErrors[j])) {
+            errorFatal = false;
+          }
+        }
+        if (errorFatal) {
+          fatalErrors.push(browserLogs[i]);
+        }
+      }
+    }
+    expect(fatalErrors).toEqual([]);
+  });
+};
+
+
 var SERVER_URL_PREFIX = 'http://localhost:4445';
 var EDITOR_URL_SLICE = '/create/';
 var PLAYER_URL_SLICE = '/explore/';
 var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
+var SCRIPTS_URL_SLICE = '/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
 
 
@@ -85,10 +115,15 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
+
+
 exports.waitForSystem = waitForSystem;
+exports.checkForConsoleErrors = checkForConsoleErrors;
+
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
+exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
 
 exports.getExplorationIdFromEditor = getExplorationIdFromEditor;
 exports.getExplorationIdFromPlayer = getExplorationIdFromPlayer;

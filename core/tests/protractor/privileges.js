@@ -18,6 +18,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -49,5 +50,11 @@ describe('Permissions for private explorations', function() {
       general.expect404Error();
       users.logout();
     });
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([
+      'Failed to load resource: the server responded with a status of 404'
+    ]);
   });
 });

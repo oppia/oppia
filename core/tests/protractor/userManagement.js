@@ -18,6 +18,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 
@@ -33,5 +34,9 @@ describe('Account creation', function() {
   // Usernames containing "admin" are not permitted.
   it('should create admins', function() {
     users.createAdmin('admin@example.com', 'adm1n');
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

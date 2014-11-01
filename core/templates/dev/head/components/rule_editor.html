@@ -1,5 +1,5 @@
 <div>
-  <div ng-if="!ruleEditorIsOpen" class="oppia-interactive-section protractor-test-edit-rule"
+  <div ng-if="!ruleEditorIsOpen" class="protractor-test-edit-rule"
        ng-class="{'oppia-editable-section': isEditable}">
 
     <div class="oppia-interactive-section-click-handler" ng-click="openRuleEditor()">
@@ -109,7 +109,7 @@
       <div class="oppia-dest-bubble">
         <div class="oppia-align-center">
           <strong>Destination:</strong><br />
-          <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9\.]+$" on-selection-change="createRuleDestIfNecessary()">
+          <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9\.]+$" dropdown-css-class="oppia-rule-dest-select2" format-new-selection="convertNewDestToText" invalid-search-term-message="Invalid state name">
           </select2-dropdown>
           <span ng-if="rule.dest == stateName"> ⟳ </span><br />
         </div>
