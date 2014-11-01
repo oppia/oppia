@@ -1,0 +1,425 @@
+author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: Introduction
+language_code: en
+objective: Learn how to model objects as graphs
+param_changes: []
+param_specs: {}
+schema_version: 3
+skill_tags: []
+states:
+  Bosses correct:
+    content:
+    - type: text
+      value: As you can see, graphs are very useful for modeling real world behavior.
+        They are widely used in many fields, such as computer science and statistics.&nbsp;<div><br></div><div>Maybe
+        from now on you'll start seeing graphs all over the place!&nbsp;</div>
+    param_changes: []
+    widget:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: END
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
+  Bosses question:
+    content:
+    - type: text
+      value: 'There are 6 employees in a company: Fred, George, Hannah, Irene, John
+        and Kevin.<div><ul><li>Fred and Hannah report to John.</li><li>Kevin reports
+        to George.</li><li>John and George report to Irene.</li></ul><div>Try modeling
+        this as a graph, with a directed edge from an employee to his or her immediate
+        superior.</div></div>'
+    param_changes: []
+    widget:
+      customization_args:
+        graph:
+          value:
+            edges: []
+            isDirected: true
+            isLabeled: true
+            isWeighted: false
+            vertices:
+            - label: Fred
+              x: 150
+              y: 50
+            - label: George
+              x: 200
+              y: 50
+            - label: Irene
+              x: 150
+              y: 100
+            - label: Hannah
+              x: 269.09375
+              y: 49
+            - label: John
+              x: 201.09375
+              y: 101
+            - label: Kevin
+              x: 265.09375
+              y: 100
+        movePermissions:
+          value: true
+        vertexEditPermissions:
+          value: false
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              g:
+                edges:
+                - dst: 0
+                  src: 1
+                  weight: 1
+                - dst: 0
+                  src: 2
+                  weight: 1
+                - dst: 2
+                  src: 5
+                  weight: 1
+                - dst: 1
+                  src: 4
+                  weight: 1
+                - dst: 1
+                  src: 3
+                  weight: 1
+                isDirected: true
+                isLabeled: true
+                isWeighted: false
+                vertices:
+                - label: Irene
+                  x: 156.59375
+                  y: 43.0
+                - label: John
+                  x: 126.59375
+                  y: 99.0
+                - label: George
+                  x: 220.59375
+                  y: 92.0
+                - label: Fred
+                  x: 103.59375
+                  y: 163.0
+                - label: Hannah
+                  x: 163.59375
+                  y: 163.0
+                - label: Kevin
+                  x: 218.59375
+                  y: 162.0
+            name: IsIsomorphicTo
+            rule_type: atomic
+            subject: answer
+          dest: Bosses correct
+          feedback:
+          - Well done!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Bosses question
+          feedback:
+          - Not exactly... try again!
+          param_changes: []
+      sticky: false
+      widget_id: GraphInput
+  Cities correct:
+    content:
+    - type: text
+      value: Distances on a map are a very common thing to use graphs to model, as
+        computers can then process these graphs to do stuff like path-finding without
+        worrying about extra details that a full map would have. Note that it doesn't
+        matter how far apart the vertices are when you draw them, the important thing
+        is the weight of the edge.<div><br></div><div>Another piece of extra information
+        we might want to add to a graph are relations that only go in one direction.
+        In that case, instead of having lines between dots, we have arrows instead.
+        In mathematician-speak, this would be a "directed graph", since every edge
+        has a direction.</div><div><br></div><div>Let's give this a try now!</div>
+    param_changes: []
+    widget:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Bosses question
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
+  Cities question:
+    content:
+    - type: text
+      value: 'Use the following information about distances between cities to model
+        them on a graph:<div><ul><li>Paris is 344km from London.</li><li>London is
+        932km from Berlin.</li><li>Berlin is 878km from Paris.</li><li>Paris is 1054km
+        from Madrid.</li><li>London is 1265km from Madrid.</li><li>Madrid is 1871km
+        from Berlin.</li></ul><div>(Note: On the graph, don''t put "km" on the edges,
+        just put the number)</div></div>'
+    param_changes: []
+    widget:
+      customization_args:
+        graph:
+          value:
+            edges: []
+            isDirected: false
+            isLabeled: true
+            isWeighted: true
+            vertices:
+            - label: London
+              x: 305.09375
+              y: 32
+            - label: Paris
+              x: 324.09375
+              y: 98
+            - label: Madrid
+              x: 211.09375
+              y: 190
+            - label: Berlin
+              x: 491.09375
+              y: 119
+        movePermissions:
+          value: true
+        vertexEditPermissions:
+          value: false
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              g:
+                edges:
+                - dst: 1
+                  src: 0
+                  weight: 344
+                - dst: 0
+                  src: 2
+                  weight: 932
+                - dst: 1
+                  src: 2
+                  weight: 878
+                - dst: 3
+                  src: 1
+                  weight: 1054
+                - dst: 0
+                  src: 3
+                  weight: 1265
+                - dst: 2
+                  src: 3
+                  weight: 1871
+                isDirected: false
+                isLabeled: true
+                isWeighted: true
+                vertices:
+                - label: London
+                  x: 158.59375
+                  y: 45.0
+                - label: Paris
+                  x: 227.59375
+                  y: 197.0
+                - label: Berlin
+                  x: 218.59375
+                  y: 64.0
+                - label: Madrid
+                  x: 99.59375
+                  y: 177.0
+            name: IsIsomorphicTo
+            rule_type: atomic
+            subject: answer
+          dest: Cities correct
+          feedback:
+          - Excellent!
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Cities question
+          feedback:
+          - Not quite, try again!
+          param_changes: []
+      sticky: false
+      widget_id: GraphInput
+  Friends correct:
+    content:
+    - type: text
+      value: Friendships and social relations are just one example of things that
+        can be modeled by graphs.<div><br></div><div>Sometimes, though, we want a
+        bit more information in our graphs. For example, let's say that we want to
+        use a graph to model distances between cities. In this case, we can attach
+        numbers to each edge to represent this data. In mathematician-speak, such
+        a graph is a "weighted graph", since each edge has a "weight" number.</div><div><br></div><div>Let's
+        give this a try!</div>
+    param_changes: []
+    widget:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Cities question
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
+  Friends question:
+    content:
+    - type: text
+      value: '<div>There are a group of 5 people in a room: Alice, Bob, Charlie, David
+        and Emily. We have that:</div><div><ul><li>Alice is friends with everyone
+        but David<br></li><li>Bob is friends with Alice only<br></li><li>Charlie is
+        friends with Alice and David<br></li><li>David is friends with Charlie and
+        Emily<br></li><li>Emily is friends with Alice and David<br></li></ul></div><div>Try
+        to model the friendships as a graph!</div>'
+    param_changes: []
+    widget:
+      customization_args:
+        graph:
+          value:
+            edges: []
+            isDirected: false
+            isLabeled: true
+            isWeighted: false
+            vertices:
+            - label: Bob
+              x: 380.59375
+              y: 97
+            - label: Emily
+              x: 259.59375
+              y: 98
+            - label: David
+              x: 291.59375
+              y: 157
+            - label: Charlie
+              x: 353.59375
+              y: 159
+            - label: Alice
+              x: 320.59375
+              y: 57
+        movePermissions:
+          value: true
+        vertexEditPermissions:
+          value: false
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              g:
+                edges:
+                - dst: 1
+                  src: 0
+                  weight: 1
+                - dst: 0
+                  src: 2
+                  weight: 1
+                - dst: 4
+                  src: 0
+                  weight: 1
+                - dst: 3
+                  src: 4
+                  weight: 1
+                - dst: 2
+                  src: 3
+                  weight: 1
+                isDirected: false
+                isLabeled: true
+                isWeighted: false
+                vertices:
+                - label: Alice
+                  x: 68.09375
+                  y: 91
+                - label: Bob
+                  x: 128.09375
+                  y: 124
+                - label: Charlie
+                  x: 114.09375
+                  y: 189
+                - label: David
+                  x: 45.09375
+                  y: 206
+                - label: Emily
+                  x: 17.09375
+                  y: 161
+            name: IsIsomorphicTo
+            rule_type: atomic
+            subject: answer
+          dest: Friends correct
+          feedback:
+          - Correct!
+          param_changes: []
+        - definition:
+            inputs:
+              g:
+                edges: []
+                isDirected: false
+                isLabeled: true
+                isWeighted: false
+                vertices:
+                - label: Alice
+                  x: 115.09375
+                  y: 85
+                - label: Bob
+                  x: 184.09375
+                  y: 110
+                - label: Charlie
+                  x: 164.09375
+                  y: 156
+                - label: David
+                  x: 109.09375
+                  y: 185
+                - label: Emily
+                  x: 80.09375
+                  y: 138
+            name: IsIsomorphicTo
+            rule_type: atomic
+            subject: answer
+          dest: Friends question
+          feedback:
+          - Did you forget to add new edges?
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Friends question
+          feedback:
+          - Not quite... Let's try again!
+          param_changes: []
+      sticky: false
+      widget_id: GraphInput
+  Introduction:
+    content:
+    - type: text
+      value: 'When mathematicians talk about graph theory, they usually aren''t referring
+        to curve sketching!<div><br></div><div>A graph is a mathematical object that
+        consists of "vertices" and "edges". Does this sound complicated? Actually,
+        it isn''t: in simple terms, graphs just dots joined by lines! The dots are
+        called "vertices" and the lines are called "edges". An example of a graph
+        is shown below:</div><div><br></div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;A
+        simple graph.png&amp;quot;"></oppia-noninteractive-image><br></div><div><br></div><div>Despite
+        this simplicity, graphs are useful for modeling all kinds of real world behavior.
+        Not convinced? Let''s take a look at some things that graphs can model...</div>'
+    param_changes: []
+    widget:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Friends question
+          feedback: []
+          param_changes: []
+      sticky: false
+      widget_id: Continue
