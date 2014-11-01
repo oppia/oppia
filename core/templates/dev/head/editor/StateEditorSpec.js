@@ -276,7 +276,8 @@ describe('State Editor controller', function() {
       expect(cls.getChangeList()).toEqual([]);
     });
 
-    it('should not save any changes to content', function() {
+    it('should not save any changes to content when an edit is cancelled',
+       function() {
       ecs.setActiveStateName('Third State');
       scope.initStateEditor();
       var contentBeforeEdit = angular.copy(scope.content);
