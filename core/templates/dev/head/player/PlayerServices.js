@@ -455,6 +455,9 @@ oppia.factory('oppiaPlayerService', [
       } else {
         throw 'Error: cannot populate exploration in learner mode.';
       }
+    },
+    isAnswerBeingProcessed: function() {
+      return answerIsBeingProcessed;
     }
   };
 }]);

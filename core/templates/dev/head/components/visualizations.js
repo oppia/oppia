@@ -144,9 +144,6 @@ oppia.factory('stateGraphArranger', [
       }
 
       // Handle nodes that were not visited in the forward traversal.
-      // TODO(sll): Consider bounding the maximum offset for these nodes based on
-      // the graph computed so far, and spilling over to additional rows if
-      // necessary.
       maxOffsetInEachLevel[maxDepth + 1] = 0;
       maxDepth += 1;
       var orphanedNodesExist = false;
@@ -155,7 +152,12 @@ oppia.factory('stateGraphArranger', [
           orphanedNodesExist = true;
           nodeData[nodeId].depth = maxDepth;
           nodeData[nodeId].offset = maxOffsetInEachLevel[maxDepth];
-          maxOffsetInEachLevel[maxDepth] += 1;
+          if (maxOffsetInEachLevel[maxDepth] + 1 >= MAX_NODES_PER_ROW) {
+            maxOffsetInEachLevel[maxDepth + 1] = 0;
+            maxDepth += 1;
+          } else {
+            maxOffsetInEachLevel[maxDepth] += 1;
+          }
         }
       }
       if (orphanedNodesExist) {

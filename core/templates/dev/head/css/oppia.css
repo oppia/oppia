@@ -993,3 +993,11 @@ oppia-parameter {
 .oppia-rule-dest-select2 .select2-search input {
   background: none;
 }
+
+.oppia-large-modal-window .modal-dialog {
+  max-width: 900px;
+  width: 80%;
+}
+.oppia-large-modal-window .modal-body {
+  height: 60vh;
+}
