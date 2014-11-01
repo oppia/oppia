@@ -46,9 +46,6 @@ import utils
 # This takes additional 'title' and 'category' parameters.
 CMD_CREATE_NEW = 'create_new'
 
-# TODO(sll): Unify this with the SUBMIT_HANDLER_NAMEs in other files.
-SUBMIT_HANDLER_NAME = 'submit'
-
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 

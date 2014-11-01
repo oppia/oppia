@@ -182,7 +182,7 @@
         <p>
           <span ng-if="commitMessageIsOptional">(Optional)</span>
           Please enter a brief description of what you have changed:
-          <textarea rows="3" cols="50" ng-model="commitMessage" autofocus></textarea>
+          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened"></textarea>
         </p>
 
         <div ng-if="explorationChangesExist">

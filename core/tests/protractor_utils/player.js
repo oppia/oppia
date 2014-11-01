@@ -28,6 +28,12 @@ var widgetUtils = {
     '../../../extensions/widgets/interactive/MultipleChoiceInput/protractor.js'),
   NumericInput: require(
     '../../../extensions/widgets/interactive/NumericInput/protractor.js'),
+  TextInput: require(
+    '../../../extensions/widgets/interactive/TextInput/protractor.js'),
+};
+
+var restartExploration = function() {
+  element(by.css('.protractor-test-restart-exploration')).click();
 };
 
 // The get functions return promises rather than values.
@@ -78,6 +84,8 @@ var expectExplorationToNotBeOver = function() {
   expect(element(by.css('.conversation-skin-response-finished')).
     isDisplayed()).toBe(false);
 };
+
+exports.restartExploration = restartExploration;
 
 exports.getExplorationName = getExplorationName;
 exports.getCurrentQuestionText = getCurrentQuestionText;

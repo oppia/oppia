@@ -22,7 +22,7 @@ oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
-    'explorationInitStateNameService', 'changeListService', 'warningsData', 
+    'explorationInitStateNameService', 'changeListService', 'warningsData',
     'explorationStatesService', function(
       $scope, $http, $window, $modal, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
@@ -54,7 +54,14 @@ oppia.controller('ExplorationSettings', [
   };
 
   $scope.refreshSettingsTab = function() {
-    $scope.stateNames = Object.keys(explorationStatesService.getStates());
+    var _states = explorationStatesService.getStates();
+    // Ensure that explorationStatesService has been initialized before getting
+    // the state names from it. (Otherwise, navigating to the settings tab
+    // directly (by entering a URL that ends with /settings) results in a
+    // console error.
+    if (_states) {
+      $scope.stateNames = Object.keys(_states);
+    }
   };
 
   $scope.$on('refreshSettingsTab', $scope.refreshSettingsTab);

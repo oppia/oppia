@@ -249,7 +249,6 @@ EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
 EXPLORATION_URL_PREFIX = '/explore'
 EXPLORATION_INIT_URL_PREFIX = '/explorehandler/init'
-EXPLORATION_TRANSITION_URL_PREFIX = '/explorehandler/transition'
 FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
@@ -302,6 +301,9 @@ OUTPUT_FORMAT_ZIP = 'zip'
 # Types of updates shown in the 'recent updates' table in the dashboard page.
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
+
+# The name for the default handler of a widget.
+SUBMIT_HANDLER_NAME = 'submit'
 
 # List of supported language codes. Each description has a
 # parenthetical part that may be stripped out to give a shorter

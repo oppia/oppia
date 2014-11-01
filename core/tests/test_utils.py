@@ -22,6 +22,7 @@ import re
 import unittest
 import webtest
 
+from core.controllers import reader
 from core.domain import config_domain
 from core.domain import exp_domain
 from core.domain import exp_services
@@ -283,6 +284,20 @@ class TestBase(unittest.TestCase):
         exploration.objective = objective
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
+
+    def submit_answer(
+            self, exploration_id, state_name, answer,
+            params=None, handler_name=feconf.SUBMIT_HANDLER_NAME,
+            exploration_version=None):
+        """Submits an answer as an exploration player and returns the
+        corresponding dict.
+        """
+        if params is None:
+            params = {}
+        return reader.submit_answer_in_tests(
+            exploration_id, state_name, answer, params, handler_name,
+            exploration_version)
+
 
     @contextlib.contextmanager
     def swap(self, obj, attr, newvalue):

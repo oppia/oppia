@@ -20,7 +20,8 @@
  */
 
 var forms = require('./forms.js');
-var general = require('./general.js')
+var general = require('./general.js');
+var admin = require('./admin.js');
 
 var login = function(email, isSuperAdmin) {
   // Use of element is not possible because the login page is non-angular.
@@ -40,24 +41,6 @@ var logout = function() {
   var driver = protractor.getInstance().driver;
   driver.get(general.SERVER_URL_PREFIX + general.LOGIN_URL_SUFFIX);
   driver.findElement(protractor.By.id('submit-logout')).click();
-};
-
-var _appendToConfigList = function(listName, textToAppend) {
-  browser.get(general.ADMIN_URL_SUFFIX);
-  element.all(
-      by.repeater('(configPropertyId, configPropertyData) in configProperties')
-    ).map(function(configProperty) {
-    configProperty.element(by.tagName('em')).getText().then(function(title) {
-      if (title.match(listName)) {
-        var newEntry = forms.editList(configProperty).appendEntry();
-        forms.editUnicode(newEntry, true).setText(textToAppend);
-        element(by.buttonText('Save')).click();
-        browser.driver.switchTo().alert().accept();
-        // Time is needed for the saving to complete.
-        protractor.getInstance().waitForAngular();
-      }
-    });
-  });
 };
 
 // This will fail if the user already has a username.
@@ -83,14 +66,14 @@ var createAndLoginUser = function(email, username) {
 var createModerator = function(email, username) {
   login(email, true);
   registerAsEditor(username);
-  _appendToConfigList('Email addresses of moderators', email);
+  admin.appendToConfigList('Email addresses of moderators', email);
   logout();
 };
 
 var createAdmin = function(email, username) {
   login(email, true);
   registerAsEditor(username);
-  _appendToConfigList('Email addresses of admins', email);
+  admin.appendToConfigList('Email addresses of admins', email);
   logout();
 };
 

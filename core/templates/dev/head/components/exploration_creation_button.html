@@ -22,7 +22,12 @@
             Title
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" autofocus required>
+            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="isTitleValid(newExplorationTitle, true)" autofocus required>
+            <span style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
+              <[warningText]>
+            </span>
+            <div ng-show="!warningText || !changedAtLeastOnce" style="height: 20px;">
+            </div>
           </div>
         </div>
 
@@ -42,7 +47,7 @@
             Category
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <select2-dropdown item="newExplorationCategory" choices="categoriesForDropdown" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px">
+            <select2-dropdown item="newExplorationCategory" choices="categoriesForDropdown" placeholder="Select a category, or enter a new one" new-choice-regex="^[A-Z a-z]+$" width="300px" invalid-search-term-message="Invalid category name">
             </select2-dropdown>
           </div>
         </div>
@@ -73,7 +78,7 @@
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     <button class="btn btn-success" type="submit" ng-click="save(newExplorationTitle, newExplorationCategory, newExplorationObjective, newExplorationLanguageCode)"
-      ng-disabled="!newExplorationTitle || !newExplorationCategory || !newExplorationLanguageCode">
+      ng-disabled="!isTitleValid(newExplorationTitle, false) || !newExplorationCategory || !newExplorationLanguageCode">
         Create New Exploration
     </button>
   </div>

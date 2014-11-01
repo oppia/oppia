@@ -31,7 +31,7 @@ oppia.controller('ExplorationStatistics', [
     width: 500
   };
 
-  $scope.getLocaleStringForDatetime = function(millisSinceEpoch) {
+  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 

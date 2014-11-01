@@ -19,7 +19,6 @@ __author__ = 'Sean Lip'
 import feconf
 import logging
 
-from core import jobs_registry
 from core.controllers import admin
 from core.controllers import base
 from core.controllers import editor
@@ -34,7 +33,6 @@ from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import services
 from core.controllers import widgets
-from core.domain import event_services
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
@@ -220,18 +218,23 @@ urls = [
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler, 'exploration_handler'),
     get_redirect_route(
-        (r'%s/<exploration_id>/<escaped_state_name>'
-         % feconf.EXPLORATION_TRANSITION_URL_PREFIX),
-        reader.FeedbackHandler, 'feedback_handler'),
-    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler, 'state_hit_event_handler'),
+    get_redirect_route(
+        r'/explorehandler/answer_submitted_event/<exploration_id>',
+        reader.AnswerSubmittedEventHandler, 'answer_submitted_event_handler'),
     get_redirect_route(
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
     get_redirect_route(
         r'/explorehandler/leave/<exploration_id>/<escaped_state_name>',
         reader.ReaderLeaveHandler, 'reader_leave_handler'),
+    get_redirect_route(
+        r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
+        'reader_classify_handler'),
+    get_redirect_route(
+        r'/explorehandler/next_state/<exploration_id>',
+        reader.NextStateHandler, 'reader_next_state_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
@@ -274,12 +277,6 @@ urls = [
     get_redirect_route(
         r'/createhandler/init_exploration/<exploration_id>',
         editor.InitExplorationHandler, 'editor_init_exploration_handler'),
-    get_redirect_route(
-        r'/createhandler/classify/<exploration_id>', editor.ClassifyHandler,
-        'editor_classify_handler'),
-    get_redirect_route(
-        r'/createhandler/next_state/<exploration_id>', editor.NextStateHandler,
-        'editor_next_state_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
@@ -302,6 +299,10 @@ urls = [
     get_redirect_route(
         r'/widgetrepository/data/<widget_type>',
         widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
+
+    get_redirect_route(
+        r'/notificationshandler', home.NotificationsHandler,
+        'notifications_handler'),
 
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),
