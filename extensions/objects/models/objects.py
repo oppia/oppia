@@ -484,17 +484,24 @@ class Graph(BaseObject):
     @classmethod
     def normalize(cls, raw):
         """Validates and normalizes a raw Python object."""
+        """
+        Checks that there are no self-loops or multiple edges.
+        Checks that unlabeled graphs have all labels empty.
+        Checks that unweighted graphs have all weights set to 1.
+        TODO(czx): Think about support for multigraphs?
+        """
+
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
             
-            for vertex in raw['vertices']:
-                if not raw['isLabeled']:
-                    vertex['label'] = ''
+            if not raw['isLabeled']:
+                for vertex in raw['vertices']:
+                    assert (vertex['label'] == '')
             
             for edge in raw['edges']:
                 assert (edge['src'] != edge['dst'])
                 if not raw['isWeighted']:
-                    edge['weight'] = 1
+                    assert (edge['weight'] == 1.0)
 
             if raw['isDirected']:
                 edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]

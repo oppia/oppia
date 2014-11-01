@@ -217,10 +217,10 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
                 {'label': 'b', 'x': 2.0, 'y': 2.0}
             ],
             'edges': [
-                {'src': 0, 'dst': 1, 'weight': 1}
+                {'src': 0, 'dst': 1, 'weight': 2}
             ],
             'isDirected': False,
-            'isWeighted': False,
+            'isWeighted': True,
             'isLabeled': True
         }).eval({
             'vertices': [
@@ -231,6 +231,6 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
                 {'src': 0, 'dst': 1, 'weight': 2}
             ],
             'isDirected': False,
-            'isWeighted': False,
+            'isWeighted': True,
             'isLabeled': True
         }))

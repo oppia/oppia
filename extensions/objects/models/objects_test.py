@@ -315,31 +315,10 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'isDirected': False,
             'isWeighted': False
         }
-        unused_labels_and_weights_graph = {
-            'vertices': [
-                {'x': 0.0, 'y': 0.0, 'label': 'a'},
-                {'x': 1.0, 'y': 1.0, 'label': 'bCD'}
-            ],
-            'edges': [{'src': 0, 'dst': 1, 'weight': 2}],
-            'isLabeled': False,
-            'isDirected': False,
-            'isWeighted': False
-        }
-        normalized_labels_and_weights_graph = {
-            'vertices': [
-                {'x': 0.0, 'y': 0.0, 'label': ''},
-                {'x': 1.0, 'y': 1.0, 'label': ''}
-            ],
-            'edges': [{'src': 0, 'dst': 1, 'weight': 1}],
-            'isLabeled': False,
-            'isDirected': False,
-            'isWeighted': False
-        }
 
         mappings = [
             (empty_graph, empty_graph),
             (cycle_5_graph, cycle_5_graph),
-            (unused_labels_and_weights_graph, normalized_labels_and_weights_graph)
         ]
         
         invalid_values = [None, 1, {}, 'string', {
@@ -365,6 +344,30 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
             'edges': [
                 {'src': 0, 'dst': 0, 'weight': 1},
                 {'src': 1, 'dst': 0, 'weight': 1}
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }, {
+            'vertices': [
+                {'x': 0.0, 'y': 0.0, 'label': ''},
+                {'x': 1.0, 'y': 1.0, 'label': 'ab'}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 0, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1}
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }, {
+            'vertices': [
+                {'x': 0.0, 'y': 0.0, 'label': ''},
+                {'x': 1.0, 'y': 1.0, 'label': ''}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 0, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 2}
             ],
             'isLabeled': False,
             'isDirected': False,

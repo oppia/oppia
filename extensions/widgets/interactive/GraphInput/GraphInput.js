@@ -75,6 +75,7 @@ oppia.directive('oppiaResponseGraphInput', [
 
 /*
  * Directive for graph-viz.
+ * TODO(czx): Move directive to GraphEditor.js once it gets included in the learner page
  */
 oppia.directive('graphViz', function() {
   return {
@@ -113,7 +114,6 @@ oppia.directive('graphViz', function() {
         mouseY: 0,
       };
 
-      // TODO(czxcjx): Can someone confirm if the jQuery offset() function is the right one to use here?
       var vizContainer = $($element).find('.oppia-graph-viz-svg');
       $scope.mousemoveGraphSVG = function(event) {
         $scope.state.mouseX = event.pageX - vizContainer.offset().left;
@@ -325,6 +325,8 @@ oppia.directive('graphViz', function() {
         }
       }
       function deleteVertex(index) {
+        // Using jQuery's map instead of normal array.map because 
+        // it removes elements for which the callback returns null
         $scope.graph.edges = $.map($scope.graph.edges, function(edge) {
           if (edge.src === index || edge.dst === index) {
             return null;
