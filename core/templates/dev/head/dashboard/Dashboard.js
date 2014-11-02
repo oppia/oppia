@@ -50,6 +50,11 @@ oppia.controller('Dashboard', [
     'Statistics'
   ];
 
+  $scope.navigateToItem = function(activityId, updateType) {
+    window.location.href = (
+      '/create/' + activityId + (updateType === 'feedback_thread' ? '#/feedback': ''));
+  };
+
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
@@ -70,6 +75,8 @@ oppia.controller('Dashboard', [
   $http.get($scope.dashboardDataUrl).success(function(data) {
     $scope.recentUpdates = data.recent_updates;
     $scope.jobQueuedMsec = data.job_queued_msec;
+    $scope.lastSeenMsec = data.last_seen_msec || 0.0;
+    $scope.currentUsername = data.username;
 
     $scope.privateExplorationIds = [];
     $scope.betaExplorationIds = [];

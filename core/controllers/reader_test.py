@@ -17,7 +17,6 @@
 __author__ = 'Sean Lip'
 
 from core.controllers import reader
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -102,26 +101,15 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     def setUp(self):
         super(ReaderControllerEndToEndTests, self).setUp()
 
-    def _submit_answer(self, answer):
-        """Action representing submission of an answer to the backend."""
-        url = '%s/%s/%s' % (
-            feconf.EXPLORATION_TRANSITION_URL_PREFIX,
-            self.EXP_ID, self.last_state_name)
-        reader_dict = self.post_json(url, {
-            'answer': answer, 'handler': 'submit', 'params': self.last_params,
-        })
-
-        self.last_params = reader_dict['params']
-        self.last_state_name = reader_dict['state_name']
-
-        return reader_dict
-
     def submit_and_compare(self, answer, expected_feedback, expected_question):
         """Submits an answer and compares the output to a regex.
 
         `expected_response` will be interpreted as a regex string.
         """
-        reader_dict = self._submit_answer(answer)
+        reader_dict = self.submit_answer(
+            self.EXP_ID, self.last_state_name, answer, params=self.last_params)
+        self.last_params = reader_dict['params']
+        self.last_state_name = reader_dict['state_name']
         self.assertRegexpMatches(
             reader_dict['feedback_html'], expected_feedback)
         self.assertRegexpMatches(
@@ -226,11 +214,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         )
 
         # Viewer submits answer '0'
-        exploration_dict = self.post_json(
-            '%s/%s/%s' % (feconf.EXPLORATION_TRANSITION_URL_PREFIX,
-                          EXP_ID, state_name_1),
-            {'answer': '0', 'handler': 'submit'}
-        )
+        exploration_dict = self.submit_answer(EXP_ID, state_name_1, '0')
         state_name_2 = exploration_dict['state_name']
 
         # Viewer gives 2nd feedback

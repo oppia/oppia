@@ -61,6 +61,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # When the user last checked notifications. May be None.
+    last_checked = ndb.DateTimeProperty(default=None)
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):

@@ -28,7 +28,7 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
-  'explorationStatesService', 'routerService', 'graphDataService',
+  'explorationStatesService', 'routerService', 'graphDataService', 'focusService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -37,7 +37,7 @@ oppia.controller('ExplorationEditor', [
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
-    graphDataService) {
+    graphDataService, focusService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -312,6 +312,14 @@ oppia.controller('ExplorationEditor', [
             };
           }
         ]
+      });
+
+      modalInstance.opened.then(function(data) {
+        // The $timeout seems to be needed in order to give the modal time to
+        // render.
+        $timeout(function() {
+          focusService.setFocus('saveChangesModalOpened');
+        });
       });
 
       modalInstance.result.then(function(commitMessage) {
