@@ -19,8 +19,9 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-forms = require('./forms.js');
-general = require('./general.js');
+var forms = require('./forms.js');
+var general = require('./general.js');
+var widgets = require('./widgets.js');
 
 var setStateName = function(name) {
   var nameElement = element(by.css('.oppia-state-name-container'))
@@ -33,7 +34,7 @@ var setStateName = function(name) {
 // Content & non-interactive widgets. It is necessary to run open() at the
 // start and close() at the end.
 var editContent = function() {
-  var operations = forms.editRichText(element(by.css('.oppia-state-content')));
+  var operations = forms.RichTextEditor(element(by.css('.oppia-state-content')));
   operations.open = function() {
     element(by.css('.protractor-test-edit-content')).click();
   };
@@ -44,51 +45,60 @@ var editContent = function() {
   return operations;
 };
 
+// Note that this fails for collapsibles and tabs since it is not possible to
+// click on them to view their contents.
+var expectContentToMatch = function(callbackFunction) {
+  forms.expectRichText(
+    element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
+  ).toMatch(callbackFunction);
+};
+
+var expectContentTextToEqual = function(text) {
+  forms.expectRichText(
+    element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
+  ).toEqual(text);
+};
 
 // Interactive widgets
-var _openWidgetEditor = function() {
-  element(by.css('.protractor-test-edit-interaction')).click();
+
+// Additional arguments may be sent to this function, and they will be
+// passed on to the relevant widget editor.
+var selectWidget = function(widgetName) {
+  element(by.css('.protractor-test-select-interaction-id')).
+    element(by.css('option[value=' + widgetName + ']')).click();
+
+  if (arguments.length > 1) {
+    element(by.css('.protractor-test-edit-interaction')).click();
+
+    var elem = element(by.css('.oppia-interactive-widget-editor'));
+
+    // Need to convert arguments to an actual array, discarding widgetName. We
+    // also send the interaction editor element, within which the customizer
+    // should act.
+    var args = [elem];
+    for (var i = 1; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    widgets.getInteractive(widgetName).customizeInteraction.apply(null, args);
+
+    element(by.css('.protractor-test-save-interaction')).click();
+  }
 };
 
-var _closeWidgetEditor = function() {
+// Likewise additional arguments to this function will be passed on.
+var selectComplexWidget = function(widgetName) {
+  element(by.css('.protractor-test-select-interaction-id')).
+    element(by.css('option[value=' + widgetName + ']')).click();
+  element(by.css('.protractor-test-edit-interaction')).click();
+  var elem = element(by.css('.oppia-interactive-widget-editor'));
+  var args = [elem];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  widgets.getInteractive(widgetName).
+    customizeComplexInteraction.apply(null, args);
   element(by.css('.protractor-test-save-interaction')).click();
 };
-
-var _selectWidget = function(widgetName) {
-  element(by.css('.protractor-test-select-interaction-id')).
-    element(by.cssContainingText('option', widgetName)).click();
-};
-
-var selectNumericWidget = function() {
-  _selectWidget('Numeric');
-};
-
-var selectContinueWidget = function(buttonText) {
-  _selectWidget('Continue Button');
-
-  _openWidgetEditor();
-  if (buttonText) {
-    forms.editUnicode(element(by.css('.protractor-test-widget-args'))).
-      setText(buttonText);
-  }
-  _closeWidgetEditor();
-};
-
-// textArray should be a non-empty array of strings (to be the options)
-var selectSimpleMultipleChoiceWidget = function(textArray) {
-  _selectWidget('Multiple Choice');
-
-  _openWidgetEditor();
-  var customizer = forms.editList(
-    element(by.css('.protractor-test-widget-args')));
-  customizer.editRichTextEntry(0).setPlainText(textArray[0]);
-  for (var i = 1; i < textArray.length; i++) {
-    var newEntry = customizer.appendEntry('Add multiple choice option');
-    forms.editRichText(newEntry).appendPlainText(textArray[i]);
-  }
-  _closeWidgetEditor();
-};
-
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var editRule = function(ruleNum) {
@@ -110,7 +120,7 @@ var editRule = function(ruleNum) {
     // Note: this does NOT save the rule after the feedback is entered.
     editFeedback: function() {
       var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
-      return forms.editList(feedbackElement);
+      return forms.ListEditor(feedbackElement);
     },
     // Enter 'END' for the end state.
     // NB: This saves the rule after the destination is selected.
@@ -145,9 +155,9 @@ var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
       ).row(parameterArray[i].fragmentNum));
 
       if (parameterArray[i].type === 'real') {
-        forms.editReal(parameterElement).setValue(parameterArray[i].value);
+        forms.RealEditor(parameterElement).setValue(parameterArray[i].value);
       } else if (parameterArray[i].type === 'unicode') {
-        forms.editUnicode(parameterElement).setText(parameterArray[i].value);
+        forms.UnicodeEditor(parameterElement).setText(parameterArray[i].value);
       } else if (parameterArray[i].type === 'choice') {
         parameterElement.element(
           by.cssContainingText('option', parameterArray[i].value
@@ -312,10 +322,11 @@ var saveChanges = function(commitMessage) {
 
 exports.setStateName = setStateName;
 exports.editContent = editContent;
+exports.expectContentToMatch = expectContentToMatch;
+exports.expectContentTextToMatch = expectContentTextToEqual;
 
-exports.selectNumericWidget = selectNumericWidget;
-exports.selectContinueWidget = selectContinueWidget;
-exports.selectSimpleMultipleChoiceWidget = selectSimpleMultipleChoiceWidget;
+exports.selectWidget = selectWidget;
+exports.selectComplexWidget = selectComplexWidget;
 
 exports.editRule = editRule;
 exports.addNumericRule = addNumericRule;

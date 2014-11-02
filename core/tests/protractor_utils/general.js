@@ -29,7 +29,8 @@ var waitForSystem = function() {
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [
-  // TODO (Jacob): fix error and remove this entry
+  // This error arises when a logout event takes place before a page has fully
+  // loaded.
   'http://localhost:4445/third_party/static/angularjs-1.3.0-rc.5/angular.js 11086:24'
 ];
 

@@ -19,9 +19,9 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-forms = require('./forms.js');
-editor = require('./editor.js');
-general = require('./general.js');
+var forms = require('./forms.js');
+var editor = require('./editor.js');
+var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
@@ -53,7 +53,7 @@ var createAndPublishExploration = function(name, category, objective, language) 
   if (language) {
     editor.setLanguage(language);
   }
-  editor.selectContinueWidget();
+  editor.selectWidget('Continue');
   editor.saveChanges();
   publishExploration();
 };

@@ -34,12 +34,12 @@ describe('State editor', function() {
     editor.editContent().open();
     editor.editContent().setPlainText('plain text');
     editor.editContent().close();
-    editor.selectContinueWidget('click here');
+    editor.selectWidget('Continue', 'click here');
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
-    expect(player.getCurrentQuestionText()).toBe('plain text');
+    player.expectContentToMatch('plain text');
     player.expectExplorationToNotBeOver();
     player.expectInteractionToMatch('Continue', 'click here');
     player.submitAnswer('Continue', null);
@@ -62,13 +62,14 @@ describe('State editor', function() {
     editor.editContent().appendUnorderedList(['an entry', 'another entry']);
     editor.editContent().close();
 
-    editor.selectSimpleMultipleChoiceWidget(['option A', 'option B']);
+    editor.selectWidget('MultipleChoiceInput', ['option A', 'option B']);
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
     player.expectExplorationToNotBeOver();
-    player.expectInteractionToMatch('MultipleChoiceInput', ['option A', 'option B']);
+    player.expectInteractionToMatch(
+      'MultipleChoiceInput', ['option A', 'option B']);
     player.submitAnswer('MultipleChoiceInput', 'option B');
     player.expectExplorationToBeOver();
 
@@ -80,12 +81,12 @@ describe('State editor', function() {
     users.login('user3@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.selectNumericWidget();
+    editor.selectWidget('NumericInput');
     editor.addNumericRule.IsInclusivelyBetween(3, 6);
     editor.editRule(0).setDestination('END');
-    editor.editRule(0).editFeedback().editRichTextEntry(0).
+    editor.editRule(0).editFeedback().editEntry(0, 'RichText').
       appendPlainText('correct');
-    editor.editRule('default').editFeedback().editRichTextEntry(0).
+    editor.editRule('default').editFeedback().editEntry(0, 'RichText').
       appendPlainText('out of bounds');
     editor.saveChanges();
 
@@ -111,7 +112,7 @@ describe('Full exploration editor', function() {
     editor.editContent().open();
     editor.editContent().setPlainText('this is state 1');
     editor.editContent().close();
-    editor.selectNumericWidget();
+    editor.selectWidget('NumericInput');
     editor.addNumericRule.Equals(21);
     editor.editRule(0).setDestination('state 2');
 
@@ -119,21 +120,21 @@ describe('Full exploration editor', function() {
     editor.editContent().open();
     editor.editContent().setPlainText('this is state 2');
     editor.editContent().close();
-    editor.selectSimpleMultipleChoiceWidget(['return', 'complete']);
+    editor.selectWidget('MultipleChoiceInput', ['return', 'complete']);
     editor.addMultipleChoiceRule.Equals('return');
     editor.editRule(0).setDestination('state 1');
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
-    expect(player.getCurrentQuestionText()).toBe('this is state 1');
+    player.expectContentToMatch('this is state 1');
     player.submitAnswer('NumericInput', 19);
     player.submitAnswer('NumericInput', 21);
-    expect(player.getCurrentQuestionText()).toBe('this is state 2');
+    player.expectContentToMatch('this is state 2');
     player.submitAnswer('MultipleChoiceInput', 'return');
-    expect(player.getCurrentQuestionText()).toBe('this is state 1');
+    player.expectContentToMatch('this is state 1');
     player.submitAnswer('NumericInput', 21);
-    expect(player.getCurrentQuestionText()).toBe('this is state 2');
+    player.expectContentToMatch('this is state 2');
     player.expectExplorationToNotBeOver();
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
@@ -141,5 +142,109 @@ describe('Full exploration editor', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([]);
+  });
+});
+
+describe('Non-interactive widgets', function() {
+  it('should display correctly', function() {
+    users.createUser('user11@example.com', 'user11');
+    users.login('user11@example.com')
+    
+    workflow.createExploration('widgets', 'maths');
+
+    editor.editContent().open();
+    editor.editContent().clear();
+    editor.editContent().appendPlainText('plainly');
+    editor.editContent().appendBoldText('bold');
+    editor.editContent().addWidget('Collapsible', 'title', 'inner');
+    // TODO (Jacob) add image widget test
+    editor.editContent().addWidget('Link', 'http://google.com/', true);
+    editor.editContent().addWidget('Math', 'abc');
+    editor.editContent().appendUnderlineText('underlined');
+    editor.editContent().appendPlainText('extra');
+    editor.editContent().addWidget(
+      'Tabs', ['title 1', 'title 2'], ['contents 1', 'contents 2']);
+    editor.editContent().addWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
+    editor.editContent().close();
+
+    var readRichText = function(checker) {
+      checker.readPlainText('plainly');
+      checker.readBoldText('bold');
+      checker.readWidget('Collapsible', 'title', 'inner');
+      checker.readWidget('Link', 'http://google.com/', true);
+      checker.readWidget('Math', 'abc');
+      checker.readUnderlineText('underlined');
+      checker.readPlainText('extra');
+      checker.readWidget(
+        'Tabs', ['title 1', 'title 2'], ['contents 1', 'contents 2']);
+      checker.readWidget('Video', 'ANeHmk22a6Q', 10, 100, false)
+    };
+
+    editor.saveChanges();
+
+    general.moveToPlayer();
+    player.expectComplexContentToMatch(readRichText);
+
+    users.logout();
+  });
+
+  it('should allow nesting of widgets inside one another', function() {
+    users.createUser('user12@example.com', 'user12');
+    users.login('user12@example.com')
+    
+    workflow.createExploration('widgets', 'maths');
+
+    editor.editContent().open();
+    editor.editContent().clear();
+    editor.editContent().appendItalicText('slanted');
+    editor.editContent().addComplexWidget(
+        'Collapsible', 'heading', function(handler) {
+      handler.clear();
+      // TODO (Jacob) add sub-widgets when issue 423 is fixed
+      handler.addComplexWidget('Tabs', ['no1', 'no2'], [function(handler2) {
+        handler2.setPlainText('boring');
+      }, function(handler3) {
+        handler3.clear();
+        handler3.appendBoldText('fun!');
+      }])
+      handler.addWidget('Math', 'xyz');
+    });
+    editor.editContent().close();
+
+    var readRichText = function(checker) {
+      checker.readItalicText('slanted');
+      checker.readComplexWidget('Collapsible', 'heading', function(handler) {
+        handler.readComplexWidget('Tabs', ['no1', 'no2'], [function(handler2) {
+          handler2.readPlainText('boring');
+        }, function(handler3) {
+          handler3.readBoldText('fun!');
+        }])
+        handler.readWidget('Math', 'xyz');
+      });
+    };
+
+    editor.saveChanges();
+
+    general.moveToPlayer();
+    player.expectComplexContentToMatch(readRichText);
+
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([
+      // TODO (Jacob) Remove when 
+      // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
+      'chrome-extension://boadgeojelhgndaghljhdicfkmllpafd/' + 
+        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
+      'chrome-extension://dliochdbjfkdbacpmhlcpmleaejidimm/' + 
+        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
+      'chrome-extension://hfaagokkkhdbgiakmmlclaapfelnkoah/' + 
+        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
+      'chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/' + 
+        'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
+      'chrome-extension://enhhojjnijigcajfphajepfemndkmdlo/' + 
+      'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED'
+    ]);
   });
 });

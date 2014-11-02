@@ -39,13 +39,13 @@ describe('Embedding', function() {
       general.waitForSystem();
       protractor.getInstance().waitForAngular();
 
-      expect(player.getCurrentQuestionText()).toBe(
+      player.expectContentToMatch(
         (version === 1) ?
           'Suppose you were given three balls: one red, one blue, and one ' +
           'yellow. How many ways are there to arrange them in a straight line?':
           'Version 2');
       player.submitAnswer('NumericInput', 6);
-      expect(player.getCurrentQuestionText()).toBe(
+      player.expectContentToMatch(
         'Right! Why do you think it is 6?');
       player.expectExplorationToNotBeOver();
       player.submitAnswer('TextInput', 'factorial');

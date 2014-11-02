@@ -19,18 +19,8 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-// Each widget should declare a checkExistence() function and a submitAnswer()
-// function.
-var widgetUtils = {
-  Continue: require(
-    '../../../extensions/widgets/interactive/Continue/protractor.js'),
-  MultipleChoiceInput: require(
-    '../../../extensions/widgets/interactive/MultipleChoiceInput/protractor.js'),
-  NumericInput: require(
-    '../../../extensions/widgets/interactive/NumericInput/protractor.js'),
-  TextInput: require(
-    '../../../extensions/widgets/interactive/TextInput/protractor.js'),
-};
+var widgets = require('./widgets.js');
+var forms = require('./forms.js');
 
 var restartExploration = function() {
   element(by.css('.protractor-test-restart-exploration')).click();
@@ -43,9 +33,18 @@ var getExplorationName = function() {
     element(by.tagName('h3')).getText();
 };
 
-var getCurrentQuestionText = function() {
-  return element.all(by.repeater('response in responseLog track by $index')).
-    last().element(by.css('.protractor-test-conversation-content')).getText();
+var expectContentToMatch = function(text) {
+  expect(
+    element.all(by.repeater('response in responseLog track by $index')).
+      last().element(by.css('.protractor-test-conversation-content')).getText()
+  ).toBe(text);
+};
+
+var expectComplexContentToMatch = function(callbackFunction) {
+  forms.expectRichText(
+    element.all(by.repeater('response in responseLog track by $index')).
+      last().element(by.css('.protractor-test-conversation-content')).element(by.xpath('./div'))
+  ).toMatch(callbackFunction);
 };
 
 var getLatestFeedbackText = function() {
@@ -53,25 +52,32 @@ var getLatestFeedbackText = function() {
     last().element(by.css('.protractor-test-conversation-feedback')).getText();
 };
 
-
-// 'widgetCustomizations' is a variable that is passed to the corresponding
-// widget's protractor utilities. Its definition and type are widget-specific.
-var expectInteractionToMatch = function(widgetName, widgetCustomizations) {
-  if (widgetUtils.hasOwnProperty(widgetName)) {
-    widgetUtils[widgetName].expectInteractionDetailsToMatch(widgetCustomizations);
-  } else {
-    throw 'Unknown widget: ' + widgetName;
+// Additional arguments may be sent to this function, and they will be
+// passed on to the relevant widget's detail checker.
+var expectInteractionToMatch = function(widgetName) {
+  // Convert additional arguments to an array to send on.
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
   }
+  widgets.getInteractive(widgetName).
+    expectInteractionDetailsToMatch.apply(null, args);
+};
+
+// Likewise additional arguments can be sent to this function
+var expectComplexInteractionToMatch = function(widgetName) {
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  widgets.getInteractive(widgetName).
+    expectComplexInteractionDetailsToMatch.apply(null, args);
 };
 
 // `answerData` is a variable that is passed to the corresponding widget's
 // protractor utilities. Its definition and type are widget-specific.
 var submitAnswer = function(widgetName, answerData) {
-  if (widgetUtils.hasOwnProperty(widgetName)) {
-    widgetUtils[widgetName].submitAnswer(answerData);
-  } else {
-    throw 'Cannot submit answer to unknown widget: ' + widgetName;
-  }
+  widgets.getInteractive(widgetName).submitAnswer(answerData);
 };
 
 
@@ -88,10 +94,12 @@ var expectExplorationToNotBeOver = function() {
 exports.restartExploration = restartExploration;
 
 exports.getExplorationName = getExplorationName;
-exports.getCurrentQuestionText = getCurrentQuestionText;
+exports.expectContentToMatch = expectContentToMatch;
+exports.expectComplexContentToMatch = expectComplexContentToMatch;
 exports.getLatestFeedbackText = getLatestFeedbackText;
 
 exports.expectInteractionToMatch = expectInteractionToMatch;
+exports.expectComplexInteractionToMatch = expectComplexInteractionToMatch;
 exports.submitAnswer = submitAnswer;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;

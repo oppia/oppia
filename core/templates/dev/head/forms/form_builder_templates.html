@@ -235,7 +235,7 @@
         </schema-based-editor>
       </td>
       <td ng-if="!len">
-        <button class="btn btn-default btn-xs oppia-small-delete-button" type="button" ng-click="deleteElement($index)"
+        <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button" ng-click="deleteElement($index)"
                 ng-disabled="disabled()">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>
@@ -246,7 +246,7 @@
 
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
   <button ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
-          type="button" class="btn btn-default btn-sm" ng-click="addElement()"
+          type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
           ng-disabled="disabled()" style="margin-left: 8px;">
     <[addElementText]>
   </button>
@@ -369,6 +369,6 @@
 
   <div class="modal-footer">
     <input type="submit" class="btn btn-default" value="Cancel" ng-click="cancel()">
-    <input type="submit" class="btn btn-success" value="Done" ng-click="save(customizationArgsList)" ng-disabled="form.schemaForm.$invalid">
+    <input type="submit" class="btn btn-success protractor-test-close-widget-editor" value="Done" ng-click="save(customizationArgsList)" ng-disabled="form.schemaForm.$invalid">
   </div>
 </script>

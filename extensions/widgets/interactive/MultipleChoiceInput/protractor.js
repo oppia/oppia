@@ -17,15 +17,44 @@
  * interaction.
  */
 
-// 'answerChoices' is a list of strings that correspond to the various
-// multiple-choice options.
-var expectInteractionDetailsToMatch = function(answerChoices) {
-  expect(
-    element.all(by.repeater('choice in choices track by $index')).
-        map(function(elem) {
-      return elem.getText();
-    })
-  ).toEqual(answerChoices);
+var forms = require('../../../../core/tests/protractor_utils/forms.js');
+
+var customizeInteraction = function(elem, options) {
+  var listEditor = forms.ListEditor(elem);
+  listEditor.setLength(options.length);
+  for (var i = 0; i < options.length; i++) {
+    listEditor.editEntry(i, 'RichText').setPlainText(options[i]);
+  }
+};
+
+// The callbackFunctions each describe how to create one of the options using
+// the rich text editor.
+var customizeComplexInteraction = function(elem, callbackFunctions) {
+  forms.ListEditor(elem).setLength(callbackFunctions.length);
+  for (var i = 0; i < callbackFunctions.length; i++) {
+    callbackFunctions[i](forms.ListEditor.editEntry(i, 'RichText'));
+  }
+};
+
+// These callbackFunctions each describe how to check one of the options.
+var expectComplexInteractionDetailsToMatch = function(callbackFunctions) {
+  element.all(by.repeater('choice in choices track by $index')).
+      then(function(optionElements) {
+    expect(optionElements.length).toEqual(callbackFunctions.length);
+    for (var i = 0; i < optionElements.length; i++) {
+      forms.expectRichText(
+        optionElements[i].element(by.xpath('./button/span'))
+      ).toMatch(callbackFunctions[i]);
+    }
+  });
+};
+
+var expectInteractionDetailsToMatch = function(options) {
+  expectComplexInteractionDetailsToMatch(options.map(function(text) {
+    return function(checker) {
+      checker.readPlainText(text);
+    };
+  }));
 };
 
 // 'answer' {String} is the text on the multiple-choice item to select.
@@ -34,5 +63,8 @@ var submitAnswer = function(answer) {
     element(by.buttonText(answer)).click();
 };
 
+exports.customizeInteraction = customizeInteraction;
+exports.customizeComplexInteraction = customizeComplexInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
+exports.expectComplexInteractionDetailsToMatch = expectComplexInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;

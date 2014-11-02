@@ -29,8 +29,8 @@ var appendToConfigList = function(listName, textToAppend) {
     ).map(function(configProperty) {
     configProperty.element(by.tagName('em')).getText().then(function(title) {
       if (title.match(listName)) {
-        var newEntry = forms.editList(configProperty).appendEntry();
-        forms.editUnicode(newEntry, true).setText(textToAppend);
+        var newEntry = forms.ListEditor(configProperty).addEntry();
+        forms.UnicodeEditor(newEntry, true).setText(textToAppend);
         element(by.buttonText('Save')).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the saving to complete.

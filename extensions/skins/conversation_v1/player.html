@@ -40,9 +40,9 @@
           </div>
 
           <div ng-if="response.question">
-            <div class="conversation-skin-response well protractor-test-conversation-content"
+            <div class="conversation-skin-response well"
                  ng-class="{'conversation-skin-old-content': $index !== mostRecentQuestionIndex}">
-              <div angular-html-bind="response.question">
+              <div angular-html-bind="response.question" class="protractor-test-conversation-content">
               </div>
             </div>
           </div>

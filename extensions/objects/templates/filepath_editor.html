@@ -28,9 +28,9 @@
     <div class="oppia-warning">
       Before uploading any images, please ensure that they are compatible with the <a href="/about#license" target="_blank">license terms</a> of this site (the link opens in a new window).
     </div>
-    <input type="file" id="newImage">
+    <input type="file" id="newImage" class="protractor-test-file-upload">
     <br>
-    Choose a filename: <input type="text" ng-model="newImageFilename">
+    Choose a filename: <input type="text" ng-model="newImageFilename" class="protractor-test-file-name">
     <br>
     <button type="button" class="btn btn-success" ng-click="uploadNewImage(newImageFilename)" ng-disabled="!newImageFilename">Save</button>
     <button type="button" class="btn btn-default" ng-click="closeImageUploader()">Cancel</button>
