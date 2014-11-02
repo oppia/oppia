@@ -46,13 +46,13 @@ class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
     """
     @classmethod
     def entity_classes_to_map_over(cls):
-        return [exp_models.ExplorationRightsModel]
+        return [exp_models.ExplorationModel]
 
     @staticmethod
-    def map(exploration_rights_model):
+    def map(exploration_model):
         from core.domain import exp_services
-        if not exploration_rights_model.deleted:
-			exp_services.create_exploration_summary(exploration_rights_model.id)
+        if not exploration_model.deleted:
+            exp_services.create_exploration_summary(exploration_model.id)
 
     @staticmethod
     def reduce(exp_id, list_of_exps):
