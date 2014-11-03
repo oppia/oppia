@@ -36,8 +36,8 @@ var BooleanEditor = function(elem) {
 var FilepathEditor = function(elem) {
   return {
     upload: function(filepath) {
-      // TODO: FIX AND TIDY!
-      var absolutePath = require('path').resolve(__dirname, filepath);
+      // TODO (Jacob) Modify filepath relative to the directory from which the
+      // protractor code is operating.
       elem.element(by.css('.protractor-test-file-upload')).sendKeys(filepath);
     },
     setName: function(name) {

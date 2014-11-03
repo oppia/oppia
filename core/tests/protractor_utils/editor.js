@@ -45,8 +45,17 @@ var editContent = function() {
   return operations;
 };
 
+// This receives a callbackFunction used to verify the display of the state's
+// content visible when the content editor is closed. The callbackFunction will
+// be supplied with a handler of the form forms.RichTextChecker and can then
+// perform checks such as
+//   handler.readBoldText('bold')
+//   handler.readWidget('Collapsible', 'outer', 'inner')
+// These would verify that the content consists of the word 'bold' in bold 
+// followed by a Collapsible widget with the given arguments, and nothing else.
 // Note that this fails for collapsibles and tabs since it is not possible to
-// click on them to view their contents.
+// click on them to view their contents, as clicks instead open the rich text
+// editor.
 var expectContentToMatch = function(callbackFunction) {
   forms.expectRichText(
     element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()

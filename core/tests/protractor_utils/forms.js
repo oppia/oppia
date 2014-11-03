@@ -75,7 +75,7 @@ var ListEditor = function(elem) {
         for (var i = startingLength; i < desiredLength; i++) {
           addEntry();
         }
-        for (var i = desiredLength; i < startingLength; i++) {
+        for (var i = startingLength - 1; i >= desiredLength; i--) {
           deleteEntry(i);
         }
     });
@@ -156,6 +156,8 @@ var RichTextEditor = function(elem) {
     appendHorizontalRule: function() {
       _clickContentMenuButton('insertHorizontalRule');
     },
+    // This adds non-interactive widgets and allows simple customizations
+    // thereof.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant widget editor.
     addWidget: function(widgetName) {
@@ -176,6 +178,9 @@ var RichTextEditor = function(elem) {
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
     },
+    // This adds non-interactive widgets together with complex customizations;
+    // in practice this means widgets (e.g. Collapsible) that contain rich text
+    // editors, for the editing of which functions may be sent.
     // Likewise, additional arguments can be sent
     addComplexWidget: function(widgetName) {
       _clickContentMenuButton('custom-command-' + widgetName.toLowerCase());
@@ -215,12 +220,24 @@ var editAutocompleteDropdown = function(elem) {
   };
 };
 
-// This must be sent the element immediately containing the various elements of
-// the rich text content.
+// This function is sent 'elem', which should be the element immediately 
+// containing the various elements of a rich text area, for example
+// <div>
+//   plain
+//   <b>bold</b>
+//   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
+// <div>
+// The callbackFunction will be supplied with a 'handler' argument which it
+// should then use to read through the rich-text area using the functions
+// supplied by the RichTextChecker below. In the example above callbackFunction
+// should consist of:
+//   handler.readPlainText('plain');
+//   handler.readBoldText('bold');
+//   handler.readWidget('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(callbackFunction) {
     // We remove all <span> elements since these are plain text that is 
-    // sometimes represented just be text nodes.
+    // sometimes represented just by text nodes.
     elem.all(by.xpath('./*[not(self::span)]')).map(function(entry) {
       return entry.getText(function(text) {
         return text;
@@ -247,12 +264,19 @@ var expectRichText = function(elem) {
   };
 };
 
-// The arrayOfElems should be the array of promises of top-level element nodes
-// in the rich-text area. fullText should be a string consisting of all the 
-// visible text in the rich text area (including both element and text nodes).
+// This supplies functions to verify the contents of a rich text area.
+// 'arrayOfElems': the array of promises of top-level element nodes in the 
+//   rich-text area.
+// 'arrayOfTexts': the array of visible texts of top-level element nodes in 
+//   the rich-text area, obtained from getText().
+// 'fullText': a string consisting of all the visible text in the rich text 
+//   area (including both element and text nodes, so more than just the 
+//   concatenation of arrayOfTexts).
 var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
+  expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
-  // the child elements and text of the rich text area checking has gone.
+  // the child elements and text of the rich text area checking has gone. The
+  // arrayPointer traverses both arrays simultaneously.
   var arrayPointer = 0;
   var textPointer = 0;
   // Widgets insert line breaks above and below themselves and these are
@@ -260,9 +284,18 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   // specially.
   var justPassedWidget = false;
 
+  var _readFormattedText = function(text, tagName) {
+    expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
+    expect(arrayOfElems[arrayPointer].getInnerHtml()).toBe(text);
+    expect(arrayOfTexts[arrayPointer]).toEqual(text);
+    arrayPointer = arrayPointer + 1;
+    textPointer = textPointer + text.length;
+    justPassedWidget = false;
+  };
+
   return {
     readPlainText: function(text) {
-      // Plain text is in a text node so not recorded in the array
+      // Plain text is in a text node so not recorded in either array
       expect(
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
@@ -270,28 +303,13 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       justPassedWidget = false;
     },
     readBoldText: function(text) {
-      expect(arrayOfElems[arrayPointer].getTagName()).toBe('b');
-      expect(arrayOfElems[arrayPointer].getInnerHtml()).toBe(text);
-      expect(arrayOfTexts[arrayPointer]).toEqual(text);
-      arrayPointer = arrayPointer + 1;
-      textPointer = textPointer + text.length;
-      justPassedWidget = false;
+      _readFormattedText(text, 'b');
     },
     readItalicText: function(text) {
-      expect(arrayOfElems[arrayPointer].getTagName()).toBe('i');
-      expect(arrayOfElems[arrayPointer].getInnerHtml()).toBe(text);
-      expect(arrayOfTexts[arrayPointer]).toEqual(text);
-      arrayPointer = arrayPointer + 1;
-      textPointer = textPointer + text.length;
-      justPassedWidget = false;
+      _readFormattedText(text, 'i');
     },
     readUnderlineText: function(text) {
-      expect(arrayOfElems[arrayPointer].getTagName()).toBe('u');
-      expect(arrayOfElems[arrayPointer].getInnerHtml()).toBe(text);
-      expect(arrayOfTexts[arrayPointer]).toEqual(text);
-      arrayPointer = arrayPointer + 1;
-      textPointer = textPointer + text.length;
-      justPassedWidget = false;
+      _readFormattedText(text, 'u');
     },
     // TODO (Jacob) add functions for other rich text components
     // Additional arguments may be sent to this function, and they will be
@@ -339,7 +357,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 };
 
 
-// This is used by the list and dictionary editors to retreive the editors of
+// This is used by the list and dictionary editors to retrieve the editors of
 // their entries dynamically.
 var FORM_EDITORS = {
   'Dictionary': DictionaryEditor,

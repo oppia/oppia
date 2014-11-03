@@ -20,7 +20,7 @@
 var objects = require('../../../objects/protractor.js');
 
 var customizeInteraction = function(elem) {
-  // There are no customizations
+  // There are no customizations.
 };
 
 var expectInteractionDetailsToMatch = function() {

@@ -33,6 +33,14 @@ var getExplorationName = function() {
     element(by.tagName('h3')).getText();
 };
 
+// These two functions verify the question just asked. The first just checks
+// that the visible question text matches the text sent to it. The second also
+// checks formatting and non-interactive widgets. To do so the callbackFunction
+// will be sent a handler (as given in forms.RichTextChecker) to which calls
+// such as
+//   handler.readItalicText('slanted');
+// can then be sent.
+
 var expectContentToMatch = function(text) {
   expect(
     element.all(by.repeater('response in responseLog track by $index')).
@@ -43,7 +51,8 @@ var expectContentToMatch = function(text) {
 var expectComplexContentToMatch = function(callbackFunction) {
   forms.expectRichText(
     element.all(by.repeater('response in responseLog track by $index')).
-      last().element(by.css('.protractor-test-conversation-content')).element(by.xpath('./div'))
+      last().element(by.css('.protractor-test-conversation-content')).
+        element(by.xpath('./div'))
   ).toMatch(callbackFunction);
 };
 

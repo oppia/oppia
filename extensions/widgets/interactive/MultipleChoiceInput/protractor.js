@@ -19,6 +19,8 @@
 
 var forms = require('../../../../core/tests/protractor_utils/forms.js');
 
+// Use when the options are all plain text, then options is an array of strings
+// representing the options.
 var customizeInteraction = function(elem, options) {
   var listEditor = forms.ListEditor(elem);
   listEditor.setLength(options.length);
@@ -27,8 +29,11 @@ var customizeInteraction = function(elem, options) {
   }
 };
 
-// The callbackFunctions each describe how to create one of the options using
-// the rich text editor.
+// Use when the options contain formatting or non-interactive widgets. Then 
+// callbackFunctions should be an array of functions, one for each option,
+// which will each be passed a 'handler' that they can use to edit the
+// rich-text area of the option, for example by
+//   handler.appendUnderlineText('emphasised');
 var customizeComplexInteraction = function(elem, callbackFunctions) {
   forms.ListEditor(elem).setLength(callbackFunctions.length);
   for (var i = 0; i < callbackFunctions.length; i++) {

@@ -18,7 +18,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var interactive = {
+var INTERACTIVE_WIDGETS = {
   Continue: require(
     '../../../extensions/widgets/interactive/Continue/protractor.js'),
   MultipleChoiceInput: require(
@@ -29,7 +29,7 @@ var interactive = {
     '../../../extensions/widgets/interactive/TextInput/protractor.js')
 };
 
-var noninteractive = {
+var NONINTERACTIVE_WIDGETS = {
   Collapsible: require(
     '../../../extensions/widgets/noninteractive/Collapsible/protractor.js'),
   Image: require(
@@ -45,18 +45,18 @@ var noninteractive = {
 };
 
 var getInteractive = function(widgetName) {
-  if (interactive.hasOwnProperty(widgetName)) {
-    return interactive[widgetName];
+  if (INTERACTIVE_WIDGETS.hasOwnProperty(widgetName)) {
+    return INTERACTIVE_WIDGETS[widgetName];
   } else {
-    throw Error('Unknow interactive widget: ' + widgetName);
+    throw Error('Unknown interactive widget: ' + widgetName);
   }
 };
 
 var getNoninteractive = function(widgetName) {
-  if (noninteractive.hasOwnProperty(widgetName)) {
-    return noninteractive[widgetName];
+  if (NONINTERACTIVE_WIDGETS.hasOwnProperty(widgetName)) {
+    return NONINTERACTIVE_WIDGETS[widgetName];
   } else {
-    throw Error('Unknow non-interactive widget: ' + widgetName);
+    throw Error('Unknown non-interactive widget: ' + widgetName);
   }
 };
 

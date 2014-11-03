@@ -31,7 +31,7 @@ var expectInteractionDetailsToMatch = function(placeholderText, heightOfBox) {
   expect(
     element(by.tagName('oppia-interactive-text-input')).isPresent()
   ).toBe(true);
-  // TODO (Jacob) add other checks
+  // TODO (Jacob) add checks for the placeholder text and box height
 };
 
 var submitAnswer = function(answer) {

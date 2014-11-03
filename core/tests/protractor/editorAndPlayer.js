@@ -167,7 +167,10 @@ describe('Non-interactive widgets', function() {
     editor.editContent().addWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
     editor.editContent().close();
 
-    var readRichText = function(checker) {
+    editor.saveChanges();
+
+    general.moveToPlayer();
+    player.expectComplexContentToMatch(function(checker) {
       checker.readPlainText('plainly');
       checker.readBoldText('bold');
       checker.readWidget('Collapsible', 'title', 'inner');
@@ -178,12 +181,7 @@ describe('Non-interactive widgets', function() {
       checker.readWidget(
         'Tabs', ['title 1', 'title 2'], ['contents 1', 'contents 2']);
       checker.readWidget('Video', 'ANeHmk22a6Q', 10, 100, false)
-    };
-
-    editor.saveChanges();
-
-    general.moveToPlayer();
-    player.expectComplexContentToMatch(readRichText);
+    });
 
     users.logout();
   });
@@ -211,7 +209,10 @@ describe('Non-interactive widgets', function() {
     });
     editor.editContent().close();
 
-    var readRichText = function(checker) {
+    editor.saveChanges();
+
+    general.moveToPlayer();
+    player.expectComplexContentToMatch(function(checker) {
       checker.readItalicText('slanted');
       checker.readComplexWidget('Collapsible', 'heading', function(handler) {
         handler.readComplexWidget('Tabs', ['no1', 'no2'], [function(handler2) {
@@ -221,12 +222,7 @@ describe('Non-interactive widgets', function() {
         }])
         handler.readWidget('Math', 'xyz');
       });
-    };
-
-    editor.saveChanges();
-
-    general.moveToPlayer();
-    player.expectComplexContentToMatch(readRichText);
+    });
 
     users.logout();
   });
