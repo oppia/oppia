@@ -21,57 +21,34 @@
 
 var forms = require('../../../../core/tests/protractor_utils/forms.js');
 
-var customizeWidget = function(modal, tabTitles, tabContents) {
-  expect(tabTitles.length === tabContents.length);
+// tabArray should be an array of dictionaries with keys 'title' and 'content'
+var customizeWidget = function(modal, tabArray) {
   var listEditor = forms.ListEditor(modal);
 
-  listEditor.setLength(tabTitles.length);
-  for (var i = 0; i < tabTitles.length; i++) {
+  listEditor.setLength(tabArray.length);
+  for (var i = 0; i < tabArray.length; i++) {
     dictionaryEditor = listEditor.editEntry(i, 'Dictionary');
-    dictionaryEditor.editEntry(0, 'UnicodeString').setText(tabTitles[i]);
-    dictionaryEditor.editEntry(1, 'RichText').setPlainText(tabContents[i]);
+    dictionaryEditor.editEntry(0, 'UnicodeString').setText(tabArray[i].title);
+    tabArray[i].content(dictionaryEditor.editEntry(1, 'RichText'));
   }
 };
 
-var customizeComplexWidget = function(modal, tabTitles, callbackFunctions) {
-  expect(tabTitles.length === callbackFunctions.length);
-  var listEditor = forms.ListEditor(modal);
-
-  listEditor.setLength(tabTitles.length);
-  for (var i = 0; i < tabTitles.length; i++) {
-    dictionaryEditor = listEditor.editEntry(i, 'Dictionary');
-    dictionaryEditor.editEntry(0, 'UnicodeString').setText(tabTitles[i]);
-    callbackFunctions[i](dictionaryEditor.editEntry(1, 'RichText'));
-  }
-};
-
-var expectComplexWidgetDetailsToMatch = function(elem, tabTitles, callbackFunctions) {
+var expectWidgetDetailsToMatch = function(elem, tabArray) {
   elem.element(by.tagName('ul')).all(by.tagName('li')).then(function(titleElems) {
-    expect(titleElems.length).toEqual(tabTitles.length);
+    expect(titleElems.length).toEqual(tabArray.length);
     elem.element(by.css('.tab-content')).all(by.xpath('./*')).
         then(function(contentElems) {
-      for (var i = 0; i < tabTitles.length; i++) {
+      for (var i = 0; i < tabArray.length; i++) {
         // Click on each tab in turn to check its contents
-        expect(titleElems[i].getText()).toMatch(tabTitles[i]);
+        expect(titleElems[i].getText()).toMatch(tabArray[i].title);
         titleElems[i].click();
         forms.expectRichText(
           contentElems[i].element(by.xpath('./span'))
-        ).toMatch(callbackFunctions[i]);
+        ).toMatch(tabArray[i].content);
       }
     });
   });
 };
 
-var expectWidgetDetailsToMatch = function(elem, tabTitles, tabContents) {
-  expectComplexWidgetDetailsToMatch(
-      elem, tabTitles, tabContents.map(function(content) {
-    return function(checker) {
-      checker.readPlainText(content);
-    }
-  }));
-};
-
 exports.customizeWidget = customizeWidget;
-exports.customizeComplexWidget = customizeComplexWidget;
 exports.expectWidgetDetailsToMatch = expectWidgetDetailsToMatch;
-exports.expectComplexWidgetDetailsToMatch = expectComplexWidgetDetailsToMatch;

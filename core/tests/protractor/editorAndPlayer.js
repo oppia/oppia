@@ -1,6 +1,6 @@
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Version 2.0 (the "License");
+// Licensed under the Apache License, Verson 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -20,6 +20,7 @@
  */
 
 var general = require('../protractor_utils/general.js');
+var forms = require('../protractor_utils/forms.js');
 var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
@@ -31,15 +32,13 @@ describe('State editor', function() {
     users.login('user1@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.editContent().open();
-    editor.editContent().setPlainText('plain text');
-    editor.editContent().close();
+    editor.setContent(forms.toRichText('plain text'));
     editor.selectWidget('Continue', 'click here');
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch('plain text');
+    player.expectContentToMatch(forms.toRichText('plain text'));
     player.expectExplorationToNotBeOver();
     player.expectInteractionToMatch('Continue', 'click here');
     player.submitAnswer('Continue', null);
@@ -53,23 +52,25 @@ describe('State editor', function() {
     users.login('user2@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.editContent().open();
-    editor.editContent().clear();
-    editor.editContent().appendBoldText('bold text ');
-    editor.editContent().appendItalicText('italic text ');
-    editor.editContent().appendUnderlineText('underline text');
-    editor.editContent().appendOrderedList(['entry 1', 'entry 2']);
-    editor.editContent().appendUnorderedList(['an entry', 'another entry']);
-    editor.editContent().close();
-
-    editor.selectWidget('MultipleChoiceInput', ['option A', 'option B']);
+    editor.setContent(function(handler) {
+      handler.clear();
+      handler.appendBoldText('bold text ');
+      handler.appendItalicText('italic text ');
+      handler.appendUnderlineText('underline text');
+      handler.appendOrderedList(['entry 1', 'entry 2']);
+      handler.appendUnorderedList(['an entry', 'another entry']);
+    });
+    editor.selectWidget(
+      'MultipleChoiceInput', 
+      [forms.toRichText('option A'), forms.toRichText('option B')]);
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
     player.expectExplorationToNotBeOver();
     player.expectInteractionToMatch(
-      'MultipleChoiceInput', ['option A', 'option B']);
+      'MultipleChoiceInput', 
+      [forms.toRichText('option A'), forms.toRichText('option B')]);
     player.submitAnswer('MultipleChoiceInput', 'option B');
     player.expectExplorationToBeOver();
 
@@ -109,32 +110,30 @@ describe('Full exploration editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.setStateName('state 1');
-    editor.editContent().open();
-    editor.editContent().setPlainText('this is state 1');
-    editor.editContent().close();
+    editor.setContent(forms.toRichText('this is state 1'));
     editor.selectWidget('NumericInput');
     editor.addNumericRule.Equals(21);
     editor.editRule(0).setDestination('state 2');
 
     editor.moveToState('state 2');
-    editor.editContent().open();
-    editor.editContent().setPlainText('this is state 2');
-    editor.editContent().close();
-    editor.selectWidget('MultipleChoiceInput', ['return', 'complete']);
+    editor.setContent(forms.toRichText('this is state 2'));
+    editor.selectWidget(
+      'MultipleChoiceInput', 
+      [forms.toRichText('return'), forms.toRichText('complete')]);
     editor.addMultipleChoiceRule.Equals('return');
     editor.editRule(0).setDestination('state 1');
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch('this is state 1');
+    player.expectContentToMatch(forms.toRichText('this is state 1'));
     player.submitAnswer('NumericInput', 19);
     player.submitAnswer('NumericInput', 21);
-    player.expectContentToMatch('this is state 2');
+    player.expectContentToMatch(forms.toRichText('this is state 2'));
     player.submitAnswer('MultipleChoiceInput', 'return');
-    player.expectContentToMatch('this is state 1');
+    player.expectContentToMatch(forms.toRichText('this is state 1'));
     player.submitAnswer('NumericInput', 21);
-    player.expectContentToMatch('this is state 2');
+    player.expectContentToMatch(forms.toRichText('this is state 2'));
     player.expectExplorationToNotBeOver();
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
@@ -152,35 +151,44 @@ describe('Non-interactive widgets', function() {
     
     workflow.createExploration('widgets', 'maths');
 
-    editor.editContent().open();
-    editor.editContent().clear();
-    editor.editContent().appendPlainText('plainly');
-    editor.editContent().appendBoldText('bold');
-    editor.editContent().addWidget('Collapsible', 'title', 'inner');
-    // TODO (Jacob) add image widget test
-    editor.editContent().addWidget('Link', 'http://google.com/', true);
-    editor.editContent().addWidget('Math', 'abc');
-    editor.editContent().appendUnderlineText('underlined');
-    editor.editContent().appendPlainText('extra');
-    editor.editContent().addWidget(
-      'Tabs', ['title 1', 'title 2'], ['contents 1', 'contents 2']);
-    editor.editContent().addWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
-    editor.editContent().close();
-
+    editor.setContent(function(handler) {
+      handler.clear();
+      handler.appendPlainText('plainly');
+      handler.appendBoldText('bold');
+      handler.addWidget('Collapsible', 'title', forms.toRichText('inner'));
+      // TODO (Jacob) add image widget test
+      handler.addWidget('Link', 'http://google.com/', true);
+      handler.addWidget('Math', 'abc');
+      handler.appendUnderlineText('underlined');
+      handler.appendPlainText('extra');
+      handler.addWidget('Tabs', [{
+        title: 'title 1',
+        content: forms.toRichText('contents 1')
+      }, {
+        title: 'title 1',
+        content: forms.toRichText('contents 2')
+      }]);
+      handler.addWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
+    })
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectComplexContentToMatch(function(checker) {
+    player.expectContentToMatch(function(checker) {
       checker.readPlainText('plainly');
       checker.readBoldText('bold');
-      checker.readWidget('Collapsible', 'title', 'inner');
+      checker.readWidget('Collapsible', 'title', forms.toRichText('inner'));
       checker.readWidget('Link', 'http://google.com/', true);
       checker.readWidget('Math', 'abc');
       checker.readUnderlineText('underlined');
       checker.readPlainText('extra');
-      checker.readWidget(
-        'Tabs', ['title 1', 'title 2'], ['contents 1', 'contents 2']);
-      checker.readWidget('Video', 'ANeHmk22a6Q', 10, 100, false)
+      checker.readWidget('Tabs', [{
+        title: 'title 1',
+        content: forms.toRichText('contents 1')
+      }, {
+        title: 'title 1',
+        content: forms.toRichText('contents 2')
+      }]);
+      checker.readWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
     });
 
     users.logout();
@@ -192,35 +200,46 @@ describe('Non-interactive widgets', function() {
     
     workflow.createExploration('widgets', 'maths');
 
-    editor.editContent().open();
-    editor.editContent().clear();
-    editor.editContent().appendItalicText('slanted');
-    editor.editContent().addComplexWidget(
-        'Collapsible', 'heading', function(handler) {
+    editor.setContent(function(handler) {
       handler.clear();
-      // TODO (Jacob) add sub-widgets when issue 423 is fixed
-      handler.addComplexWidget('Tabs', ['no1', 'no2'], [function(handler2) {
-        handler2.setPlainText('boring');
-      }, function(handler3) {
-        handler3.clear();
-        handler3.appendBoldText('fun!');
-      }])
-      handler.addWidget('Math', 'xyz');
+      handler.appendItalicText('slanted');
+      handler.addWidget(
+          'Collapsible', 'heading', function(handler2) {
+        handler2.clear();
+        // TODO (Jacob) add sub-widgets when issue 423 is fixed
+        handler2.addWidget('Tabs', [{
+          title: 'no1',
+          content: function(handler3) {
+            handler3.setPlainText('boring');
+          }
+        }, {
+          title: 'no2',
+          content: function(handler4) {
+            handler4.clear();
+            handler4.appendBoldText('fun!');
+          }
+        }]);
+        handler2.addWidget('Math', 'xyz');
+      });
     });
-    editor.editContent().close();
-
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectComplexContentToMatch(function(checker) {
+    player.expectContentToMatch(function(checker) {
       checker.readItalicText('slanted');
-      checker.readComplexWidget('Collapsible', 'heading', function(handler) {
-        handler.readComplexWidget('Tabs', ['no1', 'no2'], [function(handler2) {
-          handler2.readPlainText('boring');
-        }, function(handler3) {
-          handler3.readBoldText('fun!');
-        }])
-        handler.readWidget('Math', 'xyz');
+      checker.readWidget('Collapsible', 'heading', function(checker2) {
+        checker2.readWidget('Tabs', [{
+          title: 'no1',
+          content: function(checker3) {
+            checker3.readPlainText('boring');
+          }
+        }, {
+          title: 'no2',
+          content: function(checker4) {
+            checker4.readBoldText('fun!');
+          }
+        }]); 
+        checker2.readWidget('Math', 'xyz');
       });
     });
 

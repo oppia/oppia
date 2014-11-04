@@ -29,8 +29,8 @@ var customizeWidget = function(modal, filepath, name) {
   filepathEditor.setName(name);
 };
 
-var expectWidgetDetailsToMatch = function(elem, filepath, name) {
-  // The filepath is not recorded and so cannot be checked.
+var expectWidgetDetailsToMatch = function(elem, name) {
+  // The original filepath is not recorded and so cannot be checked.
   expect(elem.getAttribute('filepath-with-value')).toMatch(name);
 };
 

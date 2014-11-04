@@ -18,6 +18,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
@@ -40,13 +41,13 @@ describe('Embedding', function() {
       protractor.getInstance().waitForAngular();
 
       player.expectContentToMatch(
-        (version === 1) ?
+        forms.toRichText((version === 1) ?
           'Suppose you were given three balls: one red, one blue, and one ' +
           'yellow. How many ways are there to arrange them in a straight line?':
-          'Version 2');
+          'Version 2'));
       player.submitAnswer('NumericInput', 6);
       player.expectContentToMatch(
-        'Right! Why do you think it is 6?');
+        forms.toRichText('Right! Why do you think it is 6?'));
       player.expectExplorationToNotBeOver();
       player.submitAnswer('TextInput', 'factorial');
       player.expectExplorationToBeOver();
@@ -64,9 +65,7 @@ describe('Embedding', function() {
     admin.reloadExploration('counting');
 
     general.openEditor('4');
-    editor.editContent().open();
-    editor.editContent().setPlainText('Version 2');
-    editor.editContent().close();
+    editor.setContent(forms.toRichText('Version 2'));
     editor.saveChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {

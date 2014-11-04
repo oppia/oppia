@@ -41,15 +41,15 @@ var ListEditor = function(elem) {
       return items.length;
     });
   };
-  var getEntry = function(entryNum) {
-    return elem.element(by.repeater('item in localValue track by $index').
-      row(entryNum));
-  };
-  // Returns the new entry for further manipulation
-  var addEntry = function() {
+  // Optionally returns the new entry editor for further manipulation
+  var addEntry = function(objectType) {
     var listLength = _getLength();
     elem.element(by.css('.protractor-test-add-list-entry')).click();
-    return getEntry(listLength);
+    if (objectType) {
+      return getEditor(objectType)(
+        elem.element(
+          by.repeater('item in localValue track by $index').row(listLength)));
+    }
   };
   var deleteEntry = function(index) {
     elem.element(
@@ -67,7 +67,6 @@ var ListEditor = function(elem) {
     },
     addEntry: addEntry,
     deleteEntry: deleteEntry,
-    getEntry: getEntry,
     // This will add or delete list elements as necessary
     setLength: function(desiredLength) {
       elem.all(by.repeater('item in localValue track by $index')).count().
@@ -156,8 +155,7 @@ var RichTextEditor = function(elem) {
     appendHorizontalRule: function() {
       _clickContentMenuButton('insertHorizontalRule');
     },
-    // This adds non-interactive widgets and allows simple customizations
-    // thereof.
+    // This adds and customizes non-interactive widgets.
     // Additional arguments may be sent to this function, and they will be
     // passed on to the relevant widget editor.
     addWidget: function(widgetName) {
@@ -173,24 +171,6 @@ var RichTextEditor = function(elem) {
         args.push(arguments[i]);
       }
       widgets.getNoninteractive(widgetName).customizeWidget.apply(null, args);
-      modal.element(by.css('.protractor-test-close-widget-editor')).click();
-      // TODO (Jacob) remove when issue 422 is fixed
-      elem.element(by.tagName('rich-text-editor')).
-        element(by.tagName('iframe')).click();
-    },
-    // This adds non-interactive widgets together with complex customizations;
-    // in practice this means widgets (e.g. Collapsible) that contain rich text
-    // editors, for the editing of which functions may be sent.
-    // Likewise, additional arguments can be sent
-    addComplexWidget: function(widgetName) {
-      _clickContentMenuButton('custom-command-' + widgetName.toLowerCase());
-      var modal = element.all(by.css('.modal-dialog')).last();
-      var args = [modal];
-      for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i]);
-      }
-      widgets.getNoninteractive(widgetName).
-        customizeComplexWidget.apply(null, args);
       modal.element(by.css('.protractor-test-close-widget-editor')).click();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
@@ -264,14 +244,15 @@ var expectRichText = function(elem) {
   };
 };
 
-// This supplies functions to verify the contents of a rich text area.
+// This supplies functions to verify the contents of an area of the page that
+// was created using a rich-text editor, e.g. <div>text<b>bold</b></div>.
 // 'arrayOfElems': the array of promises of top-level element nodes in the 
-//   rich-text area.
+//   rich-text area, e.g [promise of <b>bold</b>].
 // 'arrayOfTexts': the array of visible texts of top-level element nodes in 
-//   the rich-text area, obtained from getText().
+//   the rich-text area, obtained from getText(), e.g. ['bold'].
 // 'fullText': a string consisting of all the visible text in the rich text 
 //   area (including both element and text nodes, so more than just the 
-//   concatenation of arrayOfTexts).
+//   concatenation of arrayOfTexts), e.g. 'textbold'.
 var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
   // These are shared by the returned functions, and records how far through
@@ -333,27 +314,21 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       arrayPointer = arrayPointer + 1;
       justPassedWidget = true;
     },
-    // Likewise additonal arguments can be sent.
-    readComplexWidget: function(widgetName) {
-      var elem = arrayOfElems[arrayPointer];
-      expect(elem.getTagName()).
-        toBe('oppia-noninteractive-' + widgetName.toLowerCase());
-      expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
-      var args = [elem];
-      for (var i = 1; i < arguments.length; i++) {
-        args.push(arguments[i]);
-      }
-      widgets.getNoninteractive(widgetName).
-        expectComplexWidgetDetailsToMatch.apply(null, args)
-      textPointer = textPointer + arrayOfTexts[arrayPointer].length + 
-        (justPassedWidget ? 1 : 2);
-      arrayPointer = arrayPointer + 1;
-      justPassedWidget = true;
-    },
     expectEnd: function() {
       expect(arrayPointer).toBe(arrayOfElems.length);
     }
   }
+};
+
+var toRichText = function(text) {
+  // The 'handler' should be either a RichTextEditor or RichTextChecker
+  return function(handler) {
+    if (handler.hasOwnProperty('setPlainText')) {
+      handler.setPlainText(text);
+    } else {
+      handler.readPlainText(text);
+    }
+  };
 };
 
 
@@ -383,9 +358,10 @@ exports.RealEditor = RealEditor;
 exports.RichTextEditor = RichTextEditor;
 exports.UnicodeEditor = UnicodeEditor;
 
+exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;
+exports.toRichText = toRichText;
 
 exports.editAutocompleteDropdown = editAutocompleteDropdown;
-exports.expectRichText = expectRichText;
 
 exports.getEditor = getEditor;

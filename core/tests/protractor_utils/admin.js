@@ -22,21 +22,29 @@
 var general = require('./general.js');
 var forms = require('./forms.js');
 
-var appendToConfigList = function(listName, textToAppend) {
+var editConfigProperty = function(propertyName, objectType, callbackFunction) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(
       by.repeater('(configPropertyId, configPropertyData) in configProperties')
     ).map(function(configProperty) {
-    configProperty.element(by.tagName('em')).getText().then(function(title) {
-      if (title.match(listName)) {
-        var newEntry = forms.ListEditor(configProperty).addEntry();
-        forms.UnicodeEditor(newEntry, true).setText(textToAppend);
+    return configProperty.element(by.tagName('em')).getText().then(function(title) {
+      if (title.match(propertyName)) {
+        callbackFunction(forms.getEditor(objectType)(configProperty));
         element(by.buttonText('Save')).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the saving to complete.
         protractor.getInstance().waitForAngular();
+        return true;
       }
     });
+  }).then(function(results) {
+    var success = false;
+    for (var i = 0; i < results.length; i++) {
+      success = success || results[i];
+    }
+    if (! success) {
+      throw Error('Could not find config property: ' + propertyName);
+    }
   });
 };
 
@@ -59,5 +67,5 @@ var reloadExploration = function(name) {
   });
 };
 
-exports.appendToConfigList = appendToConfigList;
+exports.editConfigProperty = editConfigProperty;
 exports.reloadExploration = reloadExploration;

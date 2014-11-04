@@ -19,30 +19,19 @@
 
 var forms = require('../../../../core/tests/protractor_utils/forms.js');
 
-// Use when the options are all plain text, then options is an array of strings
-// representing the options.
-var customizeInteraction = function(elem, options) {
-  var listEditor = forms.ListEditor(elem);
-  listEditor.setLength(options.length);
-  for (var i = 0; i < options.length; i++) {
-    listEditor.editEntry(i, 'RichText').setPlainText(options[i]);
-  }
-};
-
-// Use when the options contain formatting or non-interactive widgets. Then 
-// callbackFunctions should be an array of functions, one for each option,
+// The callbackFunctions should be an array of functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeComplexInteraction = function(elem, callbackFunctions) {
+var customizeInteraction = function(elem, callbackFunctions) {
   forms.ListEditor(elem).setLength(callbackFunctions.length);
   for (var i = 0; i < callbackFunctions.length; i++) {
-    callbackFunctions[i](forms.ListEditor.editEntry(i, 'RichText'));
+    callbackFunctions[i](forms.ListEditor(elem).editEntry(i, 'RichText'));
   }
 };
 
 // These callbackFunctions each describe how to check one of the options.
-var expectComplexInteractionDetailsToMatch = function(callbackFunctions) {
+var expectInteractionDetailsToMatch = function(callbackFunctions) {
   element.all(by.repeater('choice in choices track by $index')).
       then(function(optionElements) {
     expect(optionElements.length).toEqual(callbackFunctions.length);
@@ -54,14 +43,6 @@ var expectComplexInteractionDetailsToMatch = function(callbackFunctions) {
   });
 };
 
-var expectInteractionDetailsToMatch = function(options) {
-  expectComplexInteractionDetailsToMatch(options.map(function(text) {
-    return function(checker) {
-      checker.readPlainText(text);
-    };
-  }));
-};
-
 // 'answer' {String} is the text on the multiple-choice item to select.
 var submitAnswer = function(answer) {
   element(by.tagName('oppia-interactive-multiple-choice-input')).
@@ -69,7 +50,5 @@ var submitAnswer = function(answer) {
 };
 
 exports.customizeInteraction = customizeInteraction;
-exports.customizeComplexInteraction = customizeComplexInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
-exports.expectComplexInteractionDetailsToMatch = expectComplexInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;

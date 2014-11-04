@@ -18,6 +18,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var forms = require('../protractor_utils/forms.js');
 var editor = require('../protractor_utils/editor.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
@@ -40,9 +41,7 @@ describe('Permissions for private explorations', function() {
 
       users.login('bob@example.com');
       general.openEditor(explorationId);
-      editor.editContent().open();
-      editor.editContent().setPlainText('I love you');
-      editor.editContent().close();
+      editor.setContent(forms.toRichText('I love you'));
       editor.saveChanges();
       users.logout();
 

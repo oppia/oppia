@@ -21,15 +21,7 @@
 
 var forms = require('../../../../core/tests/protractor_utils/forms.js');
 
-var customizeWidget = function(modal, heading, content) {
-  forms.UnicodeEditor(
-    modal.element(by.tagName('schema-based-unicode-editor'))
-  ).setText(heading);
-  forms.RichTextEditor(modal.element(by.tagName('schema-based-html-editor'))).
-    setPlainText(content);
-};
-
-var customizeComplexWidget = function(modal, heading, callbackFunction) {
+var customizeWidget = function(modal, heading, callbackFunction) {
   forms.UnicodeEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setText(heading);
@@ -38,7 +30,7 @@ var customizeComplexWidget = function(modal, heading, callbackFunction) {
       modal.element(by.tagName('schema-based-html-editor'))));
 };
 
-var expectComplexWidgetDetailsToMatch = function(elem, heading, callbackFunction) {
+var expectWidgetDetailsToMatch = function(elem, heading, callbackFunction) {
   expect(
     elem.element(by.css('.protractor-test-collapsible-heading')).getText()
   ).toMatch(heading);
@@ -49,13 +41,5 @@ var expectComplexWidgetDetailsToMatch = function(elem, heading, callbackFunction
   ).toMatch(callbackFunction);
 };
 
-var expectWidgetDetailsToMatch = function(elem, heading, content) {
-  expectComplexWidgetDetailsToMatch(elem, heading, function(checker) {
-    checker.readPlainText(content);
-  });
-};
-
 exports.customizeWidget = customizeWidget;
-exports.customizeComplexWidget = customizeComplexWidget;
 exports.expectWidgetDetailsToMatch = expectWidgetDetailsToMatch;
-exports.expectComplexWidgetDetailsToMatch = expectComplexWidgetDetailsToMatch;

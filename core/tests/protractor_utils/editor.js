@@ -31,18 +31,12 @@ var setStateName = function(name) {
   nameElement.element(by.buttonText('Done')).click();
 };
 
-// Content & non-interactive widgets. It is necessary to run open() at the
-// start and close() at the end.
-var editContent = function() {
-  var operations = forms.RichTextEditor(element(by.css('.oppia-state-content')));
-  operations.open = function() {
-    element(by.css('.protractor-test-edit-content')).click();
-  };
-  operations.close = function() {
-    element(by.css('.oppia-state-content')).
-      element(by.buttonText('Save Content')).click();
-  };
-  return operations;
+var setContent = function(callbackFunction) {
+  element(by.css('.protractor-test-edit-content')).click();
+  callbackFunction(
+    forms.RichTextEditor(element(by.css('.oppia-state-content'))));
+  element(by.css('.oppia-state-content')).
+    element(by.buttonText('Save Content')).click();
 };
 
 // This receives a callbackFunction used to verify the display of the state's
@@ -57,6 +51,8 @@ var editContent = function() {
 // click on them to view their contents, as clicks instead open the rich text
 // editor.
 var expectContentToMatch = function(callbackFunction) {
+  // The .last() is necessary because we want the second of two <span>s; the
+  // first holds the placeholder text for the exploration content.
   forms.expectRichText(
     element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
   ).toMatch(callbackFunction);
@@ -92,21 +88,6 @@ var selectWidget = function(widgetName) {
 
     element(by.css('.protractor-test-save-interaction')).click();
   }
-};
-
-// Likewise additional arguments to this function will be passed on.
-var selectComplexWidget = function(widgetName) {
-  element(by.css('.protractor-test-select-interaction-id')).
-    element(by.css('option[value=' + widgetName + ']')).click();
-  element(by.css('.protractor-test-edit-interaction')).click();
-  var elem = element(by.css('.oppia-interactive-widget-editor'));
-  var args = [elem];
-  for (var i = 1; i < arguments.length; i++) {
-    args.push(arguments[i]);
-  }
-  widgets.getInteractive(widgetName).
-    customizeComplexInteraction.apply(null, args);
-  element(by.css('.protractor-test-save-interaction')).click();
 };
 
 // Rules are zero-indexed; 'default' denotes the default rule.
@@ -330,12 +311,11 @@ var saveChanges = function(commitMessage) {
 };
 
 exports.setStateName = setStateName;
-exports.editContent = editContent;
+
+exports.setContent = setContent;
 exports.expectContentToMatch = expectContentToMatch;
-exports.expectContentTextToMatch = expectContentTextToEqual;
 
 exports.selectWidget = selectWidget;
-exports.selectComplexWidget = selectComplexWidget;
 
 exports.editRule = editRule;
 exports.addNumericRule = addNumericRule;

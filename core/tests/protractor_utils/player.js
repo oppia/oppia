@@ -33,22 +33,12 @@ var getExplorationName = function() {
     element(by.tagName('h3')).getText();
 };
 
-// These two functions verify the question just asked. The first just checks
-// that the visible question text matches the text sent to it. The second also
-// checks formatting and non-interactive widgets. To do so the callbackFunction
-// will be sent a handler (as given in forms.RichTextChecker) to which calls
-// such as
+// This verifies the question just asked, including formatting and 
+// non-interactive widgets. To do so the callbackFunction will be sent a 
+// handler (as given in forms.RichTextChecker) to which calls such as
 //   handler.readItalicText('slanted');
 // can then be sent.
-
-var expectContentToMatch = function(text) {
-  expect(
-    element.all(by.repeater('response in responseLog track by $index')).
-      last().element(by.css('.protractor-test-conversation-content')).getText()
-  ).toBe(text);
-};
-
-var expectComplexContentToMatch = function(callbackFunction) {
+var expectContentToMatch = function(callbackFunction) {
   forms.expectRichText(
     element.all(by.repeater('response in responseLog track by $index')).
       last().element(by.css('.protractor-test-conversation-content')).
@@ -73,16 +63,6 @@ var expectInteractionToMatch = function(widgetName) {
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
-// Likewise additional arguments can be sent to this function
-var expectComplexInteractionToMatch = function(widgetName) {
-  var args = [];
-  for (var i = 1; i < arguments.length; i++) {
-    args.push(arguments[i]);
-  }
-  widgets.getInteractive(widgetName).
-    expectComplexInteractionDetailsToMatch.apply(null, args);
-};
-
 // `answerData` is a variable that is passed to the corresponding widget's
 // protractor utilities. Its definition and type are widget-specific.
 var submitAnswer = function(widgetName, answerData) {
@@ -104,11 +84,9 @@ exports.restartExploration = restartExploration;
 
 exports.getExplorationName = getExplorationName;
 exports.expectContentToMatch = expectContentToMatch;
-exports.expectComplexContentToMatch = expectComplexContentToMatch;
 exports.getLatestFeedbackText = getLatestFeedbackText;
 
 exports.expectInteractionToMatch = expectInteractionToMatch;
-exports.expectComplexInteractionToMatch = expectComplexInteractionToMatch;
 exports.submitAnswer = submitAnswer;
 
 exports.expectExplorationToBeOver = expectExplorationToBeOver;
