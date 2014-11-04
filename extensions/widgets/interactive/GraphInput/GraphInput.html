@@ -59,6 +59,8 @@
             rx="5"
             ry="5"
             ng-click="setMode(button.mode, $event)"
+            ng-mouseenter="state.hoveredModeButton = button.mode"
+            ng-mouseleave="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : hoveredModeButton"
             ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
           </rect>
           <text class="oppia-graph-button-label unselectable-text unclickable-text" x="8" ng-attr-y="<[42 + 50 * $index]>">
@@ -83,6 +85,13 @@
           <[button.text]>
         </text>
       </g>
+      <text ng-if="state.hoveredModeButton !== null" 
+        class="unselectable-text unclickable-text"
+        text-anchor="middle"
+        ng-attr-x="<[vizWidth/2]>"
+        y="240">
+        <[getModeTooltipText()]>
+      </text>
 
       <!-- Selected vertex -->
       <circle ng-if="state.selectedVertex !== null && graph.isLabeled && vertexEditPermissions === true"
@@ -92,9 +101,9 @@
         style="fill: orange">
       </circle>
       <!-- Hovered vertex -->
-      <circle ng-if="state.hoverVertex !== null"
-        ng-attr-cx="<[graph.vertices[state.hoverVertex].x]>"
-        ng-attr-cy="<[graph.vertices[state.hoverVertex].y]>"
+      <circle ng-if="state.hoveredVertex !== null"
+        ng-attr-cx="<[graph.vertices[state.hoveredVertex].x]>"
+        ng-attr-cy="<[graph.vertices[state.hoveredVertex].y]>"
         r="8"
         ng-attr-style="fill: <[getHoverVertexColor()]>">
       </circle>
@@ -108,8 +117,8 @@
       <g ng-repeat="edge in graph.edges">
         <line
           ng-click="onClickEdge($index)"
-          ng-mouseenter="state.hoverEdge = $index"
-          ng-mouseleave="state.hoverEdge = ($index === state.hoverEdge) ? null : state.hoverEdge"
+          ng-mouseenter="state.hoveredEdge = $index"
+          ng-mouseleave="state.hoveredEdge = ($index === state.hoveredEdge) ? null : state.hoveredEdge"
           ng-attr-x1="<[graph.vertices[edge.src].x]>"
           ng-attr-y1="<[graph.vertices[edge.src].y]>"
           ng-attr-x2="<[graph.vertices[edge.dst].x]>"
@@ -118,8 +127,8 @@
         </line>
         <polygon
           ng-if="graph.isDirected"
-          ng-mouseenter="state.hoverEdge = $index"
-          ng-mouseleave="state.hoverEdge = ($index === state.hoverEdge) ? null : state.hoverEdge"
+          ng-mouseenter="state.hoveredEdge = $index"
+          ng-mouseleave="state.hoveredEdge = ($index === state.hoveredEdge) ? null : state.hoveredEdge"
           ng-attr-points="<[getDirectedEdgeArrowPoints($index)]>"
           ng-attr-style="fill: <[getEdgeColor($index)]>;">
         </polygon>
@@ -141,8 +150,8 @@
           class="unselectable-text">
           <[vertex.label]>
         </text>
-        <circle ng-mouseenter="state.hoverVertex = $index"
-          ng-mouseleave="state.hoverVertex = ($index === state.hoverVertex) ? null : state.hoverVertex"
+        <circle ng-mouseenter="state.hoveredVertex = $index"
+          ng-mouseleave="state.hoveredVertex = ($index === state.hoveredVertex) ? null : state.hoveredVertex"
           ng-click="onClickVertex($index)"
           ng-mousedown="onMousedownVertex($index)"
           ng-mouseup="onMouseupVertex($index)"
