@@ -114,6 +114,9 @@ oppia.directive('graphViz', function() {
         mouseX: 0,
         mouseY: 0,
       };
+      
+      $scope.vertexRadius = 6;
+      $scope.edgeWidth = 3;
 
       var vizContainer = $($element).find('.oppia-graph-viz-svg');
       $scope.vizWidth = vizContainer.width();
