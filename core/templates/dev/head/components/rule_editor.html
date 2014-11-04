@@ -119,7 +119,7 @@
     <div class="oppia-rule-save-cancel-buttons">
       <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
       <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-danger pull-right" ng-if="!isDefaultRule() && !isTmpRule()" ng-click="deleteThisRule()">Delete Rule</button>
+      <button type="button" class="btn btn-danger pull-right protractor-test-delete-rule" ng-if="!isDefaultRule() && !isTmpRule()" ng-click="deleteThisRule()">Delete Rule</button>
     </div>
   </div>
 </div>

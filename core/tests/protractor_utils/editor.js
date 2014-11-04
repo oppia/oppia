@@ -90,6 +90,17 @@ var selectWidget = function(widgetName) {
   }
 };
 
+// Likewise this can receive additional arguments
+var expectInteractionToMatch = function(widgetName) {
+  // Convert additional arguments to an array to send on.
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  widgets.getInteractive(widgetName).
+    expectInteractionDetailsToMatch.apply(null, args);
+};
+
 // Rules are zero-indexed; 'default' denotes the default rule.
 var editRule = function(ruleNum) {
   var elem = (ruleNum === 'default') ?
@@ -119,6 +130,10 @@ var editRule = function(ruleNum) {
       forms.editAutocompleteDropdown(destinationElement).
         setText(destinationName);
       elem.element(by.css('.protractor-test-save-rule')).click();
+    },
+    delete: function() {
+      element(by.css('.protractor-test-delete-rule')).click();
+      browser.driver.switchTo().alert().accept();
     }
   }
 };
@@ -240,10 +255,18 @@ var addMultipleChoiceRule = {
   }
 };
 
+
+var createState = function(newStateName) {
+  element(by.css('.oppia-add-state-container')).
+    element(by.tagName('input')).sendKeys(newStateName);
+  element(by.css('.oppia-add-state-container')).
+    element(by.tagName('button')).click();
+};
+
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
   element.all(by.css('.node')).map(function(stateElement) {
-    return stateElement.element(by.tagName('title')).getText();
+    return stateElement.element(by.tagName('text')).getText();
   }).then(function(listOfNames) {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
@@ -257,6 +280,33 @@ var moveToState = function(targetName) {
     }
   });
 };
+
+var deleteState = function(stateName) {
+  element.all(by.css('.node')).map(function(stateElement) {
+    return stateElement.element(by.tagName('text')).getText();
+  }).then(function(listOfNames) {
+    var matched = false;
+    for (var i = 0; i < listOfNames.length; i++) {
+      if (listOfNames[i] === stateName) {
+        element.all(by.css('.node')).get(i).element(by.tagName('g')).click();
+        element(by.css('.protractor-test-confirm-delete-state')).click();
+        matched = true;
+      }
+    }
+    if (! matched) {
+      throw Error('State ' + stateName + ' not found by editor.moveToState');
+    }
+  });
+};
+
+var expectStateNamesToBe = function(names) {
+  element.all(by.css('.node')).map(function(stateNode) {
+    return stateNode.element(by.tagName('text')).getText();
+  }).then(function(stateNames) {
+    expect(stateNames).toEqual(names);
+  });
+};
+
 
 // All functions involving the settings tab should be sent through this
 // wrapper.
@@ -310,18 +360,35 @@ var saveChanges = function(commitMessage) {
   });
 };
 
+var discardChanges = function() {
+  element(by.css('.protractor-test-discard-changes')).click();
+  browser.driver.switchTo().alert().accept();
+};
+
+var enterPreviewMode = function() {
+  element(by.css('.protractor-test-enter-preview-mode')).click();
+};
+
+var exitPreviewMode = function() {
+  element(by.css('.protractor-test-exit-preview-mode')).click();
+};
+
 exports.setStateName = setStateName;
 
 exports.setContent = setContent;
 exports.expectContentToMatch = expectContentToMatch;
 
 exports.selectWidget = selectWidget;
+exports.expectInteractionToMatch = expectInteractionToMatch;
 
 exports.editRule = editRule;
 exports.addNumericRule = addNumericRule;
 exports.addMultipleChoiceRule = addMultipleChoiceRule;
 
+exports.createState = createState;
 exports.moveToState = moveToState;
+exports.deleteState = deleteState;
+exports.expectStateNamesToBe = expectStateNamesToBe;
 
 exports.runFromSettingsTab = runFromSettingsTab;
 exports.setTitle = setTitle;
@@ -330,3 +397,6 @@ exports.setObjective = setObjective;
 exports.setLanguage = setLanguage;
 
 exports.saveChanges = saveChanges;
+exports.discardChanges = discardChanges;
+exports.enterPreviewMode = enterPreviewMode;
+exports.exitPreviewMode = exitPreviewMode;

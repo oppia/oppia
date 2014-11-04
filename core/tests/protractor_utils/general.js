@@ -122,6 +122,7 @@ exports.waitForSystem = waitForSystem;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
+exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;

@@ -311,13 +311,13 @@
                       </span>
                     </button>
 
-                    <button class="btn btn-default oppia-main-control-button" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()" title="Discard all pending changes.">discard changes</button>
+                    <button class="btn btn-default oppia-main-control-button protractor-test-discard-changes" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()" title="Discard all pending changes.">discard changes</button>
                   </span>
                 </span>
 
                 <div class="btn-group">
-                  <label class="btn btn-default" ng-model="isInPreviewMode" btn-radio="false" ng-click="exitPreviewMode()"><span class="glyphicon glyphicon-pencil"></span> Edit</label>
-                  <label class="btn btn-default" ng-model="isInPreviewMode" btn-radio="true" ng-click="enterPreviewMode()"><span class="glyphicon glyphicon-play"></span> Preview</label>
+                  <label class="btn btn-default protractor-test-exit-preview-mode" ng-model="isInPreviewMode" btn-radio="false" ng-click="exitPreviewMode()"><span class="glyphicon glyphicon-pencil"></span> Edit</label>
+                  <label class="btn btn-default protractor-test-enter-preview-mode" ng-model="isInPreviewMode" btn-radio="true" ng-click="enterPreviewMode()"><span class="glyphicon glyphicon-play"></span> Preview</label>
                 </div>
               </span>
             </div>

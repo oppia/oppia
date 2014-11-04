@@ -1,6 +1,6 @@
 // Copyright 2014 The Oppia Authors. All Rights Reserved.
 //
-// Licensed under the Apache License, Verson 2.0 (the "License");
+// Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
 //
@@ -137,6 +137,74 @@ describe('Full exploration editor', function() {
     player.expectExplorationToNotBeOver();
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
+    users.logout();
+  });
+
+  it('should allow complex behaviour', function() {
+    users.createUser('user5@example.com', 'user5');
+    users.login('user5@example.com');
+
+    workflow.createExploration('sums', 'maths');
+    general.getExplorationIdFromEditor().then(function(explorationID) {
+
+      // Check discarding of changes
+      editor.setStateName('state1');
+      editor.expectStateNamesToBe(['state1', 'END']);
+      editor.createState('state2');
+      editor.expectStateNamesToBe(['state1', 'state2', 'END']);
+      editor.discardChanges();
+      editor.setStateName('first');
+      editor.expectStateNamesToBe(['first', 'END']);
+
+      // Check deletion of states
+      editor.createState('second');
+      editor.expectStateNamesToBe(['first', 'second', 'END']);
+      editor.deleteState('second');
+      editor.expectStateNamesToBe(['first', 'END']);
+
+      // Check behaviour of the back button
+      editor.setObjective('do stuff');
+      browser.navigate().back();
+      expect(browser.getCurrentUrl()).toEqual(
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationID + 
+        '#/settings');
+      browser.navigate().back();
+      expect(browser.getCurrentUrl()).toEqual(
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationID + 
+        '#/gui/first');
+
+      // Check display of content & interaction in the editor
+      editor.setContent(function(handler) {
+        handler.clear();
+        handler.appendItalicText('Welcome');
+      });
+      editor.expectContentToMatch(function(checker) {
+        checker.readItalicText('Welcome');
+      });
+      editor.selectWidget('NumericInput');
+      editor.expectInteractionToMatch('NumericInput');
+
+      // Check deletion of rules
+      editor.editRule('default').editFeedback().editEntry(0, 'RichText').
+        appendPlainText('Farewell');
+      editor.editRule('default').setDestination('END');
+      editor.addNumericRule.IsGreaterThan(2);
+      editor.editRule(0).delete();
+
+      // Check editor preview mode
+      editor.enterPreviewMode();
+      player.expectContentToMatch(function(handler) {
+        handler.readItalicText('Welcome');
+      });
+      player.expectInteractionToMatch('NumericInput');
+      player.submitAnswer('NumericInput', 6);
+      expect(player.getLatestFeedbackText()).toBe('Farewell');
+      player.expectExplorationToBeOver();
+      editor.exitPreviewMode();
+
+      editor.discardChanges();
+      users.logout();
+    });
   });
 
   afterEach(function() {
