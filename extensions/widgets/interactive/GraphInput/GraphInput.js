@@ -173,6 +173,7 @@ oppia.directive('graphViz', function() {
         });
       }
 
+      // TODO(czx): Consider a better way to make the tooltip appear
       $scope.getModeTooltipText = function() {
         if ($scope.state.hoveredModeButton == _MODES.MOVE) {
           return "[Move vertices]";
