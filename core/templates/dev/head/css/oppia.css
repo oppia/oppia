@@ -1000,11 +1000,18 @@ oppia-parameter {
 .oppia-dashboard-row:hover {
   background: #eee;
 }
-
 .oppia-dashboard-row-recent {
   background: #fff4ca;
   cursor: pointer;
 }
 .oppia-dashboard-row-recent:hover {
   background: #ffe279;
+}
+
+.oppia-large-modal-window .modal-dialog {
+  max-width: 900px;
+  width: 80%;
+}
+.oppia-large-modal-window .modal-body {
+  height: 60vh;
 }

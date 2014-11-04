@@ -32,6 +32,10 @@ oppia.directive('conversationSkin', [function() {
       $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
       $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
 
+      $scope.isAnswerBeingProcessed = function() {
+        return oppiaPlayerService.isAnswerBeingProcessed();
+      };
+
       $window.addEventListener('beforeunload', function(e) {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
             !oppiaPlayerService.isInPreviewMode()) {
