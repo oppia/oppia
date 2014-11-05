@@ -32,7 +32,7 @@ def create_login_url(slug):
 
 def create_logout_url(slug):
     """Creates a logout url."""
-    return users.create_logout_url(slug)
+    return '/logout'
 
 
 def get_current_user(request):

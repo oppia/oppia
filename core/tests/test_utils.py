@@ -146,7 +146,7 @@ class TestBase(unittest.TestCase):
 
     def get_expected_logout_url(self, slug):
         """Returns the expected logout URL."""
-        return current_user_services.create_logout_url(slug)
+        return current_user_services.create_logout_url()
 
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
