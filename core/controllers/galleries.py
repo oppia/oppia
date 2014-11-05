@@ -95,7 +95,8 @@ class GalleryHandler(base.BaseHandler):
         }
 
         # Get non-private and viewable private exploration summaries
-        exp_summaries_dict = exp_services.get_non_private_exploration_summaries()
+        exp_summaries_dict = (
+            exp_services.get_non_private_exploration_summaries())
         if self.user_id:
             exp_summaries_dict.update(
                 exp_services.get_private_at_least_viewable_exploration_summaries(
@@ -134,7 +135,8 @@ class GalleryHandler(base.BaseHandler):
                 private_explorations_list.append(e_dict)
             elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
                 beta_explorations_list.append(e_dict)
-            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+            elif (e_dict['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLICIZED):
                 released_explorations_list.append(e_dict)
 
         private_explorations_list = sorted(

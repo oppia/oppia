@@ -26,7 +26,6 @@ following Python types: bool, dict, float, int, list, unicode.
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import logging
 import numbers
 import urllib
 import urlparse

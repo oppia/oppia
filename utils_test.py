@@ -159,4 +159,3 @@ class UtilsTests(test_utils.GenericTestBase):
         self.assertEqual(p, 'foo')
         p = utils.vfs_normpath('/foo//bar//baz//')
         self.assertEqual(p, '/foo/bar/baz')
-        

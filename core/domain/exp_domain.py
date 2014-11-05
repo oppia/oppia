@@ -440,9 +440,9 @@ class WidgetInstance(object):
         self.widget_id = widget_id
         # Customization args for the interactive widget view. Parts of these
         # args may be Jinja templates that refer to state parameters.
-        # This is a dict: the keys are names of customization_args and the values
-        # are dicts with a single key, 'value', whose corresponding value is the
-        # value of the customization arg.
+        # This is a dict: the keys are names of customization_args and the
+        # values are dicts with a single key, 'value', whose corresponding
+        # value is the value of the customization arg.
         self.customization_args = customization_args
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
@@ -511,7 +511,8 @@ class WidgetInstance(object):
 
     @classmethod
     def create_default_widget(cls, default_dest_state_name):
-        default_obj_type = WidgetInstance._get_obj_type(feconf.DEFAULT_WIDGET_ID)
+        default_obj_type = WidgetInstance._get_obj_type(
+            feconf.DEFAULT_WIDGET_ID)
         return cls(
             feconf.DEFAULT_WIDGET_ID,
             {},
@@ -666,7 +667,8 @@ class State(object):
         )
 
     @classmethod
-    def create_default_state(cls, default_dest_state_name, is_initial_state=False):
+    def create_default_state(
+            cls, default_dest_state_name, is_initial_state=False):
         text_str = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
@@ -710,9 +712,10 @@ class Exploration(object):
         self.last_updated = last_updated
 
     def is_equal_to(self, other):
-        simple_props = ['id', 'title', 'category', 'objective', 'language_code',
-                        'skill_tags', 'blurb', 'author_notes', 'default_skin',
-                        'init_state_name', 'version']
+        simple_props = [
+            'id', 'title', 'category', 'objective', 'language_code',
+            'skill_tags', 'blurb', 'author_notes', 'default_skin',
+            'init_state_name', 'version']
 
         for prop in simple_props:
             if getattr(self, prop) != getattr(other, prop):
@@ -731,7 +734,8 @@ class Exploration(object):
                 return False
 
         for i in xrange(len(self.param_changes)):
-            if self.param_changes[i].to_dict() != other.param_changes[i].to_dict():
+            if (self.param_changes[i].to_dict() !=
+                    other.param_changes[i].to_dict()):
                 return False
 
         return True
@@ -748,9 +752,9 @@ class Exploration(object):
         }
 
         return cls(
-            exploration_id, title, category, objective, language_code, [], '', '',
-            'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [],
-            0)
+            exploration_id, title, category, objective, language_code, [], '',
+            '', 'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict,
+            {}, [], 0)
 
     @classmethod
     def _require_valid_name(cls, name, name_type):

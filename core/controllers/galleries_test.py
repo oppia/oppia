@@ -16,7 +16,6 @@
 
 __author__ = 'Sean Lip'
 
-from core import jobs_registry
 from core.controllers import galleries
 from core.domain import config_services
 from core.domain import exp_jobs
@@ -116,7 +115,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['released'][0])
 
-
     def test_gallery_handler_for_created_explorations(self):
         """Test the gallery data handler for manually created explirations."""
 
@@ -209,7 +207,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'objective': 'Objective B',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['released'][0])
-
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""

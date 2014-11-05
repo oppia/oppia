@@ -18,18 +18,11 @@
 
 __author__ = 'Frederik Creemers'
 
-import ast
-
 from core import jobs
-from core.domain import exp_domain
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
 transaction_services = models.Registry.import_transaction_services()
-import feconf
-import utils
-
-from google.appengine.ext import ndb
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
@@ -68,7 +61,9 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        # We're inline importing here to break import loops like this: (-> means imports)
-        # exp_services -> event_services -> jobs_registry -> exp_jobs -> exp_services.
+        # We're inline importing here to break import loops like this: (->
+        # means imports):
+        #   exp_services -> event_services -> jobs_registry ->
+        #   exp_jobs -> exp_services.
         from core.domain import exp_services
         exp_services.index_explorations_given_ids([item.id])

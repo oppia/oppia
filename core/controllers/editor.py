@@ -563,7 +563,8 @@ class ExplorationSnapshotsHandler(EditorHandler):
         """Handles GET requests."""
 
         try:
-            snapshots = exp_services.get_exploration_snapshots_metadata(exploration_id)
+            snapshots = exp_services.get_exploration_snapshots_metadata(
+                exploration_id)
         except:
             raise self.PageNotFoundException
 

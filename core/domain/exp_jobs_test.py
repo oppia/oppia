@@ -20,25 +20,15 @@ __author__ = 'Frederik Creemers'
 
 """Tests for ExpSummary continuous computations."""
 
-import collections
-import datetime
-
-from core import jobs
 from core import jobs_registry
-from core.domain import config_services
-from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_jobs
-from core.domain import exp_services
 from core.domain import rights_manager
 from core.platform import models
 from core.tests import test_utils
-import feconf
 (job_models, exp_models,) = models.Registry.import_models([
    models.NAMES.job, models.NAMES.exploration])
 search_services = models.Registry.import_search_services()
-import utils
-
 
 
 class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
@@ -47,7 +37,9 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
     ONE_OFF_JOB_MANAGERS_FOR_TESTS = [exp_jobs.ExpSummariesCreationOneOffJob]
 
     def test_all_exps_publicized(self):
-        """Test exploration summary batch job if all explorations are publicized."""
+        """Test exploration summary batch job if all explorations are
+        publicized.
+        """
 
         # specify explorations that will be used in test
         exp_specs = [
@@ -164,21 +156,22 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 # publish or publicize exploration
                 if spec['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
                     rights_manager.publish_exploration(self.owner_id, exp_id)
-                elif spec['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+                elif (spec['status'] ==
+                        rights_manager.EXPLORATION_STATUS_PUBLICIZED):
                     rights_manager.publish_exploration(self.owner_id, exp_id)
                     rights_manager.publicize_exploration(self.owner_id, exp_id)
 
                 # do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id
                 # in galleries)
-                is_editable = False
-                exp_rights_model = exp_models.ExplorationRightsModel.get(exp_id)
+                exp_rights_model = exp_models.ExplorationRightsModel.get(
+                    exp_id)
 
                 exploration = exp_services.get_exploration_by_id(exp_id)
                 exploration_model_last_updated = exploration.last_updated
                 exploration_model_created_on = exploration.created_on
 
-                # manually create the expectated summary specifying title, 
+                # manually create the expectated summary specifying title,
                 # category, etc
                 expected_job_output[exp_id] = exp_domain.ExplorationSummary(
                     exp_id,
@@ -229,15 +222,16 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.assertEqual(actual_job_output.keys(),
                              expected_job_output.keys())
             simple_props = ['id', 'title', 'category', 'objective',
-                            'language_code','skill_tags', 'status',
+                            'language_code', 'skill_tags', 'status',
                             'community_owned', 'owner_ids',
                             'editor_ids', 'viewer_ids', 'version',
                             'exploration_model_created_on',
                             'exploration_model_last_updated']
             for exp_id in actual_job_output:
                 for prop in simple_props:
-                    self.assertEqual(getattr(actual_job_output[exp_id], prop),
-                                     getattr(expected_job_output[exp_id], prop))
+                    self.assertEqual(
+                        getattr(actual_job_output[exp_id], prop),
+                        getattr(expected_job_output[exp_id], prop))
 
 
 class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
@@ -271,7 +265,8 @@ class OneOffReindexExplorationsJobTest(test_utils.GenericTestBase):
             from core.domain import exp_services
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
 
-        add_docs_swap = self.swap(search_services, 'add_documents_to_index', add_docs_mock)
+        add_docs_swap = self.swap(
+            search_services, 'add_documents_to_index', add_docs_mock)
 
         with add_docs_swap:
             self.process_and_flush_pending_tasks()

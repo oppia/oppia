@@ -41,8 +41,9 @@ from core.tests import test_utils
 import feconf
 import utils
 
-# TODO(msl): test ExpSummaryModel changes if explorations are updated, 
+# TODO(msl): test ExpSummaryModel changes if explorations are updated,
 # reverted, deleted, created, rights changed
+
 
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
@@ -186,7 +187,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertIsNone(result['doesnt_exist'])
 
         with self.assertRaises(Exception):
-            exp_services.get_multiple_explorations_by_id(exp_ids + ['doesnt_exist'])
+            exp_services.get_multiple_explorations_by_id(
+                exp_ids + ['doesnt_exist'])
 
     def test_soft_deletion_of_explorations(self):
         """Test that soft deletion of explorations works correctly."""
@@ -255,8 +257,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration summary does not show up in any queries.
         self.assertEqual(
-            exp_services.get_at_least_editable_exploration_summaries(self.OWNER_ID),
-            {})
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID), {})
 
         # The exploration summary model has been purged from the backend.
         self.assertNotIn(
@@ -266,7 +268,9 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         )
 
     def test_explorations_are_removed_from_index_when_deleted(self):
-        """Tests that explorations are removed from the search index when deleted."""
+        """Tests that explorations are removed from the search index when
+        deleted.
+        """
 
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
 
@@ -326,7 +330,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 'new_value': 'A new category'
             }],
             'Change title and category')
-        
+
         retrieved_exp_summary = exp_services.get_exploration_summary_by_id(
             self.EXP_ID)
 
@@ -1583,8 +1587,8 @@ class SearchTests(ExplorationServicesUnitTests):
     def test_index_explorations_given_domain_objects(self):
 
         expected_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_exp_titles = ['title 0','title 1', 'title 2',
-                               'title 3', 'title 4']
+        expected_exp_titles = [
+            'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
         expected_exp_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
 
         def mock_add_documents_to_index(docs, index):
@@ -1616,12 +1620,11 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-
     def test_index_explorations_given_ids(self):
-
         all_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
         expected_exp_ids = all_exp_ids[:-1]
-        all_exp_titles = ['title 0', 'title 1', 'title 2', 'title 3', 'title 4']
+        all_exp_titles = [
+            'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
         expected_exp_titles = all_exp_titles[:-1]
 
         def mock_add_documents_to_index(docs, index):
@@ -1643,8 +1646,8 @@ class SearchTests(ExplorationServicesUnitTests):
                 self.OWNER_ID,
                 all_exp_titles[i])
 
-        # We're only publishing the first 4 explorations, so we're not expecting
-        # the last exploration to be indexed.
+        # We're only publishing the first 4 explorations, so we're not
+        # expecting the last exploration to be indexed.
         for i in xrange(4):
             rights_manager.publish_exploration(
                 self.OWNER_ID,
@@ -1692,7 +1695,8 @@ class SearchTests(ExplorationServicesUnitTests):
 
         def mock_get_rights(exp_id):
             return rights_manager.ExplorationRights(
-                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                self.EXP_ID,
+                [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
                 status=rights_manager.EXPLORATION_STATUS_PUBLIC
             )
 
@@ -1720,14 +1724,16 @@ class SearchTests(ExplorationServicesUnitTests):
 
         def mock_get_rights(exp_id):
             return rights_manager.ExplorationRights(
-                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                self.EXP_ID,
+                [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
                 status=rights_manager.EXPLORATION_STATUS_PRIVATE
             )
 
         delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
 
         delete_docs_swap = self.swap(
-            search_services, 'delete_documents_from_index', delete_docs_counter)
+            search_services, 'delete_documents_from_index',
+            delete_docs_counter)
         get_rights_swap = self.swap(
             rights_manager, 'get_exploration_rights', mock_get_rights)
 
@@ -1818,11 +1824,16 @@ class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
 
         with record_event_swap:
             self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
-            rights_manager.create_new_exploration_rights(self.EXP_ID, self.OWNER_ID)
-            rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
-            rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublicize_exploration(self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
+            rights_manager.create_new_exploration_rights(
+                self.EXP_ID, self.OWNER_ID)
+            rights_manager.publish_exploration(
+                self.OWNER_ID, self.EXP_ID)
+            rights_manager.publicize_exploration(
+                self.user_id_admin, self.EXP_ID)
+            rights_manager.unpublicize_exploration(
+                self.user_id_admin, self.EXP_ID)
+            rights_manager.unpublish_exploration(
+                self.user_id_admin, self.EXP_ID)
 
         self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID,
                                         self.EXP_ID, self.EXP_ID])
@@ -1950,7 +1961,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code','skill_tags', 'status',
+                        'language_code', 'skill_tags', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1960,9 +1971,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 self.assertEqual(getattr(actual_summaries[exp_id], prop),
                                  getattr(expected_summaries[exp_id], prop))
 
-
     def test_get_all_exploration_summaries(self):
-
         actual_summaries = exp_services.get_all_exploration_summaries()
 
         expected_summaries = {
@@ -1972,7 +1981,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
-                actual_summaries[self.EXP_ID_1].exploration_model_last_updated),
+                actual_summaries[self.EXP_ID_1].exploration_model_last_updated
+            ),
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
@@ -1980,13 +1990,14 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
                 actual_summaries[self.EXP_ID_2].exploration_model_last_updated
-                )}
+            )
+        }
 
         # check actual summaries equal expected summaries
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code','skill_tags', 'status',
+                        'language_code', 'skill_tags', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -2017,7 +2028,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code','skill_tags', 'status',
+                        'language_code', 'skill_tags', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -2038,9 +2049,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries,
                          expected_summaries)
 
-
     def test_get_at_least_editable_exploration_summaries(self):
-
         exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_1)
 
         actual_summaries = (
@@ -2061,7 +2070,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code','skill_tags', 'status',
+                        'language_code', 'skill_tags', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
