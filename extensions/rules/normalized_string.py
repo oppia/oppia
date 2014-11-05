@@ -30,7 +30,8 @@ class Equals(base.NormalizedStringRule):
 
 
 class CaseSensitiveEquals(base.NormalizedStringRule):
-    description = 'is equal to {{x|NormalizedString}}, taking case into account'
+    description = (
+        'is equal to {{x|NormalizedString}}, taking case into account')
     is_generic = False
 
     def _evaluate(self, subject):
@@ -55,11 +56,14 @@ class Contains(base.NormalizedStringRule):
 
 class FuzzyEquals(base.NormalizedStringRule):
     description = (
-        'is equal to {{x|NormalizedString}}, misspelled by exactly '
+        'is equal to {{x|NormalizedString}}, misspelled by at most '
         'one character')
     is_generic = False
 
     def _evaluate(self, subject):
+        if subject.lower() == self.x.lower():
+            return True
+
         oneago = None
         thisrow = range(1, len(self.x) + 1) + [0]
         for i in range(len(subject)):

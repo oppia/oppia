@@ -51,11 +51,16 @@ class NormalizedStringRuleUnitTests(test_utils.GenericTestBase):
         self.assertFalse(normalized_string.Contains('ol').eval('hello'))
 
     def test_fuzzy_equals_rule(self):
+        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('hello'))
+        self.assertTrue(normalized_string.FuzzyEquals('HEllp').eval('hellp'))
         self.assertTrue(normalized_string.FuzzyEquals('hello').eval('hell'))
         self.assertTrue(normalized_string.FuzzyEquals('hell').eval('hello'))
         self.assertTrue(normalized_string.FuzzyEquals('hellp').eval('hello'))
         self.assertTrue(normalized_string.FuzzyEquals('hello').eval('hellp'))
+        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('helo'))
+        self.assertTrue(normalized_string.FuzzyEquals('hello').eval('helllo'))
 
-        self.assertFalse(normalized_string.FuzzyEquals('hello').eval('hello'))
-        self.assertFalse(normalized_string.FuzzyEquals('HEllp').eval('hellp'))
         self.assertFalse(normalized_string.FuzzyEquals('pleh').eval('help'))
+        self.assertFalse(normalized_string.FuzzyEquals('hello').eval(
+            'hellllo'))
+        self.assertFalse(normalized_string.FuzzyEquals('hello').eval('help'))
