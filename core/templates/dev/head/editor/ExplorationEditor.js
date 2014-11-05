@@ -414,7 +414,7 @@ oppia.controller('ExplorationEditor', [
   };
 
   $scope.$on('refreshGraph', function() {
-    graphDataService.recompute()
+    graphDataService.recompute();
     $scope.updateWarningsList();
   });
 

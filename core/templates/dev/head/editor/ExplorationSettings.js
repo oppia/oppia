@@ -19,12 +19,12 @@
  */
 
 oppia.controller('ExplorationSettings', [
-    '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
+    '$scope', '$http', '$window', '$modal', '$rootScope', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
     'explorationInitStateNameService', 'changeListService', 'warningsData',
     'explorationStatesService', function(
-      $scope, $http, $window, $modal, activeInputData, explorationData,
+      $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, changeListService, warningsData, explorationStatesService) {
@@ -100,6 +100,8 @@ oppia.controller('ExplorationSettings', [
     }
 
     explorationInitStateNameService.saveDisplayedValue();
+
+    $rootScope.$broadcast('refreshGraph');
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
