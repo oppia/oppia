@@ -25,9 +25,10 @@ var customizeWidget = function(modal, heading, callbackFunction) {
   forms.UnicodeEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setText(heading);
-  callbackFunction(
-    forms.RichTextEditor(
-      modal.element(by.tagName('schema-based-html-editor'))));
+  var richTextEditor = forms.RichTextEditor(
+      modal.element(by.tagName('schema-based-html-editor')));
+  richTextEditor.clear();
+  callbackFunction(richTextEditor);
 };
 
 var expectWidgetDetailsToMatch = function(elem, heading, callbackFunction) {

@@ -26,7 +26,9 @@ var forms = require('../../../../core/tests/protractor_utils/forms.js');
 var customizeInteraction = function(elem, callbackFunctions) {
   forms.ListEditor(elem).setLength(callbackFunctions.length);
   for (var i = 0; i < callbackFunctions.length; i++) {
-    callbackFunctions[i](forms.ListEditor(elem).editEntry(i, 'RichText'));
+    var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
+    richTextEditor.clear();
+    callbackFunctions[i](richTextEditor);
   }
 };
 

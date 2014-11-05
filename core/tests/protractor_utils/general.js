@@ -63,6 +63,7 @@ var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
 var SCRIPTS_URL_SLICE = '/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
+var FIRST_STATE_DEFAULT_NAME = 'First State';
 
 
 var _getExplorationId = function(currentUrlPrefix) {
@@ -126,6 +127,7 @@ exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
+exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;
 
 exports.getExplorationIdFromEditor = getExplorationIdFromEditor;
 exports.getExplorationIdFromPlayer = getExplorationIdFromPlayer;

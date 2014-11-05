@@ -38,11 +38,16 @@ var ListEditor = function(elem) {
   var _getLength = function() {
     return elem.all(by.repeater('item in localValue track by $index')).
         then(function(items) {
+
       return items.length;
     });
   };
-  // Optionally returns the new entry editor for further manipulation
-  var addEntry = function(objectType) {
+  // If objectType is specified this returns an editor for objects of that type
+  // which can be used to make changes to the newly-added item (for example
+  // by calling setValue() on it). Clients should ensure the given objectType
+  // corresponds to the type of elements in the list.
+  // If not specified, this function returns nothing.
+  var addItem = function(objectType) {
     var listLength = _getLength();
     elem.element(by.css('.protractor-test-add-list-entry')).click();
     if (objectType) {
@@ -51,31 +56,31 @@ var ListEditor = function(elem) {
           by.repeater('item in localValue track by $index').row(listLength)));
     }
   };
-  var deleteEntry = function(index) {
+  var deleteItem = function(index) {
     elem.element(
       by.repeater('item in localValue track by $index').row(index)
     ).element(by.css('.protractor-test-delete-list-entry')).click();
   };
 
   return {
-    editEntry: function(index, objectType) {
-      var entry = elem.element(
+    editItem: function(index, objectType) {
+      var item = elem.element(
         by.repeater('item in localValue track by $index'
       ).row(index));
       var editor = getEditor(objectType);
-      return editor(entry);
+      return editor(item);
     },
-    addEntry: addEntry,
-    deleteEntry: deleteEntry,
+    addItem: addItem,
+    deleteItem: deleteItem,
     // This will add or delete list elements as necessary
     setLength: function(desiredLength) {
       elem.all(by.repeater('item in localValue track by $index')).count().
           then(function(startingLength) {
         for (var i = startingLength; i < desiredLength; i++) {
-          addEntry();
+          addItem();
         }
         for (var i = startingLength - 1; i >= desiredLength; i--) {
-          deleteEntry(i);
+          deleteItem(i);
         }
     });
     }
@@ -188,7 +193,7 @@ var UnicodeEditor = function(elem) {
   };
 };
 
-var editAutocompleteDropdown = function(elem) {
+var AutocompleteDropdownEditor = function(elem) {
   return {
     setText: function(text) {
       elem.element(by.css('.select2-container')).click();
@@ -196,6 +201,17 @@ var editAutocompleteDropdown = function(elem) {
       // container. The id is assigned when the dropdown is clicked.
       element(by.id('select2-drop')).element(by.css('.select2-input')).
         sendKeys(text + '\n');
+    },
+    expectOptionsToBe: function (expectedOptions) {
+      elem.element(by.css('.select2-container')).click();
+      element(by.id('select2-drop')).all(by.tagName('li')).map(function(elem) {
+        return elem.getText();
+      }).then(function(actualOptions) {
+        expect(actualOptions).toEqual(expectedOptions);
+      });
+      // Re-close the dropdown.
+      element(by.id('select2-drop')).element(by.css('.select2-input')).
+        sendKeys('\n');
     }
   };
 };
@@ -207,18 +223,22 @@ var editAutocompleteDropdown = function(elem) {
 //   <b>bold</b>
 //   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
 // <div>
-// The callbackFunction will be supplied with a 'handler' argument which it
+// The richTextInstructions will be supplied with a 'handler' argument which it
 // should then use to read through the rich-text area using the functions
-// supplied by the RichTextChecker below. In the example above callbackFunction
+// supplied by the RichTextChecker below. In the example above richTextInstructions
 // should consist of:
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
 //   handler.readWidget('Math', ...);
 var expectRichText = function(elem) {
-  var toMatch = function(callbackFunction) {
+  var toMatch = function(richTextInstructions) {
     // We remove all <span> elements since these are plain text that is 
     // sometimes represented just by text nodes.
     elem.all(by.xpath('./*[not(self::span)]')).map(function(entry) {
+      // It is necessary to obtain the texts of the elements in advance since
+      // applying .getText() while the RichTextChecker is running would be
+      // asynchronous and so not allow us to update the textPointer 
+      // synchronously.
       return entry.getText(function(text) {
         return text;
       });
@@ -228,7 +248,7 @@ var expectRichText = function(elem) {
         elem.getText().then(function(fullText) {
           var checker = RichTextChecker(
             arrayOfElements, arrayOfTexts, fullText);
-          callbackFunction(checker);
+          richTextInstructions(checker);
           checker.expectEnd();
         });
       });
@@ -320,6 +340,15 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   }
 };
 
+// This converts a string into a function that represents rich text, and so can
+// be sent to either editRichText() or expectRichText(). The string should not 
+// contain any html formatting. In the first case the function created will 
+// write the given text into the rich text editor (as plain text), and in
+// the second it will verify that the html created by a rich text editor
+// conists of the given text (unformatted).
+//   This is necessary because there is no abstract representation of a 'rich
+// text object' since we are more interested in the process of interacting with
+// the page than in the information thereby conveyed.
 var toRichText = function(text) {
   // The 'handler' should be either a RichTextEditor or RichTextChecker
   return function(handler) {
@@ -362,6 +391,6 @@ exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;
 exports.toRichText = toRichText;
 
-exports.editAutocompleteDropdown = editAutocompleteDropdown;
+exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 
 exports.getEditor = getEditor;

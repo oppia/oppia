@@ -28,7 +28,7 @@ var BooleanEditor = function(elem) {
         if (value !== currentValue) {
           elem.element(by.tagName('input')).click();
         }
-      })
+      });
     }
   };
 };

@@ -31,16 +31,28 @@ var setStateName = function(name) {
   nameElement.element(by.buttonText('Done')).click();
 };
 
-var setContent = function(callbackFunction) {
+var expectCurrentStateToBe = function(name) {
+  expect(
+    element(by.css('.oppia-state-name-container')).getText()
+  ).toMatch(name);
+};
+
+// CONTENT
+
+// 'richTextInstructions' is sent a RichTextEditor which it can then use to alter
+//   the state content, for example by calling .appendBoldText(...).
+var setContent = function(richTextInstructions) {
   element(by.css('.protractor-test-edit-content')).click();
-  callbackFunction(
-    forms.RichTextEditor(element(by.css('.oppia-state-content'))));
+  var richTextEditor = forms.RichTextEditor(
+    element(by.css('.oppia-state-content')));
+  richTextEditor.clear();
+  richTextInstructions(richTextEditor);
   element(by.css('.oppia-state-content')).
     element(by.buttonText('Save Content')).click();
 };
 
-// This receives a callbackFunction used to verify the display of the state's
-// content visible when the content editor is closed. The callbackFunction will
+// This receives a richTextInstructions used to verify the display of the state's
+// content visible when the content editor is closed. The richTextInstructions will
 // be supplied with a handler of the form forms.RichTextChecker and can then
 // perform checks such as
 //   handler.readBoldText('bold')
@@ -50,12 +62,12 @@ var setContent = function(callbackFunction) {
 // Note that this fails for collapsibles and tabs since it is not possible to
 // click on them to view their contents, as clicks instead open the rich text
 // editor.
-var expectContentToMatch = function(callbackFunction) {
+var expectContentToMatch = function(richTextInstructions) {
   // The .last() is necessary because we want the second of two <span>s; the
   // first holds the placeholder text for the exploration content.
   forms.expectRichText(
     element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
-  ).toMatch(callbackFunction);
+  ).toMatch(richTextInstructions);
 };
 
 var expectContentTextToEqual = function(text) {
@@ -64,11 +76,11 @@ var expectContentTextToEqual = function(text) {
   ).toEqual(text);
 };
 
-// Interactive widgets
+// INTERACTIVE WIDGETS
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant widget editor.
-var selectWidget = function(widgetName) {
+var selectInteraction = function(widgetName) {
   element(by.css('.protractor-test-select-interaction-id')).
     element(by.css('option[value=' + widgetName + ']')).click();
 
@@ -101,6 +113,8 @@ var expectInteractionToMatch = function(widgetName) {
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
+// RULES
+
 // Rules are zero-indexed; 'default' denotes the default rule.
 var editRule = function(ruleNum) {
   var elem = (ruleNum === 'default') ?
@@ -127,9 +141,14 @@ var editRule = function(ruleNum) {
     // NB: This saves the rule after the destination is selected.
     setDestination: function(destinationName) {
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
-      forms.editAutocompleteDropdown(destinationElement).
+      forms.AutocompleteDropdownEditor(destinationElement).
         setText(destinationName);
       elem.element(by.css('.protractor-test-save-rule')).click();
+    },
+    expectAvailableDestinationsToBe: function(stateNames) {
+      forms.AutocompleteDropdownEditor(
+        elem.element(by.css('.oppia-dest-bubble'))
+      ).expectOptionsToBe(stateNames);
     },
     delete: function() {
       element(by.css('.protractor-test-delete-rule')).click();
@@ -255,6 +274,7 @@ var addMultipleChoiceRule = {
   }
 };
 
+// STATE GRAPH
 
 var createState = function(newStateName) {
   element(by.css('.oppia-add-state-container')).
@@ -289,6 +309,8 @@ var deleteState = function(stateName) {
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === stateName) {
         element.all(by.css('.node')).get(i).element(by.tagName('g')).click();
+        protractor.getInstance().waitForAngular();
+        general.waitForSystem();
         element(by.css('.protractor-test-confirm-delete-state')).click();
         matched = true;
       }
@@ -307,6 +329,7 @@ var expectStateNamesToBe = function(names) {
   });
 };
 
+// SETTINGS
 
 // All functions involving the settings tab should be sent through this
 // wrapper.
@@ -345,6 +368,26 @@ var setLanguage = function(language) {
   });
 };
 
+var expectAvailableFirstStatesToBe = function(names) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationInitStateName')).
+        all(by.tagName('option')).map(function(elem) {
+      return elem.getText();
+    }).then(function(options) {
+      expect(options).toEqual(names);
+    });
+  });
+};
+
+var setFirstState = function(stateName) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationInitStateName')).
+      element(by.cssContainingText('option', stateName)).click();
+  });
+};
+
+// CONTROLS
+
 var saveChanges = function(commitMessage) {
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
@@ -373,12 +416,14 @@ var exitPreviewMode = function() {
   element(by.css('.protractor-test-exit-preview-mode')).click();
 };
 
+
 exports.setStateName = setStateName;
+exports.expectCurrentStateToBe = expectCurrentStateToBe;
 
 exports.setContent = setContent;
 exports.expectContentToMatch = expectContentToMatch;
 
-exports.selectWidget = selectWidget;
+exports.selectInteraction = selectInteraction;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 
 exports.editRule = editRule;
@@ -395,6 +440,8 @@ exports.setTitle = setTitle;
 exports.setCategory = setCategory;
 exports.setObjective = setObjective;
 exports.setLanguage = setLanguage;
+exports.expectAvailableFirstStatesToBe = expectAvailableFirstStatesToBe;
+exports.setFirstState = setFirstState;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;

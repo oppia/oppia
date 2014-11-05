@@ -34,16 +34,16 @@ var getExplorationName = function() {
 };
 
 // This verifies the question just asked, including formatting and 
-// non-interactive widgets. To do so the callbackFunction will be sent a 
+// non-interactive widgets. To do so the richTextInstructions will be sent a 
 // handler (as given in forms.RichTextChecker) to which calls such as
 //   handler.readItalicText('slanted');
 // can then be sent.
-var expectContentToMatch = function(callbackFunction) {
+var expectContentToMatch = function(richTextInstructions) {
   forms.expectRichText(
     element.all(by.repeater('response in responseLog track by $index')).
       last().element(by.css('.protractor-test-conversation-content')).
         element(by.xpath('./div'))
-  ).toMatch(callbackFunction);
+  ).toMatch(richTextInstructions);
 };
 
 var getLatestFeedbackText = function() {

@@ -27,9 +27,11 @@ var customizeWidget = function(modal, tabArray) {
 
   listEditor.setLength(tabArray.length);
   for (var i = 0; i < tabArray.length; i++) {
-    dictionaryEditor = listEditor.editEntry(i, 'Dictionary');
+    dictionaryEditor = listEditor.editItem(i, 'Dictionary');
     dictionaryEditor.editEntry(0, 'UnicodeString').setText(tabArray[i].title);
-    tabArray[i].content(dictionaryEditor.editEntry(1, 'RichText'));
+    var richTextEditor = dictionaryEditor.editEntry(1, 'RichText');
+    richTextEditor.clear();
+    tabArray[i].content(richTextEditor);
   }
 };
 

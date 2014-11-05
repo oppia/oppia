@@ -33,7 +33,7 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
-    editor.selectWidget('Continue', 'click here');
+    editor.selectInteraction('Continue', 'click here');
     editor.editRule('default').setDestination('END');
     editor.saveChanges();
 
@@ -52,15 +52,14 @@ describe('State editor', function() {
     users.login('user2@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.setContent(function(handler) {
-      handler.clear();
-      handler.appendBoldText('bold text ');
-      handler.appendItalicText('italic text ');
-      handler.appendUnderlineText('underline text');
-      handler.appendOrderedList(['entry 1', 'entry 2']);
-      handler.appendUnorderedList(['an entry', 'another entry']);
+    editor.setContent(function(richTextEditor) {
+      richTextEditor.appendBoldText('bold text ');
+      richTextEditor.appendItalicText('italic text ');
+      richTextEditor.appendUnderlineText('underline text');
+      richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
+      richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
-    editor.selectWidget(
+    editor.selectInteraction(
       'MultipleChoiceInput', 
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     editor.editRule('default').setDestination('END');
@@ -82,12 +81,12 @@ describe('State editor', function() {
     users.login('user3@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.selectWidget('NumericInput');
+    editor.selectInteraction('NumericInput');
     editor.addNumericRule.IsInclusivelyBetween(3, 6);
     editor.editRule(0).setDestination('END');
-    editor.editRule(0).editFeedback().editEntry(0, 'RichText').
+    editor.editRule(0).editFeedback().editItem(0, 'RichText').
       appendPlainText('correct');
-    editor.editRule('default').editFeedback().editEntry(0, 'RichText').
+    editor.editRule('default').editFeedback().editItem(0, 'RichText').
       appendPlainText('out of bounds');
     editor.saveChanges();
 
@@ -111,13 +110,13 @@ describe('Full exploration editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setStateName('state 1');
     editor.setContent(forms.toRichText('this is state 1'));
-    editor.selectWidget('NumericInput');
+    editor.selectInteraction('NumericInput');
     editor.addNumericRule.Equals(21);
     editor.editRule(0).setDestination('state 2');
 
     editor.moveToState('state 2');
     editor.setContent(forms.toRichText('this is state 2'));
-    editor.selectWidget(
+    editor.selectInteraction(
       'MultipleChoiceInput', 
       [forms.toRichText('return'), forms.toRichText('complete')]);
     editor.addMultipleChoiceRule.Equals('return');
@@ -140,12 +139,13 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  it('should allow complex behaviour', function() {
+  it('should handle discarding changes, navigation, deleting states ect.', 
+      function() {
     users.createUser('user5@example.com', 'user5');
     users.login('user5@example.com');
 
     workflow.createExploration('sums', 'maths');
-    general.getExplorationIdFromEditor().then(function(explorationID) {
+    general.getExplorationIdFromEditor().then(function(explorationId) {
 
       // Check discarding of changes
       editor.setStateName('state1');
@@ -153,51 +153,68 @@ describe('Full exploration editor', function() {
       editor.createState('state2');
       editor.expectStateNamesToBe(['state1', 'state2', 'END']);
       editor.discardChanges();
+      editor.expectCurrentStateToBe(general.FIRST_STATE_DEFAULT_NAME);
       editor.setStateName('first');
       editor.expectStateNamesToBe(['first', 'END']);
 
-      // Check deletion of states
+      // Check deletion of states and changing the first state
       editor.createState('second');
       editor.expectStateNamesToBe(['first', 'second', 'END']);
-      editor.deleteState('second');
-      editor.expectStateNamesToBe(['first', 'END']);
+      editor.expectCurrentStateToBe('second');
+      // TODO (Jacob) remove the '' when issue 443 is fixed
+      editor.expectAvailableFirstStatesToBe(['', 'first', 'second']);
+      editor.setFirstState('second');
+      // TODO (Jacob) remove these two lines when issue 441 is fixed
+      editor.createState('temp');
+      editor.deleteState('temp');
+      editor.moveToState('first');
+      editor.deleteState('first');
+      editor.expectCurrentStateToBe('second');
+      editor.expectStateNamesToBe(['second', 'END']);
 
       // Check behaviour of the back button
       editor.setObjective('do stuff');
+      expect(browser.getCurrentUrl()).toEqual(
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        '#/gui/second');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationID + 
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
         '#/settings');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationID + 
-        '#/gui/first');
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        '#/gui/second');
 
       // Check display of content & interaction in the editor
-      editor.setContent(function(handler) {
-        handler.clear();
-        handler.appendItalicText('Welcome');
+      editor.setContent(function(richTextEditor) {
+        richTextEditor.appendItalicText('Welcome');
       });
-      editor.expectContentToMatch(function(checker) {
-        checker.readItalicText('Welcome');
+      editor.expectContentToMatch(function(richTextChecker) {
+        richTextChecker.readItalicText('Welcome');
       });
-      editor.selectWidget('NumericInput');
+      editor.selectInteraction('NumericInput');
       editor.expectInteractionToMatch('NumericInput');
 
       // Check deletion of rules
-      editor.editRule('default').editFeedback().editEntry(0, 'RichText').
+      editor.editRule('default').editFeedback().editItem(0, 'RichText').
         appendPlainText('Farewell');
+      editor.editRule('default').
+        expectAvailableDestinationsToBe(['second', 'END']);
       editor.editRule('default').setDestination('END');
+      editor.editRule('default').
+        expectAvailableDestinationsToBe(['second', 'END']);
       editor.addNumericRule.IsGreaterThan(2);
       editor.editRule(0).delete();
 
       // Check editor preview mode
       editor.enterPreviewMode();
-      player.expectContentToMatch(function(handler) {
-        handler.readItalicText('Welcome');
+      player.expectContentToMatch(function(richTextEditor) {
+        richTextEditor.readItalicText('Welcome');
       });
       player.expectInteractionToMatch('NumericInput');
       player.submitAnswer('NumericInput', 6);
+      // This check the previously-deleted rule no longer applies.
       expect(player.getLatestFeedbackText()).toBe('Farewell');
       player.expectExplorationToBeOver();
       editor.exitPreviewMode();
@@ -219,44 +236,43 @@ describe('Non-interactive widgets', function() {
     
     workflow.createExploration('widgets', 'maths');
 
-    editor.setContent(function(handler) {
-      handler.clear();
-      handler.appendPlainText('plainly');
-      handler.appendBoldText('bold');
-      handler.addWidget('Collapsible', 'title', forms.toRichText('inner'));
+    editor.setContent(function(richTextEditor) {
+      richTextEditor.appendPlainText('plainly');
+      richTextEditor.appendBoldText('bold');
+      richTextEditor.addWidget('Collapsible', 'title', forms.toRichText('inner'));
       // TODO (Jacob) add image widget test
-      handler.addWidget('Link', 'http://google.com/', true);
-      handler.addWidget('Math', 'abc');
-      handler.appendUnderlineText('underlined');
-      handler.appendPlainText('extra');
-      handler.addWidget('Tabs', [{
+      richTextEditor.addWidget('Link', 'http://google.com/', true);
+      richTextEditor.addWidget('Math', 'abc');
+      richTextEditor.appendUnderlineText('underlined');
+      richTextEditor.appendPlainText('extra');
+      richTextEditor.addWidget('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-      handler.addWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextEditor.addWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
     })
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(function(checker) {
-      checker.readPlainText('plainly');
-      checker.readBoldText('bold');
-      checker.readWidget('Collapsible', 'title', forms.toRichText('inner'));
-      checker.readWidget('Link', 'http://google.com/', true);
-      checker.readWidget('Math', 'abc');
-      checker.readUnderlineText('underlined');
-      checker.readPlainText('extra');
-      checker.readWidget('Tabs', [{
+    player.expectContentToMatch(function(richTextChecker) {
+      richTextChecker.readPlainText('plainly');
+      richTextChecker.readBoldText('bold');
+      richTextChecker.readWidget('Collapsible', 'title', forms.toRichText('inner'));
+      richTextChecker.readWidget('Link', 'http://google.com/', true);
+      richTextChecker.readWidget('Math', 'abc');
+      richTextChecker.readUnderlineText('underlined');
+      richTextChecker.readPlainText('extra');
+      richTextChecker.readWidget('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-      checker.readWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
     });
 
     users.logout();
@@ -268,46 +284,44 @@ describe('Non-interactive widgets', function() {
     
     workflow.createExploration('widgets', 'maths');
 
-    editor.setContent(function(handler) {
-      handler.clear();
-      handler.appendItalicText('slanted');
-      handler.addWidget(
-          'Collapsible', 'heading', function(handler2) {
-        handler2.clear();
+    editor.setContent(function(richTextEditor) {
+      richTextEditor.appendItalicText('slanted');
+      richTextEditor.addWidget(
+          'Collapsible', 'heading', function(collapsibleEditor) {
         // TODO (Jacob) add sub-widgets when issue 423 is fixed
-        handler2.addWidget('Tabs', [{
+        collapsibleEditor.addWidget('Tabs', [{
           title: 'no1',
-          content: function(handler3) {
-            handler3.setPlainText('boring');
+          content: function(tab1Editor) {
+            tab1Editor.setPlainText('boring');
           }
         }, {
           title: 'no2',
-          content: function(handler4) {
-            handler4.clear();
-            handler4.appendBoldText('fun!');
+          content: function(tab2Editor) {
+            tab2Editor.appendBoldText('fun!');
           }
         }]);
-        handler2.addWidget('Math', 'xyz');
+        collapsibleEditor.addWidget('Math', 'xyz');
       });
     });
     editor.saveChanges();
 
     general.moveToPlayer();
-    player.expectContentToMatch(function(checker) {
-      checker.readItalicText('slanted');
-      checker.readWidget('Collapsible', 'heading', function(checker2) {
-        checker2.readWidget('Tabs', [{
+    player.expectContentToMatch(function(richTextChecker) {
+      richTextChecker.readItalicText('slanted');
+      richTextChecker.readWidget(
+          'Collapsible', 'heading', function(collapsibleChecker) {
+        collapsibleChecker.readWidget('Tabs', [{
           title: 'no1',
-          content: function(checker3) {
-            checker3.readPlainText('boring');
+          content: function(tab1Checker) {
+            tab1Checker.readPlainText('boring');
           }
         }, {
           title: 'no2',
-          content: function(checker4) {
-            checker4.readBoldText('fun!');
+          content: function(tab2Checker) {
+            tab2Checker.readBoldText('fun!');
           }
         }]); 
-        checker2.readWidget('Math', 'xyz');
+        collapsibleChecker.readWidget('Math', 'xyz');
       });
     });
 

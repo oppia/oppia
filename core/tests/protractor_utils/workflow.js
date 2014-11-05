@@ -28,7 +28,7 @@ var createExploration = function(name, category) {
   browser.get('/gallery');
   element(by.css('.protractor-test-create-exploration')).click();
   element(by.model('newExplorationTitle')).sendKeys(name);
-  forms.editAutocompleteDropdown(element(by.tagName('select2-dropdown'))).
+  forms.AutocompleteDropdownEditor(element(by.tagName('select2-dropdown'))).
     setText(category);
   element(by.buttonText('Create New Exploration')).click();
 
@@ -53,7 +53,7 @@ var createAndPublishExploration = function(name, category, objective, language) 
   if (language) {
     editor.setLanguage(language);
   }
-  editor.selectWidget('Continue');
+  editor.selectInteraction('Continue');
   editor.saveChanges();
   publishExploration();
 };
