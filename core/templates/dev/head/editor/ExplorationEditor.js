@@ -13,7 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers and services for the exploration editor page.
+ * @fileoverview Controllers for the exploration editor page and the editor help tab
+ *               in the navbar.
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -28,7 +29,7 @@ oppia.controller('ExplorationEditor', [
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
-  'explorationStatesService', 'routerService', 'graphDataService', 'focusService',
+  'explorationStatesService', 'routerService', 'graphDataService', 'focusService', 'stateEditorTutorialFirstTimeService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -37,7 +38,7 @@ oppia.controller('ExplorationEditor', [
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
-    graphDataService, focusService) {
+    graphDataService, focusService, stateEditorTutorialFirstTimeService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -501,8 +502,6 @@ oppia.controller('ExplorationEditor', [
     return explorationId ? ('/explore/' + explorationId) : '';
   };
 
-  $scope.firstTutorialVisit = false;
-
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
@@ -569,13 +568,7 @@ oppia.controller('ExplorationEditor', [
         successCallback();
       }
 
-      if (data.show_state_editor_tutorial_on_load) {
-        $scope.firstTutorialVisit = true;
-        $scope.startTutorial();
-        $http.post('/createhandler/started_tutorial_event/' + $scope.explorationId).error(function() {
-          console.error('Warning: could not record tutorial start event.');
-        });
-      }
+      stateEditorTutorialFirstTimeService.init(data.show_state_editor_tutorial_on_load, $scope.explorationId);
     });
   };
 
@@ -715,12 +708,8 @@ oppia.controller('ExplorationEditor', [
 
     var _onLeaveTutorial = function() {
       editabilityService.onEndTutorial();
-      $scope.$apply();
-
-      if ($scope.firstTutorialVisit) {
-        $scope.$parent.showPostTutorialHelpPopover();
-        $scope.firstTutorialVisit = false;
-      }
+      $scope.$apply();        
+      stateEditorTutorialFirstTimeService.markTutorialFinished();
     };
 
     intro.onexit(_onLeaveTutorial);
@@ -730,7 +719,7 @@ oppia.controller('ExplorationEditor', [
     intro.start();
   };
 
-  $scope.startTutorial = function() {
+  $scope.startTutorial = function(firstTime) {
     if ($scope.isInPreviewMode) {
       $scope.exitPreviewMode();
       $timeout(function() {
@@ -743,4 +732,26 @@ oppia.controller('ExplorationEditor', [
   };
 
   $scope.$on('openEditorTutorial', $scope.startTutorial);
+}]);
+
+
+oppia.controller('EditorHelpTab', [
+    '$scope', '$rootScope', '$timeout', function($scope, $rootScope, $timeout) {
+  $scope.postTutorialHelpPopoverIsShown = false;
+
+  $scope.$on('openPostTutorialHelpPopover', function() {
+    $scope.postTutorialHelpPopoverIsShown = true;
+    // Without this, the popover does not trigger.
+    $scope.$apply();
+    $timeout(function() {
+      $scope.postTutorialHelpPopoverIsShown = false;
+    }, 5000);
+  });
+
+  // This method is here because the trigger for the tutorial is in the site
+  // navbar. It broadcasts an event to tell the exploration editor to open the
+  // editor tutorial.
+  $scope.openEditorTutorial = function() {
+    $rootScope.$broadcast('openEditorTutorial');
+  };
 }]);

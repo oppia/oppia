@@ -21,9 +21,9 @@
 
 // Global utility methods.
 oppia.controller('Base', [
-    '$scope', '$http', '$rootScope', '$window', '$log', '$timeout',
+    '$scope', '$http', '$rootScope', '$window', '$log',
     'warningsData', 'activeInputData', 'messengerService',
-    function($scope, $http, $rootScope, $window, $log, $timeout,
+    function($scope, $http, $rootScope, $window, $log,
              warningsData, activeInputData, messengerService) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
@@ -91,22 +91,5 @@ oppia.controller('Base', [
 
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
-  };
-
-  $scope.postTutorialHelpPopoverIsShown = false;
-  $scope.showPostTutorialHelpPopover = function() {
-    $scope.postTutorialHelpPopoverIsShown = true;
-    // Without this, the popover does not trigger.
-    $scope.$apply();
-    $timeout(function() {
-      $scope.postTutorialHelpPopoverIsShown = false;
-    }, 5000);
-  };
-
-  // This method is here because the trigger for the tutorial is in the site
-  // navbar. It broadcasts an event to tell the exploration editor to open the
-  // editor tutorial.
-  $scope.openEditorTutorial = function() {
-    $scope.$broadcast('openEditorTutorial');
   };
 }]);
