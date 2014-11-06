@@ -9,7 +9,7 @@
 #      http://www.apache.org/licenses/LICENSE-2.0
 #
 # Unless required by applicable law or agreed to in writing, software
-# distributed under the License is distributed on an 'AS-IS' BASIS, 
+# distributed under the License is distributed on an 'AS-IS' BASIS,
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
@@ -45,15 +45,16 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
 
     Args:
       - documents: a list of documents. Each document should be a dictionary.
-          Every key in the document is a field name, and the corresponding value
-          will be the field's value.
+          Every key in the document is a field name, and the corresponding
+          value will be the field's value.
           If there is a key named 'id', its value will be used as the
           document's id.
           If there is a key named 'rank', its value will be used as
           the document's rank.
           By default, search results are returned ordered by descending rank.
-          If there is a key named 'language_code', its value will be used as the
-          document's language. Otherwise, feconf.DEFAULT_LANGUAGE_CODE is used.
+          If there is a key named 'language_code', its value will be used as
+          the document's language. Otherwise, feconf.DEFAULT_LANGUAGE_CODE is
+          used.
       - index: the name of the index to insert the document into, a string.
       - retries: the number of times to retry inserting the documents.
 
@@ -66,14 +67,15 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
       - ValueError: raised when invalid values are given.
     """
     if not isinstance(index, basestring):
-        raise ValueError('Index must be the unicode/str name of an index, got %s'
-                         % type(index))
+        raise ValueError(
+            'Index must be the unicode/str name of an index, got %s'
+            % type(index))
 
     index = gae_search.Index(index)
     gae_docs = [_dict_to_search_document(d) for d in documents]
 
     try:
-        logging.debug('adding the following docs to index %s: %s', 
+        logging.debug('adding the following docs to index %s: %s',
                       index.name, documents)
         results = index.put(gae_docs, deadline=5)
     except gae_search.PutError as e:
@@ -84,8 +86,8 @@ def add_documents_to_index(documents, index, retries=DEFAULT_NUM_RETRIES):
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     return add_documents_to_index(
-                        documents=documents, 
-                        index=index.name, 
+                        documents=documents,
+                        index=index.name,
                         retries=new_retries)
 
         # At this pint, either we don't have any tries left, or none of the
@@ -113,7 +115,8 @@ def _dict_to_search_document(d):
 
         fields += _make_fields(key, value)
 
-    doc = gae_search.Document(doc_id=doc_id, fields=fields, rank=rank, language=language_code)
+    doc = gae_search.Document(
+        doc_id=doc_id, fields=fields, rank=rank, language=language_code)
     return doc
 
 
@@ -128,11 +131,14 @@ def _make_fields(key, value):
     if isinstance(value, numbers.Number):
         return [gae_search.NumberField(name=key, value=value)]
 
-    if isinstance(value, datetime.datetime) or isinstance(value, datetime.date):
+    if isinstance(value, datetime.datetime) or isinstance(
+            value, datetime.date):
         return [gae_search.DateField(name=key, value=value)]
 
-    raise ValueError('Value for document field %s should be a (unicode) string, numeric type, datetime.date, '
-                     'datetime.datetime or list of such types, got %s' % (key, type(value)))
+    raise ValueError(
+        'Value for document field %s should be a (unicode) string, numeric '
+        'type, datetime.date, datetime.datetime or list of such types, got %s'
+        % (key, type(value)))
 
 
 def _validate_list(key, value):
@@ -155,7 +161,8 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
     """Deletes documents from an index.
 
     Args:
-      - doc_ids: a list of document ids of documents to be deleted from the index.
+      - doc_ids: a list of document ids of documents to be deleted from the
+          index.
       - index: the name of the index to delete the document from, a string.
       - retries: the number of times to retry deleting the documents.
 
@@ -164,8 +171,9 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
         document, none will be deleted.
     """
     if not isinstance(index, basestring):
-        raise ValueError('Index must be the unicode/str name of an index, got %s'
-                         % type(index))
+        raise ValueError(
+            'Index must be the unicode/str name of an index, got %s'
+            % type(index))
 
     for i in xrange(len(doc_ids)):
         if not isinstance(doc_ids[i], basestring):
@@ -185,8 +193,8 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
                     new_retries = retries - 1
                     logging.debug('%d tries left, retrying.' % (new_retries))
                     delete_documents_from_index(
-                        doc_ids=doc_ids, 
-                        index=index.name, 
+                        doc_ids=doc_ids,
+                        index=index.name,
                         retries=new_retries)
                     return
 
@@ -199,19 +207,17 @@ def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
 
     Args:
       - query_string: the search query.
-        The syntax used is described here:
-        https://developers.google.com/appengine/docs/python/search/query_strings
+          The syntax used is described here:
+          https://developers.google.com/appengine/docs/python/search/query_strings
       - index: the name of the index to search.
       - cursor: a cursor string, as returned by this function. Pass this in to
-        get the next 'page' of results. Leave as None to start at the beginning.
-        This function returns a cursor that you can use to retrieve
-        the next 'page' of search results.
-      - sort: a string indicating how to sort results.
-        This should be a string of space separated values.
-        Each value should start with a '+' or a '-' character indicating whether
-        to sort in ascending or descending
-        order respectively. This character should be followed by a field name to
-        sort on.
+          get the next 'page' of results. Leave as None to start at the
+          beginning.
+      - sort: a string indicating how to sort results. This should be a string
+          of space separated values. Each value should start with a '+' or a
+          '-' character indicating whether to sort in ascending or descending
+          order respectively. This character should be followed by a field name
+          to sort on.
       - limit: the maximum number of documents to return.
       - ids_only: whether to only return document ids.
       - retries: the number of times to retry searching the index.
@@ -236,9 +242,9 @@ def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
         sort_options = gae_search.SortOptions(expr)
 
     options = gae_search.QueryOptions(
-        limit=limit, 
-        cursor=gae_cursor, 
-        ids_only=ids_only, 
+        limit=limit,
+        cursor=gae_cursor,
+        ids_only=ids_only,
         sort_options=sort_options)
     query = gae_search.Query(query_string, options=options)
     index = gae_search.Index(index)
@@ -251,12 +257,12 @@ def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
         if retries > 1:
             logging.debug('%d attempts left, retrying...' % (retries - 1))
             return search(
-                query_string, 
-                index.name, 
-                cursor=cursor, 
-                limit=limit, 
-                sort=sort, 
-                ids_only=ids_only, 
+                query_string,
+                index.name,
+                cursor=cursor,
+                limit=limit,
+                sort=sort,
+                ids_only=ids_only,
                 retries=retries - 1)
         else:
             raise SearchFailureError(e)
@@ -268,7 +274,8 @@ def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
     if ids_only:
         result_docs = [doc.doc_id for doc in results.results]
     else:
-        result_docs = [_search_document_to_dict(doc) for doc in results.results]
+        result_docs = [
+            _search_document_to_dict(doc) for doc in results.results]
 
     return result_docs, result_cursor_str
 
@@ -287,7 +294,7 @@ def _string_to_sort_expressions(s):
                 ' or "-" to indicate sort direction.'
                 ' The field %s has no such indicator'
                 ' in expression "%s".' % (expression, s))
-        sort_expressions.append(gae_search.SortExpression(expression[1:], 
+        sort_expressions.append(gae_search.SortExpression(expression[1:],
                                                           direction))
     return sort_expressions
 
