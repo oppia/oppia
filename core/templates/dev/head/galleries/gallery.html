@@ -23,7 +23,7 @@
                   <span class="glyphicon glyphicon-search">
                   </span>
                 </div>
-                <input type="text" class="form-control" placeholder="Search" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+                <input type="text" class="form-control" placeholder="Search Explorations" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
               </div>
             </div>
           </form>
@@ -34,20 +34,20 @@
             {% if not user_email %}
               <!-- User must log in. -->
               <span class="pull-right">
-                <a class="btn btn-success btn-lg protractor-test-create-exploration" href="{{gallery_redirect_url}}">
+                <a class="btn btn-success protractor-test-create-exploration" href="{{gallery_redirect_url}}">
                   Create New Exploration
                 </a>
               </span>
             {% elif not username %}
               <!-- User must register. -->
               <span class="pull-right">
-                <a class="btn btn-success btn-lg protractor-test-create-exploration" href="/editor_prerequisites?return_url=gallery">
+                <a class="btn btn-success protractor-test-create-exploration" href="/editor_prerequisites?return_url=gallery">
                   Create New Exploration
                 </a>
               </span>
             {% else %}
               <span class="pull-right">
-                <a class="btn btn-success btn-lg protractor-test-create-exploration"
+                <a class="btn btn-success protractor-test-create-exploration"
                    ng-click="showCreateExplorationModal(getCategoryList())">
                   Create New Exploration
                 </a>

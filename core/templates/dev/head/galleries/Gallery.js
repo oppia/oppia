@@ -153,7 +153,7 @@ oppia.controller('Gallery', [
   };
 
   $scope.delayedOnSearchQueryChangeExec = oppiaDebouncer.debounce(
-    $scope.onSearchQueryChangeExec, 750);
+    $scope.onSearchQueryChangeExec, 400);
 
   $scope.refreshGalleryData = function(data) {
     $scope.releasedExplorations = data.released;
