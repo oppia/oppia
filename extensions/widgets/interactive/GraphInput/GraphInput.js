@@ -34,11 +34,22 @@ oppia.directive('oppiaInteractiveGraphInput', [
           // angular.copy needed to strip $$hashkey from the graph 
           $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph), 'submit');
         };
+        $scope.resetGraph = function() {
+          updateGraphFromJSON($attrs.graphWithValue);
+        };
         
         $scope.init = function() {
           updateGraphFromJSON($attrs.graphWithValue);
-          $scope.movePermissions = ($attrs.movePermissionsWithValue === 'true') ? true : false;
-          $scope.vertexEditPermissions = ($attrs.vertexEditPermissionsWithValue === 'true') ? true : false;
+          function stringToBool(str) {
+            return (str === 'true');
+          }
+          $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);          
+          $scope.canDeleteVertex = stringToBool($attrs.canDeleteVertexWithValue);
+          $scope.canEditLabel = stringToBool($attrs.canEditLabelWithValue);
+          $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
+          $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
+          $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
+          $scope.canChangeWeight = stringToBool($attrs.canChangeWeightWithValue);
         };
         $scope.init();
         
@@ -127,9 +138,14 @@ oppia.directive('graphViz', function() {
     restrict: 'E',
     scope: {
       graph: '=',
-      vertexEditPermissions: '=',
-      movePermissions: '=',
-      optionsEditPermissions: '=',
+      canAddVertex: '=',
+      canDeleteVertex: '=',
+      canMoveVertex: '=',
+      canEditLabel: '=',
+      canAddEdge: '=',
+      canDeleteEdge: '=',
+      canEditWeight: '=',
+      canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
     controller: ['$scope', '$element', '$attrs', '$document', 'focusService', function($scope, $element, $attrs, $document, focusService) {
@@ -175,7 +191,7 @@ oppia.directive('graphViz', function() {
       };
 
       $scope.onClickGraphSVG = function(event) {
-        if ($scope.state.currentMode === _MODES.ADD_VERTEX && $scope.vertexEditPermissions) {
+        if ($scope.state.currentMode === _MODES.ADD_VERTEX && $scope.canAddVertex) {
           $scope.graph.vertices.push({
             x: $scope.state.mouseX,
             y: $scope.state.mouseY,
@@ -196,26 +212,30 @@ oppia.directive('graphViz', function() {
       
       function initButtons() {
         $scope.buttons = [];
-        if ($scope.movePermissions) {
+        if ($scope.canMoveVertex) {
           $scope.buttons.push({
             text: '\uE068',
             mode: _MODES.MOVE
           });
         }
-        $scope.buttons.push({
-          text: '\uE144',
-          mode: _MODES.ADD_EDGE
-        });
-        if ($scope.vertexEditPermissions) {
+        if ($scope.canAddEdge) {
+          $scope.buttons.push({
+            text: '\uE144',
+            mode: _MODES.ADD_EDGE
+          });
+        }
+        if ($scope.canAddVertex) {
           $scope.buttons.push({
             text: '\u002B',
             mode: _MODES.ADD_VERTEX
           });
         }
-        $scope.buttons.push({
-          text: '\u2212',
-          mode: _MODES.DELETE
-        });
+        if ($scope.canDeleteVertex || $scope.canDeleteEdge) {
+          $scope.buttons.push({
+            text: '\u2212',
+            mode: _MODES.DELETE
+          });
+        }
       }
 
       // TODO(czx): Consider a better way to make the tooltip appear
@@ -267,28 +287,30 @@ oppia.directive('graphViz', function() {
       // Vertex events
       $scope.onClickVertex = function(index) {
         if ($scope.state.currentMode === _MODES.DELETE) {
-          if ($scope.vertexEditPermissions) {
+          if ($scope.canDeleteVertex) {
             deleteVertex(index);
           }
         }
       };
       $scope.onMousedownVertex = function(index) {
         if ($scope.state.currentMode === _MODES.ADD_EDGE) {
-          beginAddEdge(index);
+          if ($scope.canAddEdge) {
+            beginAddEdge(index);
+          }
         } else if ($scope.state.currentMode === _MODES.MOVE) {
-          if ($scope.movePermissions) {
+          if ($scope.canMoveVertex) {
             beginDragVertex(index);
           }
         }
       };
       
       $scope.onDoubleclickVertex = function(index) {
-        if ($scope.graph.isLabeled) {
+        if ($scope.graph.isLabeled && $scope.canEditLabel) {
           beginEditVertexLabel(index);
         }
       };
       $scope.onDoubleclickVertexLabel = function(index) {
-        if ($scope.graph.isLabeled) {
+        if ($scope.graph.isLabeled && $scope.canEditLabel) {
           beginEditVertexLabel(index);
         }
       };
@@ -296,11 +318,13 @@ oppia.directive('graphViz', function() {
       // Edge events
       $scope.onClickEdge = function(index) {
         if ($scope.state.currentMode === _MODES.DELETE) {
-          deleteEdge(index);
+          if ($scope.canDeleteEdge) {
+            deleteEdge(index);
+          }
         }
       };
       $scope.onDoubleclickEdgeWeight = function(index) {
-        if ($scope.graph.isWeighted) {
+        if ($scope.graph.isWeighted && $scope.canEditWeight) {
           beginEditEdgeWeight(index);
         }
       };
@@ -428,7 +452,8 @@ oppia.directive('graphViz', function() {
       // Styling functions
       $scope.getEdgeColor = function(index) {
         if ($scope.state.currentMode === _MODES.DELETE && 
-            index === $scope.state.hoveredEdge) {
+            index === $scope.state.hoveredEdge &&
+            $scope.canDeleteEdge) {
           return 'red';
         } else {
           return 'black';
@@ -436,7 +461,7 @@ oppia.directive('graphViz', function() {
       };
       $scope.getHoverVertexColor = function() {
         if ($scope.state.currentMode === _MODES.DELETE &&
-            $scope.vertexEditPermissions) {
+            $scope.canDeleteVertex) {
           return 'red';
         } else {
           return 'aqua';

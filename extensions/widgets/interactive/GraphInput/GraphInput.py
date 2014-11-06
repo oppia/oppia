@@ -68,17 +68,50 @@ class GraphInput(widget_domain.BaseWidget):
             'isWeighted': False,
         }
     }, {
-        'name': 'movePermissions',
-        'description': 'Whether the learner is allowed to move the vertices around.',
+        'name': 'canAddVertex',
+        'description': 'Allow learner to add vertices.',
         'schema': {
             'type': 'bool',
         },
         'default_value': False 
     }, {
-        'name': 'vertexEditPermissions',
-        'description': (
-            'Whether the learner is allowed to edit the vertex '
-            'set (i.e. add/remove vertices, change vertex names).'),
+        'name': 'canDeleteVertex',
+        'description': 'Allow learner to delete vertices.',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': False
+    }, {
+        'name': 'canMoveVertex',
+        'description': 'Allow learner to move vertices.',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
+        'name': 'canEditLabel',
+        'description': 'Allow learner to edit vertex labels.',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': False
+    }, {
+        'name': 'canAddEdge',
+        'description': 'Allow learner to add edges.',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
+        'name': 'canDeleteEdge',
+        'description': 'Allow learner to delete edges.',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': True
+    }, {
+        'name': 'canChangeWeight',
+        'description': 'Allow learner to change edge weights.',
         'schema': {
             'type': 'bool',
         },

@@ -5,8 +5,17 @@
     }
   </style>
   <div>
-    <graph-viz graph="graph" vertex-edit-permissions="vertexEditPermissions" move-permissions="movePermissions"></graph-viz>
+    <graph-viz graph="graph" 
+      can-add-vertex="canAddVertex" 
+      can-delete-vertex="canDeleteVertex" 
+      can-edit-label="canEditLabel" 
+      can-move-vertex="canMoveVertex" 
+      can-add-edge="canAddEdge" 
+      can-delete-edge="canDeleteEdge" 
+      can-change-weight="canChangeWeight">
+    </graph-viz>
     <button class="btn btn-default" ng-click="submitGraph()">Submit</button>
+    <button class="btn btn-default" ng-click="resetGraph()">Reset</button>
     <span ng-show="errorMessage" style="color: red; margin-left: 30px;" aria-live="assertive">
       <[errorMessage]>
     </span>
@@ -92,11 +101,11 @@
     }
   </style>
   <div style="height: 35px;">
-    <div ng-if="state.selectedVertex !== null && graph.isLabeled && vertexEditPermissions">
+    <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditLabel">
       <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
       <button class="btn btn-default" ng-click="state.selectedVertex = null;">Update Label</button>
     </div>
-    <div ng-if="state.selectedEdge !== null && graph.isWeighted">
+    <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditWeight">
       <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
       <button class="btn btn-default" ng-click="state.selectedEdge = null;">Update Weight</button>
     </div>
@@ -121,7 +130,7 @@
           </text>
         </g>
       </svg>
-      <g ng-if="optionsEditPermissions" ng-repeat="button in graphOptions">
+      <g ng-if="canEditOptions" ng-repeat="button in graphOptions">
         <rect width="70"
           height="30"
           x="10"
@@ -147,7 +156,7 @@
       </text>
 
       <!-- Selected vertex -->
-      <circle ng-if="state.selectedVertex !== null && graph.isLabeled && vertexEditPermissions === true"
+      <circle ng-if="state.selectedVertex !== null && graph.isLabeled && canEditLabel"
         ng-attr-cx="<[graph.vertices[state.selectedVertex].x]>"
         ng-attr-cy="<[graph.vertices[state.selectedVertex].y]>"
         ng-attr-r="<[VERTEX_RADIUS + 3]>"

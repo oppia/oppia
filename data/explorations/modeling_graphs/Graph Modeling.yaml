@@ -12,9 +12,10 @@ states:
   Bosses correct:
     content:
     - type: text
-      value: As you can see, graphs are very useful for modeling real world behavior.
-        They are widely used in many fields, such as computer science and statistics.&nbsp;<div><br></div><div>Maybe
-        from now on you'll start seeing graphs all over the place!&nbsp;</div>
+      value: "As you can see, graphs are very useful for modeling real world behavior.\
+        \ They are widely used in many fields, such as computer science and statistics.\_\
+        <div><br></div><div>Maybe from now on you'll start seeing graphs all over\
+        \ the place!\_</div>"
     param_changes: []
     widget:
       customization_args:
@@ -41,6 +42,20 @@ states:
     param_changes: []
     widget:
       customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: false
+        canChangeWeight:
+          value: false
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: false
+        canEditLabel:
+          value: false
+        canMoveVertex:
+          value: true
         graph:
           value:
             edges: []
@@ -66,10 +81,6 @@ states:
             - label: Kevin
               x: 265.09375
               y: 100
-        movePermissions:
-          value: true
-        vertexEditPermissions:
-          value: false
       handlers:
       - name: submit
         rule_specs:
@@ -168,6 +179,20 @@ states:
     param_changes: []
     widget:
       customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: false
+        canChangeWeight:
+          value: true
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: false
+        canEditLabel:
+          value: false
+        canMoveVertex:
+          value: true
         graph:
           value:
             edges: []
@@ -187,10 +212,6 @@ states:
             - label: Berlin
               x: 491.09375
               y: 119
-        movePermissions:
-          value: true
-        vertexEditPermissions:
-          value: false
       handlers:
       - name: submit
         rule_specs:
@@ -284,6 +305,20 @@ states:
     param_changes: []
     widget:
       customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: false
+        canChangeWeight:
+          value: false
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: false
+        canEditLabel:
+          value: false
+        canMoveVertex:
+          value: true
         graph:
           value:
             edges: []
@@ -306,10 +341,6 @@ states:
             - label: Alice
               x: 320.59375
               y: 57
-        movePermissions:
-          value: true
-        vertexEditPermissions:
-          value: false
       handlers:
       - name: submit
         rule_specs:
