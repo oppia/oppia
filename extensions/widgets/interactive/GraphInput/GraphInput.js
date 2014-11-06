@@ -45,11 +45,11 @@ oppia.directive('oppiaInteractiveGraphInput', [
           }
           $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);          
           $scope.canDeleteVertex = stringToBool($attrs.canDeleteVertexWithValue);
-          $scope.canEditLabel = stringToBool($attrs.canEditLabelWithValue);
+          $scope.canEditVertexLabel = stringToBool($attrs.canEditVertexLabelWithValue);
           $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
           $scope.canAddEdge = stringToBool($attrs.canAddEdgeWithValue);
           $scope.canDeleteEdge = stringToBool($attrs.canDeleteEdgeWithValue);
-          $scope.canChangeWeight = stringToBool($attrs.canChangeWeightWithValue);
+          $scope.canEditEdgeWeight = stringToBool($attrs.canEditEdgeWeightWithValue);
         };
         $scope.init();
         
@@ -141,10 +141,10 @@ oppia.directive('graphViz', function() {
       canAddVertex: '=',
       canDeleteVertex: '=',
       canMoveVertex: '=',
-      canEditLabel: '=',
+      canEditVertexLabel: '=',
       canAddEdge: '=',
       canDeleteEdge: '=',
-      canEditWeight: '=',
+      canEditEdgeWeight: '=',
       canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
@@ -305,12 +305,12 @@ oppia.directive('graphViz', function() {
       };
       
       $scope.onDoubleclickVertex = function(index) {
-        if ($scope.graph.isLabeled && $scope.canEditLabel) {
+        if ($scope.graph.isLabeled && $scope.canEditVertexLabel) {
           beginEditVertexLabel(index);
         }
       };
       $scope.onDoubleclickVertexLabel = function(index) {
-        if ($scope.graph.isLabeled && $scope.canEditLabel) {
+        if ($scope.graph.isLabeled && $scope.canEditVertexLabel) {
           beginEditVertexLabel(index);
         }
       };
@@ -324,7 +324,7 @@ oppia.directive('graphViz', function() {
         }
       };
       $scope.onDoubleclickEdgeWeight = function(index) {
-        if ($scope.graph.isWeighted && $scope.canEditWeight) {
+        if ($scope.graph.isWeighted && $scope.canEditEdgeWeight) {
           beginEditEdgeWeight(index);
         }
       };

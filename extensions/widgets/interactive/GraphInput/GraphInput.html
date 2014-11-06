@@ -8,11 +8,11 @@
     <graph-viz graph="graph" 
       can-add-vertex="canAddVertex" 
       can-delete-vertex="canDeleteVertex" 
-      can-edit-label="canEditLabel" 
+      can-edit-vertex-label="canEditVertexLabel" 
       can-move-vertex="canMoveVertex" 
       can-add-edge="canAddEdge" 
       can-delete-edge="canDeleteEdge" 
-      can-change-weight="canChangeWeight">
+      can-edit-edge-weight="canEditEdgeWeight">
     </graph-viz>
     <button class="btn btn-default" ng-click="submitGraph()">Submit</button>
     <button class="btn btn-default" ng-click="resetGraph()">Reset</button>
@@ -90,7 +90,7 @@
       font-family: 'Glyphicons Halflings';
     }
     .unselectable-text {
-      -moz-user-select: none;
+      -moz-user-select: -moz-none;
       -khtml-user-select: none;
       -webkit-user-select: none;
       -o-user-select: none;
@@ -101,11 +101,11 @@
     }
   </style>
   <div style="height: 35px;">
-    <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditLabel">
+    <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
       <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
       <button class="btn btn-default" ng-click="state.selectedVertex = null;">Update Label</button>
     </div>
-    <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditWeight">
+    <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
       <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
       <button class="btn btn-default" ng-click="state.selectedEdge = null;">Update Weight</button>
     </div>
@@ -156,7 +156,7 @@
       </text>
 
       <!-- Selected vertex -->
-      <circle ng-if="state.selectedVertex !== null && graph.isLabeled && canEditLabel"
+      <circle ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel"
         ng-attr-cx="<[graph.vertices[state.selectedVertex].x]>"
         ng-attr-cy="<[graph.vertices[state.selectedVertex].y]>"
         ng-attr-r="<[VERTEX_RADIUS + 3]>"
