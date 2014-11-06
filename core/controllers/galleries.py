@@ -94,13 +94,20 @@ class GalleryHandler(base.BaseHandler):
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 
-        # Get non-private and viewable private exploration summaries
-        exp_summaries_dict = (
-            exp_services.get_non_private_exploration_summaries())
-        if self.user_id:
-            exp_summaries_dict.update(
-                exp_services.get_private_at_least_viewable_exploration_summaries(
-                    self.user_id))
+        query_string = self.request.get('q')
+        if query_string:
+            # The user is performing a search.
+            exp_summaries_dict = (
+                exp_services.get_exploration_summaries_matching_query(
+                    query_string))
+        else:
+            # Get non-private and viewable private exploration summaries
+            exp_summaries_dict = (
+                exp_services.get_non_private_exploration_summaries())
+            if self.user_id:
+                exp_summaries_dict.update(
+                    exp_services.get_private_at_least_viewable_exploration_summaries(
+                        self.user_id))
 
         # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
         # individual lookups. Note that this will depend on user_id.

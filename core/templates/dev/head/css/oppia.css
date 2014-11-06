@@ -392,7 +392,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   height: 100%;
   /* This is the same as the min-height in .oppia-gallery-menu. */
   min-height: 600px;
-  padding-left: 20px;
 }
 
 .oppia-gallery-tile {
