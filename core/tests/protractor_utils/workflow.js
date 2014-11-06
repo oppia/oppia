@@ -48,7 +48,7 @@ var publishExploration = function() {
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(name, category, objective, language) {
   createExploration(name, category);
-  editor.editRule('default').setDestination('END');
+  editor.RuleEditor('default').setDestination('END');
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);

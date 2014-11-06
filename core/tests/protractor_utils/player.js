@@ -19,18 +19,18 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('./widgets.js');
+var widgets = require('../../../extensions/widgets/protractor.js');
 var forms = require('./forms.js');
 
 var restartExploration = function() {
   element(by.css('.protractor-test-restart-exploration')).click();
 };
 
-// The get functions return promises rather than values.
-
-var getExplorationName = function() {
-  return element(by.css('.conversation-skin-exploration-header')).
-    element(by.tagName('h3')).getText();
+var expectExplorationNameToBe = function(name) {
+  expect(
+    element(by.css('.conversation-skin-exploration-header')).
+      element(by.tagName('h3')).getText()
+  ).toBe(name);
 };
 
 // This verifies the question just asked, including formatting and 
@@ -46,9 +46,12 @@ var expectContentToMatch = function(richTextInstructions) {
   ).toMatch(richTextInstructions);
 };
 
-var getLatestFeedbackText = function() {
-  return element.all(by.repeater('response in responseLog track by $index')).
-    last().element(by.css('.protractor-test-conversation-feedback')).getText();
+var expectLatestFeedbackToMatch = function(richTextInstructions) {
+  forms.expectRichText(
+    element.all(by.repeater('response in responseLog track by $index')).
+      last().element(by.css('.protractor-test-conversation-feedback')).
+        element(by.xpath('./div/div')).getText()
+  ).toMatch(richTextInstructions);
 };
 
 // Additional arguments may be sent to this function, and they will be
@@ -82,9 +85,9 @@ var expectExplorationToNotBeOver = function() {
 
 exports.restartExploration = restartExploration;
 
-exports.getExplorationName = getExplorationName;
+exports.expectExplorationNameToBe = expectExplorationNameToBe;
 exports.expectContentToMatch = expectContentToMatch;
-exports.getLatestFeedbackText = getLatestFeedbackText;
+exports.expectLatestFeedbackToMatch = expectLatestFeedbackToMatch;
 
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;

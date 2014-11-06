@@ -51,6 +51,9 @@ var submitAnswer = function(answer) {
     element(by.buttonText(answer)).click();
 };
 
+var submissionHandler = 'NonnegativeInt';
+
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.submissionHandler = submissionHandler;

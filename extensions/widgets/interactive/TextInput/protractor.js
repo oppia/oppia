@@ -41,6 +41,9 @@ var submitAnswer = function(answer) {
     element(by.tagName('button')).click();
 };
 
+var submissionHandler = 'NormalizedString';
+
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.submissionHandler = submissionHandler;

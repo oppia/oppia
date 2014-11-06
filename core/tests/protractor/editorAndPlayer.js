@@ -34,7 +34,7 @@ describe('State editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
     editor.selectInteraction('Continue', 'click here');
-    editor.editRule('default').setDestination('END');
+    editor.RuleEditor('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -62,7 +62,7 @@ describe('State editor', function() {
     editor.selectInteraction(
       'MultipleChoiceInput', 
       [forms.toRichText('option A'), forms.toRichText('option B')]);
-    editor.editRule('default').setDestination('END');
+    editor.RuleEditor('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -82,20 +82,23 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.selectInteraction('NumericInput');
-    editor.addNumericRule.IsInclusivelyBetween(3, 6);
-    editor.editRule(0).setDestination('END');
-    editor.editRule(0).editFeedback().editItem(0, 'RichText').
-      appendPlainText('correct');
-    editor.editRule('default').editFeedback().editItem(0, 'RichText').
-      appendPlainText('out of bounds');
+    editor.addRule('NumericInput', 'IsInclusivelyBetween', [3, 6]);
+    editor.RuleEditor(0).setDestination('END');
+    editor.RuleEditor(0).editFeedback(0, function(richTextEditor) {
+      richTextEditor.appendBoldText('correct');
+    });
+    editor.RuleEditor('default').
+      editFeedback(0, forms.toRichText('out of bounds'));
     editor.saveChanges();
 
     general.moveToPlayer();
     player.submitAnswer('NumericInput', 7);
-    expect(player.getLatestFeedbackText()).toBe('out of bounds');
+    player.expectLatestFeedbackToMatch(forms.toRichText('out of bounds'));
     player.expectExplorationToNotBeOver();
     player.submitAnswer('NumericInput', 4);
-    expect(player.getLatestFeedbackText()).toBe('correct');
+    player.expectLatestFeedbackToMatch(function(richTextChecker) {
+      richTextChecker.readBoldText('correct');
+    });
     player.expectExplorationToBeOver();
 
     users.logout();
@@ -111,17 +114,17 @@ describe('Full exploration editor', function() {
     editor.setStateName('state 1');
     editor.setContent(forms.toRichText('this is state 1'));
     editor.selectInteraction('NumericInput');
-    editor.addNumericRule.Equals(21);
-    editor.editRule(0).setDestination('state 2');
+    editor.addRule('NumericInput', 'Equals', [21]);
+    editor.RuleEditor(0).setDestination('state 2');
 
     editor.moveToState('state 2');
     editor.setContent(forms.toRichText('this is state 2'));
     editor.selectInteraction(
       'MultipleChoiceInput', 
       [forms.toRichText('return'), forms.toRichText('complete')]);
-    editor.addMultipleChoiceRule.Equals('return');
-    editor.editRule(0).setDestination('state 1');
-    editor.editRule('default').setDestination('END');
+    editor.addRule('MultipleChoiceInput', 'Equals', ['return']);
+    editor.RuleEditor(0).setDestination('state 1');
+    editor.RuleEditor('default').setDestination('END');
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -197,15 +200,15 @@ describe('Full exploration editor', function() {
       editor.expectInteractionToMatch('NumericInput');
 
       // Check deletion of rules
-      editor.editRule('default').editFeedback().editItem(0, 'RichText').
-        appendPlainText('Farewell');
-      editor.editRule('default').
+      editor.RuleEditor('default').
+        editFeedback(0, forms.toRichText('Farewell'));
+      editor.RuleEditor('default').
         expectAvailableDestinationsToBe(['second', 'END']);
-      editor.editRule('default').setDestination('END');
-      editor.editRule('default').
+      editor.RuleEditor('default').setDestination('END');
+      editor.RuleEditor('default').
         expectAvailableDestinationsToBe(['second', 'END']);
-      editor.addNumericRule.IsGreaterThan(2);
-      editor.editRule(0).delete();
+      editor.addRule('NumericInput', 'IsGreaterThan', [2]);
+      editor.RuleEditor(0).delete();
 
       // Check editor preview mode
       editor.enterPreviewMode();
@@ -215,7 +218,7 @@ describe('Full exploration editor', function() {
       player.expectInteractionToMatch('NumericInput');
       player.submitAnswer('NumericInput', 6);
       // This check the previously-deleted rule no longer applies.
-      expect(player.getLatestFeedbackText()).toBe('Farewell');
+      player.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
       player.expectExplorationToBeOver();
       editor.exitPreviewMode();
 

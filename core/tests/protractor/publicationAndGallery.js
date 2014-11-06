@@ -93,7 +93,7 @@ describe('Gallery view', function() {
     expect(gallery.getExplorationObjective('Vilya')).toBe(
       'Preserve the works of the elves');
     gallery.playExploration('silmarils');
-    expect(player.getExplorationName()).toBe('silmarils');
+    player.expectExplorationNameToBe('silmarils');
     player.submitAnswer('Continue');
 
     users.logout();

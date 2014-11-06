@@ -34,6 +34,9 @@ var submitAnswer = function(answer) {
     element(by.tagName('input')).sendKeys(answer + '\n');
 };
 
+var submissionHandler = 'Real';
+
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.submissionHandler = submissionHandler;

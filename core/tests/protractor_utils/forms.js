@@ -19,7 +19,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('./widgets.js');
+var widgets = require('../../../extensions/widgets/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 
 var DictionaryEditor = function(elem) {

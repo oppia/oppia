@@ -20,28 +20,28 @@
 
 var INTERACTIVE_WIDGETS = {
   Continue: require(
-    '../../../extensions/widgets/interactive/Continue/protractor.js'),
+    './interactive/Continue/protractor.js'),
   MultipleChoiceInput: require(
-    '../../../extensions/widgets/interactive/MultipleChoiceInput/protractor.js'),
+    './interactive/MultipleChoiceInput/protractor.js'),
   NumericInput: require(
-    '../../../extensions/widgets/interactive/NumericInput/protractor.js'),
+    './interactive/NumericInput/protractor.js'),
   TextInput: require(
-    '../../../extensions/widgets/interactive/TextInput/protractor.js')
+    './interactive/TextInput/protractor.js')
 };
 
 var NONINTERACTIVE_WIDGETS = {
   Collapsible: require(
-    '../../../extensions/widgets/noninteractive/Collapsible/protractor.js'),
+    './noninteractive/Collapsible/protractor.js'),
   Image: require(
-    '../../../extensions/widgets/noninteractive/Image/protractor.js'),
+    './noninteractive/Image/protractor.js'),
   Link: require(
-    '../../../extensions/widgets/noninteractive/Link/protractor.js'),
+    './noninteractive/Link/protractor.js'),
   Math: require(
-    '../../../extensions/widgets/noninteractive/Math/protractor.js'),
+    './noninteractive/Math/protractor.js'),
   Tabs: require(
-    '../../../extensions/widgets/noninteractive/Tabs/protractor.js'),
+    './noninteractive/Tabs/protractor.js'),
   Video: require(
-    '../../../extensions/widgets/noninteractive/Video/protractor.js')
+    './noninteractive/Video/protractor.js')
 };
 
 var getInteractive = function(widgetName) {

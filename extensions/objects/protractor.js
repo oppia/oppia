@@ -65,6 +65,15 @@ var MathLatexStringEditor = function(elem) {
   };
 };
 
+var NonnegativeIntEditor = function(elem) {
+  return {
+    setValue: function(value) {
+      elem.element(by.tagName('input')).clear();
+      elem.element(by.tagName('input')).sendKeys(value);
+    }
+  };
+};
+
 var SanitizedUrlEditor = function(elem) {
   return {
     setText: function(text) {
@@ -88,6 +97,7 @@ var OBJECT_EDITORS = {
   'Filepath': FilepathEditor,
   'Int': IntEditor,
   'MathLatexString': MathLatexStringEditor,
+  'NonnegativeInt': NonnegativeIntEditor,
   'SanitizedUrl': SanitizedUrlEditor,
   'UnicodeString': UnicodeStringEditor
 };
