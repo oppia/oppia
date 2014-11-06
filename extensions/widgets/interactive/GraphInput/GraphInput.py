@@ -89,7 +89,7 @@ class GraphInput(widget_domain.BaseWidget):
         },
         'default_value': True
     }, {
-        'name': 'canEditLabel',
+        'name': 'canEditVertexLabel',
         'description': 'Allow learner to edit vertex labels.',
         'schema': {
             'type': 'bool',
@@ -110,8 +110,8 @@ class GraphInput(widget_domain.BaseWidget):
         },
         'default_value': True
     }, {
-        'name': 'canChangeWeight',
-        'description': 'Allow learner to change edge weights.',
+        'name': 'canEditEdgeWeight',
+        'description': 'Allow learner to edit edge weights.',
         'schema': {
             'type': 'bool',
         },
