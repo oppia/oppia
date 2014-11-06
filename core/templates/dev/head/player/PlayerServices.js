@@ -393,7 +393,8 @@ oppia.factory('oppiaPlayerService', [
             handler: handler,
             params: learnerParamsService.getAllParams(),
             version: version,
-            old_state_name: _currentStateName
+            old_state_name: _currentStateName,
+            rule_spec: ruleSpec
           });
         }
 
@@ -455,6 +456,9 @@ oppia.factory('oppiaPlayerService', [
       } else {
         throw 'Error: cannot populate exploration in learner mode.';
       }
+    },
+    isAnswerBeingProcessed: function() {
+      return answerIsBeingProcessed;
     }
   };
 }]);

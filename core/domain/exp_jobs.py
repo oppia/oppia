@@ -1,3 +1,5 @@
+# coding: utf-8
+#
 # Copyright 2014 The Oppia Authors. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,7 +20,36 @@ __author__ = 'Frederik Creemers'
 
 from core import jobs
 from core.platform import models
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+(base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration])
+transaction_services = models.Registry.import_transaction_services()
+
+
+class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
+    """Job that calculates summaries of explorations, which can be
+    used to get e.g. the gallery. For every ExplorationModel entity,
+    create a ExpSummaryModel entity containing information described
+    in ExpSummariesAggregator.
+
+    The summaries store the following information:
+        title, category, objective, language_code, skill_tags,
+        last_updated, created_on, status (private, public or
+        publicized), community_owned, owner_ids, editor_ids,
+        viewer_ids, version.
+    """
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(exploration_model):
+        from core.domain import exp_services
+        if not exploration_model.deleted:
+            exp_services.create_exploration_summary(exploration_model.id)
+
+    @staticmethod
+    def reduce(exp_id, list_of_exps):
+        pass
 
 
 class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
@@ -30,7 +61,9 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
 
     @staticmethod
     def map(item):
-        # We're inline importing here to break import loops like this: (-> means imports)
-        # exp_services -> event_services -> jobs_registry -> exp_jobs -> exp_services.
+        # We're inline importing here to break import loops like this: (->
+        # means imports):
+        #   exp_services -> event_services -> jobs_registry ->
+        #   exp_jobs -> exp_services.
         from core.domain import exp_services
         exp_services.index_explorations_given_ids([item.id])

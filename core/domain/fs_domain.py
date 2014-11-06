@@ -143,7 +143,7 @@ class ExplorationFileSystem(object):
         file does not exist, None is returned.
 
         The 'mode' argument is unused. It is included so that this method
-        signature matches that of other files systems. 
+        signature matches that of other file systems.
         """
         metadata = self._get_file_metadata(filepath, version)
         if metadata:

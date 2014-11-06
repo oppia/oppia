@@ -369,7 +369,6 @@ states:
     feconf.DEFAULT_INIT_STATE_NAME
 )).replace('<', '\\u003c').replace('>', '\\u003e')
 
-
     def test_exploration_download_handler_for_default_exploration(self):
 
         # Register and log in as an editor.

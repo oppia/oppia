@@ -26,7 +26,6 @@ following Python types: bool, dict, float, int, list, unicode.
 
 __author__ = 'sll@google.com (Sean Lip)'
 
-import logging
 import numbers
 import urllib
 import urlparse
@@ -222,6 +221,13 @@ class _Validators(object):
         if not hasattr(cls, validator_id):
             raise Exception('Invalid validator id: %s' % validator_id)
         return getattr(cls, validator_id)
+
+    @staticmethod
+    def has_length_at_least(obj, min_value):
+        """Returns True iff the given object (a list) has at least
+        `min_value` elements.
+        """
+        return len(obj) >= min_value
 
     @staticmethod
     def has_length_at_most(obj, max_value):

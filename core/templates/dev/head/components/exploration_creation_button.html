@@ -22,7 +22,7 @@
             Title
           </label>
           <div class="col-lg-10 col-md-10 col-sm-10">
-            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="isTitleValid(newExplorationTitle, true)" autofocus required>
+            <input id="newExplorationTitle" type="text" class="form-control" ng-model="newExplorationTitle" name="newExplorationTitle" ng-change="isTitleValid(newExplorationTitle, true)" required focus-on="newExplorationModalOpened">
             <span style="color: red;" aria-live="assertive" ng-show="changedAtLeastOnce">
               <[warningText]>
             </span>

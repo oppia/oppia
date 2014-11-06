@@ -234,7 +234,7 @@
                              label-for-focus-target="getFocusLabel($index)">
         </schema-based-editor>
       </td>
-      <td ng-if="!len">
+      <td ng-if="!len && (!minListLength || localValue.length > minListLength)">
         <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button" ng-click="deleteElement($index)"
                 ng-disabled="disabled()">
           <span class="glyphicon glyphicon-remove" title="Delete item">

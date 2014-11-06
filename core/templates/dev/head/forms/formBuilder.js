@@ -1268,13 +1268,21 @@ oppia.directive('schemaBasedListEditor', [
         $scope.addElementText = $scope.uiConfig().add_element_text;
       }
 
+      $scope.minListLength = null;
       $scope.maxListLength = null;
       if ($scope.validators()) {
         for (var i = 0; i < $scope.validators().length; i++) {
           if ($scope.validators()[i].id === 'has_length_at_most') {
             $scope.maxListLength = $scope.validators()[i].max_value;
+          } else if ($scope.validators()[i].id === 'has_length_at_least') {
+            $scope.minListLength = $scope.validators()[i].min_value;
           }
         }
+      }
+
+      while ($scope.localValue.length < $scope.minListLength) {
+        $scope.localValue.push(
+          schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
       }
 
       if ($scope.len === undefined) {

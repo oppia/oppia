@@ -246,7 +246,10 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         old_params['answer'] = answer
         # The version of the exploration.
         version = self.payload.get('version')
-        rule_spec = self.payload.get('rule_spec')
+        rule_spec_dict = self.payload.get('rule_spec')
+
+        rule_spec = exp_domain.RuleSpec.from_dict_and_obj_type(
+            rule_spec_dict, rule_spec_dict['obj_type'])
 
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)

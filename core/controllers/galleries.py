@@ -21,11 +21,14 @@ import logging
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
+(base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
@@ -53,6 +56,7 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+
         noninteractive_widget_html = (
             widget_registry.Registry.get_noninteractive_widget_html())
 
@@ -90,26 +94,31 @@ class GalleryHandler(base.BaseHandler):
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 
-        explorations_dict = (
-            exp_services.get_non_private_explorations_summary_dict(
-                user_id=self.user_id))
+        # Get non-private and viewable private exploration summaries
+        exp_summaries_dict = (
+            exp_services.get_non_private_exploration_summaries())
         if self.user_id:
-            explorations_dict.update(
-                exp_services.get_private_at_least_viewable_explorations_summary_dict(
+            exp_summaries_dict.update(
+                exp_services.get_private_at_least_viewable_exploration_summaries(
                     self.user_id))
 
+        # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
+        # individual lookups. Note that this will depend on user_id.
         explorations_list = [{
-            'id': exp_id,
-            'title': exp_data['title'],
-            'category': exp_data['category'],
-            'objective': exp_data['objective'],
+            'id': exp_summary.id,
+            'title': exp_summary.title,
+            'category': exp_summary.category,
+            'objective': exp_summary.objective,
             'language': language_codes_to_short_descs.get(
-                exp_data['language_code'], exp_data['language_code']),
-            'last_updated': exp_data['last_updated'],
-            'status': exp_data['status'],
-            'community_owned': exp_data['community_owned'],
-            'is_editable': exp_data['is_editable'],
-        } for (exp_id, exp_data) in explorations_dict.iteritems()]
+                exp_summary.language_code, exp_summary.language_code),
+            'last_updated': utils.get_time_in_millisecs(
+                exp_summary.exploration_model_last_updated),
+            'status': exp_summary.status,
+            'community_owned': exp_summary.community_owned,
+            'is_editable': exp_services.is_exp_summary_editable(
+                exp_summary,
+                user_id=self.user_id)
+        } for exp_summary in exp_summaries_dict.values()]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
@@ -126,7 +135,8 @@ class GalleryHandler(base.BaseHandler):
                 private_explorations_list.append(e_dict)
             elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
                 beta_explorations_list.append(e_dict)
-            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
+            elif (e_dict['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLICIZED):
                 released_explorations_list.append(e_dict)
 
         private_explorations_list = sorted(

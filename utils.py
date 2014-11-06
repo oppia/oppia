@@ -32,7 +32,6 @@ import yaml
 import zipfile
 
 
-
 # Sentinel value for schema verification, indicating that a value can take any
 # type.
 ANY_TYPE = 1
@@ -391,5 +390,5 @@ def vfs_normpath(path):
     comps = new_comps
     path = slash.join(comps)
     if initial_slashes:
-        path = slash*initial_slashes + path
+        path = slash * initial_slashes + path
     return path or dot
