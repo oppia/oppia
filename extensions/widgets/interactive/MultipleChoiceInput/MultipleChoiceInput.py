@@ -20,6 +20,10 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
         'description': 'The options that the learner can select from.',
         'schema': {
             'type': 'list',
+            'validators': [{
+                'id': 'has_length_at_least',
+                'min_value': 1,
+            }],
             'items': {
                 'type': 'html',
                 'ui_config': {

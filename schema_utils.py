@@ -223,6 +223,13 @@ class _Validators(object):
         return getattr(cls, validator_id)
 
     @staticmethod
+    def has_length_at_least(obj, min_value):
+        """Returns True iff the given object (a list) has at least
+        `min_value` elements.
+        """
+        return len(obj) >= min_value
+
+    @staticmethod
     def has_length_at_most(obj, max_value):
         """Returns True iff the given object (a list) has at most
         `max_value` elements.
