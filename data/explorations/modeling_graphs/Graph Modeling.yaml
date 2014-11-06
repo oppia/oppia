@@ -127,7 +127,7 @@ states:
           feedback:
           - Not exactly... try again!
           param_changes: []
-      sticky: false
+      sticky: true
       widget_id: GraphInput
   Cities correct:
     content:
@@ -245,7 +245,7 @@ states:
           feedback:
           - Not quite, try again!
           param_changes: []
-      sticky: false
+      sticky: true
       widget_id: GraphInput
   Friends correct:
     content:
@@ -394,7 +394,7 @@ states:
           feedback:
           - Not quite... Let's try again!
           param_changes: []
-      sticky: false
+      sticky: true
       widget_id: GraphInput
   Introduction:
     content:
