@@ -989,6 +989,13 @@ oppia-parameter {
   min-width: 300px !important;
 }
 
+.oppia-post-tutorial-popover {
+   display: block;
+   left: -65px;
+   top: 37px;
+   width: 200px;
+}
+
 /* Hide the search icon in the rule destination dropdown. */
 .oppia-rule-dest-select2 .select2-search input {
   background: none;

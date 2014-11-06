@@ -501,6 +501,8 @@ oppia.controller('ExplorationEditor', [
     return explorationId ? ('/explore/' + explorationId) : '';
   };
 
+  $scope.firstTutorialVisit = false;
+
   // Initializes the exploration page using data from the backend. Called on
   // page load.
   $scope.initExplorationPage = function(successCallback) {
@@ -565,6 +567,14 @@ oppia.controller('ExplorationEditor', [
 
       if (successCallback) {
         successCallback();
+      }
+
+      if (data.show_state_editor_tutorial_on_load) {
+        $scope.firstTutorialVisit = true;
+        $scope.startTutorial();
+        $http.post('/createhandler/started_tutorial_event/' + $scope.explorationId).error(function() {
+          console.error('Warning: could not record tutorial start event.');
+        });
       }
     });
   };
@@ -698,17 +708,23 @@ oppia.controller('ExplorationEditor', [
     }]
   };
 
+
   $scope._actuallyStartTutorial = function() {
     var intro = introJs();
     intro.setOptions($scope.EDITOR_TUTORIAL_OPTIONS);
-    intro.onexit(function() {
+
+    var _onLeaveTutorial = function() {
       editabilityService.onEndTutorial();
       $scope.$apply();
-    });
-    intro.oncomplete(function() {
-      editabilityService.onEndTutorial();
-      $scope.$apply();
-    });
+
+      if ($scope.firstTutorialVisit) {
+        $scope.$parent.showPostTutorialHelpPopover();
+        $scope.firstTutorialVisit = false;
+      }
+    };
+
+    intro.onexit(_onLeaveTutorial);
+    intro.oncomplete(_onLeaveTutorial);
 
     editabilityService.onStartTutorial();
     intro.start();
