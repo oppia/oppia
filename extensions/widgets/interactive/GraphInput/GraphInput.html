@@ -39,7 +39,7 @@
           ng-attr-y1="<[graph.vertices[edge.src].y]>"
           ng-attr-x2="<[graph.vertices[edge.dst].x]>"
           ng-attr-y2="<[graph.vertices[edge.dst].y]>"
-          style="stroke: black; stroke-width: 3;">
+          ng-attr-style="stroke: black; stroke-width: <[EDGE_WIDTH]>;">
         </line>
         <polygon ng-if="graph.isDirected"
           ng-attr-points="<[getDirectedEdgeArrowPoints($index)]>"
@@ -62,7 +62,7 @@
         </text>
         <circle cx="0"
           cy="0"
-          r="6">
+          ng-attr-r="<[VERTEX_RADIUS]>">
         </circle>
       </g>
     </svg>
@@ -113,7 +113,7 @@
             ry="5"
             ng-click="setMode(button.mode, $event)"
             ng-mouseenter="state.hoveredModeButton = button.mode"
-            ng-mouseleave="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : hoveredModeButton"
+            ng-mouseleave="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
             ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
           </rect>
           <text class="oppia-graph-button-label unselectable-text unclickable-text" x="8" ng-attr-y="<[42 + 50 * $index]>">
@@ -150,14 +150,14 @@
       <circle ng-if="state.selectedVertex !== null && graph.isLabeled && vertexEditPermissions === true"
         ng-attr-cx="<[graph.vertices[state.selectedVertex].x]>"
         ng-attr-cy="<[graph.vertices[state.selectedVertex].y]>"
-        ng-attr-r="<[vertexRadius + 3]>"
+        ng-attr-r="<[VERTEX_RADIUS + 3]>"
         style="fill: orange">
       </circle>
       <!-- Hovered vertex -->
       <circle ng-if="state.hoveredVertex !== null"
         ng-attr-cx="<[graph.vertices[state.hoveredVertex].x]>"
         ng-attr-cy="<[graph.vertices[state.hoveredVertex].y]>"
-        ng-attr-r="<[vertexRadius + 3]>"
+        ng-attr-r="<[VERTEX_RADIUS + 3]>"
         ng-attr-style="fill: <[getHoverVertexColor()]>">
       </circle>
       <line ng-if="state.addEdgeVertex !== null"
@@ -165,7 +165,7 @@
         ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
         ng-attr-x2="<[state.mouseX]>"
         ng-attr-y2="<[state.mouseY]>"
-        style="stroke: black; stroke-width: <[edgeWidth]>;">
+        style="stroke: black; stroke-width: <[EDGE_WIDTH]>;">
       </line>
       <g ng-repeat="edge in graph.edges">
         <line
@@ -176,7 +176,7 @@
           ng-attr-y1="<[graph.vertices[edge.src].y]>"
           ng-attr-x2="<[graph.vertices[edge.dst].x]>"
           ng-attr-y2="<[graph.vertices[edge.dst].y]>"
-          ng-attr-style="stroke: <[getEdgeColor($index)]>; stroke-width: <[edgeWidth]>;">
+          ng-attr-style="stroke: <[getEdgeColor($index)]>; stroke-width: <[EDGE_WIDTH]>;">
         </line>
         <polygon
           ng-if="graph.isDirected"
@@ -211,7 +211,7 @@
           ng-dblclick="onDoubleclickVertex($index)"
           cx="0"
           cy="0"
-          ng-attr-r="<[vertexRadius]>">
+          ng-attr-r="<[VERTEX_RADIUS]>">
         </circle>
       </g>
     </svg>
