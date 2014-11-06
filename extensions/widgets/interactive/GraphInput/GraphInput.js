@@ -67,7 +67,48 @@ oppia.directive('oppiaResponseGraphInput', [
       scope: {},
       templateUrl: 'response/GraphInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
+        $scope.graph = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+
+        $scope.getDirectedEdgeArrowPoints = function(index) {
+        var ARROW_WIDTH = 5;
+        var ARROW_HEIGHT = 10;
+
+        var edge = $scope.graph.edges[index];
+        var srcVertex = $scope.graph.vertices[edge.src];
+        var dstVertex = $scope.graph.vertices[edge.dst];
+        var dx = dstVertex.x - srcVertex.x;
+        var dy = dstVertex.y - srcVertex.y;
+        var length = Math.sqrt(dx * dx + dy * dy);
+        if (length === 0) {
+          return '';
+        }
+        dx /= length;
+        dy /= length;
+        var endX = dstVertex.x - 4 * dx;
+        var endY = dstVertex.y - 4 * dy;
         
+        var ret = '';
+        ret += 
+          endX + ',' + 
+          endY + ' ';
+        ret += 
+          (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' + 
+          (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
+        ret += 
+          (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' + 
+          (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
+        return ret;
+      };
+      $scope.getEdgeCentre = function(index) {
+        var edge = $scope.graph.edges[index];
+        var srcVertex = $scope.graph.vertices[edge.src];
+        var dstVertex = $scope.graph.vertices[edge.dst];
+        return {
+          x: (srcVertex.x + dstVertex.x) / 2.0,
+          y: (srcVertex.y + dstVertex.y) / 2.0
+        };
+      };
+
       }]
     };
   }
