@@ -30,7 +30,7 @@ var createExploration = function(name, category) {
   protractor.getInstance().waitForAngular();
   element(by.model('newExplorationTitle')).sendKeys(name);
   forms.AutocompleteDropdownEditor(element(by.tagName('select2-dropdown'))).
-    setText(category);
+    setValue(category);
   element(by.buttonText('Create New Exploration')).click();
 
   // We now want to wait for the editor to fully load.

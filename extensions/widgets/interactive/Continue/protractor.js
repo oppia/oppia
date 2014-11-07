@@ -23,7 +23,7 @@ var customizeInteraction = function(elem, buttonText) {
   if (buttonText) {
     objects.UnicodeStringEditor(
       elem.element(by.tagName('schema-based-unicode-editor'))
-    ).setText(buttonText);
+    ).setValue(buttonText);
   }
 };
  

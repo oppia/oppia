@@ -186,7 +186,7 @@ var RichTextEditor = function(elem) {
 
 var UnicodeEditor = function(elem) {
   return {
-    setText: function(text) {
+    setValue: function(text) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(text);
     }
@@ -195,7 +195,7 @@ var UnicodeEditor = function(elem) {
 
 var AutocompleteDropdownEditor = function(elem) {
   return {
-    setText: function(text) {
+    setValue: function(text) {
       elem.element(by.css('.select2-container')).click();
       // NOTE: the input field is top-level in the DOM rather than below the
       // container. The id is assigned when the dropdown is clicked.

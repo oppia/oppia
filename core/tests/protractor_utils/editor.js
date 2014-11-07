@@ -129,14 +129,14 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
   // in the page (which will have the form "is equal to ...") and the types
   // of the parameter objects, which will later tell us which object editors
   // to use to enter the parameterValues.
-  var cssRuleDescription = ruleDescription.substring(0, parameterStart);
+  var ruleDescriptionInDropdown = ruleDescription.substring(0, parameterStart);
   var parameterTypes = [];
-  while (parameterStart) {
+  while (parameterStart !== undefined) {
     var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
     var nextParameterStart = 
       (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
       undefined : ruleDescription.indexOf('{{', parameterEnd);
-    cssRuleDescription = cssRuleDescription + '...' + 
+    ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' + 
       ruleDescription.substring(parameterEnd, nextParameterStart);
     parameterTypes.push(
       ruleDescription.substring(
@@ -147,7 +147,8 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
 
   ruleElement.element(by.css('.protractor-test-rule-description')).click();
   element(by.id('select2-drop')).element(
-      by.cssContainingText('li.select2-results-dept-0', cssRuleDescription)).then(
+      by.cssContainingText(
+        'li.select2-results-dept-0', ruleDescriptionInDropdown)).then(
       function(optionElement) {
     optionElement.click();
     protractor.getInstance().waitForAngular();
@@ -164,13 +165,8 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
         parameterElement.element(
           by.cssContainingText('option', parameterValues[i])
         ).click();
-      } else if (parameterEditor.hasOwnProperty('setValue')) {
-        parameterEditor.setValue(parameterValues[i]);
-      } else if (parameterEditor.hasOwnProperty('setText')) {
-        parameterEditor.setText(parameterValues[i]);
       } else {
-        throw Error('Object ' + parameterTypes[i] + ' has no function ' +
-          'that can be used by editor._selectRule to set its value.');
+        parameterEditor.setValue(parameterValues[i]);
       }
     }
   });
@@ -223,7 +219,7 @@ var RuleEditor = function(ruleNum) {
     setDestination: function(destinationName) {
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
       forms.AutocompleteDropdownEditor(destinationElement).
-        setText(destinationName);
+        setValue(destinationName);
       elem.element(by.css('.protractor-test-save-rule')).click();
     },
     expectAvailableDestinationsToBe: function(stateNames) {

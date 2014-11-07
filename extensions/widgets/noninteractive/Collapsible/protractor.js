@@ -24,7 +24,7 @@ var forms = require('../../../../core/tests/protractor_utils/forms.js');
 var customizeWidget = function(modal, heading, contentInstructions) {
   forms.UnicodeEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
-  ).setText(heading);
+  ).setValue(heading);
   var richTextEditor = forms.RichTextEditor(
     modal.element(by.tagName('schema-based-html-editor')));
   richTextEditor.clear();

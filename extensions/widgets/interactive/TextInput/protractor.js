@@ -21,7 +21,7 @@ var objects = require('../../../objects/protractor.js');
 var customizeInteraction = function(elem, placeholderText, heightOfBox) {
   objects.UnicodeStringEditor(
     elem.element(by.tagName('schema-based-unicode-editor'))
-  ).setText(placeholderText);
+  ).setValue(placeholderText);
   objects.IntEditor(
     elem.element(by.tagName('schema-based-int-editor'))
   ).setValue(heightOfBox);

@@ -24,7 +24,7 @@ var objects = require('../../../objects/protractor.js');
 var customizeWidget = function(modal, url, openInSameWindow) {
   objects.SanitizedUrlEditor(
     modal.element(by.tagName('sanitized-url-editor'))
-  ).setText(url);
+  ).setValue(url);
   objects.BooleanEditor(
     modal.element(by.tagName('schema-based-bool-editor'))
   ).setValue(openInSameWindow);

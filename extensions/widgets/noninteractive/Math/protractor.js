@@ -24,7 +24,7 @@ var objects = require('../../../objects/protractor.js');
 var customizeWidget = function(modal, rawLatex) {
   objects.MathLatexStringEditor(
     modal.element(by.tagName('math-latex-string-editor'))
-  ).setText(rawLatex);
+  ).setValue(rawLatex);
 };
 
 var expectWidgetDetailsToMatch = function(elem, rawLatex) {

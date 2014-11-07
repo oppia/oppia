@@ -68,7 +68,7 @@ var createModerator = function(email, username) {
   registerAsEditor(username);
   admin.editConfigProperty(
       'Email addresses of moderators', 'List', function(listEditor) {
-    listEditor.addItem('Unicode').setText(email)
+    listEditor.addItem('Unicode').setValue(email);
   });
   logout();
 };
@@ -78,7 +78,7 @@ var createAdmin = function(email, username) {
   registerAsEditor(username);
   admin.editConfigProperty(
       'Email addresses of admins', 'List', function(listEditor) {
-    listEditor.addItem('Unicode').setText(email)
+    listEditor.addItem('Unicode').setValue(email);
   });
   logout();
 };

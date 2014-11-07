@@ -21,6 +21,10 @@
 
 var forms = require('../../core/tests/protractor_utils/forms.js');
 
+// NOTE: all editors that have rules associated with them must implement a 
+// setValue() function to which a single argument can be sent that will 
+// completely determine the object.
+
 var BooleanEditor = function(elem) {
   return {
     setValue: function(value) {
@@ -58,7 +62,7 @@ var IntEditor = function(elem) {
 
 var MathLatexStringEditor = function(elem) {
   return {
-    setText: function(rawLatex) {
+    setValue: function(rawLatex) {
       elem.element(by.tagName('textarea')).clear();
       elem.element(by.tagName('textarea')).sendKeys(rawLatex);
     }
@@ -76,7 +80,7 @@ var NonnegativeIntEditor = function(elem) {
 
 var SanitizedUrlEditor = function(elem) {
   return {
-    setText: function(text) {
+    setValue: function(text) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(text);
     }
@@ -85,7 +89,7 @@ var SanitizedUrlEditor = function(elem) {
 
 var UnicodeStringEditor = function(elem) {
   return {
-    setText: function(text) {
+    setValue: function(text) {
       elem.element(by.tagName('input')).clear();
       elem.element(by.tagName('input')).sendKeys(text);
     }

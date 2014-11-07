@@ -24,7 +24,7 @@ var objects = require('../../../objects/protractor.js');
 var customizeWidget = function(modal, youtubeId, startTime, endTime, ifAutoplay) {
   objects.UnicodeStringEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
-  ).setText(youtubeId);
+  ).setValue(youtubeId);
   objects.IntEditor(
     modal.all(by.tagName('schema-based-int-editor')).first()
   ).setValue(startTime);
