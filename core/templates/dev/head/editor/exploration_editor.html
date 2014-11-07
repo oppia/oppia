@@ -298,8 +298,8 @@
                     </button>
                   </span>
 
-                  <span ng-if="editabilityService.isEditable()">
-                    <button class="btn oppia-main-control-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+                  <span ng-if="editabilityService.isEditableOutsideTutorialMode()">
+                    <button id="tutorialSaveExplorationButton" class="btn oppia-main-control-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
                       <span ng-if="!isSaveInProgress">
                         <span ng-if="!getChangeListLength() && lastSaveOrDiscardAction == 'save'">saved</span>
                         <span ng-if="getChangeListLength() || lastSaveOrDiscardAction !== 'save'">
@@ -318,7 +318,7 @@
 
                 <div class="btn-group">
                   <label class="btn btn-default" ng-model="isInPreviewMode" btn-radio="false" ng-click="exitPreviewMode()"><span class="glyphicon glyphicon-pencil"></span> Edit</label>
-                  <label class="btn btn-default" ng-model="isInPreviewMode" btn-radio="true" ng-click="enterPreviewMode()"><span class="glyphicon glyphicon-play"></span> Preview</label>
+                  <label id="tutorialPreviewExplorationButton" class="btn btn-default" ng-model="isInPreviewMode" btn-radio="true" ng-click="enterPreviewMode()"><span class="glyphicon glyphicon-play"></span> Preview</label>
                 </div>
               </span>
             </div>

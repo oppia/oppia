@@ -140,6 +140,9 @@ oppia.factory('editabilityService', [function() {
     onEndTutorial: function() {
       inTutorialMode = false;
     },
+    isEditableOutsideTutorialMode: function() {
+      return isEditable;
+    },
     isEditable: function() {
       return isEditable && !inTutorialMode;
     },

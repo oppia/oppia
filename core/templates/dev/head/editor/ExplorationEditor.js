@@ -647,6 +647,8 @@ oppia.controller('ExplorationEditor', [
     exitOnOverlayClick: true,
     keyboardNavigation: true,
     scrollToElement: true,
+    showBullets: false,
+    showProgress: true,
     showStepNumbers: false,
     skipLabel: 'Exit',
     tooltipClass: 'oppia-tutorial-tooltip',
@@ -660,44 +662,60 @@ oppia.controller('ExplorationEditor', [
     }, {
       element: '#tutorialStateContent',
       intro: (
-        'The <b>Content</b> section is where you type what you want to tell the ' +
-        'learner. <br><br>' +
-        '<em>Example:</em><br>' +
-        '<em>Introduce the problem and ask a question: "Jane bought a new alarm clock with ' +
-        'a 12-hour display. It now shows 12:45 and she wants to leave the ' +
-        'house for lunch in half an hour. <br><br>' +
+        'In the <b>Content</b> section, type what you want to tell the ' +
+        'learner before they respond. Here\'s an example:<br><br>' +
+        '<em>"Jane bought a new alarm clock with a 12-hour display. It now shows ' +
+        '12:45 and she wants to leave the house for lunch in half an hour. <br><br>' +
         'What time should she set the alarm to?"</em>')
     }, {
       element: '#tutorialStateInteraction',
       position: 'top',
       intro: (
-        'The <b>Interaction</b> section allows you to choose how the learner ' +
-        'responds. You can edit details of the interaction by clicking on it. <br><br>' +
-        '<em>Example:</em><br>' +
-        '<em>Select a \'text\' input and set the placeholder text to \'Type the time here\'.</em>')
+        'In the <b>Interaction</b> section, you can choose how the learner ' +
+        'responds. You can edit details of the interaction by clicking on it.<br><br>' +
+        'For example, you could select a \'text\' input (which means the ' +
+        'learner is expected to enter some text), then customize it so that the ' +
+        'placeholder text says <em>\'Type the time here\'</em>.')
     }, {
       element: '#tutorialStateRules',
       position: 'top',
       intro: (
-        'The <b>Rules</b> section allows you to choose what you want to do next ' +
-        'based on the learner\'s response.<br><br>' +
-        '<em>Example:</em><br>' +
-        '<em>If the learner types \'1:15\', send them to a new state that ' +
-        'congratulates them on solving the problem and poses a follow-up question.<br><br>' +
-        'If the learner types \'13:15\', say: ' +
-        '"Remember, there is no \'13\' on a 12-hour clock. Try again?"</em>')
+        'After the learner responds, you can choose how you reply by ' +
+        'creating a <b>rule</b>. You can create different replies to different ' +
+        'responses, just as you would in a face-to-face conversation. For example:<br><br>' +
+        '<ul><li>If the learner types \'1:15\', you might send them to a new state that ' +
+        'congratulates them on solving the problem and poses a follow-up question.</li>' +
+        '<li>If the learner types \'13:15\', you might instead reply: ' +
+        '<em>"Remember, there is no \'13\' on a 12-hour clock. Try again?"</em>' +
+        '</li></ul>')
     }, {
       element: '#tutorialExplorationGraph',
       position: 'left',
       intro: (
         'The <b>exploration graph</b> shows how your states relate to one another.<br><br>' +
-        'You can click on individual states to navigate to them. You can also click ' +
-        'the button in the top-right to expand the graph.')
+        'You can navigate to individual states by clicking on them, and you can also click ' +
+        'the top-right button to expand the graph.')
+    }, {
+      element: '#tutorialPreviewExplorationButton',
+      position: 'left',
+      intro: (
+        'At any time, click the \'Preview\' button to preview an interactive version ' +
+        'of your exploration, where you can interact with it as a student would! This ' +
+        'is very useful for ensuring that the learning experience feels natural and ' +
+        'enjoyable.')
+    }, {
+      element: '#tutorialSaveExplorationButton',
+      position: 'left',
+      intro: (
+        'Finally, when you\'re happy with your changes, click the \'Save\' button. ' +
+        'This stores your changes so that they will appear when a learner next ' +
+        'plays the exploration.')
     }, {
       intro: (
-        'That\'s the end of the tutorial! ' +
-        'You can find additional information and design tips in the \'Help\' menu at the top of this page.<br><br> ' +
-        'Have fun!')
+        'This completes the Oppia editor tutorial. For more information, including ' +
+        'exploration design tips, see the \'Help\' menu at the top of this ' +
+        'page.<br><br> If you run into any issues, feel free to post in the site ' +
+        'forum. Have fun!')
     }]
   };
 
@@ -708,7 +726,7 @@ oppia.controller('ExplorationEditor', [
 
     var _onLeaveTutorial = function() {
       editabilityService.onEndTutorial();
-      $scope.$apply();        
+      $scope.$apply();
       stateEditorTutorialFirstTimeService.markTutorialFinished();
     };
 

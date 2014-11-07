@@ -19,8 +19,19 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-forms = require('./forms.js');
-general = require('./general.js');
+var forms = require('./forms.js');
+var general = require('./general.js');
+
+var exitTutorialIfNecessary = function() {
+  // If the editor tutorial shows up, exit it.
+  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else if (buttons.length !== 0) {
+      throw 'Expected to find at most one \'exit tutorial\' button';
+    }
+  });
+};
 
 var setStateName = function(name) {
   var nameElement = element(by.css('.oppia-state-name-container'))
@@ -309,6 +320,8 @@ var saveChanges = function(commitMessage) {
     general.waitForSystem();
   });
 };
+
+exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 
 exports.setStateName = setStateName;
 exports.editContent = editContent;
