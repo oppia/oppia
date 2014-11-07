@@ -725,12 +725,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   cursor: pointer;
 }
 
-.oppia-editor-pencil {
+.oppia-editor-edit-icon {
   font-size: 16px;
   opacity: 0.4;
 }
 
-.oppia-editable-section:hover .oppia-editor-pencil {
+.oppia-editable-section:hover .oppia-editor-edit-icon {
   opacity: 1.0;
 }
 
