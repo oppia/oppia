@@ -100,9 +100,9 @@ oppia.directive('checkboxGroup', function() {
 
 oppia.controller('Gallery', [
     '$scope', '$http', '$rootScope', '$window', 'createExplorationButtonService',
-    'oppiaDatetimeFormatter', 'oppiaDebouncer',
+    'oppiaDatetimeFormatter', 'oppiaDebouncer', 'urlService',
     function($scope, $http, $rootScope, $window, createExplorationButtonService,
-             oppiaDatetimeFormatter, oppiaDebouncer) {
+             oppiaDatetimeFormatter, oppiaDebouncer, urlService) {
   $scope.galleryDataUrl = '/galleryhandler/data';
   $scope.currentUserIsModerator = false;
 
@@ -180,6 +180,13 @@ oppia.controller('Gallery', [
     }
 
     $scope.refreshGalleryData(data);
+
+    if (data.username) {
+      var urlParams = urlService.getUrlParams();
+      if (urlParams.mode === 'create') {
+        $scope.showCreateExplorationModal($scope.getCategoryList());
+      }  
+    }    
   });
 
   $scope.gallerySidebarIsActive = false;
