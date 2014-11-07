@@ -142,8 +142,9 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  it('should handle discarding changes, navigation, deleting states ect.', 
-      function() {
+  it('should handle discarding changes, navigation, deleting states, ' + 
+      'changing the first state, displaying content, deleting rules and ' +
+      'switching to preview mode', function() {
     users.createUser('user5@example.com', 'user5');
     users.login('user5@example.com');
 
@@ -167,9 +168,6 @@ describe('Full exploration editor', function() {
       // TODO (Jacob) remove the '' when issue 443 is fixed
       editor.expectAvailableFirstStatesToBe(['', 'first', 'second']);
       editor.setFirstState('second');
-      // TODO (Jacob) remove these two lines when issue 441 is fixed
-      editor.createState('temp');
-      editor.deleteState('temp');
       editor.moveToState('first');
       editor.deleteState('first');
       editor.expectCurrentStateToBe('second');
@@ -217,7 +215,7 @@ describe('Full exploration editor', function() {
       });
       player.expectInteractionToMatch('NumericInput');
       player.submitAnswer('NumericInput', 6);
-      // This check the previously-deleted rule no longer applies.
+      // This checks the previously-deleted rule no longer applies.
       player.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
       player.expectExplorationToBeOver();
       editor.exitPreviewMode();

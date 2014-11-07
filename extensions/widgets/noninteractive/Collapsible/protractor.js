@@ -21,17 +21,17 @@
 
 var forms = require('../../../../core/tests/protractor_utils/forms.js');
 
-var customizeWidget = function(modal, heading, callbackFunction) {
+var customizeWidget = function(modal, heading, contentInstructions) {
   forms.UnicodeEditor(
     modal.element(by.tagName('schema-based-unicode-editor'))
   ).setText(heading);
   var richTextEditor = forms.RichTextEditor(
-      modal.element(by.tagName('schema-based-html-editor')));
+    modal.element(by.tagName('schema-based-html-editor')));
   richTextEditor.clear();
-  callbackFunction(richTextEditor);
+  contentInstructions(richTextEditor);
 };
 
-var expectWidgetDetailsToMatch = function(elem, heading, callbackFunction) {
+var expectWidgetDetailsToMatch = function(elem, heading, contentInstructions) {
   expect(
     elem.element(by.css('.protractor-test-collapsible-heading')).getText()
   ).toMatch(heading);
@@ -39,7 +39,7 @@ var expectWidgetDetailsToMatch = function(elem, heading, callbackFunction) {
   element(by.css('.glyphicon-plus-sign')).click();
   forms.expectRichText(
     elem.element(by.css('.panel-body')).element(by.xpath('./div'))
-  ).toMatch(callbackFunction);
+  ).toMatch(contentInstructions);
 };
 
 exports.customizeWidget = customizeWidget;

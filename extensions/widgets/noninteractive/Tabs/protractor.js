@@ -21,13 +21,15 @@
 
 var forms = require('../../../../core/tests/protractor_utils/forms.js');
 
-// tabArray should be an array of dictionaries with keys 'title' and 'content'
+// tabArray should be an array of dictionaries with keys:
+//   'title': a string
+//   'content': a function that gives rich text editing instructions
 var customizeWidget = function(modal, tabArray) {
   var listEditor = forms.ListEditor(modal);
 
   listEditor.setLength(tabArray.length);
   for (var i = 0; i < tabArray.length; i++) {
-    dictionaryEditor = listEditor.editItem(i, 'Dictionary');
+    var dictionaryEditor = listEditor.editItem(i, 'Dictionary');
     dictionaryEditor.editEntry(0, 'UnicodeString').setText(tabArray[i].title);
     var richTextEditor = dictionaryEditor.editEntry(1, 'RichText');
     richTextEditor.clear();

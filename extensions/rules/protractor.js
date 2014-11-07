@@ -13,13 +13,13 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for interacting with rule during protractor
+ * @fileoverview Utilities for interacting with rules during protractor
  * tests.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var descriptions = {
+var DESCRIPTIONS = {
   CheckedProof: {
     Correct: 'is correct',
     NotCorrect: 'is not correct',
@@ -54,7 +54,7 @@ var descriptions = {
       'into account',
     StartsWith: 'starts with {{x|NormalizedString}}',
     Contains: 'contains {{x|NormalizedString}}',
-    FuzzyEquals: 'is equal to {{x|NormalizedString}}, misspelled by one ' + 
+    FuzzyEquals: 'is equal to {{x|NormalizedString}}, misspelled by at most one ' + 
       'character'
   },
   Real: {
@@ -87,14 +87,14 @@ var descriptions = {
 };
 
 var getDescription = function(objectName, ruleName) {
-  if (descriptions.hasOwnProperty(objectName)) {
-    if (descriptions[objectName].hasOwnProperty(ruleName)) {
-      return descriptions[objectName][ruleName];
+  if (DESCRIPTIONS.hasOwnProperty(objectName)) {
+    if (DESCRIPTIONS[objectName].hasOwnProperty(ruleName)) {
+      return DESCRIPTIONS[objectName][ruleName];
     } else {
       throw Error('Unknown rule: ' + ruleName);
     }
   } else {
-    throw Error('Rule handler was asked for unknown object: ' + objectName);
+    throw Error('Could not find rule for object: ' + objectName);
   }
 };
 

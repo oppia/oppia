@@ -34,8 +34,8 @@ var expectExplorationNameToBe = function(name) {
 };
 
 // This verifies the question just asked, including formatting and 
-// non-interactive widgets. To do so the richTextInstructions will be sent a 
-// handler (as given in forms.RichTextChecker) to which calls such as
+// non-interactive widgets. To do so the richTextInstructions function will be
+//  sent a handler (as given in forms.RichTextChecker) to which calls such as
 //   handler.readItalicText('slanted');
 // can then be sent.
 var expectContentToMatch = function(richTextInstructions) {

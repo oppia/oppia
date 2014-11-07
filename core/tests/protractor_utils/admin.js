@@ -23,17 +23,17 @@ var general = require('./general.js');
 var forms = require('./forms.js');
 
 // 'propertyName' is the name of the property as given in the left-hand column.
-// 'objectType' is the type of the property, e.g. 'Unicode' or 'List'
-// 'callbackFunction' is sent an editor for the objectType which it can then
-//   act on, for example by adding elements to a list.
-var editConfigProperty = function(propertyName, objectType, callbackFunction) {
+// 'objectType' is the type of the property, e.g. 'Unicode' or 'List'.
+// 'editingInstructions' is  a function that is sent an editor for the 
+// objectType which it can then act on, for example by adding elements to a list.
+var editConfigProperty = function(propertyName, objectType, editingInstructions) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(
       by.repeater('(configPropertyId, configPropertyData) in configProperties')
     ).map(function(configProperty) {
     return configProperty.element(by.tagName('em')).getText().then(function(title) {
       if (title.match(propertyName)) {
-        callbackFunction(forms.getEditor(objectType)(configProperty));
+        editingInstructions(forms.getEditor(objectType)(configProperty));
         element(by.buttonText('Save')).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the saving to complete.

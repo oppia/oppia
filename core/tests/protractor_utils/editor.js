@@ -40,8 +40,9 @@ var expectCurrentStateToBe = function(name) {
 
 // CONTENT
 
-// 'richTextInstructions' is sent a RichTextEditor which it can then use to alter
-//   the state content, for example by calling .appendBoldText(...).
+// 'richTextInstructions' is a function that is sent a RichTextEditor which it 
+// can then use to alter the state content, for example by calling 
+// .appendBoldText(...).
 var setContent = function(richTextInstructions) {
   element(by.css('.protractor-test-edit-content')).click();
   var richTextEditor = forms.RichTextEditor(
@@ -52,10 +53,10 @@ var setContent = function(richTextInstructions) {
     element(by.buttonText('Save Content')).click();
 };
 
-// This receives a richTextInstructions used to verify the display of the state's
-// content visible when the content editor is closed. The richTextInstructions will
-// be supplied with a handler of the form forms.RichTextChecker and can then
-// perform checks such as
+// This receives a function richTextInstructions used to verify the display of
+// the state's content visible when the content editor is closed. The 
+// richTextInstructions will be supplied with a handler of the form 
+// forms.RichTextChecker and can then perform checks such as
 //   handler.readBoldText('bold')
 //   handler.readWidget('Collapsible', 'outer', 'inner')
 // These would verify that the content consists of the word 'bold' in bold 
@@ -176,12 +177,11 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
 };
 
 // This clicks the "add new rule" button and then selects the rule type and
-// enters its parameters.
+// enters its parameters, and closes the rule editor.
 var addRule = function(widgetName, ruleName, parameterValues) {
   element(by.css('.oppia-add-rule-button')).click();
   var ruleElement = element(by.css('.protractor-test-temporary-rule'));
   _selectRule(ruleElement, widgetName, ruleName, parameterValues);
-  // TODO! remove
   ruleElement.element(by.css('.protractor-test-save-rule')).click();
 };
 

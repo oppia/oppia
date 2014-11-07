@@ -19,28 +19,29 @@
 
 var forms = require('../../../../core/tests/protractor_utils/forms.js');
 
-// The callbackFunctions should be an array of functions, one for each option,
+// The members of richTextInstructionsArray are functions, one for each option,
 // which will each be passed a 'handler' that they can use to edit the
 // rich-text area of the option, for example by
 //   handler.appendUnderlineText('emphasised');
-var customizeInteraction = function(elem, callbackFunctions) {
-  forms.ListEditor(elem).setLength(callbackFunctions.length);
-  for (var i = 0; i < callbackFunctions.length; i++) {
+var customizeInteraction = function(elem, richTextInstructionsArray) {
+  forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
+  for (var i = 0; i < richTextInstructionsArray.length; i++) {
     var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
     richTextEditor.clear();
-    callbackFunctions[i](richTextEditor);
+    richTextInstructionsArray[i](richTextEditor);
   }
 };
 
-// These callbackFunctions each describe how to check one of the options.
-var expectInteractionDetailsToMatch = function(callbackFunctions) {
+// These members of richTextInstructionsArray each describe how to check one of
+// the options.
+var expectInteractionDetailsToMatch = function(richTextInstructionsArray) {
   element.all(by.repeater('choice in choices track by $index')).
       then(function(optionElements) {
-    expect(optionElements.length).toEqual(callbackFunctions.length);
+    expect(optionElements.length).toEqual(richTextInstructionsArray.length);
     for (var i = 0; i < optionElements.length; i++) {
       forms.expectRichText(
         optionElements[i].element(by.xpath('./button/span'))
-      ).toMatch(callbackFunctions[i]);
+      ).toMatch(richTextInstructionsArray[i]);
     }
   });
 };

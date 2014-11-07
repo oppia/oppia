@@ -27,6 +27,7 @@ var general = require('./general.js');
 var createExploration = function(name, category) {
   browser.get('/gallery');
   element(by.css('.protractor-test-create-exploration')).click();
+  protractor.getInstance().waitForAngular();
   element(by.model('newExplorationTitle')).sendKeys(name);
   forms.AutocompleteDropdownEditor(element(by.tagName('select2-dropdown'))).
     setText(category);

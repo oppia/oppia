@@ -46,7 +46,7 @@ var ListEditor = function(elem) {
   // which can be used to make changes to the newly-added item (for example
   // by calling setValue() on it). Clients should ensure the given objectType
   // corresponds to the type of elements in the list.
-  // If not specified, this function returns nothing.
+  // If objectType is not specified, this function returns nothing.
   var addItem = function(objectType) {
     var listLength = _getLength();
     elem.element(by.css('.protractor-test-add-list-entry')).click();
@@ -223,8 +223,8 @@ var AutocompleteDropdownEditor = function(elem) {
 //   <b>bold</b>
 //   <oppia-nointeractive-math> ... </oppia-noninteractive-math>
 // <div>
-// The richTextInstructions will be supplied with a 'handler' argument which it
-// should then use to read through the rich-text area using the functions
+// The richTextInstructions function will be supplied with a 'handler' argument
+// which it should then use to read through the rich-text area using the functions
 // supplied by the RichTextChecker below. In the example above richTextInstructions
 // should consist of:
 //   handler.readPlainText('plain');
@@ -340,15 +340,16 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   }
 };
 
-// This converts a string into a function that represents rich text, and so can
+// This converts a string into a function that represents rich text, which can then
 // be sent to either editRichText() or expectRichText(). The string should not 
 // contain any html formatting. In the first case the function created will 
 // write the given text into the rich text editor (as plain text), and in
 // the second it will verify that the html created by a rich text editor
-// conists of the given text (unformatted).
-//   This is necessary because there is no abstract representation of a 'rich
-// text object' since we are more interested in the process of interacting with
-// the page than in the information thereby conveyed.
+// consists of the given text (without any formatting).
+//   This is necessary because the Protractor tests do not have an abstract 
+// representation of a 'rich text object'. This is because we are more 
+// interested in the process of interacting with the page than in the 
+// information thereby conveyed.
 var toRichText = function(text) {
   // The 'handler' should be either a RichTextEditor or RichTextChecker
   return function(handler) {
