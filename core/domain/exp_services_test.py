@@ -1760,10 +1760,7 @@ class SearchTests(ExplorationServicesUnitTests):
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
-            return [{'id': _id} for _id in doc_ids], expected_result_cursor
-
-        explorations = [self.save_new_default_exploration(_id, self.OWNER_ID)
-                        for _id in doc_ids]
+            return doc_ids, expected_result_cursor
 
         with self.swap(search_services, 'search', mock_search):
             result, cursor = exp_services.search_explorations(
@@ -1773,18 +1770,8 @@ class SearchTests(ExplorationServicesUnitTests):
                 cursor=expected_cursor,
             )
 
-        def check_exploration_list_equality(l1, l2):
-            if len(l1) != len(l2):
-                return False
-
-            for i in xrange(len(l1)):
-                if not l1[i].is_equal_to(l2[i]):
-                    return False
-
-            return True
-
         self.assertEqual(cursor, expected_result_cursor)
-        self.assertTrue(check_exploration_list_equality(result, explorations))
+        self.assertEqual(result, doc_ids)
 
 
 class ExplorationChangedEventsTests(ExplorationServicesUnitTests):

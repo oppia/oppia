@@ -392,7 +392,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   height: 100%;
   /* This is the same as the min-height in .oppia-gallery-menu. */
   min-height: 600px;
-  padding-left: 20px;
 }
 
 .oppia-gallery-tile {
@@ -726,12 +725,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   cursor: pointer;
 }
 
-.oppia-editor-pencil {
+.oppia-editor-edit-icon {
   font-size: 16px;
   opacity: 0.4;
 }
 
-.oppia-editable-section:hover .oppia-editor-pencil {
+.oppia-editable-section:hover .oppia-editor-edit-icon {
   opacity: 1.0;
 }
 

@@ -118,7 +118,7 @@ def get_exploration_summary_by_id(exploration_id):
 
 def get_multiple_explorations_by_id(exp_ids, strict=True):
     """Returns a dict of domain objects representing explorations with the given
-    ids as keys..
+    ids as keys.
     """
     exp_ids = set(exp_ids)
     result = {}
@@ -148,11 +148,14 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         db_results_dict[eid] = exploration
 
     if strict and not_found:
-        raise ValueError('Couldn\'t find explorations with the following ids:\n%s'
-                        % '\n'.join(not_found))
+        raise ValueError(
+            'Couldn\'t find explorations with the following ids:\n%s'
+            % '\n'.join(not_found))
 
-    cache_update = {eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
-                    if db_results_dict[eid] is not None}
+    cache_update = {
+        eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
+        if db_results_dict[eid] is not None
+    }
 
     if cache_update:
         memcache_services.set_multi(cache_update)
@@ -287,9 +290,19 @@ def _get_exploration_summary_dicts_from_models(exp_summary_models):
     return result
 
 
+def get_exploration_summaries_matching_query(query_string):
+    """Returns a dict with all exploration summary domain objects matching the
+    given search query string."""
+    exp_ids, unused_cursor = search_explorations(query_string)
+    summary_models = [
+        model for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
+        if model is not None]
+    return _get_exploration_summary_dicts_from_models(summary_models)
+
+
 def get_non_private_exploration_summaries():
     """Returns a dict with all non-private exploration summary domain objects,
-    keyed by their id.""" 
+    keyed by their id."""
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_non_private())
 
@@ -303,7 +316,7 @@ def get_all_exploration_summaries():
 
 def get_private_at_least_viewable_exploration_summaries(user_id):
     """Returns a dict with all exploration summary domain objects that are
-    at least viewable by given user. The dict is keyed by exploration id.""" 
+    at least viewable by given user. The dict is keyed by exploration id."""
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_private_at_least_viewable(
             user_id=user_id))
@@ -311,7 +324,7 @@ def get_private_at_least_viewable_exploration_summaries(user_id):
 
 def get_at_least_editable_exploration_summaries(user_id):
     """Returns a dict with all exploration summary domain objects that are
-    at least editable by given user. The dict is keyed by exploration id.""" 
+    at least editable by given user. The dict is keyed by exploration id."""
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id))
@@ -1142,28 +1155,25 @@ def search_explorations(
 
     args:
       - query_string: the query string to search for.
-      - sort: a string indicating how to sort results.
-        This should be a string of space separated values.
-        Each value should start with a '+' or a '-' character indicating whether
-        to sort in ascending or descending
-        order respectively. This character should be followed by a field name to
-        sort on. When this is None, results are based on 'rank'.
-        See _exp_to_search_dict to see how rank is determined
+      - sort: a string indicating how to sort results. This should be a string
+          of space separated values. Each value should start with a '+' or a
+          '-' character indicating whether to sort in ascending or descending
+          order respectively. This character should be followed by a field name
+          to sort on. When this is None, results are based on 'rank'. See
+          _exp_to_search_dict to see how rank is determined.
       - limit: the maximum number of results to return.
       - cursor: A cursor, used to get the next page of results.
-        If there are more documents that match the query than
-        'limit', this function will return a cursor to get the next page.
+          If there are more documents that match the query than 'limit', this
+          function will return a cursor to get the next page.
 
     returns: a tuple:
-      - a list of Exploration domain objects that match the query.
-      - a cursor if there are more matching exploration to fetch, None otherwise.
-        If a cursor is returned, it will be a web-safe string that can be used in URLs.
+      - a list of exploration ids that match the query.
+      - a cursor if there are more matching explorations to fetch, None
+          otherwise. If a cursor is returned, it will be a web-safe string that
+          can be used in URLs.
     """
-    results, cursor = search_services.search(query, SEARCH_INDEX_EXPLORATIONS,
-                                             cursor, limit, sort, ids_only=True)
-    ids = [result.get('id') for result in results]
-    explorations = get_multiple_explorations_by_id(ids, strict=True)
-    return [explorations[_id] for _id in ids ], cursor
+    return search_services.search(
+        query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
 
 # Temporary event handlers
 
