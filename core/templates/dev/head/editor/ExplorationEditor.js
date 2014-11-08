@@ -740,13 +740,14 @@ oppia.controller('ExplorationEditor', [
   $scope.startTutorial = function(firstTime) {
     if ($scope.isInPreviewMode) {
       $scope.exitPreviewMode();
-      $timeout(function() {
-        $scope._actuallyStartTutorial();
-      });
     } else {
       routerService.navigateToMainTab();
-      $scope._actuallyStartTutorial();
     }
+
+    // The $timeout wrapper is needed for all components on the page to load,
+    // otherwise elements within ng-if's are not guaranteed to be present on
+    // the page.
+    $timeout($scope._actuallyStartTutorial);
   };
 
   $scope.$on('openEditorTutorial', $scope.startTutorial);
