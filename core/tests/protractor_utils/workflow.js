@@ -35,9 +35,11 @@ var createExploration = function(name, category) {
 
   // We now want to wait for the editor to fully load.
   protractor.getInstance().waitForAngular();
+
+  editor.exitTutorialIfNecessary();
 };
 
-// This will only work if all changes have been saved and there are no 
+// This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
   element(by.css('.protractor-test-publish-exploration')).click();
@@ -100,7 +102,7 @@ var _getExplorationRoles = function(roleName) {
           itemName + ' in explorationRightsService.' + listName + ' track by $index'
         )).map(function(elem) {
       return elem.getText();
-    }); 
+    });
   });
   return result;
 };

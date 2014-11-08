@@ -21,10 +21,10 @@
 
 // Global utility methods.
 oppia.controller('Base', [
-    '$scope', '$http', '$rootScope', '$window', '$log', 'warningsData',
-    'activeInputData', 'messengerService',
-    function($scope, $http, $rootScope, $window, $log, warningsData,
-             activeInputData, messengerService) {
+    '$scope', '$http', '$rootScope', '$window', '$log',
+    'warningsData', 'activeInputData', 'messengerService',
+    function($scope, $http, $rootScope, $window, $log,
+             warningsData, activeInputData, messengerService) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
@@ -91,12 +91,5 @@ oppia.controller('Base', [
 
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
-  };
-
-  // This method is here because the trigger for the tutorial is in the site
-  // navbar. It broadcasts an event to tell the exploration editor to open the
-  // editor tutorial.
-  $scope.openEditorTutorial = function() {
-    $scope.$broadcast('openEditorTutorial');
   };
 }]);

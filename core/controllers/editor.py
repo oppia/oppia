@@ -313,6 +313,9 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
+            'show_state_editor_tutorial_on_load': (
+                self.user_id and not
+                self.user_has_started_state_editor_tutorial),
             'ALL_INTERACTIVE_WIDGETS': {
                 widget.id: widget.to_dict()
                 for widget in widget_registry.Registry.get_widgets_of_type(
@@ -766,3 +769,11 @@ class InitExplorationHandler(EditorHandler):
             'init_html': init_html,
             'params': init_params,
         })
+
+
+class StartedTutorialEventHandler(EditorHandler):
+    """Records that this user has started the state editor tutorial."""
+
+    def post(self, exploration_id):
+        """Handles GET requests."""
+        user_services.record_user_started_state_editor_tutorial(self.user_id)

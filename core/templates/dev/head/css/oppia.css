@@ -985,7 +985,14 @@ oppia-parameter {
 }
 
 .oppia-tutorial-tooltip {
-  min-width: 300px !important;
+  min-width: 400px !important;
+}
+
+.oppia-post-tutorial-popover {
+   display: block;
+   left: -65px;
+   top: 37px;
+   width: 200px;
 }
 
 /* Hide the search icon in the rule destination dropdown. */

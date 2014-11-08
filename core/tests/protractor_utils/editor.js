@@ -24,6 +24,17 @@ var general = require('./general.js');
 var widgets = require('../../../extensions/widgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
+var exitTutorialIfNecessary = function() {
+  // If the editor tutorial shows up, exit it.
+  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else if (buttons.length !== 0) {
+      throw 'Expected to find at most one \'exit tutorial\' button';
+    }
+  });
+};
+
 var setStateName = function(name) {
   var nameElement = element(by.css('.oppia-state-name-container'))
   nameElement.click();
@@ -376,6 +387,7 @@ var exitPreviewMode = function() {
   element(by.css('.protractor-test-exit-preview-mode')).click();
 };
 
+exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 
 exports.setStateName = setStateName;
 exports.expectCurrentStateToBe = expectCurrentStateToBe;

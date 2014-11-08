@@ -251,7 +251,7 @@ UI_SORTABLE_ZIP_URL = (
 UI_SORTABLE_ZIP_ROOT_NAME = 'ui-sortable-src%s' % UI_SORTABLE_REV
 UI_SORTABLE_TARGET_ROOT_NAME = 'ui-sortable-%s' % UI_SORTABLE_REV
 
-INTRO_JS_REV = '0.9.0'
+INTRO_JS_REV = '1.0.0'
 INTRO_JS_ZIP_URL = (
     'https://github.com/usablica/intro.js/archive/v%s.zip' % INTRO_JS_REV)
 INTRO_JS_ZIP_ROOT_NAME = 'intro.js-%s' % INTRO_JS_REV

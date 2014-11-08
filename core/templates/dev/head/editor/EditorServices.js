@@ -140,6 +140,9 @@ oppia.factory('editabilityService', [function() {
     onEndTutorial: function() {
       inTutorialMode = false;
     },
+    isEditableOutsideTutorialMode: function() {
+      return isEditable;
+    },
     isEditable: function() {
       return isEditable && !inTutorialMode;
     },
@@ -865,6 +868,36 @@ oppia.factory('graphDataService', [
     },
     getGraphData: function() {
       return angular.copy(_graphData);
+    }
+  };
+}]);
+
+
+// Service for the state editor tutorial.
+oppia.factory('stateEditorTutorialFirstTimeService', ['$http', '$rootScope', function($http, $rootScope) {
+  // Whether this is the first time the tutorial has been seen by this user.
+  var _currentlyInFirstVisit = true;
+
+  return {
+    // After the first call to it in a client session, this does nothing.
+    init: function(firstTime, explorationId) {
+      if (!firstTime || !_currentlyInFirstVisit) {
+        _currentlyInFirstVisit = false;
+      }
+
+      if (_currentlyInFirstVisit) {
+        $rootScope.$broadcast('openEditorTutorial');
+        $http.post('/createhandler/started_tutorial_event/' + explorationId).error(function() {
+          console.error('Warning: could not record tutorial start event.');
+        });
+      }
+    },
+    markTutorialFinished: function() {
+      if (_currentlyInFirstVisit) {
+        $rootScope.$broadcast('openPostTutorialHelpPopover');
+      }
+
+      _currentlyInFirstVisit = false;
     }
   };
 }]);

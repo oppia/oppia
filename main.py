@@ -272,6 +272,9 @@ urls = [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
+    get_redirect_route(
+        r'/createhandler/started_tutorial_event/<exploration_id>',
+        editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
     # Temporary handlers to support preview mode.
     # TODO(sll): Remove this once we have support for client-side expressions.
     get_redirect_route(
