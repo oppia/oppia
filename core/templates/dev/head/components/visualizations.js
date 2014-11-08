@@ -255,8 +255,8 @@ oppia.factory('stateGraphArranger', [
 
 
 oppia.directive('stateGraphViz', [
-    '$filter', 'stateGraphArranger', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
-    function($filter, stateGraphArranger, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
+    '$filter', '$timeout', 'stateGraphArranger', 'MAX_NODES_PER_ROW', 'MAX_NODE_LABEL_LENGTH',
+    function($filter, $timeout, stateGraphArranger, MAX_NODES_PER_ROW, MAX_NODE_LABEL_LENGTH) {
   return {
     restrict: 'A',
     scope: {
@@ -301,10 +301,16 @@ oppia.directive('stateGraphViz', [
     controller: ['$scope', '$element', function($scope, $element) {
       var _redrawGraph = function() {
         if ($scope.graphData()) {
+          $scope.graphLoaded = false;
           $scope.drawGraph(
             $scope.graphData().nodes, $scope.graphData().links,
             $scope.graphData().initStateId, $scope.graphData().finalStateId
           );
+
+          // Wait for the graph to finish loading before showing it again.
+          $timeout(function() {
+            $scope.graphLoaded = true;
+          });
         }
       };
 
@@ -378,8 +384,6 @@ oppia.directive('stateGraphViz', [
         }
         $scope.GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
 
-        var dimensions = _getElementDimensions();
-
         // Change the position values in nodeData to use pixels.
         for (var nodeId in nodeData) {
           for (var i = 0; i < HORIZONTAL_NODE_PROPERTIES.length; i++) {
@@ -400,73 +404,6 @@ oppia.directive('stateGraphViz', [
         $scope.VIEWPORT_Y = -Math.max(1000, $scope.GRAPH_HEIGHT * 2);
 
         var graphBoundaries = _getGraphBoundaries(nodeData);
-
-        // The translation applied when the graph is first loaded.
-        var originalTranslationAmounts = [0, 0];
-        $scope.overallTransformStr = 'translate(0,0)';
-        $scope.innerTransformStr = 'translate(0,0)';
-        if ($scope.centerAtCurrentState) {
-          // Center the graph at the node representing the current state.
-          originalTranslationAmounts[0] = (
-            dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
-            nodeData[$scope.currentStateId()].width / 2);
-          originalTranslationAmounts[1] = (
-            dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
-            nodeData[$scope.currentStateId()].height / 2);
-
-          if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
-            originalTranslationAmounts[0] = (
-              dimensions.w / 2 - (graphBoundaries.right + graphBoundaries.left) / 2);
-          } else {
-            originalTranslationAmounts[0] = _ensureBetween(
-              originalTranslationAmounts[0],
-              dimensions.w - graphBoundaries.right, - graphBoundaries.left);
-          }
-
-          if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
-            originalTranslationAmounts[1] = (
-              dimensions.h / 2 - (graphBoundaries.bottom + graphBoundaries.top) / 2);
-          } else {
-            originalTranslationAmounts[1] = _ensureBetween(
-              originalTranslationAmounts[1],
-              dimensions.h - graphBoundaries.bottom, - graphBoundaries.top);
-          }
-
-          $scope.overallTransformStr = 'translate(' + originalTranslationAmounts + ')';
-          $scope.innerTransformStr = 'translate(0,0)';
-        }
-
-        if ($scope.allowPanning) {
-          // Without the timeout, $element.find fails to find the required rect in the
-          // state graph modal dialog.
-          setTimeout(function() {
-            d3.select($element.find('rect.pannable-rect')[0]).call(
-                d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
-              if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
-                d3.event.translate[0] = 0;
-              } else {
-                d3.event.translate[0] = _ensureBetween(
-                  d3.event.translate[0],
-                  dimensions.w - graphBoundaries.right - originalTranslationAmounts[0],
-                  - graphBoundaries.left - originalTranslationAmounts[0]);
-              }
-
-              if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
-                d3.event.translate[1] = 0;
-              } else {
-                d3.event.translate[1] = _ensureBetween(
-                  d3.event.translate[1],
-                  dimensions.h - graphBoundaries.bottom - originalTranslationAmounts[1],
-                  - graphBoundaries.top - originalTranslationAmounts[1]);
-              }
-
-              // We need a separate layer here so that the translation does not
-              // influence the panning event receivers.
-              $scope.innerTransformStr = 'translate(' + d3.event.translate + ')';
-              $scope.$apply();
-            }));
-          });
-        }
 
         $scope.augmentedLinks = links.map(function(link) {
           return {
@@ -626,6 +563,81 @@ oppia.directive('stateGraphViz', [
 
           nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId != finalStateId);
           $scope.nodeList.push(nodeData[nodeId]);
+        }
+
+
+        // The translation applied when the graph is first loaded.
+        var originalTranslationAmounts = [0, 0];
+        $scope.overallTransformStr = 'translate(0,0)';
+        $scope.innerTransformStr = 'translate(0,0)';
+
+        if ($scope.allowPanning) {
+          // Without the timeout, $element.find fails to find the required rect in the
+          // state graph modal dialog.
+          setTimeout(function() {
+            var dimensions = _getElementDimensions();
+
+            d3.select($element.find('rect.pannable-rect')[0]).call(
+                d3.behavior.zoom().scaleExtent([1, 1]).on('zoom', function() {
+              if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
+                d3.event.translate[0] = 0;
+              } else {
+                d3.event.translate[0] = _ensureBetween(
+                  d3.event.translate[0],
+                  dimensions.w - graphBoundaries.right - originalTranslationAmounts[0],
+                  - graphBoundaries.left - originalTranslationAmounts[0]);
+              }
+
+              if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
+                d3.event.translate[1] = 0;
+              } else {
+                d3.event.translate[1] = _ensureBetween(
+                  d3.event.translate[1],
+                  dimensions.h - graphBoundaries.bottom - originalTranslationAmounts[1],
+                  - graphBoundaries.top - originalTranslationAmounts[1]);
+              }
+
+              // We need a separate layer here so that the translation does not
+              // influence the panning event receivers.
+              $scope.innerTransformStr = 'translate(' + d3.event.translate + ')';
+              $scope.$apply();
+            }));
+          });
+        }
+
+        if ($scope.centerAtCurrentState) {
+          setTimeout(function() {
+            var dimensions = _getElementDimensions();
+
+            // Center the graph at the node representing the current state.
+            originalTranslationAmounts[0] = (
+              dimensions.w / 2 - nodeData[$scope.currentStateId()].x0 -
+              nodeData[$scope.currentStateId()].width / 2);
+            originalTranslationAmounts[1] = (
+              dimensions.h / 2 - nodeData[$scope.currentStateId()].y0 -
+              nodeData[$scope.currentStateId()].height / 2);
+
+            if (graphBoundaries.right - graphBoundaries.left < dimensions.w) {
+              originalTranslationAmounts[0] = (
+                dimensions.w / 2 - (graphBoundaries.right + graphBoundaries.left) / 2);
+            } else {
+              originalTranslationAmounts[0] = _ensureBetween(
+                originalTranslationAmounts[0],
+                dimensions.w - graphBoundaries.right, - graphBoundaries.left);
+            }
+
+            if (graphBoundaries.bottom - graphBoundaries.top < dimensions.h) {
+              originalTranslationAmounts[1] = (
+                dimensions.h / 2 - (graphBoundaries.bottom + graphBoundaries.top) / 2);
+            } else {
+              originalTranslationAmounts[1] = _ensureBetween(
+                originalTranslationAmounts[1],
+                dimensions.h - graphBoundaries.bottom, - graphBoundaries.top);
+            }
+
+            $scope.overallTransformStr = 'translate(' + originalTranslationAmounts + ')';
+            $scope.$apply();
+          });
         }
       };
     }]
