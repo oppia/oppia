@@ -65,8 +65,12 @@ class GalleryPage(base.BaseHandler):
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             'noninteractive_widget_html': jinja2.utils.Markup(
                 noninteractive_widget_html),
-            'gallery_redirect_url': current_user_services.create_login_url(
-                feconf.GALLERY_REDIRECT_URL),
+            'gallery_login_redirect_url': (
+                current_user_services.create_login_url(
+                    feconf.GALLERY_LOGIN_REDIRECT_URL)),
+            'gallery_register_redirect_url': utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL,
+                'return_url', feconf.GALLERY_CREATE_MODE_URL),
         })
         self.render_template('galleries/gallery.html')
 
@@ -164,7 +168,7 @@ class GalleryHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
-class GalleryRedirector(base.BaseHandler):
+class GalleryLoginRedirector(base.BaseHandler):
     """Redirects a logged-in user to the editor prerequisites page or the
     gallery, according as to whether they are logged in or not.
     """
@@ -175,9 +179,9 @@ class GalleryRedirector(base.BaseHandler):
         if not user_services.has_user_registered_as_editor(self.user_id):
             redirect_url = utils.set_url_query_parameter(
                 feconf.EDITOR_PREREQUISITES_URL,
-                'return_url', feconf.GALLERY_URL)
+                'return_url', feconf.GALLERY_CREATE_MODE_URL)
         else:
-            redirect_url = feconf.GALLERY_URL
+            redirect_url = feconf.GALLERY_CREATE_MODE_URL
 
         self.redirect(redirect_url)
 

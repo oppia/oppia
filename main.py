@@ -183,8 +183,8 @@ urls = [
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_REDIRECT_URL, galleries.GalleryRedirector,
-        'gallery_redirect'),
+        r'%s' % feconf.GALLERY_LOGIN_REDIRECT_URL,
+        galleries.GalleryLoginRedirector, 'gallery_redirect'),
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
