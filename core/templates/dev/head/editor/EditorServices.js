@@ -384,8 +384,7 @@ oppia.factory('explorationPropertyService', [
         throw 'Exploration property name cannot be null.';
       }
 
-      $log.info('Initializing exploration property: ' + this.propertyName);
-      $log.info(value);
+      $log.info('Initializing exploration ' + this.propertyName + ':', value);
 
       // The current value of the property (which may not have been saved to the
       // frontend yet). In general, this will be bound directly to the UI.
@@ -698,8 +697,7 @@ oppia.factory('statePropertyService', [
         throw 'State property name cannot be null.';
       }
 
-      $log.info('Initializing state property: ' + this.propertyName);
-      $log.info(value);
+      $log.info('Initializing state ' + this.propertyName + ':', value);
 
       // A reference to the state dict that should be updated.
       this.statesAccessorDict = statesAccessorDict;
