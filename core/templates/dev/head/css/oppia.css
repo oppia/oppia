@@ -1021,3 +1021,8 @@ oppia-parameter {
 .oppia-large-modal-window .modal-body {
   height: 60vh;
 }
+
+.oppia-disabled-link {
+  pointer-events: none;
+  opacity: 0.6;
+}
