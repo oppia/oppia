@@ -106,11 +106,6 @@ oppia.controller('Gallery', [
   $scope.galleryDataUrl = '/galleryhandler/data';
   $scope.currentUserIsModerator = false;
 
-  $scope.selectedStatuses = {
-    'public': true,
-    'private': false
-  };
-
   $scope.getCategoryList = function() {
     return Object.keys($scope.selectedCategories);
   };
@@ -157,10 +152,9 @@ oppia.controller('Gallery', [
   $scope.refreshGalleryData = function(data) {
     $scope.featuredExplorations = data.featured;
     $scope.publicExplorations = data['public'];
-    $scope.privateExplorations = data['private'];
 
     $scope.allExplorationsInOrder = $scope.featuredExplorations.concat(
-      $scope.publicExplorations).concat($scope.privateExplorations);
+      $scope.publicExplorations);
 
     $scope.selectedCategories = {};
     $scope.selectedLanguages = {};

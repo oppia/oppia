@@ -40,8 +40,7 @@ describe('Gallery controller', function() {
           language: 'English',
           last_updated: 12345678911111,
           community_owned: false,
-          status: 'public',
-          public_private_status: 'public'
+          status: 'public'
         }, {
           id: '3',
           title: 'Geography 2',
@@ -50,8 +49,7 @@ describe('Gallery controller', function() {
           language: 'español',
           last_updated: 12345678912345,
           community_owned: false,
-          status: 'public',
-          public_private_status: 'public'
+          status: 'public'
         }, {
           id: '6',
           title: 'My Exploration',
@@ -60,8 +58,7 @@ describe('Gallery controller', function() {
           language: 'English',
           last_updated: 12345678954322,
           community_owned: false,
-          status: 'public',
-          public_private_status: 'public'
+          status: 'public'
         }],
         'featured': []
       });
@@ -86,10 +83,6 @@ describe('Gallery controller', function() {
       expect(scope.selectedLanguages).toEqual({
         'English': true,
         'español': true
-      });
-      expect(scope.selectedStatuses).toEqual({
-        'private': false,
-        'public': true
       });
     });
   });

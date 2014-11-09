@@ -45,7 +45,6 @@ describe('Gallery view', function() {
 
     users.login('varda@example.com');
     browser.get('/gallery');
-    gallery.tickCheckbox('status', 'Public');
     gallery.editExploration('Vingilot');
     // Moderators can edit explorations and mark them as featured.
     editor.setLanguage('français');
@@ -58,19 +57,15 @@ describe('Gallery view', function() {
     editor.setObjective('preserve the works of the elves');
     editor.saveChanges();
 
-    // The situation is now:
-    names = ['silmarils', 'Vingilot', 'Vilya'];
+    // The situation (for non-private explorations) is now:
+    names = ['silmarils', 'Vingilot'];
     properties = {
-      status: ['Public', 'Featured', 'Private'],
-      category: ['gems', 'ships', 'rings'],
-      language: ['Deutsch', 'français', 'English']
+      category: ['gems', 'ships'],
+      language: ['Deutsch', 'français']
     };
 
+    // We now check explorations are visible under the right conditions.
     browser.get('/gallery');
-    // This box is checked by default so we uncheck it.
-    gallery.untickCheckbox('status', 'Featured');
-
-    // We next check explorations are visible under the right conditions.
     for (var key in properties) {
       for (var i = 0; i < names.length; i++) {
         gallery.tickCheckbox(key, properties[key][i]);
@@ -90,8 +85,12 @@ describe('Gallery view', function() {
       }
     }
 
-    expect(gallery.getExplorationObjective('Vilya')).toBe(
-      'Preserve the works of the elves');
+    // Private explorations are not shown in the gallery.
+    gallery.expectExplorationToBeHidden('Vilya');
+
+    // The first letter of the objective is automatically capitalized.
+    expect(gallery.getExplorationObjective('Vingilot')).toBe(
+      'Seek the aid of the Valar');
     gallery.playExploration('silmarils');
     player.expectExplorationNameToBe('silmarils');
     player.submitAnswer('Continue');

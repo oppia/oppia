@@ -105,13 +105,9 @@ class GalleryHandler(base.BaseHandler):
                 exp_services.get_exploration_summaries_matching_query(
                     query_string))
         else:
-            # Get non-private and viewable private exploration summaries
+            # Get non-private exploration summaries
             exp_summaries_dict = (
                 exp_services.get_non_private_exploration_summaries())
-            if self.user_id:
-                exp_summaries_dict.update(
-                    exp_services.get_private_at_least_viewable_exploration_summaries(
-                        self.user_id))
 
         # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
         # individual lookups. Note that this will depend on user_id.
@@ -125,10 +121,6 @@ class GalleryHandler(base.BaseHandler):
             'last_updated': utils.get_time_in_millisecs(
                 exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
-            'public_private_status': (
-                'private' if
-                exp_summary.status == rights_manager.EXPLORATION_STATUS_PRIVATE
-                else 'public'),
             'community_owned': exp_summary.community_owned,
             'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
@@ -141,22 +133,16 @@ class GalleryHandler(base.BaseHandler):
                 'You may be running up against the default query limits.'
                 % feconf.DEFAULT_QUERY_LIMIT)
 
-        private_explorations_list = []
         public_explorations_list = []
         featured_explorations_list = []
 
         for e_dict in explorations_list:
-            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE:
-                private_explorations_list.append(e_dict)
-            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
+            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
                 public_explorations_list.append(e_dict)
             elif (e_dict['status'] ==
                     rights_manager.EXPLORATION_STATUS_PUBLICIZED):
                 featured_explorations_list.append(e_dict)
 
-        private_explorations_list = sorted(
-            private_explorations_list, key=lambda x: x['last_updated'],
-            reverse=True)
         public_explorations_list = sorted(
             public_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
@@ -167,7 +153,6 @@ class GalleryHandler(base.BaseHandler):
         self.values.update({
             'featured': publicized_explorations_list,
             'public': public_explorations_list,
-            'private': private_explorations_list,
         })
         self.render_json(self.values)
 

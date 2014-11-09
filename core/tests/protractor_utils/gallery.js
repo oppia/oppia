@@ -45,7 +45,7 @@ var _clickCheckbox = function(section, label, isPreviouslyTicked) {
     for (var i = 0; i < results.length; i++) {
       foundCheckbox = foundCheckbox || results[i];
     }
-    if (! foundCheckbox) {
+    if (!foundCheckbox) {
       throw Error('Checkbox ' + label + ' not found in section ' + section);
     }
   });

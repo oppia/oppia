@@ -55,7 +55,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
-            'private': [],
             'public': [],
             'featured': [],
         }, response_dict)
@@ -129,7 +128,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_admin': True,
             'is_moderator': True,
             'is_super_admin': False,
-            'private': [],
             'public': [],
             'featured': [],
             'user_email': self.OWNER_EMAIL,
@@ -143,19 +141,10 @@ class GalleryPageTest(test_utils.GenericTestBase):
         exp_services._save_exploration(
             owner_id, exploration, 'Exploration A', [])
 
-        # Test gallery
+        # Test that the private exploration isn't displayed.
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
         self.assertEqual(response_dict['public'], [])
         self.assertEqual(response_dict['featured'], [])
-        self.assertEqual(len(response_dict['private']), 1)
-        self.assertDictContainsSubset({
-            'id': 'A',
-            'category': 'Category A',
-            'title': 'Title A',
-            'language': 'English',
-            'objective': 'Objective A',
-            'status': rights_manager.EXPLORATION_STATUS_PRIVATE,
-        }, response_dict['private'][0])
 
         # Create exploration B
         exploration = self.save_new_valid_exploration(
@@ -171,7 +160,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['private'], [])
         self.assertEqual(len(response_dict['public']), 1)
         self.assertEqual(len(response_dict['featured']), 1)
         self.assertDictContainsSubset({
@@ -196,7 +184,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['private'], [])
         self.assertEqual(response_dict['public'], [])
         self.assertEqual(len(response_dict['featured']), 1)
         self.assertDictContainsSubset({
