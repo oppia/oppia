@@ -166,14 +166,14 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       };
 
       $scope.commitParamChange = function(index) {
-        if (!$scope.tmpParamChange.name) {
-          warningsData.addWarning('Please specify a parameter name.');
-          return;
-        }
         if ($scope.tmpParamChange.name === '') {
           // This reverses a temporary parameter change addition that has not
           // been edited.
           $scope.deleteParamChange(index);
+          return;
+        }
+        if (!$scope.tmpParamChange.name) {
+          warningsData.addWarning('Please specify a parameter name.');
           return;
         }
 
