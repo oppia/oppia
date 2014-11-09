@@ -104,7 +104,7 @@
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to submit your exploration to be reviewed for release! Once released, the exploration will appear in the gallery for everyone to learn from.
+          Congratulations, you are about to submit your exploration to be featured in the gallery!
         </p>
 
         <p>
@@ -261,7 +261,7 @@
                 Beta
               </span>
               <span ng-if="explorationRightsService.isPublicized()" class="label label-primary">
-                Released
+                Featured
               </span>
               <span ng-if="explorationRightsService.isCloned()" class="label label-primary">
                 Cloned
@@ -287,7 +287,7 @@
                   {% endif %}
 
                   <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the gallery by default." tooltip-placement="bottom">
+                    <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for release from beta status, so that it becomes featured in the gallery." tooltip-placement="bottom">
                       nominate for release
                     </button>
                   </span>

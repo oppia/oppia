@@ -108,7 +108,7 @@ oppia.controller('Gallery', [
 
   $scope.selectedStatuses = {
     'publicized': true,
-    'public': false,
+    'public': true,
     'private': false
   };
 

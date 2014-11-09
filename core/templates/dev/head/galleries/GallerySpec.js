@@ -86,7 +86,7 @@ describe('Gallery controller', function() {
       });
       expect(scope.selectedStatuses).toEqual({
         'private': false,
-        'public': false,
+        'public': true,
         'publicized': true
       });
     });

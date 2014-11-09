@@ -87,7 +87,7 @@
               <li class="checkbox">
                 <label>
                   <input type="checkbox" ng-model="selectedStatuses.publicized">
-                  Released
+                  Featured
                 </label>
               </li>
               <li class="checkbox">
@@ -160,8 +160,9 @@
                       <span class="label label-info">
                         <[exploration.category]>
                       </span>
-                      <span ng-if="exploration.status === 'public'" class="label label-info" style="opacity: 0.5">
-                        Beta
+                      <span ng-if="exploration.status === 'publicized'" class="label label-primary">
+                        Featured
+                        <span class="glyphicon glyphicon-star"></span>
                       </span>
                       <span ng-if="exploration.status === 'private'" class="label label-info" style="opacity: 0.5">
                         Private
