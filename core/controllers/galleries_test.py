@@ -56,8 +56,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_moderator': False,
             'is_super_admin': False,
             'private': [],
-            'beta': [],
-            'released': [],
+            'public': [],
+            'featured': [],
         }, response_dict)
 
         # Load a public demo exploration.
@@ -65,8 +65,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['released'], [])
-        self.assertEqual(len(response_dict['beta']), 1)
+        self.assertEqual(response_dict['featured'], [])
+        self.assertEqual(len(response_dict['public']), 1)
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'Welcome',
@@ -74,7 +74,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
-        }, response_dict['beta'][0])
+        }, response_dict['public'][0])
 
         # Publicize the demo exploration.
         rights_manager.publicize_exploration(owner_id, '0')
@@ -104,8 +104,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['beta'], [])
-        self.assertEqual(len(response_dict['released']), 1)
+        self.assertEqual(response_dict['public'], [])
+        self.assertEqual(len(response_dict['featured']), 1)
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'A new category',
@@ -113,7 +113,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
-        }, response_dict['released'][0])
+        }, response_dict['featured'][0])
 
     def test_gallery_handler_for_created_explorations(self):
         """Test the gallery data handler for manually created explirations."""
@@ -130,8 +130,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_moderator': True,
             'is_super_admin': False,
             'private': [],
-            'beta': [],
-            'released': [],
+            'public': [],
+            'featured': [],
             'user_email': self.OWNER_EMAIL,
             'username': 'defaultusername'
         }, response_dict)
@@ -145,8 +145,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['beta'], [])
-        self.assertEqual(response_dict['released'], [])
+        self.assertEqual(response_dict['public'], [])
+        self.assertEqual(response_dict['featured'], [])
         self.assertEqual(len(response_dict['private']), 1)
         self.assertDictContainsSubset({
             'id': 'A',
@@ -172,8 +172,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
         self.assertEqual(response_dict['private'], [])
-        self.assertEqual(len(response_dict['beta']), 1)
-        self.assertEqual(len(response_dict['released']), 1)
+        self.assertEqual(len(response_dict['public']), 1)
+        self.assertEqual(len(response_dict['featured']), 1)
         self.assertDictContainsSubset({
             'id': 'A',
             'category': 'Category A',
@@ -181,7 +181,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'language': 'English',
             'objective': 'Objective A',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
-        }, response_dict['beta'][0])
+        }, response_dict['public'][0])
         self.assertDictContainsSubset({
             'id': 'B',
             'category': 'Category B',
@@ -189,7 +189,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'language': 'English',
             'objective': 'Objective B',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
-        }, response_dict['released'][0])
+        }, response_dict['featured'][0])
 
         # Delete exploration A
         exp_services.delete_exploration(owner_id, 'A')
@@ -197,8 +197,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
         self.assertEqual(response_dict['private'], [])
-        self.assertEqual(response_dict['beta'], [])
-        self.assertEqual(len(response_dict['released']), 1)
+        self.assertEqual(response_dict['public'], [])
+        self.assertEqual(len(response_dict['featured']), 1)
         self.assertDictContainsSubset({
             'id': 'B',
             'category': 'Category B',
@@ -206,7 +206,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'language': 'English',
             'objective': 'Objective B',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
-        }, response_dict['released'][0])
+        }, response_dict['featured'][0])
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""

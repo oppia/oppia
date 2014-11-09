@@ -86,14 +86,8 @@
             <ul class="nav nav-pills nav-stacked protractor-test-gallery-status">
               <li class="checkbox">
                 <label>
-                  <input type="checkbox" ng-model="selectedStatuses.publicized">
-                  Featured
-                </label>
-              </li>
-              <li class="checkbox">
-                <label>
                   <input type="checkbox" ng-model="selectedStatuses.public">
-                  Beta
+                  Public
                 </label>
               </li>
               {% if username %}
@@ -118,19 +112,13 @@
 
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
           <div class="tab-content oppia-gallery-tiles-container">
-            <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status').length === 0">
+            <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'public_private_status').length === 0">
               <div>
                 <em>No explorations selected.</em>
               </div>
-              <br>
-              <div>
-                <em ng-if="selectedStatuses.publicized && !selectedStatuses.public">
-                  However, there may be beta explorations in these categories available for playtesting. Click the 'Beta' checkbox on the left to view them!
-                </em>
-              </div>
             </div>
 
-            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="oppia-gallery-tile">
+            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'public_private_status' track by $index" class="oppia-gallery-tile">
               <div style="position: relative;">
                 <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 5px;">
                   <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>

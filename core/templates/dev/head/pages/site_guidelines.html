@@ -21,7 +21,7 @@
         <div class="tabbable">
           <ul class="nav nav-tabs about-tabs">
             <li class="active"><a href="#how-to-use" data-toggle="tab">How to use Oppia</a></li>
-            <li><a href="#publish-and-release-criteria" data-toggle="tab">Exploration publishing criteria</a></li>
+            <li><a href="#publication-criteria" data-toggle="tab">Exploration publishing criteria</a></li>
             <li><a href="#publication-policies" data-toggle="tab">Publication Policies</a></li>
           </ul>
 
@@ -67,10 +67,10 @@
                       Each exploration starts out as <strong>private</strong>: only the creator of the exploration, any editors they assign, invited playtesters, and the site moderators can see it.
                     </li>
                     <li style="line-height: 25px;">
-                      Once the creators of the exploration are ready for it to be publicly playtested, they can publish the exploration, at which point its status changes to <strong>beta</strong>. The exploration becomes viewable in the gallery. Community members can see and play the exploration, and leave feedback and suggestions.
+                      Once the creators of the exploration are ready for it to be publicly playtested, they can publish the exploration, at which point its status changes to <strong>public</strong>. The exploration becomes viewable in the gallery. Community members can see and play the exploration, and leave feedback and suggestions.
                     </li>
                     <li style="line-height: 25px;">
-                      Once the exploration satisfies the <a href="site_guidelines/#publish-and-release-criteria">release criteria</a>, the exploration is officially marked as <strong>featured</strong> and is shown in the default view of the <a href="/gallery">gallery</a>.
+                      Once the exploration satisfies the <a href="site_guidelines#/publication-criteria">criteria for featuring explorations</a>, the exploration is officially marked in the gallery as <strong>featured</strong>.
                     </li>
                   </ul>
                 </p>
@@ -80,16 +80,16 @@
               </div>
             </div>
 
-            <div class="tab-pane" id="publish-and-release-criteria">
+            <div class="tab-pane" id="publication-criteria">
               <div class="oppia-about">
                 <h1>Exploration publishing criteria</h1>
                 <p>
-                  In order to ensure that Oppia is filled with high-quality explorations that do a good job of helping people learn something new, there are some minimal criteria for publishing an exploration to the "beta" stage and later moving it to the "featured" stage. These are described below:
+                  In order to ensure that Oppia is filled with high-quality explorations that do a good job of helping people learn something new, there are some minimal criteria for publishing an exploration and, later, for moving it to the "featured" stage. These are described below:
                 </p>
 
-                <h2>"Beta" criteria</h2>
+                <h2>Publication criteria</h2>
                 <p>
-                  The following criteria for publishing an exploration to "beta" stage are meant to ensure that playtesters can test beta explorations meaningfully and leave helpful feedback, and that it is possible to continue developing and refining these explorations to move towards the Featured stage. These criteria are intended to be objective and precise, so that it is easy for anyone to determine whether a particular exploration fits the criteria.
+                  The following criteria for publishing an exploration are meant to ensure that published explorations can be playtested meaningfully, and that it is possible to continue developing and refining these explorations to move towards being featured. These criteria are intended to be objective and precise, so that it is easy for anyone to determine whether a particular exploration fits the criteria.
                 </p>
 
                 <p>
@@ -104,7 +104,7 @@
                       <strong>It provides informative feedback.</strong> The feedback that it provides to the players should be more than just "Correct" or "Incorrect"; it should provide (or guide players toward) the reasoning about why something is right or wrong, and how to correct it if necessary. An exploration should be more than just a quiz!
                     </li>
                     <li style="line-height: 25px;">
-                      <strong>It doesn't duplicate an existing Beta or Featured exploration</strong>. It's fine to teach the same thing using a significantly different way of teaching, but if a new exploration teaches the exact same things as an existing one, in the same way, then the effort would be better spent submitting feedback to, and improving, the existing one.
+                      <strong>It doesn't duplicate an existing published exploration</strong>. It's fine to teach the same thing using a significantly different way of teaching, but if a new exploration teaches the exact same things as an existing one, in the same way, then the effort would be better spent submitting feedback to, and improving, the existing one.
                     </li>
                   </ul>
                 </p>
@@ -140,15 +140,15 @@
               <div class="oppia-about">
                 <h1>Publication policies</h1>
                 <p>
-                  The following policies help Oppia moderators enforce the publication and release criteria, and keep explorations moving on the path to Featured status. All explorations hosted on {{SITE_NAME}} should ultimately be improved to the point where they satisfy these criteria.
+                  The following policies help Oppia moderators enforce the criteria for publishing and featuring explorations. All explorations hosted on {{SITE_NAME}} should ultimately be improved to the point where they satisfy these criteria.
                 </p>
-                <h2>Publishing to Beta</h2>
+                <h2>Publishing an exploration</h2>
                 <p>
-                  Any owner of a private exploration can make the decision to publish an exploration to Beta at any time. However, if the published exploration does not fit the Beta <a href="site_guidelines/#publish-and-release-criteria">criteria</a>, the site moderators may unpublish or delete it, at their discretion. (The norm is to unpublish; deletion is only likely to happen in egregious cases, such as outright spam.)
+                  Any owner of a private exploration can make the decision to publish an exploration at any time. However, if the published exploration does not fit the <a href="site_guidelines#/publication-criteria">publication criteria</a>, the site moderators may unpublish or delete it, at their discretion. (The norm is to unpublish; deletion is only likely to happen in egregious cases, such as outright spam.)
                 </p>
-                <h2>Beta explorations</h2>
+                <h2>Editing rights</h2>
                 <p>
-                  Explorations should not linger in the Beta state forever; they are meant to be polished and developed until they can be featured. A Beta exploration that has not been edited for a prolonged period may be considered "orphaned", and ownership of it may revert to the community at large (at moderator discretion), so that {{SITE_NAME}} community members can continue to improve it.
+                  Explorations are meant to be polished and developed until they can be featured. An exploration that has not been edited for a prolonged period may be considered "orphaned", and ownership of it may revert to the community at large (at moderator discretion), so that {{SITE_NAME}} community members can continue to improve it.
                 </p>
                 <p>
                   Note that when you embed a particular version of your exploration in your site, this embedded version will not change unless the original exploration on {{SITE_NAME}} is unpublished or deleted. In particular, even if you or other community members make further additions or changes to the exploration on {{SITE_NAME}}, the version embedded on your website will remain the same.
@@ -156,7 +156,7 @@
 
                 <h2>Releasing an exploration</h2>
                 <p>
-                  Currently, the process of releasing an exploration is moderator-driven, though we hope to make it more community-driven in the future. When an owner of the exploration - or anybody else involved in the process - thinks the exploration is ready to be featured, they can post to the <a href="{{MODERATOR_REQUEST_FORUM_URL}}" target="_blank">Moderator Requests forum</a> with a request for moderator review. A moderator will play through the exploration, look at its structure, and decide whether it fits the Featured <a href="site_guidelines/#publish-and-release-criteria">criteria</a>. If it does, then the exploration will be marked as featured. If it does not, the moderator will make a series of specific suggestions on how to make the exploration conform to the criteria, and work with the creator(s) in that forum thread to get it polished and ready to be featured.
+                  Currently, the process of releasing an exploration is moderator-driven, though we hope to make it more community-driven in the future. When an owner of the exploration - or anybody else involved in the process - thinks the exploration is ready to be featured, they can post to the <a href="{{MODERATOR_REQUEST_FORUM_URL}}" target="_blank">Moderator Requests forum</a> with a request for moderator review. A moderator will play through the exploration, look at its structure, and decide whether it fits the Featured <a href="site_guidelines#/publication-criteria">criteria</a>. If it does, then the exploration will be marked as featured. If it does not, the moderator will make a series of specific suggestions on how to make the exploration conform to the criteria, and work with the creator(s) in that forum thread to get it polished and ready to be featured.
                 </p>
               </div>
             </div>

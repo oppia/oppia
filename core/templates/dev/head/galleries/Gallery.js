@@ -107,7 +107,6 @@ oppia.controller('Gallery', [
   $scope.currentUserIsModerator = false;
 
   $scope.selectedStatuses = {
-    'publicized': true,
     'public': true,
     'private': false
   };
@@ -156,12 +155,12 @@ oppia.controller('Gallery', [
     $scope.onSearchQueryChangeExec, 400);
 
   $scope.refreshGalleryData = function(data) {
-    $scope.releasedExplorations = data.released;
-    $scope.betaExplorations = data.beta;
+    $scope.featuredExplorations = data.featured;
+    $scope.publicExplorations = data['public'];
     $scope.privateExplorations = data['private'];
 
-    $scope.allExplorationsInOrder = $scope.releasedExplorations.concat(
-      $scope.betaExplorations).concat($scope.privateExplorations);
+    $scope.allExplorationsInOrder = $scope.featuredExplorations.concat(
+      $scope.publicExplorations).concat($scope.privateExplorations);
 
     $scope.selectedCategories = {};
     $scope.selectedLanguages = {};

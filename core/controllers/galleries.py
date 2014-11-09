@@ -125,6 +125,10 @@ class GalleryHandler(base.BaseHandler):
             'last_updated': utils.get_time_in_millisecs(
                 exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
+            'public_private_status': (
+                'private' if
+                exp_summary.status == rights_manager.EXPLORATION_STATUS_PRIVATE
+                else 'public'),
             'community_owned': exp_summary.community_owned,
             'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
@@ -138,31 +142,31 @@ class GalleryHandler(base.BaseHandler):
                 % feconf.DEFAULT_QUERY_LIMIT)
 
         private_explorations_list = []
-        beta_explorations_list = []
-        released_explorations_list = []
+        public_explorations_list = []
+        featured_explorations_list = []
 
         for e_dict in explorations_list:
             if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE:
                 private_explorations_list.append(e_dict)
             elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
-                beta_explorations_list.append(e_dict)
+                public_explorations_list.append(e_dict)
             elif (e_dict['status'] ==
                     rights_manager.EXPLORATION_STATUS_PUBLICIZED):
-                released_explorations_list.append(e_dict)
+                featured_explorations_list.append(e_dict)
 
         private_explorations_list = sorted(
             private_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
-        beta_explorations_list = sorted(
-            beta_explorations_list, key=lambda x: x['last_updated'],
+        public_explorations_list = sorted(
+            public_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
         publicized_explorations_list = sorted(
-            released_explorations_list, key=lambda x: x['last_updated'],
+            featured_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
 
         self.values.update({
-            'released': publicized_explorations_list,
-            'beta': beta_explorations_list,
+            'featured': publicized_explorations_list,
+            'public': public_explorations_list,
             'private': private_explorations_list,
         })
         self.render_json(self.values)

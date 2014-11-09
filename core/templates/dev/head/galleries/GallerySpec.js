@@ -31,8 +31,8 @@ describe('Gallery controller', function() {
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/galleryhandler/data').respond({
-        allow_yaml_file_upload: false,
-        beta: [{
+        'allow_yaml_file_upload': false,
+        'public': [{
           id: '5',
           title: 'Landmarks',
           category: 'Geography',
@@ -40,7 +40,8 @@ describe('Gallery controller', function() {
           language: 'English',
           last_updated: 12345678911111,
           community_owned: false,
-          status: 'public'
+          status: 'public',
+          public_private_status: 'public'
         }, {
           id: '3',
           title: 'Geography 2',
@@ -49,7 +50,8 @@ describe('Gallery controller', function() {
           language: 'español',
           last_updated: 12345678912345,
           community_owned: false,
-          status: 'public'
+          status: 'public',
+          public_private_status: 'public'
         }, {
           id: '6',
           title: 'My Exploration',
@@ -58,9 +60,10 @@ describe('Gallery controller', function() {
           language: 'English',
           last_updated: 12345678954322,
           community_owned: false,
-          status: 'public'
+          status: 'public',
+          public_private_status: 'public'
         }],
-        released: []
+        'featured': []
       });
       scope = $rootScope.$new();
       ctrl = $controller('Gallery', {
@@ -86,8 +89,7 @@ describe('Gallery controller', function() {
       });
       expect(scope.selectedStatuses).toEqual({
         'private': false,
-        'public': true,
-        'publicized': true
+        'public': true
       });
     });
   });

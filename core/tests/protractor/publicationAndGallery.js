@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests of the publication and release process, and
+ * @fileoverview End-to-end tests of the publication and featuring process, and
  * the resultant display of explorations in the gallery.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
@@ -27,7 +27,7 @@ var player = require('../protractor_utils/player.js');
 var gallery = require('../protractor_utils/gallery.js');
 
 describe('Gallery view', function() {
-  it('should display private, published and released explorations', function() {
+  it('should display private, published and featured explorations', function() {
     users.createModerator('varda@example.com', 'Varda');
     users.createUser('feanor@exmple.com', 'Feanor');
     users.createUser('celebrimbor@example.com', 'Celebrimbor');
@@ -45,12 +45,12 @@ describe('Gallery view', function() {
 
     users.login('varda@example.com');
     browser.get('/gallery');
-    gallery.tickCheckbox('status', 'Beta');
+    gallery.tickCheckbox('status', 'Public');
     gallery.editExploration('Vingilot');
-    // Moderators can edit and release explorations.
+    // Moderators can edit explorations and mark them as featured.
     editor.setLanguage('français');
     editor.saveChanges('change language');
-    workflow.releaseExploration();
+    workflow.markExplorationAsFeatured();
     users.logout();
 
     users.login('celebrimbor@example.com');
@@ -61,14 +61,14 @@ describe('Gallery view', function() {
     // The situation is now:
     names = ['silmarils', 'Vingilot', 'Vilya'];
     properties = {
-      status: ['Beta', 'Released', 'Private'],
+      status: ['Public', 'Featured', 'Private'],
       category: ['gems', 'ships', 'rings'],
       language: ['Deutsch', 'français', 'English']
     };
 
     browser.get('/gallery');
     // This box is checked by default so we uncheck it.
-    gallery.untickCheckbox('status', 'Released');
+    gallery.untickCheckbox('status', 'Featured');
 
     // We next check explorations are visible under the right conditions.
     for (var key in properties) {

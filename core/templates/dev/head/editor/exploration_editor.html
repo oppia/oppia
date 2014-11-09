@@ -70,7 +70,7 @@
           Congratulations, you are about to publish an exploration!
         </p>
         <p>
-          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/site_guidelines#/publish-and-release-criteria" target="_blank">why?</a>):
+          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/site_guidelines#/publication-criteria" target="_blank">why?</a>):
           <ul>
             <li>It should help its intended audience learn something new.</li>
             <li>It should convey more than a single isolated factoid.</li>
@@ -79,7 +79,7 @@
           </ul>
         </p>
         <p>
-          You can read more about these criteria on the <a href="/site_guidelines#/publish-and-release-criteria" target="_blank">exploration publishing criteria</a> page.
+          You can read more about these criteria on the <a href="/site_guidelines#/publication-criteria" target="_blank">exploration publishing criteria</a> page.
         </p>
 
         <p>
@@ -99,28 +99,28 @@
 
     <script type="text/ng-template" id="modals/nominateExploration">
       <div class="modal-header">
-        <h3>Nominate exploration for release</h3>
+        <h3>Nominate for featured status</h3>
       </div>
 
       <div class="modal-body">
         <p>
-          Congratulations, you are about to submit your exploration to be featured in the gallery!
+          Congratulations, you are about to submit this exploration for featuring in the gallery!
         </p>
 
         <p>
-          Currently, the review process is a manual, moderator-driven process.
+          Currently, the decision to feature an exploration is based on moderator review.
           When you submit an exploration for review, a moderator will play through
           it, look at its structure, and decide whether it fits the
-          <a href="/site_guidelines#publish-and-release-criteria">release criteria</a>.
+          <a href="/site_guidelines#/publication-criteria">criteria for featured status</a>.
           If not, the moderator will make a series of specific suggestions on how
           to make the exploration satisfy the criteria, and work with the editor(s)
-          to get it ready for release.
+          to get it featured.
         </p>
 
         <p>
           <strong>To kick off the review process</strong>, please make a post to the
           <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
-          include a link to your exploration.
+          include a link to the exploration.
         </p>
       </div>
 
@@ -258,7 +258,7 @@
                 Private
               </span>
               <span ng-if="explorationRightsService.isPublic()" class="label label-primary">
-                Beta
+                Public
               </span>
               <span ng-if="explorationRightsService.isPublicized()" class="label label-primary">
                 Featured
@@ -287,8 +287,8 @@
                   {% endif %}
 
                   <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for release from beta status, so that it becomes featured in the gallery." tooltip-placement="bottom">
-                      nominate for release
+                    <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
+                      nominate for featuring
                     </button>
                   </span>
 

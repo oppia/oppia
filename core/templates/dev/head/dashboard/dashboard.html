@@ -80,27 +80,27 @@
                   </h4>
                 </div>
 
-                <div ng-if="!isEmpty(betaExplorationIds)">
+                <div ng-if="!isEmpty(publicExplorationIds)">
                   <hr>
-                  <h4>Beta explorations</h4>
+                  <h4>Public explorations</h4>
                   <ul>
-                    <li ng-repeat="expId in betaExplorationIds">
+                    <li ng-repeat="expId in publicExplorationIds">
                       <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
                     </li>
                   </ul>
                 </div>
 
-                <div ng-if="!isEmpty(releasedExplorationIds)">
+                <div ng-if="!isEmpty(featuredExplorationIds)">
                   <hr>
-                  <h4>Released explorations</h4>
+                  <h4>Featured explorations</h4>
                   <ul>
-                    <li ng-repeat="expId in releasedExplorationIds">
+                    <li ng-repeat="expId in featuredExplorationIds">
                       <a ng-href="/create/<[expId]>"><[explorations[expId].title]></a>
                     </li>
                   </ul>
                 </div>
 
-                <div ng-if="isEmpty(privateExplorationIds) && isEmpty(betaExplorationIds) && isEmpty(releasedExplorationIds)">
+                <div ng-if="isEmpty(privateExplorationIds) && isEmpty(publicExplorationIds) && isEmpty(featuredExplorationIds)">
                   <p>
                     <em>You currently aren't managing or collaborating on any explorations.</em>
                   </p>

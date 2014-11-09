@@ -21,7 +21,7 @@
 var editor = require('./editor.js');
 
 // Here section can be 'status', 'category' or 'language'.
-// If section = 'status' then label can be 'Released', 'Beta' or 'Private',
+// If section = 'status' then label can be 'Featured', 'Public' or 'Private',
 // otherwise it can be any category or language respectively.
 // Verifies the previous state of the checkbox, then clicks it.
 var _clickCheckbox = function(section, label, isPreviouslyTicked) {
