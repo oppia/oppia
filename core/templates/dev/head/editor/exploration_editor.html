@@ -285,6 +285,20 @@
                     </button>
                   </span>
 
+                  {% if can_publish %}
+                    <span ng-if="explorationRightsService.isPrivate()">
+                      <button type="button" class="btn btn-default protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
+                        Publish in Gallery
+                      </button>
+                    </span>
+                  {% endif %}
+
+                  <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
+                    <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the gallery by default." tooltip-placement="bottom">
+                      Nominate for Release
+                    </button>
+                  </span>
+
                   <span ng-if="editabilityService.isEditable()">
                     <div class="btn-group" dropdown>
                       <button class="btn  btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
@@ -305,14 +319,6 @@
                       </button>
                       <ul class="dropdown-menu" role="menu">
                         <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" title="Discard all pending changes.">Discard Changes</a></li>
-                        {% if can_publish %}
-                          <li ng-if="explorationRightsService.isPrivate()"><a class="protractor-test-publish-exploration" ng-click="showPublishExplorationModal()" ng-class="{'oppia-disabled-link': isExplorationLockedForEditing() || warningsList.length}" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
-                            Publish in Gallery
-                          </a></li>
-                        {% endif %}
-                        <li><a ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()" ng-click="showNominateExplorationModal()" ng-class="{'oppia-disabled-link': isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for release from beta status, so that it appears in the gallery by default." tooltip-placement="bottom">
-                          Nominate for Release
-                        </a></li>
                       </ul>
                     </div>
                   </span>
