@@ -903,30 +903,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-bottom: -5px;
 }
 
-.oppia-splash-image {
-  width: 100%;
-}
-
-.oppia-splash p {
-  font-size: 1.4em;
-  margin-top: .5em;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
-.oppia-splash .btn {
-  margin-top: .5em;
-  display: block;
-}
-
-.oppia-splash-highlight {
-  padding: 10px 0;
-  background: #dde0FF;
-  margin-bottom: 20px;
-  padding-left: 10px;
-  padding-right: 10px;
-}
-
 .help {
   font-size: .85em;
   color: #999;
@@ -1021,7 +997,17 @@ oppia-parameter {
   height: 60vh;
 }
 
+.oppia-vcenter {
+  display: table-cell;
+  float: none;
+  vertical-align: middle;
+}
+
 /* Splash page. */
+
+.oppia-splash-image {
+  width: 100%;
+}
 
 .oppia-splash-btn-row {
   margin-top: 30px;
@@ -1034,7 +1020,6 @@ oppia-parameter {
   margin: 0 10px;
   color: #fff;
 }
-
 .oppia-splash-btn:hover {
   background-color: #2569C2;
   color: #fff;
@@ -1048,24 +1033,6 @@ oppia-parameter {
   margin-top: 100px;
 }
 
-@media (max-width: 800px) {
-  .oppia-splash-background {
-    background-size: cover;
-  }
-}
-@media (min-width: 800px) {
-  .oppia-splash-background {
-    background-size: 100%;
-  }
-}
-/* This is needed for vertical alignment. */
-.oppia-splash-background-main-div {
-  display: table;
-  width: 100%;
-  height: 100%;
-  margin-left: 0;
-}
-
 .oppia-splash-section {
   display: table;
   width: 100%;
@@ -1073,39 +1040,10 @@ oppia-parameter {
   padding: 48px 200px;
   background-color: #fff;
 }
-
 .oppia-splash-section p {
   font-size: 1.8rem;
   min-width: 300px;
   max-width: 500px;
-}
-
-.oppia-vcenter {
-  display: table-cell;
-  float: none;
-  vertical-align: middle;
-}
-
-.oppia-splash-background {
-  background: url(/images/banner.png) no-repeat;
-  background-position: center;
-  width: 100%;
-}
-
-.oppia-splash-brown {
-  background-color: #f1edea;
-}
-
-.oppia-splash-green {
-  background-color: #7BAD64;
-}
-
-.oppia-splash-blue {
-  background-color: #0BBCD5;
-}
-
-.oppia-splash-red {
-  background-color: #da554c;
 }
 
 .oppia-splash-block-left {
@@ -1118,25 +1056,6 @@ oppia-parameter {
   margin: 200px auto;
   padding: 0 0 40px 50px;
   width: 600px;
-}
-
-.oppia-splash-page-row {
-  height: 300px;
-  margin-top: 15px;
-  padding-right: 50px;
-}
-
-.oppia-splash-page-row.even {
-  background-color: #fafafa;
-}
-
-.oppia-splash-page-hr {
-  width: 60%;
-}
-
-.oppia-splash-page-buttons h3 {
-  color: #666;
-  margin-bottom: 24px;
 }
 
 .oppia-splash-page-screenshot {
