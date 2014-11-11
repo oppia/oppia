@@ -459,23 +459,42 @@ oppia.directive('graphViz', function() {
 
 
       // Styling functions
+      var DELETE_COLOR = 'red';
+      var HOVER_COLOR = 'aqua';
+      var SELECT_COLOR = 'orange';
+      var DEFAULT_COLOR = 'black';
       $scope.getEdgeColor = function(index) {
         if ($scope.state.currentMode === _MODES.DELETE && 
             index === $scope.state.hoveredEdge &&
             $scope.canDeleteEdge) {
-          return 'red';
+          return DELETE_COLOR;
+        } else if ($scope.graph.isWeighted &&
+                   (index === $scope.state.hoveredEdge || 
+                    index === $scope.state.hoveredWeight) && 
+                   $scope.canEditEdgeWeight) {
+          return HOVER_COLOR;
+        } else if ($scope.state.selectedEdge === index) {
+          return SELECT_COLOR;
         } else {
-          return 'black';
+          return DEFAULT_COLOR;
         }
       };
-      $scope.getHoverVertexColor = function() {
+      $scope.getVertexColor = function(index) {
         if ($scope.state.currentMode === _MODES.DELETE &&
+            index === $scope.state.hoveredVertex &&
             $scope.canDeleteVertex) {
-          return 'red';
+          return DELETE_COLOR;
+        } else if ($scope.graph.isLabeled &&
+                   (index === $scope.state.hoveredVertex ||
+                    index === $scope.state.hoveredLabel) &&
+                    $scope.canEditVertexLabel) {
+          return HOVER_COLOR;
+        } else if ($scope.state.selectedVertex === index) {
+          return SELECT_COLOR;
         } else {
-          return 'aqua';
+          return DEFAULT_COLOR;
         }
-      };
+      }
       $scope.getDirectedEdgeArrowPoints = function(index) {
         var ARROW_WIDTH = 5;
         var ARROW_HEIGHT = 10;

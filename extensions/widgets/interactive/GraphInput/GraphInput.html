@@ -155,20 +155,6 @@
         <[getModeTooltipText()]>
       </text>
 
-      <!-- Selected vertex -->
-      <circle ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel"
-        ng-attr-cx="<[graph.vertices[state.selectedVertex].x]>"
-        ng-attr-cy="<[graph.vertices[state.selectedVertex].y]>"
-        ng-attr-r="<[VERTEX_RADIUS + 3]>"
-        style="fill: orange">
-      </circle>
-      <!-- Hovered vertex -->
-      <circle ng-if="state.hoveredVertex !== null"
-        ng-attr-cx="<[graph.vertices[state.hoveredVertex].x]>"
-        ng-attr-cy="<[graph.vertices[state.hoveredVertex].y]>"
-        ng-attr-r="<[VERTEX_RADIUS + 3]>"
-        ng-attr-style="fill: <[getHoverVertexColor()]>">
-      </circle>
       <line ng-if="state.addEdgeVertex !== null"
         ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
         ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
@@ -197,6 +183,7 @@
         <text ng-if="graph.isWeighted"
           ng-attr-x="<[getEdgeCentre($index).x]>"
           ng-attr-y="<[getEdgeCentre($index).y - 12]>"
+          ng-attr-style="fill: <[getEdgeColor($index)]>;"
           ng-click="onClickEdgeWeight($index)"
           ng-mouseenter="state.hoveredWeight = $index"
           ng-mouseleave="state.hoveredWeight = ($index === state.hoveredWeight) ? null : state.hoveredWeight"
@@ -213,6 +200,7 @@
           ng-click="onClickVertexLabel($index)"
           ng-mouseenter="state.hoveredLabel = $index"
           ng-mouseleave="state.hoveredLabel = ($index === state.hoveredLabel) ? null : state.hoveredLabel"
+          ng-attr-style="fill: <[getVertexColor($index)]>;"
           class="unselectable-text">
           <[vertex.label]>
         </text>
@@ -221,6 +209,7 @@
           ng-click="onClickVertex($index)"
           ng-mousedown="onMousedownVertex($index)"
           ng-mouseup="onMouseupVertex($index)"
+          ng-attr-style="fill: <[getVertexColor($index)]>;"
           cx="0"
           cy="0"
           ng-attr-r="<[VERTEX_RADIUS]>">
