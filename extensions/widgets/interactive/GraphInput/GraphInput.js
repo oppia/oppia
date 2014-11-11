@@ -159,10 +159,12 @@ oppia.directive('graphViz', function() {
       // The current state of the UI and stuff like that
       $scope.state = {
         currentMode: _MODES.MOVE,
-        // Vertex, edge, mode button currently being hovered over
+        // Vertex, edge, mode button, label currently being hovered over
         hoveredVertex: null,
         hoveredEdge: null,
         hoveredModeButton: null,
+        hoveredLabel: null,
+        hoveredWeight: null,
         // If in ADD_EDGE mode, source vertex of the new edge, if it exists
         addEdgeVertex: null,
         // Currently dragged vertex
@@ -198,10 +200,12 @@ oppia.directive('graphViz', function() {
             label: ''
           });
         }
-        if ($scope.state.hoveredVertex === null) {
+        if ($scope.state.hoveredVertex === null && $scope.state.hoveredLabel === null) {
           $scope.state.selectedVertex = null;
         }
-        $scope.state.selectedEdge = null;
+        if ($scope.state.hoveredEdge === null && $scope.state.hoveredWeight === null) {
+          $scope.state.selectedEdge = null;
+        }
       };
 
       $scope.init = function() {
@@ -291,6 +295,11 @@ oppia.directive('graphViz', function() {
             deleteVertex(index);
           }
         }
+        if ($scope.state.currentMode !== _MODES.DELETE &&
+            $scope.graph.isLabeled &&
+            $scope.canEditVertexLabel) {
+          beginEditVertexLabel(index);
+        }
       };
       $scope.onMousedownVertex = function(index) {
         if ($scope.state.currentMode === _MODES.ADD_EDGE) {
@@ -304,12 +313,7 @@ oppia.directive('graphViz', function() {
         }
       };
       
-      $scope.onDoubleclickVertex = function(index) {
-        if ($scope.graph.isLabeled && $scope.canEditVertexLabel) {
-          beginEditVertexLabel(index);
-        }
-      };
-      $scope.onDoubleclickVertexLabel = function(index) {
+      $scope.onClickVertexLabel = function(index) {
         if ($scope.graph.isLabeled && $scope.canEditVertexLabel) {
           beginEditVertexLabel(index);
         }
@@ -322,8 +326,13 @@ oppia.directive('graphViz', function() {
             deleteEdge(index);
           }
         }
+        if ($scope.state.currentMode !== _MODES.DELETE &&
+            $scope.graph.isWeighted && 
+            $scope.canEditEdgeWeight) {
+          beginEditEdgeWeight(index);
+        }
       };
-      $scope.onDoubleclickEdgeWeight = function(index) {
+      $scope.onClickEdgeWeight = function(index) {
         if ($scope.graph.isWeighted && $scope.canEditEdgeWeight) {
           beginEditEdgeWeight(index);
         }

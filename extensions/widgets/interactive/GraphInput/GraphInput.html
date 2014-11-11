@@ -197,7 +197,9 @@
         <text ng-if="graph.isWeighted"
           ng-attr-x="<[getEdgeCentre($index).x]>"
           ng-attr-y="<[getEdgeCentre($index).y - 12]>"
-          ng-dblclick="onDoubleclickEdgeWeight($index)"
+          ng-click="onClickEdgeWeight($index)"
+          ng-mouseenter="state.hoveredWeight = $index"
+          ng-mouseleave="state.hoveredWeight = ($index === state.hoveredWeight) ? null : state.hoveredWeight"
           class="unselectable-text">
           <[edge.weight]>
         </text>
@@ -208,7 +210,9 @@
         <text ng-if="graph.isLabeled" 
           x="0" 
           y="-10"
-          ng-dblclick="onDoubleclickVertexLabel($index)"
+          ng-click="onClickVertexLabel($index)"
+          ng-mouseenter="state.hoveredLabel = $index"
+          ng-mouseleave="state.hoveredLabel = ($index === state.hoveredLabel) ? null : state.hoveredLabel"
           class="unselectable-text">
           <[vertex.label]>
         </text>
@@ -217,7 +221,6 @@
           ng-click="onClickVertex($index)"
           ng-mousedown="onMousedownVertex($index)"
           ng-mouseup="onMouseupVertex($index)"
-          ng-dblclick="onDoubleclickVertex($index)"
           cx="0"
           cy="0"
           ng-attr-r="<[VERTEX_RADIUS]>">
