@@ -104,7 +104,8 @@ EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     default_value='')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', 'UnicodeString',
-    'A link to the forum for nominating explorations for release.',
+    'A link to the forum for nominating explorations to be featured '
+    'in the gallery',
     default_value='https://moderator/request/forum/url')
 
 

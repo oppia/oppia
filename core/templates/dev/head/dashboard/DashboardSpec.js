@@ -33,10 +33,10 @@ describe('Dashboard controller', function() {
             status: 'private',
             title: 'Private exploration'
           },
-          'released_exp_id': {
-            category: 'Released category',
+          'featured_exp_id': {
+            category: 'Featured category',
             status: 'publicized',
-            title: 'Released exploration'
+            title: 'Featured exploration'
           }
         }
       });
@@ -54,8 +54,8 @@ describe('Dashboard controller', function() {
     it('should classify explorations correctly', function() {
       $httpBackend.flush();
       expect(scope.privateExplorationIds).toEqual(['private_exp_id']);
-      expect(scope.betaExplorationIds).toEqual([]);
-      expect(scope.releasedExplorationIds).toEqual(['released_exp_id']);
+      expect(scope.publicExplorationIds).toEqual([]);
+      expect(scope.featuredExplorationIds).toEqual(['featured_exp_id']);
     });
   });
 });

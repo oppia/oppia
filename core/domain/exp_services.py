@@ -1082,13 +1082,10 @@ def get_next_page_of_all_non_private_commits(
 
 
 def _exp_rights_to_search_dict(rights):
-    # Allow searches like "is:beta" or "is:publicized".
+    # Allow searches like "is:featured".
     doc = {}
     if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
-        doc['is'] = 'publicized'
-    else:
-        doc['is'] = 'beta'
-
+        doc['is'] = 'featured'
     return doc
 
 
