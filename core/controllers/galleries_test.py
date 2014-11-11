@@ -18,18 +18,20 @@ __author__ = 'Sean Lip'
 
 from core.controllers import galleries
 from core.domain import config_services
+from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.tests import test_utils
 import feconf
+
 
 CAN_EDIT_STR = 'can_edit'
 
 
 class GalleryPageTest(test_utils.GenericTestBase):
 
-    EXP_ID = 'eid'
-    EXP_TITLE = 'title'
+    EDITOR_EMAIL = 'editor@example.com'
+    OWNER_EMAIL = 'owner@example.com'
 
     def test_gallery_page(self):
         """Test access to the gallery page."""
@@ -42,11 +44,10 @@ class GalleryPageTest(test_utils.GenericTestBase):
             response.body,
             r'class="active">\s+<a href="%s">Gallery' % feconf.GALLERY_URL)
 
-    def test_gallery_handler(self):
-        """Test the gallery data handler."""
+    def test_gallery_handler_demo_exploration(self):
+        """Test the gallery data handler on demo explorations."""
+
         owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.save_new_default_exploration(
-            self.EXP_ID, owner_id, title=self.EXP_TITLE)
         self.set_admins([self.OWNER_EMAIL])
 
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
@@ -54,16 +55,17 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_admin': False,
             'is_moderator': False,
             'is_super_admin': False,
-            'private': [],
-            'beta': [],
-            'released': [],
+            'public': [],
+            'featured': [],
         }, response_dict)
 
         # Load a public demo exploration.
         exp_services.load_demo('0')
+
+        # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['released'], [])
-        self.assertEqual(len(response_dict['beta']), 1)
+        self.assertEqual(response_dict['featured'], [])
+        self.assertEqual(len(response_dict['public']), 1)
         self.assertDictContainsSubset({
             'id': '0',
             'category': 'Welcome',
@@ -71,21 +73,127 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
-        }, response_dict['beta'][0])
+        }, response_dict['public'][0])
 
         # Publicize the demo exploration.
         rights_manager.publicize_exploration(owner_id, '0')
+
+        # Run migration job to create exploration summaries.
+        # This is not necessary, but serves as additional check that
+        # the migration job works well and gives correct galleries.
+        self.process_and_flush_pending_tasks()
+        job_id = (exp_jobs.ExpSummariesCreationOneOffJob.create_new())
+        exp_jobs.ExpSummariesCreationOneOffJob.enqueue(job_id)
+        self.assertGreaterEqual(self.count_jobs_in_taskqueue(), 1)
+        self.process_and_flush_pending_tasks()
+        self.assertEqual(self.count_jobs_in_taskqueue(), 0)
+
+        # change title and category
+        exp_services.update_exploration(
+            owner_id, '0', [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'A new title!'
+            }, {
+                'cmd': 'edit_exploration_property',
+                'property_name': 'category',
+                'new_value': 'A new category'
+            }],
+            'Change title and category')
+
+        # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
-        self.assertEqual(response_dict['beta'], [])
-        self.assertEqual(len(response_dict['released']), 1)
+        self.assertEqual(response_dict['public'], [])
+        self.assertEqual(len(response_dict['featured']), 1)
         self.assertDictContainsSubset({
             'id': '0',
-            'category': 'Welcome',
-            'title': 'Welcome to Oppia!',
+            'category': 'A new category',
+            'title': 'A new title!',
             'language': 'English',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
-        }, response_dict['released'][0])
+        }, response_dict['featured'][0])
+
+    def test_gallery_handler_for_created_explorations(self):
+        """Test the gallery data handler for manually created explirations."""
+
+        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.set_admins([self.OWNER_EMAIL])
+
+        self.register_editor(self.OWNER_EMAIL)
+        self.login(self.OWNER_EMAIL)
+
+        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        self.assertEqual({
+            'is_admin': True,
+            'is_moderator': True,
+            'is_super_admin': False,
+            'public': [],
+            'featured': [],
+            'user_email': self.OWNER_EMAIL,
+            'username': 'defaultusername'
+        }, response_dict)
+
+        # Create exploration A
+        exploration = self.save_new_valid_exploration(
+            'A', owner_id, title='Title A', category='Category A',
+            objective='Objective A')
+        exp_services._save_exploration(
+            owner_id, exploration, 'Exploration A', [])
+
+        # Test that the private exploration isn't displayed.
+        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        self.assertEqual(response_dict['public'], [])
+        self.assertEqual(response_dict['featured'], [])
+
+        # Create exploration B
+        exploration = self.save_new_valid_exploration(
+            'B', owner_id, title='Title B', category='Category B',
+            objective='Objective B')
+        exp_services._save_exploration(
+            owner_id, exploration, 'Exploration B', [])
+        rights_manager.publish_exploration(owner_id, 'B')
+        rights_manager.publicize_exploration(owner_id, 'B')
+
+        # Publish exploration A
+        rights_manager.publish_exploration(owner_id, 'A')
+
+        # Test gallery
+        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        self.assertEqual(len(response_dict['public']), 1)
+        self.assertEqual(len(response_dict['featured']), 1)
+        self.assertDictContainsSubset({
+            'id': 'A',
+            'category': 'Category A',
+            'title': 'Title A',
+            'language': 'English',
+            'objective': 'Objective A',
+            'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
+        }, response_dict['public'][0])
+        self.assertDictContainsSubset({
+            'id': 'B',
+            'category': 'Category B',
+            'title': 'Title B',
+            'language': 'English',
+            'objective': 'Objective B',
+            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+        }, response_dict['featured'][0])
+
+        # Delete exploration A
+        exp_services.delete_exploration(owner_id, 'A')
+
+        # Test gallery
+        response_dict = self.get_json(feconf.GALLERY_DATA_URL)
+        self.assertEqual(response_dict['public'], [])
+        self.assertEqual(len(response_dict['featured']), 1)
+        self.assertDictContainsSubset({
+            'id': 'B',
+            'category': 'Category B',
+            'title': 'Title B',
+            'language': 'English',
+            'objective': 'Objective B',
+            'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
+        }, response_dict['featured'][0])
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""

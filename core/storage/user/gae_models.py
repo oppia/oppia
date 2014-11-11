@@ -38,6 +38,8 @@ class UserSettingsModel(base_models.BaseModel):
     normalized_username = ndb.StringProperty(indexed=True)
     # When the user last agreed to the terms of the site. May be None.
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
+    # When the user last started the state editor tutorial. May be None.
+    last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
@@ -61,6 +63,8 @@ class UserSubscriptionsModel(base_models.BaseModel):
     activity_ids = ndb.StringProperty(repeated=True, indexed=True)
     # IDs of feedback thread ids that this user subscribes to.
     feedback_thread_ids = ndb.StringProperty(repeated=True, indexed=True)
+    # When the user last checked notifications. May be None.
+    last_checked = ndb.DateTimeProperty(default=None)
 
 
 class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):

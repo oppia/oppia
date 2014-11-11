@@ -49,6 +49,7 @@ CMD_CREATE_NEW = 'create_new'
 #Name for the exploration search index
 SEARCH_INDEX_EXPLORATIONS = 'explorations'
 
+
 # Repository GET methods.
 def _get_exploration_memcache_key(exploration_id, version=None):
     """Returns a memcache key for an exploration."""
@@ -68,6 +69,18 @@ def get_exploration_from_model(exploration_model):
         exploration_model.states, exploration_model.param_specs,
         exploration_model.param_changes, exploration_model.version,
         exploration_model.created_on, exploration_model.last_updated)
+
+
+def get_exploration_summary_from_model(exp_summary_model):
+    return exp_domain.ExplorationSummary(
+        exp_summary_model.id, exp_summary_model.title,
+        exp_summary_model.category, exp_summary_model.objective,
+        exp_summary_model.language_code, exp_summary_model.skill_tags,
+        exp_summary_model.status, exp_summary_model.community_owned,
+        exp_summary_model.owner_ids, exp_summary_model.editor_ids,
+        exp_summary_model.viewer_ids, exp_summary_model.version,
+        exp_summary_model.exploration_model_created_on,
+        exp_summary_model.exploration_model_last_updated)
 
 
 def get_exploration_by_id(exploration_id, strict=True, version=None):
@@ -90,9 +103,22 @@ def get_exploration_by_id(exploration_id, strict=True, version=None):
         else:
             return None
 
+
+def get_exploration_summary_by_id(exploration_id):
+    """Returns a domain object representing an exploration summary."""
+    # TODO(msl): Maybe use memcache similarly to get_exploration_by_id.
+    exp_summary_model = exp_models.ExpSummaryModel.get(
+        exploration_id)
+    if exp_summary_model:
+        exp_summary = get_exploration_summary_from_model(exp_summary_model)
+        return exp_summary
+    else:
+        return None
+
+
 def get_multiple_explorations_by_id(exp_ids, strict=True):
     """Returns a dict of domain objects representing explorations with the given
-    ids as keys..
+    ids as keys.
     """
     exp_ids = set(exp_ids)
     result = {}
@@ -122,11 +148,14 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         db_results_dict[eid] = exploration
 
     if strict and not_found:
-        raise ValueError('Couldn\'t find explorations with the following ids:\n%s'
-                        % '\n'.join(not_found))
+        raise ValueError(
+            'Couldn\'t find explorations with the following ids:\n%s'
+            % '\n'.join(not_found))
 
-    cache_update = {eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
-                    if db_results_dict[eid] is not None}
+    cache_update = {
+        eid: db_results_dict[eid] for eid in db_results_dict.iterkeys()
+        if db_results_dict[eid] is not None
+    }
 
     if cache_update:
         memcache_services.set_multi(cache_update)
@@ -138,6 +167,15 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
 def get_new_exploration_id():
     """Returns a new exploration id."""
     return exp_models.ExplorationModel.get_new_id('')
+
+
+def is_exp_summary_editable(exp_summary, user_id=None):
+    """Checks if a given user may edit an exploration by checking
+    the given domain object."""
+    return user_id is not None and (
+        user_id in exp_summary.editor_ids
+        or user_id in exp_summary.owner_ids
+        or exp_summary.community_owned)
 
 
 # Query methods.
@@ -240,19 +278,56 @@ def get_exploration_titles(exp_ids):
     return result
 
 
-def get_non_private_explorations_summary_dict(user_id=None):
-    """Returns a summary of non-private explorations."""
-    return _get_explorations_summary_dict(
-        rights_manager.get_non_private_exploration_rights(), user_id=user_id)
+def _get_exploration_summary_dicts_from_models(exp_summary_models):
+    """Given an iterable of ExpSummaryModel instances, create a dict containing
+    corresponding exploration summary domain objects, keyed by id."""
+    exploration_summaries = [
+        get_exploration_summary_from_model(exp_summary_model)
+        for exp_summary_model in exp_summary_models]
+    result = {}
+    for exp_summary in exploration_summaries:
+        result[exp_summary.id] = exp_summary
+    return result
 
 
-def get_private_at_least_viewable_explorations_summary_dict(user_id):
-    """Returns a summary of private explorations that are at least viewable by
-    the given user.
-    """
-    return _get_explorations_summary_dict(
-        rights_manager.get_private_at_least_viewable_exploration_rights(
-            user_id), user_id=user_id)
+def get_exploration_summaries_matching_query(query_string):
+    """Returns a dict with all exploration summary domain objects matching the
+    given search query string."""
+    exp_ids, unused_cursor = search_explorations(query_string)
+    summary_models = [
+        model for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
+        if model is not None]
+    return _get_exploration_summary_dicts_from_models(summary_models)
+
+
+def get_non_private_exploration_summaries():
+    """Returns a dict with all non-private exploration summary domain objects,
+    keyed by their id."""
+    return _get_exploration_summary_dicts_from_models(
+        exp_models.ExpSummaryModel.get_non_private())
+
+
+def get_all_exploration_summaries():
+    """Returns a dict with all exploration summary domain objects,
+    keyed by their id."""
+    return _get_exploration_summary_dicts_from_models(
+        exp_models.ExpSummaryModel.get_all())
+
+
+def get_private_at_least_viewable_exploration_summaries(user_id):
+    """Returns a dict with all exploration summary domain objects that are
+    at least viewable by given user. The dict is keyed by exploration id."""
+    return _get_exploration_summary_dicts_from_models(
+        exp_models.ExpSummaryModel.get_private_at_least_viewable(
+            user_id=user_id))
+
+
+def get_at_least_editable_exploration_summaries(user_id):
+    """Returns a dict with all exploration summary domain objects that are
+    at least editable by given user. The dict is keyed by exploration id."""
+    return _get_exploration_summary_dicts_from_models(
+        exp_models.ExpSummaryModel.get_at_least_editable(
+            user_id=user_id))
 
 
 def get_explicit_viewer_explorations_summary_dict(user_id):
@@ -275,6 +350,7 @@ def get_at_least_editable_summary_dict(user_id):
     """Returns a summary of explorations that are at least editable by this
     user.
     """
+    # TODO(msl): use stored exploration summaries for this
     return  _get_explorations_summary_dict(
         rights_manager.get_at_least_editable_exploration_rights(user_id),
         user_id=user_id)
@@ -379,6 +455,7 @@ def apply_change_list(exploration_id, change_list):
                 elif change.property_name == 'init_state_name':
                     exploration.update_init_state_name(change.new_value)
         return exploration
+
     except Exception as e:
         logging.error(
             '%s %s %s %s' % (
@@ -612,6 +689,9 @@ def _create_exploration(
     _handle_exp_change_event(exploration.id)
     exploration.version += 1
 
+    # create summary of exploration
+    create_exploration_summary(exploration.id)
+
 
 def save_new_exploration(committer_id, exploration):
     commit_message = (
@@ -654,6 +734,9 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     #delete the exploration from search.
     search_services.delete_documents_from_index([exploration_id],
                                                 SEARCH_INDEX_EXPLORATIONS)
+
+    # delete summary of exploration
+    delete_exploration_summary(exploration_id, force_deletion=force_deletion)
 
 
 # Operations on exploration snapshots.
@@ -743,6 +826,84 @@ def update_exploration(
     exploration = apply_change_list(exploration_id, change_list)
     _save_exploration(committer_id, exploration, commit_message, change_list)
 
+    # update summary of changed exploration
+    update_exploration_summary(exploration.id)
+
+
+def create_exploration_summary(exploration_id):
+    """Create summary of an exploration and store in datastore."""
+    exploration = get_exploration_by_id(exploration_id)
+    exp_summary = get_summary_of_exploration(exploration)
+    _save_exploration_summary(exp_summary)
+
+
+def update_exploration_summary(exploration_id):
+    """Update the summary of an exploration."""
+    exploration = get_exploration_by_id(exploration_id)
+    exp_summary = get_summary_of_exploration(exploration)
+    _save_exploration_summary(exp_summary)
+
+
+def get_summary_of_exploration(exploration):
+    """Create ExplorationSummary domain object for a given Exploration
+    domain object and return it.
+    """
+    exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
+
+    exploration_model_last_updated = exploration.last_updated
+    exploration_model_created_on = exploration.created_on
+
+    exp_summary = exp_domain.ExplorationSummary(
+        exploration.id,
+        exploration.title,
+        exploration.category,
+        exploration.objective,
+        exploration.language_code,
+        exploration.skill_tags,
+        exp_rights.status,
+        exp_rights.community_owned,
+        exp_rights.owner_ids,
+        exp_rights.editor_ids,
+        exp_rights.viewer_ids,
+        exploration.version,
+        exploration_model_created_on,
+        exploration_model_last_updated
+    )
+
+    return exp_summary
+
+
+def _save_exploration_summary(exp_summary):
+    """Save exploration summary domain object as ExpSummaryModel
+    entity in datastore."""
+
+    exp_summary_model = exp_models.ExpSummaryModel(
+        id=exp_summary.id,
+        title=exp_summary.title,
+        category=exp_summary.category,
+        objective=exp_summary.objective,
+        language_code=exp_summary.language_code,
+        skill_tags=exp_summary.skill_tags,
+        status=exp_summary.status,
+        community_owned=exp_summary.community_owned,
+        owner_ids=exp_summary.owner_ids,
+        editor_ids=exp_summary.editor_ids,
+        viewer_ids=exp_summary.viewer_ids,
+        version=exp_summary.version,
+        exploration_model_last_updated=(
+            exp_summary.exploration_model_last_updated),
+        exploration_model_created_on=(
+            exp_summary.exploration_model_created_on)
+    )
+
+    exp_summary_model.put()
+
+
+def delete_exploration_summary(exploration_id, force_deletion=False):
+    """Delete an exploration summary model."""
+
+    exp_models.ExpSummaryModel.get(exploration_id).delete()
+
 
 def revert_exploration(
         committer_id, exploration_id, current_version, revert_to_version):
@@ -775,6 +936,8 @@ def revert_exploration(
         committer_id, 'Reverted exploration to version %s' % revert_to_version,
         revert_to_version)
     memcache_services.delete(_get_exploration_memcache_key(exploration_id))
+
+    update_exploration_summary(exploration_id)
 
 
 # Creation and deletion methods.
@@ -919,13 +1082,10 @@ def get_next_page_of_all_non_private_commits(
 
 
 def _exp_rights_to_search_dict(rights):
-    # Allow searches like "is:beta" or "is:publicized".
+    # Allow searches like "is:featured".
     doc = {}
     if rights.status == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
-        doc['is'] = 'publicized'
-    else:
-        doc['is'] = 'beta'
-
+        doc['is'] = 'featured'
     return doc
 
 
@@ -992,28 +1152,25 @@ def search_explorations(
 
     args:
       - query_string: the query string to search for.
-      - sort: a string indicating how to sort results.
-        This should be a string of space separated values.
-        Each value should start with a '+' or a '-' character indicating whether
-        to sort in ascending or descending
-        order respectively. This character should be followed by a field name to
-        sort on. When this is None, results are based on 'rank'.
-        See _exp_to_search_dict to see how rank is determined
+      - sort: a string indicating how to sort results. This should be a string
+          of space separated values. Each value should start with a '+' or a
+          '-' character indicating whether to sort in ascending or descending
+          order respectively. This character should be followed by a field name
+          to sort on. When this is None, results are based on 'rank'. See
+          _exp_to_search_dict to see how rank is determined.
       - limit: the maximum number of results to return.
       - cursor: A cursor, used to get the next page of results.
-        If there are more documents that match the query than
-        'limit', this function will return a cursor to get the next page.
+          If there are more documents that match the query than 'limit', this
+          function will return a cursor to get the next page.
 
     returns: a tuple:
-      - a list of Exploration domain objects that match the query.
-      - a cursor if there are more matching exploration to fetch, None otherwise.
-        If a cursor is returned, it will be a web-safe string that can be used in URLs.
+      - a list of exploration ids that match the query.
+      - a cursor if there are more matching explorations to fetch, None
+          otherwise. If a cursor is returned, it will be a web-safe string that
+          can be used in URLs.
     """
-    results, cursor = search_services.search(query, SEARCH_INDEX_EXPLORATIONS,
-                                             cursor, limit, sort, ids_only=True)
-    ids = [result.get('id') for result in results]
-    explorations = get_multiple_explorations_by_id(ids, strict=True)
-    return [explorations[_id] for _id in ids ], cursor
+    return search_services.search(
+        query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
 
 # Temporary event handlers
 

@@ -183,8 +183,8 @@ urls = [
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_REDIRECT_URL, galleries.GalleryRedirector,
-        'gallery_redirect'),
+        r'%s' % feconf.GALLERY_LOGIN_REDIRECT_URL,
+        galleries.GalleryLoginRedirector, 'gallery_redirect'),
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
@@ -272,6 +272,9 @@ urls = [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
+    get_redirect_route(
+        r'/createhandler/started_tutorial_event/<exploration_id>',
+        editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
     # Temporary handlers to support preview mode.
     # TODO(sll): Remove this once we have support for client-side expressions.
     get_redirect_route(
@@ -299,6 +302,10 @@ urls = [
     get_redirect_route(
         r'/widgetrepository/data/<widget_type>',
         widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
+
+    get_redirect_route(
+        r'/notificationshandler', home.NotificationsHandler,
+        'notifications_handler'),
 
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),

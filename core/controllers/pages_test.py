@@ -17,7 +17,6 @@
 __author__ = 'Sean Lip'
 
 from core.tests import test_utils
-import feconf
 
 
 class NoninteractivePagesTest(test_utils.GenericTestBase):

@@ -21,10 +21,10 @@
 oppia.controller('ExplorationGraph', [
     '$scope', '$modal', 'editorContextService', 'warningsData',
     'explorationStatesService', 'editabilityService', 'validatorsService',
-    'routerService', 'graphDataService',
+    'routerService', 'graphDataService', 'focusService',
     function($scope, $modal, editorContextService, warningsData,
              explorationStatesService, editabilityService, validatorsService,
-             routerService, graphDataService) {
+             routerService, graphDataService, focusService) {
 
   $scope.getGraphData = graphDataService.getGraphData;
   $scope.isEditable = editabilityService.isEditable;
@@ -38,6 +38,7 @@ oppia.controller('ExplorationGraph', [
     explorationStatesService.addState(newStateName, function() {
       $scope.newStateName = '';
       routerService.navigateToMainTab(newStateName);
+      focusService.setFocus('newStateNameSubmittedFromStateEditor');
     });
   };
 
@@ -61,12 +62,37 @@ oppia.controller('ExplorationGraph', [
     $modal.open({
       templateUrl: 'modals/stateGraph',
       backdrop: 'static',
-      resolve: {},
+      resolve: {
+        isEditable: function() {
+          return $scope.isEditable;
+        }
+      },
+      windowClass: 'oppia-large-modal-window',
       controller: [
         '$scope', '$modalInstance', 'editorContextService', 'graphDataService',
-        function($scope, $modalInstance, editorContextService, graphDataService) {
+        'explorationStatesService', 'isEditable',
+        function($scope, $modalInstance, editorContextService, graphDataService,
+                 explorationStatesService, isEditable) {
           $scope.currentStateName = editorContextService.getActiveStateName();
           $scope.graphData = graphDataService.getGraphData();
+          $scope.isEditable = isEditable;
+
+          $scope.isNewStateNameValid = function(newStateName) {
+            return explorationStatesService.isNewStateNameValid(newStateName, false);
+          }
+
+          $scope.newStateName = '';
+          $scope.addStateFromModal = function(newStateName) {
+            if (!explorationStatesService.isNewStateNameValid(newStateName, true)) {
+              $scope.newStateName = '';
+              return;
+            }
+            explorationStatesService.addState(newStateName, function() {
+              $scope.newStateName = '';
+              $scope.graphData = graphDataService.getGraphData();
+              focusService.setFocus('newStateNameSubmittedFromModal');
+            });
+          };
 
           $scope.deleteState = function(stateName) {
             $modalInstance.close({

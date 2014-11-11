@@ -111,6 +111,9 @@ class ExplorationModel(base_models.VersionedModel):
 
         exp_rights = ExplorationRightsModel.get_by_id(self.id)
 
+        # TODO(msl): test if put_async() leads to any problems (make
+        # sure summary dicts get updated correctly when explorations
+        # are changed)
         ExplorationCommitLogEntryModel(
             id=('exploration-%s-%s' % (self.id, self.version)),
             user_id=committer_id,
@@ -209,7 +212,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_page_of_non_private(
-            cls, page_size=feconf.DEFAULT_QUERY_LIMIT, urlsafe_start_cursor=None):
+            cls, page_size=feconf.DEFAULT_QUERY_LIMIT,
+            urlsafe_start_cursor=None):
         """Returns a page of non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
@@ -286,6 +290,9 @@ class ExplorationRightsModel(base_models.VersionedModel):
             committer_username = (
                 committer_user_settings_model.username
                 if committer_user_settings_model else '')
+            # TODO(msl): test if put_async() leads to any problems (make
+            # sure summary dicts get updated correctly when explorations
+            # are changed)
             ExplorationCommitLogEntryModel(
                 id=('rights-%s-%s' % (self.id, self.version)),
                 user_id=committer_id,
@@ -352,9 +359,11 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
             cls.query(), page_size, urlsafe_start_cursor)
 
     @classmethod
-    def get_all_non_private_commits(cls, page_size, urlsafe_start_cursor, max_age=None):
+    def get_all_non_private_commits(
+            cls, page_size, urlsafe_start_cursor, max_age=None):
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError('max_age must be a datetime.timedelta instance or None.')
+            raise ValueError(
+                'max_age must be a datetime.timedelta instance or None.')
 
         query = cls.query(cls.post_commit_is_private == False)
         if max_age:
@@ -362,3 +371,127 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
                 cls.last_updated >= datetime.datetime.utcnow() - max_age)
         return cls._fetch_page_sorted_by_last_updated(
             query, page_size, urlsafe_start_cursor)
+
+
+class ExpSummaryModel(base_models.BaseModel):
+    """Summary model for an Oppia exploration.
+
+    This should be used whenever the content blob of the exploration is not
+    needed (e.g. gallery, search, etc).
+
+    A ExpSummaryModel instance stores the following information:
+
+        id, title, category, objective, language_code, skill_tags,
+        last_updated, created_on, status (private, public or
+        publicized), community_owned, owner_ids, editor_ids,
+        viewer_ids, version.
+
+    The key of each instance is the exploration id.
+    """
+
+    # What this exploration is called.
+    title = ndb.StringProperty(required=True)
+    # The category this exploration belongs to.
+    category = ndb.StringProperty(required=True, indexed=True)
+    # The objective of this exploration.
+    objective = ndb.TextProperty(required=True, indexed=False)
+    # The ISO 639-1 code for the language this exploration is written in.
+    language_code = ndb.StringProperty(
+        required=True, indexed=True)
+    # Skill tags associated with this exploration.
+    skill_tags = ndb.StringProperty(repeated=True, indexed=True)
+
+    # Time when the exploration model was last updated (not to be
+    # confused with last_updated, which is the time when the
+    # exploration *summary* model was last updated)
+    exploration_model_last_updated = ndb.DateTimeProperty(indexed=True)
+    # Time when the exploration model was created (not to be confused
+    # with created_on, which is the time when the exploration *summary*
+    # model was created)
+    exploration_model_created_on = ndb.DateTimeProperty(indexed=True)
+
+    # The publication status of this exploration.
+    status = ndb.StringProperty(
+        default=EXPLORATION_STATUS_PRIVATE, indexed=True,
+        choices=[
+            EXPLORATION_STATUS_PRIVATE,
+            EXPLORATION_STATUS_PUBLIC,
+            EXPLORATION_STATUS_PUBLICIZED
+        ]
+    )
+
+    # Whether this exploration is owned by the community.
+    community_owned = ndb.BooleanProperty(required=True, indexed=True)
+
+    # The user_ids of owners of this exploration.
+    owner_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to edit this exploration.
+    editor_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The user_ids of users who are allowed to view this exploration.
+    viewer_ids = ndb.StringProperty(indexed=True, repeated=True)
+    # The version number of the exploration after this commit. Only populated
+    # for commits to an exploration (as opposed to its rights, etc.)
+    version = ndb.IntegerProperty()
+
+    @classmethod
+    def get_public(cls):
+        """Returns an iterable with public (beta) exp summary models."""
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.status == EXPLORATION_STATUS_PUBLIC
+        ).filter(
+            ExpSummaryModel.deleted == False
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_publicized(cls):
+        """Returns an iterable with publicized exp summary models."""
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.status == EXPLORATION_STATUS_PUBLICIZED
+        ).filter(
+            ExpSummaryModel.deleted == False
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_non_private(cls):
+        """Returns an iterable with non-private exp summary models."""
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.status != EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ExpSummaryModel.deleted == False
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_community_owned(cls):
+        """Returns an iterable with community-owned exp summary models."""
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.community_owned == True
+        ).filter(
+            ExpSummaryModel.deleted == False
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_private_at_least_viewable(cls, user_id):
+        """Returns an iterable with private exp summaries that are at least
+        viewable by the given user.
+        """
+        return ExpSummaryModel.query().filter(
+            ExpSummaryModel.status == EXPLORATION_STATUS_PRIVATE
+        ).filter(
+            ndb.OR(ExpSummaryModel.owner_ids == user_id,
+                   ExpSummaryModel.editor_ids == user_id,
+                   ExpSummaryModel.viewer_ids == user_id)
+        ).filter(
+            ExpSummaryModel.deleted == False
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
+
+    @classmethod
+    def get_at_least_editable(cls, user_id):
+        """Returns an iterable with exp summaries that are at least
+        editable by the given user.
+        """
+        return ExpSummaryModel.query().filter(
+            ndb.OR(ExpSummaryModel.owner_ids == user_id,
+                   ExpSummaryModel.editor_ids == user_id)
+        ).filter(
+            ExpSummaryModel.deleted == False
+        ).fetch(feconf.DEFAULT_QUERY_LIMIT)

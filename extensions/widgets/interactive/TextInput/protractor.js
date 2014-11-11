@@ -16,10 +16,22 @@
  * @fileoverview End-to-end testing utilities for the Text interaction.
  */
 
-var expectInteractionDetailsToMatch = function() {
+var objects = require('../../../objects/protractor.js');
+
+var customizeInteraction = function(elem, placeholderText, heightOfBox) {
+  objects.UnicodeStringEditor(
+    elem.element(by.tagName('schema-based-unicode-editor'))
+  ).setValue(placeholderText);
+  objects.IntEditor(
+    elem.element(by.tagName('schema-based-int-editor'))
+  ).setValue(heightOfBox);
+};
+
+var expectInteractionDetailsToMatch = function(placeholderText, heightOfBox) {
   expect(
     element(by.tagName('oppia-interactive-text-input')).isPresent()
   ).toBe(true);
+  // TODO (Jacob) add checks for the placeholder text and box height
 };
 
 var submitAnswer = function(answer) {
@@ -29,5 +41,9 @@ var submitAnswer = function(answer) {
     element(by.tagName('button')).click();
 };
 
+var submissionHandler = 'NormalizedString';
+
+exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.submissionHandler = submissionHandler;

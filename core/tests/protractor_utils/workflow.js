@@ -19,24 +19,27 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-forms = require('./forms.js');
-editor = require('./editor.js');
-general = require('./general.js');
+var forms = require('./forms.js');
+var editor = require('./editor.js');
+var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
   browser.get('/gallery');
   element(by.css('.protractor-test-create-exploration')).click();
+  protractor.getInstance().waitForAngular();
   element(by.model('newExplorationTitle')).sendKeys(name);
-  forms.editAutocompleteDropdown(element(by.tagName('select2-dropdown'))).
-    setText(category);
+  forms.AutocompleteDropdownEditor(element(by.tagName('select2-dropdown'))).
+    setValue(category);
   element(by.buttonText('Create New Exploration')).click();
 
   // We now want to wait for the editor to fully load.
   protractor.getInstance().waitForAngular();
+
+  editor.exitTutorialIfNecessary();
 };
 
-// This will only work if all changes have been saved and there are no 
+// This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
   element(by.css('.protractor-test-publish-exploration')).click();
@@ -48,20 +51,20 @@ var publishExploration = function() {
 // Creates and publishes a minimal exploration
 var createAndPublishExploration = function(name, category, objective, language) {
   createExploration(name, category);
-  editor.editRule('default').setDestination('END');
+  editor.RuleEditor('default').setDestination('END');
   editor.setObjective(objective);
   if (language) {
     editor.setLanguage(language);
   }
-  editor.selectContinueWidget();
+  editor.selectInteraction('Continue');
   editor.saveChanges();
   publishExploration();
 };
 
 // Run from the editor, requires user to be a moderator / admin.
-var releaseExploration = function() {
+var markExplorationAsFeatured = function() {
   editor.runFromSettingsTab(function() {
-    element(by.css('.protractor-test-release-exploration')).click();
+    element(by.css('.protractor-test-mark-exploration-featured')).click();
   });
 };
 
@@ -99,7 +102,7 @@ var _getExplorationRoles = function(roleName) {
           itemName + ' in explorationRightsService.' + listName + ' track by $index'
         )).map(function(elem) {
       return elem.getText();
-    }); 
+    });
   });
   return result;
 };
@@ -119,7 +122,7 @@ var getExplorationPlaytesters = function() {
 exports.createExploration = createExploration;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
-exports.releaseExploration = releaseExploration;
+exports.markExplorationAsFeatured = markExplorationAsFeatured;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;

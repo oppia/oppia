@@ -97,7 +97,8 @@ def get_state_improvements(exploration_id):
         total_entry_count = 0
         no_answer_submitted_count = 0
         if state_name in state_hit_counts:
-            total_entry_count = state_hit_counts[state_name]['total_entry_count']
+            total_entry_count = (
+                state_hit_counts[state_name]['total_entry_count'])
             no_answer_submitted_count = state_hit_counts[state_name].get(
                 'no_answer_count', 0)
 

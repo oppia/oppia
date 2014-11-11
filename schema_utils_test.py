@@ -124,6 +124,15 @@ VALIDATOR_SPECS = {
         },
     },
     SCHEMA_TYPE_LIST: {
+        'has_length_at_least': {
+            'min_value': {
+                'type': SCHEMA_TYPE_INT,
+                'validators': [{
+                    'id': 'is_at_least',
+                    'min_value': 1,
+                }],
+            }
+        },
         'has_length_at_most': {
             'max_value': {
                 'type': SCHEMA_TYPE_INT,

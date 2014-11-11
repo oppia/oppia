@@ -17,17 +17,26 @@
  * interaction.
  */
 
+var objects = require('../../../objects/protractor.js');
+
+var customizeInteraction = function(elem) {
+  // There are no customizations.
+};
+
 var expectInteractionDetailsToMatch = function() {
   expect(
     element(by.tagName('oppia-interactive-numeric-input')).isPresent()
   ).toBe(true);
 };
 
-// 'answer' {Number} is the number to submit.
 var submitAnswer = function(answer) {
   element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer + '\n');
 };
 
+var submissionHandler = 'Real';
+
+exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.submissionHandler = submissionHandler;

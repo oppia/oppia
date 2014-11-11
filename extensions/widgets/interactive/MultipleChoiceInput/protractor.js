@@ -17,15 +17,33 @@
  * interaction.
  */
 
-// 'answerChoices' is a list of strings that correspond to the various
-// multiple-choice options.
-var expectInteractionDetailsToMatch = function(answerChoices) {
-  expect(
-    element.all(by.repeater('choice in choices track by $index')).
-        map(function(elem) {
-      return elem.getText();
-    })
-  ).toEqual(answerChoices);
+var forms = require('../../../../core/tests/protractor_utils/forms.js');
+
+// The members of richTextInstructionsArray are functions, one for each option,
+// which will each be passed a 'handler' that they can use to edit the
+// rich-text area of the option, for example by
+//   handler.appendUnderlineText('emphasised');
+var customizeInteraction = function(elem, richTextInstructionsArray) {
+  forms.ListEditor(elem).setLength(richTextInstructionsArray.length);
+  for (var i = 0; i < richTextInstructionsArray.length; i++) {
+    var richTextEditor = forms.ListEditor(elem).editItem(i, 'RichText');
+    richTextEditor.clear();
+    richTextInstructionsArray[i](richTextEditor);
+  }
+};
+
+// These members of richTextInstructionsArray each describe how to check one of
+// the options.
+var expectInteractionDetailsToMatch = function(richTextInstructionsArray) {
+  element.all(by.repeater('choice in choices track by $index')).
+      then(function(optionElements) {
+    expect(optionElements.length).toEqual(richTextInstructionsArray.length);
+    for (var i = 0; i < optionElements.length; i++) {
+      forms.expectRichText(
+        optionElements[i].element(by.xpath('./button/span'))
+      ).toMatch(richTextInstructionsArray[i]);
+    }
+  });
 };
 
 // 'answer' {String} is the text on the multiple-choice item to select.
@@ -34,5 +52,9 @@ var submitAnswer = function(answer) {
     element(by.buttonText(answer)).click();
 };
 
+var submissionHandler = 'NonnegativeInt';
+
+exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.submissionHandler = submissionHandler;

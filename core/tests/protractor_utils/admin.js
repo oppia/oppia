@@ -22,21 +22,33 @@
 var general = require('./general.js');
 var forms = require('./forms.js');
 
-var appendToConfigList = function(listName, textToAppend) {
+// 'propertyName' is the name of the property as given in the left-hand column.
+// 'objectType' is the type of the property, e.g. 'Unicode' or 'List'.
+// 'editingInstructions' is  a function that is sent an editor for the 
+// objectType which it can then act on, for example by adding elements to a list.
+var editConfigProperty = function(propertyName, objectType, editingInstructions) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(
       by.repeater('(configPropertyId, configPropertyData) in configProperties')
     ).map(function(configProperty) {
-    configProperty.element(by.tagName('em')).getText().then(function(title) {
-      if (title.match(listName)) {
-        var newEntry = forms.editList(configProperty).appendEntry();
-        forms.editUnicode(newEntry, true).setText(textToAppend);
+    return configProperty.element(by.tagName('em')).getText().then(function(title) {
+      if (title.match(propertyName)) {
+        editingInstructions(forms.getEditor(objectType)(configProperty));
         element(by.buttonText('Save')).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the saving to complete.
         protractor.getInstance().waitForAngular();
+        return true;
       }
     });
+  }).then(function(results) {
+    var success = false;
+    for (var i = 0; i < results.length; i++) {
+      success = success || results[i];
+    }
+    if (!success) {
+      throw Error('Could not find config property: ' + propertyName);
+    }
   });
 };
 
@@ -59,5 +71,5 @@ var reloadExploration = function(name) {
   });
 };
 
-exports.appendToConfigList = appendToConfigList;
+exports.editConfigProperty = editConfigProperty;
 exports.reloadExploration = reloadExploration;

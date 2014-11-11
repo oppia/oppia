@@ -274,9 +274,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id)[1])
+                ModifiedRecentUpdatesAggregator.get_recent_updates(
+                    user_a_id)[1])
             recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id)[1])
+                ModifiedRecentUpdatesAggregator.get_recent_updates(
+                    user_b_id)[1])
             expected_feedback_thread_update_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -341,9 +343,11 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates_for_user_a = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_a_id)[1])
+                ModifiedRecentUpdatesAggregator.get_recent_updates(
+                    user_a_id)[1])
             recent_updates_for_user_b = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_b_id)[1])
+                ModifiedRecentUpdatesAggregator.get_recent_updates(
+                    user_b_id)[1])
             expected_feedback_thread_update_dict = {
                 'activity_id': EXP_ID,
                 'activity_title': EXP_TITLE,
@@ -446,7 +450,7 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
                 thread_id, self.user_c_id, None, None, 'more text')
 
         self._run_one_off_job()
-        
+
         # Both users are subscribed to the feedback thread.
         user_b_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_b_id)
@@ -484,8 +488,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_c_id, strict=False)
 
-        self.assertEqual(user_a_subscriptions_model.activity_ids, [self.EXP_ID])
-        self.assertEqual(user_b_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(
+            user_b_subscriptions_model.activity_ids, [self.EXP_ID])
         self.assertEqual(user_a_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_b_subscriptions_model.feedback_thread_ids, [])
         self.assertEqual(user_c_subscriptions_model, None)
@@ -534,8 +540,10 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
         user_c_subscriptions_model = user_models.UserSubscriptionsModel.get(
             self.user_c_id, strict=False)
 
-        self.assertEqual(user_a_subscriptions_model.activity_ids, [self.EXP_ID])
-        self.assertEqual(user_b_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(
+            user_a_subscriptions_model.activity_ids, [self.EXP_ID])
+        self.assertEqual(
+            user_b_subscriptions_model.activity_ids, [self.EXP_ID])
         self.assertEqual(user_c_subscriptions_model, None)
 
     def test_deleted_exploration(self):

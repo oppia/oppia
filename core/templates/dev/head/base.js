@@ -18,10 +18,13 @@
  * @author sll@google.com (Sean Lip)
  */
 
+
 // Global utility methods.
 oppia.controller('Base', [
-    '$scope', '$rootScope', '$window', '$log', 'warningsData', 'activeInputData', 'messengerService',
-    function($scope, $rootScope, $window, $log, warningsData, activeInputData, messengerService) {
+    '$scope', '$http', '$rootScope', '$window', '$log',
+    'warningsData', 'activeInputData', 'messengerService',
+    function($scope, $http, $rootScope, $window, $log,
+             warningsData, activeInputData, messengerService) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
   $scope.warningsData = warningsData;
@@ -29,6 +32,18 @@ oppia.controller('Base', [
 
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';
+
+  // Show the number of unseen notifications in the navbar and page title,
+  // unless the user is already on the dashboard page.
+  $http.get('/notificationshandler').success(function(data) {
+    if ($window.location.pathname !== '/') {
+      $scope.numUnseenNotifications = data.num_unseen_notifications;
+      if ($scope.numUnseenNotifications > 0) {
+        $window.document.title = (
+          '(' + $scope.numUnseenNotifications + ') ' + $window.document.title);
+      }
+    }
+  });
 
   /**
    * Checks if an object is empty.
@@ -76,12 +91,5 @@ oppia.controller('Base', [
 
   $scope.cloneObject = function(obj) {
     return angular.copy(obj);
-  };
-
-  // This method is here because the trigger for the tutorial is in the site
-  // navbar. It broadcasts an event to tell the exploration editor to open the
-  // editor tutorial.
-  $scope.openEditorTutorial = function() {
-    $scope.$broadcast('openEditorTutorial');
   };
 }]);

@@ -21,11 +21,11 @@
 
 // Service for the create/upload exploration buttons and modals.
 oppia.factory('createExplorationButtonService', [
-    '$filter', '$http', '$modal', '$rootScope', 'validatorsService', 'warningsData',
-    function($filter, $http, $modal, $rootScope, validatorsService, warningsData) {
+    '$filter', '$http', '$modal', '$timeout', '$rootScope', 'validatorsService', 'warningsData', 'focusService',
+    function($filter, $http, $modal, $timeout, $rootScope, validatorsService, warningsData, focusService) {
   var createExplorationButtonService = {
     _getCreateModalInstance: function(categoryList, isUploadModal) {
-      return $modal.open({
+      var modalInstance = $modal.open({
         templateUrl: 'modals/galleryCreateNew',
         backdrop: 'static',
         resolve: {
@@ -118,6 +118,16 @@ oppia.factory('createExplorationButtonService', [
           }
         ]
       });
+
+      modalInstance.opened.then(function(data) {
+        // The $timeout seems to be needed in order to give the modal time to
+        // render.
+        $timeout(function() {
+          focusService.setFocus('newExplorationModalOpened');
+        });
+      });
+
+      return modalInstance;
     },
     showCreateExplorationModal: function(categoryList) {
       warningsData.clear();

@@ -62,7 +62,8 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         other_exploration = exp_domain.Exploration.create_default_exploration(
             'eid2', 'A title', 'A category')
-        exp_services.save_new_exploration(other_editor_email, other_exploration)
+        exp_services.save_new_exploration(
+            other_editor_email, other_exploration)
 
         self.login(other_editor_email)
         response = self.testapp.get(

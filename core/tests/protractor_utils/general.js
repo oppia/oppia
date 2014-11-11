@@ -19,6 +19,8 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var editor = require('./editor.js');
+
 // Time (in ms) to wait when the system needs time for some computations.
 var WAIT_TIME = 4000;
 
@@ -29,7 +31,8 @@ var waitForSystem = function() {
 // We will report all console logs of level greater than this.
 var CONSOLE_LOG_THRESHOLD = 900;
 var CONSOLE_ERRORS_TO_IGNORE = [
-  // TODO (Jacob): fix error and remove this entry
+  // This error arises when a logout event takes place before a page has fully
+  // loaded.
   'http://localhost:4445/third_party/static/angularjs-1.3.0-rc.5/angular.js 11086:24'
 ];
 
@@ -62,6 +65,7 @@ var LOGIN_URL_SUFFIX = '/_ah/login';
 var ADMIN_URL_SUFFIX = '/admin';
 var SCRIPTS_URL_SLICE = '/scripts/';
 var EXPLORATION_ID_LENGTH = 12;
+var FIRST_STATE_DEFAULT_NAME = 'First State';
 
 
 var _getExplorationId = function(currentUrlPrefix) {
@@ -70,7 +74,7 @@ var _getExplorationId = function(currentUrlPrefix) {
       browser.getCurrentUrl().then(function(url) {
         expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
         var explorationId = url.slice(
-          currentUrlPrefix.length, 
+          currentUrlPrefix.length,
           currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
         return callbackFunction(explorationId);
       });
@@ -78,7 +82,7 @@ var _getExplorationId = function(currentUrlPrefix) {
   };
 };
 
-// If we are currently in the editor, this will return a promise with the 
+// If we are currently in the editor, this will return a promise with the
 // exploration ID.
 var getExplorationIdFromEditor = function() {
   return _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
@@ -93,6 +97,7 @@ var getExplorationIdFromPlayer = function() {
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
   protractor.getInstance().waitForAngular();
+  editor.exitTutorialIfNecessary();
 };
 
 var openPlayer = function(explorationId) {
@@ -121,9 +126,11 @@ exports.waitForSystem = waitForSystem;
 exports.checkForConsoleErrors = checkForConsoleErrors;
 
 exports.SERVER_URL_PREFIX = SERVER_URL_PREFIX;
+exports.EDITOR_URL_SLICE = EDITOR_URL_SLICE;
 exports.LOGIN_URL_SUFFIX = LOGIN_URL_SUFFIX;
 exports.ADMIN_URL_SUFFIX = ADMIN_URL_SUFFIX;
 exports.SCRIPTS_URL_SLICE = SCRIPTS_URL_SLICE;
+exports.FIRST_STATE_DEFAULT_NAME = FIRST_STATE_DEFAULT_NAME;
 
 exports.getExplorationIdFromEditor = getExplorationIdFromEditor;
 exports.getExplorationIdFromPlayer = getExplorationIdFromPlayer;

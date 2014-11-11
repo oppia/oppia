@@ -19,59 +19,57 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-// Each widget should declare a checkExistence() function and a submitAnswer()
-// function.
-var widgetUtils = {
-  Continue: require(
-    '../../../extensions/widgets/interactive/Continue/protractor.js'),
-  MultipleChoiceInput: require(
-    '../../../extensions/widgets/interactive/MultipleChoiceInput/protractor.js'),
-  NumericInput: require(
-    '../../../extensions/widgets/interactive/NumericInput/protractor.js'),
-  TextInput: require(
-    '../../../extensions/widgets/interactive/TextInput/protractor.js'),
-};
+var widgets = require('../../../extensions/widgets/protractor.js');
+var forms = require('./forms.js');
 
 var restartExploration = function() {
   element(by.css('.protractor-test-restart-exploration')).click();
 };
 
-// The get functions return promises rather than values.
-
-var getExplorationName = function() {
-  return element(by.css('.conversation-skin-exploration-header')).
-    element(by.tagName('h3')).getText();
+var expectExplorationNameToBe = function(name) {
+  expect(
+    element(by.css('.conversation-skin-exploration-header')).
+      element(by.tagName('h3')).getText()
+  ).toBe(name);
 };
 
-var getCurrentQuestionText = function() {
-  return element.all(by.repeater('response in responseLog track by $index')).
-    last().element(by.css('.protractor-test-conversation-content')).getText();
+// This verifies the question just asked, including formatting and 
+// non-interactive widgets. To do so the richTextInstructions function will be
+// sent a handler (as given in forms.RichTextChecker) to which calls such as
+//   handler.readItalicText('slanted');
+// can then be sent.
+var expectContentToMatch = function(richTextInstructions) {
+  forms.expectRichText(
+    element.all(by.repeater('response in responseLog track by $index')).
+      last().element(by.css('.protractor-test-conversation-content')).
+        element(by.xpath('./div'))
+  ).toMatch(richTextInstructions);
 };
 
-var getLatestFeedbackText = function() {
-  return element.all(by.repeater('response in responseLog track by $index')).
-    last().element(by.css('.protractor-test-conversation-feedback')).getText();
+var expectLatestFeedbackToMatch = function(richTextInstructions) {
+  forms.expectRichText(
+    element.all(by.repeater('response in responseLog track by $index')).
+      last().element(by.css('.protractor-test-conversation-feedback')).
+        element(by.xpath('./div/div')).getText()
+  ).toMatch(richTextInstructions);
 };
 
-
-// 'widgetCustomizations' is a variable that is passed to the corresponding
-// widget's protractor utilities. Its definition and type are widget-specific.
-var expectInteractionToMatch = function(widgetName, widgetCustomizations) {
-  if (widgetUtils.hasOwnProperty(widgetName)) {
-    widgetUtils[widgetName].expectInteractionDetailsToMatch(widgetCustomizations);
-  } else {
-    throw 'Unknown widget: ' + widgetName;
+// Additional arguments may be sent to this function, and they will be
+// passed on to the relevant widget's detail checker.
+var expectInteractionToMatch = function(widgetName) {
+  // Convert additional arguments to an array to send on.
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
   }
+  widgets.getInteractive(widgetName).
+    expectInteractionDetailsToMatch.apply(null, args);
 };
 
 // `answerData` is a variable that is passed to the corresponding widget's
 // protractor utilities. Its definition and type are widget-specific.
 var submitAnswer = function(widgetName, answerData) {
-  if (widgetUtils.hasOwnProperty(widgetName)) {
-    widgetUtils[widgetName].submitAnswer(answerData);
-  } else {
-    throw 'Cannot submit answer to unknown widget: ' + widgetName;
-  }
+  widgets.getInteractive(widgetName).submitAnswer(answerData);
 };
 
 
@@ -87,9 +85,9 @@ var expectExplorationToNotBeOver = function() {
 
 exports.restartExploration = restartExploration;
 
-exports.getExplorationName = getExplorationName;
-exports.getCurrentQuestionText = getCurrentQuestionText;
-exports.getLatestFeedbackText = getLatestFeedbackText;
+exports.expectExplorationNameToBe = expectExplorationNameToBe;
+exports.expectContentToMatch = expectContentToMatch;
+exports.expectLatestFeedbackToMatch = expectLatestFeedbackToMatch;
 
 exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.submitAnswer = submitAnswer;
