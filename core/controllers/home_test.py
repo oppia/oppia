@@ -29,13 +29,11 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Bite-sized learning journeys',
-            'Browse the explorations gallery', '100% free!',
-            'Gallery', 'About', 'Contact',
-            'Login', 'Create an Oppia account',
+            'Oppia strives to enable learning by doing.',
+            'Explore Gallery', '100% Free',
+            'Gallery', 'About', 'Contact', 'Login',
             # No navbar tabs should be highlighted.
-            no=['class="active"',
-                'Logout', 'Create an exploration', 'Dashboard'])
+            no=['class="active"', 'Logout', 'Dashboard'])
 
     def test_logged_in_but_not_registered_as_editor_homepage(self):
         """Test the logged-in-but-not-editor version of the home page."""
@@ -49,11 +47,10 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Bite-sized learning journeys',
-            'Gallery', 'Logout', 'Create an exploration',
+            'Oppia strives to enable learning by doing.',
+            'Gallery', 'Logout', 'Explore Gallery',
             self.get_expected_logout_url('/'),
-            no=['Login', 'Create an Oppia account', 'Dashboard',
-                self.get_expected_login_url('/')])
+            no=['Login', 'Dashboard', self.get_expected_login_url('/')])
         self.logout()
 
     def test_logged_in_and_registered_as_editor_homepage(self):
@@ -71,9 +68,8 @@ class HomePageTest(test_utils.GenericTestBase):
         response.mustcontain(
             'Dashboard', 'Gallery', 'Logout',
             self.get_expected_logout_url('/'),
-            no=['Login', 'Create an Oppia account',
-                'Bite-sized learning journeys',
-                self.get_expected_login_url('/')])
+            no=['Login', 'Oppia strives to enable learning by doing.',
+                'Explore Gallery', self.get_expected_login_url('/')])
         self.logout()
 
 
