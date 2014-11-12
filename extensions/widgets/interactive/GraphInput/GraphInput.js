@@ -71,8 +71,55 @@ oppia.directive('oppiaInteractiveGraphInput', [
   }
 ]);
 
+oppia.factory('graphDetailService', [function(){
+  return {
+    VERTEX_RADIUS: 6,
+    EDGE_WIDTH: 3,
+    getDirectedEdgeArrowPoints: function(graph, index) {
+      var ARROW_WIDTH = 5;
+      var ARROW_HEIGHT = 10;
+
+      var edge = graph.edges[index];
+      var srcVertex = graph.vertices[edge.src];
+      var dstVertex = graph.vertices[edge.dst];
+      var dx = dstVertex.x - srcVertex.x;
+      var dy = dstVertex.y - srcVertex.y;
+      var length = Math.sqrt(dx * dx + dy * dy);
+      if (length === 0) {
+        return '';
+      }
+      dx /= length;
+      dy /= length;
+
+      var endX = dstVertex.x - 4 * dx;
+      var endY = dstVertex.y - 4 * dy;
+      
+      var ret = '';
+      ret += 
+        endX + ',' + 
+        endY + ' ';
+      ret += 
+        (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' + 
+        (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
+      ret += 
+        (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' + 
+        (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
+      return ret;
+    },
+    getEdgeCentre: function(graph, index) {
+      var edge = graph.edges[index];
+      var srcVertex = graph.vertices[edge.src];
+      var dstVertex = graph.vertices[edge.dst];
+      return {
+        x: (srcVertex.x + dstVertex.x) / 2.0,
+        y: (srcVertex.y + dstVertex.y) / 2.0
+      };
+    }
+  };
+}]);
+
 oppia.directive('oppiaResponseGraphInput', [
-  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+  'oppiaHtmlEscaper', 'graphDetailService', function(oppiaHtmlEscaper, graphDetailService) {
     return {
       restrict: 'E',
       scope: {},
@@ -80,48 +127,14 @@ oppia.directive('oppiaResponseGraphInput', [
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.graph = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
 
-        // TODO(czx): Is there a way to avoid this copy-pasting?
-        $scope.VERTEX_RADIUS = 6;
-        $scope.EDGE_WIDTH = 3;
+        $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
+        $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
 
         $scope.getDirectedEdgeArrowPoints = function(index) {
-          var ARROW_WIDTH = 5;
-          var ARROW_HEIGHT = 10;
-
-          var edge = $scope.graph.edges[index];
-          var srcVertex = $scope.graph.vertices[edge.src];
-          var dstVertex = $scope.graph.vertices[edge.dst];
-          var dx = dstVertex.x - srcVertex.x;
-          var dy = dstVertex.y - srcVertex.y;
-          var length = Math.sqrt(dx * dx + dy * dy);
-          if (length === 0) {
-            return '';
-          }
-          dx /= length;
-          dy /= length;
-          var endX = dstVertex.x - 4 * dx;
-          var endY = dstVertex.y - 4 * dy;
-          
-          var ret = '';
-          ret += 
-            endX + ',' + 
-            endY + ' ';
-          ret += 
-            (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' + 
-            (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
-          ret += 
-            (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' + 
-            (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
-          return ret;
+          return graphDetailService.getDirectedEdgeArrowPoints($scope.graph, index);
         };
         $scope.getEdgeCentre = function(index) {
-          var edge = $scope.graph.edges[index];
-          var srcVertex = $scope.graph.vertices[edge.src];
-          var dstVertex = $scope.graph.vertices[edge.dst];
-          return {
-            x: (srcVertex.x + dstVertex.x) / 2.0,
-            y: (srcVertex.y + dstVertex.y) / 2.0
-          };
+          return graphDetailService.getEdgeCentre($scope.graph, index);
         };
 
       }]
@@ -148,7 +161,7 @@ oppia.directive('graphViz', function() {
       canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', function($scope, $element, $attrs, $document, focusService) {
+    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', function($scope, $element, $attrs, $document, focusService, graphDetailService) {
       var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
@@ -182,8 +195,8 @@ oppia.directive('graphViz', function() {
         mouseDragStartY: 0,
       };
       
-      $scope.VERTEX_RADIUS = 6;
-      $scope.EDGE_WIDTH = 3;
+      $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
+      $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
 
       var vizContainer = $($element).find('.oppia-graph-viz-svg');
       $scope.vizWidth = vizContainer.width();
@@ -498,43 +511,10 @@ oppia.directive('graphViz', function() {
         }
       }
       $scope.getDirectedEdgeArrowPoints = function(index) {
-        var ARROW_WIDTH = 5;
-        var ARROW_HEIGHT = 10;
-
-        var edge = $scope.graph.edges[index];
-        var srcVertex = $scope.graph.vertices[edge.src];
-        var dstVertex = $scope.graph.vertices[edge.dst];
-        var dx = dstVertex.x - srcVertex.x;
-        var dy = dstVertex.y - srcVertex.y;
-        var length = Math.sqrt(dx * dx + dy * dy);
-        if (length === 0) {
-          return '';
-        }
-        dx /= length;
-        dy /= length;
-        var endX = dstVertex.x - 4 * dx;
-        var endY = dstVertex.y - 4 * dy;
-        
-        var ret = '';
-        ret += 
-          endX + ',' + 
-          endY + ' ';
-        ret += 
-          (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' + 
-          (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
-        ret += 
-          (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' + 
-          (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
-        return ret;
+        return graphDetailService.getDirectedEdgeArrowPoints($scope.graph, index);
       };
       $scope.getEdgeCentre = function(index) {
-        var edge = $scope.graph.edges[index];
-        var srcVertex = $scope.graph.vertices[edge.src];
-        var dstVertex = $scope.graph.vertices[edge.dst];
-        return {
-          x: (srcVertex.x + dstVertex.x) / 2.0,
-          y: (srcVertex.y + dstVertex.y) / 2.0
-        };
+        return graphDetailService.getEdgeCentre($scope.graph, index);
       };
     }]
   }
