@@ -278,19 +278,6 @@
             <div class="col-lg-12 col-md-12 col-sm-12">
               <span class="pull-right" style="margin-top: 10px;">
                 <span ng-show="!isInPreviewMode">
-                  {% if can_publish %}
-                    <span ng-if="explorationRightsService.isPrivate()">
-                      <button type="button" class="btn btn-default oppia-main-control-button protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
-                        publish
-                      </button>
-                    </span>
-                  {% endif %}
-
-                  <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-                    <button type="button" class="btn btn-default oppia-main-control-button" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
-                      nominate for featuring
-                    </button>
-                  </span>
 
                   <span class="oppia-exploration-ctrl" ng-if="!explorationRightsService.isPrivate()">
                     <button class="btn btn-default" title="Embed this exploration in another webpage." ng-click="showEmbedExplorationModal()" ng-disabled="isExplorationSaveable()">
@@ -298,21 +285,38 @@
                     </button>
                   </span>
 
+                  {% if can_publish %}
+                    <span ng-if="explorationRightsService.isPrivate()">
+                      <button type="button" class="btn btn-default protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
+                        Publish in Gallery
+                      </button>
+                    </span>
+                  {% endif %}
+
+                  <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
+                    <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
+                      Nominate for Featured Status
+                    </button>
+                  </span>
+
                   <span ng-if="editabilityService.isEditableOutsideTutorialMode()">
-                    <button id="tutorialSaveExplorationButton" class="btn oppia-main-control-button protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
-                      <span ng-if="!isSaveInProgress">
-                        <span ng-if="!getChangeListLength() && lastSaveOrDiscardAction == 'save'">saved</span>
-                        <span ng-if="getChangeListLength() || lastSaveOrDiscardAction !== 'save'">
-                          save
+                    <div class="btn-group" dropdown>
+                      <button id="tutorialSaveExplorationButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+                        <span ng-if="!isSaveInProgress">
+                          Save Changes
                           <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
                         </span>
-                      </span>
-                      <span ng-if="isSaveInProgress">
-                        saving...
-                      </span>
-                    </button>
-
-                    <button class="btn btn-default oppia-main-control-button protractor-test-discard-changes" ng-click="discardChanges()" ng-disabled="!isExplorationSaveable()" title="Discard all pending changes.">discard changes</button>
+                        <span ng-if="isSaveInProgress">
+                          Saving...
+                        </span>
+                      </button>
+                      <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle">
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" role="menu">
+                        <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Changes</a></li>
+                      </ul>
+                    </div>
                   </span>
                 </span>
 
@@ -332,13 +336,13 @@
                 <div class="alert alert-warning oppia-exploration-warnings-box pull-right">
                   <div>
                     <span ng-if="!areExplorationWarningsVisible" style="color: black;">
-                      <span class="glyphicon glyphicon-plus-sign"></span>
                     </span>
                     <span ng-if="areExplorationWarningsVisible" style="color: black;">
-                      <span class="glyphicon glyphicon-minus-sign"></span>
                     </span>
                     <span class="glyphicon glyphicon-warning-sign"></span>
-                    This exploration has <strong><[warningsList.length]></strong> warning(s).
+                    <strong><[warningsList.length]></strong> warning<span ng-if="warningsList.length > 1">s</span>
+                    <span class="glyphicon glyphicon-chevron-right" ng-if="!areExplorationWarningsVisible"></span>
+                    <span class="glyphicon glyphicon-chevron-up pull-right" ng-if="areExplorationWarningsVisible"></span>
                   </div>
                   <div collapse="!areExplorationWarningsVisible">
                     <ul>

@@ -60,7 +60,7 @@ describe('State editor', function() {
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
     editor.selectInteraction(
-      'MultipleChoiceInput', 
+      'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     editor.RuleEditor('default').setDestination('END');
     editor.saveChanges();
@@ -68,7 +68,7 @@ describe('State editor', function() {
     general.moveToPlayer();
     player.expectExplorationToNotBeOver();
     player.expectInteractionToMatch(
-      'MultipleChoiceInput', 
+      'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     player.submitAnswer('MultipleChoiceInput', 'option B');
     player.expectExplorationToBeOver();
@@ -120,7 +120,7 @@ describe('Full exploration editor', function() {
     editor.moveToState('state 2');
     editor.setContent(forms.toRichText('this is state 2'));
     editor.selectInteraction(
-      'MultipleChoiceInput', 
+      'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
     editor.addRule('MultipleChoiceInput', 'Equals', ['return']);
     editor.RuleEditor(0).setDestination('state 1');
@@ -142,7 +142,7 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  it('should handle discarding changes, navigation, deleting states, ' + 
+  it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting rules and ' +
       'switching to preview mode', function() {
     users.createUser('user5@example.com', 'user5');
@@ -176,15 +176,15 @@ describe('Full exploration editor', function() {
       // Check behaviour of the back button
       editor.setObjective('do stuff');
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
         '#/gui/second');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
         '#/settings');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
         '#/gui/second');
 
       // Check display of content & interaction in the editor
@@ -234,7 +234,7 @@ describe('Non-interactive widgets', function() {
   it('should display correctly', function() {
     users.createUser('user11@example.com', 'user11');
     users.login('user11@example.com')
-    
+
     workflow.createExploration('widgets', 'maths');
 
     editor.setContent(function(richTextEditor) {
@@ -282,7 +282,7 @@ describe('Non-interactive widgets', function() {
   it('should allow nesting of widgets inside one another', function() {
     users.createUser('user12@example.com', 'user12');
     users.login('user12@example.com')
-    
+
     workflow.createExploration('widgets', 'maths');
 
     editor.setContent(function(richTextEditor) {
@@ -321,7 +321,7 @@ describe('Non-interactive widgets', function() {
           content: function(tab2Checker) {
             tab2Checker.readBoldText('fun!');
           }
-        }]); 
+        }]);
         collapsibleChecker.readWidget('Math', 'xyz');
       });
     });
@@ -331,17 +331,17 @@ describe('Non-interactive widgets', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      // TODO (Jacob) Remove when 
+      // TODO (Jacob) Remove when
       // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'chrome-extension://boadgeojelhgndaghljhdicfkmllpafd/' + 
+      'chrome-extension://boadgeojelhgndaghljhdicfkmllpafd/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://dliochdbjfkdbacpmhlcpmleaejidimm/' + 
+      'chrome-extension://dliochdbjfkdbacpmhlcpmleaejidimm/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://hfaagokkkhdbgiakmmlclaapfelnkoah/' + 
+      'chrome-extension://hfaagokkkhdbgiakmmlclaapfelnkoah/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/' + 
+      'chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://enhhojjnijigcajfphajepfemndkmdlo/' + 
+      'chrome-extension://enhhojjnijigcajfphajepfemndkmdlo/' +
       'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED'
     ]);
   });
