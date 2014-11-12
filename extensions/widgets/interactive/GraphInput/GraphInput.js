@@ -174,6 +174,12 @@ oppia.directive('graphViz', function() {
         // Mouse position in SVG coordinates
         mouseX: 0,
         mouseY: 0,
+        // Starting vertex position of dragged vertex in SVG coordinates
+        vertexDragStartX: 0,
+        vertexDragStartY: 0,
+        // Starting mouse position of dragged vertex
+        mouseDragStartX: 0,
+        mouseDragStartY: 0,
       };
       
       $scope.VERTEX_RADIUS = 6;
@@ -185,8 +191,8 @@ oppia.directive('graphViz', function() {
         $scope.state.mouseX = event.pageX - vizContainer.offset().left;
         $scope.state.mouseY = event.pageY - vizContainer.offset().top;
         if ($scope.state.currentlyDraggedVertex !== null) {
-          $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = $scope.state.mouseX;
-          $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = $scope.state.mouseY;
+          $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = $scope.state.vertexDragStartX + ($scope.state.mouseX - $scope.state.mouseDragStartX);
+          $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = $scope.state.vertexDragStartY + ($scope.state.mouseY - $scope.state.mouseDragStartY);
         }
       };
 
@@ -378,9 +384,17 @@ oppia.directive('graphViz', function() {
       }
       function beginDragVertex(index) {
         $scope.state.currentlyDraggedVertex = index;
+        $scope.state.vertexDragStartX = $scope.graph.vertices[index].x;
+        $scope.state.vertexDragStartY = $scope.graph.vertices[index].y;
+        $scope.state.mouseDragStartX = $scope.state.mouseX;
+        $scope.state.mouseDragStartY = $scope.state.mouseY;
       }
       function endDragVertex() {
         $scope.state.currentlyDraggedVertex = null;
+        $scope.state.vertexDragStartX = 0;
+        $scope.state.vertexDragStartY = 0;
+        $scope.state.mouseDragStartX = 0;
+        $scope.state.mouseDragStartY = 0;
       }
       function beginEditVertexLabel(index) {
         $scope.state.selectedVertex = index;
@@ -471,6 +485,8 @@ oppia.directive('graphViz', function() {
             index === $scope.state.hoveredVertex &&
             $scope.canDeleteVertex) {
           return DELETE_COLOR;
+        } else if (index === $scope.state.currentlyDraggedVertex) {
+          return HOVER_COLOR;
         } else if ($scope.graph.isLabeled &&
                    index === $scope.state.hoveredVertex &&
                    $scope.canEditVertexLabel) {
