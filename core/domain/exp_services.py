@@ -118,7 +118,8 @@ def get_exploration_summary_by_id(exploration_id):
 
 def get_multiple_explorations_by_id(exp_ids, strict=True):
     """Returns a dict of domain objects representing explorations with the given
-    ids as keys.
+    ids as keys. If an exp_id is not present it is not included in the return
+    dict.
     """
     exp_ids = set(exp_ids)
     result = {}
@@ -140,12 +141,11 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         model = db_exp_models[i]
         if model:
             exploration = get_exploration_from_model(model)
+            db_results_dict[eid] = exploration
         else:
             logging.info('Tried to fetch exploration with id %s, but no such '
                          'exploration exists in the datastore' % eid)
-            exploration = None
             not_found.append(eid)
-        db_results_dict[eid] = exploration
 
     if strict and not_found:
         raise ValueError(
