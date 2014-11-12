@@ -272,13 +272,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   display: none;
 }
 
-.oppia-main-control-button {
-  font-size: 110%;
-  font-variant: small-caps;
-  font-weight: bold;
-  margin: 0 5px 0 5px;
-}
-
 .oppia-code {
   font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
@@ -1013,6 +1006,11 @@ oppia-parameter {
   display: table-cell;
   float: none;
   vertical-align: middle;
+}
+
+.oppia-disabled-link {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 /* Splash page. */

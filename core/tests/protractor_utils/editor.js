@@ -51,8 +51,8 @@ var expectCurrentStateToBe = function(name) {
 
 // CONTENT
 
-// 'richTextInstructions' is a function that is sent a RichTextEditor which it 
-// can then use to alter the state content, for example by calling 
+// 'richTextInstructions' is a function that is sent a RichTextEditor which it
+// can then use to alter the state content, for example by calling
 // .appendBoldText(...).
 var setContent = function(richTextInstructions) {
   element(by.css('.protractor-test-edit-content')).click();
@@ -65,12 +65,12 @@ var setContent = function(richTextInstructions) {
 };
 
 // This receives a function richTextInstructions used to verify the display of
-// the state's content visible when the content editor is closed. The 
-// richTextInstructions will be supplied with a handler of the form 
+// the state's content visible when the content editor is closed. The
+// richTextInstructions will be supplied with a handler of the form
 // forms.RichTextChecker and can then perform checks such as
 //   handler.readBoldText('bold')
 //   handler.readWidget('Collapsible', 'outer', 'inner')
-// These would verify that the content consists of the word 'bold' in bold 
+// These would verify that the content consists of the word 'bold' in bold
 // followed by a Collapsible widget with the given arguments, and nothing else.
 // Note that this fails for collapsibles and tabs since it is not possible to
 // click on them to view their contents, as clicks instead open the rich text
@@ -134,9 +134,9 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
   var ruleDescription = rules.getDescription(
     widgets.getInteractive(widgetName).submissionHandler, ruleName);
 
-  var parameterStart = (ruleDescription.indexOf('{{') === -1) ? 
+  var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
-  // From the ruleDescription string we can deduce both the description used 
+  // From the ruleDescription string we can deduce both the description used
   // in the page (which will have the form "is equal to ...") and the types
   // of the parameter objects, which will later tell us which object editors
   // to use to enter the parameterValues.
@@ -144,10 +144,10 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
   var parameterTypes = [];
   while (parameterStart !== undefined) {
     var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
-    var nextParameterStart = 
+    var nextParameterStart =
       (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
       undefined : ruleDescription.indexOf('{{', parameterEnd);
-    ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' + 
+    ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' +
       ruleDescription.substring(parameterEnd, nextParameterStart);
     parameterTypes.push(
       ruleDescription.substring(
@@ -375,6 +375,7 @@ var saveChanges = function(commitMessage) {
 };
 
 var discardChanges = function() {
+  element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
   browser.driver.switchTo().alert().accept();
 };
