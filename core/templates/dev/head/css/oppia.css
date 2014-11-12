@@ -676,6 +676,28 @@ div.wysiwyg iframe.wysiwyg-content-large {
   -webkit-user-select: none;
 }
 
+@media (min-width: 768px) {
+  .oppia-widget-selector {
+    bottom: -24px;
+    position: absolute;
+    right: 15px;
+  }
+}
+@media (max-width: 768px) {
+  .oppia-widget-selector {
+    position: absolute;
+    right: 15px;
+    top: -27px;
+    width: 60%;
+  }
+}
+.oppia-widget-selector {
+  /* This must be larger than the z-index in
+     .oppia-interactive-section-click-handler, so that the rule does not
+     switch to edit mode when the destination link is clicked. */
+  z-index: 200;
+}
+
 .oppia-interactive-widget-display {
   margin: 0;
   padding: 0 10px;
@@ -691,16 +713,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 .oppia-save-state-item-button {
   margin-top: 2px;
-}
-
-.oppia-widget-selector {
-  bottom: -24px;
-  right: 15px;
-  position: absolute;
-  /* This must be larger than the z-index in
-     .oppia-interactive-section-click-handler, so that the rule does not
-     switch to edit mode when the destination link is clicked. */
-  z-index: 200;
 }
 
 .oppia-customize-widget-arg-description {
