@@ -71,7 +71,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
   }
 ]);
 
-oppia.factory('graphDetailService', [function(){
+oppia.factory('graphDetailService', [function() {
   return {
     VERTEX_RADIUS: 6,
     EDGE_WIDTH: 3,
@@ -187,10 +187,10 @@ oppia.directive('graphViz', function() {
         // Mouse position in SVG coordinates
         mouseX: 0,
         mouseY: 0,
-        // Starting vertex position of dragged vertex in SVG coordinates
+        // Original position of dragged vertex
         vertexDragStartX: 0,
         vertexDragStartY: 0,
-        // Starting mouse position of dragged vertex
+        // Original position of mouse when dragging started
         mouseDragStartX: 0,
         mouseDragStartY: 0,
       };
@@ -203,6 +203,10 @@ oppia.directive('graphViz', function() {
       $scope.mousemoveGraphSVG = function(event) {
         $scope.state.mouseX = event.pageX - vizContainer.offset().left;
         $scope.state.mouseY = event.pageY - vizContainer.offset().top;
+        // vertexDragStartX/Y and mouseDragStartX/Y are to make mouse-dragging 
+        // by label more natural, by moving the vertex according to the difference
+        // from the original position. Otherwise, mouse-dragging by label will make
+        // the vertex awkwardly jump to the mouse.
         if ($scope.state.currentlyDraggedVertex !== null) {
           $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = $scope.state.vertexDragStartX + ($scope.state.mouseX - $scope.state.mouseDragStartX);
           $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = $scope.state.vertexDragStartY + ($scope.state.mouseY - $scope.state.mouseDragStartY);
@@ -509,7 +513,7 @@ oppia.directive('graphViz', function() {
         } else {
           return DEFAULT_COLOR;
         }
-      }
+      };
       $scope.getDirectedEdgeArrowPoints = function(index) {
         return graphDetailService.getDirectedEdgeArrowPoints($scope.graph, index);
       };
