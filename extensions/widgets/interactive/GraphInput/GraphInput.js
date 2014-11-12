@@ -163,8 +163,6 @@ oppia.directive('graphViz', function() {
         hoveredVertex: null,
         hoveredEdge: null,
         hoveredModeButton: null,
-        hoveredLabel: null,
-        hoveredWeight: null,
         // If in ADD_EDGE mode, source vertex of the new edge, if it exists
         addEdgeVertex: null,
         // Currently dragged vertex
@@ -200,10 +198,10 @@ oppia.directive('graphViz', function() {
             label: ''
           });
         }
-        if ($scope.state.hoveredVertex === null && $scope.state.hoveredLabel === null) {
+        if ($scope.state.hoveredVertex === null) {
           $scope.state.selectedVertex = null;
         }
-        if ($scope.state.hoveredEdge === null && $scope.state.hoveredWeight === null) {
+        if ($scope.state.hoveredEdge === null) {
           $scope.state.selectedEdge = null;
         }
       };
@@ -219,42 +217,32 @@ oppia.directive('graphViz', function() {
         if ($scope.canMoveVertex) {
           $scope.buttons.push({
             text: '\uE068',
+            description: 'Move',
             mode: _MODES.MOVE
           });
         }
         if ($scope.canAddEdge) {
           $scope.buttons.push({
             text: '\uE144',
+            description: 'Link',
             mode: _MODES.ADD_EDGE
           });
         }
         if ($scope.canAddVertex) {
           $scope.buttons.push({
             text: '\u002B',
+            description: 'Add',
             mode: _MODES.ADD_VERTEX
           });
         }
         if ($scope.canDeleteVertex || $scope.canDeleteEdge) {
           $scope.buttons.push({
             text: '\u2212',
+            description: 'Delete',
             mode: _MODES.DELETE
           });
         }
       }
-
-      // TODO(czx): Consider a better way to make the tooltip appear
-      $scope.getModeTooltipText = function() {
-        if ($scope.state.hoveredModeButton == _MODES.MOVE) {
-          return "[Move vertices]";
-        } else if ($scope.state.hoveredModeButton == _MODES.ADD_EDGE) {
-          return "[Add edges]";
-        } else if ($scope.state.hoveredModeButton == _MODES.ADD_VERTEX) {
-          return "[Add vertices]";
-        } else if ($scope.state.hoveredModeButton == _MODES.DELETE) {
-          return "[Delete]";
-        }
-        return "";
-      };
 
       $scope.graphOptions = [{
         text: 'Labeled',
@@ -469,8 +457,7 @@ oppia.directive('graphViz', function() {
             $scope.canDeleteEdge) {
           return DELETE_COLOR;
         } else if ($scope.graph.isWeighted &&
-                   (index === $scope.state.hoveredEdge || 
-                    index === $scope.state.hoveredWeight) && 
+                   index === $scope.state.hoveredEdge &&
                    $scope.canEditEdgeWeight) {
           return HOVER_COLOR;
         } else if ($scope.state.selectedEdge === index) {
@@ -485,9 +472,8 @@ oppia.directive('graphViz', function() {
             $scope.canDeleteVertex) {
           return DELETE_COLOR;
         } else if ($scope.graph.isLabeled &&
-                   (index === $scope.state.hoveredVertex ||
-                    index === $scope.state.hoveredLabel) &&
-                    $scope.canEditVertexLabel) {
+                   index === $scope.state.hoveredVertex &&
+                   $scope.canEditVertexLabel) {
           return HOVER_COLOR;
         } else if ($scope.state.selectedVertex === index) {
           return SELECT_COLOR;

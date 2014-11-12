@@ -112,49 +112,46 @@
   </div>
   <div class="oppia-graph-viz-container">
     <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="onClickGraphSVG($event)">
-      <svg viewBox="0 0 50 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
-        <g ng-repeat="button in buttons">
-          <rect width="30"
+      <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
+        <g ng-if="canEditOptions" ng-repeat="button in graphOptions">
+          <rect width="70"
             height="30"
-            x="0"
-            ng-attr-y="<[20 + 50 * $index]>"
+            x="10"
+            ng-attr-y="<[10 + 50 * $index]>"
             rx="5"
             ry="5"
-            ng-click="setMode(button.mode, $event)"
-            ng-mouseenter="state.hoveredModeButton = button.mode"
-            ng-mouseleave="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
-            ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
+            ng-attr-style="stroke: black; fill: white; stroke-width: <[graph[button.option] ? 3 : 1]>;"
+            ng-click="toggleGraphOption(button.option)">
           </rect>
-          <text class="oppia-graph-button-label unselectable-text unclickable-text" x="8" ng-attr-y="<[42 + 50 * $index]>">
+          <text class="unselectable-text unclickable-text" 
+            x="45" 
+            ng-attr-y="<[30 + 50 * $index]>"
+            style="text-anchor: middle">
             <[button.text]>
           </text>
         </g>
       </svg>
-      <g ng-if="canEditOptions" ng-repeat="button in graphOptions">
-        <rect width="70"
+
+      <g ng-repeat="button in buttons">
+        <rect width="80"
           height="30"
           x="10"
           ng-attr-y="<[10 + 50 * $index]>"
           rx="5"
           ry="5"
-          ng-attr-style="stroke: black; fill: white; stroke-width: <[graph[button.option] ? 3 : 1]>;"
-          ng-click="toggleGraphOption(button.option)">
+          ng-click="setMode(button.mode, $event)"
+          ng-mouseenter="state.hoveredModeButton = button.mode"
+          ng-mouseleave="state.hoveredModeButton = (state.hoveredModeButton == button.mode) ? null : state.hoveredModeButton"
+          ng-attr-style="fill: white; stroke: black; stroke-width: <[(state.currentMode == button.mode) ? 3 : 1]>;">
         </rect>
-        <text class="unselectable-text unclickable-text" 
-          x="45" 
-          ng-attr-y="<[30 + 50 * $index]>"
-          style="text-anchor: middle">
+        <text class="oppia-graph-button-label unselectable-text unclickable-text" x="18" ng-attr-y="<[32 + 50 * $index]>">
           <[button.text]>
         </text>
+        <text class="unselectable-text unclickable-text" x="60" ng-attr-y="<[30 + 50 * $index]>" text-anchor="middle">
+          <[button.description]>
+        </text>
       </g>
-      <text ng-if="state.hoveredModeButton !== null" 
-        class="unselectable-text unclickable-text"
-        text-anchor="middle"
-        ng-attr-x="<[vizWidth/2]>"
-        y="240">
-        <[getModeTooltipText()]>
-      </text>
-
+      
       <line ng-if="state.addEdgeVertex !== null"
         ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
         ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
@@ -184,9 +181,9 @@
           ng-attr-x="<[getEdgeCentre($index).x]>"
           ng-attr-y="<[getEdgeCentre($index).y - 12]>"
           ng-attr-style="fill: <[getEdgeColor($index)]>;"
-          ng-click="onClickEdgeWeight($index)"
-          ng-mouseenter="state.hoveredWeight = $index"
-          ng-mouseleave="state.hoveredWeight = ($index === state.hoveredWeight) ? null : state.hoveredWeight"
+          ng-click="onClickEdge($index)"
+          ng-mouseenter="state.hoveredEdge = $index"
+          ng-mouseleave="state.hoveredEdge = ($index === state.hoveredEdge) ? null : state.hoveredEdge"
           class="unselectable-text">
           <[edge.weight]>
         </text>
@@ -197,9 +194,11 @@
         <text ng-if="graph.isLabeled" 
           x="0" 
           y="-10"
-          ng-click="onClickVertexLabel($index)"
-          ng-mouseenter="state.hoveredLabel = $index"
-          ng-mouseleave="state.hoveredLabel = ($index === state.hoveredLabel) ? null : state.hoveredLabel"
+          ng-click="onClickVertex($index)"
+          ng-mouseenter="state.hoveredVertex = $index"
+          ng-mouseleave="state.hoveredVertex = ($index === state.hoveredVertex) ? null : state.hoveredVertex"
+          ng-mousedown="onMousedownVertex($index)"
+          ng-mouseup="onMouseupVertex($index)"
           ng-attr-style="fill: <[getVertexColor($index)]>;"
           class="unselectable-text">
           <[vertex.label]>
