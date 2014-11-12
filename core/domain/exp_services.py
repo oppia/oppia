@@ -141,7 +141,7 @@ def get_multiple_explorations_by_id(exp_ids, strict=True):
         if model:
             exploration = get_exploration_from_model(model)
         else:
-            logging.info('Tried to fetch exploration with id %s, but no such'
+            logging.info('Tried to fetch exploration with id %s, but no such '
                          'exploration exists in the datastore' % eid)
             exploration = None
             not_found.append(eid)
@@ -1122,7 +1122,8 @@ def index_explorations_given_domain_objects(exp_objects):
 
 
 def index_explorations_given_ids(exp_ids):
-    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=True)
+    # We pass 'strict=False' so as not to index deleted explorations.
+    exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
     index_explorations_given_domain_objects(exploration_models.values())
 
 
