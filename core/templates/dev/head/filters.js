@@ -134,9 +134,7 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
       } else if (varType === 'NormalizedString') {
         replacementText = '"' + replacementText + '"';
       } else if (varType === 'Graph') {
-        replacementText = '<oppia-response-graph-input answer=';
-        replacementText += JSON.stringify(angular.copy(inputs[varName]));
-        replacementText += '></oppia-response-graph-input>';
+        replacementText = '[referenceGraph]';
       }
 
       description = description.replace(pattern, ' ');
