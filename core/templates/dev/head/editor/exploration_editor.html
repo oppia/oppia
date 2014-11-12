@@ -310,11 +310,11 @@
                           Saving...
                         </span>
                       </button>
-                      <button type="button" class="btn btn-default dropdown-toggle">
+                      <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle">
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" role="menu">
-                        <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" title="Discard all pending changes.">Discard Changes</a></li>
+                        <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Changes</a></li>
                       </ul>
                     </div>
                   </span>
