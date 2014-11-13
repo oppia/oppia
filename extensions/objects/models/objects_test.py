@@ -287,6 +287,96 @@ class ObjectNormalizationUnitTests(test_utils.GenericTestBase):
         self.check_normalization(
             objects.LogicErrorCategory, mappings, invalid_values)
 
+    def test_graph(self):
+        """Tests objects of type Graph"""
+        empty_graph = {
+            'vertices': [],
+            'edges': [],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }
+        cycle_5_graph = {
+            'vertices': [
+                {'x': 0.0, 'y': 10.0, 'label': ''}, 
+                {'x': 50.0, 'y': 10.0, 'label': ''}, 
+                {'x': 23.0, 'y': 31.0, 'label': ''}, 
+                {'x': 14.0, 'y': 5.0, 'label': ''}, 
+                {'x': 200.0, 'y': 1000.0, 'label': ''}, 
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 2, 'weight': 1},
+                {'src': 2, 'dst': 3, 'weight': 1},
+                {'src': 3, 'dst': 4, 'weight': 1},
+                {'src': 4, 'dst': 0, 'weight': 1},
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }
+
+        mappings = [
+            (empty_graph, empty_graph),
+            (cycle_5_graph, cycle_5_graph),
+        ]
+        
+        invalid_values = [None, 1, {}, 'string', {
+            'vertices': [],
+            'edges': []
+        }, {
+            'vertices': [
+                {'x': 0.0, 'y': 0.0, 'label': ''},
+                {'x': 1.0, 'y': 1.0, 'label': ''}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1}
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }, {
+            'vertices': [
+                {'x': 0.0, 'y': 0.0, 'label': ''},
+                {'x': 1.0, 'y': 1.0, 'label': ''}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 0, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1}
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }, {
+            'vertices': [
+                {'x': 0.0, 'y': 0.0, 'label': ''},
+                {'x': 1.0, 'y': 1.0, 'label': 'ab'}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 0, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 1}
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }, {
+            'vertices': [
+                {'x': 0.0, 'y': 0.0, 'label': ''},
+                {'x': 1.0, 'y': 1.0, 'label': ''}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 0, 'weight': 1},
+                {'src': 1, 'dst': 0, 'weight': 2}
+            ],
+            'isLabeled': False,
+            'isDirected': False,
+            'isWeighted': False
+        }]
+
+        self.check_normalization(
+            objects.Graph, mappings, invalid_values)
+
 
 class SchemaValidityTests(test_utils.GenericTestBase):
 
@@ -298,4 +388,4 @@ class SchemaValidityTests(test_utils.GenericTestBase):
                     schema_utils_test.validate_schema(member.SCHEMA)
                     count += 1
 
-        self.assertEquals(count, 16)
+        self.assertEquals(count, 17)

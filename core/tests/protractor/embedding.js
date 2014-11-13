@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License. 
+// limitations under the License.
 
 /**
  * @fileoverview End-to-end tests of embedding explorations in other websites.
@@ -29,7 +29,7 @@ describe('Embedding', function() {
   it('should display and play embedded explorations', function() {
 
     var TEST_PAGES = [
-      'embedding_tests_dev_0.0.1.html', 
+      'embedding_tests_dev_0.0.1.html',
       'embedding_tests_dev_0.0.1.min.html',
       'embedding_tests_jsdelivr_0.0.1.min.html'];
     // The length of time the page waits before confirming an exploration
@@ -98,7 +98,7 @@ describe('Embedding', function() {
         driver.findElement(
           by.xpath("//div[@class='protractor-test-missing-id']/div/span")
         ).getText()).toMatch(
-          'This Oppia exploration could not be loaded because no oppia-id ' + 
+          'This Oppia exploration could not be loaded because no oppia-id ' +
           'attribute was specified in the HTML tag.');
       driver.findElement(
         by.xpath(
@@ -131,7 +131,7 @@ describe('Embedding', function() {
           }
         } catch(err) {}
       }
-      
+
       // We played the exploration twice for each test page.
       var expectedLogs = [];
       for (var i = 0; i < TEST_PAGES.length * 2; i ++) {

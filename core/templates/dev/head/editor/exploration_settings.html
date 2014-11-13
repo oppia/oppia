@@ -213,10 +213,10 @@
                 It is <strong>not shown</strong> in the gallery.
               </p>
               <p ng-if="explorationRightsService.isPublic()">
-                It is <strong>shown</strong> in the gallery (in Beta mode).
+                It is <strong>shown</strong> in the gallery.
               </p>
               <p ng-if="explorationRightsService.isPublicized()">
-                It is <strong>shown</strong> in the gallery.
+                It is <strong>featured</strong> in the gallery.
               </p>
             </div>
           </div>
@@ -257,8 +257,8 @@
 
               {% if can_publicize %}
                 <p ng-show="explorationRightsService.isPublic()">
-                  <button type="button" class="btn btn-default protractor-test-release-exploration" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                    Move out of beta
+                  <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                    Mark "featured"
                     <span ng-if="currentUserIsAdmin">(as admin)</span>
                     <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
                   </button>
@@ -268,7 +268,7 @@
               {% if can_unpublicize %}
                 <p ng-show="explorationRightsService.isPublicized()">
                   <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                    Move back into beta
+                    Remove "featured" status
                     <span ng-if="currentUserIsAdmin">(as admin)</span>
                     <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
                   </button>

@@ -210,6 +210,9 @@ ALLOWED_WIDGETS = {
         'MusicNotesInput': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MusicNotesInput')
         },
+        'GraphInput': {
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'GraphInput')
+        },
     }
 }
 
@@ -235,7 +238,8 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_of_widgets.yaml', 'Test of widgets', 'Test')
+    ('test_of_widgets.yaml', 'Test of widgets', 'Test'),
+    ('modeling_graphs', 'Graph Modeling', 'Mathematics')
 ]
 
 # TODO(sll): Add all other URLs here.

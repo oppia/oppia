@@ -150,6 +150,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
+        $scope.ruleDescriptionMemento = null;
+        $scope.ruleDefinitionMemento = null;
         $scope.removeNullFeedback = function() {
           // Remove null feedback.
           var nonemptyFeedback = [];
@@ -290,6 +292,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             } else if (varType == 'NonnegativeInt') {
               // Set a default value.
               $scope.rule.definition.inputs[varName] = 0;
+            } else if (varType == "Graph") {
+              $scope.rule.definition.inputs[varName] = {
+                'vertices': [], 
+                'edges': [], 
+                'isDirected': false, 
+                'isWeighted': false, 
+                'isLabeled': false
+              };
             } else {
               $scope.rule.definition.inputs[varName] = '';
             }

@@ -52,6 +52,7 @@ var registerAsEditor = function(username) {
   element(by.buttonText('Submit and start contributing')).click();
   // The create modal needs time to load.
   browser.waitForAngular();
+  general.waitForSystem();
   element(by.css('.protractor-test-cancel-create')).click();
 };
 
