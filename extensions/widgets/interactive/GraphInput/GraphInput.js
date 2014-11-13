@@ -247,14 +247,14 @@ oppia.directive('graphViz', function() {
         if ($scope.canAddEdge) {
           $scope.buttons.push({
             text: '\uE144',
-            description: 'Link',
+            description: 'Add Edge',
             mode: _MODES.ADD_EDGE
           });
         }
         if ($scope.canAddVertex) {
           $scope.buttons.push({
             text: '\u002B',
-            description: 'Add',
+            description: 'Add Node',
             mode: _MODES.ADD_VERTEX
           });
         }
