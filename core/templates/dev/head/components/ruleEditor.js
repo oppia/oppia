@@ -24,7 +24,8 @@ oppia.directive('ruleTypeSelector', [function() {
     scope: {
       allRuleTypes: '&',
       localValue: '=',
-      onSelectionChange: '&'
+      onSelectionChange: '&',
+      disable: '='
     },
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$filter', function($scope, $element, $filter) {
@@ -47,6 +48,10 @@ oppia.directive('ruleTypeSelector', [function() {
           return $filter('truncateAtFirstInput')(object.id);
         }
       });
+      
+      if($scope.disable) {
+        $(select2Node).select2("enable", false);
+      }
 
       // Initialize the dropdown.
       $(select2Node).select2('val', $scope.localValue);
@@ -249,6 +254,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           return (
             $scope.rule.feedback.length === 0 &&
             $scope.rule.dest === editorContextService.getActiveStateName());
+        };
+      
+        $scope.moreThanOneChoice == function() {
+          return ($scope.allRuleTypes.lenght > 1);
         };
 
         $scope.onSelectNewRuleType = function() {
