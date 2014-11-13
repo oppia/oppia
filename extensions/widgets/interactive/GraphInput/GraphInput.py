@@ -69,49 +69,49 @@ class GraphInput(widget_domain.BaseWidget):
         }
     }, {
         'name': 'canAddVertex',
-        'description': 'Allow learner to add vertices.',
+        'description': 'Add vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': False 
     }, {
         'name': 'canDeleteVertex',
-        'description': 'Allow learner to delete vertices.',
+        'description': 'Delete vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canMoveVertex',
-        'description': 'Allow learner to move vertices.',
+        'description': 'Move vertices',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canEditVertexLabel',
-        'description': 'Allow learner to edit vertex labels.',
+        'description': 'Edit vertex labels',
         'schema': {
             'type': 'bool',
         },
         'default_value': False
     }, {
         'name': 'canAddEdge',
-        'description': 'Allow learner to add edges.',
+        'description': 'Add edges',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canDeleteEdge',
-        'description': 'Allow learner to delete edges.',
+        'description': 'Delete edges',
         'schema': {
             'type': 'bool',
         },
         'default_value': True
     }, {
         'name': 'canEditEdgeWeight',
-        'description': 'Allow learner to edit edge weights.',
+        'description': 'Edit edge weights',
         'schema': {
             'type': 'bool',
         },
