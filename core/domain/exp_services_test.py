@@ -184,7 +184,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         for _id in exp_ids:
             self.assertEqual(result.get(_id).title, exps.get(_id).title)
 
-        self.assertIsNone(result['doesnt_exist'])
+        self.assertNotIn('doesnt_exist', result)
 
         with self.assertRaises(Exception):
             exp_services.get_multiple_explorations_by_id(
