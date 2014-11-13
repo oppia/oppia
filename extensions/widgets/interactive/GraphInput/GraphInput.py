@@ -23,7 +23,7 @@ class GraphInput(widget_domain.BaseWidget):
     """Interactive widget for graphs."""
        
     # The human-readable name of the widget.
-    name = 'Graph Input'
+    name = 'Graph'
 
     # The category the widget falls under in the widget repository.
     category = 'Custom'
