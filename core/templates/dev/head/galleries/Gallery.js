@@ -178,8 +178,8 @@ oppia.controller('Gallery', [
       var urlParams = urlService.getUrlParams();
       if (urlParams.mode === 'create') {
         $scope.showCreateExplorationModal($scope.getCategoryList());
-      }  
-    }    
+      }
+    }
   });
 
   $scope.gallerySidebarIsActive = false;

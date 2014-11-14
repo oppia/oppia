@@ -975,6 +975,13 @@ oppia-parameter {
    width: 200px;
 }
 
+.introjs-button.introjs-skipbutton,
+.introjs-button.introjs-prevbutton,
+.introjs-button.introjs-nextbutton {
+  font-size: 85%;
+  padding: .7em 1.0em
+}
+
 /* Hide the search icon in the rule destination dropdown. */
 .oppia-rule-dest-select2 .select2-search input {
   background: none;
