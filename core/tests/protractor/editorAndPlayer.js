@@ -106,7 +106,7 @@ describe('State editor', function() {
 });
 
 describe('Full exploration editor', function() {
-  it('should navigate multiple states correctly', function() {
+  it('should navigate multiple states correctly, with parameters', function() {
     users.createUser('user4@example.com', 'user4');
     users.login('user4@example.com');
 
@@ -118,7 +118,8 @@ describe('Full exploration editor', function() {
     editor.RuleEditor(0).setDestination('state 2');
 
     editor.moveToState('state 2');
-    editor.setContent(forms.toRichText('this is state 2'));
+    editor.setContent(forms.toRichText(
+      'this is state 2 with previous answer {{answer}}'));
     editor.selectInteraction(
       'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
@@ -131,11 +132,13 @@ describe('Full exploration editor', function() {
     player.expectContentToMatch(forms.toRichText('this is state 1'));
     player.submitAnswer('NumericInput', 19);
     player.submitAnswer('NumericInput', 21);
-    player.expectContentToMatch(forms.toRichText('this is state 2'));
+    player.expectContentToMatch(forms.toRichText(
+      'this is state 2 with previous answer 21'));
     player.submitAnswer('MultipleChoiceInput', 'return');
     player.expectContentToMatch(forms.toRichText('this is state 1'));
     player.submitAnswer('NumericInput', 21);
-    player.expectContentToMatch(forms.toRichText('this is state 2'));
+    player.expectContentToMatch(forms.toRichText(
+      'this is state 2 with previous answer 21'));
     player.expectExplorationToNotBeOver();
     player.submitAnswer('MultipleChoiceInput', 'complete');
     player.expectExplorationToBeOver();
