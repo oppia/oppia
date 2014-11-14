@@ -46,13 +46,13 @@ states:
           value: true
         canAddVertex:
           value: false
-        canChangeWeight:
-          value: false
         canDeleteEdge:
           value: true
         canDeleteVertex:
           value: false
-        canEditLabel:
+        canEditEdgeWeight:
+          value: false
+        canEditVertexLabel:
           value: false
         canMoveVertex:
           value: true
@@ -183,13 +183,13 @@ states:
           value: true
         canAddVertex:
           value: false
-        canChangeWeight:
-          value: true
         canDeleteEdge:
           value: true
         canDeleteVertex:
           value: false
-        canEditLabel:
+        canEditEdgeWeight:
+          value: true
+        canEditVertexLabel:
           value: false
         canMoveVertex:
           value: true
@@ -309,13 +309,13 @@ states:
           value: true
         canAddVertex:
           value: false
-        canChangeWeight:
-          value: false
         canDeleteEdge:
           value: true
         canDeleteVertex:
           value: false
-        canEditLabel:
+        canEditEdgeWeight:
+          value: false
+        canEditVertexLabel:
           value: false
         canMoveVertex:
           value: true
