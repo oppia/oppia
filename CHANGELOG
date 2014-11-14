@@ -3,14 +3,85 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.11 (14 Nov 2014)
+---------------------
+Editor UI fixes
+* State editor tutorial:
+  - Show the tutorial immediately for first-time users.
+  - Make tutorial buttons slightly larger.
+  - Rename tutorial link to 'Oppia editor tutorial' in the help menu.
+  - Add new stages to the tutorial for the preview and save buttons; rewrite other parts to flow better.
+  - Do not gray out the 'Let's go' button at the end of the tutorial.
+* Rules:
+  - Change readonly rule display to a plain text string.
+  - Clarify the 'add variation' text for each rule.
+  - Improve the rule destination UI by removing the search icon, adding targeted error messages, and adding '(New)' helper text.
+* Controls:
+  - Add tooltip to 'publish exploration' button to explain why it is disabled.
+  - Combine saving + discarding into a single button with a dropdown.
+  - Remove the sentence in the 'save exploration' modal that suggests that the user is changing the publication status of the exploration.
+  - When the save modal is opened, shift focus to the textarea field in which to enter a commit message.
+* Exploration map:
+  - Fix a bug where the map was not being centered correctly on page load.
+  - Make the exploration map modal bigger.
+* After a new feedback message is sent, clear the feedback message input field.
+* Suppress the warning message that pops up when trying to navigate away or reset an exploration while in preview mode (issue 416).
+* Allow parameter changes to be discarded in mid-edit.
+* Autofocus to the corresponding create-new-state text box after a new state has just been created.
+* Remove the on-hover effect for the content and rule sections in non-editable mode.
+* Change the interaction editor icon from a pencil to a cog (to suggest 'settings' or 'customization').
+* Make the interaction selector responsive.
+* Update the client-side exploration data immediately after the first state of the exploration is changed, when a tab transition is made, and after a state deletion event (cf. issues 441 and 442).
+* Fix a bug where the settings and history tabs were displayed before the exploration data loaded fully.
+* Add a 'Cancel' button to the content editor in exploration editor (issue 343).
+
+Learner view:
+* Separate the state transition handler into multiple handlers, for parity with the editor preview mode.
+
+Gallery:
+* Add a search field to the gallery.
+* If an interstitial breaks the exploration creation flow, redirect the user to the exploration creation modal in the gallery at the end of the process.
+* Show beta explorations in the gallery by default, and remove private explorations and the 'status' checkbox group.
+* Rename 'beta' to 'public', and mark released explorations as 'featured' in the gallery. Update the wording on the site to reflect this change.
+* Create exploration summary models so that the gallery loads faster.
+* Make the 'Create New Exploration' button a bit smaller.
+* Autofocus to the title field in the gallery modal when the 'create new' button is clicked.
+* Add inline validation to the 'create exploration' modal.
+
+Dashboard:
+* Show notifications of new activity in the navbar and page title (where appropriate) and highlight this information in the dashboard.
+* Record the time a user last checked the dashboard.
+
+Site pages:
+* Update and simplify the splash page.
+* Change the issue tracker link on error pages to use HTTPS.
+
+Widgets:
+* Add a new interactive widget for combinatorial graphs, and a sample exploration to illustrate its use.
+* Change the 'misspelled by one character' rule for string input to 'misspelled by at most one character'.
+* MultipleChoiceInput: forbid the case of zero choices.
+* MultipleChoiceInput: stop very long strings in the aanswer buttons from overflowing.
+
+Infrastructure and tests:
+* Upgrade intro.js to v1.0.0.
+* Upgrade Angular to v1.3.0-rc.5.
+* Upgrade jQuery to v2.1.1.
+* Add Protractor tests for non-interactive widgets, the rich-text editor, parameters, complex behaviours and navigation within the exploration editor.
+* Add Protractor tests for the embedding of oppia explorations in external webpages.
+* In Protractor tests, allow each widget to have its own integration test utilities.
+* Add checks for console errors during Protractor tests.
+* Fix issue 411: the check for the installed version of Protractor was not working correctly.
+
+
 v1.2.10.patch (10 Oct 2014)
---------------------
+---------------------------
 Editor improvements:
 * In noneditable mode, hide the widget selector in the state editor.
 * Fix a bug relating to the graph visualization height in Firefox.
 
 Infrastructure:
 * Allow exploration statistics datastore models to be migrated.
+
 
 v1.2.10 (7 Oct 2014)
 --------------------
