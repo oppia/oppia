@@ -66,9 +66,7 @@
       <span ng-if="rule.description !== 'Default'">
         <form class="form-inline" role="form">
           Answer
-          <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="onSelectNewRuleType()" ng-if="!moreThanOneChoice()" disable="true">
-          </rule-type-selector>
-          <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="onSelectNewRuleType()" ng-if="moreThanOneChoice()" disable="false">
+          <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="onSelectNewRuleType()">
           </rule-type-selector>
 
           <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group">

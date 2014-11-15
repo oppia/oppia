@@ -25,12 +25,13 @@ oppia.directive('ruleTypeSelector', [function() {
       allRuleTypes: '&',
       localValue: '=',
       onSelectionChange: '&',
-      disable: '='
     },
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$filter', function($scope, $element, $filter) {
       var choices = [];
+      var numberOfRuleTypes = 0 ;
       for (var ruleType in $scope.allRuleTypes()) {
+        numberOfRuleTypes++;
         choices.push({
           id: ruleType,
           text: $filter('replaceInputsWithEllipses')(ruleType)
@@ -49,8 +50,8 @@ oppia.directive('ruleTypeSelector', [function() {
         }
       });
       
-      if($scope.disable) {
-        $(select2Node).select2("enable", false);
+      if (numberOfRuleTypes <= 1) {
+        $(select2Node).select2('enable', false);
       }
 
       // Initialize the dropdown.
@@ -258,10 +259,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.rule.dest === editorContextService.getActiveStateName());
         };
       
-        $scope.moreThanOneChoice == function() {
-          return ($scope.allRuleTypes.lenght > 1);
-        };
-
         $scope.onSelectNewRuleType = function() {
           var description = $scope.currentRuleDescription;
           $scope.rule.description = description;
