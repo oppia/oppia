@@ -24,7 +24,7 @@ oppia.directive('ruleTypeSelector', [function() {
     scope: {
       allRuleTypes: '&',
       localValue: '=',
-      onSelectionChange: '&',
+      onSelectionChange: '&'
     },
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$filter', function($scope, $element, $filter) {
