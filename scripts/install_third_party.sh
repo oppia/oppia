@@ -104,7 +104,7 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     echo Downloading jsrepl
     cd $TOOLS_DIR
     rm -rf jsrepl
-    git clone git://github.com/replit/jsrepl.git
+    git clone https://github.com/replit/jsrepl.git
     cd jsrepl
     # Use a specific version of the JSRepl repository.
     git checkout 13f89c2cab0ee9163e0077102478958a14afb781
