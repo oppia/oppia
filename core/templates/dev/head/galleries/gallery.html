@@ -20,7 +20,7 @@
             <div class="form-group">
               <div class="input-group">
                 <div class="input-group-addon">
-                   <span ng-class="{'glyphicon glyphicon-search': !isLoading, 'glyphicon glyphicon-refresh': isLoading}">
+                   <span ng-class="{'glyphicon glyphicon-search': !searchIsLoading, 'glyphicon glyphicon-refresh': searchIsLoading}">
                    </span>
                 </div>
                 <input type="text" class="form-control" placeholder="Search Explorations" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
