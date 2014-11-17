@@ -177,6 +177,7 @@ class ExplorationPage(base.BaseHandler):
             'skin_tag': jinja2.utils.Markup(
                 skins_services.Registry.get_skin_tag(exploration.default_skin)
             ),
+            'title': exp_services.get_exploration_by_id(exploration_id).title,
             'widget_dependencies_html': jinja2.utils.Markup(
                 widget_dependencies_html),
             'widget_templates': jinja2.utils.Markup(widget_templates),
