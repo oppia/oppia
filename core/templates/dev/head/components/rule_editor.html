@@ -18,7 +18,12 @@
               <div class="col-lg-8 col-md-8 col-sm-8" style="margin-left: -5px;">
                 <span>
                   <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
-                    If <[rule | parameterizeRuleDescription: answerChoices]> ...
+                    <span ng-if="!answerChoices">
+                      If <[rule | parameterizeRuleDescription: answerChoices]> ...
+                    </span>
+                    <span ng-if="answerChoices">
+                      If <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
+                    </span>
                   </span>
                   <span ng-if="rule.description === 'Default'">
                     If no other rules apply...

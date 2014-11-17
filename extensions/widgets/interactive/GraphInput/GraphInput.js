@@ -247,14 +247,14 @@ oppia.directive('graphViz', function() {
         if ($scope.canAddEdge) {
           $scope.buttons.push({
             text: '\uE144',
-            description: 'Link',
+            description: 'Add Edge',
             mode: _MODES.ADD_EDGE
           });
         }
         if ($scope.canAddVertex) {
           $scope.buttons.push({
             text: '\u002B',
-            description: 'Add',
+            description: 'Add Node',
             mode: _MODES.ADD_VERTEX
           });
         }
@@ -487,9 +487,7 @@ oppia.directive('graphViz', function() {
             index === $scope.state.hoveredEdge &&
             $scope.canDeleteEdge) {
           return DELETE_COLOR;
-        } else if ($scope.graph.isWeighted &&
-                   index === $scope.state.hoveredEdge &&
-                   $scope.canEditEdgeWeight) {
+        } else if (index === $scope.state.hoveredEdge) {
           return HOVER_COLOR;
         } else if ($scope.state.selectedEdge === index) {
           return SELECT_COLOR;
@@ -504,9 +502,7 @@ oppia.directive('graphViz', function() {
           return DELETE_COLOR;
         } else if (index === $scope.state.currentlyDraggedVertex) {
           return HOVER_COLOR;
-        } else if ($scope.graph.isLabeled &&
-                   index === $scope.state.hoveredVertex &&
-                   $scope.canEditVertexLabel) {
+        } else if (index === $scope.state.hoveredVertex) {
           return HOVER_COLOR;
         } else if ($scope.state.selectedVertex === index) {
           return SELECT_COLOR;
