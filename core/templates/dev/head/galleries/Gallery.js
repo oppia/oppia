@@ -105,6 +105,7 @@ oppia.controller('Gallery', [
              oppiaDatetimeFormatter, oppiaDebouncer, urlService) {
   $scope.galleryDataUrl = '/galleryhandler/data';
   $scope.currentUserIsModerator = false;
+  $scope.isLoading = false;
 
   $scope.getCategoryList = function() {
     return Object.keys($scope.selectedCategories);
@@ -141,6 +142,7 @@ oppia.controller('Gallery', [
     if (!$scope.searchQuery) {
       $http.get($scope.galleryDataUrl).success($scope.refreshGalleryData);
     } else {
+      $scope.isLoading = true;
       $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
         $scope.refreshGalleryData);
     }
@@ -150,6 +152,7 @@ oppia.controller('Gallery', [
     $scope.onSearchQueryChangeExec, 400);
 
   $scope.refreshGalleryData = function(data) {
+    $scope.isLoading = false;
     $scope.featuredExplorations = data.featured;
     $scope.publicExplorations = data['public'];
 
