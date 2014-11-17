@@ -87,7 +87,8 @@ oppia.filter('truncateAtFirstInput', [function() {
 }]);
 
 // Filter that changes {{...}} tags into the corresponding parameter input values.
-// Note that this returns a text string.
+// Note that this returns an HTML string to accommodate the case of multiple-choice
+// input.
 oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
   return function(input, choices) {
     if (!input || !(input.description)) {

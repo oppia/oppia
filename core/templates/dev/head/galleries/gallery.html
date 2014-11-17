@@ -20,8 +20,8 @@
             <div class="form-group">
               <div class="input-group">
                 <div class="input-group-addon">
-                  <span class="glyphicon glyphicon-search">
-                  </span>
+                   <span ng-class="{'glyphicon glyphicon-search': !searchIsLoading, 'glyphicon glyphicon-refresh': searchIsLoading}">
+                   </span>
                 </div>
                 <input type="text" class="form-control" placeholder="Search Explorations" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
               </div>
@@ -31,6 +31,7 @@
 
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
           <div class="hidden-xs">
+            <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
             {% if not user_email %}
               <!-- User must log in. -->
               <span class="pull-right">
@@ -96,7 +97,15 @@
           <div class="tab-content oppia-gallery-tiles-container">
             <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language').length === 0">
               <div>
-                <em>No explorations selected.</em>
+                <em>We don't have any explorations on this topic yet.</em>
+                <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
+                {% if not user_email %}
+                  <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
+                {% elif not username %}
+                  <a href="{{gallery_register_redirect_url}}">Would you like to create one?</a>
+                {% else %}
+                  <a ng-click="showCreateExplorationModal(getCategoryList())">Would you like to create one?</a>
+                {% endif %}
               </div>
             </div>
 

@@ -32,7 +32,7 @@
     </a>
     <ul class="dropdown-menu">
       <li class="dropdown">
-        <a href="#" ng-click="openEditorTutorial()">How to Use the Editor</a>
+        <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
       </li>
       <li class="dropdown">
         <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
@@ -286,11 +286,12 @@
                   </span>
 
                   {% if can_publish %}
-                    <span ng-if="explorationRightsService.isPrivate()">
-                      <button type="button" class="btn btn-default protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length" tooltip="Click this button to publish your exploration to the gallery." tooltip-placement="bottom">
+                    <!-- The 'display: inline-block' is needed for tooltips to display when the button is disabled. -->
+                    <div style="display: inline-block;" ng-if="explorationRightsService.isPrivate()" title="<[getPublishExplorationButtonTooltip()]>">
+                      <button type="button" class="btn btn-default protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length">
                         Publish in Gallery
                       </button>
-                    </span>
+                    </div>
                   {% endif %}
 
                   <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">

@@ -639,6 +639,16 @@ oppia.controller('ExplorationEditor', [
     });
   };
 
+  $scope.getPublishExplorationButtonTooltip = function() {
+    if ($scope.warningsList.length > 0) {
+      return 'Please resolve the warnings before publishing.';
+    } else if ($scope.isExplorationLockedForEditing()) {
+      return 'Please save your changes before publishing.';
+    } else {
+      return 'Click this button to publish your exploration to the gallery.';
+    }
+  };
+
   // Constants and methods relating to the state editor tutorial.
   $scope.EDITOR_TUTORIAL_OPTIONS = {
     disableInteraction: true,

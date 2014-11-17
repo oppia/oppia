@@ -975,6 +975,13 @@ oppia-parameter {
    width: 200px;
 }
 
+.introjs-button.introjs-skipbutton,
+.introjs-button.introjs-prevbutton,
+.introjs-button.introjs-nextbutton {
+  font-size: 85%;
+  padding: .7em 1.0em
+}
+
 /* Hide the search icon in the rule destination dropdown. */
 .oppia-rule-dest-select2 .select2-search input {
   background: none;
@@ -1027,7 +1034,7 @@ oppia-parameter {
   background-color: #18447E;
   border-radius: 20px;
   width: 200px;
-  margin: 0 10px;
+  margin: 3px 10px;
   color: #fff;
 }
 .oppia-splash-btn:hover {
@@ -1039,33 +1046,25 @@ oppia-parameter {
   display: table;
   width: 100%;
   margin-left: 0;
-  margin-bottom: 120px;
-  margin-top: 100px;
+  margin-bottom: 60px;
+  margin-top: 50px;
 }
 
 .oppia-splash-section {
   display: table;
   width: 100%;
   margin: 0;
-  padding: 48px 200px;
+  padding: 12px 200px;
   background-color: #fff;
 }
 .oppia-splash-section p {
   font-size: 1.8rem;
-  min-width: 300px;
   max-width: 500px;
 }
 
-.oppia-splash-block-left {
+.oppia-splash-block {
   margin: 200px auto;
-  padding: 0 0 40px 50px;
-  width: 600px;
-}
-
-.oppia-splash-block-right {
-  margin: 200px auto;
-  padding: 0 0 40px 50px;
-  width: 600px;
+  padding: 0 0 10px 40px;
 }
 
 .oppia-splash-page-screenshot {
@@ -1073,6 +1072,26 @@ oppia-parameter {
 }
 
 .oppia-splash-hr {
-  width: 60%;
   border-color: #ccc;
+  width: 60%;
+}
+
+@media (min-width: 768px) {
+  .oppia-splash-block {
+    width: 600px;
+  }
+}
+
+@media (max-width: 992px) {
+  .oppia-splash-block {
+    text-align: center;
+  }
+
+  .oppia-splash-section {
+    padding: 0 10px;
+  }
+
+  .oppia-splash-section p {
+    max-width: 100%;
+  }
 }
