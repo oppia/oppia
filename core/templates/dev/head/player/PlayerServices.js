@@ -307,9 +307,30 @@ oppia.factory('oppiaPlayerService', [
   };
 
   return {
+    // This should only be used in editor preview mode.
+    populateExploration: function(exploration) {
+      if (_editorPreviewMode) {
+        _exploration = exploration;
+      } else {
+        throw 'Error: cannot populate exploration in learner mode.';
+      }
+    },
+    /**
+     * Loads the data for the initial state of the exploration.
+     *
+     * In editor preview mode, populateExploration() should be called before
+     * calling init().
+     *
+     * @param {function} successCallback The function to execute after the initial
+     *   exploration data is successfully loaded. This function will be passed two
+     *   arguments:
+     *   - stateName {string}, the name of the first state
+     *   - initHtml {string}, an HTML string representing the content of the first
+     *       state.
+     */
     init: function(successCallback) {
       if (_editorPreviewMode) {
-        // Before calling init(), populateExploration() should be called.
+        
         var initExplorationUrl = '/createhandler/init_exploration/' + _explorationId;
         $http.post(initExplorationUrl, {
           exp_param_specs: _exploration.param_specs,
@@ -336,8 +357,7 @@ oppia.factory('oppiaPlayerService', [
           stopwatch.resetStopwatch();
           _updateStatus(data.params, data.state_name);
           $rootScope.$broadcast('playerStateChange');
-          // TODO(sll): Restrict what is passed here to just the relevant blobs of content.
-          successCallback(data);
+          successCallback(data.state_name, data.init_html);
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
@@ -448,14 +468,6 @@ oppia.factory('oppiaPlayerService', [
       }
 
       window.open('/create/' + _explorationId, '_blank');
-    },
-    // This should only be used in editor preview mode.
-    populateExploration: function(exploration) {
-      if (_editorPreviewMode) {
-        _exploration = exploration;
-      } else {
-        throw 'Error: cannot populate exploration in learner mode.';
-      }
     },
     isAnswerBeingProcessed: function() {
       return answerIsBeingProcessed;
