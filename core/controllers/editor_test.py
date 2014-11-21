@@ -556,6 +556,7 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.EXP_ID))
         csrf_token = self.get_csrf_token_from_response(response)
+        self.assertIn('Welcome to Oppia!', response.body)
 
         # May not revert to any version that's not 1
         for rev_version in (-1, 0, 2, 3, 4, '1', ()):
