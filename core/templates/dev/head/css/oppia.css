@@ -615,6 +615,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   max-width: 700px;
 }
 
+.oppia-warning-chevron {
+  font-size: 10px;
+  padding-left: 4px;
+  padding-top: 4px;
+}
+
 .oppia-missing-objective-error {
   background-color: #fcf8e3;
   border-color: #faebcc;
