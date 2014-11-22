@@ -427,7 +427,7 @@ oppia.factory('oppiaPlayerService', [
           // client eval fails.
           console.log('client:');
           console.log(
-            stateTransitionService.next(ruleSpec,
+            stateTransitionService.getNextStateData(ruleSpec,
               newStateName ? _exploration.states[newStateName] : null,
               answer));
           console.log('server:');
@@ -439,7 +439,6 @@ oppia.factory('oppiaPlayerService', [
           warningsData.addWarning(
             data.error || 'There was an error processing your input.');
         });
-        }
       });
     },
     showFeedbackModal: function() {

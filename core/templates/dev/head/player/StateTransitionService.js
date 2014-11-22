@@ -19,15 +19,27 @@
  * @author kashida@google.com (Koji Ashida)
  */
 
-oppia.factory('paramInterpolationService', [
-    'expressionEvaluatorService',
-    function(expressionEvaluatorService) {
+// Interpolates a string containing expressions, or a value which is
+// represented by an expression. In either case, the string/value
+// is evaluated against the supplied environments. If the interpolation fails,
+// a null value is returned.
+//
+// Examples:
+//   processString('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
+//   processString('abc{{a}}', [{}]) returns null.
+//   processString('abc', [{}]) returns 'abc'.
+//   processValue('{{a}}', [{'a': 'b'}]) returns 'b'.
+//   processValue('{{a}}', [{}]) returns null.
+//   processValue('a', [{'a': 'b'}]) throws an error.
+//   processValue(345, [{'a': 'b'}]) throws an error.
+//   processValue('345{{a}}', [{}]) throws an error.
+oppia.factory('expressionInterpolationService', [
+    'expressionEvaluatorService', function(expressionEvaluatorService) {
   return {
-    // Returns null when failed to evaluate.
-    html: function(sourceHtml, env) {
+    processString: function(sourceString, envs) {
       try {
-        return sourceHtml.replace(/{{([^}]*)}}/, function(match, p1) {
-          return expressionEvaluatorService.evaluateExpression(p1, env);
+        return sourceString.replace(/{{([^}]*)}}/, function(match, p1) {
+          return expressionEvaluatorService.evaluateExpression(p1, envs);
         });
       } catch (e) {
         if (e instanceof expressionEvaluatorService.ExpressionError) {
@@ -37,11 +49,18 @@ oppia.factory('paramInterpolationService', [
       }
     },
 
-    // Returns null when failed to evaluate.
-    value: function(valueExpression, env) {
-      var expression = valueExpression.replace(/^\s*{{(.*)}}\s*$/, '$1')
+    // valueExpression should be a string of the form '{{...}}'.
+    processValue: function(valueExpression, envs) {
+      valueExpression = valueExpression.trim();
+      if (valueExpression.indexOf('{{') !== 0 ||
+          valueExpression.indexOf('}}') + 2 !== valueExpression.length) {
+        throw 'Invalid value expression: ' + valueExpression;
+      }
+
+      valueExpression = valueExpression.substring(
+        2, valueExpression.length - 2);
       try {
-        return expressionEvaluatorService.evaluateExpression(expression, env);
+        return expressionEvaluatorService.evaluateExpression(valueExpression, envs);
       } catch (e) {
         if (e instanceof expressionEvaluatorService.ExpressionError) {
           return null;
@@ -55,78 +74,80 @@ oppia.factory('paramInterpolationService', [
 // Produces information necessary to transition from one state to another.
 // independently reset and queried for the current time.
 oppia.factory('stateTransitionService', [
-    'learnerParamsService', 'paramInterpolationService',
-    function(learnerParamsService, paramInterpolationService) {
+    'learnerParamsService', 'expressionInterpolationService',
+    function(learnerParamsService, expressionInterpolationService) {
   var randomFromArray = function(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
   };
 
   // Evaluate feedback.
-  var makeFeedback = function(feedbacks, env) {
+  var makeFeedback = function(feedbacks, envs) {
     var feedbackString = feedbacks.length > 0 ? randomFromArray(feedbacks) : '';
-    return paramInterpolationService.html(feedbackString, env);
+    return expressionInterpolationService.processString(feedbackString, envs);
   };
 
-  // Evaluate params.
-  var makeParams = function(param_changes, env) {
-    var new_params = {};
-    if (param_changes.every(function(pc) {
+  // Evaluate parameters. Returns null if any evaluation fails.
+  var makeParams = function(paramChanges, envs) {
+    var newParams = {};
+    if (paramChanges.every(function(pc) {
       if (pc.generator_id === 'Copier') {
         var args = pc.customization_args;
         if (!args.parse_with_jinja) {
-          new_params[pc.name] = args.value;
+          newParams[pc.name] = args.value;
         } else {
-          var paramValue = paramInterpolationService.value(args.value, env);
+          var paramValue = expressionInterpolationService.processValue(
+            args.value, envs);
           if (paramValue === null) {
             return false;
           }
-          new_params[pc.name] = paramValue;
+          newParams[pc.name] = paramValue;
         }
       } else {
         // RandomSelector.
-        new_params[pc.name] = randomFromArray(pc.list_of_values);
+        newParams[pc.name] = randomFromArray(pc.list_of_values);
       }
       return true;
     })) {
-      // All params succeeded.
-      return new_params;
+      // All parameters were evaluated successfully.
+      return newParams;
     }
-    // Evaluation of a param failed.
+    // Evaluation of some parameter failed.
     return null;
   };
 
   // Evaluate question string.
-  var makeQuestion = function(new_state, scope) {
-    return paramInterpolationService.html(new_state.content[0].value, [scope]);
+  var makeQuestion = function(new_state, envs) {
+    return expressionInterpolationService.processString(
+      new_state.content[0].value, envs);
   };
 
   return {
     // Returns null when failed to evaluate.
-    next: function(rule_spec, new_state, answer) {
-      var old_params = learnerParamsService.getAllParams();
-      old_params.answer = answer;
-      var feedback = makeFeedback(rule_spec.feedback, [old_params]);
+    getNextStateData: function(ruleSpec, new_state, answer) {
+      var oldParams = learnerParamsService.getAllParams();
+      oldParams.answer = answer;
+      var feedback = makeFeedback(ruleSpec.feedback, [oldParams]);
       if (feedback === null) {
         return null;
       }
 
-      var new_params = makeParams(new_state.param_changes, [old_params]);
-      if (new_params == null) {
+      var newParams = makeParams(new_state.param_changes, [oldParams]);
+      if (newParams === null) {
         return null;
       }
-      new_params.answer = answer;
 
-      var question = makeQuestion(new_state, new_params);
+      var question = makeQuestion(new_state, [newParams, {answer: 'answer'}]);
       if (question === null) {
         return null;
       }
 
       // All succeeded. Return all the results.
+      // Note that newParams does not include a key for 'answer'.
       return {
-        finished: rule_spec.dest === 'END',
-        params: new_params,
-        feedback_html: '<div>' + feedback + '<div>',
-        question_html: '<div>' + question + '</div>',
+        finished: ruleSpec.dest === 'END',
+        params: newParams,
+        feedback_html: feedback,
+        question_html: question,
       }
     }
   };
