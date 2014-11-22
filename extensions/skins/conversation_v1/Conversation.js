@@ -107,8 +107,10 @@ oppia.directive('conversationSkin', [function() {
           warningsData.clear();
           $scope.hasInteractedAtLeastOnce = true;
 
+          var _oldStateName = $scope.stateName;
+
           $scope.stateName = newStateName;
-          $scope.finished = (newStateName === 'END');
+          $scope.finished = !Boolean(newStateName);
 
           if (!$scope.finished && !isSticky) {
             // The previous widget is not sticky and should be replaced.
@@ -116,11 +118,11 @@ oppia.directive('conversationSkin', [function() {
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }
 
-          // TODO(sll): Check the state change instead of question_html so that it
-          // works correctly when the new state doesn't have a question string.
-          var isQuestion = !!questionHtml;
+          var isQuestion = (_oldStateName !== newStateName) && !!questionHtml;
           if (isQuestion) {
             $scope.mostRecentQuestionIndex = $scope.responseLog.length;
+          } else {
+            questionHtml = '';
           }
 
           // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'

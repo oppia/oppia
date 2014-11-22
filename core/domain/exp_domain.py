@@ -173,8 +173,7 @@ class Content(object):
                 'Expected context params for parsing content to be a dict, '
                 'received %s' % params)
 
-        return html_cleaner.clean(
-            '<div>%s</div>' % jinja_utils.parse_string(self.value, params))
+        return html_cleaner.clean(jinja_utils.parse_string(self.value, params))
 
 
 class RuleSpec(object):

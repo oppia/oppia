@@ -106,21 +106,19 @@ def get_next_state_dict(
     the new state name, response HTML, and updated parameters.
     """
     finished = (rule_spec.dest == feconf.END_DEST)
-    new_params = (
-        {} if finished
-        else _get_updated_param_dict(
-            old_params, new_state.param_changes, exp_param_specs))
+    new_params = _get_updated_param_dict(
+        old_params, {} if finished else new_state.param_changes,
+        exp_param_specs)
 
     return {
-        'feedback_html': '<div>%s</div>' % jinja_utils.parse_string(
+        'feedback_html': jinja_utils.parse_string(
             rule_spec.get_feedback_string(), old_params),
         'finished': finished,
         'params': new_params,
         'question_html': (
             new_state.content[0].to_html(new_params)
-            if not finished and old_state_name != rule_spec.dest
-            else ''),
-        'state_name': rule_spec.dest,
+            if not finished else ''),
+        'state_name': rule_spec.dest if not finished else None,
     }
 
 

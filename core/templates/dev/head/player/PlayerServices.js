@@ -260,7 +260,7 @@ oppia.factory('oppiaPlayerService', [
     // happen in the same place. Perhaps in the non-sticky case we should call
     // a frontend method named appendFeedback() or similar.
     var isSticky = (
-      newStateName !== _END_DEST && newStateData.widget.sticky &&
+      newStateName && newStateData.widget.sticky &&
       newStateData.widget.widget_id === oldStateData.widget.widget_id);
 
     if (!_editorPreviewMode) {
@@ -411,27 +411,35 @@ oppia.factory('oppiaPlayerService', [
           });
         }
 
+        var finished = (ruleSpec.dest === 'END');
         var nextStateDictUrl = '/explorehandler/next_state/' + _explorationId;
-        var newStateName = (ruleSpec.dest !== 'END') ? ruleSpec.dest : null;
+        var newStateName = finished ? null : ruleSpec.dest;
         $http.post(nextStateDictUrl, {
           exp_param_specs: angular.copy(_exploration.param_specs),
           old_state_name: _currentStateName,
           input_type: ruleSpec.inputType,
           params: learnerParamsService.getAllParams(),
           rule_spec: ruleSpec,
-          new_state: newStateName ? _exploration.states[newStateName] : null,
+          new_state: finished ? null : _exploration.states[newStateName],
           answer: answer
         }).success(function(data) {
           // Compare client and server evaluation results.
           // TODO(kashida): Do client eval first and make server call only when
           // client eval fails.
-          console.log('client:');
-          console.log(
-            stateTransitionService.getNextStateData(ruleSpec,
-              newStateName ? _exploration.states[newStateName] : null,
-              answer));
-          console.log('server:');
-          console.log(data);
+          var clientEvalResult = stateTransitionService.getNextStateData(
+            ruleSpec,
+            finished ? null : _exploration.states[newStateName],
+            answer);
+          clientEvalResult['state_name'] = newStateName;
+
+          var serverEvalResult = data;
+
+          if (!angular.equals(clientEvalResult, serverEvalResult)) {
+            console.error('Client and server evaluations do not match!');
+            console.log('client:', clientEvalResult);
+            console.log('server:', data);
+          }
+
           answerIsBeingProcessed = false;
           _onStateTransitionProcessed(data, answer, handler, successCallback);
         }).error(function(data) {
