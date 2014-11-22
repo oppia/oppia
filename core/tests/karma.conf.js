@@ -7,6 +7,7 @@ module.exports = function(config) {
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-animate.min.js',
+      'third_party/static/angularjs-1.3.0-rc.5/angular-aria.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-resource.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-sanitize.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-mocks.js',
@@ -15,6 +16,8 @@ module.exports = function(config) {
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
       'third_party/static/ui-sortable-0.12.6/src/sortable.js',
+      'third_party/static/bower-material-0.6.0-rc1/angular-material.js',
+      'third_party/static/hammer-js-2.0.4/hammer.js',
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
@@ -43,7 +46,7 @@ module.exports = function(config) {
       'core/templates/dev/head/admin/*.js': ['coverage'],
       'core/templates/dev/head/components/*.js': ['coverage'],
       'core/templates/dev/head/css/*.js': ['coverage'],
-     'core/templates/dev/head/dashboard/*.js': ['coverage'],
+      'core/templates/dev/head/dashboard/*.js': ['coverage'],
       'core/templates/dev/head/editor/*.js': ['coverage'],
       'core/templates/dev/head/error/*.js': ['coverage'],
       'core/templates/dev/head/expressions/*.js': ['coverage'],

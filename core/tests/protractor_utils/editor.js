@@ -157,30 +157,32 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
   expect(parameterValues.length).toEqual(parameterTypes.length);
 
   ruleElement.element(by.css('.protractor-test-rule-description')).click();
-  element(by.id('select2-drop')).element(
-      by.cssContainingText(
-        'li.select2-results-dept-0', ruleDescriptionInDropdown)).then(
-      function(optionElement) {
-    optionElement.click();
-    protractor.getInstance().waitForAngular();
 
-    // Now we enter the parameters
-    for (var i = 0; i < parameterValues.length; i++) {
-      var parameterElement = ruleElement.element(
-        by.repeater('item in ruleDescriptionFragments track by $index'
-      ).row(i * 2 + 1));
-      var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
-
-      if (widgetName === 'MultipleChoiceInput') {
-        // This is a special case as it uses a dropdown to set a NonnegativeInt
-        parameterElement.element(
-          by.cssContainingText('option', parameterValues[i])
-        ).click();
-      } else {
-        parameterEditor.setValue(parameterValues[i]);
-      }
-    }
+  element.all(by.id('select2-drop')).map(function(selectorElement) {
+    selectorElement.element(by.cssContainingText(
+      'li.select2-results-dept-0', ruleDescriptionInDropdown
+    )).then(function(optionElement) {
+      optionElement.click();
+      protractor.getInstance().waitForAngular();
+    });
   });
+
+  // Now we enter the parameters
+  for (var i = 0; i < parameterValues.length; i++) {
+    var parameterElement = ruleElement.element(
+      by.repeater('item in ruleDescriptionFragments track by $index'
+    ).row(i * 2 + 1));
+    var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
+
+    if (widgetName === 'MultipleChoiceInput') {
+      // This is a special case as it uses a dropdown to set a NonnegativeInt
+      parameterElement.element(
+        by.cssContainingText('option', parameterValues[i])
+      ).click();
+    } else {
+      parameterEditor.setValue(parameterValues[i]);
+    }
+  }
 };
 
 // This clicks the "add new rule" button and then selects the rule type and
