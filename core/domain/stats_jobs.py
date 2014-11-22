@@ -93,7 +93,7 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query method.
     @classmethod
-    def get_statistics(cls, exploration_id):
+    def get_statistics(cls, exploration_id, exploration_version='all'):
         """Returns a dict with the following keys:
         - 'start_exploration_count': # of times exploration was started
         - 'complete_exploration_count': # of times exploration was completed
@@ -113,7 +113,7 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
         last_updated = None
 
         mr_model = stats_models.ExplorationAnnotationsModel.get(
-            exploration_id, strict=False)
+            '%s:%s' % (exploration_id, exploration_version), strict=False)
         if mr_model is not None:
             num_starts += mr_model.num_starts
             num_completions += mr_model.num_completions
@@ -153,17 +153,24 @@ class StatisticsMRJobManager(
     @staticmethod
     def map(item):
         if StatisticsMRJobManager._entity_created_before_job_queued(item):
-            yield (item.exploration_id, {
+            value = {
                 'event_type': item.event_type,
                 'session_id': item.session_id,
                 'state_name': item.state_name,
-                'created_on': utils.get_time_in_millisecs(item.created_on)})
+                'created_on': utils.get_time_in_millisecs(item.created_on),
+                'exploration_id': item.exploration_id,
+                'version': item.exploration_version}
+            yield ('%s:%s' % (item.exploration_id, item.exploration_version),
+                   value)
+            yield ('%s:all' % item.exploration_id, value)
+            yield ('%s:None' % item.exploration_id, {})
 
     @staticmethod
     def reduce(key, stringified_values):
         exp_model = None
+        (exp_id, version) = key.split(':')
         try:
-            exp_model = exp_models.ExplorationModel.get(key)
+            exp_model = exp_models.ExplorationModel.get(exp_id)
         except base_models.BaseModel.EntityNotFoundError:
             return
             
@@ -185,6 +192,8 @@ class StatisticsMRJobManager(
         # Iterate and process each event for this exploration.
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
+            if value == {}:
+                continue
             event_type = value['event_type']
             state_name = value['state_name']
             created_on = value['created_on']
@@ -233,33 +242,45 @@ class StatisticsMRJobManager(
             (_, state_name) = session_id_to_latest_leave_event[session_id]
             state_hit_counts[state_name]['no_answer_count'] += 1
 
-        # Update all stats with old model values
-        old_models_start_count = stats_models.StateCounterModel.get_or_create(
-            key, exp_model.init_state_name).first_entry_count
-        old_models_complete_count = (
-            stats_models.StateCounterModel.get_or_create(
-                key, feconf.END_DEST).first_entry_count)
+        num_starts = new_models_start_count
+        num_completions = new_models_complete_count
 
-        num_starts = (
-            old_models_start_count + new_models_start_count)
-        num_completions = (
-            old_models_complete_count + new_models_complete_count)
-        for state_name in exp_model.states:
-            state_counter = stats_models.StateCounterModel.get_or_create(
-                key, state_name)
-            state_hit_counts[state_name]['no_answer_count'] += (
-                state_counter.first_entry_count
-                + state_counter.subsequent_entries_count
-                - state_counter.resolved_answer_count
-                - state_counter.active_answer_count)
-            state_hit_counts[state_name]['first_entry_count'] += (
-                state_counter.first_entry_count)
-            state_hit_counts[state_name]['total_entry_count'] += (
-                state_counter.first_entry_count
-                + state_counter.subsequent_entries_count)
+        if version == 'None' or version == 'all':
+            # Update all stats with old model values
+            old_models_start_count = (
+                stats_models.StateCounterModel.get_or_create(
+                    exp_id, exp_model.init_state_name).first_entry_count
+            old_models_complete_count = (
+                stats_models.StateCounterModel.get_or_create(
+                    exp_id, feconf.END_DEST).first_entry_count)
 
-        stats_models.ExplorationAnnotationsModel(
-            id=key,
-            num_starts=num_starts,
-            num_completions=num_completions,
-            state_hit_counts=state_hit_counts).put()
+            num_starts = (
+                old_models_start_count + new_models_start_count)
+            num_completions = (
+                old_models_complete_count + new_models_complete_count)
+            for state_name in exp_model.states:
+                state_counter = stats_models.StateCounterModel.get_or_create(
+                    exp_id, state_name)
+                state_hit_counts[state_name]['no_answer_count'] += (
+                    state_counter.first_entry_count
+                    + state_counter.subsequent_entries_count
+                    - state_counter.resolved_answer_count
+                    - state_counter.active_answer_count)
+                state_hit_counts[state_name]['first_entry_count'] += (
+                    state_counter.first_entry_count)
+                state_hit_counts[state_name]['total_entry_count'] += (
+                    state_counter.first_entry_count
+                    + state_counter.subsequent_entries_count)
+
+        if version == 'None':
+            version = 'prior to INSERT DATE HERE'
+            key = '%s:%s' % (exp_id, version)
+
+        if num_starts > 0:
+            stats_models.ExplorationAnnotationsModel(
+                id=key,
+                exploration_id=exp_id,
+                version=str(version),
+                num_starts=num_starts,
+                num_completions=num_completions,
+                state_hit_counts=state_hit_counts).put()

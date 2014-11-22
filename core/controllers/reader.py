@@ -143,6 +143,8 @@ class ExplorationPage(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        version = exploration.version
+
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 

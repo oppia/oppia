@@ -248,7 +248,7 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         exp_services.delete_demo('0')
         exp_services.load_demo('0')
 
-        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0'
+        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0/1'
 
         # Check, from the editor perspective, that no stats have been recorded.
         self.register_editor(self.EDITOR_EMAIL)

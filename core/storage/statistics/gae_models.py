@@ -342,6 +342,10 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics."""
+    # Id of exploration.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Version of exploration.
+    version = ndb.StringProperty(indexed=False)
     # Number of students who started the exploration
     num_starts = ndb.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration
@@ -352,6 +356,12 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     #               'no_answer_count': ...}}
     state_hit_counts = ndb.JsonProperty(indexed=False)
 
+    @classmethod
+    def get_versions(cls, exploration_id):
+        return [annotations.version for annotations in
+            cls.get_all().filter(
+                cls.exploration_id == exploration_id).fetch(
+                    feconf.DEFAULT_QUERY_LIMIT)]
 
 def process_submitted_answer(
         exploration_id, exploration_version, state_name, handler_name,

@@ -82,7 +82,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            id = '%s:%s' % (exp_id, exp_version)
+            output_model = stats_models.ExplorationAnnotationsModel.get(id)
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 0)
 
@@ -107,7 +108,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            id = '%s:%s' % (exp_id, exp_version)
+            output_model = stats_models.ExplorationAnnotationsModel.get(id)
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 2)
 
@@ -135,7 +137,8 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertEqual(self.count_jobs_in_taskqueue(), 1)
             self.process_and_flush_pending_tasks()
 
-            output_model = stats_models.ExplorationAnnotationsModel.get(exp_id)
+            id = '%s:%s' % (exp_id, exp_version)
+            output_model = stats_models.ExplorationAnnotationsModel.get(id)
             self.assertEqual(output_model.num_starts, 2)
             self.assertEqual(output_model.num_completions, 1)
 

@@ -35,19 +35,24 @@ oppia.directive('barChart', [function() {
       }
       var options = $scope.options();
       var chart = new google.visualization.BarChart($element[0]);
-      chart.draw(
-        google.visualization.arrayToDataTable($scope.data()), {
-        chartArea: {
-          left: 0,
-          width: options.chartAreaWidth
-        },
-        colors: options.colors,
-        hAxis: {gridlines: {color: 'transparent'}},
-        height: options.height,
-        isStacked: true,
-        legend: {position:  options.legendPosition || 'none'},
-        width: options.width
-      });
+      var _redrawGraph = function() {
+          chart.draw(
+            google.visualization.arrayToDataTable($scope.data()), {
+            chartArea: {
+              left: 0,
+              width: options.chartAreaWidth
+            },
+            colors: options.colors,
+            hAxis: {gridlines: {color: 'transparent'}},
+            height: options.height,
+            isStacked: true,
+            legend: {position:  options.legendPosition || 'none'},
+            width: options.width
+          });
+      }
+      $scope.$watch('data()', _redrawGraph);
+      $(window).resize(_redrawGraph);
+
     }]
   };
 }]);
@@ -308,6 +313,7 @@ oppia.directive('stateGraphViz', [
 
       $scope.$watch('graphData()', _redrawGraph, true);
       $scope.$watch('currentStateId()', _redrawGraph);
+      $scope.$watch('opacityMap', _redrawGraph);
       $(window).resize(_redrawGraph);
 
       // A rough upper bound for the width of a single letter, in pixels, to use

@@ -609,7 +609,7 @@ class ExplorationRevertHandler(EditorHandler):
 class ExplorationStatisticsHandler(EditorHandler):
     """Returns statistics for an exploration."""
 
-    def get(self, exploration_id):
+    def get(self, exploration_id, exploration_version):
         """Handles GET requests."""
         try:
             exp_services.get_exploration_by_id(exploration_id)
@@ -617,7 +617,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json(stats_services.get_exploration_stats(
-            exploration_id))
+            exploration_id, exploration_version=exploration_version))
 
 
 class StateRulesStatsHandler(EditorHandler):

@@ -42,8 +42,10 @@ oppia.controller('ExplorationStatistics', [
   });
 
   $scope.hasExplorationBeenVisited = false;
-  $scope.refreshExplorationStatistics = function() {
-    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId;
+  $scope.refreshExplorationStatistics = function(version) {
+    version = typeof(version)==='undefined' ? explorationData.data.version : version;
+    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId
+      + '/' + version;
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
       $scope.graphData = graphDataService.getGraphData();
 
@@ -62,6 +64,8 @@ oppia.controller('ExplorationStatistics', [
         ['', 'Completions', 'Non-completions'],
         ['', numCompletions, numVisits - numCompletions]
       ];
+
+      $scope.versions = data.versions;
 
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'
@@ -85,6 +89,10 @@ oppia.controller('ExplorationStatistics', [
 
       $scope.hasTabLoaded = true;
     });
+  };
+
+  $scope.onSelectExplorationVersion = function(version) {
+    $scope.refreshExplorationStatistics(version);
   };
 
   $scope.onClickStateInStatsGraph = function(stateName) {

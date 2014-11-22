@@ -8,6 +8,12 @@
   <div ng-if="hasTabLoaded">
     <br>
     <div ng-if="hasExplorationBeenVisited">
+      <div>Show stats for version:
+        <select style="padding: 5px; background: white; border: #ddd solid 1px; color: #555; border-radius: 4px;"
+            ng-change="onSelectExplorationVersion(version)" ng-model="version" ng-options="version for version in versions">
+        </select>
+      </div>
+      <div style="margin-left:15px; margin-top:15px">
       <h4>Exploration Completion Rate</h4>
       <bar-chart data="chartData" options="COMPLETION_RATE_CHART_OPTIONS">
       </bar-chart>
@@ -31,6 +37,7 @@
       </em>
     </div>
   </div>
+</div>
 </div>
 
 <script type="text/ng-template" id="modals/stateStats">

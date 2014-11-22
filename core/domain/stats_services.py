@@ -74,7 +74,7 @@ def get_state_rules_stats(exploration_id, state_name):
     return results
 
 
-def get_state_improvements(exploration_id):
+def get_state_improvements(exploration_id, exploration_version):
     """Returns a list of dicts, each representing a suggestion for improvement
     to a particular state.
     """
@@ -90,8 +90,9 @@ def get_state_improvements(exploration_id):
             'rule_str': exp_domain.DEFAULT_RULESPEC_STR
         } for state_name in state_names])
 
-    state_hit_counts = stats_jobs.StatisticsAggregator.get_statistics(
-        exploration_id)['state_hit_counts']
+    statistics = stats_jobs.StatisticsAggregator.get_statistics(
+        exploration_id, exploration_version=exploration_version)
+    state_hit_counts = statistics['state_hit_counts']
 
     for ind, state_name in enumerate(state_names):
         total_entry_count = 0
@@ -134,16 +135,18 @@ def get_state_improvements(exploration_id):
         key=lambda x: -x['rank'])
 
 
-def get_exploration_stats(exploration_id):
+def get_exploration_stats(exploration_id, exploration_version):
     """Returns a dict with state statistics for the given exploration id."""
     exploration = exp_services.get_exploration_by_id(exploration_id)
-    exp_stats = stats_jobs.StatisticsAggregator.get_statistics(exploration_id)
+    exp_stats = stats_jobs.StatisticsAggregator.get_statistics(exploration_id,
+        exploration_version=exploration_version)
 
     last_updated = exp_stats['last_updated']
     state_hit_counts = exp_stats['state_hit_counts']
 
     return {
-        'improvements': get_state_improvements(exploration_id),
+        'improvements': get_state_improvements(exploration_id,
+             exploration_version),
         'last_updated': last_updated,
         'num_completions': exp_stats['complete_exploration_count'],
         'num_starts': exp_stats['start_exploration_count'],
@@ -158,4 +161,6 @@ def get_exploration_stats(exploration_id):
                     if state_name in state_hit_counts else 0),
             } for state_name in exploration.states
         },
+        'versions': stats_models.ExplorationAnnotationsModel.get_versions(
+            exploration_id),
     }
