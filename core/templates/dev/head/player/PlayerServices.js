@@ -340,14 +340,8 @@ oppia.factory('oppiaPlayerService', [
           stopwatch.resetStopwatch();
           _updateStatus(initHtmlAndParamsData.params, _exploration.init_state_name);
           $rootScope.$broadcast('playerStateChange');
-          successCallback({
-            exploration: _exploration,
-            isLoggedIn: false,
-            sessionId: null,
-            init_html: initHtmlAndParamsData.init_html,
-            params: initHtmlAndParamsData.params,
-            state_name: _exploration.init_state_name
-          });
+          successCallback(
+            _exploration.init_state_name, initHtmlAndParamsData.init_html);
         });
       } else {
         $http.get(explorationDataUrl).success(function(data) {
