@@ -249,7 +249,7 @@ class StatisticsMRJobManager(
             # Update all stats with old model values
             old_models_start_count = (
                 stats_models.StateCounterModel.get_or_create(
-                    exp_id, exp_model.init_state_name).first_entry_count
+                    exp_id, exp_model.init_state_name).first_entry_count)
             old_models_complete_count = (
                 stats_models.StateCounterModel.get_or_create(
                     exp_id, feconf.END_DEST).first_entry_count)
