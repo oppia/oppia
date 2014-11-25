@@ -64,6 +64,9 @@ class EditorTest(BaseEditorControllerTest):
         self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
 
+        # Check if exploration title was loaded.
+        self.assertIn('Welcome to Oppia!', response.body)        
+
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
@@ -556,7 +559,6 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         response = self.testapp.get(
             '%s/%s' % (feconf.EDITOR_URL_PREFIX, self.EXP_ID))
         csrf_token = self.get_csrf_token_from_response(response)
-        self.assertIn('Welcome to Oppia!', response.body)
 
         # May not revert to any version that's not 1
         for rev_version in (-1, 0, 2, 3, 4, '1', ()):

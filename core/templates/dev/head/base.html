@@ -34,7 +34,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
     <link rel="apple-touch-icon" href="/images/logo.png">
-    <title>Oppia{% block maintitle %} - {% endblock %}{% block subtitle %}{% endblock %}</title>
+   <title>{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
 
     {% block header_css %}
       {% include 'header_css_libs.html' %}
