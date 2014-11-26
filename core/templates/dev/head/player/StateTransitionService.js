@@ -65,6 +65,10 @@ oppia.factory('expressionInterpolationService', [
         if (e instanceof expressionEvaluatorService.ExpressionError) {
           return null;
         }
+        // This can arise if an expression using Jinja syntax is detected.
+        if (e.name === 'SyntaxError') {
+          return null;
+        }
         throw e;
       }
     }
@@ -87,16 +91,15 @@ oppia.factory('stateTransitionService', [
   };
 
   // Evaluate parameters. Returns null if any evaluation fails.
-  var makeParams = function(paramChanges, envs) {
-    var newParams = {};
+  var makeParams = function(oldParams, paramChanges, envs) {
+    var newParams = angular.copy(oldParams);
     if (paramChanges.every(function(pc) {
       if (pc.generator_id === 'Copier') {
-        var args = pc.customization_args;
-        if (!args.parse_with_jinja) {
-          newParams[pc.name] = args.value;
+        if (!pc.customization_args.parse_with_jinja) {
+          newParams[pc.name] = pc.customization_args.value;
         } else {
           var paramValue = expressionInterpolationService.processValue(
-            args.value, envs);
+            pc.customization_args.value, envs);
           if (paramValue === null) {
             return false;
           }
@@ -104,7 +107,8 @@ oppia.factory('stateTransitionService', [
         }
       } else {
         // RandomSelector.
-        newParams[pc.name] = randomFromArray(pc.list_of_values);
+        newParams[pc.name] = randomFromArray(
+          pc.customization_args.list_of_values);
       }
       return true;
     })) {
@@ -132,7 +136,8 @@ oppia.factory('stateTransitionService', [
       }
 
       var newParams = (
-        newState ? makeParams(newState.param_changes, [oldParams]) : oldParams);
+        newState ? makeParams(
+          oldParams, newState.param_changes, [oldParams]) : oldParams);
       if (newParams === null) {
         return null;
       }

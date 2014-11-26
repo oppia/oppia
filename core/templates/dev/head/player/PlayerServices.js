@@ -246,9 +246,10 @@ oppia.factory('oppiaPlayerService', [
 
   var stopwatch = stopwatchProviderService.getInstance();
 
-  var _onStateTransitionProcessed = function(data, answer, handler, successCallback) {
+  var _onStateTransitionProcessed = function(
+      newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
+      handler, successCallback) {
     var oldStateName = _currentStateName;
-    var newStateName = data.state_name;
     var oldStateData = _exploration.states[oldStateName];
     // NB: This may be undefined if newStateName === END_DEST.
     var newStateData = _exploration.states[newStateName];
@@ -279,11 +280,11 @@ oppia.factory('oppiaPlayerService', [
       messengerService.sendMessage(messengerService.STATE_TRANSITION, {
         oldStateName: _currentStateName,
         jsonAnswer: JSON.stringify(answer),
-        newStateName: data.state_name
+        newStateName: newStateName
       });
     }
 
-    _updateStatus(data.params, data.state_name);
+    _updateStatus(newParams, newStateName);
     stopwatch.resetStopwatch();
 
     // TODO(sll): Get rid of this special case for multiple choice.
@@ -295,14 +296,14 @@ oppia.factory('oppiaPlayerService', [
     var readerResponseHtml = _getReaderResponseHtml(
       _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
     if (newStateData) {
-      learnerParamsService.init(data.params);
+      learnerParamsService.init(newParams);
     }
 
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
-      newStateName, isSticky, data.question_html, readerResponseHtml,
-      data.feedback_html);
+      newStateName, isSticky, newQuestionHtml, readerResponseHtml,
+      newFeedbackHtml);
   };
 
   return {
@@ -329,7 +330,7 @@ oppia.factory('oppiaPlayerService', [
      */
     init: function(successCallback) {
       if (_editorPreviewMode) {
-        
+
         var initExplorationUrl = '/createhandler/init_exploration/' + _explorationId;
         $http.post(initExplorationUrl, {
           exp_param_specs: _exploration.param_specs,
@@ -423,14 +424,17 @@ oppia.factory('oppiaPlayerService', [
           new_state: finished ? null : _exploration.states[newStateName],
           answer: answer
         }).success(function(data) {
-          // Compare client and server evaluation results.
+          // Compare client and server evaluation results. Note that the client
+          // eval result may be null if there are malformed expressions.
           // TODO(kashida): Do client eval first and make server call only when
           // client eval fails.
           var clientEvalResult = stateTransitionService.getNextStateData(
             ruleSpec,
             finished ? null : _exploration.states[newStateName],
             answer);
-          clientEvalResult['state_name'] = newStateName;
+          if (clientEvalResult) {
+            clientEvalResult['state_name'] = newStateName;
+          }
 
           var serverEvalResult = data;
 
@@ -441,7 +445,9 @@ oppia.factory('oppiaPlayerService', [
           }
 
           answerIsBeingProcessed = false;
-          _onStateTransitionProcessed(data, answer, handler, successCallback);
+          _onStateTransitionProcessed(
+            data.state_name, data.params, data.question_html,
+            data.feedback_html, answer, handler, successCallback);
         }).error(function(data) {
           answerIsBeingProcessed = false;
           warningsData.addWarning(
