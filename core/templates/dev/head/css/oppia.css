@@ -83,6 +83,14 @@ input.ng-dirty.ng-invalid {
   background-color: #f0f0f0;
 }
 
+/* Fixes for Google Maps zoom controls. */
+.gm-style img {
+  max-width: none;
+}
+.gm-style label {
+  width: auto; display:inline;
+}
+
 .oppia-form-error {
   color: red;
 }
