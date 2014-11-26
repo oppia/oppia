@@ -415,44 +415,48 @@ oppia.factory('oppiaPlayerService', [
         var finished = (ruleSpec.dest === 'END');
         var nextStateDictUrl = '/explorehandler/next_state/' + _explorationId;
         var newStateName = finished ? null : ruleSpec.dest;
-        $http.post(nextStateDictUrl, {
-          exp_param_specs: angular.copy(_exploration.param_specs),
-          old_state_name: _currentStateName,
-          input_type: ruleSpec.inputType,
-          params: learnerParamsService.getAllParams(),
-          rule_spec: ruleSpec,
-          new_state: finished ? null : _exploration.states[newStateName],
-          answer: answer
-        }).success(function(data) {
-          // Compare client and server evaluation results. Note that the client
-          // eval result may be null if there are malformed expressions.
-          // TODO(kashida): Do client eval first and make server call only when
-          // client eval fails.
-          var clientEvalResult = stateTransitionService.getNextStateData(
-            ruleSpec,
-            finished ? null : _exploration.states[newStateName],
-            answer);
-          if (clientEvalResult) {
-            clientEvalResult['state_name'] = newStateName;
-          }
 
-          var serverEvalResult = data;
+        // Compute the client evaluation result. This may be null if there are
+        // malformed expressions.
+        var clientEvalResult = stateTransitionService.getNextStateData(
+          ruleSpec,
+          finished ? null : _exploration.states[newStateName],
+          answer);
 
-          if (!angular.equals(clientEvalResult, serverEvalResult)) {
-            console.error('Client and server evaluations do not match!');
-            console.log('client:', clientEvalResult);
-            console.log('server:', data);
-          }
-
+        if (clientEvalResult) {
+          clientEvalResult['state_name'] = newStateName;
           answerIsBeingProcessed = false;
           _onStateTransitionProcessed(
-            data.state_name, data.params, data.question_html,
-            data.feedback_html, answer, handler, successCallback);
-        }).error(function(data) {
-          answerIsBeingProcessed = false;
-          warningsData.addWarning(
-            data.error || 'There was an error processing your input.');
-        });
+            clientEvalResult.state_name, clientEvalResult.params,
+            clientEvalResult.question_html, clientEvalResult.feedback_html,
+            answer, handler, successCallback);
+        } else {
+          console.warn('Server evaluation required.');
+          if (!finished) {
+            console.log(
+              'Data sent to client for evaluation: ', _exploration.states[newStateName]);
+          }
+
+          // Make a server call only when client evaluation fails.
+          $http.post(nextStateDictUrl, {
+            exp_param_specs: angular.copy(_exploration.param_specs),
+            old_state_name: _currentStateName,
+            input_type: ruleSpec.inputType,
+            params: learnerParamsService.getAllParams(),
+            rule_spec: ruleSpec,
+            new_state: finished ? null : _exploration.states[newStateName],
+            answer: answer
+          }).success(function(data) {
+            answerIsBeingProcessed = false;
+            _onStateTransitionProcessed(
+              data.state_name, data.params, data.question_html,
+              data.feedback_html, answer, handler, successCallback);
+          }).error(function(data) {
+            answerIsBeingProcessed = false;
+            warningsData.addWarning(
+              data.error || 'There was an error processing your input.');
+          });
+        }
       });
     },
     showFeedbackModal: function() {
