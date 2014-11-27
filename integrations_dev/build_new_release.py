@@ -21,7 +21,7 @@ can be used to integrate Oppia explorations with other platforms.
 
 This script should be run from the oppia root folder:
 
-    python integrations_dev/scripts/build_new_release.py \
+    python integrations_dev/build_new_release.py
         --name=[INTEGRATION_NAME]
         --version_number=[VERSION_NUMBER]
 
@@ -43,7 +43,7 @@ ALLOWED_INTEGRATION_NAMES = [
 ]
 
 SCRIPT_FILEPATH = os.path.join(
-    os.getcwd(), 'static', 'scripts', 'oppia-player-0.0.0.js')
+    os.getcwd(), 'static', 'scripts', 'oppia-player-0.0.1.min.js')
 README_FILENAME = 'README'
 
 VERSION_NUMBER_REGEX = re.compile(r'^\d+\.\d+\.\d+$')

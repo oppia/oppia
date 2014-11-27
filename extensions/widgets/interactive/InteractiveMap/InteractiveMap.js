@@ -32,6 +32,12 @@ oppia.directive('oppiaInteractiveInteractiveMap', [
           oppiaHtmlEscaper.escapedJsonToObj($attrs.longitudeWithValue)];
         $scope.zoom = oppiaHtmlEscaper.escapedJsonToObj($attrs.zoomWithValue);
 
+        // This is required in order to avoid the following bug:
+        //   http://stackoverflow.com/questions/18769287/how-to-trigger-map-resize-event-after-the-angular-js-ui-map-directive-is-rendere
+        window.setTimeout(function() {
+          google.maps.event.trigger($scope.map, 'resize');
+        }, 100);
+
         $scope.mapMarkers = [];
 
         var coords = $scope.coords || [0, 0];
@@ -68,8 +74,8 @@ oppia.directive('oppiaResponseInteractiveMap', [
         $scope.stateSticky = oppiaHtmlEscaper.escapedJsonToObj($attrs.stateSticky);
 
         var latLongPair = $scope.answer[0] + ',' + $scope.answer[1];
-        $scope.staticMapUrl = 
-          'https://maps.googleapis.com/maps/api/staticmap?' + 
+        $scope.staticMapUrl =
+          'https://maps.googleapis.com/maps/api/staticmap?' +
           'center=' + latLongPair + '&zoom=4&size=500x400' +
           '&maptype=roadmap&visual_refresh=true&markers=color:red|' +
           latLongPair + '&sensor=false';

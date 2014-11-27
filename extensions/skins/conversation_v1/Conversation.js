@@ -73,20 +73,20 @@ oppia.directive('conversationSkin', [function() {
       $scope.initializePage = function() {
         $scope.responseLog = [];
         $scope.inputTemplate = '';
-        oppiaPlayerService.init(function(data) {
+        oppiaPlayerService.init(function(stateName, initHtml) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
           $scope.hasInteractedAtLeastOnce = false;
+          $scope.finished = false;
 
-          $scope.finished = data.finished;
-          $scope.stateName = data.state_name;
+          $scope.stateName = stateName;
           $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
             $scope.stateName);
 
           $scope.responseLog = [{
             previousReaderAnswer: '',
             feedback: '',
-            question: data.init_html,
+            question: initHtml,
           }];
           $scope.mostRecentQuestionIndex = 0;
 

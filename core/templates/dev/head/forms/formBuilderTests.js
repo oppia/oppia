@@ -22,7 +22,7 @@ oppia.directive('formOverlay', ['recursionHelper', function(recursionHelper) {
   return {
     scope: {
       definition: '=',
-      disabled: '&',
+      isDisabled: '&',
       savedValue: '=',
       allowExpressions: '&'
     },

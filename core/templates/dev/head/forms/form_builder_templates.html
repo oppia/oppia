@@ -3,45 +3,45 @@
 <script type="text/ng-template" id="schemaBasedEditor/master">
   <schema-based-choices-editor ng-if="schema().choices" local-value="$parent.localValue"
                                schema="schema()" choices="schema().choices"
-                               disabled="disabled()">
+                               is-disabled="isDisabled()">
   </schema-based-choices-editor>
 
   <schema-based-bool-editor ng-if="schema().type === 'bool' && !schema().choices"
-                            local-value="$parent.localValue" disabled="disabled()"
+                            local-value="$parent.localValue" is-disabled="isDisabled()"
                             allow-expressions="allowExpressions()"
                             label-for-focus-target="labelForFocusTarget()">
   </schema-based-bool-editor>
 
   <schema-based-int-editor ng-if="schema().type === 'int' && !schema().choices"
-                           local-value="$parent.localValue" disabled="disabled()"
+                           local-value="$parent.localValue" is-disabled="isDisabled()"
                            allow-expressions="allowExpressions()"
                            validators="schema().validators"
                            label-for-focus-target="labelForFocusTarget()">
   </schema-based-int-editor>
 
   <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices"
-                             local-value="$parent.localValue" disabled="disabled()"
+                             local-value="$parent.localValue" is-disabled="isDisabled()"
                              allow-expressions="allowExpressions()"
                              validators="schema().validators"
                              label-for-focus-target="labelForFocusTarget()">
   </schema-based-float-editor>
 
   <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices"
-                               local-value="$parent.localValue" disabled="disabled()"
+                               local-value="$parent.localValue" is-disabled="isDisabled()"
                                validators="schema().validators" ui-config="schema().ui_config"
                                allow-expressions="allowExpressions()"
                                label-for-focus-target="labelForFocusTarget()">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices"
-                            local-value="$parent.localValue" disabled="disabled()"
+                            local-value="$parent.localValue" is-disabled="isDisabled()"
                             allow-expressions="allowExpressions()"
                             label-for-focus-target="labelForFocusTarget()"
                             ui-config="schema().ui_config">
   </schema-based-html-editor>
 
   <schema-based-list-editor ng-if="schema().type === 'list' && !schema().choices"
-                            local-value="$parent.localValue" disabled="disabled()"
+                            local-value="$parent.localValue" is-disabled="isDisabled()"
                             item-schema="schema().items" len="schema().len"
                             ui-config="schema().ui_config" validators="schema().validators"
                             allow-expressions="allowExpressions()"
@@ -49,7 +49,7 @@
   </schema-based-list-editor>
 
   <schema-based-dict-editor ng-if="schema().type === 'dict' && !schema().choices"
-                            local-value="$parent.localValue" disabled="disabled()"
+                            local-value="$parent.localValue" is-disabled="isDisabled()"
                             property-schemas="schema().properties"
                             allow-expressions="allowExpressions()"
                             label-for-focus-target="labelForFocusTarget()">
@@ -57,37 +57,37 @@
 
   <schema-based-custom-editor ng-if="schema().type === 'custom' && !schema().choices"
                               obj-type="schema().obj_type" local-value="$parent.localValue"
-                              disabled="disabled()">
+                              is-disabled="isDisabled()">
   </schema-based-custom-editor>
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/choices">
   <select class="form-control" ng-model="$parent.$parent.localValue"
           ng-options="choice as choice for choice in choices()" required
-          ng-disabled="disabled()">
+          ng-disabled="isDisabled()">
   </select>
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/expression">
-  <input type="text" ng-model="localValue" class="form-control" ng-disabled="disabled()"
+  <input type="text" ng-model="localValue" class="form-control" ng-disabled="isDisabled()"
          required require-is-valid-expression focus-on="<[labelForFocusTarget()]>">
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/bool">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <input type="checkbox" ng-model="$parent.localValue" ng-disabled="disabled()"
+      <input type="checkbox" ng-model="$parent.localValue" ng-disabled="isDisabled()"
              focus-on="<[labelForFocusTarget()]>">
     </span>
 
     <span ng-if="allowExpressions()">
-      <schema-based-expression-editor ng-if="expressionMode" disabled="disabled()"
+      <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
                                       local-value="$parent.$parent.localValue"
                                       param-names="paramNames" output-type="bool"
                                       label-for-focus-target="labelForFocusTarget()">
       </schema-based-expression-editor>
       <span class="input-group-btn">
-        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="disabled()">
+        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="isDisabled()">
           <span ng-if="!expressionMode">E</span>
           <span ng-if="expressionMode"><del>E</del></span>
         </button>
@@ -99,19 +99,19 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <input type="number" ng-model="$parent.localValue" class="form-control" ng-disabled="disabled()"
+      <input type="number" ng-model="$parent.localValue" class="form-control" ng-disabled="isDisabled()"
              required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>">
     </span>
 
     <span ng-if="allowExpressions()">
-      <schema-based-expression-editor ng-if="expressionMode" disabled="disabled()"
+      <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
                                       local-value="$parent.$parent.localValue"
                                       param-names="paramNames" output-type="int"
                                       ng-keypress="onKeypress($event)"
                                       label-for-focus-target="labelForFocusTarget()">
       </schema-based-expression-editor>
       <span class="input-group-btn">
-        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="disabled()">
+        <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="isDisabled()">
           <span ng-if="!expressionMode">E</span>
           <span ng-if="expressionMode"><del>E</del></span>
         </button>
@@ -125,18 +125,18 @@
     <span class="input-group" ng-form="floatForm">
       <span ng-if="!expressionMode">
         <input type="text" name="floatValue" ng-model="$parent.localValue" class="form-control"
-               require-is-float apply-validation="validators()" ng-disabled="disabled()"
+               require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
                focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)">
       </span>
 
       <span ng-if="allowExpressions()">
-        <schema-based-expression-editor ng-if="expressionMode" disabled="disabled()"
+        <schema-based-expression-editor ng-if="expressionMode" is-disabled="isDisabled()"
                                         local-value="$parent.$parent.localValue"
                                         param-names="paramNames" output-type="float"
                                         label-for-focus-target="labelForFocusTarget()">
         </schema-based-expression-editor>
         <span class="input-group-btn">
-          <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="disabled()">
+          <button type="button" class="btn btn-default" ng-click="toggleExpressionMode()" ng-disabled="isDisabled()">
             <span ng-if="!expressionMode">E</span>
             <span ng-if="expressionMode"><del>E</del></span>
           </button>
@@ -164,14 +164,14 @@
               ng-model="$parent.$parent.localValue"
               rows="<[getRows()]>"
               placeholder="<[getPlaceholder()]>"
-              ng-disabled="disabled()"
+              ng-disabled="isDisabled()"
               class="form-control" focus-on="<[labelForFocusTarget()]>">
     </textarea>
 
     <input ng-if="!getCodingMode() && !getRows()" type="text"
            ng-model="$parent.$parent.localValue"
            placeholder="<[getPlaceholder()]>"
-           ng-disabled="disabled()"
+           ng-disabled="isDisabled()"
            ng-keypress="onKeypress($event)"
            class="form-control" focus-on="<[labelForFocusTarget()]>">
 
@@ -185,11 +185,11 @@
   </span>
 
   <span ng-if="allowExpressions()">
-    <span ng-if="disabled()"
-          ng-class="{'oppia-disabled-contenteditable': disabled()}"
+    <span ng-if="isDisabled()"
+          ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
           ng-bind-html="getDisplayedValue()">
     </span>
-    <span ng-if="!disabled()">
+    <span ng-if="!isDisabled()">
       <unicode-with-parameters-editor local-value="$parent.$parent.localValue"
                                       allowed-parameter-names="allowedParameterNames"
                                       focus-on="<[labelForFocusTarget()]>">
@@ -199,10 +199,10 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/html">
-  <rich-text-editor ng-if="!disabled()" html-content="$parent.localValue" size="<[getSize()]>">
+  <rich-text-editor ng-if="!isDisabled()" html-content="$parent.localValue" size="<[getSize()]>">
   </rich-text-editor>
-  <span ng-if="disabled()"
-        ng-class="{'oppia-disabled-contenteditable': disabled()}"
+  <span ng-if="isDisabled()"
+        ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
         ng-bind-html="localValue">
   </span>
 </script>
@@ -214,7 +214,7 @@
         <label for="<[fieldIds[property.name]]>"><[getHumanReadablePropertyDescription(property)]></label>
         <!-- TODO(sll): This is in the wrong place. It should be on the input field. -->
         <div id="<[fieldIds[property.name]]>">
-          <schema-based-editor schema="property.schema" disabled="disabled()"
+          <schema-based-editor schema="property.schema" is-disabled="isDisabled()"
                                local-value="localValue[property.name]"
                                allow-expressions="allowExpressions()"
                                label-for-focus-target="$index === 0 ? labelForFocusTarget() : ''">
@@ -229,14 +229,14 @@
   <table class="table">
     <tr ng-repeat="item in localValue track by $index">
       <td>
-        <schema-based-editor schema="itemSchema()" disabled="disabled()" local-value="localValue[$index]"
+        <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
                              label-for-focus-target="getFocusLabel($index)">
         </schema-based-editor>
       </td>
       <td ng-if="!len && (!minListLength || localValue.length > minListLength)">
         <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button" ng-click="deleteElement($index)"
-                ng-disabled="disabled()">
+                ng-disabled="isDisabled()">
           <span class="glyphicon glyphicon-remove" title="Delete item">
           </span>
         </button>
@@ -247,7 +247,7 @@
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
   <button ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
           type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
-          ng-disabled="disabled()" style="margin-left: 8px;">
+          ng-disabled="isDisabled()" style="margin-left: 8px;">
     <[addElementText]>
   </button>
 </script>

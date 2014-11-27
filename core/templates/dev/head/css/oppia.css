@@ -14,6 +14,25 @@
   limitations under the License.
 */
 
+/* Animation keyframes. These must be placed at the top of the file
+   in order to work in IE.
+*/
+@-webkit-keyframes dot {
+  0% { opacity: 0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@-moz-keyframes dot {
+  0% { opacity: 0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes dot {
+  0% { opacity: 0; }
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
 /* Bootstrap overrides and additions. */
 
 html {
@@ -62,6 +81,14 @@ input.ng-dirty.ng-invalid {
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
   background-color: #f0f0f0;
+}
+
+/* Fixes for Google Maps zoom controls. */
+.gm-style img {
+  max-width: none;
+}
+.gm-style label {
+  width: auto; display:inline;
 }
 
 .oppia-form-error {
@@ -317,21 +344,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   -webkit-animation: dot 1.5s infinite;
   -webkit-animation-delay: 0.6s;
 }
-@-webkit-keyframes dot {
-  0% { opacity: 0; }
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-@-moz-keyframes dot {
-  0% { opacity: 0; }
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
-@-keyframes dot {
-  0% { opacity: 0; }
-  0% { opacity: 0; }
-  100% { opacity: 1; }
-}
 
 .oppia-light-border-right {
   border-right: 1px solid #bbb;
@@ -343,6 +355,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   height: 100%;
   min-height: 700px;
   -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
   -webkit-transition: all 0.5s;
   -o-transition: all 0.5s;
   transition: all 0.5s;
@@ -355,6 +368,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-gallery-main {
   float: left;
   -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
   -webkit-transition: all 0.5s;
   -o-transition: all 0.5s;
   transition: all 0.5s;
@@ -372,6 +386,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-gallery-menu.ng-enter {
   opacity: 0;
   -moz-transition: all 0.2s linear 0.2s;
+  -ms-transition: all 0.2s linear 0.2s;
   -webkit-transition: all 0.2s linear 0.2s;
   -o-transition: all 0.2s linear 0.2s;
   transition: all 0.2s linear 0.2s;
@@ -463,6 +478,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-btn {
   background-image: -webkit-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
+  background-image: -ms-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
   background-image: -moz-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
   background-image: linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
   border-radius: 3px;
@@ -613,6 +629,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   background: #F9EDBE;
   width: 80%;
   max-width: 700px;
+}
+
+.oppia-warning-chevron {
+  font-size: 10px;
+  padding-left: 4px;
+  padding-top: 4px;
 }
 
 .oppia-missing-objective-error {
@@ -1094,4 +1116,44 @@ oppia-parameter {
   .oppia-splash-section p {
     max-width: 100%;
   }
+}
+
+/* CSS3 Animations */
+@-ms-keyframes spin {
+  from { -ms-transform: rotate(0deg); }
+  to { -ms-transform: rotate(360deg); }
+}
+@-moz-keyframes spin {
+  from { -moz-transform: rotate(0deg); }
+  to { -moz-transform: rotate(360deg); }
+}
+@-webkit-keyframes spin {
+  from { -webkit-transform: rotate(0deg); }
+  to { -webkit-transform: rotate(360deg); }
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.oppia-animate-spin {
+  -webkit-animation-name: spin;
+  -webkit-animation-duration: 1000ms;
+  -webkit-animation-iteration-count: infinite;
+  -webkit-animation-timing-function: ease-in-out;
+
+  -moz-animation-name: spin;
+  -moz-animation-duration: 1000ms;
+  -moz-animation-iteration-count: infinite;
+  -moz-animation-timing-function: ease-in-out;
+
+  -ms-animation-name: spin;
+  -ms-animation-duration: 1000ms;
+  -ms-animation-iteration-count: infinite;
+  -ms-animation-timing-function: ease-in-out;
+
+  animation-name: spin;
+  animation-duration: 1000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: ease-in-out;
 }
