@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License. 
+// limitations under the License.
 
 /**
  * @fileoverview End-to-end testing utilities for the Numeric
@@ -36,7 +36,16 @@ var submitAnswer = function(answer) {
 
 var submissionHandler = 'Real';
 
+var testSuite = [{
+  interactionArguments: [],
+  ruleArguments: ['IsWithinTolerance', 2, 143],
+  expectDetailsArguments: [],
+  wrongAnswers: [146, 130],
+  correctAnswers: [142]
+}];
+
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
 exports.submissionHandler = submissionHandler;
+exports.testSuite = testSuite;

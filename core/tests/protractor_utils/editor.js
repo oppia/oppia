@@ -40,8 +40,8 @@ var expectCurrentStateToBe = function(name) {
 
 // CONTENT
 
-// 'richTextInstructions' is a function that is sent a RichTextEditor which it 
-// can then use to alter the state content, for example by calling 
+// 'richTextInstructions' is a function that is sent a RichTextEditor which it
+// can then use to alter the state content, for example by calling
 // .appendBoldText(...).
 var setContent = function(richTextInstructions) {
   element(by.css('.protractor-test-edit-content')).click();
@@ -54,12 +54,12 @@ var setContent = function(richTextInstructions) {
 };
 
 // This receives a function richTextInstructions used to verify the display of
-// the state's content visible when the content editor is closed. The 
-// richTextInstructions will be supplied with a handler of the form 
+// the state's content visible when the content editor is closed. The
+// richTextInstructions will be supplied with a handler of the form
 // forms.RichTextChecker and can then perform checks such as
 //   handler.readBoldText('bold')
 //   handler.readWidget('Collapsible', 'outer', 'inner')
-// These would verify that the content consists of the word 'bold' in bold 
+// These would verify that the content consists of the word 'bold' in bold
 // followed by a Collapsible widget with the given arguments, and nothing else.
 // Note that this fails for collapsibles and tabs since it is not possible to
 // click on them to view their contents, as clicks instead open the rich text
@@ -82,7 +82,7 @@ var expectContentTextToEqual = function(text) {
 
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant widget editor.
-var selectInteraction = function(widgetName) {
+var setInteraction = function(widgetName) {
   element(by.css('.protractor-test-select-interaction-id')).
     element(by.css('option[value=' + widgetName + ']')).click();
 
@@ -118,14 +118,20 @@ var expectInteractionToMatch = function(widgetName) {
 // RULES
 
 // This function selects a rule for the current interaction and enters the
-// entries of the parameterValues array as its parameters.
-var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
+// entries of the parameterValues array as its parameters; the parameterValues
+// should be specified after the ruleName as additional arguments.
+var _selectRule = function(ruleElement, widgetName, ruleName) {
+  var parameterValues = [];
+  for (var i = 3; i < arguments.length; i++) {
+    parameterValues.push(arguments[i]);
+  }
+
   var ruleDescription = rules.getDescription(
     widgets.getInteractive(widgetName).submissionHandler, ruleName);
 
-  var parameterStart = (ruleDescription.indexOf('{{') === -1) ? 
+  var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
-  // From the ruleDescription string we can deduce both the description used 
+  // From the ruleDescription string we can deduce both the description used
   // in the page (which will have the form "is equal to ...") and the types
   // of the parameter objects, which will later tell us which object editors
   // to use to enter the parameterValues.
@@ -133,16 +139,17 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
   var parameterTypes = [];
   while (parameterStart !== undefined) {
     var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
-    var nextParameterStart = 
+    var nextParameterStart =
       (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
       undefined : ruleDescription.indexOf('{{', parameterEnd);
-    ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' + 
+    ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' +
       ruleDescription.substring(parameterEnd, nextParameterStart);
     parameterTypes.push(
       ruleDescription.substring(
         ruleDescription.indexOf('|', parameterStart) + 1, parameterEnd - 2));
     parameterStart = nextParameterStart;
   }
+
   expect(parameterValues.length).toEqual(parameterTypes.length);
 
   ruleElement.element(by.css('.protractor-test-rule-description')).click();
@@ -173,11 +180,16 @@ var _selectRule = function(ruleElement, widgetName, ruleName, parameterValues) {
 };
 
 // This clicks the "add new rule" button and then selects the rule type and
-// enters its parameters, and closes the rule editor.
-var addRule = function(widgetName, ruleName, parameterValues) {
+// enters its parameters, and closes the rule editor. Any number of rule
+// parameters may be specified after the ruleName.
+var addRule = function(widgetName, ruleName) {
   element(by.css('.oppia-add-rule-button')).click();
-  var ruleElement = element(by.css('.protractor-test-temporary-rule'));
-  _selectRule(ruleElement, widgetName, ruleName, parameterValues);
+  var ruleElement = element(by.css('.protractor-test-temporary-rule'))
+  var args = [ruleElement];
+  for (var i = 0; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  _selectRule.apply(null, args);
   ruleElement.element(by.css('.protractor-test-save-rule')).click();
 };
 
@@ -198,13 +210,20 @@ var RuleEditor = function(ruleNum) {
   });
 
   return {
-    setDescription: function(widgetName, ruleName, parameterValues) {
-      _selectRule(elem, widgetName, ruleName, parameterValues);
+    // Any number of parameters may be specified after the ruleName
+    setDescription: function(widgetName, ruleName) {
+      var args = [elem];
+      for (var i = 0; i < arguments.length; i++) {
+        args.push(arguments[i]);
+      }
+      _selectRule.apply(null, args);
     },
-    editFeedback: function(index, richTextInstructions) {
-      richTextInstructions(
-        forms.ListEditor(elem.element(by.css('.oppia-feedback-bubble'))).
-          editItem(index, 'RichText'));
+    setFeedback: function(index, richTextInstructions) {
+      var feedbackEditor = forms.ListEditor(
+        elem.element(by.css('.oppia-feedback-bubble'))
+      ).editItem(index, 'RichText');
+      feedbackEditor.clear();
+      richTextInstructions(feedbackEditor);
     },
     addFeedback: function() {
       forms.ListEditor(elem.element(by.css('.oppia-feedback-bubble'))).
@@ -383,7 +402,7 @@ exports.expectCurrentStateToBe = expectCurrentStateToBe;
 exports.setContent = setContent;
 exports.expectContentToMatch = expectContentToMatch;
 
-exports.selectInteraction = selectInteraction;
+exports.setInteraction = setInteraction;
 exports.expectInteractionToMatch = expectInteractionToMatch;
 
 exports.addRule = addRule;

@@ -10,10 +10,10 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License. 
+// limitations under the License.
 
 /**
- * @fileoverview End-to-end tests of the interaction between the player and 
+ * @fileoverview End-to-end tests of the interaction between the player and
  * editor.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
@@ -25,6 +25,7 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
+var widgets = require('../../../extensions/widgets/protractor.js');
 
 describe('State editor', function() {
   it('should display plain text content', function() {
@@ -33,7 +34,7 @@ describe('State editor', function() {
 
     workflow.createExploration('sums', 'maths');
     editor.setContent(forms.toRichText('plain text'));
-    editor.selectInteraction('Continue', 'click here');
+    editor.setInteraction('Continue', 'click here');
     editor.RuleEditor('default').setDestination('END');
     editor.saveChanges();
 
@@ -59,8 +60,8 @@ describe('State editor', function() {
       richTextEditor.appendOrderedList(['entry 1', 'entry 2']);
       richTextEditor.appendUnorderedList(['an entry', 'another entry']);
     });
-    editor.selectInteraction(
-      'MultipleChoiceInput', 
+    editor.setInteraction(
+      'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     editor.RuleEditor('default').setDestination('END');
     editor.saveChanges();
@@ -68,7 +69,7 @@ describe('State editor', function() {
     general.moveToPlayer();
     player.expectExplorationToNotBeOver();
     player.expectInteractionToMatch(
-      'MultipleChoiceInput', 
+      'MultipleChoiceInput',
       [forms.toRichText('option A'), forms.toRichText('option B')]);
     player.submitAnswer('MultipleChoiceInput', 'option B');
     player.expectExplorationToBeOver();
@@ -81,14 +82,14 @@ describe('State editor', function() {
     users.login('user3@example.com');
 
     workflow.createExploration('sums', 'maths');
-    editor.selectInteraction('NumericInput');
-    editor.addRule('NumericInput', 'IsInclusivelyBetween', [3, 6]);
+    editor.setInteraction('NumericInput');
+    editor.addRule('NumericInput', 'IsInclusivelyBetween', 3, 6);
     editor.RuleEditor(0).setDestination('END');
-    editor.RuleEditor(0).editFeedback(0, function(richTextEditor) {
+    editor.RuleEditor(0).setFeedback(0, function(richTextEditor) {
       richTextEditor.appendBoldText('correct');
     });
     editor.RuleEditor('default').
-      editFeedback(0, forms.toRichText('out of bounds'));
+      setFeedback(0, forms.toRichText('out of bounds'));
     editor.saveChanges();
 
     general.moveToPlayer();
@@ -113,16 +114,16 @@ describe('Full exploration editor', function() {
     workflow.createExploration('sums', 'maths');
     editor.setStateName('state 1');
     editor.setContent(forms.toRichText('this is state 1'));
-    editor.selectInteraction('NumericInput');
-    editor.addRule('NumericInput', 'Equals', [21]);
+    editor.setInteraction('NumericInput');
+    editor.addRule('NumericInput', 'Equals', 21);
     editor.RuleEditor(0).setDestination('state 2');
 
     editor.moveToState('state 2');
     editor.setContent(forms.toRichText('this is state 2'));
-    editor.selectInteraction(
-      'MultipleChoiceInput', 
+    editor.setInteraction(
+      'MultipleChoiceInput',
       [forms.toRichText('return'), forms.toRichText('complete')]);
-    editor.addRule('MultipleChoiceInput', 'Equals', ['return']);
+    editor.addRule('MultipleChoiceInput', 'Equals', 'return');
     editor.RuleEditor(0).setDestination('state 1');
     editor.RuleEditor('default').setDestination('END');
     editor.saveChanges();
@@ -142,7 +143,7 @@ describe('Full exploration editor', function() {
     users.logout();
   });
 
-  it('should handle discarding changes, navigation, deleting states, ' + 
+  it('should handle discarding changes, navigation, deleting states, ' +
       'changing the first state, displaying content, deleting rules and ' +
       'switching to preview mode', function() {
     users.createUser('user5@example.com', 'user5');
@@ -176,15 +177,15 @@ describe('Full exploration editor', function() {
       // Check behaviour of the back button
       editor.setObjective('do stuff');
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
         '#/gui/second');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
         '#/settings');
       browser.navigate().back();
       expect(browser.getCurrentUrl()).toEqual(
-        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId + 
+        general.SERVER_URL_PREFIX + general.EDITOR_URL_SLICE + explorationId +
         '#/gui/second');
 
       // Check display of content & interaction in the editor
@@ -194,18 +195,18 @@ describe('Full exploration editor', function() {
       editor.expectContentToMatch(function(richTextChecker) {
         richTextChecker.readItalicText('Welcome');
       });
-      editor.selectInteraction('NumericInput');
+      editor.setInteraction('NumericInput');
       editor.expectInteractionToMatch('NumericInput');
 
       // Check deletion of rules
       editor.RuleEditor('default').
-        editFeedback(0, forms.toRichText('Farewell'));
+        setFeedback(0, forms.toRichText('Farewell'));
       editor.RuleEditor('default').
         expectAvailableDestinationsToBe(['second', 'END']);
       editor.RuleEditor('default').setDestination('END');
       editor.RuleEditor('default').
         expectAvailableDestinationsToBe(['second', 'END']);
-      editor.addRule('NumericInput', 'IsGreaterThan', [2]);
+      editor.addRule('NumericInput', 'IsGreaterThan', 2);
       editor.RuleEditor(0).delete();
 
       // Check editor preview mode
@@ -234,7 +235,7 @@ describe('Non-interactive widgets', function() {
   it('should display correctly', function() {
     users.createUser('user11@example.com', 'user11');
     users.login('user11@example.com')
-    
+
     workflow.createExploration('widgets', 'maths');
 
     editor.setContent(function(richTextEditor) {
@@ -282,7 +283,7 @@ describe('Non-interactive widgets', function() {
   it('should allow nesting of widgets inside one another', function() {
     users.createUser('user12@example.com', 'user12');
     users.login('user12@example.com')
-    
+
     workflow.createExploration('widgets', 'maths');
 
     editor.setContent(function(richTextEditor) {
@@ -321,7 +322,7 @@ describe('Non-interactive widgets', function() {
           content: function(tab2Checker) {
             tab2Checker.readBoldText('fun!');
           }
-        }]); 
+        }]);
         collapsibleChecker.readWidget('Math', 'xyz');
       });
     });
@@ -331,18 +332,58 @@ describe('Non-interactive widgets', function() {
 
   afterEach(function() {
     general.checkForConsoleErrors([
-      // TODO (Jacob) Remove when 
+      // TODO (Jacob) Remove when
       // https://code.google.com/p/google-cast-sdk/issues/detail?id=309 is fixed
-      'chrome-extension://boadgeojelhgndaghljhdicfkmllpafd/' + 
+      'chrome-extension://boadgeojelhgndaghljhdicfkmllpafd/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://dliochdbjfkdbacpmhlcpmleaejidimm/' + 
+      'chrome-extension://dliochdbjfkdbacpmhlcpmleaejidimm/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://hfaagokkkhdbgiakmmlclaapfelnkoah/' + 
+      'chrome-extension://hfaagokkkhdbgiakmmlclaapfelnkoah/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/' + 
+      'chrome-extension://fmfcbgogabcbclcofgocippekhfcmgfj/' +
         'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED',
-      'chrome-extension://enhhojjnijigcajfphajepfemndkmdlo/' + 
+      'chrome-extension://enhhojjnijigcajfphajepfemndkmdlo/' +
       'cast_sender.js 0:0 Failed to load resource: net::ERR_FAILED'
     ]);
+  });
+});
+
+describe('Interactive widgets', function() {
+  it('should pass their own test suites', function() {
+    users.createUser('user21@example.com', 'user21');
+    users.login('user21@example.com');
+    workflow.createExploration('widgets', 'history');
+    editor.RuleEditor('default').setFeedback(0, forms.toRichText('no'));
+
+    for (var widgetName in widgets.INTERACTIVE_WIDGETS) {
+      var widget = widgets.INTERACTIVE_WIDGETS[widgetName];
+      for (var i = 0; i < widget.testSuite.length; i++) {
+        var test = widget.testSuite[i];
+        editor.setInteraction.apply(
+          null, [widgetName].concat(test.interactionArguments));
+        editor.addRule.apply(null, [widgetName].concat(test.ruleArguments));
+        editor.RuleEditor(0).setFeedback(0, forms.toRichText('yes'));
+
+        editor.enterPreviewMode();
+        editor.expectInteractionToMatch.apply(
+          null, [widgetName].concat(test.expectDetailsArguments));
+        for (var j = 0; j < test.wrongAnswers.length; j++) {
+          player.submitAnswer(widgetName, test.wrongAnswers[j]);
+          player.expectLatestFeedbackToMatch(forms.toRichText('no'));
+        }
+        for (var j = 0; j < test.correctAnswers.length; j++) {
+          player.submitAnswer(widgetName, test.correctAnswers[j]);
+          player.expectLatestFeedbackToMatch(forms.toRichText('yes'));
+        }
+        editor.exitPreviewMode();
+      }
+    }
+
+    editor.discardChanges();
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
   });
 });

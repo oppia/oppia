@@ -37,7 +37,7 @@ var createExploration = function(name, category) {
   protractor.getInstance().waitForAngular();
 };
 
-// This will only work if all changes have been saved and there are no 
+// This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
   element(by.css('.protractor-test-publish-exploration')).click();
@@ -54,7 +54,7 @@ var createAndPublishExploration = function(name, category, objective, language) 
   if (language) {
     editor.setLanguage(language);
   }
-  editor.selectInteraction('Continue');
+  editor.setInteraction('Continue');
   editor.saveChanges();
   publishExploration();
 };
@@ -100,7 +100,7 @@ var _getExplorationRoles = function(roleName) {
           itemName + ' in explorationRightsService.' + listName + ' track by $index'
         )).map(function(elem) {
       return elem.getText();
-    }); 
+    });
   });
   return result;
 };

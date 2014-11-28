@@ -33,7 +33,7 @@ var expectExplorationNameToBe = function(name) {
   ).toBe(name);
 };
 
-// This verifies the question just asked, including formatting and 
+// This verifies the question just asked, including formatting and
 // non-interactive widgets. To do so the richTextInstructions function will be
 // sent a handler (as given in forms.RichTextChecker) to which calls such as
 //   handler.readItalicText('slanted');
@@ -57,7 +57,7 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant widget's detail checker.
 var expectInteractionToMatch = function(widgetName) {
-  // Convert additional arguments to an array to send on.
+  // Convert etadditional arguments to an array to send on.
   var args = [];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);

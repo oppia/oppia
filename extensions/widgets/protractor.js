@@ -60,5 +60,7 @@ var getNoninteractive = function(widgetName) {
   }
 };
 
+exports.INTERACTIVE_WIDGETS = INTERACTIVE_WIDGETS;
+exports.NONINTERACTIVE_WIDGETS = NONINTERACTIVE_WIDGETS;
 exports.getInteractive = getInteractive;
 exports.getNoninteractive = getNoninteractive;

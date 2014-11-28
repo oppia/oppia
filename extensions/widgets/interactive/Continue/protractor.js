@@ -38,6 +38,9 @@ var submitAnswer = function() {
   element(by.tagName('oppia-interactive-continue')).click();
 };
 
+var testSuite = [];
+
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.testSuite = testSuite;
