@@ -3,26 +3,27 @@
     <div class="row">
       <div class="col-lg-9 col-md-9 col-sm-9">
         <span ng-if="activeItem !== $index">
-          <[$index + 1]>. Change parameter <span class="label label-info"><[param.name]></span> <[HUMAN_READABLE_ARGS_RENDERERS[param.generator_id](param.customization_args)]>
+          <[$index + 1]>. Change <span class="label label-info"><[param.name]></span> <[HUMAN_READABLE_ARGS_RENDERERS[param.generator_id](param.customization_args)]>
         </span>
 
         <div ng-if="activeItem === $index">
           <form novalidate class="oppia-form" name="newParameterForm" ng-submit="commitParamChange(activeItem)">
-            Select a parameter to change:
-
+            Change
             <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose or type new" new-choice-regex="^[A-Za-z]+$" width="180px">
             </select2-dropdown>
 
             <span ng-show="tmpParamChange.name">
-              <select ng-model="tmpParamChange.generator_id"
-                      ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS"
-                      style="width: 220px;" required>
+              <select class="form-control" ng-model="tmpParamChange.generator_id"
+                      ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS" style="width: 250px;" required>
               </select>
 
               <value-generator-editor generator-id="tmpParamChange.generator_id"
                                       customization-args="tmpParamChange.customization_args"
                                       obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
               </value-generator-editor>
+            </span>
+            <span ng-hide="tmpParamChange.name">
+              to ...
             </span>
             <br>
 

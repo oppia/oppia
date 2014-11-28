@@ -104,7 +104,8 @@ EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     default_value='')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', 'UnicodeString',
-    'A link to the forum for nominating explorations for release.',
+    'A link to the forum for nominating explorations to be featured '
+    'in the gallery',
     default_value='https://moderator/request/forum/url')
 
 
@@ -197,7 +198,7 @@ class ExplorationPage(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
-            exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
 
@@ -270,6 +271,7 @@ class ExplorationPage(EditorHandler):
                 skins_services.Registry.get_skin_js_url(skin_id)
                 for skin_id in skins_services.Registry.get_all_skin_ids()],
             'skin_templates': jinja2.utils.Markup(skin_templates),
+            'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
@@ -313,6 +315,9 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
+            'show_state_editor_tutorial_on_load': (
+                self.user_id and not
+                self.user_has_started_state_editor_tutorial),
             'ALL_INTERACTIVE_WIDGETS': {
                 widget.id: widget.to_dict()
                 for widget in widget_registry.Registry.get_widgets_of_type(
@@ -766,3 +771,11 @@ class InitExplorationHandler(EditorHandler):
             'init_html': init_html,
             'params': init_params,
         })
+
+
+class StartedTutorialEventHandler(EditorHandler):
+    """Records that this user has started the state editor tutorial."""
+
+    def post(self, exploration_id):
+        """Handles GET requests."""
+        user_services.record_user_started_state_editor_tutorial(self.user_id)

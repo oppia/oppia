@@ -210,6 +210,9 @@ ALLOWED_WIDGETS = {
         'MusicNotesInput': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MusicNotesInput')
         },
+        'GraphInput': {
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'GraphInput')
+        },
     }
 }
 
@@ -235,7 +238,8 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_of_widgets.yaml', 'Test of widgets', 'Test')
+    ('test_of_widgets.yaml', 'Test of widgets', 'Test'),
+    ('modeling_graphs', 'Graph Modeling', 'Mathematics')
 ]
 
 # TODO(sll): Add all other URLs here.
@@ -253,8 +257,9 @@ FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 GALLERY_URL = '/gallery'
+GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
-GALLERY_REDIRECT_URL = '/gallery_redirect'
+GALLERY_LOGIN_REDIRECT_URL = '/gallery_login_redirect'
 HOMEPAGE_URL = '/'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'

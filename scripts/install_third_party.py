@@ -179,7 +179,7 @@ ANGULAR_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'angularjs-%s' % ANGULAR_REV)
 ANGULAR_FILES = [
     'angular%s.%s' % (part1, part2) for (part1, part2) in itertools.product(
-        ['', '-animate', '-resource', '-route', '-sanitize'],
+        ['', '-animate', '-resource', '-route', '-sanitize', '-aria'],
         ['js', 'min.js', 'min.js.map'])]
 ANGULAR_TEST_FILES = ['angular-mocks.js', 'angular-scenario.js']
 
@@ -198,6 +198,20 @@ download_files(D3_URL, D3_DST, D3_FILES)
 
 
 # Download all the frontend library zip files.
+BOWER_MATERIAL_REV = '0.6.0-rc1'
+BOWER_MATERIAL_ROOT_NAME = 'bower-material-%s' % BOWER_MATERIAL_REV
+BOWER_MATERIAL_ZIP_URL = (
+    'https://github.com/angular/bower-material/archive/v%s.zip'
+    % BOWER_MATERIAL_REV)
+BOWER_MATERIAL_ZIP_ROOT_NAME = BOWER_MATERIAL_ROOT_NAME
+BOWER_MATERIAL_TARGET_ROOT_NAME = BOWER_MATERIAL_ROOT_NAME
+
+HAMMER_JS_REV = '2.0.4'
+HAMMER_JS_ROOT_NAME = 'hammer.js-%s' % HAMMER_JS_REV
+HAMMER_JS_ZIP_URL = (
+    'https://github.com/hammerjs/hammer.js/archive/%s.zip' % HAMMER_JS_REV)
+HAMMER_JS_ZIP_ROOT_NAME = HAMMER_JS_ROOT_NAME
+HAMMER_JS_TARGET_ROOT_NAME = 'hammer-js-%s' % HAMMER_JS_REV
 
 SELECT2_REV = '3.5.1'
 SELECT2_ZIP_URL = (
@@ -251,7 +265,7 @@ UI_SORTABLE_ZIP_URL = (
 UI_SORTABLE_ZIP_ROOT_NAME = 'ui-sortable-src%s' % UI_SORTABLE_REV
 UI_SORTABLE_TARGET_ROOT_NAME = 'ui-sortable-%s' % UI_SORTABLE_REV
 
-INTRO_JS_REV = '0.9.0'
+INTRO_JS_REV = '1.0.0'
 INTRO_JS_ZIP_URL = (
     'https://github.com/usablica/intro.js/archive/v%s.zip' % INTRO_JS_REV)
 INTRO_JS_ZIP_ROOT_NAME = 'intro.js-%s' % INTRO_JS_REV
@@ -272,6 +286,12 @@ MATHJAX_ZIP_URL = (
 MATHJAX_ZIP_ROOT_NAME = MATHJAX_ROOT_NAME
 MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
 
+download_and_unzip_files(
+    BOWER_MATERIAL_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    BOWER_MATERIAL_ZIP_ROOT_NAME, BOWER_MATERIAL_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    HAMMER_JS_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    HAMMER_JS_ZIP_ROOT_NAME, HAMMER_JS_TARGET_ROOT_NAME)
 download_and_unzip_files(
     SELECT2_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     SELECT2_ZIP_ROOT_NAME, SELECT2_TARGET_ROOT_NAME)

@@ -35,6 +35,8 @@ var createExploration = function(name, category) {
 
   // We now want to wait for the editor to fully load.
   protractor.getInstance().waitForAngular();
+
+  editor.exitTutorialIfNecessary();
 };
 
 // This will only work if all changes have been saved and there are no
@@ -60,9 +62,9 @@ var createAndPublishExploration = function(name, category, objective, language) 
 };
 
 // Run from the editor, requires user to be a moderator / admin.
-var releaseExploration = function() {
+var markExplorationAsFeatured = function() {
   editor.runFromSettingsTab(function() {
-    element(by.css('.protractor-test-release-exploration')).click();
+    element(by.css('.protractor-test-mark-exploration-featured')).click();
   });
 };
 
@@ -120,7 +122,7 @@ var getExplorationPlaytesters = function() {
 exports.createExploration = createExploration;
 exports.publishExploration = publishExploration;
 exports.createAndPublishExploration = createAndPublishExploration;
-exports.releaseExploration = releaseExploration;
+exports.markExplorationAsFeatured = markExplorationAsFeatured;
 
 exports.addExplorationManager = addExplorationManager;
 exports.addExplorationCollaborator = addExplorationCollaborator;

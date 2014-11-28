@@ -23,8 +23,10 @@
 // 'see' the GLOBALS variable that is defined in base.html. We should fix this
 // in order to make the testing and production environments match.
 var oppia = angular.module(
-  'oppia',
-  ['ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.sortable'].concat(
+  'oppia', [
+    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
+    'ui.sortable'
+  ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 

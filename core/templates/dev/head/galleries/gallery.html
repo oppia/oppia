@@ -20,8 +20,11 @@
             <div class="form-group">
               <div class="input-group">
                 <div class="input-group-addon">
-                  <span class="glyphicon glyphicon-search">
-                  </span>
+                   <span class="glyphicon"
+                         ng-class="{'glyphicon-search': !searchIsLoading,
+                                    'glyphicon-refresh': searchIsLoading,
+                                    'oppia-animate-spin': searchIsLoading}">
+                   </span>
                 </div>
                 <input type="text" class="form-control" placeholder="Search Explorations" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
               </div>
@@ -31,17 +34,18 @@
 
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
           <div class="hidden-xs">
+            <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
             {% if not user_email %}
               <!-- User must log in. -->
               <span class="pull-right">
-                <a class="btn btn-success protractor-test-create-exploration" href="{{gallery_redirect_url}}">
+                <a class="btn btn-success protractor-test-create-exploration" href="{{gallery_login_redirect_url}}">
                   Create New Exploration
                 </a>
               </span>
             {% elif not username %}
               <!-- User must register. -->
               <span class="pull-right">
-                <a class="btn btn-success protractor-test-create-exploration" href="/editor_prerequisites?return_url=gallery">
+                <a class="btn btn-success protractor-test-create-exploration" href="{{gallery_register_redirect_url}}">
                   Create New Exploration
                 </a>
               </span>
@@ -82,30 +86,6 @@
           </div>
 
           <div class="oppia-gallery-menu" ng-if="gallerySidebarIsActive || screenIsLarge">
-            <h4><strong>Status</strong></h4>
-            <ul class="nav nav-pills nav-stacked protractor-test-gallery-status">
-              <li class="checkbox">
-                <label>
-                  <input type="checkbox" ng-model="selectedStatuses.publicized">
-                  Released
-                </label>
-              </li>
-              <li class="checkbox">
-                <label>
-                  <input type="checkbox" ng-model="selectedStatuses.public">
-                  Beta
-                </label>
-              </li>
-              {% if username %}
-                <li class="checkbox">
-                  <label>
-                    <input type="checkbox" ng-model="selectedStatuses.private">
-                    Private
-                  </label>
-                </li>
-              {% endif %}
-            </ul>
-
             <h4><strong>Categories</strong></h4>
             <checkbox-group all-categories-label="All categories" model="selectedCategories" class="protractor-test-gallery-category">
             </checkbox-group>
@@ -118,19 +98,21 @@
 
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
           <div class="tab-content oppia-gallery-tiles-container">
-            <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status').length === 0">
+            <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language').length === 0">
               <div>
-                <em>No explorations selected.</em>
-              </div>
-              <br>
-              <div>
-                <em ng-if="selectedStatuses.publicized && !selectedStatuses.public">
-                  However, there may be beta explorations in these categories available for playtesting. Click the 'Beta' checkbox on the left to view them!
-                </em>
+                <em>We don't have any explorations on this topic yet.</em>
+                <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
+                {% if not user_email %}
+                  <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
+                {% elif not username %}
+                  <a href="{{gallery_register_redirect_url}}">Would you like to create one?</a>
+                {% else %}
+                  <a ng-click="showCreateExplorationModal(getCategoryList())">Would you like to create one?</a>
+                {% endif %}
               </div>
             </div>
 
-            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' | selectedCategoriesFilter:selectedStatuses:'status' track by $index" class="oppia-gallery-tile">
+            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' track by $index" class="oppia-gallery-tile">
               <div style="position: relative;">
                 <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 5px;">
                   <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
@@ -160,11 +142,9 @@
                       <span class="label label-info">
                         <[exploration.category]>
                       </span>
-                      <span ng-if="exploration.status === 'public'" class="label label-info" style="opacity: 0.5">
-                        Beta
-                      </span>
-                      <span ng-if="exploration.status === 'private'" class="label label-info" style="opacity: 0.5">
-                        Private
+                      <span ng-if="exploration.status === 'publicized'" class="label label-primary">
+                        Featured
+                        <span class="glyphicon glyphicon-star"></span>
                       </span>
                     </span>
 

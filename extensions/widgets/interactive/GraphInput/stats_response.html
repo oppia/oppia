@@ -1,0 +1,7 @@
+({% for vertex in answer.vertices -%}
+  {% if answer.isLabeled -%}{{vertex.label}}{% else -%}{{loop.index}}{% endif -%}
+  {% if not loop.last -%},{% endif -%}
+{% endfor -%})
+[{% for edge in answer.edges -%} 
+  ({{edge.src}},{{edge.dst}}){% if not loop.last -%},{% endif -%}
+{% endfor -%}]

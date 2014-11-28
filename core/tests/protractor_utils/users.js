@@ -50,6 +50,10 @@ var registerAsEditor = function(username) {
   element(by.model('username')).sendKeys(username);
   element(by.model('agreedToTerms')).click();
   element(by.buttonText('Submit and start contributing')).click();
+  // The create modal needs time to load.
+  browser.waitForAngular();
+  general.waitForSystem();
+  element(by.css('.protractor-test-cancel-create')).click();
 };
 
 var createUser = function(email, username) {

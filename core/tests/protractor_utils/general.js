@@ -19,6 +19,8 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var editor = require('./editor.js');
+
 // Time (in ms) to wait when the system needs time for some computations.
 var WAIT_TIME = 4000;
 
@@ -72,7 +74,7 @@ var _getExplorationId = function(currentUrlPrefix) {
       browser.getCurrentUrl().then(function(url) {
         expect(url.slice(0, currentUrlPrefix.length)).toBe(currentUrlPrefix);
         var explorationId = url.slice(
-          currentUrlPrefix.length, 
+          currentUrlPrefix.length,
           currentUrlPrefix.length + EXPLORATION_ID_LENGTH);
         return callbackFunction(explorationId);
       });
@@ -80,7 +82,7 @@ var _getExplorationId = function(currentUrlPrefix) {
   };
 };
 
-// If we are currently in the editor, this will return a promise with the 
+// If we are currently in the editor, this will return a promise with the
 // exploration ID.
 var getExplorationIdFromEditor = function() {
   return _getExplorationId(SERVER_URL_PREFIX + EDITOR_URL_SLICE);
@@ -95,6 +97,7 @@ var getExplorationIdFromPlayer = function() {
 var openEditor = function(explorationId) {
   browser.get(EDITOR_URL_SLICE + explorationId);
   protractor.getInstance().waitForAngular();
+  editor.exitTutorialIfNecessary();
 };
 
 var openPlayer = function(explorationId) {

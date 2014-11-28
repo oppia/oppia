@@ -688,7 +688,7 @@ def publicize_exploration(committer_id, exploration_id):
         logging.error(
             'User %s tried to publicize exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
-        raise Exception('This exploration cannot be moved out of beta.')
+        raise Exception('This exploration cannot be marked as "featured".')
 
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PUBLICIZED,
@@ -701,11 +701,8 @@ def unpublicize_exploration(committer_id, exploration_id):
         logging.error(
             'User %s tried to unpublicize exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
-        raise Exception('This exploration cannot be moved back into beta.')
+        raise Exception('This exploration cannot be unmarked as "featured".')
 
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
         'Exploration unpublicized.')
-
-
-

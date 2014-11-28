@@ -184,7 +184,7 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         for _id in exp_ids:
             self.assertEqual(result.get(_id).title, exps.get(_id).title)
 
-        self.assertIsNone(result['doesnt_exist'])
+        self.assertNotIn('doesnt_exist', result)
 
         with self.assertRaises(Exception):
             exp_services.get_multiple_explorations_by_id(
@@ -1682,7 +1682,7 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_update_public_exploration_status_in_search(self):
+    def test_update_publicized_exploration_status_in_search(self):
 
         def mock_get_doc(doc_id, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
@@ -1691,13 +1691,13 @@ class SearchTests(ExplorationServicesUnitTests):
 
         def mock_add_docs(docs, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(docs, [{'is': 'beta'}])
+            self.assertEqual(docs, [{'is': 'featured'}])
 
         def mock_get_rights(exp_id):
             return rights_manager.ExplorationRights(
                 self.EXP_ID,
                 [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.EXPLORATION_STATUS_PUBLIC
+                status=rights_manager.EXPLORATION_STATUS_PUBLICIZED
             )
 
         get_doc_counter = test_utils.CallCounter(mock_get_doc)

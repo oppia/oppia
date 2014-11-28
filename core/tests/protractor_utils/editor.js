@@ -24,6 +24,17 @@ var general = require('./general.js');
 var widgets = require('../../../extensions/widgets/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
+var exitTutorialIfNecessary = function() {
+  // If the editor tutorial shows up, exit it.
+  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else if (buttons.length !== 0) {
+      throw 'Expected to find at most one \'exit tutorial\' button';
+    }
+  });
+};
+
 var setStateName = function(name) {
   var nameElement = element(by.css('.oppia-state-name-container'))
   nameElement.click();
@@ -153,30 +164,32 @@ var _selectRule = function(ruleElement, widgetName, ruleName) {
   expect(parameterValues.length).toEqual(parameterTypes.length);
 
   ruleElement.element(by.css('.protractor-test-rule-description')).click();
-  element(by.id('select2-drop')).element(
-      by.cssContainingText(
-        'li.select2-results-dept-0', ruleDescriptionInDropdown)).then(
-      function(optionElement) {
-    optionElement.click();
-    protractor.getInstance().waitForAngular();
 
-    // Now we enter the parameters
-    for (var i = 0; i < parameterValues.length; i++) {
-      var parameterElement = ruleElement.element(
-        by.repeater('item in ruleDescriptionFragments track by $index'
-      ).row(i * 2 + 1));
-      var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
-
-      if (widgetName === 'MultipleChoiceInput') {
-        // This is a special case as it uses a dropdown to set a NonnegativeInt
-        parameterElement.element(
-          by.cssContainingText('option', parameterValues[i])
-        ).click();
-      } else {
-        parameterEditor.setValue(parameterValues[i]);
-      }
-    }
+  element.all(by.id('select2-drop')).map(function(selectorElement) {
+    selectorElement.element(by.cssContainingText(
+      'li.select2-results-dept-0', ruleDescriptionInDropdown
+    )).then(function(optionElement) {
+      optionElement.click();
+      protractor.getInstance().waitForAngular();
+    });
   });
+
+  // Now we enter the parameters
+  for (var i = 0; i < parameterValues.length; i++) {
+    var parameterElement = ruleElement.element(
+      by.repeater('item in ruleDescriptionFragments track by $index'
+    ).row(i * 2 + 1));
+    var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
+
+    if (widgetName === 'MultipleChoiceInput') {
+      // This is a special case as it uses a dropdown to set a NonnegativeInt
+      parameterElement.element(
+        by.cssContainingText('option', parameterValues[i])
+      ).click();
+    } else {
+      parameterEditor.setValue(parameterValues[i]);
+    }
+  }
 };
 
 // This clicks the "add new rule" button and then selects the rule type and
@@ -383,6 +396,7 @@ var saveChanges = function(commitMessage) {
 };
 
 var discardChanges = function() {
+  element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
   browser.driver.switchTo().alert().accept();
 };
@@ -395,6 +409,7 @@ var exitPreviewMode = function() {
   element(by.css('.protractor-test-exit-preview-mode')).click();
 };
 
+exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 
 exports.setStateName = setStateName;
 exports.expectCurrentStateToBe = expectCurrentStateToBe;

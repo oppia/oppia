@@ -18,7 +18,12 @@
               <div class="col-lg-8 col-md-8 col-sm-8" style="margin-left: -5px;">
                 <span>
                   <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
-                    If <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
+                    <span ng-if="!answerChoices">
+                      If <[rule | parameterizeRuleDescription: answerChoices]> ...
+                    </span>
+                    <span ng-if="answerChoices">
+                      If <span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...
+                    </span>
                   </span>
                   <span ng-if="rule.description === 'Default'">
                     If no other rules apply...
@@ -35,7 +40,7 @@
                     </span>
                     <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
                       <span angular-html-bind="rule.feedback[0]"></span>
-                      <span ng-if="rule.feedback.length > 1">(+ <[rule.feedback.length - 1]> more feedback option<span ng-if="rule.feedback.length > 2">s</span>)</span>
+                      <span ng-if="rule.feedback.length > 1">(+ <[rule.feedback.length - 1]> variation<span ng-if="rule.feedback.length > 2">s</span>)</span>
                     </span>
                   </li>
                 </ul>
@@ -93,9 +98,9 @@
     <div class="oppia-feedback-and-dest" ng-class="{'oppia-lightly-grayed': isTmpRule()}">
       <div class="oppia-feedback-bubble">
         <span ng-if="rule.feedback.length > 0">
-          Feedback options
+          Feedback
           <span ng-if="rule.feedback.length > 1">
-            (<em>one is chosen at random</em>):
+            (<em>one variation is chosen at random</em>):
           </span>
         </span>
         <span ng-if="rule.feedback.length == 0">

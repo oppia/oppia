@@ -100,17 +100,12 @@ oppia.directive('checkboxGroup', function() {
 
 oppia.controller('Gallery', [
     '$scope', '$http', '$rootScope', '$window', 'createExplorationButtonService',
-    'oppiaDatetimeFormatter', 'oppiaDebouncer',
+    'oppiaDatetimeFormatter', 'oppiaDebouncer', 'urlService',
     function($scope, $http, $rootScope, $window, createExplorationButtonService,
-             oppiaDatetimeFormatter, oppiaDebouncer) {
+             oppiaDatetimeFormatter, oppiaDebouncer, urlService) {
   $scope.galleryDataUrl = '/galleryhandler/data';
   $scope.currentUserIsModerator = false;
-
-  $scope.selectedStatuses = {
-    'publicized': true,
-    'public': false,
-    'private': false
-  };
+  $scope.searchIsLoading = false;
 
   $scope.getCategoryList = function() {
     return Object.keys($scope.selectedCategories);
@@ -147,6 +142,7 @@ oppia.controller('Gallery', [
     if (!$scope.searchQuery) {
       $http.get($scope.galleryDataUrl).success($scope.refreshGalleryData);
     } else {
+      $scope.searchIsLoading = true;
       $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
         $scope.refreshGalleryData);
     }
@@ -156,12 +152,12 @@ oppia.controller('Gallery', [
     $scope.onSearchQueryChangeExec, 400);
 
   $scope.refreshGalleryData = function(data) {
-    $scope.releasedExplorations = data.released;
-    $scope.betaExplorations = data.beta;
-    $scope.privateExplorations = data['private'];
+    $scope.searchIsLoading = false;
+    $scope.featuredExplorations = data.featured;
+    $scope.publicExplorations = data['public'];
 
-    $scope.allExplorationsInOrder = $scope.releasedExplorations.concat(
-      $scope.betaExplorations).concat($scope.privateExplorations);
+    $scope.allExplorationsInOrder = $scope.featuredExplorations.concat(
+      $scope.publicExplorations);
 
     $scope.selectedCategories = {};
     $scope.selectedLanguages = {};
@@ -180,6 +176,13 @@ oppia.controller('Gallery', [
     }
 
     $scope.refreshGalleryData(data);
+
+    if (data.username) {
+      var urlParams = urlService.getUrlParams();
+      if (urlParams.mode === 'create') {
+        $scope.showCreateExplorationModal($scope.getCategoryList());
+      }
+    }
   });
 
   $scope.gallerySidebarIsActive = false;
