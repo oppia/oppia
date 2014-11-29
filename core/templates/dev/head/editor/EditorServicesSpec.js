@@ -271,8 +271,9 @@ describe('Exploration rights service', function() {
       expect(ers._status).toBeUndefined();
       expect(ers._clonedFrom).toBeUndefined();
       expect(ers._isCommunityOwned).toBeUndefined();
+      expect(ers._viewableIfPrivate).toBeUndefined();
 
-      ers.init(['abc'], [], [], 'private', 'e1234', true);
+      ers.init(['abc'], [], [], 'private', 'e1234', true, true);
 
       expect(ers.ownerNames).toEqual(['abc']);
       expect(ers.editorNames).toEqual([]);
@@ -280,6 +281,7 @@ describe('Exploration rights service', function() {
       expect(ers._status).toEqual('private');
       expect(ers._clonedFrom).toEqual('e1234');
       expect(ers._isCommunityOwned).toBe(true);
+      expect(ers._viewableIfPrivate).toBe(true);
     });
 
     it('reports the correct derived statuses', function() {
@@ -324,6 +326,7 @@ describe('New state template service', function() {
 
   describe('new state template service', function() {
     var nsts = null;
+    var NEW_STATE_NAME = 'new state name'
 
     beforeEach(inject(function($injector) {
       GLOBALS = {
@@ -354,15 +357,15 @@ describe('New state template service', function() {
       nsts = $injector.get('newStateTemplateService');
     }));
 
-    it('should correctly retrieve a new state template', function() {
-      expect(nsts.getNewStateTemplate('new state name')).toEqual({
+    it('should correctly make a new state template given a state name', function() {
+      expect(nsts.getNewStateTemplate(NEW_STATE_NAME)).toEqual({
         content: [{type: 'text', value: ''}],
         param_changes: [],
         widget: {
           handlers: [{
             name: 'submit',
             rule_specs: [{
-              dest: 'new state name',
+              dest: NEW_STATE_NAME,
               definition: {rule_type: 'default'},
               feedback: [],
               param_changes: [],
