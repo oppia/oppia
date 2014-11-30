@@ -326,7 +326,7 @@ describe('New state template service', function() {
 
   describe('new state template service', function() {
     var nsts = null;
-    var NEW_STATE_NAME = 'new state name'
+    var NEW_STATE_NAME = 'new state name';
 
     beforeEach(inject(function($injector) {
       GLOBALS = {
