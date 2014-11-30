@@ -52,7 +52,7 @@ var submitAnswer = function(answer) {
     element(by.buttonText(answer)).click();
 };
 
-var submissionHandler = 'NonnegativeInt';
+var answerObjectType = 'NonnegativeInt';
 
 var testSuite = [{
   interactionArguments: [[function(editor) {
@@ -61,7 +61,7 @@ var testSuite = [{
       editor.appendUnderlineText('wrong');
     }]],
   ruleArguments: ['Equals', ['right']],
-  expectInteractionDetails: [[function(checker) {
+  expectedInteractionDetails: [[function(checker) {
       checker.readBoldText('right');
     }, function(checker) {
       checker.readUnderlineText('wrong');
@@ -73,5 +73,5 @@ var testSuite = [{
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
-exports.submissionHandler = submissionHandler;
+exports.answerObjectType = answerObjectType;
 exports.testSuite = testSuite;

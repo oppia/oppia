@@ -41,12 +41,12 @@ var submitAnswer = function(answer) {
     element(by.tagName('button')).click();
 };
 
-var submissionHandler = 'NormalizedString';
+var answerObjectType = 'NormalizedString';
 
 var testSuite = [{
   interactionArguments: ['placeholder', 4],
   ruleArguments: ['StartsWith', 'valid'],
-  expectInteractionDetails: ['placeholder', 4],
+  expectedInteractionDetails: ['placeholder', 4],
   wrongAnswers: ['invalid'],
   correctAnswers: ['valid']
 }];
@@ -54,5 +54,5 @@ var testSuite = [{
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
-exports.submissionHandler = submissionHandler;
+exports.answerObjectType = answerObjectType;
 exports.testSuite = testSuite;

@@ -34,12 +34,12 @@ var submitAnswer = function(answer) {
     element(by.tagName('input')).sendKeys(answer + '\n');
 };
 
-var submissionHandler = 'Real';
+var answerObjectType = 'Real';
 
 var testSuite = [{
   interactionArguments: [],
   ruleArguments: ['IsWithinTolerance', 2, 143],
-  expectInteractionDetails: [],
+  expectedInteractionDetails: [],
   wrongAnswers: [146, 130],
   correctAnswers: [142]
 }];
@@ -47,5 +47,5 @@ var testSuite = [{
 exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
-exports.submissionHandler = submissionHandler;
+exports.answerObjectType = answerObjectType;
 exports.testSuite = testSuite;

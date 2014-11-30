@@ -28,14 +28,14 @@
  * submitAnswer: a function that is sent a single 'answer' argument and should
  *   then use it to answer the widget in this way, for example by selecting an
  *   option in MultipleChoiceInput.
- * submissionHandler: the name of the type of object returned by the widget.
+ * answerObjectType: the name of the type of object returned by the widget.
  * testSuite: an array of dictionaries each containing:
  * - interactionArguments: an array of arguments that will be splatted and sent
  *   (together with the editor element) to the widget's customizeInteraction()
  *   function.
  * - ruleArguments: an array of arguments, the first of which should be the
  *   name of the rule to be used and the rest parameters for that rule.
- * - expectInteractionDetails: an array of arguments that will be splatted and
+ * - expectedInteractionDetails: an array of arguments that will be splatted and
  *   sent to expectInteractionDetailsToMatch when the widget is being run in
  *   the player.
  * - wrongAnswers: an array of arguments that will be submitted in sequence via

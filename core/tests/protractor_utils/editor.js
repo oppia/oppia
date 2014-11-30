@@ -140,7 +140,7 @@ var _selectRule = function(ruleElement, widgetName, ruleName) {
   }
 
   var ruleDescription = rules.getDescription(
-    widgets.getInteractive(widgetName).submissionHandler, ruleName);
+    widgets.getInteractive(widgetName).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
