@@ -130,7 +130,9 @@ var expectInteractionToMatch = function(widgetName) {
 
 // This function selects a rule for the current interaction and enters the
 // entries of the parameterValues array as its parameters; the parameterValues
-// should be specified after the ruleName as additional arguments.
+// should be specified after the ruleName as additional arguments. For example
+// with widget 'NumericInput' and rule 'Equals' then there is a single
+// parameter which the given answer is required to equal.
 var _selectRule = function(ruleElement, widgetName, ruleName) {
   var parameterValues = [];
   for (var i = 3; i < arguments.length; i++) {

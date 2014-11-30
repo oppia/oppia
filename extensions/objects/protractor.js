@@ -21,9 +21,9 @@
 
 var forms = require('../../core/tests/protractor_utils/forms.js');
 
-// NOTE: all editors that are parameters in a rule must implement a 
-// setValue() function to which a single argument can be sent that will 
-// completely determine the object.
+// NOTE: all editors for objects that are used as parameters in a rule must
+// implement a setValue() function to which a single argument can be sent
+// that will completely determine the object.
 
 var BooleanEditor = function(elem) {
   return {
@@ -39,11 +39,13 @@ var BooleanEditor = function(elem) {
 
 var CoordTwoDim = function(elem) {
   return {
+    // Co-ordinates is a two-element list whose elements represent latitude and
+    // longitude respectively.
     setValue: function(coordinates) {
       elem.all(by.tagName('input')).first().clear();
       elem.all(by.tagName('input')).first().sendKeys(coordinates[0]);
       elem.all(by.tagName('input')).last().clear();
-      elem.all(by.tagName('input')).last().sendKeys(coordinates[1]);    
+      elem.all(by.tagName('input')).last().sendKeys(coordinates[1]);
     }
   };
 };

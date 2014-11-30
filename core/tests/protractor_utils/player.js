@@ -57,7 +57,7 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant widget's detail checker.
 var expectInteractionToMatch = function(widgetName) {
-  // Convert etadditional arguments to an array to send on.
+  // Convert additional arguments to an array to send on.
   var args = [];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);

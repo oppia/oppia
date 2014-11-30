@@ -369,7 +369,7 @@ describe('Interactive widgets', function() {
 
         editor.enterPreviewMode();
         editor.expectInteractionToMatch.apply(
-          null, [widgetName].concat(test.expectDetailsArguments));
+          null, [widgetName].concat(test.expectInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
           player.submitAnswer(widgetName, test.wrongAnswers[j]);
           player.expectLatestFeedbackToMatch(forms.toRichText('no'));

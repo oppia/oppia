@@ -55,15 +55,15 @@ var submitAnswer = function(answer) {
 var submissionHandler = 'NonnegativeInt';
 
 var testSuite = [{
-  interactionArguments: [[function (editor) {
+  interactionArguments: [[function(editor) {
       editor.appendBoldText('right');
-    }, function (editor) {
+    }, function(editor) {
       editor.appendUnderlineText('wrong');
     }]],
   ruleArguments: ['Equals', ['right']],
-  expectDetailsArguments: [[function (checker) {
+  expectInteractionDetails: [[function(checker) {
       checker.readBoldText('right');
-    }, function (checker) {
+    }, function(checker) {
       checker.readUnderlineText('wrong');
     }]],
   wrongAnswers: ['wrong'],

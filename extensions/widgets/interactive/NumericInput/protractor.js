@@ -39,7 +39,7 @@ var submissionHandler = 'Real';
 var testSuite = [{
   interactionArguments: [],
   ruleArguments: ['IsWithinTolerance', 2, 143],
-  expectDetailsArguments: [],
+  expectInteractionDetails: [],
   wrongAnswers: [146, 130],
   correctAnswers: [142]
 }];

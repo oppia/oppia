@@ -46,7 +46,7 @@ var submissionHandler = 'NormalizedString';
 var testSuite = [{
   interactionArguments: ['placeholder', 4],
   ruleArguments: ['StartsWith', 'valid'],
-  expectDetailsArguments: ['placeholder', 4],
+  expectInteractionDetails: ['placeholder', 4],
   wrongAnswers: ['invalid'],
   correctAnswers: ['valid']
 }];
