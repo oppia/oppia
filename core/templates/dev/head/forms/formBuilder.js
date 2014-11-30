@@ -937,7 +937,7 @@ oppia.directive('schemaBasedEditor', [function() {
   return {
     scope: {
       schema: '&',
-      disabled: '&',
+      isDisabled: '&',
       localValue: '=',
       allowExpressions: '&',
       labelForFocusTarget: '&'
@@ -956,7 +956,7 @@ oppia.directive('schemaBasedChoicesEditor', ['recursionHelper', function(recursi
       // The schema for this object.
       // TODO(sll): Validate each choice against the schema.
       schema: '&',
-      disabled: '&'
+      isDisabled: '&'
     },
     templateUrl: 'schemaBasedEditor/choices',
     restrict: 'E',
@@ -975,7 +975,7 @@ oppia.directive('schemaBasedExpressionEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       // TODO(sll): Currently only takes a string which is either 'bool', 'int' or 'float'.
       // May need to generalize.
       outputType: '&',
@@ -990,7 +990,7 @@ oppia.directive('schemaBasedBoolEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       allowExpressions: '&',
       labelForFocusTarget: '&'
     },
@@ -1018,7 +1018,7 @@ oppia.directive('schemaBasedIntEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       allowExpressions: '&',
       validators: '&',
       labelForFocusTarget: '&'
@@ -1057,7 +1057,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       allowExpressions: '&',
       validators: '&',
       labelForFocusTarget: '&'
@@ -1113,7 +1113,7 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       validators: '&',
       uiConfig: '&',
       allowExpressions: '&',
@@ -1142,7 +1142,7 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
           lineNumbers: true,
           indentWithTabs: true,
         }
-        if ($scope.disabled()) {
+        if ($scope.isDisabled()) {
           $scope.codemirrorOptions.readOnly = 'nocursor';
         }
         // Note that only 'coffeescript', 'javascript', 'lua', 'python', 'ruby' and
@@ -1210,7 +1210,7 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       allowExpressions: '&',
       labelForFocusTarget: '&',
       uiConfig: '&'
@@ -1235,7 +1235,7 @@ oppia.directive('schemaBasedListEditor', [
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       // Read-only property. The schema definition for each item in the list.
       itemSchema: '&',
       // The length of the list. If not specified, the list is of arbitrary length.
@@ -1324,7 +1324,7 @@ oppia.directive('schemaBasedDictEditor', ['recursionHelper', function(recursionH
   return {
     scope: {
       localValue: '=',
-      disabled: '&',
+      isDisabled: '&',
       // Read-only property. An object whose keys and values are the dict
       // properties and the corresponding schemas.
       propertySchemas: '&',

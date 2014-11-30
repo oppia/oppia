@@ -198,7 +198,7 @@ class ExplorationPage(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
-            exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
 
@@ -271,6 +271,7 @@ class ExplorationPage(EditorHandler):
                 skins_services.Registry.get_skin_js_url(skin_id)
                 for skin_id in skins_services.Registry.get_all_skin_ids()],
             'skin_templates': jinja2.utils.Markup(skin_templates),
+            'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,

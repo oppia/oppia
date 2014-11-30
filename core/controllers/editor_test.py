@@ -64,6 +64,9 @@ class EditorTest(BaseEditorControllerTest):
         self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
 
+        # Check if exploration title was loaded.
+        self.assertIn('Welcome to Oppia!', response.body)        
+
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)

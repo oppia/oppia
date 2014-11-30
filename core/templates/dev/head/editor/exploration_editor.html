@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
+{% block maintitle %}
+  Oppia Editor
+{% endblock maintitle %}
+
 {% block subtitle %}
-  Exploration Editor
+  {{ title }}
 {% endblock subtitle %}
 
 {% block header_js %}
@@ -342,8 +346,8 @@
                     </span>
                     <span class="glyphicon glyphicon-warning-sign"></span>
                     <strong><[warningsList.length]></strong> warning<span ng-if="warningsList.length > 1">s</span>
-                    <span class="glyphicon glyphicon-chevron-right" ng-if="!areExplorationWarningsVisible"></span>
-                    <span class="glyphicon glyphicon-chevron-up pull-right" ng-if="areExplorationWarningsVisible"></span>
+                    <span class="glyphicon glyphicon-chevron-right oppia-warning-chevron pull-right" ng-if="!areExplorationWarningsVisible"></span>
+                    <span class="glyphicon glyphicon-chevron-down oppia-warning-chevron pull-right" ng-if="areExplorationWarningsVisible"></span>
                   </div>
                   <div collapse="!areExplorationWarningsVisible">
                     <ul>

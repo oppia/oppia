@@ -95,7 +95,6 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
 
-
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
 
@@ -132,7 +131,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
 
         self.last_params = reader_dict['params']
         self.last_state_name = reader_dict['state_name']
-
+       
         self.assertRegexpMatches(reader_dict['init_html'], expected_response)
         self.assertEqual(reader_dict['exploration']['title'], expected_title)
 
