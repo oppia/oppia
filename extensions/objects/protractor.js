@@ -39,7 +39,7 @@ var BooleanEditor = function(elem) {
 
 var CoordTwoDim = function(elem) {
   return {
-    // Coordinates is a two-element list whose elements represent latitude and
+    // coordinates is a two-element list whose elements represent latitude and
     // longitude respectively.
     setValue: function(coordinates) {
       elem.all(by.tagName('input')).first().clear();
