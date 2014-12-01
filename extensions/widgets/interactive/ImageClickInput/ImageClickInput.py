@@ -34,7 +34,7 @@ class ImageClickInput(widget_domain.BaseWidget):
     # Customization parameters and their descriptions, schemas and default
     # values.
     _customization_arg_specs = [{
-        'name': 'image_and_regions',
+        'name': 'imageAndRegions',
         'description': 'The image and its regions.',
         'schema': {
             'type': 'custom',
