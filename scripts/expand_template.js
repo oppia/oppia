@@ -20,7 +20,7 @@
 // This script runs on node.js and requires ejs module. Node.js is installed by
 // Oppia's installation. The ejs module can be installed as:
 //
-// $ ../oppia_tools/node-0.10.1/bin/npm install ejs
+// $ ../oppia_tools/node-0.10.33/bin/npm install ejs
 //
 // This script can then be run as:
 //

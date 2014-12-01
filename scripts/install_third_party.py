@@ -174,7 +174,7 @@ JQUERYUI_FILES = ['jquery-ui.min.js']
 ANGULAR_REV = '1.3.0-rc.5'
 ANGULAR_URL = (
     'https://ajax.googleapis.com/ajax/libs/angularjs/%s' % ANGULAR_REV)
-ANGULAR_TEST_URL = 'http://code.angularjs.org/%s' % ANGULAR_REV
+ANGULAR_TEST_URL = 'https://code.angularjs.org/%s' % ANGULAR_REV
 ANGULAR_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'angularjs-%s' % ANGULAR_REV)
 ANGULAR_FILES = [
