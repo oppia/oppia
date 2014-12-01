@@ -516,3 +516,36 @@ class Graph(BaseObject):
             raise TypeError('Cannot convert to graph %s' % raw)
 
         return raw
+
+class ImageRegion(BaseObject):
+    """Image Region class."""
+
+    description = 'A region of an image.'
+    
+    # Note: at the moment, only supports rectangular image regions
+    SCHEMA = {
+        'type': 'list',
+        'len': 2,
+        'items': CoordTwoDim.SCHEMA,
+    }
+
+class SegmentedImage(BaseObject):
+    """Segmented Image class."""
+
+    description = 'An image segmented into regions.'
+    edit_html_filename = 'segmented_image_editor'
+    edit_js_filename = 'SegmentedImageEditor'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'imagePath',
+            'schema': Filepath.SCHEMA
+        }, {
+            'name': 'imageRegions',
+            'schema': {
+                'type': 'list',
+                'items': ImageRegion.SCHEMA 
+            }
+        }]
+    }
