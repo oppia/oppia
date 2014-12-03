@@ -1,0 +1,21 @@
+<div ng-if="$parent.value.imagePath === ''">
+  <schema-based-editor 
+    local-value="$parent.$parent.value.imagePath" 
+    schema="{type: 'custom', obj_type: 'Filepath'}">
+  </schema-based-editor>
+</div>
+<div ng-if="$parent.value.imagePath !== ''">
+  <div style="position: relative">
+    <img ng-src="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
+      class="oppia-segmented-image-editor-img"
+      ng-mousedown="onImgMouseDown($event)"
+      ng-mousemove="onImgMouseMove($event)"
+      style="position: absolute; top: 0; left: 0;">
+    </img>
+    <!--<svg style="position: absolute; top: 0; left: 0"
+      ng-attr-height="<[imageHeight]>"
+      ng-attr-width="<[imageWidth]>">
+    </svg>-->
+  </div>
+  <br><button type="button" class="btn btn-cancel" ng-click="$parent.$parent.value.imagePath = ''">Reset</button>
+</div>

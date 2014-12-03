@@ -27,11 +27,17 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       scope: {},
       templateUrl: 'interactiveWidget/ImageClickInput',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.imageAndRegionsWithValue.imagePath);
+        $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.imageAndRegionsWithValue).imagePath;
         $scope.imageUrl = $sce.trustAsResourceUrl(
           '/imagehandler/' + $rootScope.explorationId + '/' +
           encodeURIComponent($scope.filepath)
         );
+        $scope.onClickImage = function(event) {
+          var image = $($element).find('.oppia-image-click-img');
+          var mouseX = event.pageX - image.offset().left;
+          var mouseY = event.pageY - image.offset().top;
+          $scope.$parent.$parent.submitAnswer([mouseX, mouseY], 'submit');
+        }
       }]
     };
   }
