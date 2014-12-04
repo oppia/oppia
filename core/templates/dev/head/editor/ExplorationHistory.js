@@ -47,23 +47,19 @@ oppia.controller('ExplorationHistory', [
     explorationData.getData().then(function(data) {
       var currentVersion = data.version;
       /**
-       * $scope.comparePanesVersions is an object with keys 'leftPane' and
-       * 'rightPane', whose values are the version numbers of the versions
-       * displayed in the left and right codemirror panes.
-       * $scope.compareSnapshot is an object with keys 'leftPane' and 'rightPane'
-       * whose values are the snapshots of the compared versions.
-       * $scope.yamrStrs is an object with keys 'leftPane' and 'rightPane',
+       * $scope.compareVersions is an object with keys 'earlierVersion' and
+       * 'laterVersion', whose values are the two version numbers of the
+       * compared versions.
+       * $scope.compareSnapshot is an object with keys 'earlierVersion' and
+       * 'laterVersion' whose values are the snapshots of the compared versions.
+       * $scope.yamrStrs is an object with keys 'earlierVersion' and 'laterVersion',
        * whose values are the YAML representations of the compared versions
        */
-      $scope.comparePanesVersions = {};
+      $scope.compareVersions = {};
       $scope.compareSnapshot = {};
-      // Note: if initial strings are empty CodeMirror won't initialize correctly
-      $scope.yamlStrs = {
-        'leftPane': ' ',
-        'rightPane': ' '
-      };
+      $scope.yamlStrs = {};
 
-      $scope.hideCodemirror = true;
+      $scope.hideHistoryGraph = true;
       $scope.hideCompareVersionsButton = false;
 
       $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
@@ -91,23 +87,23 @@ oppia.controller('ExplorationHistory', [
 
   // Functions to set snapshot and download YAML when selection is changed
   $scope.diffGraphData = null;
-  $scope.changeCompareVersion = function(versionNumber, changedPane) {
-    $scope.compareSnapshot[changedPane] =
+  $scope.changeCompareVersion = function(versionNumber, changedVersion) {
+    $scope.compareSnapshot[changedVersion] =
       $scope.displayedExplorationSnapshots[
-        $scope.currentVersion - $scope.comparePanesVersions[changedPane]];
+        $scope.currentVersion - $scope.compareVersions[changedVersion]];
 
     $http.get($scope.explorationDownloadUrl + '?v=' +
-        $scope.comparePanesVersions[changedPane] + '&output_format=json')
+        $scope.compareVersions[changedVersion] + '&output_format=json')
         .then(function(response) {
-      $scope.yamlStrs[changedPane] = response.data.yaml;
+      $scope.yamlStrs[changedVersion] = response.data.yaml;
     });
 
-    if ($scope.comparePanesVersions.leftPane !== undefined &&
-        $scope.comparePanesVersions.rightPane !== undefined) {
-      var comparedVersion1 = Math.min($scope.comparePanesVersions.leftPane,
-        $scope.comparePanesVersions.rightPane);
-      var comparedVersion2 = Math.max($scope.comparePanesVersions.leftPane,
-        $scope.comparePanesVersions.rightPane);
+    if ($scope.compareVersions.earlierVersion !== undefined &&
+        $scope.compareVersions.laterVersion !== undefined) {
+      var comparedVersion1 = Math.min($scope.compareVersions.earlierVersion,
+        $scope.compareVersions.laterVersion);
+      var comparedVersion2 = Math.max($scope.compareVersions.earlierVersion,
+        $scope.compareVersions.laterVersion);
       compareVersionsService.getDiffGraphData(comparedVersion1,
           comparedVersion2).then(function(response) {
         $log.info('Retrieved version comparison data');
@@ -214,9 +210,9 @@ oppia.controller('ExplorationHistory', [
   // Check if valid versions were selected
   $scope.areCompareVersionsSelected = function() {
     return (
-      $scope.comparePanesVersions &&
-      $scope.comparePanesVersions.hasOwnProperty('leftPane') &&
-      $scope.comparePanesVersions.hasOwnProperty('rightPane'));
+      $scope.compareVersions &&
+      $scope.compareVersions.hasOwnProperty('earlierVersion') &&
+      $scope.compareVersions.hasOwnProperty('laterVersion'));
   };
 
   // Downloads the zip file for an exploration.
@@ -226,30 +222,49 @@ oppia.controller('ExplorationHistory', [
     window.open($scope.explorationDownloadUrl + '?v=' + versionNumber, '&output_format=zip');
   };
 
-  // Function to show the CodeMirror MergeView instance
-  $scope.showMergeview = function() {
-    $scope.hideCodemirror = false;
+  // Functions to show history state graph
+  $scope.showHistoryGraph = function() {
+    $scope.hideHistoryGraph = false;
     $scope.hideCompareVersionsButton = true;
-
-    // Force refresh of codemirror
-    $scope.yamlStrs.leftPane = ' ';
-    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.comparePanesVersions.leftPane +
-        '&output_format=json').then(function(response) {
-      $scope.yamlStrs.leftPane = response.data.yaml;
-    });
-    $scope.yamlStrs.rightPane = ' ';
-    $http.get($scope.explorationDownloadUrl + '?v=' + $scope.comparePanesVersions.rightPane +
-        '&output_format=json').then(function(response) {
-      $scope.yamlStrs.rightPane = response.data.yaml;
-    });
   };
 
-  // Options for the ui-codemirror display.
-  $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
-    lineNumbers: true,
-    readOnly: true,
-    mode: 'yaml',
-    viewportMargin: 20
+  // Functions to show modal of history diff of a state
+  $scope.onClickStateInHistoryGraph = function(stateName) {
+    if (stateName !== END_DEST) {
+      $scope.showStateDiffModal(stateName);
+    }
+  };
+
+  $scope.showStateDiffModal = function(stateName) {
+    $modal.open({
+      templateUrl: 'modals/stateDiff',
+      backdrop: 'static',
+      windowClass: 'state-diff-modal',
+      resolve: {
+        stateName: function() {
+          return stateName;
+        }
+      },
+      controller: [
+        '$scope', '$modalInstance', 'stateName', function(
+           $scope, $modalInstance, stateName) {
+        $scope.yamlStrs = {
+          'leftPane': ' ',
+          'rightPane': ' '
+        };
+        $scope.return = function() {
+          $modalInstance.dismiss('cancel');
+        };
+
+        // Options for the codemirror mergeview.
+        $scope.CODEMIRROR_MERGEVIEW_OPTIONS = {
+          lineNumbers: true,
+          readOnly: true,
+          mode: 'yaml',
+          viewportMargin: 20
+        };
+      }]
+    });
   };
 
   $scope.showRevertExplorationModal = function(version) {
