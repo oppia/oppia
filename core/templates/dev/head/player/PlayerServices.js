@@ -435,7 +435,7 @@ oppia.factory('oppiaPlayerService', [
           console.warn('Server evaluation required.');
           if (!finished) {
             console.log(
-              'Data sent to client for evaluation: ', _exploration.states[newStateName]);
+              'Data sent to server for evaluation: ', _exploration.states[newStateName]);
           }
 
           // Make a server call only when client evaluation fails.

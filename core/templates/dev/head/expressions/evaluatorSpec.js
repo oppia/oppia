@@ -44,6 +44,7 @@ describe('Expression evaluator service', function() {
       [true, '!strNull'],
       [-5, '1 - 2 * 3'],
       [1000.01, 'num100_001 / 0.1'],
+      [50, 'floor((numZero + num100_001)/2)'],
       [3, '23 % 5'],
       [true, '1 <= numZero || 1 >= numZero'],
       [false, '100 < num100_001 && 1 > num100_001'],

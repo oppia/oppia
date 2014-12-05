@@ -270,7 +270,6 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       return numericArgs[0] * numericArgs[1];
     },
     '/': function(args, envs) {
-      // TODO(sll): Coerce to numeric. Verify denominator isn't zero?
       verifyNumArgs(args, 2);
       var numericArgs = _coerceAllArgsToNumber(args);
       return numericArgs[0] / numericArgs[1];
@@ -326,6 +325,11 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       // TODO(kashida): Make this short-circuit.
       verifyNumArgs(args, 3);
       return args[0] ? args[1] : args[2];
+    },
+    'floor': function(args, envs) {
+      verifyNumArgs(args, 1);
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return Math.floor(numericArgs[0]);
     }
   };
 
