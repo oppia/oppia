@@ -89,7 +89,20 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
   ExprWrongNumArgsError.prototype.name = 'ExprWrongNumArgsError';
   ExprWrongNumArgsError.prototype.toString = function() {
     return this.name + ': {' + this.args + '} not in range [' + this.expectedMin +
-        ',' + this.expectedMax + ']';
+      ',' + this.expectedMax + ']';
+  };
+
+  var ExprWrongArgTypeError = function(arg, actualType, expectedType) {
+    this.arg = arg;
+    this.actualType = actualType;
+    this.expectedType = expectedType;
+  };
+  ExprWrongArgTypeError.prototype = new ExpressionError();
+  ExprWrongArgTypeError.prototype.constructor = ExprWrongArgTypeError;
+  ExprWrongArgTypeError.prototype.name = 'ExprWrongArgTypeError';
+  ExprWrongArgTypeError.prototype.toString = function() {
+    return this.name + ': ' + this.arg + ' has type ' + this.actualType +
+      ' which does not match expected type ' + this.expectedType;
   };
 
 
@@ -212,7 +225,27 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       return;
     }
     throw new ExprWrongNumArgsError(args, expectedNum, expectedMax);
-  }
+  };
+
+  // Coerces the argument to a Number, and throws an error if the result
+  // is NaN.
+  var _coerceToNumber = function(originalValue) {
+    var coercedValue = (+originalValue);
+    if (!isNaN(coercedValue)) {
+      return coercedValue;
+    }
+    throw new ExprWrongArgTypeError(
+      originalValue, typeof originalValue, 'Number');
+  };
+
+  // Coerces all values in the given argument array to Number, and throws
+  // an error if the result is NaN.
+  var _coerceAllArgsToNumber = function(args) {
+    for (var i = 0; i < args.length; i++) {
+      args[i] = _coerceToNumber(args[i]);
+    }
+    return args;
+  };
 
   // TODO(kashida): Document all operators input and output contracts.
   var system = {
@@ -220,49 +253,56 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       return lookupEnvs(args[0] + '', envs);
     },
     '+': function(args, envs) {
-      // TODO(sll): Coerce to numeric.
       verifyNumArgs(args, 1, 2);
-      return args.length == 1 ? args[0] : args[0] + args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs.length == 1 ? numericArgs[0] :
+        numericArgs[0] + numericArgs[1];
     },
     '-': function(args, envs) {
-      // TODO(sll): Coerce to numeric.
       verifyNumArgs(args, 1, 2);
-      return args.length == 1 ? -args[0] : args[0] - args[1];
-    },
-    '!': function(args, envs) {
-      verifyNumArgs(args, 1);
-      return !args[0];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs.length == 1 ? -numericArgs[0] :
+        numericArgs[0] - numericArgs[1];
     },
     '*': function(args, envs) {
-      // TODO(sll): Coerce to numeric.
       verifyNumArgs(args, 2);
-      return args[0] * args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs[0] * numericArgs[1];
     },
     '/': function(args, envs) {
       // TODO(sll): Coerce to numeric. Verify denominator isn't zero?
       verifyNumArgs(args, 2);
-      return args[0] / args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs[0] / numericArgs[1];
     },
     '%': function(args, envs) {
-      // TODO(sll): Coerce to numeric. Second argument should be int.
       verifyNumArgs(args, 2);
-      return args[0] % args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs[0] % numericArgs[1];
     },
     '<=': function(args, envs) {
       verifyNumArgs(args, 2);
-      return args[0] <= args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs[0] <= numericArgs[1];
     },
     '>=': function(args, envs) {
       verifyNumArgs(args, 2);
-      return args[0] >= args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs[0] >= numericArgs[1];
     },
     '<': function(args, envs) {
       verifyNumArgs(args, 2);
-      return args[0] < args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs[0] < numericArgs[1];
     },
     '>': function(args, envs) {
       verifyNumArgs(args, 2);
-      return args[0] > args[1];
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return numericArgs[0] > numericArgs[1];
+    },
+    '!': function(args, envs) {
+      verifyNumArgs(args, 1);
+      return !args[0];
     },
     '==': function(args, envs) {
       verifyNumArgs(args, 2);
@@ -293,6 +333,7 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
     'ExpressionError': ExpressionError,
     'ExprUndefinedVarError': ExprUndefinedVarError,
     'ExprWrongNumArgsError': ExprWrongNumArgsError,
+    'ExprWrongArgTypeError': ExprWrongArgTypeError,
     'evaluate': evaluate,
     'evaluateExpression': evaluateExpression,
     'evaluateParseTree': evaluateParseTree,

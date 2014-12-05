@@ -329,8 +329,9 @@ oppia.factory('oppiaPlayerService', [
      *       state.
      */
     init: function(successCallback) {
-      if (_editorPreviewMode) {
+      answerIsBeingProcessed = false;
 
+      if (_editorPreviewMode) {
         var initExplorationUrl = '/createhandler/init_exploration/' + _explorationId;
         $http.post(initExplorationUrl, {
           exp_param_specs: _exploration.param_specs,

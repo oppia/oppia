@@ -52,6 +52,7 @@ describe('Expression parser service', function() {
           '-abc'],
       [['-', 0.35], '-.35'],
 
+      [['+', 1, 2], '1     +    2'],
       // There is a double width space after '+'.
       [['+', 1, 2], '\t1 +　2 '],
 

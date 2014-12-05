@@ -37,6 +37,8 @@ describe('Expression evaluator service', function() {
     [
       [0, 'numZero'],
       [10, '+10'],
+      [12, '2   + 10'],
+      [100.001, 'num100_001   + numZero'],
       [-80.001, '20 - num100_001'],
       [0, '0x100 - 256'],
       [true, '!strNull'],
@@ -48,9 +50,11 @@ describe('Expression evaluator service', function() {
       [false, 'boolTrue == boolFalse'],
       [true, 'strNull != strXYZ'],
       [0, 'boolFalse ? boolTrue : numZero'],
+      [Infinity, 'num100_001 / 0'],
       [ees.ExprUndefinedVarError, 'numZero + numOne'],
       [ees.ExprWrongNumArgsError, ['+', 10, 20, 30]],
       [ees.ExprWrongNumArgsError, ['==', true]],
+      [ees.ExprWrongArgTypeError, ['+', 'abc', 1]],
 
     ].forEach(function(test) {
       var expected = test[0];
