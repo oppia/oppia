@@ -36,22 +36,50 @@ oppia.directive('segmentedImageEditor', [
             encodeURIComponent(imageUrl)
           );
         };
-        $scope.mouseX = 0;
-        $scope.mouseY = 0;
-        $scope.$watch("$parent.value", function() {
-          $scope.image = $($element).find('.oppia-segmented-image-editor-img');
-          $scope.imageWidth = $scope.image.width();
-          console.log($scope.image);
-          $scope.imageHeight = $scope.image.height();
+        $scope.mouseX = $scope.mouseY = 0;
+        $scope.origX = $scope.origY = 0;
+        $scope.rectX = $scope.rectY = 0;
+        $scope.rectWidth = $scope.rectHeight = 0;
+        $scope.isDrag = false;
+        $scope.$watch('$parent.value.imagePath', function(newVal) {
+          if (newVal === '') {
+            return;
+          }
+          $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
+            function() {
+              $scope.imageWidth = this.width;
+              $scope.imageHeight = this.height;
+              $scope.$apply();
+            }
+          );
         });
-        $scope.onImgMouseDown = function(event) {
-          event.preventDefault();
+        $scope.onSvgMouseMove = function(event) {
+          var svgElement = $($element).find('.oppia-segmented-image-editor-svg');
+          $scope.mouseX = event.pageX - svgElement.offset().left;
+          $scope.mouseY = event.pageY - svgElement.offset().top;
+          $scope.rectX = Math.min($scope.origX, $scope.mouseX);
+          $scope.rectY = Math.min($scope.origY, $scope.mouseY);
+          $scope.rectWidth = Math.abs($scope.origX - $scope.mouseX);
+          $scope.rectHeight = Math.abs($scope.origY - $scope.mouseY);
         };
-        $scope.onImgMouseMove = function(event) {
-          console.log($scope.image.offset());
-          $scope.mouseX = event.pageX - $scope.image.offset().left;
-          $scope.mouseY = event.pageY - $scope.image.offset().top;
+        $scope.onSvgMouseDown = function(event) {
+          event.preventDefault();
+          $scope.origX = $scope.mouseX;
+          $scope.origY = $scope.mouseY;
+          $scope.rectWidth = $scope.rectHeight = 0;
+          $scope.isDrag = true;
         }
+        $scope.onSvgMouseUp = function(event) {
+          $scope.isDrag = false;
+          $scope.$parent.value.imageRegions.push([
+            [$scope.rectX, $scope.rectY],
+            [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight]
+          ]);
+        };
+        $scope.resetImage = function() {
+          $scope.$parent.value.imagePath = '';
+          $scope.$parent.value.imageRegions = [];
+        };
       }
     };
   }

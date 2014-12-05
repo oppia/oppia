@@ -5,17 +5,36 @@
   </schema-based-editor>
 </div>
 <div ng-if="$parent.value.imagePath !== ''">
-  <div style="position: relative">
-    <img ng-src="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
-      class="oppia-segmented-image-editor-img"
-      ng-mousedown="onImgMouseDown($event)"
-      ng-mousemove="onImgMouseMove($event)"
-      style="position: absolute; top: 0; left: 0;">
-    </img>
-    <!--<svg style="position: absolute; top: 0; left: 0"
+  <div>
+    <svg 
+      class="oppia-segmented-image-editor-svg"
+      ng-attr-width="<[imageWidth]>" 
       ng-attr-height="<[imageHeight]>"
-      ng-attr-width="<[imageWidth]>">
-    </svg>-->
+      ng-mousedown="onSvgMouseDown($event)"
+      ng-mousemove="onSvgMouseMove($event)"
+      ng-mouseup="onSvgMouseUp($event)"
+    >
+      <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
+        x="0"
+        y="0"
+        height="100%"
+        width="100%">
+      </image>
+      <rect ng-if="isDrag"
+        ng-attr-x="<[rectX]>"
+        ng-attr-y="<[rectY]>"
+        ng-attr-width="<[rectWidth]>"
+        ng-attr-height="<[rectHeight]>"
+        style="fill: blue; opacity: 0.3;">
+      </rect>
+      <rect ng-repeat="rect in $parent.$parent.value.imageRegions"
+        ng-attr-x="<[rect[0][0]]>"
+        ng-attr-y="<[rect[0][1]]>"
+        ng-attr-width="<[rect[1][0] - rect[0][0]]>"
+        ng-attr-height="<[rect[1][1] - rect[0][1]]>"
+        style="fill: blue; opacity: 0.3;">
+      </rect>
+    </svg>
   </div>
-  <br><button type="button" class="btn btn-cancel" ng-click="$parent.$parent.value.imagePath = ''">Reset</button>
+  <br><button type="button" class="btn btn-cancel" ng-click="resetImage()">Reset</button>
 </div>

@@ -36,6 +36,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           var image = $($element).find('.oppia-image-click-img');
           var mouseX = event.pageX - image.offset().left;
           var mouseY = event.pageY - image.offset().top;
+          console.log(mouseX," ",mouseY);
           $scope.$parent.$parent.submitAnswer([mouseX, mouseY], 'submit');
         }
       }]
