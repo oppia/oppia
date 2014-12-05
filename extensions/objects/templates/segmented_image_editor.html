@@ -28,10 +28,10 @@
         style="fill: blue; opacity: 0.3;">
       </rect>
       <rect ng-repeat="rect in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[rect[0][0]]>"
-        ng-attr-y="<[rect[0][1]]>"
-        ng-attr-width="<[rect[1][0] - rect[0][0]]>"
-        ng-attr-height="<[rect[1][1] - rect[0][1]]>"
+        ng-attr-x="<[rect.region[0][0]]>"
+        ng-attr-y="<[rect.region[0][1]]>"
+        ng-attr-width="<[rect.region[1][0] - rect.region[0][0]]>"
+        ng-attr-height="<[rect.region[1][1] - rect.region[0][1]]>"
         style="fill: blue; opacity: 0.3;">
       </rect>
     </svg>

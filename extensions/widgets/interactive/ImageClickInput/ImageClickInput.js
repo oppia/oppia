@@ -27,7 +27,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       scope: {},
       templateUrl: 'interactiveWidget/ImageClickInput',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
-        $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.imageAndRegionsWithValue).imagePath;
+        var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj($attrs.imageAndRegionsWithValue);
+        $scope.filepath = imageAndRegions.imagePath;
         $scope.imageUrl = $sce.trustAsResourceUrl(
           '/imagehandler/' + $rootScope.explorationId + '/' +
           encodeURIComponent($scope.filepath)
@@ -36,8 +37,16 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           var image = $($element).find('.oppia-image-click-img');
           var mouseX = event.pageX - image.offset().left;
           var mouseY = event.pageY - image.offset().top;
-          console.log(mouseX," ",mouseY);
-          $scope.$parent.$parent.submitAnswer([mouseX, mouseY], 'submit');
+          var ret = imageAndRegions.imageRegions.length;
+          for (var i = 0; i < imageAndRegions.imageRegions.length; i++) {
+            var region = imageAndRegions.imageRegions[i].region;
+            if (region[0][0] <= mouseX && mouseX <= region[1][0] &&
+                region[0][1] <= mouseY && mouseY <= region[1][1]) {
+              ret = i;
+              break;
+            }
+          }
+          $scope.$parent.$parent.submitAnswer(ret, 'submit');
         }
       }]
     };

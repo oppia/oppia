@@ -524,9 +524,18 @@ class ImageRegion(BaseObject):
     
     # Note: at the moment, only supports rectangular image regions
     SCHEMA = {
-        'type': 'list',
-        'len': 2,
-        'items': CoordTwoDim.SCHEMA,
+        'type': 'dict',
+        'properties': [{
+            'name': 'label',
+            'schema': UnicodeString.SCHEMA
+        }, {
+            'name': 'region',
+            'schema': {
+                'type': 'list',
+                'len': 2,
+                'items': CoordTwoDim.SCHEMA
+            }
+        }]
     }
 
 class SegmentedImage(BaseObject):

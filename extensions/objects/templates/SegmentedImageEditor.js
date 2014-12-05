@@ -71,10 +71,13 @@ oppia.directive('segmentedImageEditor', [
         }
         $scope.onSvgMouseUp = function(event) {
           $scope.isDrag = false;
-          $scope.$parent.value.imageRegions.push([
-            [$scope.rectX, $scope.rectY],
-            [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight]
-          ]);
+          $scope.$parent.value.imageRegions.push({
+            label: $scope.$parent.value.imageRegions.length.toString(),
+            region: [
+              [$scope.rectX, $scope.rectY],
+              [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight]
+            ]
+          });
         };
         $scope.resetImage = function() {
           $scope.$parent.value.imagePath = '';

@@ -106,12 +106,24 @@ oppia.controller('StateInteraction', [
       );
     }
 
-    // Special-case for multiple choice input.
+    // Special-case for multiple choice input and image click input.
     $scope.answerChoices = null;
     if ($scope.widgetId == 'MultipleChoiceInput') {
       for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
         if (widgetTemplate.customization_args[i].name == 'choices') {
           $scope.answerChoices = widgetTemplate.customization_args[i].value;
+        }
+      }
+    } else if ($scope.widgetId == 'ImageClickInput') {
+      for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
+        if (widgetTemplate.customization_args[i].name == 'imageAndRegions') {
+          $scope.answerChoices = [];
+          var segmentedImage = widgetTemplate.customization_args[i].value;
+          console.log(segmentedImage);
+          for (var j = 0; j < segmentedImage.imageRegions.length; j++) {
+            $scope.answerChoices.push(segmentedImage.imageRegions[j].label);
+          }
+          console.log("answerChoices:",$scope.answerChoices);
         }
       }
     }

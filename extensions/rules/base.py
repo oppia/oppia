@@ -58,3 +58,6 @@ class CheckedProofRule(rule_domain.Rule):
 
 class GraphRule(rule_domain.Rule):
     subject_type = objects.Graph
+
+class SegmentedImageRule(rule_domain.Rule):
+    subject_type = objects.SegmentedImage
