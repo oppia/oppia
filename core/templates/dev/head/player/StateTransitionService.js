@@ -99,7 +99,7 @@ oppia.factory('stateTransitionService', [
           newParams[pc.name] = pc.customization_args.value;
         } else {
           var paramValue = expressionInterpolationService.processValue(
-            pc.customization_args.value, envs);
+            pc.customization_args.value, [newParams].concat(envs));
           if (paramValue === null) {
             return false;
           }
