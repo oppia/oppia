@@ -83,6 +83,9 @@ oppia.directive('segmentedImageEditor', [
           $scope.$parent.value.imagePath = '';
           $scope.$parent.value.imageRegions = [];
         };
+        $scope.deleteRegion = function(index) {
+          $scope.$parent.value.imageRegions.splice(index, 1);
+        };
       }
     };
   }

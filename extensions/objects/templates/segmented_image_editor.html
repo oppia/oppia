@@ -6,14 +6,12 @@
 </div>
 <div ng-if="$parent.value.imagePath !== ''">
   <div>
-    <svg 
-      class="oppia-segmented-image-editor-svg"
+    <svg class="oppia-segmented-image-editor-svg"
       ng-attr-width="<[imageWidth]>" 
       ng-attr-height="<[imageHeight]>"
       ng-mousedown="onSvgMouseDown($event)"
       ng-mousemove="onSvgMouseMove($event)"
-      ng-mouseup="onSvgMouseUp($event)"
-    >
+      ng-mouseup="onSvgMouseUp($event)">
       <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
         x="0"
         y="0"
@@ -34,7 +32,18 @@
         ng-attr-height="<[rect.region[1][1] - rect.region[0][1]]>"
         style="fill: blue; opacity: 0.3;">
       </rect>
+      <text ng-repeat="region in $parent.$parent.value.imageRegions"
+        ng-attr-x="<[region.region[0][0]+3]>"
+        ng-attr-y="<[region.region[0][1]+12]>">
+        <[region.label]>
+      </text>
     </svg>
+    <ul>
+    <li ng-repeat="region in $parent.$parent.value.imageRegions">
+      <input type="text" ng-model="region.label"></input>
+      <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion($index)">Delete</button>
+    </li>
+    </ul>
   </div>
   <br><button type="button" class="btn btn-cancel" ng-click="resetImage()">Reset</button>
 </div>
