@@ -38,7 +38,7 @@ oppia.factory('expressionInterpolationService', [
   return {
     processString: function(sourceString, envs) {
       try {
-        return sourceString.replace(/{{([^}]*)}}/, function(match, p1) {
+        return sourceString.replace(/{{([^}]*)}}/g, function(match, p1) {
           return expressionEvaluatorService.evaluateExpression(p1, envs);
         });
       } catch (e) {

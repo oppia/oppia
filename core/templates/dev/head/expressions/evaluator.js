@@ -220,10 +220,12 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       return lookupEnvs(args[0] + '', envs);
     },
     '+': function(args, envs) {
+      // TODO(sll): Coerce to numeric.
       verifyNumArgs(args, 1, 2);
       return args.length == 1 ? args[0] : args[0] + args[1];
     },
     '-': function(args, envs) {
+      // TODO(sll): Coerce to numeric.
       verifyNumArgs(args, 1, 2);
       return args.length == 1 ? -args[0] : args[0] - args[1];
     },
@@ -232,14 +234,17 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       return !args[0];
     },
     '*': function(args, envs) {
+      // TODO(sll): Coerce to numeric.
       verifyNumArgs(args, 2);
       return args[0] * args[1];
     },
     '/': function(args, envs) {
+      // TODO(sll): Coerce to numeric. Verify denominator isn't zero?
       verifyNumArgs(args, 2);
       return args[0] / args[1];
     },
     '%': function(args, envs) {
+      // TODO(sll): Coerce to numeric. Second argument should be int.
       verifyNumArgs(args, 2);
       return args[0] % args[1];
     },
@@ -281,7 +286,7 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       // TODO(kashida): Make this short-circuit.
       verifyNumArgs(args, 3);
       return args[0] ? args[1] : args[2];
-    },
+    }
   };
 
   return {

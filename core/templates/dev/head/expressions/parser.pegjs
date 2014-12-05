@@ -254,12 +254,12 @@ PrimaryExpression
 
 CallExpression
   = name:Identifier __ args:(Arguments)+ {
-      var result = [name, args.shift()];
-      while (args.length > 0) {
-        result = [result, args.shift()];
-      }
-      return result;
+    var result = [name].concat(args.shift());
+    while (args.length > 0) {
+      result = [result].concat(args.shift());
     }
+    return result;
+  }
 
 Arguments
   = "(" __ args:ArgumentList? __ ")" {

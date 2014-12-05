@@ -152,12 +152,12 @@ oppia.factory('expressionParserService', ['$log', function($log) {
         peg$c99 = ")",
         peg$c100 = { type: "literal", value: ")", description: "\")\"" },
         peg$c101 = function(name, args) {
-              var result = [name, args.shift()];
-              while (args.length > 0) {
-                result = [result, args.shift()];
-              }
-              return result;
-            },
+            var result = [name].concat(args.shift());
+            while (args.length > 0) {
+              result = [result].concat(args.shift());
+            }
+            return result;
+          },
         peg$c102 = function(args) {
             return args !== null ? args : [];
           },
