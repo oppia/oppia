@@ -65,7 +65,7 @@ class EditorTest(BaseEditorControllerTest):
         self.login(self.EDITOR_EMAIL)
 
         # Check if exploration title was loaded.
-        self.assertIn('Welcome to Oppia!', response.body)        
+        self.assertIn('Welcome to Oppia!', response.body)
 
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
@@ -290,87 +290,97 @@ class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
 
     SAMPLE_JSON_CONTENT = (
 """)]}'
-{"yaml": "author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: Test JSON download
+{"State A": "content:
+- type: text
+  value: ''
 param_changes: []
-param_specs: {}
-schema_version: 3
-skill_tags: []
-states:
-  %s:
-    content:
-    - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  State A:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: State A
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  State B:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: State B
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: State A
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+", "State B": "content:
+- type: text
+  value: ''
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: State B
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+", "%s": "content:
+- type: text
+  value: Welcome to the Oppia editor!<br><br>Anything
+    you type here will be shown to the learner playing
+    your exploration.<br><br>If you need more help getting
+    started, check out the Help link in the navigation
+    bar.
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: %s
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
 "}""" % (
-    feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME
 )).replace('<', '\\u003c').replace('>', '\\u003e')
+
+    SAMPLE_STATE_STRING = (
+"""content:
+- type: text
+  value: ''
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: State A
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""")
 
     def test_exploration_download_handler_for_default_exploration(self):
 
@@ -436,6 +446,14 @@ states:
         # Check downloaded JSON string
         self.assertEqual(self.SAMPLE_JSON_CONTENT,
                          response.body.decode('string_escape'))
+
+        # Check download state as YAML string
+        state_name = 'State%20A'
+        EXPLORATION_DOWNLOAD_URL = (
+            '/createhandler/download/%s?output_format=%s&state=%s' %
+            (EXP_ID, feconf.OUTPUT_FORMAT_JSON, state_name))
+        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+        self.assertEqual(self.SAMPLE_STATE_STRING, response.body)
 
         self.logout()
 

@@ -52,12 +52,11 @@ oppia.controller('ExplorationHistory', [
        * compared versions.
        * $scope.compareSnapshot is an object with keys 'earlierVersion' and
        * 'laterVersion' whose values are the snapshots of the compared versions.
-       * $scope.yamrStrs is an object with keys 'earlierVersion' and 'laterVersion',
+       * $scope.yamlStrs is an object with keys 'earlierVersion' and 'laterVersion',
        * whose values are the YAML representations of the compared versions
        */
       $scope.compareVersions = {};
       $scope.compareSnapshot = {};
-      $scope.yamlStrs = {};
 
       $scope.hideHistoryGraph = true;
       $scope.hideCompareVersionsButton = false;
@@ -88,15 +87,10 @@ oppia.controller('ExplorationHistory', [
   // Functions to set snapshot and download YAML when selection is changed
   $scope.diffGraphData = null;
   $scope.changeCompareVersion = function(versionNumber, changedVersion) {
+    $scope.diffGraphData = null;
     $scope.compareSnapshot[changedVersion] =
       $scope.displayedExplorationSnapshots[
         $scope.currentVersion - $scope.compareVersions[changedVersion]];
-
-    $http.get($scope.explorationDownloadUrl + '?v=' +
-        $scope.compareVersions[changedVersion] + '&output_format=json')
-        .then(function(response) {
-      $scope.yamlStrs[changedVersion] = response.data.yaml;
-    });
 
     if ($scope.compareVersions.earlierVersion !== undefined &&
         $scope.compareVersions.laterVersion !== undefined) {
@@ -229,13 +223,13 @@ oppia.controller('ExplorationHistory', [
   };
 
   // Functions to show modal of history diff of a state
-  $scope.onClickStateInHistoryGraph = function(stateName) {
+  $scope.onClickStateInHistoryGraph = function(stateId, stateName, oldStateName) {
     if (stateName !== END_DEST) {
-      $scope.showStateDiffModal(stateName);
+      $scope.showStateDiffModal(stateName, oldStateName);
     }
   };
 
-  $scope.showStateDiffModal = function(stateName) {
+  $scope.showStateDiffModal = function(stateName, oldStateName) {
     $modal.open({
       templateUrl: 'modals/stateDiff',
       backdrop: 'static',
@@ -243,15 +237,51 @@ oppia.controller('ExplorationHistory', [
       resolve: {
         stateName: function() {
           return stateName;
+        },
+        oldStateName: function() {
+          return oldStateName;
+        },
+        compareSnapshot: function() {
+          return $scope.compareSnapshot;
+        },
+        explorationDownloadUrl: function() {
+          return $scope.explorationDownloadUrl;
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'stateName', function(
-           $scope, $modalInstance, stateName) {
-        $scope.yamlStrs = {
-          'leftPane': ' ',
-          'rightPane': ' '
-        };
+        '$scope', '$modalInstance', 'stateName', 'oldStateName',
+          'compareSnapshot', 'explorationDownloadUrl',
+          function(
+          $scope, $modalInstance, stateName, oldStateName, compareSnapshot,
+          explorationDownloadUrl) {
+        $scope.stateName = stateName;
+        $scope.oldStateName = oldStateName;
+        $scope.compareSnapshot = angular.copy(compareSnapshot);
+        if ($scope.compareSnapshot.earlierVersion.versionNumber >
+            $scope.compareSnapshot.laterVersion.versionNumber) {
+          var tmp = $scope.compareSnapshot.earlierVersion;
+          $scope.compareSnapshot.earlierVersion = $scope.compareSnapshot.laterVersion;
+          $scope.compareSnapshot.laterVersion = tmp;
+        }
+        $scope.yamlStrs = {};
+
+        if (oldStateName === undefined) {
+          oldStateName = stateName;
+        }
+        $http.get(explorationDownloadUrl + '?v=' +
+          $scope.compareSnapshot.laterVersion.versionNumber + '&output_format=json' +
+          '&state=' + stateName)
+        .then(function(response) {
+          $scope.yamlStrs['leftPane'] = response.data;
+        });
+
+        $http.get(explorationDownloadUrl + '?v=' +
+          $scope.compareSnapshot.earlierVersion.versionNumber + '&output_format=json' +
+          '&state=' + oldStateName)
+        .then(function(response) {
+          $scope.yamlStrs['rightPane'] = response.data;
+        });
+
         $scope.return = function() {
           $modalInstance.dismiss('cancel');
         };

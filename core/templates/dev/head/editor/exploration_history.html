@@ -3,14 +3,14 @@
     display: none;
   }
   .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
-    height: 60vh;
+    height: 55vh;
   }
   .state-diff-modal .modal-dialog {
-    max-width: 1000px;
+    max-width: 1200px;
     width: 90%;
   }
   .state-diff-modal .modal-body {
-    height: 65vh;
+    height: 60vh;
   }
 </style>
 <div ng-controller="ExplorationHistory">
@@ -55,6 +55,12 @@
             <div class="row">
               <div class="col-lg-8 col-md-8 col-sm-8">
                 <h4>Exploration Graph</h4>
+                <div ng-hide="diffGraphData" class="oppia-align-center">
+                  Loading
+                  <span class="oppia-loading-dot-one">.</span>
+                  <span class="oppia-loading-dot-two">.</span>
+                  <span class="oppia-loading-dot-three">.</span>
+                </div>
                 <div state-graph-viz graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
                 </div>
               </div>
@@ -71,13 +77,36 @@
 
   <script type="text/ng-template" id="modals/stateDiff">
     <div class="modal-header">
-      <h3>State Changes</h3>
+      <h3>Changes for <[stateName]><text ng-hide="!oldStateName"> (old name: <[oldStateName]>)</text></h3>
     </div>
-
-    <div class="modal-body">
+    <table class="table" style="margin-left: 20px; table-layout: fixed; width: 97%">
+      <!-- Table ratios 47:45 is to ensure text above right pane is aligned to codemirror gutter and does not overflow-->
+      <td style="width: 47%; word-wrap: break-word">
+        <div>
+          <strong>Revision #<[compareSnapshot.laterVersion.versionNumber]></strong>
+          by
+          <strong><[compareSnapshot.laterVersion.committerId]></strong>
+          on
+          <strong><[compareSnapshot.laterVersion.createdOn]></strong>
+        </div>
+        <[compareSnapshot.laterVersion.commitMessage]>
+      </td>
+      <td style="width: 6%"></td>
+      <td style="width: 47%; word-wrap: break-word">
+        <div>
+          <strong>Revision #<[compareSnapshot.earlierVersion.versionNumber]></strong>
+          by
+          <strong><[compareSnapshot.earlierVersion.committerId]></strong>
+          on
+          <strong><[compareSnapshot.earlierVersion.createdOn]></strong>
+        </div>
+        <[compareSnapshot.earlierVersion.commitMessage]>
+      </td>
+    </table>
+    <div class="modal-body" style="margin-top: -30px">
       <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrs.leftPane" right-value="yamlStrs.rightPane"></codemirror-mergeview>
       <div align="center" style="margin-bottom: 20px">
-        <strong>Click arrows to synchronize scrolling</strong>
+        <strong>Click arrows to desynchronize scrolling</strong>
       </div>
     </div>
 

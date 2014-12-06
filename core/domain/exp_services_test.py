@@ -566,127 +566,109 @@ states:
 
 
 class DictExportUnitTests(ExplorationServicesUnitTests):
-    """Test export methods for explorations represented as zip files."""
+    """Test export methods for explorations represented as a dict whose keys
+    are state names and whose values are YAML strings representing the state's
+    contents."""
 
-    SAMPLE_YAML_CONTENT = (
-"""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: The objective
+    SAMPLE_EXPORTED_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME:
+("""content:
+- type: text
+  value: Welcome to the Oppia editor!<br><br>Anything
+    you type here will be shown to the learner playing
+    your exploration.<br><br>If you need more help getting
+    started, check out the Help link in the navigation
+    bar.
 param_changes: []
-param_specs: {}
-schema_version: 3
-skill_tags: []
-states:
-  %s:
-    content:
-    - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  New state:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: New state
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME)
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: %s
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""") % (feconf.DEFAULT_INIT_STATE_NAME),
+        'New state': ("""content:
+- type: text
+  value: ''
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: New state
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""")
+    }
 
-    UPDATED_YAML_CONTENT = (
-"""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: The objective
+    UPDATED_SAMPLE_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME:
+("""content:
+- type: text
+  value: Welcome to the Oppia editor!<br><br>Anything
+    you type here will be shown to the learner playing
+    your exploration.<br><br>If you need more help getting
+    started, check out the Help link in the navigation
+    bar.
 param_changes: []
-param_specs: {}
-schema_version: 3
-skill_tags: []
-states:
-  %s:
-    content:
-    - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  Renamed state:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Renamed state
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME)
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: %s
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""") % (feconf.DEFAULT_INIT_STATE_NAME),
+        'Renamed state': ("""content:
+- type: text
+  value: ''
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: Renamed state
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""")
+    }
 
     def test_export_to_dict(self):
         """Test the export_to_dict() method."""
@@ -698,9 +680,7 @@ states:
 
         dict_output = exp_services.export_to_dict(self.EXP_ID)
 
-        self.assertTrue('yaml' in dict_output)
-        self.assertEqual(
-            dict_output['yaml'], self.SAMPLE_YAML_CONTENT)
+        self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
@@ -724,15 +704,11 @@ states:
 
         # Download version 2
         dict_output = exp_services.export_to_dict(self.EXP_ID, 2)
-        self.assertTrue('yaml' in dict_output)
-        self.assertEqual(
-            dict_output['yaml'], self.SAMPLE_YAML_CONTENT)
+        self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
         # Download version 3
         dict_output = exp_services.export_to_dict(self.EXP_ID, 3)
-        self.assertTrue('yaml' in dict_output)
-        self.assertEqual(
-            dict_output['yaml'], self.UPDATED_YAML_CONTENT)
+        self.assertEqual(dict_output, self.UPDATED_SAMPLE_DICT)
 
 
 def _get_change_list(state_name, property_name, new_value):

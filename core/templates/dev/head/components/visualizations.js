@@ -283,6 +283,8 @@ oppia.directive('stateGraphViz', [
       currentStateId: '&',
       centerAtCurrentState: '@',
       onClickFunction: '=',
+      // Function called when node is clicked. Takes 3 parameters: node.id,
+      // node.label, and node.secondaryLabel
       onDeleteFunction: '=',
       onMaximizeFunction: '=',
       isEditable: '=',

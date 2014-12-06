@@ -518,7 +518,8 @@ class ResolvedAnswersHandler(EditorHandler):
 
 
 class ExplorationDownloadHandler(EditorHandler):
-    """Downloads an exploration as a zip file or JSON."""
+    """Downloads an exploration as a zip file, JSON, or download a state as a
+    YAML string."""
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -529,6 +530,7 @@ class ExplorationDownloadHandler(EditorHandler):
 
         version = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
+        state = self.request.get('state', default_value=None)
 
         # If the title of the exploration has changed, we use the new title
         filename = 'oppia-%s-v%s' % (
@@ -541,8 +543,15 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-            self.render_json(
-                exp_services.export_to_dict(exploration_id, version))
+            if state is None:
+                self.render_json(
+                    exp_services.export_to_dict(exploration_id, version))
+            else:
+                exploration_dict = exp_services.export_to_dict(
+                    exploration_id, version)
+                if state not in exploration_dict:
+                    raise self.PageNotFoundException
+                self.response.write(exploration_dict[state])
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)

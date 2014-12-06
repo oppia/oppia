@@ -90,7 +90,7 @@ oppia.controller('ExplorationStatistics', [
     });
   };
 
-  $scope.onClickStateInStatsGraph = function(stateName) {
+  $scope.onClickStateInStatsGraph = function(stateId, stateName, secondaryLabel) {
     if (stateName !== END_DEST) {
       $scope.showStateStatsModal(stateName, $scope.highlightStates[stateName]);
     }
