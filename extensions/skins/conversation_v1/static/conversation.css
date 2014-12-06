@@ -41,9 +41,10 @@
 }
 
 .conversation-skin-response {
-  background: rgba(0,0,0,0.04);
-  border-radius: 6px;
+  background: rgb(255,255,255);
   margin-top: 30px;
+  padding: 40px;
+  text-align: justify;
 }
 .conversation-skin-response-finished {
   background: rgb(228,255,228);

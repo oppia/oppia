@@ -71,7 +71,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.mostRecentQuestionIndex = null;
 
       $scope.initializePage = function() {
-        $scope.responseLog = [];
+        $scope.allResponseStates = [];
         $scope.inputTemplate = '';
         oppiaPlayerService.init(function(stateName, initHtml) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -82,11 +82,9 @@ oppia.directive('conversationSkin', [function() {
           $scope.stateName = stateName;
           $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
             $scope.stateName);
-
-          $scope.responseLog = [{
-            previousReaderAnswer: '',
-            feedback: '',
-            question: initHtml,
+          $scope.allResponseStates = [{
+            content: initHtml,
+            answerFeedbackPairs: [],
           }];
           $scope.mostRecentQuestionIndex = 0;
 
@@ -106,7 +104,7 @@ oppia.directive('conversationSkin', [function() {
             newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
           warningsData.clear();
           $scope.hasInteractedAtLeastOnce = true;
-
+          var oldStateName = $scope.stateName;
           $scope.stateName = newStateName;
           $scope.finished = (newStateName === 'END');
 
@@ -116,25 +114,20 @@ oppia.directive('conversationSkin', [function() {
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }
 
-          // TODO(sll): Check the state change instead of question_html so that it
-          // works correctly when the new state doesn't have a question string.
-          var isQuestion = !!questionHtml;
-          if (isQuestion) {
-            $scope.mostRecentQuestionIndex = $scope.responseLog.length;
-          }
-
-          // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
-          // and 'question', so that the aria-live attribute will read it out.
-          // Note that we have to explicitly check for the 'Continue' widget
-          // (which has no corresopnding learner response text), otherwise a
-          // thin sliver of blue will appear.
-          $scope.responseLog.push({
-            previousReaderAnswer: (
+          $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs.push({
+            studentAnswer: (
               readerResponseHtml.indexOf('oppia-response-continue') === -1 ?
               readerResponseHtml + oppiaPlayerService.getRandomSuffix() : ''),
-            feedback: feedbackHtml + oppiaPlayerService.getRandomSuffix(),
-            question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : '')
+            oppiaFeedback: feedbackHtml + oppiaPlayerService.getRandomSuffix()
           });
+
+          // If there is a change in state, use a new card.
+          if (oldStateName !== newStateName) {
+            $scope.allResponseStates.push({
+              content: questionHtml,
+              answerFeedbackPairs: [],
+            });
+          }
 
           var lastEntryEls = document.getElementsByClassName(
             'conversation-skin-last-log-entry');
