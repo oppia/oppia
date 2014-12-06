@@ -31,10 +31,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.hasInteractedAtLeastOnce = false;
       $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
       $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
-
-      $scope.isAnswerBeingProcessed = function() {
-        return oppiaPlayerService.isAnswerBeingProcessed();
-      };
+      $scope.isAnswerBeingProcessed = oppiaPlayerService.isAnswerBeingProcessed;
 
       $window.addEventListener('beforeunload', function(e) {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
@@ -46,10 +43,6 @@ oppia.directive('conversationSkin', [function() {
           return confirmationMessage;
         }
       });
-
-      $scope.getStyle = function() {
-        return $scope.showPage ? {} : {opacity: 0};
-      };
 
       $scope.resetPage = function() {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
@@ -84,7 +77,7 @@ oppia.directive('conversationSkin', [function() {
             $scope.stateName);
           $scope.allResponseStates = [{
             content: initHtml,
-            answerFeedbackPairs: [],
+            answerFeedbackPairs: []
           }];
           $scope.mostRecentQuestionIndex = 0;
 
@@ -115,17 +108,15 @@ oppia.directive('conversationSkin', [function() {
           }
 
           $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs.push({
-            studentAnswer: (
-              readerResponseHtml.indexOf('oppia-response-continue') === -1 ?
-              readerResponseHtml + oppiaPlayerService.getRandomSuffix() : ''),
-            oppiaFeedback: feedbackHtml + oppiaPlayerService.getRandomSuffix()
+            learnerAnswer: readerResponseHtml,
+            oppiaFeedback: feedbackHtml
           });
 
           // If there is a change in state, use a new card.
           if (oldStateName !== newStateName) {
             $scope.allResponseStates.push({
               content: questionHtml,
-              answerFeedbackPairs: [],
+              answerFeedbackPairs: []
             });
           }
 
