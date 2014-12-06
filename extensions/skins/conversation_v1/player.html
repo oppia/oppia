@@ -39,7 +39,13 @@
               </div>
             </div>
 
-            <div class="conversation-skin-interaction" ng-show="!finished && $last">
+            <div ng-show="$last && !!nextCardContent">
+              <button type="button" class="btn btn-default pull-right" ng-click="continueToNextCard()">
+                Continue
+              </button>
+            </div>
+
+            <div class="conversation-skin-interaction" ng-show="!finished && $last && !nextCardContent">
               <!-- This iframe must always be contained within a div in
               which it is the only element. For more information, please
               see the ReaderExploration.js file. -->

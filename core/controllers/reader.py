@@ -112,7 +112,7 @@ def get_next_state_dict(
             old_params, new_state.param_changes, exp_param_specs))
 
     return {
-        'feedback_html': '<div>%s</div>' % jinja_utils.parse_string(
+        'feedback_html': jinja_utils.parse_string(
             rule_spec.get_feedback_string(), old_params),
         'finished': finished,
         'params': new_params,
