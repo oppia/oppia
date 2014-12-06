@@ -517,12 +517,47 @@ class Graph(BaseObject):
 
         return raw
 
+
+class NormalizedRectangle2D(BaseObject):
+    """Normalized Rectangle class."""
+    
+    description = 'A rectangle normalized so that the coordinates are within the range [0,1].'
+
+    SCHEMA = {
+        'type': 'list',
+        'length': 2,
+        'items': [{
+            'type': 'list',
+            'len': 2,
+            'items': Real.SCHEMA
+        }]
+    }
+    
+    @classmethod
+    def normalize(cls, raw):
+        def clamp(minval, curval, maxval):
+            return min(maxval, max(minval, curval))
+        try:
+            raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
+            
+            raw[0][0] = clamp(0.0, raw[0][0], 1.0)
+            raw[0][1] = clamp(0.0, raw[0][1], 1.0)
+            raw[1][0] = clamp(0.0, raw[1][0], 1.0)
+            raw[1][1] = clamp(0.0, raw[1][1], 1.0)
+
+        except Exception:
+            raise TypeError('Cannot convert to Normalized Rectangle %s' % raw)
+
+        return raw
+
+
 class ImageRegion(BaseObject):
     """Image Region class."""
 
     description = 'A region of an image.'
     
     # Note: at the moment, only supports rectangular image regions
+    # Coordinates are [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]]
     SCHEMA = {
         'type': 'dict',
         'properties': [{
@@ -530,20 +565,17 @@ class ImageRegion(BaseObject):
             'schema': UnicodeString.SCHEMA
         }, {
             'name': 'region',
-            'schema': {
-                'type': 'list',
-                'len': 2,
-                'items': CoordTwoDim.SCHEMA
-            }
+            'schema': NormalizedRectangle2D.SCHEMA
         }]
     }
 
-class SegmentedImage(BaseObject):
-    """Segmented Image class."""
 
-    description = 'An image segmented into regions.'
-    edit_html_filename = 'segmented_image_editor'
-    edit_js_filename = 'SegmentedImageEditor'
+class ImageWithRegions(BaseObject):
+    """Image With Regions class."""
+
+    description = 'An image overlaid with regions.'
+    edit_html_filename = 'image_with_regions_editor'
+    edit_js_filename = 'ImageWithRegionsEditor'
 
     SCHEMA = {
         'type': 'dict',

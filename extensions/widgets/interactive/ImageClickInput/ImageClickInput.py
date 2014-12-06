@@ -19,6 +19,7 @@ __author__ = 'Zhan Xiong Chin'
 from core.domain import widget_domain
 from extensions.value_generators.models import generators
 
+
 class ImageClickInput(widget_domain.BaseWidget):
     """Interactive widget for multiple choice selection on an image"""
 
@@ -38,7 +39,7 @@ class ImageClickInput(widget_domain.BaseWidget):
         'description': 'The image and its regions.',
         'schema': {
             'type': 'custom',
-            'obj_type': 'SegmentedImage',
+            'obj_type': 'ImageWithRegions',
         },
         'default_value': {
             'imagePath': '',

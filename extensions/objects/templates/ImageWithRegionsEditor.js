@@ -16,7 +16,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
-oppia.directive('segmentedImageEditor', [
+oppia.directive('imageWithRegionsEditor', [
   '$rootScope', '$sce', '$compile', 'warningsData', function($rootScope, $sce, $compile, warningsData) {
     return {
       link: function(scope, element, attrs) {
@@ -30,17 +30,27 @@ oppia.directive('segmentedImageEditor', [
       template: '<div ng-include="getTemplateUrl()"></div>',
       controller: function($scope, $element, $attrs) {
         $scope.alwaysEditable = true;
+
+        $scope.REGION_LABEL_OFFSET_X = 3;
+        $scope.REGION_LABEL_OFFSET_Y = 12;
+
+        // Current mouse position in SVG coordinates
+        $scope.mouseX = $scope.mouseY = 0;
+        // Original mouse click position for rectangle drawing
+        $scope.origX = $scope.origY = 0;
+        // Coordinates for currently drawn rectangle (when user is dragging)
+        $scope.rectX = $scope.rectY = 0;
+        $scope.rectWidth = $scope.rectHeight = 0;
+        // Is user currently dragging?
+        $scope.userIsCurrentlyDragging = false;
+
         $scope.getPreviewUrl = function(imageUrl) {
           return $sce.trustAsResourceUrl(
             '/imagehandler/' + $rootScope.explorationId + '/' +
             encodeURIComponent(imageUrl)
           );
         };
-        $scope.mouseX = $scope.mouseY = 0;
-        $scope.origX = $scope.origY = 0;
-        $scope.rectX = $scope.rectY = 0;
-        $scope.rectWidth = $scope.rectHeight = 0;
-        $scope.isDrag = false;
+
         $scope.$watch('$parent.value.imagePath', function(newVal) {
           if (newVal === '') {
             return;
@@ -53,33 +63,44 @@ oppia.directive('segmentedImageEditor', [
             }
           );
         });
-        $scope.onSvgMouseMove = function(event) {
-          var svgElement = $($element).find('.oppia-segmented-image-editor-svg');
-          $scope.mouseX = event.pageX - svgElement.offset().left;
-          $scope.mouseY = event.pageY - svgElement.offset().top;
+        function convertCoordsToFraction(coords, dimensions) {
+          return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
+        }
+
+        $scope.onSvgMouseMove = function(evt) {
+          var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
+          $scope.mouseX = evt.pageX - svgElement.offset().left;
+          $scope.mouseY = evt.pageY - svgElement.offset().top;
           $scope.rectX = Math.min($scope.origX, $scope.mouseX);
           $scope.rectY = Math.min($scope.origY, $scope.mouseY);
           $scope.rectWidth = Math.abs($scope.origX - $scope.mouseX);
           $scope.rectHeight = Math.abs($scope.origY - $scope.mouseY);
         };
-        $scope.onSvgMouseDown = function(event) {
-          event.preventDefault();
+        $scope.onSvgMouseDown = function(evt) {
+          evt.preventDefault();
           $scope.origX = $scope.mouseX;
           $scope.origY = $scope.mouseY;
           $scope.rectWidth = $scope.rectHeight = 0;
-          $scope.isDrag = true;
+          $scope.userIsCurrentlyDragging = true;
         }
-        $scope.onSvgMouseUp = function(event) {
-          $scope.isDrag = false;
+        $scope.onSvgMouseUp = function(evt) {
+          $scope.userIsCurrentlyDragging = false;
           $scope.$parent.value.imageRegions.push({
             label: $scope.$parent.value.imageRegions.length.toString(),
             region: [
-              [$scope.rectX, $scope.rectY],
-              [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight]
+              convertCoordsToFraction(
+                [$scope.rectX, $scope.rectY], 
+                [$scope.imageWidth, $scope.imageHeight]
+              ),
+              convertCoordsToFraction(
+                [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
+                [$scope.imageHeight, $scope.imageHeight]
+              )
             ]
           });
         };
-        $scope.resetImage = function() {
+
+        $scope.resetEditor = function() {
           $scope.$parent.value.imagePath = '';
           $scope.$parent.value.imageRegions = [];
         };

@@ -6,7 +6,7 @@
 </div>
 <div ng-if="$parent.value.imagePath !== ''">
   <div>
-    <svg class="oppia-segmented-image-editor-svg"
+    <svg class="oppia-image-with-regions-editor-svg"
       ng-attr-width="<[imageWidth]>" 
       ng-attr-height="<[imageHeight]>"
       ng-mousedown="onSvgMouseDown($event)"
@@ -18,7 +18,7 @@
         height="100%"
         width="100%">
       </image>
-      <rect ng-if="isDrag"
+      <rect ng-if="userIsCurrentlyDragging"
         ng-attr-x="<[rectX]>"
         ng-attr-y="<[rectY]>"
         ng-attr-width="<[rectWidth]>"
@@ -33,8 +33,8 @@
         style="fill: blue; opacity: 0.3;">
       </rect>
       <text ng-repeat="region in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[region.region[0][0]+3]>"
-        ng-attr-y="<[region.region[0][1]+12]>">
+        ng-attr-x="<[region.region[0][0] + REGION_LABEL_OFFSET_X]>"
+        ng-attr-y="<[region.region[0][1] + REGION_LABEL_OFFSET_Y]>">
         <[region.label]>
       </text>
     </svg>
@@ -45,5 +45,5 @@
     </li>
     </ul>
   </div>
-  <br><button type="button" class="btn btn-cancel" ng-click="resetImage()">Reset</button>
+  <br><button type="button" class="btn btn-default" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>

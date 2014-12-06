@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the GraphInput interactive widget.
+ * Directive for the ImageClickInput interactive widget.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -35,18 +35,18 @@ oppia.directive('oppiaInteractiveImageClickInput', [
         );
         $scope.onClickImage = function(event) {
           var image = $($element).find('.oppia-image-click-img');
-          var mouseX = event.pageX - image.offset().left;
-          var mouseY = event.pageY - image.offset().top;
-          var ret = imageAndRegions.imageRegions.length;
+          var mouseX = (event.pageX - image.offset().left) / image.width();
+          var mouseY = (event.pageY - image.offset().top) / image.height();
+          var answer = imageAndRegions.imageRegions.length;
           for (var i = 0; i < imageAndRegions.imageRegions.length; i++) {
             var region = imageAndRegions.imageRegions[i].region;
             if (region[0][0] <= mouseX && mouseX <= region[1][0] &&
                 region[0][1] <= mouseY && mouseY <= region[1][1]) {
-              ret = i;
+              answer = i;
               break;
             }
           }
-          $scope.$parent.$parent.submitAnswer(ret, 'submit');
+          $scope.$parent.$parent.submitAnswer(answer, 'submit');
         }
       }]
     };
