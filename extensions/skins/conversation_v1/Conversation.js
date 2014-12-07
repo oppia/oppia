@@ -127,7 +127,7 @@ oppia.directive('conversationSkin', [function() {
 
           // If there is a change in state, use a new card.
           if (oldStateName !== newStateName) {
-            if (!!feedbackHtml) {
+            if (feedbackHtml) {
               $scope.nextCardContent = questionHtml;
             } else {
               _addNewCard(questionHtml);
