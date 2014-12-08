@@ -18,6 +18,8 @@
 
 __author__ = 'Frederik Creemers'
 
+import re
+
 from core import jobs
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
@@ -67,3 +69,57 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
         #   exp_jobs -> exp_services.
         from core.domain import exp_services
         exp_services.index_explorations_given_ids([item.id])
+
+
+class ParameterDiscoveryJobManager(jobs.BaseMapReduceJobManager):
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_services
+
+        def _get_expression_pairs(label, string):
+            """Returns a list of expressions (each bounded by {{...}})."""
+            PARAM_REGEX = re.compile('{{[^}]*}}')
+            expressions = PARAM_REGEX.findall(unicode(string))
+            return [
+                '%s (%s)' % (expression, label) for expression in expressions]
+
+        output = []
+        exp = exp_services.get_exploration_from_model(item)
+        for pc in exp.param_changes:
+            for _, val in pc.customization_args.iteritems():
+                output += _get_expression_pairs(
+                    'Exploration param change: ', unicode(val))
+
+        for state_name, state in exp.states.iteritems():
+            content = state.content
+            for content_item in content:
+                output += _get_expression_pairs(
+                    'Content, %s' % state_name, content_item.value)
+            for pc in state.param_changes:
+                for _, val in pc.customization_args.iteritems():
+                    output += _get_expression_pairs(
+                        'Param change, %s' % state_name, unicode(val))
+
+            for _, val in state.widget.customization_args.iteritems():
+                output += _get_expression_pairs(
+                    'Widget_cust_args, %s' % state_name, unicode(val))
+
+            for handler in state.widget.handlers:
+                for rule_spec in handler.rule_specs:
+                    for feedback_item in rule_spec.feedback:
+                        output += _get_expression_pairs(
+                            'Rule feedback, %s' % state_name,
+                            unicode(feedback_item))
+
+        if output:
+            output_strs = [s.encode('utf-8') for s in output]
+            yield (item.id, '<br>'.join(output_strs))
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)

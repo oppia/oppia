@@ -223,7 +223,7 @@ states:
           feedback:
           - '"OK, but what if the magician says that his number is greater than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between {{[answer|int]|sum(start=1)}} and 7. That''s {{[7|int]|sum(start=-answer)}}
+            between {{answer+1}} and 7. That''s {{7-answer}}
             possible options! I don''t think we could do that in 2 tries."'
           param_changes: []
         - definition:
@@ -236,7 +236,7 @@ states:
           feedback:
           - '"OK, but what if the magician says that his number is smaller than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between 1 and {{[answer|int]|sum(start=-1)}}. That''s {{[answer|int]|sum(start=-1)}}
+            between 1 and {{answer-1}}. That''s {{answer-1}}
             possible options! I don''t think we could do that in 2 tries. We can do
             between 1 and 3 in 2 tries though..."'
           param_changes: []
@@ -635,15 +635,15 @@ states:
           dest: Add one more
           feedback:
           - '"So if the magician said it was smaller than that, we would be back to
-            the ''between 1 and {{[answer|int]|sum(start=-1)}}'' case!"
+            the ''between 1 and {{answer-1}}'' case!"
 
 
             "And of course if it was equal to {{answer}}, we would be done!"
 
 
             "But what if he said it was bigger than {{answer}}? Then we would still
-            have to guess a number between {{[answer|int]|sum(start=1)}} and 6...
-            But wait, that''s the same thing as between 1 and {{[6]|sum(start=-answer|int)}},
+            have to guess a number between {{answer+1}} and 6...
+            But wait, that''s the same thing as between 1 and {{6-answer}},
             just shifted over a bit!"'
           param_changes: []
         - definition:
@@ -656,7 +656,7 @@ states:
           feedback:
           - '"But what if the magician says that his number is greater than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between {{[answer|int]|sum(start=1)}} and 6. That''s {{[6|int]|sum(start=-answer)}}
+            between {{answer+1}} and 6. That''s {{6-answer}}
             possible options! I don''t think we could do that in 2 tries."<div>"No,
             we have to guess something else for numbers between 1 and 6..."</div>'
           param_changes: []
@@ -670,7 +670,7 @@ states:
           feedback:
           - '"But what if the magician says that his number is smaller than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between 1 and {{[answer|int]|sum(start=-1)}}. That''s {{[answer|int]|sum(start=-1)}}
+            between 1 and {{answer-1}}. That''s {{answer-1}}
             possible options! I don''t think we could do that in 2 tries. We can do
             between 1 and 3 in 2 tries though."<div><div>"What number could we guess
             between 1 and 6 that might bring us back to the ''between 1 and 3'' case?"</div></div><div><br></div>'
@@ -1006,18 +1006,18 @@ states:
             rule_type: default
           dest: Middle try it out
           feedback:
-          - "If it's less than {{(answer|int)+1}}, then the number is between 1 and\
+          - "If it's less than {{answer+1}}, then the number is between 1 and\
             \ {{answer}}. That is a range of <b>{{answer}} numbers</b>.\_<div>{{\"\
             Oh wait, it doesn't make sense for the number to be less than 1! We're\
             \ guessing a number between 1 and 10!\" if 0==(answer|int) else \"\"}}\_\
-            \n</div><div>If it IS {{(answer|int)+1}}, then we're done! that's definitely\
-            \ not the worst case though.\n\nif it's bigger than {{(answer|int)+1}},\
-            \ then it's between {{(answer|int)+2}} and 10. That's a range of <b>{{9-(answer|int)}}\
+            \n</div><div>If it IS {{answer+1}}, then we're done! that's definitely\
+            \ not the worst case though.\n\nif it's bigger than {{answer+1}},\
+            \ then it's between {{answer+2}} and 10. That's a range of <b>{{9-answer}}\
             \ numbers</b>.\_<div>{{\"Oh wait, it doesn't make sense for the number\
             \ to be bigger than 10! We're guessing a number between 1 and 10!\" if\
             \ 9==(answer|int) else \"\"}}<br><div>So, the worst case is if the real\
-            \ number is {{\"less than\" if ((answer|int)-5)==(((answer|int)-5) | abs)\
-            \ else \"greater than\"}} {{(answer|int)+1}}!<br></div></div></div>"
+            \ number is {{\"less than\" if (answer-5)==(((answer|int)-5) | abs)\
+            \ else \"greater than\"}} {{answer+1}}!<br></div></div></div>"
           param_changes: []
       sticky: false
       widget_id: MultipleChoiceInput
@@ -1408,7 +1408,7 @@ states:
           dest: Reduce2 - what was the guess
           feedback:
           - '"Hmm, but if the number was less than {{answer}}, wouldn''t it be between
-            1 and {{[answer|int]|sum(start=-1)}}?"'
+            1 and {{answer-1}}?"'
           param_changes: []
       sticky: false
       widget_id: NumericInput
@@ -1680,7 +1680,7 @@ states:
             subject: answer
           dest: What if it was bigger than 4
           feedback:
-          - But there are {{[answer|int]|sum(start=-4)}} numbers between 5 and {{answer}}!
+          - But there are {{answer-4}} numbers between 5 and {{answer}}!
             I don't think we can always find the right number in 2 tries if the range
             is that big.
           param_changes: []
@@ -1756,7 +1756,7 @@ states:
       name: middle
     - customization_args:
         parse_with_jinja: true
-        value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+        value: '{{pow(2, floor(log(rangeSize, 2))) - 1}}'
       generator_id: Copier
       name: largestValidRange
     - customization_args:
@@ -1841,7 +1841,7 @@ states:
 
             Suppose I say that the number is smaller than that. Then we know that
             the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer|int-lowest|int-2}} numbers!
+            But that still leaves a range of {{answer-lowest-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"</div>'
           param_changes: []
@@ -1857,7 +1857,7 @@ states:
 
             Suppose I say that the number is bigger than that. Then we know that the
             number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest|int-answer|int-2}} numbers!
+            But that still leaves a range of {{highest-answer-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -2263,7 +2263,7 @@ states:
       name: middle
     - customization_args:
         parse_with_jinja: true
-        value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+        value: '{{pow(2, floor(log(rangeSize, 2))) - 1}}'
       generator_id: Copier
       name: largestValidRange
     - customization_args:
@@ -2348,7 +2348,7 @@ states:
 
             Suppose I say that the number is smaller than that. Then we know that
             the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer|int-lowest|int-2}} numbers!
+            But that still leaves a range of {{answer-lowest-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -2364,7 +2364,7 @@ states:
 
             Suppose I say that the number is bigger than that. Then we know that the
             number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest|int-answer|int-2}} numbers!
+            But that still leaves a range of {{highest-answer-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -2419,7 +2419,7 @@ states:
       name: middle
     - customization_args:
         parse_with_jinja: true
-        value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+        value: '{{pow(2, floor(log(rangeSize, 2))) - 1}}'
       generator_id: Copier
       name: largestValidRange
     - customization_args:
@@ -2504,7 +2504,7 @@ states:
 
             Suppose I say that the number is smaller than that. Then we know that
             the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer|int-lowest|int-2}} numbers!
+            But that still leaves a range of {{answer-lowest-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -2520,7 +2520,7 @@ states:
 
             Suppose I say that the number is bigger than that. Then we know that the
             number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest|int-answer|int-2}} numbers!
+            But that still leaves a range of {{highest-answer-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []

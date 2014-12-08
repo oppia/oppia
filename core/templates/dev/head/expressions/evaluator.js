@@ -330,6 +330,21 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
       verifyNumArgs(args, 1);
       var numericArgs = _coerceAllArgsToNumber(args);
       return Math.floor(numericArgs[0]);
+    },
+    'pow': function(args, envs) {
+      verifyNumArgs(args, 2);
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return Math.pow(args[0], args[1]);
+    },
+    'log': function(args, envs) {
+      verifyNumArgs(args, 2);
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return Math.log(numericArgs[0]) / Math.log(numericArgs[1]);
+    },
+    'abs': function(args, envs) {
+      verifyNumArgs(args, 1);
+      var numericArgs = _coerceAllArgsToNumber(args);
+      return Math.abs(numericArgs[0]);
     }
   };
 
