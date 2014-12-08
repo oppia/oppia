@@ -27,8 +27,8 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Version History</h4>
         <div ng-repeat="snapshot in displayedExplorationSnapshots">
-          <input type="radio" name="compareVer1" ng-model="compareVersions.earlierVersion" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'earlierVersion')">
-          <input type="radio" name="compareVer2" ng-model="compareVersions.laterVersion" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'laterVersion')">
+          <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'selectedVersion1')">
+          <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'selectedVersion2')">
           [<[snapshot.versionNumber]>]
           <strong><[snapshot.committerId]></strong>
           <[snapshot.commitMessage]>
@@ -77,10 +77,10 @@
 
   <script type="text/ng-template" id="modals/stateDiff">
     <div class="modal-header">
-      <h3>Changes for <[stateName]><text ng-hide="!oldStateName"> (old name: <[oldStateName]>)</text></h3>
+      <h3>Changes for <[stateName]><span ng-show="oldStateName"> (old name: <[oldStateName]>)</span></h3>
     </div>
     <table class="table" style="margin-left: 20px; table-layout: fixed; width: 97%">
-      <!-- Table ratios 47:45 is to ensure text above right pane is aligned to codemirror gutter and does not overflow-->
+      <!-- Spacing on the left of table and in the middle of the tabel is to ensure text above each pane is aligned to codemirror gutter. -->
       <td style="width: 47%; word-wrap: break-word">
         <div>
           <strong>Revision #<[compareSnapshot.laterVersion.versionNumber]></strong>

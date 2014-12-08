@@ -47,9 +47,9 @@ oppia.controller('ExplorationHistory', [
     explorationData.getData().then(function(data) {
       var currentVersion = data.version;
       /**
-       * $scope.compareVersions is an object with keys 'earlierVersion' and
-       * 'laterVersion', whose values are the two version numbers of the
-       * compared versions.
+       * $scope.compareVersions is an object with keys 'selectedVersion1' and
+       * 'selectedVersion2', whose values are the version numbers of the
+       * compared versions selected on the left and right radio buttons.
        * $scope.compareSnapshot is an object with keys 'earlierVersion' and
        * 'laterVersion' whose values are the snapshots of the compared versions.
        * $scope.yamlStrs is an object with keys 'earlierVersion' and 'laterVersion',
@@ -88,18 +88,22 @@ oppia.controller('ExplorationHistory', [
   $scope.diffGraphData = null;
   $scope.changeCompareVersion = function(versionNumber, changedVersion) {
     $scope.diffGraphData = null;
-    $scope.compareSnapshot[changedVersion] =
-      $scope.displayedExplorationSnapshots[
-        $scope.currentVersion - $scope.compareVersions[changedVersion]];
 
-    if ($scope.compareVersions.earlierVersion !== undefined &&
-        $scope.compareVersions.laterVersion !== undefined) {
-      var comparedVersion1 = Math.min($scope.compareVersions.earlierVersion,
-        $scope.compareVersions.laterVersion);
-      var comparedVersion2 = Math.max($scope.compareVersions.earlierVersion,
-        $scope.compareVersions.laterVersion);
-      compareVersionsService.getDiffGraphData(comparedVersion1,
-          comparedVersion2).then(function(response) {
+    if ($scope.compareVersions.selectedVersion1 !== undefined &&
+        $scope.compareVersions.selectedVersion2 !== undefined) {
+      var earlierComparedVersion = Math.min($scope.compareVersions.selectedVersion1,
+        $scope.compareVersions.selectedVersion2);
+      var laterComparedVersion = Math.max($scope.compareVersions.selectedVersion1,
+        $scope.compareVersions.selectedVersion2);
+      $scope.compareSnapshot.earlierVersion =
+        $scope.displayedExplorationSnapshots[
+          $scope.currentVersion - earlierComparedVersion];
+      $scope.compareSnapshot.laterVersion =
+        $scope.displayedExplorationSnapshots[
+          $scope.currentVersion - laterComparedVersion];
+
+      compareVersionsService.getDiffGraphData(earlierComparedVersion,
+          laterComparedVersion).then(function(response) {
         $log.info('Retrieved version comparison data');
         $log.info(response);
 
@@ -205,8 +209,8 @@ oppia.controller('ExplorationHistory', [
   $scope.areCompareVersionsSelected = function() {
     return (
       $scope.compareVersions &&
-      $scope.compareVersions.hasOwnProperty('earlierVersion') &&
-      $scope.compareVersions.hasOwnProperty('laterVersion'));
+      $scope.compareVersions.hasOwnProperty('selectedVersion1') &&
+      $scope.compareVersions.hasOwnProperty('selectedVersion2'));
   };
 
   // Downloads the zip file for an exploration.
@@ -223,12 +227,21 @@ oppia.controller('ExplorationHistory', [
   };
 
   // Functions to show modal of history diff of a state
+  // stateId is the unique ID assigned to a state during calculation of state
+  // graph, stateName is the name of the state in the newer version,
+  // oldStateName is the name of the state in the older version, or undefined
+  // if the state name in the 2 versions are the same.
   $scope.onClickStateInHistoryGraph = function(stateId, stateName, oldStateName) {
     if (stateName !== END_DEST) {
       $scope.showStateDiffModal(stateName, oldStateName);
     }
   };
 
+  // Shows a modal comparing changes on a state between 2 versions.
+  // stateName is the name of the state in the newer version.
+  // oldStateName is undefined if the name of the state is unchanged between
+  // the 2 versions, or the name of the state in the older version if the state
+  // name is changed.
   $scope.showStateDiffModal = function(stateName, oldStateName) {
     $modal.open({
       templateUrl: 'modals/stateDiff',
@@ -257,12 +270,6 @@ oppia.controller('ExplorationHistory', [
         $scope.stateName = stateName;
         $scope.oldStateName = oldStateName;
         $scope.compareSnapshot = angular.copy(compareSnapshot);
-        if ($scope.compareSnapshot.earlierVersion.versionNumber >
-            $scope.compareSnapshot.laterVersion.versionNumber) {
-          var tmp = $scope.compareSnapshot.earlierVersion;
-          $scope.compareSnapshot.earlierVersion = $scope.compareSnapshot.laterVersion;
-          $scope.compareSnapshot.laterVersion = tmp;
-        }
         $scope.yamlStrs = {};
 
         if (oldStateName === undefined) {

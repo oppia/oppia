@@ -46,7 +46,10 @@ oppia.controller('ExplorationGraph', [
     explorationStatesService.deleteState(deleteStateName);
   };
 
-  $scope.onClickStateInMinimap = function(stateId, stateName, secondaryLabel) {
+  $scope.onClickStateInMinimap = function(unusedStateId, stateName,
+      unusedSecondaryLabel) {
+    // In the exploration graph, stateId should equal stateName.
+    // unusedSecondaryLabel should be undefined.
     if (stateName !== END_DEST) {
       routerService.navigateToMainTab(stateName);
     }
@@ -101,7 +104,10 @@ oppia.controller('ExplorationGraph', [
             });
           };
 
-          $scope.selectState = function(stateId, stateName, secondaryLabel) {
+          $scope.selectState = function(unusedStateId, stateName,
+              unusedSecondaryLabel) {
+            // In the exploration graph, stateId should equal stateName.
+            // unusedSecondaryLabel should be undefined.
             if (stateName !== END_DEST) {
               $modalInstance.close({
                 action: 'navigate',
