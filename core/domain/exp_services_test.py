@@ -565,14 +565,12 @@ states:
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
 
 
-class DictExportUnitTests(ExplorationServicesUnitTests):
+class YAMLExportUnitTests(ExplorationServicesUnitTests):
     """Test export methods for explorations represented as a dict whose keys
     are state names and whose values are YAML strings representing the state's
     contents."""
 
-    SAMPLE_EXPORTED_DICT = {
-        feconf.DEFAULT_INIT_STATE_NAME:
-("""content:
+    _SAMPLE_INIT_STATE_CONTENT = ("""content:
 - type: text
   value: Welcome to the Oppia editor!<br><br>Anything
     you type here will be shown to the learner playing
@@ -596,7 +594,10 @@ widget:
       param_changes: []
   sticky: false
   widget_id: TextInput
-""") % (feconf.DEFAULT_INIT_STATE_NAME),
+""") % (feconf.DEFAULT_INIT_STATE_NAME)
+
+    SAMPLE_EXPORTED_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'New state': ("""content:
 - type: text
   value: ''
@@ -621,32 +622,7 @@ widget:
     }
 
     UPDATED_SAMPLE_DICT = {
-        feconf.DEFAULT_INIT_STATE_NAME:
-("""content:
-- type: text
-  value: Welcome to the Oppia editor!<br><br>Anything
-    you type here will be shown to the learner playing
-    your exploration.<br><br>If you need more help getting
-    started, check out the Help link in the navigation
-    bar.
-param_changes: []
-widget:
-  customization_args:
-    placeholder:
-      value: Type your answer here.
-    rows:
-      value: 1
-  handlers:
-  - name: submit
-    rule_specs:
-    - definition:
-        rule_type: default
-      dest: %s
-      feedback: []
-      param_changes: []
-  sticky: false
-  widget_id: TextInput
-""") % (feconf.DEFAULT_INIT_STATE_NAME),
+        feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
         'Renamed state': ("""content:
 - type: text
   value: ''
@@ -678,7 +654,7 @@ widget:
         exploration.objective = 'The objective'
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
-        dict_output = exp_services.export_to_dict(self.EXP_ID)
+        dict_output = exp_services.export_states_to_yaml(self.EXP_ID, width=50)
 
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
@@ -703,11 +679,11 @@ widget:
         self.assertEqual(exploration.version, 3)
 
         # Download version 2
-        dict_output = exp_services.export_to_dict(self.EXP_ID, 2)
+        dict_output = exp_services.export_states_to_yaml(self.EXP_ID, 2, 50)
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
         # Download version 3
-        dict_output = exp_services.export_to_dict(self.EXP_ID, 3)
+        dict_output = exp_services.export_states_to_yaml(self.EXP_ID, 3, 50)
         self.assertEqual(dict_output, self.UPDATED_SAMPLE_DICT)
 
 

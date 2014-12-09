@@ -285,12 +285,11 @@ class StatsIntegrationTest(BaseEditorControllerTest):
         self.logout()
 
 
-class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
-    """Test handler for exploration download."""
+class DownloadIntegrationTest(BaseEditorControllerTest):
+    """Test handler for exploration and state download."""
 
-    SAMPLE_JSON_CONTENT = (
-""")]}'
-{"State A": "content:
+    SAMPLE_JSON_CONTENT = {
+        "State A": ("""content:
 - type: text
   value: ''
 param_changes: []
@@ -310,7 +309,8 @@ widget:
       param_changes: []
   sticky: false
   widget_id: TextInput
-", "State B": "content:
+"""),
+        "State B": ("""content:
 - type: text
   value: ''
 param_changes: []
@@ -330,7 +330,8 @@ widget:
       param_changes: []
   sticky: false
   widget_id: TextInput
-", "%s": "content:
+"""),
+        feconf.DEFAULT_INIT_STATE_NAME: ("""content:
 - type: text
   value: Welcome to the Oppia editor!<br><br>Anything
     you type here will be shown to the learner playing
@@ -354,10 +355,8 @@ widget:
       param_changes: []
   sticky: false
   widget_id: TextInput
-"}""" % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME
-)).replace('<', '\\u003c').replace('>', '\\u003e')
+""") % feconf.DEFAULT_INIT_STATE_NAME
+    }
 
     SAMPLE_STATE_STRING = (
 """content:
@@ -438,20 +437,42 @@ widget:
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         # Download to JSON string using download handler
+        self.maxDiff = None
         EXPLORATION_DOWNLOAD_URL = (
-            '/createhandler/download/%s?output_format=%s' %
+            '/createhandler/download/%s?output_format=%s&width=50' %
             (EXP_ID, feconf.OUTPUT_FORMAT_JSON))
-        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+        response = self.get_json(EXPLORATION_DOWNLOAD_URL)
 
-        # Check downloaded JSON string
-        self.assertEqual(self.SAMPLE_JSON_CONTENT,
-                         response.body.decode('string_escape'))
+        # Check downloaded dict
+        self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
+
+        self.logout()
+
+    def test_state_download_handler_for_default_exploration(self):
+
+        # Register and log in as an editor.
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Create a simple exploration
+        EXP_ID = 'eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'The title for states download handler test!',
+            'This is just a test category')
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        exploration.rename_state('State 2', 'State B')
+        exploration.delete_state('State 3')
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        response = self.testapp.get('/create/%s' % EXP_ID)
 
         # Check download state as YAML string
+        self.maxDiff = None
         state_name = 'State%20A'
         EXPLORATION_DOWNLOAD_URL = (
-            '/createhandler/download/%s?output_format=%s&state=%s' %
-            (EXP_ID, feconf.OUTPUT_FORMAT_JSON, state_name))
+            '/createhandler/download_state/%s?state=%s&width=50' %
+            (EXP_ID, state_name))
         response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
         self.assertEqual(self.SAMPLE_STATE_STRING, response.body)
 

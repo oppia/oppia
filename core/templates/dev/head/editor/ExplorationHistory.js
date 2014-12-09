@@ -257,16 +257,17 @@ oppia.controller('ExplorationHistory', [
         compareSnapshot: function() {
           return $scope.compareSnapshot;
         },
-        explorationDownloadUrl: function() {
-          return $scope.explorationDownloadUrl;
+        explorationId: function() {
+          return $scope.explorationId;
         }
       },
       controller: [
         '$scope', '$modalInstance', 'stateName', 'oldStateName',
-          'compareSnapshot', 'explorationDownloadUrl',
+          'compareSnapshot', 'explorationId',
           function(
           $scope, $modalInstance, stateName, oldStateName, compareSnapshot,
-          explorationDownloadUrl) {
+          explorationId) {
+        var stateDownloadUrl = '/createhandler/download_state/' + explorationId;
         $scope.stateName = stateName;
         $scope.oldStateName = oldStateName;
         $scope.compareSnapshot = angular.copy(compareSnapshot);
@@ -275,16 +276,14 @@ oppia.controller('ExplorationHistory', [
         if (oldStateName === undefined) {
           oldStateName = stateName;
         }
-        $http.get(explorationDownloadUrl + '?v=' +
-          $scope.compareSnapshot.laterVersion.versionNumber + '&output_format=json' +
-          '&state=' + stateName)
+        $http.get(stateDownloadUrl + '?v=' +
+          $scope.compareSnapshot.laterVersion.versionNumber + '&state=' + stateName)
         .then(function(response) {
           $scope.yamlStrs['leftPane'] = response.data;
         });
 
-        $http.get(explorationDownloadUrl + '?v=' +
-          $scope.compareSnapshot.earlierVersion.versionNumber + '&output_format=json' +
-          '&state=' + oldStateName)
+        $http.get(stateDownloadUrl + '?v=' +
+          $scope.compareSnapshot.earlierVersion.versionNumber + '&state=' + oldStateName)
         .then(function(response) {
           $scope.yamlStrs['rightPane'] = response.data;
         });
