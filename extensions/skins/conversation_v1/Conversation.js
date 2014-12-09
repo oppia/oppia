@@ -31,10 +31,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.hasInteractedAtLeastOnce = false;
       $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
       $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
-
-      $scope.isAnswerBeingProcessed = function() {
-        return oppiaPlayerService.isAnswerBeingProcessed();
-      };
+      $scope.isAnswerBeingProcessed = oppiaPlayerService.isAnswerBeingProcessed;
 
       $window.addEventListener('beforeunload', function(e) {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
@@ -46,10 +43,6 @@ oppia.directive('conversationSkin', [function() {
           return confirmationMessage;
         }
       });
-
-      $scope.getStyle = function() {
-        return $scope.showPage ? {} : {opacity: 0};
-      };
 
       $scope.resetPage = function() {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
@@ -67,6 +60,13 @@ oppia.directive('conversationSkin', [function() {
         $scope.initializePage();
       };
 
+      var _addNewCard = function(contentHtml) {
+        $scope.allResponseStates.push({
+          content: contentHtml,
+          answerFeedbackPairs: []
+        });
+      };
+
       $scope.isLoggedIn = false;
       $scope.mostRecentQuestionIndex = null;
 
@@ -82,10 +82,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.stateName = stateName;
           $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
             $scope.stateName);
-          $scope.allResponseStates = [{
-            content: initHtml,
-            answerFeedbackPairs: [],
-          }];
+          _addNewCard(initHtml);
           $scope.mostRecentQuestionIndex = 0;
 
           messengerService.sendMessage(
@@ -98,6 +95,15 @@ oppia.directive('conversationSkin', [function() {
       };
 
       $scope.initializePage();
+
+      // Temporary storage for the next card's content. This is null iff a 'next card'
+      // exists (in which case we show a 'Continue' button to go to it).
+      $scope.nextCardContent = null;
+
+      $scope.continueToNextCard = function() {
+        _addNewCard($scope.nextCardContent);
+        $scope.nextCardContent = null;
+      };
 
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
@@ -115,29 +121,28 @@ oppia.directive('conversationSkin', [function() {
           }
 
           $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs.push({
-            studentAnswer: (
-              readerResponseHtml.indexOf('oppia-response-continue') === -1 ?
-              readerResponseHtml + oppiaPlayerService.getRandomSuffix() : ''),
-            oppiaFeedback: feedbackHtml + oppiaPlayerService.getRandomSuffix()
+            learnerAnswer: readerResponseHtml,
+            oppiaFeedback: feedbackHtml
           });
 
           // If there is a change in state, use a new card.
           if (oldStateName !== newStateName) {
-            $scope.allResponseStates.push({
-              content: questionHtml,
-              answerFeedbackPairs: [],
-            });
-          }
+            if (feedbackHtml) {
+              $scope.nextCardContent = questionHtml;
+            } else {
+              _addNewCard(questionHtml);
 
-          var lastEntryEls = document.getElementsByClassName(
-            'conversation-skin-last-log-entry');
-          $scope.adjustPageHeight(true, function() {
-            if (lastEntryEls.length > 0) {
-              // TODO(sll): Try and drop this in favor of an Angular-based solution.
-              $('html, body, iframe').animate(
-                {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
+              var lastEntryEls = document.getElementsByClassName(
+                'conversation-skin-last-log-entry');
+              $scope.adjustPageHeight(true, function() {
+                if (lastEntryEls.length > 0) {
+                  // TODO(sll): Try and drop this in favor of an Angular-based solution.
+                  $('html, body, iframe').animate(
+                    {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
+                }
+              });
             }
-          });
+          }
 
           if ($scope.finished) {
             messengerService.sendMessage(

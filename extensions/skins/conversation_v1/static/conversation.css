@@ -14,7 +14,40 @@
   limitations under the License.
 */
 
+/*
+  Note that this affects both the learner mode and the 'editor preview'
+  mode.
+*/
+html, body {
+  background-color: #eeedee;
+}
+
 /* Additional CSS for the conversation_v1 skin. */
+.conversation-skin-input {
+  padding-left: 7%;
+}
+
+.conversation-answer-feedback-pair {
+  padding-top: 20px;
+}
+
+.conversation-response-container {
+  width: 100%;
+}
+
+.conversation-skin-avatar {
+  width: 7%;
+}
+
+.conversation-skin-avatar-img {
+  width: 30px;
+  height: 30px;
+}
+
+.conversation-skin-content {
+  width: 93%;
+}
+
 .conversation-skin-exploration-header {
   padding-left: 7px;
 }
@@ -23,34 +56,36 @@
   -webkit-overflow-scrolling: touch;
 }
 
-.conversation-skin-oppia-feedback {
-  margin-top: 30px;
-}
-
 .conversation-skin-old-content {
-  opacity: 0.7;
+  opacity: 0.8;
 }
 
-.conversation-skin-learner-answer {
-  background-color: rgba(200, 231, 247, 0.65);
-  border-radius: 6px;
-  font-style: italic;
-  margin: 35px 0;
-  opacity: 0.7;
-  padding: 5px 20px;
-}
-
-.conversation-skin-response {
+.conversation-skin-card {
   background: rgb(255,255,255);
   margin-top: 30px;
   padding: 40px;
   text-align: justify;
 }
-.conversation-skin-response-finished {
-  background: rgb(228,255,228);
-  border-radius: 6px;
-  margin-top: 30px;
-  padding: 10px 10px;
+
+.conversation-skin-content {
+}
+
+.conversation-skin-learner-answer {
+  color: #579287;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.conversation-skin-oppia-feedback {
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.conversation-skin-interaction {
+  margin-top: 20px;
+}
+
+.conversation-skin-endtext {
 }
 
 .affix {
