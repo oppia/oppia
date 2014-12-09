@@ -50,7 +50,7 @@ describe('Expression evaluator service', function() {
       [false, '100 < num100_001 && 1 > num100_001'],
       [false, 'boolTrue == boolFalse'],
       [true, 'strNull != strXYZ'],
-      [0, 'boolFalse ? boolTrue : numZero'],
+      [0, 'if boolFalse then boolTrue else numZero'],
       [Infinity, 'num100_001 / 0'],
       [3, 'abs(-3)'],
       [1, 'pow(num100_001, numZero)'],

@@ -371,9 +371,9 @@ LogicalOROperator
   = "||" !"=" { return "||"; }
 
 Expression
-  = condition:LogicalORExpression __
-    "?" __ trueExpression:Expression __
-    ":" __ falseExpression:Expression {
-      return ['?', condition, trueExpression, falseExpression];
+  = "if" __ condition:LogicalORExpression __
+    "then" __ trueExpression:Expression __
+    "else" __ falseExpression:Expression {
+      return ['if', condition, trueExpression, falseExpression];
     }
   / LogicalORExpression

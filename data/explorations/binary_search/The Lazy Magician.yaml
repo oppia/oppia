@@ -500,7 +500,7 @@ states:
   Discussion Start:
     content:
     - type: text
-      value: <div>{{"'So, how do you think he does it?' asks your friend." if 1==(redux|int)
+      value: <div>{{if redux == 1 then "'So, how do you think he does it?' asks your friend."
         else "Ah, so where were we again?"}}</div>
     param_changes:
     - customization_args:
@@ -1006,17 +1006,16 @@ states:
             rule_type: default
           dest: Middle try it out
           feedback:
-          - "If it's less than {{answer+1}}, then the number is between 1 and\
-            \ {{answer}}. That is a range of <b>{{answer}} numbers</b>.\_<div>{{\"\
-            Oh wait, it doesn't make sense for the number to be less than 1! We're\
-            \ guessing a number between 1 and 10!\" if 0==(answer|int) else \"\"}}\_\
-            \n</div><div>If it IS {{answer+1}}, then we're done! that's definitely\
-            \ not the worst case though.\n\nif it's bigger than {{answer+1}},\
-            \ then it's between {{answer+2}} and 10. That's a range of <b>{{9-answer}}\
-            \ numbers</b>.\_<div>{{\"Oh wait, it doesn't make sense for the number\
-            \ to be bigger than 10! We're guessing a number between 1 and 10!\" if\
-            \ 9==(answer|int) else \"\"}}<br><div>So, the worst case is if the real\
-            \ number is {{\"less than\" if (answer-5)==(((answer|int)-5) | abs)\
+          - "If it's less than {{answer+1}}, then the number is between 1 and {{answer}}.\
+            \ That is a range of <b>{{answer}} numbers</b>.\_<div>{{if answer==0 then\
+            \ \"Oh wait, it doesn't make sense for the number to be less than 1! We're\
+            \ guessing a number between 1 and 10!\" else \"\"}}\_\n</div><div>If it\
+            \ IS {{answer+1}}, then we're done! that's definitely not the worst case\
+            \ though.\n\nif it's bigger than {{answer+1}}, then it's between {{answer+2}}\
+            \ and 10. That's a range of <b>{{9-answer}} numbers</b>.\_<div>{{if answer==9\
+            \ then \"Oh wait, it doesn't make sense for the number to be bigger than\
+            \ 10! We're guessing a number between 1 and 10!\" else \"\"}}<br><div>So,\
+            \ the worst case is if the real number is {{if answer-5==abs(answer-5) then \"less than\"\
             \ else \"greater than\"}} {{answer+1}}!<br></div></div></div>"
           param_changes: []
       sticky: false
@@ -1712,7 +1711,7 @@ states:
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{'''' if (tries|int)<=5 else ''false''}}'
+        value: '{{if tries<=5 then '''' else ''false''}}'
       generator_id: Copier
       name: OptimalityProxy
     widget:
@@ -1736,7 +1735,7 @@ states:
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+        value: '{{if highest-lowest<=3 then lowest+1 else -1}}'
       generator_id: Copier
       name: worstnum
     - customization_args:
@@ -2142,12 +2141,12 @@ states:
       name: comparison
     - customization_args:
         parse_with_jinja: true
-        value: '{{ lowest if comparison=="smaller" else guess}}'
+        value: '{{if comparison=="smaller" then lowest else guess}}'
       generator_id: Copier
       name: newLowest
     - customization_args:
         parse_with_jinja: true
-        value: '{{ highest if comparison=="bigger" else guess}}'
+        value: '{{if comparison=="bigger" then highest else guess}}'
       generator_id: Copier
       name: newHighest
     widget:
@@ -2243,7 +2242,7 @@ states:
       name: guess
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+        value: '{{if highest-lowest<=3 then lowest+1 else -1}}'
       generator_id: Copier
       name: worstnum
     - customization_args:
@@ -2399,7 +2398,7 @@ states:
       name: guess
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+        value: '{{if highest-lowest <= 3 then lowest+1 else -1}}'
       generator_id: Copier
       name: worstnum
     - customization_args:
