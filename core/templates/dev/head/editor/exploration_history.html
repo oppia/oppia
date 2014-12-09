@@ -15,7 +15,7 @@
 </style>
 <div ng-controller="ExplorationHistory">
 
-  <div ng-hide="displayedExplorationSnapshots" class="oppia-align-center">
+  <div ng-hide="explorationVersionData" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
     <span class="oppia-loading-dot-two">.</span>
@@ -26,30 +26,30 @@
     <div class="oppia-main-content">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Version History</h4>
-        <div ng-repeat="snapshot in displayedExplorationSnapshots">
-          <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'selectedVersion1')">
-          <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'selectedVersion2')">
-          [<[snapshot.versionNumber]>]
-          <strong><[snapshot.committerId]></strong>
-          <[snapshot.commitMessage]>
+        <div ng-repeat="versionNumber in snapshotOrderArray">
+          <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')">
+          <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')">
+          [<[versionNumber]>]
+          <strong><[explorationVersionData[versionNumber].committerId]></strong>
+          <[explorationVersionData[versionNumber].commitMessage]>
           <span class="pull-right">
-            <em><[snapshot.createdOn]></em>
-            <span ng-if="snapshot.versionNumber !== currentVersion && editabilityService.isEditable()">
-              | <a href="#" ng-click="showRevertExplorationModal(snapshot.versionNumber)">Revert</a>
+            <em><[explorationVersionData[versionNumber].createdOn]></em>
+            <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
+              | <a href="#" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
             </span>
             <span>
-              | <a href="#" ng-click="downloadExplorationWithVersion(snapshot.versionNumber)" title="Download exploration as a zip file.">Download</a>
+              | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
             </span>
           </span>
         </div>
 
         <br>
 
-        <div ng-hide="!displayedExplorationSnapshots || hideCompareVersionsButton">
+        <div ng-hide="!explorationVersionData || hideCompareVersionsButton">
           <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
         </div>
 
-        <div ng-hide="hideHistoryGraph || !displayedExplorationSnapshots">
+        <div ng-hide="hideHistoryGraph || !explorationVersionData">
           <hr>
           <div class="container">
             <div class="row">
@@ -83,24 +83,24 @@
       <!-- Spacing on the left of table and in the middle of the table is to ensure text above each pane is aligned to codemirror gutter. -->
       <td style="width: 47%; word-wrap: break-word">
         <div>
-          <strong>Revision #<[compareSnapshot.laterVersion.versionNumber]></strong>
+          <strong>Revision #<[compareVersionData.laterVersion.versionNumber]></strong>
           by
-          <strong><[compareSnapshot.laterVersion.committerId]></strong>
+          <strong><[compareVersionData.laterVersion.committerId]></strong>
           on
-          <strong><[compareSnapshot.laterVersion.createdOn]></strong>
+          <strong><[compareVersionData.laterVersion.createdOn]></strong>
         </div>
-        <[compareSnapshot.laterVersion.commitMessage]>
+        <[compareVersionData.laterVersion.commitMessage]>
       </td>
       <td style="width: 6%"></td>
       <td style="width: 47%; word-wrap: break-word">
         <div>
-          <strong>Revision #<[compareSnapshot.earlierVersion.versionNumber]></strong>
+          <strong>Revision #<[compareVersionData.earlierVersion.versionNumber]></strong>
           by
-          <strong><[compareSnapshot.earlierVersion.committerId]></strong>
+          <strong><[compareVersionData.earlierVersion.committerId]></strong>
           on
-          <strong><[compareSnapshot.earlierVersion.createdOn]></strong>
+          <strong><[compareVersionData.earlierVersion.createdOn]></strong>
         </div>
-        <[compareSnapshot.earlierVersion.commitMessage]>
+        <[compareVersionData.earlierVersion.commitMessage]>
       </td>
     </table>
     <div class="modal-body" style="margin-top: -30px">

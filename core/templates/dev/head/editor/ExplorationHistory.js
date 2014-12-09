@@ -27,17 +27,22 @@ oppia.controller('ExplorationHistory', [
   $scope.explorationAllSnapshotsUrl =
       '/createhandler/snapshots/' + $scope.explorationId;
 
-  /* displayedExplorationSnapshots is a list of snapshots (in descending order)
-   * for the displayed version history list (max 30)
-   * allExplorationSnapshots is a list of all snapshots for the exploration in
-   * ascending order
+  /* explorationSnapshots is a list of all snapshots for the exploration in
+   * ascending order.
+   * explorationVersionData is an object whose keys are version numbers and
+   * whose values are objects containing data of that revision (that is to be
+   * displayed) with the keys 'committerId', 'createdOn', 'commitMessage', and
+   * 'versionNumber'. It contains a maximum of 30 versions.
+   * snapshotOrderArray is an array of the version numbers of the revisions to
+   * be displayed on the page, in the order they are displayed in.
    */
-  $scope.displayedExplorationSnapshots = null;
-  var allExplorationSnapshots = null;
+  $scope.explorationVersionData = null;
+  $scope.snapshotOrderArray = [];
+  var explorationSnapshots = null;
   var versionTreeParents = null;
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
-    if (data.forceRefresh || $scope.displayedExplorationSnapshots === null) {
+    if (data.forceRefresh || $scope.explorationVersionData === null) {
       $scope.refreshVersionHistory();
     }
   });
@@ -50,29 +55,30 @@ oppia.controller('ExplorationHistory', [
        * $scope.compareVersions is an object with keys 'selectedVersion1' and
        * 'selectedVersion2', whose values are the version numbers of the
        * compared versions selected on the left and right radio buttons.
-       * $scope.compareSnapshot is an object with keys 'earlierVersion' and
+       * $scope.compareVersionData is an object with keys 'earlierVersion' and
        * 'laterVersion' whose values are the snapshots of the compared versions.
        * $scope.yamlStrs is an object with keys 'earlierVersion' and 'laterVersion',
        * whose values are the YAML representations of the compared versions
        */
       $scope.compareVersions = {};
-      $scope.compareSnapshot = {};
+      $scope.compareVersionData = {};
 
       $scope.hideHistoryGraph = true;
       $scope.hideCompareVersionsButton = false;
 
       $http.get($scope.explorationAllSnapshotsUrl).then(function(response) {
-        allExplorationSnapshots = response.data.snapshots;
-        versionsTreeService.init(allExplorationSnapshots);
+        explorationSnapshots = response.data.snapshots;
+        versionsTreeService.init(explorationSnapshots);
 
-        $scope.displayedExplorationSnapshots = [];
+        $scope.explorationVersionData = {};
         for (var i = currentVersion - 1; i >= Math.max(0, currentVersion - 30); i--) {
-          $scope.displayedExplorationSnapshots.push({
-            'committerId': allExplorationSnapshots[i].committer_id,
-            'createdOn': allExplorationSnapshots[i].created_on,
-            'commitMessage': allExplorationSnapshots[i].commit_message,
-            'versionNumber': allExplorationSnapshots[i].version_number
-          });
+          $scope.explorationVersionData[explorationSnapshots[i].version_number] = {
+            'committerId': explorationSnapshots[i].committer_id,
+            'createdOn': explorationSnapshots[i].created_on,
+            'commitMessage': explorationSnapshots[i].commit_message,
+            'versionNumber': explorationSnapshots[i].version_number
+          };
+          $scope.snapshotOrderArray.push(explorationSnapshots[i].version_number);
         }
       });
     });
@@ -95,12 +101,10 @@ oppia.controller('ExplorationHistory', [
         $scope.compareVersions.selectedVersion2);
       var laterComparedVersion = Math.max($scope.compareVersions.selectedVersion1,
         $scope.compareVersions.selectedVersion2);
-      $scope.compareSnapshot.earlierVersion =
-        $scope.displayedExplorationSnapshots[
-          $scope.currentVersion - earlierComparedVersion];
-      $scope.compareSnapshot.laterVersion =
-        $scope.displayedExplorationSnapshots[
-          $scope.currentVersion - laterComparedVersion];
+      $scope.compareVersionData.earlierVersion =
+        $scope.explorationVersionData[earlierComparedVersion];
+      $scope.compareVersionData.laterVersion =
+        $scope.explorationVersionData[laterComparedVersion];
 
       compareVersionsService.getDiffGraphData(earlierComparedVersion,
           laterComparedVersion).then(function(response) {
@@ -254,8 +258,8 @@ oppia.controller('ExplorationHistory', [
         oldStateName: function() {
           return oldStateName;
         },
-        compareSnapshot: function() {
-          return $scope.compareSnapshot;
+        compareVersionData: function() {
+          return $scope.compareVersionData;
         },
         explorationId: function() {
           return $scope.explorationId;
@@ -263,27 +267,27 @@ oppia.controller('ExplorationHistory', [
       },
       controller: [
         '$scope', '$modalInstance', 'stateName', 'oldStateName',
-          'compareSnapshot', 'explorationId',
+          'compareVersionData', 'explorationId',
           function(
-          $scope, $modalInstance, stateName, oldStateName, compareSnapshot,
+          $scope, $modalInstance, stateName, oldStateName, compareVersionData,
           explorationId) {
         var stateDownloadUrl = '/createhandler/download_state/' + explorationId;
         $scope.stateName = stateName;
         $scope.oldStateName = oldStateName;
-        $scope.compareSnapshot = angular.copy(compareSnapshot);
+        $scope.compareVersionData = compareVersionData;
         $scope.yamlStrs = {};
 
         if (oldStateName === undefined) {
           oldStateName = stateName;
         }
         $http.get(stateDownloadUrl + '?v=' +
-          $scope.compareSnapshot.laterVersion.versionNumber + '&state=' + stateName)
+          $scope.compareVersionData.laterVersion.versionNumber + '&state=' + stateName)
         .then(function(response) {
           $scope.yamlStrs['leftPane'] = response.data;
         });
 
         $http.get(stateDownloadUrl + '?v=' +
-          $scope.compareSnapshot.earlierVersion.versionNumber + '&state=' + oldStateName)
+          $scope.compareVersionData.earlierVersion.versionNumber + '&state=' + oldStateName)
         .then(function(response) {
           $scope.yamlStrs['rightPane'] = response.data;
         });

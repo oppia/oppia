@@ -679,11 +679,13 @@ widget:
         self.assertEqual(exploration.version, 3)
 
         # Download version 2
-        dict_output = exp_services.export_states_to_yaml(self.EXP_ID, 2, 50)
+        dict_output = exp_services.export_states_to_yaml(
+            self.EXP_ID, version=2, width=50)
         self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
         # Download version 3
-        dict_output = exp_services.export_states_to_yaml(self.EXP_ID, 3, 50)
+        dict_output = exp_services.export_states_to_yaml(
+            self.EXP_ID, version=3, width=50)
         self.assertEqual(dict_output, self.UPDATED_SAMPLE_DICT)
 
 
