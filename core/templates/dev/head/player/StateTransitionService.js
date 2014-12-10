@@ -34,12 +34,17 @@
 //   processValue(345, [{'a': 'b'}]) throws an error.
 //   processValue('345{{a}}', [{}]) throws an error.
 oppia.factory('expressionInterpolationService', [
-    'expressionEvaluatorService', function(expressionEvaluatorService) {
+    '$filter', 'expressionEvaluatorService',
+    function($filter, expressionEvaluatorService) {
   return {
     processString: function(sourceString, envs) {
       try {
         return sourceString.replace(/{{([^}]*)}}/g, function(match, p1) {
-          return expressionEvaluatorService.evaluateExpression(p1, envs);
+          // TODO(sll): Remove the call to oppiaHtmlEscaper once we have a
+          // custom UI for entering expressions. It is only needed because
+          // expressions are currently input inline via the RTE.
+          return expressionEvaluatorService.evaluateExpression(
+            $filter('convertHtmlToUnicode')(p1), envs);
         });
       } catch (e) {
         if (e instanceof expressionEvaluatorService.ExpressionError) {
@@ -86,8 +91,8 @@ oppia.factory('stateTransitionService', [
 
   // Evaluate feedback.
   var makeFeedback = function(feedbacks, envs) {
-    var feedbackString = feedbacks.length > 0 ? randomFromArray(feedbacks) : '';
-    return expressionInterpolationService.processString(feedbackString, envs);
+    var feedbackHtml = feedbacks.length > 0 ? randomFromArray(feedbacks) : '';
+    return expressionInterpolationService.processString(feedbackHtml, envs);
   };
 
   // Evaluate parameters. Returns null if any evaluation fails.
@@ -120,9 +125,9 @@ oppia.factory('stateTransitionService', [
   };
 
   // Evaluate question string.
-  var makeQuestion = function(new_state, envs) {
+  var makeQuestion = function(newState, envs) {
     return expressionInterpolationService.processString(
-      new_state.content[0].value, envs);
+      newState.content[0].value, envs);
   };
 
   return {

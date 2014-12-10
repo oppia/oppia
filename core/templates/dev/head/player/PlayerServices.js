@@ -325,6 +325,10 @@ oppia.factory('oppiaPlayerService', [
         initStateName, initStateData.question_html, initStateData.params,
         successCallback);
     } else {
+      console.warn('Server evaluation required.');
+      console.log(
+        'Data sent to server for evaluation: ', _exploration.states[initStateName]);
+
       var initExplorationUrl = '/explorehandler/init_exploration/' + _explorationId;
       $http.post(initExplorationUrl, {
         exp_param_specs: _exploration.param_specs,

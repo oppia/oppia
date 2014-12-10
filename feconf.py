@@ -238,7 +238,7 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_of_widgets.yaml', 'Test of widgets', 'Test'),
+    ('test_exploration.yaml', 'Test of expressions and widgets', 'Test'),
     ('modeling_graphs', 'Graph Modeling', 'Mathematics')
 ]
 
