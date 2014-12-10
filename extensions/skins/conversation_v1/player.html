@@ -27,34 +27,34 @@
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last, 'conversation-skin-old-content': !$last}">
           <md-card class="conversation-skin-card">
-            <table class="conversation-response-container">
+            <table class="conversation-skin-card-row">
               <tr>
-                <td class="conversation-skin-avatar" valign="top"> 
-                  <img class="conversation-skin-avatar-img" src="/images/oppia_favicon_mint.png"></img>
+                <td class="conversation-skin-row-avatar" valign="top"> 
+                  <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                 </td>
-                <td class="conversation-skin-content protractor-test-conversation-content"
+                <td class="conversation-skin-row-content protractor-test-conversation-content"
                      angular-html-bind="state.content">
                 </td>
               </tr>
             </table>
 
-            <div class="conversation-answer-feedback-pair" ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
-              <table class="conversation-response-container">
+            <div class="conversation-skin-answer-feedback-pair" ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
+              <table class="conversation-skin-card-row">
                 <tr>
-                  <td class="conversation-skin-avatar" valign="top"> 
-                    <img class="conversation-skin-avatar-img" src="/images/user.png"></img>
+                  <td class="conversation-skin-row-avatar" valign="top"> 
+                    <img class="conversation-skin-row-avatar-img" src="/images/user.png">
                   </td>
-                  <td class="conversation-skin-content conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
+                  <td class="conversation-skin-row-content conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
                 </tr>
               </table>
-              <div class="conversation-response-container conversation-skin-oppia-feedback protractor-test-conversation-feedback"
+              <div class="conversation-skin-card-row conversation-skin-oppia-feedback protractor-test-conversation-feedback"
                   aria-live="<[$last ? 'polite' : 'off']>" aria-atomic="true">
-                <table class="conversation-response-container">
+                <table class="conversation-skin-card-row">
                   <tr>
-                    <td class="conversation-skin-avatar" valign="top"> 
-                      <img class="conversation-skin-avatar-img" src="/images/oppia_favicon_mint.png"></img>
+                    <td class="conversation-skin-row-avatar" valign="top"> 
+                      <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                     </td>
-                    <td class="conversation-skin-content" angular-html-bind="responsePair.oppiaFeedback"></td>
+                    <td class="conversation-skin-row-content" angular-html-bind="responsePair.oppiaFeedback"></td>
                   </tr>
                 </table>
               </div>
@@ -71,7 +71,15 @@
               which it is the only element. For more information, please
               see the ReaderExploration.js file. -->
               <div ng-hide="isAnswerBeingProcessed()">
-                <div class="conversation-skin-input" angular-html-bind="inputTemplate"></div>
+                <table class="conversation-skin-card-row">
+                  <tr>
+                    <td class="conversation-skin-row-avatar" valign="top"> 
+                      <!-- No avatar on user input. Hence This is Empty -->
+                    </td>
+                    <td angular-html-bind="inputTemplate"></td>
+                  </tr>
+                </table>
+                
               </div>
               <div ng-show="isAnswerBeingProcessed()">
                 <center style="font-size: 8em;">
