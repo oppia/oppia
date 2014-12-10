@@ -75,8 +75,8 @@ oppia.factory('expressionInterpolationService', [
   };
 }]);
 
-// Produces information necessary to transition from one state to another.
-// independently reset and queried for the current time.
+// Produces information necessary to render a particular state. Note that this
+// service is memoryless -- all calls to it are independent of each other.
 oppia.factory('stateTransitionService', [
     'learnerParamsService', 'expressionInterpolationService',
     function(learnerParamsService, expressionInterpolationService) {
@@ -126,6 +126,33 @@ oppia.factory('stateTransitionService', [
   };
 
   return {
+    getInitStateData: function(expParamSpecs, expParamChanges, initState) {
+      var baseParams = {};
+      for (var paramName in expParamSpecs) {
+        // TODO(sll): This assumes all parameters are of type UnicodeString.
+        // We should generalize this to other default values for different
+        // types of parameters.
+        baseParams[paramName] = '';
+      }
+
+      var newParams = makeParams(
+        baseParams, expParamChanges.concat(initState.param_changes),
+        [baseParams]);
+      if (newParams === null) {
+        return null;
+      }
+
+      var question = makeQuestion(initState, [newParams]);
+      if (question === null) {
+        return null;
+      }
+
+      // All succeeded. Return all the results.
+      return {
+        params: newParams,
+        question_html: question
+      }
+    },
     // Returns null when failed to evaluate.
     getNextStateData: function(ruleSpec, newState, answer) {
       var oldParams = learnerParamsService.getAllParams();

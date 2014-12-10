@@ -280,7 +280,7 @@ oppia.factory('oppiaPlayerService', [
       messengerService.sendMessage(messengerService.STATE_TRANSITION, {
         oldStateName: _currentStateName,
         jsonAnswer: JSON.stringify(answer),
-        newStateName: newStateName
+        newStateName: newStateName ? newStateName : 'END'
       });
     }
 
@@ -306,6 +306,38 @@ oppia.factory('oppiaPlayerService', [
       newFeedbackHtml);
   };
 
+  var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
+    stopwatch.resetStopwatch();
+    _updateStatus(newParams, initStateName);
+    $rootScope.$broadcast('playerStateChange');
+    callback(initStateName, initHtml);
+  };
+
+  // This should only be called when _exploration is non-null.
+  var _loadInitialState = function(successCallback) {
+    var initStateName = _exploration.init_state_name;
+    var initStateData = stateTransitionService.getInitStateData(
+      _exploration.param_specs, _exploration.param_changes,
+      _exploration.states[initStateName]);
+
+    if (initStateData) {
+      _onInitialStateProcessed(
+        initStateName, initStateData.question_html, initStateData.params,
+        successCallback);
+    } else {
+      var initExplorationUrl = '/explorehandler/init_exploration/' + _explorationId;
+      $http.post(initExplorationUrl, {
+        exp_param_specs: _exploration.param_specs,
+        exp_param_changes: _exploration.param_changes,
+        init_state: _exploration.states[initStateName]
+      }).success(function(initHtmlAndParamsData) {
+        _onInitialStateProcessed(
+          _exploration.init_state_name, initHtmlAndParamsData.init_html,
+          initHtmlAndParamsData.params, successCallback);
+      });
+    }
+  };
+
   return {
     // This should only be used in editor preview mode.
     populateExploration: function(exploration) {
@@ -316,7 +348,8 @@ oppia.factory('oppiaPlayerService', [
       }
     },
     /**
-     * Loads the data for the initial state of the exploration.
+     * Initializes an exploration, passing the data for the first state to
+     * successCallback.
      *
      * In editor preview mode, populateExploration() should be called before
      * calling init().
@@ -332,27 +365,13 @@ oppia.factory('oppiaPlayerService', [
       answerIsBeingProcessed = false;
 
       if (_editorPreviewMode) {
-        var initExplorationUrl = '/createhandler/init_exploration/' + _explorationId;
-        $http.post(initExplorationUrl, {
-          exp_param_specs: _exploration.param_specs,
-          init_state: _exploration.states[_exploration.init_state_name],
-          exp_param_changes: _exploration.param_changes
-        }).success(function(initHtmlAndParamsData) {
-          stopwatch.resetStopwatch();
-          _updateStatus(initHtmlAndParamsData.params, _exploration.init_state_name);
-          $rootScope.$broadcast('playerStateChange');
-          successCallback(
-            _exploration.init_state_name, initHtmlAndParamsData.init_html);
-        });
+        _loadInitialState(successCallback);
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
           isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
-          stopwatch.resetStopwatch();
-          _updateStatus(data.params, data.state_name);
-          $rootScope.$broadcast('playerStateChange');
-          successCallback(data.state_name, data.init_html);
+          _loadInitialState(successCallback);
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');

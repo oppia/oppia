@@ -51,7 +51,7 @@ oppia.controller('ExplorationEditor', [
       param_specs: $scope.paramSpecs,
       title: explorationTitleService.savedMemento,
       // TODO(sll): are these actually editable?
-      param_changes: []
+      param_changes: explorationData.data.param_changes
     });
     $timeout(function() {
       $scope.isInPreviewMode = true;

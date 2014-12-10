@@ -292,6 +292,36 @@ class StateHitEventHandler(base.BaseHandler):
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
 
 
+class InitExplorationHandler(base.BaseHandler):
+    """Performs a get_init_html_and_params() operation server-side and
+    returns the result. This is done while maintaining no state.
+    """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # A domain object representing the old state.
+        init_state = exp_domain.State.from_dict(self.payload.get('init_state'))
+        # A domain object representing the exploration-level parameter changes.
+        exp_param_changes = [
+            param_domain.ParamChange.from_dict(param_change_dict)
+            for param_change_dict in self.payload.get('exp_param_changes')]
+
+        init_html, init_params = get_init_html_and_params(
+            exp_param_changes, init_state, exp_param_specs)
+
+        self.render_json({
+            'init_html': init_html,
+            'params': init_params,
+        })
+
+
 class ClassifyHandler(base.BaseHandler):
     """Stateless handler that performs a classify() operation server-side and
     returns the corresponding rule_spec (as a dict).

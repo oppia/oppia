@@ -33,7 +33,7 @@ var expectExplorationNameToBe = function(name) {
   ).toBe(name);
 };
 
-// This verifies the question just asked, including formatting and 
+// This verifies the question just asked, including formatting and
 // non-interactive widgets. To do so the richTextInstructions function will be
 // sent a handler (as given in forms.RichTextChecker) to which calls such as
 //   handler.readItalicText('slanted');
@@ -41,8 +41,7 @@ var expectExplorationNameToBe = function(name) {
 var expectContentToMatch = function(richTextInstructions) {
   forms.expectRichText(
     element.all(by.repeater('response in responseLog track by $index')).
-      last().element(by.css('.protractor-test-conversation-content')).
-        element(by.xpath('./div'))
+      last().element(by.css('.protractor-test-conversation-content'))
   ).toMatch(richTextInstructions);
 };
 
@@ -50,7 +49,7 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
   forms.expectRichText(
     element.all(by.repeater('response in responseLog track by $index')).
       last().element(by.css('.protractor-test-conversation-feedback')).
-        element(by.xpath('./div/div')).getText()
+        element(by.xpath('./div')).getText()
   ).toMatch(richTextInstructions);
 };
 

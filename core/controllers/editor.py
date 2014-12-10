@@ -743,35 +743,6 @@ class ChangeListSummaryHandler(EditorHandler):
             })
 
 
-class InitExplorationHandler(EditorHandler):
-    """Performs a get_init_html_and_params() operation server-side and
-    returns the result. This is done while maintaining no state.
-    """
-
-    @require_editor
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
-        exp_param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
-        }
-        # A domain object representing the old state.
-        init_state = exp_domain.State.from_dict(self.payload.get('init_state'))
-        # A domain object representing the exploration-level parameter changes.
-        exp_param_changes = [
-            param_domain.ParamChange.from_dict(param_change_dict)
-            for param_change_dict in self.payload.get('exp_param_changes')]
-
-        init_html, init_params = reader.get_init_html_and_params(
-            exp_param_changes, init_state, exp_param_specs)
-
-        self.render_json({
-            'init_html': init_html,
-            'params': init_params,
-        })
-
-
 class StartedTutorialEventHandler(EditorHandler):
     """Records that this user has started the state editor tutorial."""
 
