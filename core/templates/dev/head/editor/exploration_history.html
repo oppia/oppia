@@ -54,7 +54,7 @@
           <div class="container">
             <div class="row">
               <div class="col-lg-8 col-md-8 col-sm-8">
-                <h4>Exploration Graph</h4>
+                <h4>Changes from version <[compareVersionData.earlierVersion.versionNumber]> to version <[compareVersionData.laterVersion.versionNumber]></h4>
                 <div ng-hide="diffGraphData" class="oppia-align-center">
                   Loading
                   <span class="oppia-loading-dot-one">.</span>
@@ -66,7 +66,7 @@
               </div>
               <div class="col-lg-4 col-md-4 col-sm-4">
                 <h4>Exploration Graph Legend</h4>
-                <div state-graph-viz graph-data="LEGEND_GRAPH" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
+                <div state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
               </div>
             </div>
           </div>
