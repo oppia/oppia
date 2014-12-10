@@ -499,7 +499,7 @@ oppia.directive('stateGraphViz', [
           var tooltip = node.label;
 
           if (node.hasOwnProperty('secondaryLabel')) {
-            tooltip += ' | ' + node.secondaryLabel;
+            tooltip += ' ' + node.secondaryLabel;
           }
 
           if (warning) {

@@ -15,7 +15,7 @@
 </style>
 <div ng-controller="ExplorationHistory">
 
-  <div ng-hide="explorationVersionData" class="oppia-align-center">
+  <div ng-hide="explorationVersionMetadata" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
     <span class="oppia-loading-dot-two">.</span>
@@ -30,10 +30,10 @@
           <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')">
           <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')">
           [<[versionNumber]>]
-          <strong><[explorationVersionData[versionNumber].committerId]></strong>
-          <[explorationVersionData[versionNumber].commitMessage]>
+          <strong><[explorationVersionMetadata[versionNumber].committerId]></strong>
+          <[explorationVersionMetadata[versionNumber].commitMessage]>
           <span class="pull-right">
-            <em><[explorationVersionData[versionNumber].createdOn]></em>
+            <em><[explorationVersionMetadata[versionNumber].createdOn]></em>
             <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
               | <a href="#" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
             </span>
@@ -45,16 +45,16 @@
 
         <br>
 
-        <div ng-hide="!explorationVersionData || hideCompareVersionsButton">
+        <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
           <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
         </div>
 
-        <div ng-hide="hideHistoryGraph || !explorationVersionData">
+        <div ng-hide="hideHistoryGraph || !explorationVersionMetadata">
           <hr>
           <div class="container">
             <div class="row">
               <div class="col-lg-8 col-md-8 col-sm-8">
-                <h4>Changes from version <[compareVersionData.earlierVersion.versionNumber]> to version <[compareVersionData.laterVersion.versionNumber]></h4>
+                <h4>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h4>
                 <div ng-hide="diffGraphData" class="oppia-align-center">
                   Loading
                   <span class="oppia-loading-dot-one">.</span>
@@ -83,24 +83,24 @@
       <!-- Spacing on the left of table and in the middle of the table is to ensure text above each pane is aligned to codemirror gutter. -->
       <td style="width: 47%; word-wrap: break-word">
         <div>
-          <strong>Revision #<[compareVersionData.laterVersion.versionNumber]></strong>
+          <strong>Revision #<[compareVersionMetadata.laterVersion.versionNumber]></strong>
           by
-          <strong><[compareVersionData.laterVersion.committerId]></strong>
+          <strong><[compareVersionMetadata.laterVersion.committerId]></strong>
           on
-          <strong><[compareVersionData.laterVersion.createdOn]></strong>
+          <strong><[compareVersionMetadata.laterVersion.createdOn]></strong>
         </div>
-        <[compareVersionData.laterVersion.commitMessage]>
+        <[compareVersionMetadata.laterVersion.commitMessage]>
       </td>
       <td style="width: 6%"></td>
       <td style="width: 47%; word-wrap: break-word">
         <div>
-          <strong>Revision #<[compareVersionData.earlierVersion.versionNumber]></strong>
+          <strong>Revision #<[compareVersionMetadata.earlierVersion.versionNumber]></strong>
           by
-          <strong><[compareVersionData.earlierVersion.committerId]></strong>
+          <strong><[compareVersionMetadata.earlierVersion.committerId]></strong>
           on
-          <strong><[compareVersionData.earlierVersion.createdOn]></strong>
+          <strong><[compareVersionMetadata.earlierVersion.createdOn]></strong>
         </div>
-        <[compareVersionData.earlierVersion.commitMessage]>
+        <[compareVersionMetadata.earlierVersion.commitMessage]>
       </td>
     </table>
     <div class="modal-body" style="margin-top: -30px">
