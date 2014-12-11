@@ -126,6 +126,11 @@ XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
+# Invalid names for parameters used in expressions.
+INVALID_PARAMETER_NAMES = [
+    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
+    'pow', 'round', 'then']
+
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
