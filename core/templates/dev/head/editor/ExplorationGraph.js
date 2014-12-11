@@ -101,10 +101,7 @@ oppia.controller('ExplorationGraph', [
             });
           };
 
-          $scope.selectState = function(unusedStateId, stateName,
-              unusedSecondaryLabel) {
-            // In the exploration graph, stateId should equal stateName.
-            // unusedSecondaryLabel should be undefined.
+          $scope.selectState = function(stateName) {
             if (stateName !== END_DEST) {
               $modalInstance.close({
                 action: 'navigate',
