@@ -18,39 +18,30 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
+oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsService',
+    function(warningsData, explorationParamSpecsService) {
   // Directive that implements an editor for specifying parameter changes.
   return {
     restrict: 'E',
     scope: {
       paramChanges: '=',
-      paramSpecs: '=',
       saveParamChanges: '=',
-      addExplorationParamSpec: '=',
       isEditable: '='
     },
     templateUrl: 'inline/param_change_editor',
     controller: ['$scope', '$attrs', function($scope, $attrs) {
-      $scope._inArray = function(array, value) {
-        for (var i = 0; i < array.length; i++) {
-          if (array[i] == value) {
-            return true;
-          }
-        }
-        return false;
-      };
-
       $scope.getObjTypeForParam = function(paramName) {
-        if ($scope.paramSpecs && paramName in $scope.paramSpecs) {
-          return $scope.paramSpecs[paramName].obj_type;
+        if (explorationParamSpecsService.savedMemento.hasOwnProperty(paramName)) {
+          return explorationParamSpecsService.savedMemento[paramName].obj_type;
+        } else {
+          return '';
         }
-        return '';
       };
 
       $scope.DEFAULT_CUSTOMIZATION_ARGS = {
         'Copier': {
           value: '[New parameter value]',
-          parse_with_jinja: false
+          parse_with_jinja: true
         },
         'RandomSelector': {
           list_of_values: []
@@ -78,9 +69,7 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       };
       $scope.HUMAN_READABLE_ARGS_RENDERERS = {
         'Copier': function(customization_args) {
-          return 'to ' + customization_args.value + (
-              customization_args.parse_with_jinja ? ' (evaluating parameters)' : ''
-          );
+          return 'to ' + customization_args.value;
         },
         'RandomSelector': function(customization_args) {
           var result = 'to one of [';
@@ -108,17 +97,15 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       $scope.paramNameChoices = [];
       $scope.resetParamNameChoices = function() {
         // Initialize dropdown options for the parameter name selector.
-        $scope.paramNameChoices = [];
-        if ($scope.paramSpecs) {
-          var paramNames = Object.keys($scope.paramSpecs).sort();
-          for (var i = 0; i < paramNames.length; i++) {
-            $scope.paramNameChoices.push({
-              id: paramNames[i],
-              text: paramNames[i]
-            });
+        $scope.paramNameChoices = Object.keys(
+          explorationParamSpecsService.savedMemento
+        ).sort().map(function(paramName) {
+          return {
+            id: paramName,
+            text: paramName
           }
-        }
-      }
+        });
+      };
 
       // Called when an 'add param change' action is triggered.
       $scope.startAddParamChange = function() {
@@ -139,8 +126,7 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
           }
         }
         for (var j = 0; j < customizationArgsKeys.length; j++) {
-          if (!$scope._inArray($scope.ALLOWED_KEYS[generatorId],
-                              customizationArgsKeys[j])) {
+          if ($scope.ALLOWED_KEYS[generatorId].indexOf(customizationArgsKeys[j]) === -1) {
             delete newCustomizationArgs[customizationArgsKeys[j]];
           }
         }
@@ -204,10 +190,11 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
               $scope.paramChanges, angular.copy($scope.paramChangesMemento));
         };
 
-        if (!$scope.getObjTypeForParam(name)) {
-          // The name is new, so add the parameter to the exploration parameter
-          // list.
-          $scope.addExplorationParamSpec(name, 'UnicodeString');
+        // If the name is new, add the parameter to the exploration parameter
+        // list.
+        if (!explorationParamSpecsService.savedMemento.hasOwnProperty(name)) {
+          explorationParamSpecsService.displayed[name] = {obj_type: 'UnicodeString'};
+          explorationParamSpecsService.saveDisplayedValue();
         }
 
         _updateAndSaveParamChangeList(
