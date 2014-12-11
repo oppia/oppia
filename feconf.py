@@ -127,7 +127,8 @@ XSSI_PREFIX = ')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # Invalid names for parameters used in expressions.
-INVALID_PARAMETER_NAMES = [
+AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
+INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
     'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
     'pow', 'round', 'then']
 
