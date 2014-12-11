@@ -25,6 +25,7 @@ from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
 transaction_services = models.Registry.import_transaction_services()
+import utils
 
 
 class ExpSummariesCreationOneOffJob(jobs.BaseMapReduceJobManager):
@@ -69,6 +70,27 @@ class IndexAllExplorationsJobManager(jobs.BaseMapReduceJobManager):
         #   exp_jobs -> exp_services.
         from core.domain import exp_services
         exp_services.index_explorations_given_ids([item.id])
+
+
+class ExplorationValidityJobManager(jobs.BaseMapReduceJobManager):
+    """Job that checks (non-strict) validation status of all explorations."""
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_services
+        exploration = exp_services.get_exploration_from_model(item)
+        try:
+            exploration.validate(strict=False)
+        except utils.ValidationError as e:
+            yield (item.id, e)
+
+    @staticmethod
+    def reduce(key, values):
+        yield (key, values)
 
 
 class ParameterDiscoveryJobManager(jobs.BaseMapReduceJobManager):
