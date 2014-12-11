@@ -247,6 +247,10 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
     return args;
   };
 
+  // NOTE TO DEVELOPERS: When adding a new reserved word to this object,
+  //   please first ensure that existing explorations do not use this
+  //   parameter name. Also, to prevent future explorations using it,
+  //   modify feconf.INVALID_PARAMETER_NAMES accordingly.
   // TODO(kashida): Document all operators input and output contracts.
   var system = {
     '#': function(args, envs) {

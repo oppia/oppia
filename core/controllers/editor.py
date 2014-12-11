@@ -272,6 +272,7 @@ class ExplorationPage(EditorHandler):
                 for skin_id in skins_services.Registry.get_all_skin_ids()],
             'skin_templates': jinja2.utils.Markup(skin_templates),
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })

@@ -22,7 +22,7 @@
             </value-generator-editor>
             <br>
 
-            <input class="btn btn-success" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name">
+            <input class="btn btn-success" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name || INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
           </form>
         </div>
       </div>
