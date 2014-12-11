@@ -35,11 +35,15 @@ oppia.controller('ExplorationHistory', [
    * 'versionNumber'. It contains a maximum of 30 versions.
    * snapshotOrderArray is an array of the version numbers of the revisions to
    * be displayed on the page, in the order they are displayed in.
+   * nodesData is an object whose keys are nodeIds (assigned in version
+   * comparison), and whose values are an object containing 'newestStateName',
+   * 'originalStateName' and 'stateProperty'.
    */
   $scope.explorationVersionMetadata = null;
   $scope.snapshotOrderArray = [];
   var explorationSnapshots = null;
   var versionTreeParents = null;
+  var nodesData = null;
 
   $scope.$on('refreshVersionHistory', function(evt, data) {
     if (data.forceRefresh || $scope.explorationVersionMetadata === null) {
@@ -88,18 +92,28 @@ oppia.controller('ExplorationHistory', [
     });
   };
 
-  var COLOR_ADDED = ' #4EA24E';
+  // Constants for color of nodes in diff graph
+  var COLOR_ADDED = '#4EA24E';
   var COLOR_DELETED = '#DC143C';
   var COLOR_CHANGED = '#1E90FF';
   var COLOR_UNCHANGED = 'beige';
   var COLOR_RENAMED_UNCHANGED = '#FFD700';
 
-  // Object whose keys are state properties and whose values are 'true' or
+  // Constants for names in legend
+  var NODE_TYPE_ADDED = 'Added';
+  var NODE_TYPE_DELETED = 'Deleted';
+  var NODE_TYPE_CHANGED = 'Changed';
+  var NODE_TYPE_CHANGED_RENAMED = 'Changed/renamed';
+  var NODE_TYPE_RENAMED = 'Renamed';
+  var NODE_TYPE_UNCHANGED = 'Unchanged';
+
+  // Object whose keys are legend node names and whose values are 'true' or
   // false depending on whether the state property is used in the diff graph.
   // (Will be used to generate legend)
   var _stateTypeUsed = {};
 
-  // Function to set snapshot and download YAML when selection is changed
+  // Function to set compared version metadata, download YAML and generate
+  // diff graph and legend when selection is changed
   $scope.changeCompareVersion = function(versionNumber, changedVersion) {
     $scope.diffGraphData = null;
 
@@ -123,35 +137,33 @@ oppia.controller('ExplorationHistory', [
         var STATE_PROPERTY_DELETED = 'deleted';
         var STATE_PROPERTY_CHANGED = 'changed';
         var STATE_PROPERTY_UNCHANGED = 'unchanged';
-        _stateTypeUsed['Added state'] = false;
-        _stateTypeUsed['Deleted state'] = false;
-        _stateTypeUsed['Changed state'] = false;
-        _stateTypeUsed['Unchanged state'] = false;
-        _stateTypeUsed['Renamed state'] = false;
-        _stateTypeUsed['Changed/renamed'] = false;
+        _stateTypeUsed[NODE_TYPE_ADDED] = false;
+        _stateTypeUsed[NODE_TYPE_DELETED] = false;
+        _stateTypeUsed[NODE_TYPE_CHANGED] = false;
+        _stateTypeUsed[NODE_TYPE_UNCHANGED] = false;
+        _stateTypeUsed[NODE_TYPE_RENAMED] = false;
+        _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = false;
 
         var diffGraphNodes = {};
         $scope.diffGraphSecondaryLabels = {};
         $scope.diffGraphNodeColors = {};
 
-        var nodesData = response.nodes;
+        nodesData = response.nodes;
         nodesData[response.finalStateId] = {
           'newestStateName': END_DEST,
           'originalStateName': END_DEST,
           'stateProperty': STATE_PROPERTY_UNCHANGED
         };
 
-        $scope.stateProperty = {};
-
         for (var nodeId in nodesData) {
           if (nodesData[nodeId].stateProperty == STATE_PROPERTY_ADDED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_ADDED;
-            _stateTypeUsed['Added state'] = true;
+            _stateTypeUsed[NODE_TYPE_ADDED] = true;
           } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_DELETED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_DELETED;
-            _stateTypeUsed['Deleted state'] = true;
+            _stateTypeUsed[NODE_TYPE_DELETED] = true;
           } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_CHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
             $scope.diffGraphNodeColors[nodeId] = COLOR_CHANGED;
@@ -159,9 +171,9 @@ oppia.controller('ExplorationHistory', [
               $scope.diffGraphSecondaryLabels[nodeId] = '(was: ' +
                 nodesData[nodeId].originalStateName + ')';
               diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
-              _stateTypeUsed['Changed/renamed'] = true;
+              _stateTypeUsed[NODE_TYPE_CHANGED_RENAMED] = true;
             } else {
-              _stateTypeUsed['Changed state'] = true;
+              _stateTypeUsed[NODE_TYPE_CHANGED] = true;
             }
           } else if (nodesData[nodeId].stateProperty == STATE_PROPERTY_UNCHANGED) {
             diffGraphNodes[nodeId] = nodesData[nodeId].originalStateName;
@@ -171,14 +183,13 @@ oppia.controller('ExplorationHistory', [
                 nodesData[nodeId].originalStateName + ')';
               diffGraphNodes[nodeId] = nodesData[nodeId].newestStateName;
               $scope.diffGraphNodeColors[nodeId] = COLOR_RENAMED_UNCHANGED;
-              _stateTypeUsed['Renamed state'] = true;
+              _stateTypeUsed[NODE_TYPE_RENAMED] = true;
             } else {
-              _stateTypeUsed['Unchanged state'] = true;
+              _stateTypeUsed[NODE_TYPE_UNCHANGED] = true;
             }
           } else {
             throw new Error('Invalid state property.');
           }
-          $scope.stateProperty[nodeId] = nodesData[nodeId].stateProperty;
         }
 
         $scope.v1InitStateId = response.v1InitStateId;
@@ -222,18 +233,18 @@ oppia.controller('ExplorationHistory', [
     'deleted': 'stroke: #B22222; stroke-opacity: 0.8; marker-end: url(#arrowhead-red)'
   };
 
-  $scope.LEGEND_GRAPH_COLORS = {
-    'Unchanged state': COLOR_UNCHANGED,
-    'Added state': COLOR_ADDED,
-    'Deleted state': COLOR_DELETED,
-    'Changed state': COLOR_CHANGED,
-    'Changed/renamed': COLOR_CHANGED,
-    'Renamed state': COLOR_RENAMED_UNCHANGED
-  };
-  $scope.LEGEND_GRAPH_SECONDARY_LABELS = {
-    'Changed/renamed': '(was: Old name)',
-    'Renamed state': '(was: Old name)'
-  };
+  $scope.LEGEND_GRAPH_COLORS = {};
+  $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_UNCHANGED] = COLOR_UNCHANGED;
+  $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_ADDED] = COLOR_ADDED;
+  $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_DELETED] = COLOR_DELETED;
+  $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED] = COLOR_CHANGED;
+  $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_CHANGED_RENAMED] = COLOR_CHANGED;
+  $scope.LEGEND_GRAPH_COLORS[NODE_TYPE_RENAMED] = COLOR_UNCHANGED;
+
+  $scope.LEGEND_GRAPH_SECONDARY_LABELS = {};
+  $scope.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_CHANGED_RENAMED] = '(was: Old name)';
+  $scope.LEGEND_GRAPH_SECONDARY_LABELS[NODE_TYPE_RENAMED] = '(was: Old name)';
+
   $scope.LEGEND_GRAPH_LINK_PROPERTY_MAPPING = {
     'hidden': 'stroke: none; marker-end: none;'
   };
@@ -261,54 +272,51 @@ oppia.controller('ExplorationHistory', [
 
   // Functions to show modal of history diff of a state
   // stateId is the unique ID assigned to a state during calculation of state
-  // graph, stateName is the name of the state in the newer version,
-  // oldStateName is the name of the state in the older version, or undefined
-  // if the state name in the 2 versions are the same.
-  $scope.onClickStateInHistoryGraph = function(stateId, stateName, oldStateName) {
-    if (stateName !== END_DEST) {
-      $scope.showStateDiffModal(stateId, stateName, oldStateName);
+  // graph.
+  $scope.onClickStateInHistoryGraph = function(stateId) {
+    if (nodesData[stateId].newestStateName !== END_DEST) {
+      var oldStateName = undefined;
+      if (nodesData[stateId].newestStateName != nodesData[stateId].originalStateName) {
+        oldStateName = nodesData[stateId].originalStateName;
+      }
+      $scope.showStateDiffModal(nodesData[stateId].newestStateName,
+        oldStateName, nodesData[stateId].stateProperty);
     }
   };
 
   // Shows a modal comparing changes on a state between 2 versions.
-  // stateId is the unique ID assigned to a state during calculation of state
-  // graph.
   // stateName is the name of the state in the newer version.
   // oldStateName is undefined if the name of the state is unchanged between
   // the 2 versions, or the name of the state in the older version if the state
   // name is changed.
-  $scope.showStateDiffModal = function(stateId, stateName, oldStateName) {
+  // stateProperty is whether the state is added, changed, unchanged or deleted
+  $scope.showStateDiffModal = function(stateName, oldStateName, stateProperty) {
     $modal.open({
       templateUrl: 'modals/stateDiff',
       backdrop: 'static',
       windowClass: 'state-diff-modal',
       resolve: {
-        stateId: function() {
-          return stateId;
-        },
         stateName: function() {
           return stateName;
         },
         oldStateName: function() {
           return oldStateName;
         },
+        stateProperty: function() {
+          return stateProperty;
+        },
         compareVersionMetadata: function() {
           return $scope.compareVersionMetadata;
         },
         explorationId: function() {
           return $scope.explorationId;
-        },
-        stateProperty: function() {
-          // An object whose keys are state IDs and whose values are the property
-          // (added, deleted, changed or unchanged) of the state.
-          return $scope.stateProperty;
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'stateId', 'stateName', 'oldStateName',
+        '$scope', '$modalInstance', 'stateName', 'oldStateName',
           'compareVersionMetadata', 'explorationId', 'stateProperty',
           function(
-          $scope, $modalInstance, stateId, stateName, oldStateName,
+          $scope, $modalInstance, stateName, oldStateName,
           compareVersionMetadata, explorationId, stateProperty) {
         var stateDownloadUrl = '/createhandler/download_state/' + explorationId;
         $scope.stateName = stateName;
@@ -318,13 +326,11 @@ oppia.controller('ExplorationHistory', [
 
         var STATE_PROPERTY_ADDED = 'added';
         var STATE_PROPERTY_DELETED = 'deleted';
-        var STATE_PROPERTY_CHANGED = 'changed';
-        var STATE_PROPERTY_UNCHANGED = 'unchanged';
 
         if (oldStateName === undefined) {
           oldStateName = stateName;
         }
-        if (stateProperty[stateId] != STATE_PROPERTY_DELETED) {
+        if (stateProperty != STATE_PROPERTY_DELETED) {
           $http.get(stateDownloadUrl + '?v=' +
             $scope.compareVersionMetadata.laterVersion.versionNumber + '&state=' +
             stateName + '&width=50')
@@ -335,7 +341,7 @@ oppia.controller('ExplorationHistory', [
           $scope.yamlStrs['leftPane'] = '';
         }
 
-        if (stateProperty[stateId] != STATE_PROPERTY_ADDED) {
+        if (stateProperty != STATE_PROPERTY_ADDED) {
           $http.get(stateDownloadUrl + '?v=' +
             $scope.compareVersionMetadata.earlierVersion.versionNumber + '&state=' +
             oldStateName + '&width=50')

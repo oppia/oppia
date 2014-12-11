@@ -99,7 +99,7 @@
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                       ng-class="{clickable: canNavigateToNode(node.id), 'init-node': node.isInitNode, 'end-node': node.isEndNode, 'bad-node': node.isBadNode, 'normal-node': node.isNormalNode}"
                       ng-attr-style="<[node.style]>"
-                      ng-click="onClickFunction(node.id, node.label, node.secondaryLabel)">
+                      ng-click="onClickFunction(node.id)">
                 </rect>
                 <title><[getNodeTitle(node)]></title>
                 <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>">

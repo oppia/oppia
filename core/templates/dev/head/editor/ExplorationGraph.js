@@ -46,10 +46,7 @@ oppia.controller('ExplorationGraph', [
     explorationStatesService.deleteState(deleteStateName);
   };
 
-  $scope.onClickStateInMinimap = function(unusedStateId, stateName,
-      unusedSecondaryLabel) {
-    // In the exploration graph, stateId should equal stateName.
-    // unusedSecondaryLabel should be undefined.
+  $scope.onClickStateInMinimap = function(stateName) {
     if (stateName !== END_DEST) {
       routerService.navigateToMainTab(stateName);
     }
