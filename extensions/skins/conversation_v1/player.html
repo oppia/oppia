@@ -40,24 +40,21 @@
 
             <div class="conversation-skin-answer-feedback-pair" ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
               <table class="conversation-skin-card-row-container">
-                <tr ng-show="responsePair.learnerAsnwer" class="conversation-skin-card-row"> 
+                <tr ng-show="responsePair.learnerAnswer" class="conversation-skin-card-row"> 
                   <td class="conversation-skin-row-avatar" valign="top"> 
                     <img class="conversation-skin-row-avatar-img" src="/images/user.png">
                   </td>
                   <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
                 </tr>
               </table>
-              <div class="conversation-skin-card-row protractor-test-conversation-feedback"
-                  aria-live="<[$last ? 'polite' : 'off']>" aria-atomic="true">
-                <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">
-                  <tr class="conversation-skin-card-row">
-                    <td class="conversation-skin-row-avatar" valign="top"> 
-                      <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
-                    </td>
-                    <td angular-html-bind="responsePair.oppiaFeedback"></td>
-                  </tr>
-                </table>
-              </div>
+              <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">
+                <tr class="conversation-skin-card-row">
+                  <td class="conversation-skin-row-avatar" valign="top"> 
+                    <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
+                  </td>
+                  <td class = "protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
+                </tr>
+              </table>
             </div>
 
             <div ng-show="$last && !!nextCardContent">
@@ -79,7 +76,6 @@
                     <td angular-html-bind="inputTemplate"></td>
                   </tr>
                 </table>
-                
               </div>
               <div ng-show="isAnswerBeingProcessed()">
                 <center style="font-size: 8em;">
