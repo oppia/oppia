@@ -57,13 +57,8 @@
               </table>
             </div>
 
-            <div ng-show="$last && !!nextCardContent">
-              <button type="button" class="btn btn-default pull-right" ng-click="continueToNextCard()">
-                Continue
-              </button>
-            </div>
 
-            <div ng-show="!finished && $last && !nextCardContent">
+            <div ng-show="!finished && $last">
               <!-- This iframe must always be contained within a div in
               which it is the only element. For more information, please
               see the ReaderExploration.js file. -->

@@ -60,12 +60,25 @@ oppia.directive('conversationSkin', [function() {
         $scope.initializePage();
       };
 
+
       var _addNewCard = function(contentHtml) {
         $scope.allResponseStates.push({
           content: contentHtml,
           answerFeedbackPairs: []
         });
       };
+
+      var _scrollToLastEntry = function() {
+        var lastEntryEls = document.getElementsByClassName(
+          'conversation-skin-last-log-entry');
+        $scope.adjustPageHeight(true, function() {
+          if (lastEntryEls.length > 0) {
+            // TODO(sll): Try and drop this in favor of an Angular-based solution.
+            $('html, body, iframe').animate(
+              {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
+          }
+        });
+      }
 
       $scope.isLoggedIn = false;
       $scope.mostRecentQuestionIndex = null;
@@ -89,21 +102,11 @@ oppia.directive('conversationSkin', [function() {
             messengerService.EXPLORATION_LOADED, null);
           $scope.showPage = true;
           $scope.adjustPageHeight(false, null);
-
           $window.scrollTo(0, 0);
         });
       };
 
       $scope.initializePage();
-
-      // Temporary storage for the next card's content. This is null iff a 'next card'
-      // exists (in which case we show a 'Continue' button to go to it).
-      $scope.nextCardContent = null;
-
-      $scope.continueToNextCard = function() {
-        _addNewCard($scope.nextCardContent);
-        $scope.nextCardContent = null;
-      };
 
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
@@ -127,27 +130,14 @@ oppia.directive('conversationSkin', [function() {
 
           // If there is a change in state, use a new card.
           if (oldStateName !== newStateName) {
-            if (feedbackHtml) {
-              $scope.nextCardContent = questionHtml;
-            } else {
-              _addNewCard(questionHtml);
-
-              var lastEntryEls = document.getElementsByClassName(
-                'conversation-skin-last-log-entry');
-              $scope.adjustPageHeight(true, function() {
-                if (lastEntryEls.length > 0) {
-                  // TODO(sll): Try and drop this in favor of an Angular-based solution.
-                  $('html, body, iframe').animate(
-                    {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
-                }
-              });
-            }
+            _addNewCard(questionHtml);
           }
 
           if ($scope.finished) {
             messengerService.sendMessage(
               messengerService.EXPLORATION_COMPLETED, null);
           }
+          _scrollToLastEntry();
         });
       };
 
