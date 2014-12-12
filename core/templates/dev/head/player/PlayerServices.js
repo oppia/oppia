@@ -165,6 +165,7 @@ oppia.factory('oppiaPlayerService', [
   var stateHistory = [];
   var _currentStateName = null;
   var answerIsBeingProcessed = false;
+  var _viewerhasEditingRights = false;
 
   var _updateStatus = function(newParams, newStateName) {
     // TODO(sll): Do this more incrementally.
@@ -310,7 +311,7 @@ oppia.factory('oppiaPlayerService', [
     stopwatch.resetStopwatch();
     _updateStatus(newParams, initStateName);
     $rootScope.$broadcast('playerStateChange');
-    callback(initStateName, initHtml);
+    callback(initStateName, initHtml, _viewerHasEditingRights);
   };
 
   // This should only be called when _exploration is non-null.
@@ -377,6 +378,7 @@ oppia.factory('oppiaPlayerService', [
           _exploration = data.exploration;
           isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
+          _viewerHasEditingRights = true;
           _loadInitialState(successCallback);
         }).error(function(data) {
           warningsData.addWarning(
