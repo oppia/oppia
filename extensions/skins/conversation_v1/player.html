@@ -27,7 +27,7 @@
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last, 'conversation-skin-old-content': !$last}">
           <md-card class="conversation-skin-card">
-            <table class="conversation-skin-card-row-container">
+            <table ng-show="state.content" class="conversation-skin-card-row-container">
               <tr class="conversation-skin-card-row">
                 <td class="conversation-skin-row-avatar" valign="top"> 
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
@@ -40,7 +40,7 @@
 
             <div class="conversation-skin-answer-feedback-pair" ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
               <table class="conversation-skin-card-row-container">
-                <tr class="conversation-skin-card-row"> 
+                <tr ng-show="responsePair.learnerAsnwer" class="conversation-skin-card-row"> 
                   <td class="conversation-skin-row-avatar" valign="top"> 
                     <img class="conversation-skin-row-avatar-img" src="/images/user.png">
                   </td>
@@ -49,7 +49,7 @@
               </table>
               <div class="conversation-skin-card-row protractor-test-conversation-feedback"
                   aria-live="<[$last ? 'polite' : 'off']>" aria-atomic="true">
-                <table style="width: 100%;">
+                <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">
                   <tr class="conversation-skin-card-row">
                     <td class="conversation-skin-row-avatar" valign="top"> 
                       <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
@@ -90,9 +90,16 @@
               </div>
             </div>
 
-            <div ng-show="finished && $last">
-              Congratulations, you have finished this exploration!
-            </div>
+            <table ng-show="finished && $last" class="conversation-skin-card-row-container">
+              <tr class="conversation-skin-card-row">
+                <td class="conversation-skin-row-avatar" valign="top"> 
+                  <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
+                </td>
+                <td>
+                  Congratulations, you have finished this exploration!
+                </td>
+              </tr>
+            </table>
           </md-card>
         </div>
       </div>
