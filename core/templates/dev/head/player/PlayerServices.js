@@ -330,7 +330,7 @@ oppia.factory('oppiaPlayerService', [
      */
     init: function(successCallback) {
       if (_editorPreviewMode) {
-        
+
         var initExplorationUrl = '/createhandler/init_exploration/' + _explorationId;
         $http.post(initExplorationUrl, {
           exp_param_specs: _exploration.param_specs,
@@ -351,7 +351,7 @@ oppia.factory('oppiaPlayerService', [
           stopwatch.resetStopwatch();
           _updateStatus(data.params, data.state_name);
           $rootScope.$broadcast('playerStateChange');
-          successCallback(data.state_name, data.init_html);
+          successCallback(data.state_name, data.init_html, data.can_edit);
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
@@ -455,9 +455,9 @@ oppia.factory('oppiaPlayerService', [
     openExplorationEditorPage: function() {
       if (_editorPreviewMode) {
         warningsData.addWarning(
-          'The \'Look Inside\' functionality is not available in preview mode. ' +
-          'In non-preview mode, it will open the exploration editor page in a ' +
-          'new tab.');
+          'The \'View Source/Edit\' functionality is not available in ' +
+          'preview mode. In non-preview mode, it will open the exploration ' +
+          'editor page in a new tab.');
         return;
       }
 

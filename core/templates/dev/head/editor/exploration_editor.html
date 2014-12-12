@@ -326,7 +326,14 @@
                 </span>
 
                 <div class="btn-group">
-                  <label class="btn btn-default protractor-test-exit-preview-mode" ng-model="isInPreviewMode" btn-radio="false" ng-click="exitPreviewMode()"><span class="glyphicon glyphicon-pencil"></span> Edit</label>
+                  <label class="btn btn-default protractor-test-exit-preview-mode" ng-model="isInPreviewMode" btn-radio="false" ng-click="exitPreviewMode()">
+                    <span ng-if="!editabilityService.isEditable()">
+                      <span class="glyphicon glyphicon-file"></span> Source
+                    </span>
+                    <span ng-if="editabilityService.isEditable()">
+                      <span class="glyphicon glyphicon-pencil"></span> Edit
+                    </span>
+                  </label>
                   <label id="tutorialPreviewExplorationButton" class="btn btn-default protractor-test-enter-preview-mode" ng-model="isInPreviewMode" btn-radio="true" ng-click="enterPreviewMode()"><span class="glyphicon glyphicon-play"></span> Preview</label>
                 </div>
               </span>

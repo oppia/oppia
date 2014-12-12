@@ -744,12 +744,13 @@ class ChangeListSummaryHandler(EditorHandler):
             })
 
 
-class InitExplorationHandler(EditorHandler):
+class InitExplorationHandler(base.BaseHandler):
     """Performs a get_init_html_and_params() operation server-side and
     returns the result. This is done while maintaining no state.
     """
 
-    @require_editor
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
     def post(self, exploration_id):
         """Handles POST requests."""
         exp_param_specs_dict = self.payload.get('exp_param_specs', {})
