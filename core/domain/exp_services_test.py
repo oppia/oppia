@@ -787,7 +787,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Check that updates cannot be made to non-existent parameters."""
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                r'The parameter myParam .* does not exist .*'):
+                r'The parameter with name \'myParam\' .* does not exist .*'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID, _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),

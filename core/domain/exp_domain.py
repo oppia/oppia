@@ -884,10 +884,6 @@ class Exploration(object):
                 raise utils.ValidationError(
                     'Only parameter names with characters in [a-zA-Z0-9] are '
                     'accepted.')
-            if param_name in feconf.INVALID_PARAMETER_NAMES:
-                raise utils.ValidationError(
-                    'The parameter with name %s is reserved. Please choose '
-                    'another one.' % param_name)
             self.param_specs[param_name].validate()
 
         if not isinstance(self.param_changes, list):
@@ -898,7 +894,12 @@ class Exploration(object):
             param_change.validate()
             if param_change.name not in self.param_specs:
                 raise utils.ValidationError(
-                    'No parameter named %s exists in this exploration'
+                    'No parameter named \'%s\' exists in this exploration'
+                    % param_change.name)
+            if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                raise utils.ValidationError(
+                    'The exploration-level parameter with name \'%s\' is '
+                    'reserved. Please choose a different name.'
                     % param_change.name)
 
         # TODO(sll): Find a way to verify the param change customization args
@@ -908,13 +909,20 @@ class Exploration(object):
         # link to this one?
 
         # Check that all state param changes are valid.
-        for state in self.states.values():
+        for state_name, state in self.states.iteritems():
             for param_change in state.param_changes:
                 param_change.validate()
                 if param_change.name not in self.param_specs:
                     raise utils.ValidationError(
-                        'The parameter %s was used in a state, but it does '
-                        'not exist in this exploration.' % param_change.name)
+                        'The parameter with name \'%s\' was set in state '
+                        '\'%s\', but it does not exist in the list of '
+                        'parameter specifications for this exploration.'
+                        % (param_change.name, state_name))
+                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                    raise utils.ValidationError(
+                        'The parameter name \'%s\' is reserved. Please choose '
+                        'a different name for the parameter being set in '
+                        'state \'%s\'.' % (param_change.name, state_name))
 
         # Check that all rule definitions, destinations and param changes are
         # valid.
