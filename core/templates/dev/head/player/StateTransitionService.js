@@ -25,22 +25,44 @@
 // a null value is returned.
 //
 // Examples:
-//   processString('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
-//   processString('abc{{a}}', [{}]) returns null.
-//   processString('abc', [{}]) returns 'abc'.
+//   processHtml('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
+//   processHtml('abc{{a}}', [{}]) returns null.
+//   processHtml('abc', [{}]) returns 'abc'.
+//   processHtml('{[a}}', [{'a': '<button></button>'}]) returns '&lt;button&gt;&lt;/button&gt;'.
+//   processUnicode('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
+//   processUnicode('abc{{a}}', [{}]) returns null.
+//   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns '<button></button>'.
 //   processValue('{{a}}', [{'a': 'b'}]) returns 'b'.
 //   processValue('{{a}}', [{}]) returns null.
 //   processValue('a', [{'a': 'b'}]) throws an error.
 //   processValue(345, [{'a': 'b'}]) throws an error.
 //   processValue('345{{a}}', [{}]) throws an error.
 oppia.factory('expressionInterpolationService', [
-    '$filter', 'expressionEvaluatorService',
-    function($filter, expressionEvaluatorService) {
+    '$filter', 'expressionEvaluatorService', 'oppiaHtmlEscaper',
+    function($filter, expressionEvaluatorService, oppiaHtmlEscaper) {
   return {
-    processString: function(sourceString, envs) {
+    // This method also escapes the resulting HTML.
+    processHtml: function(sourceHtml, envs) {
       try {
-        return sourceString.replace(/{{([^}]*)}}/g, function(match, p1) {
-          // TODO(sll): Remove the call to oppiaHtmlEscaper once we have a
+        return sourceHtml.replace(/{{([^}]*)}}/g, function(match, p1) {
+          // TODO(sll): Remove the call to $filter once we have a
+          // custom UI for entering expressions. It is only needed because
+          // expressions are currently input inline via the RTE.
+          return oppiaHtmlEscaper.unescapedStrToEscapedStr(
+            expressionEvaluatorService.evaluateExpression(
+              $filter('convertHtmlToUnicode')(p1), envs));
+        });
+      } catch (e) {
+        if (e instanceof expressionEvaluatorService.ExpressionError) {
+          return null;
+        }
+        throw e;
+      }
+    },
+    processUnicode: function(sourceUnicode, envs) {
+      try {
+        return sourceUnicode.replace(/{{([^}]*)}}/g, function(match, p1) {
+          // TODO(sll): Remove the call to $filter once we have a
           // custom UI for entering expressions. It is only needed because
           // expressions are currently input inline via the RTE.
           return expressionEvaluatorService.evaluateExpression(
@@ -53,7 +75,6 @@ oppia.factory('expressionInterpolationService', [
         throw e;
       }
     },
-
     // valueExpression should be a string of the form '{{...}}'.
     processValue: function(valueExpression, envs) {
       valueExpression = valueExpression.trim();
@@ -92,7 +113,7 @@ oppia.factory('stateTransitionService', [
   // Evaluate feedback.
   var makeFeedback = function(feedbacks, envs) {
     var feedbackHtml = feedbacks.length > 0 ? randomFromArray(feedbacks) : '';
-    return expressionInterpolationService.processString(feedbackHtml, envs);
+    return expressionInterpolationService.processHtml(feedbackHtml, envs);
   };
 
   // Evaluate parameters. Returns null if any evaluation fails.
@@ -103,7 +124,7 @@ oppia.factory('stateTransitionService', [
         if (!pc.customization_args.parse_with_jinja) {
           newParams[pc.name] = pc.customization_args.value;
         } else {
-          var paramValue = expressionInterpolationService.processString(
+          var paramValue = expressionInterpolationService.processUnicode(
             pc.customization_args.value, [newParams].concat(envs));
           if (paramValue === null) {
             return false;
@@ -126,7 +147,7 @@ oppia.factory('stateTransitionService', [
 
   // Evaluate question string.
   var makeQuestion = function(newState, envs) {
-    return expressionInterpolationService.processString(
+    return expressionInterpolationService.processHtml(
       newState.content[0].value, envs);
   };
 

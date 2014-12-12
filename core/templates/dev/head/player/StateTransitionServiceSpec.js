@@ -28,12 +28,26 @@ describe('Expression interpolation service', function() {
       expressionInterpolationService = $injector.get('expressionInterpolationService');
     }));
 
-    it('should correctly interpolate strings', function() {
-      expect(expressionInterpolationService.processString('abc', [{}])).toEqual('abc');
+    it('should correctly interpolate and escape HTML strings', function() {
+      expect(expressionInterpolationService.processHtml('abc', [{}])).toEqual('abc');
       expect(
-        expressionInterpolationService.processString('abc{{a}}', [{'a': 'b'}])
+        expressionInterpolationService.processHtml('abc{{a}}', [{'a': 'b'}])
       ).toEqual('abcb');
-      expect(expressionInterpolationService.processString('abc{{a}}', [{}])).toBeNull();
+      expect(
+        expressionInterpolationService.processHtml('abc{{a}}', [{'a': '<script></script>'}])
+      ).toEqual('abc&lt;script&gt;&lt;/script&gt;');
+      expect(expressionInterpolationService.processHtml('abc{{a}}', [{}])).toBeNull();
+    });
+
+    it('should correctly interpolate unicode strings', function() {
+      expect(expressionInterpolationService.processUnicode('abc', [{}])).toEqual('abc');
+      expect(
+        expressionInterpolationService.processUnicode('abc{{a}}', [{'a': 'b'}])
+      ).toEqual('abcb');
+      expect(
+        expressionInterpolationService.processUnicode('abc{{a}}', [{'a': '<script></script>'}])
+      ).toEqual('abc<script></script>');
+      expect(expressionInterpolationService.processUnicode('abc{{a}}', [{}])).toBeNull();
     });
 
     it('should correctly interpolate values', function() {
