@@ -185,9 +185,9 @@ def to_ascii(string):
         'NFKD', unicode(string)).encode('ascii', 'ignore')
 
 
-def yaml_from_dict(dictionary):
+def yaml_from_dict(dictionary, width=80):
     """Gets the YAML representation of a dict."""
-    return yaml.safe_dump(dictionary, default_flow_style=False)
+    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
 
 
 def dict_from_yaml(yaml_str):

@@ -384,13 +384,15 @@ def export_to_zip_file(exploration_id, version=None):
     return o.getvalue()
 
 
-def export_to_dict(exploration_id, version=None):
-    """Returns a python dictionary of the exploration."""
+def export_states_to_yaml(exploration_id, version=None, width=80):
+    """Returns a python dictionary of the exploration, whose keys are state
+    names and values are yaml strings representing the state contents with
+    lines wrapped at 'width' characters."""
     exploration = get_exploration_by_id(exploration_id, version=version)
-    yaml_repr = exploration.to_yaml()
-    exploration_dict = {
-        'yaml': yaml_repr
-    }
+    exploration_dict = {}
+    for state in exploration.states:
+        exploration_dict[state] = utils.yaml_from_dict(
+            exploration.states[state].to_dict(), width=width)
     return exploration_dict
 
 

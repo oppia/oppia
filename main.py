@@ -249,6 +249,9 @@ urls = [
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),
     get_redirect_route(
+        r'/createhandler/download_state/<exploration_id>',
+        editor.StateDownloadHandler, 'state_download_handler'),
+    get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
     get_redirect_route(

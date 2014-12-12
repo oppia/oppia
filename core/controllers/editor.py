@@ -518,7 +518,8 @@ class ResolvedAnswersHandler(EditorHandler):
 
 
 class ExplorationDownloadHandler(EditorHandler):
-    """Downloads an exploration as a zip file or JSON."""
+    """Downloads an exploration as a zip file, or dict of YAML strings
+    representing states."""
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -529,6 +530,7 @@ class ExplorationDownloadHandler(EditorHandler):
 
         version = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
+        width = int(self.request.get('width', default_value=80))
 
         # If the title of the exploration has changed, we use the new title
         filename = 'oppia-%s-v%s' % (
@@ -541,11 +543,36 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-            self.render_json(
-                exp_services.export_to_dict(exploration_id, version))
+                self.render_json(exp_services.export_states_to_yaml(
+                    exploration_id, version=version, width=width))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
+
+
+class StateDownloadHandler(EditorHandler):
+    """Downloads a state as a YAML string."""
+
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        version = self.request.get('v', default_value=exploration.version)
+        width = int(self.request.get('width', default_value=80))
+
+        try:
+            state = self.request.get('state')
+        except:
+            raise self.InvalidInputException('State not found')
+
+        exploration_dict = exp_services.export_states_to_yaml(
+            exploration_id, version=version, width=width)
+        if state not in exploration_dict:
+            raise self.PageNotFoundException
+        self.response.write(exploration_dict[state])
 
 
 class ExplorationResourcesHandler(EditorHandler):

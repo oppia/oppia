@@ -165,7 +165,7 @@ oppia.factory('stateGraphArranger', [
       }
 
       // Calculate the width and height of each grid rectangle.
-      var totalRows = maxDepth + 1;
+      var totalRows = maxDepth;
       // Set totalColumns to be MAX_NODES_PER_ROW, so that the width of the graph
       // visualization can be calculated based on a fixed constant, MAX_NODES_PER_ROW.
       // Otherwise, the width of the individual nodes is dependent on the number
@@ -282,6 +282,7 @@ oppia.directive('stateGraphViz', [
       allowPanning: '@',
       currentStateId: '&',
       centerAtCurrentState: '@',
+      // Function called when node is clicked. Should take a parameter node.id.
       onClickFunction: '=',
       onDeleteFunction: '=',
       onMaximizeFunction: '=',
@@ -382,7 +383,7 @@ oppia.directive('stateGraphViz', [
         for (var nodeId in nodeData) {
           maxDepth = Math.max(maxDepth, nodeData[nodeId].depth);
         }
-        $scope.GRAPH_HEIGHT = 80.0 * (maxDepth + 1);
+        $scope.GRAPH_HEIGHT = 70.0 * (maxDepth + 1);
 
         // Change the position values in nodeData to use pixels.
         for (var nodeId in nodeData) {
@@ -497,7 +498,7 @@ oppia.directive('stateGraphViz', [
           var tooltip = node.label;
 
           if (node.hasOwnProperty('secondaryLabel')) {
-            tooltip += ' | ' + node.secondaryLabel;
+            tooltip += ' ' + node.secondaryLabel;
           }
 
           if (warning) {

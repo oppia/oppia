@@ -3,12 +3,19 @@
     display: none;
   }
   .CodeMirror-merge, .CodeMirror-merge .CodeMirror {
-    height: 700px;
+    height: 55vh;
+  }
+  .state-diff-modal .modal-dialog {
+    max-width: 1200px;
+    width: 90%;
+  }
+  .state-diff-modal .modal-body {
+    height: 60vh;
   }
 </style>
 <div ng-controller="ExplorationHistory">
 
-  <div ng-hide="displayedExplorationSnapshots" class="oppia-align-center">
+  <div ng-hide="explorationVersionMetadata" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
     <span class="oppia-loading-dot-two">.</span>
@@ -19,61 +26,94 @@
     <div class="oppia-main-content">
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h4>Version History</h4>
-        <div ng-repeat="snapshot in displayedExplorationSnapshots">
-          <input type="radio" name="compareVer1" ng-model="comparePanesVersions.leftPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'leftPane')">
-          <input type="radio" name="compareVer2" ng-model="comparePanesVersions.rightPane" ng-value="snapshot.versionNumber" ng-change="changeCompareVersion(snapshot.versionNumber, 'rightPane')">
-          [<[snapshot.versionNumber]>]
-          <strong><[snapshot.committerId]></strong>
-          <[snapshot.commitMessage]>
+        <div ng-repeat="versionNumber in snapshotOrderArray">
+          <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')">
+          <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')">
+          [<[versionNumber]>]
+          <strong><[explorationVersionMetadata[versionNumber].committerId]></strong>
+          <[explorationVersionMetadata[versionNumber].commitMessage]>
           <span class="pull-right">
-            <em><[snapshot.createdOn]></em>
-            <span ng-if="snapshot.versionNumber !== currentVersion && editabilityService.isEditable()">
-              | <a href="#" ng-click="showRevertExplorationModal(snapshot.versionNumber)">Revert</a>
+            <em><[explorationVersionMetadata[versionNumber].createdOn]></em>
+            <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
+              | <a href="#" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
             </span>
             <span>
-              | <a href="#" ng-click="downloadExplorationWithVersion(snapshot.versionNumber)" title="Download exploration as a zip file.">Download</a>
+              | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
             </span>
           </span>
         </div>
 
         <br>
 
-        <div ng-hide="!displayedExplorationSnapshots || hideCompareVersionsButton">
-          <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showMergeview()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+        <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
+          <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
         </div>
 
-        <div ng-hide="hideCodemirror || !displayedExplorationSnapshots" id="codemirrorMergeviewInstance">
-          <table class="table" style="margin-top: 15px">
-            <!-- Table ratios 53:47 is to ensure text above right pane is aligned to codemirror gutter -->
-            <td style="width: 53%">
-              <div>
-                <strong>Revision #<[compareSnapshot.leftPane.versionNumber]></strong>
-                by
-                <strong><[compareSnapshot.leftPane.committerId]></strong>
-                on
-                <strong><[compareSnapshot.leftPane.createdOn]></strong>
+        <div ng-hide="hideHistoryGraph || !explorationVersionMetadata">
+          <hr>
+          <div class="container">
+            <div class="row">
+              <div class="col-lg-8 col-md-8 col-sm-8">
+                <h4>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h4>
+                <div ng-hide="diffGraphData" class="oppia-align-center">
+                  Loading
+                  <span class="oppia-loading-dot-one">.</span>
+                  <span class="oppia-loading-dot-two">.</span>
+                  <span class="oppia-loading-dot-three">.</span>
+                </div>
+                <div state-graph-viz graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
+                </div>
               </div>
-              <[compareSnapshot.leftPane.commitMessage]>
-            </td>
-            <td style="width: 47%">
-              <div>
-                <strong>Revision #<[compareSnapshot.rightPane.versionNumber]></strong>
-                by
-                <strong><[compareSnapshot.rightPane.committerId]></strong>
-                on
-                <strong><[compareSnapshot.rightPane.createdOn]></strong>
+              <div class="col-lg-4 col-md-4 col-sm-4">
+                <h4>Exploration Graph Legend</h4>
+                <div state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
               </div>
-              <[compareSnapshot.rightPane.commitMessage]>
-            </td>
-          </table>
-          <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrs.leftPane" right-value="yamlStrs.rightPane"></codemirror-mergeview>
-          <div align="center" style="margin-bottom: 20px">
-            <strong>Click arrows to synchronize scrolling</strong>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <script type="text/ng-template" id="modals/stateDiff">
+    <div class="modal-header">
+      <h3>Changes for <[stateName]><span ng-show="oldStateName"> (was: <[oldStateName]>)</span></h3>
+    </div>
+    <table class="table" style="margin-left: 20px; table-layout: fixed; width: 97%">
+      <!-- Spacing on the left of table and in the middle of the table is to ensure text above each pane is aligned to codemirror gutter. -->
+      <td style="width: 47%; word-wrap: break-word">
+        <div>
+          <strong>Revision #<[compareVersionMetadata.laterVersion.versionNumber]></strong>
+          by
+          <strong><[compareVersionMetadata.laterVersion.committerId]></strong>
+          on
+          <strong><[compareVersionMetadata.laterVersion.createdOn]></strong>
+        </div>
+        <[compareVersionMetadata.laterVersion.commitMessage]>
+      </td>
+      <td style="width: 6%"></td>
+      <td style="width: 47%; word-wrap: break-word">
+        <div>
+          <strong>Revision #<[compareVersionMetadata.earlierVersion.versionNumber]></strong>
+          by
+          <strong><[compareVersionMetadata.earlierVersion.committerId]></strong>
+          on
+          <strong><[compareVersionMetadata.earlierVersion.createdOn]></strong>
+        </div>
+        <[compareVersionMetadata.earlierVersion.commitMessage]>
+      </td>
+    </table>
+    <div class="modal-body" style="margin-top: -30px">
+      <codemirror-mergeview codemirror-mergeview-options="CODEMIRROR_MERGEVIEW_OPTIONS" left-value="yamlStrs.leftPane" right-value="yamlStrs.rightPane"></codemirror-mergeview>
+      <div align="center" style="margin-bottom: 20px">
+        <strong>Click arrows to desynchronize scrolling</strong>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-default" ng-click="return()">Done</button>
+    </div>
+  </script>
 
   <script type="text/ng-template" id="modals/revertExploration">
     <div class="modal-header">
