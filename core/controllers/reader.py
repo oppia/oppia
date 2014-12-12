@@ -210,6 +210,9 @@ class ExplorationHandler(base.BaseHandler):
         session_id = utils.generate_random_string(24)
 
         self.values.update({
+            'can_edit': (
+                self.user_id and
+                rights_manager.Actor(self.user_id).can_edit(exploration_id)),
             'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
             'init_html': init_html,
