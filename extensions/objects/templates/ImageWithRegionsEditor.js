@@ -34,6 +34,7 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.REGION_LABEL_OFFSET_X = 3;
         $scope.REGION_LABEL_OFFSET_Y = 12;
 
+        //All coordinates have origin at top-left, increasing in x to the right and increasing in y down
         // Current mouse position in SVG coordinates
         $scope.mouseX = $scope.mouseY = 0;
         // Original mouse click position for rectangle drawing
@@ -55,6 +56,8 @@ oppia.directive('imageWithRegionsEditor', [
           if (newVal === '') {
             return;
           }
+          // Loads the image in hanging <img> tag so as to get the
+          // width and height
           $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
             function() {
               $scope.imageWidth = this.width;

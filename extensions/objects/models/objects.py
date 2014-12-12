@@ -535,8 +535,9 @@ class NormalizedRectangle2D(BaseObject):
     
     @classmethod
     def normalize(cls, raw):
-        def clamp(minval, curval, maxval):
-            return min(maxval, max(minval, curval))
+        # Moves cur_value to the nearest available value in the range [min_value, max_value]
+        def clamp(min_value, cur_value, max_value):
+            return min(max_value, max(min_value, cur_value))
         try:
             raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
             
@@ -558,16 +559,8 @@ class ImageRegion(BaseObject):
     
     # Note: at the moment, only supports rectangular image regions
     # Coordinates are [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]]
-    SCHEMA = {
-        'type': 'dict',
-        'properties': [{
-            'name': 'label',
-            'schema': UnicodeString.SCHEMA
-        }, {
-            'name': 'region',
-            'schema': NormalizedRectangle2D.SCHEMA
-        }]
-    }
+    # origin is top-left, increasing x is to the right, increasing y is down
+    SCHEMA = NormalizedRectangle2D.SCHEMA
 
 
 class ImageWithRegions(BaseObject):
@@ -586,7 +579,16 @@ class ImageWithRegions(BaseObject):
             'name': 'imageRegions',
             'schema': {
                 'type': 'list',
-                'items': ImageRegion.SCHEMA 
+                'items': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'label',
+                        'schema': UnicodeString.SCHEMA
+                    }, {
+                        'name': 'region',
+                        'schema': ImageRegion.SCHEMA 
+                    }]
+                }
             }
         }]
     }
