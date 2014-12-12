@@ -41,8 +41,7 @@ var expectExplorationNameToBe = function(name) {
 var expectContentToMatch = function(richTextInstructions) {
   forms.expectRichText(
     element.all(by.repeater('response in responseLog track by $index')).
-      last().element(by.css('.protractor-test-conversation-content')).
-        element(by.xpath('./div'))
+      last().element(by.css('.protractor-test-conversation-content'))
   ).toMatch(richTextInstructions);
 };
 
@@ -50,7 +49,7 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
   forms.expectRichText(
     element.all(by.repeater('response in responseLog track by $index')).
       last().element(by.css('.protractor-test-conversation-feedback')).
-        element(by.xpath('./div/div')).getText()
+        element(by.xpath('./div')).getText()
   ).toMatch(richTextInstructions);
 };
 

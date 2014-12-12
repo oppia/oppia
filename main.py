@@ -235,6 +235,12 @@ urls = [
     get_redirect_route(
         r'/explorehandler/next_state/<exploration_id>',
         reader.NextStateHandler, 'reader_next_state_handler'),
+    # Temporary handler.
+    # TODO(sll): Remove this once we have full support for client-side
+    # expressions.
+    get_redirect_route(
+        r'/explorehandler/init_exploration/<exploration_id>',
+        reader.InitExplorationHandler, 'reader_init_exploration_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
@@ -278,11 +284,6 @@ urls = [
     get_redirect_route(
         r'/createhandler/started_tutorial_event/<exploration_id>',
         editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
-    # Temporary handlers to support preview mode.
-    # TODO(sll): Remove this once we have support for client-side expressions.
-    get_redirect_route(
-        r'/createhandler/init_exploration/<exploration_id>',
-        editor.InitExplorationHandler, 'editor_init_exploration_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,

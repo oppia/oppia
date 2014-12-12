@@ -40,10 +40,6 @@ oppia.controller('StateEditor', [
   });
 
   $scope.initStateEditor = function() {
-    explorationData.getData().then(function(data) {
-      $scope.paramSpecs = data.param_specs || {};
-    });
-
     $scope.stateNameEditorIsShown = false;
 
     $scope.stateName = editorContextService.getActiveStateName();

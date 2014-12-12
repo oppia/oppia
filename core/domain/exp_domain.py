@@ -173,8 +173,7 @@ class Content(object):
                 'Expected context params for parsing content to be a dict, '
                 'received %s' % params)
 
-        return html_cleaner.clean(
-            '<div>%s</div>' % jinja_utils.parse_string(self.value, params))
+        return html_cleaner.clean(jinja_utils.parse_string(self.value, params))
 
 
 class RuleSpec(object):
@@ -885,6 +884,10 @@ class Exploration(object):
                 raise utils.ValidationError(
                     'Only parameter names with characters in [a-zA-Z0-9] are '
                     'accepted.')
+            if param_name in feconf.INVALID_PARAMETER_NAMES:
+                raise utils.ValidationError(
+                    'The parameter with name %s is reserved. Please choose '
+                    'another one.' % param_name)
             self.param_specs[param_name].validate()
 
         if not isinstance(self.param_changes, list):

@@ -154,15 +154,18 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             'town square')
         self.submit_and_compare(0, '', 'Is it')
         self.submit_and_compare(2, '', 'Do you want to play again?')
-        self.submit_and_compare(1, '', 'how do you think he does it?')
-        self.submit_and_compare('middle',
-            'he\'s always picking a number in the middle',
-            'what number the magician picked')
-        self.submit_and_compare(0, 'Exactly!', 'try it out')
-        self.submit_and_compare(10, '', 'best worst case')
-        self.submit_and_compare(
-            0, '', 'to be sure our strategy works in all cases')
-        self.submit_and_compare(0, 'try to guess', '')
+        # TODO(sll): Redo all of the following as a JS test, since the
+        # backend can no longer parse expressions:
+        #
+        # self.submit_and_compare(1, '', 'how do you think he does it?')
+        # self.submit_and_compare('middle',
+        #     'he\'s always picking a number in the middle',
+        #     'what number the magician picked')
+        # self.submit_and_compare(0, 'Exactly!', 'try it out')
+        # self.submit_and_compare(10, '', 'best worst case')
+        # self.submit_and_compare(
+        #     0, '', 'to be sure our strategy works in all cases')
+        # self.submit_and_compare(0, 'try to guess', '')
 
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""

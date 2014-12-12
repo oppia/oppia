@@ -523,6 +523,15 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
+oppia.factory('explorationParamSpecsService', [
+    'explorationPropertyService', function(explorationPropertyService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'param_specs';
+  child._isValid = function(value) {
+    return true;
+  };
+  return child;
+}]);
 
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no

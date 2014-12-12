@@ -126,6 +126,12 @@ XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
+# Invalid names for parameters used in expressions.
+AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
+INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
+    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
+    'pow', 'round', 'then']
+
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
@@ -238,7 +244,7 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_of_widgets.yaml', 'Test of widgets', 'Test'),
+    ('test_exploration.yaml', 'Test of expressions and widgets', 'Test'),
     ('modeling_graphs', 'Graph Modeling', 'Mathematics')
 ]
 

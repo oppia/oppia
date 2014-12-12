@@ -118,12 +118,11 @@ oppia.factory('answerClassificationService', [
 oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
-    'oppiaHtmlEscaper', 'answerClassificationService',
+    'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
     function(
       $http, $rootScope, $modal, $filter, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
-      oppiaHtmlEscaper, answerClassificationService) {
-
+      oppiaHtmlEscaper, answerClassificationService, stateTransitionService) {
   var _END_DEST = 'END';
 
   var _editorPreviewMode = null;
@@ -247,9 +246,10 @@ oppia.factory('oppiaPlayerService', [
 
   var stopwatch = stopwatchProviderService.getInstance();
 
-  var _onStateTransitionProcessed = function(data, answer, handler, successCallback) {
+  var _onStateTransitionProcessed = function(
+      newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
+      handler, successCallback) {
     var oldStateName = _currentStateName;
-    var newStateName = data.state_name;
     var oldStateData = _exploration.states[oldStateName];
     // NB: This may be undefined if newStateName === END_DEST.
     var newStateData = _exploration.states[newStateName];
@@ -261,7 +261,7 @@ oppia.factory('oppiaPlayerService', [
     // happen in the same place. Perhaps in the non-sticky case we should call
     // a frontend method named appendFeedback() or similar.
     var isSticky = (
-      newStateName !== _END_DEST && newStateData.widget.sticky &&
+      newStateName && newStateData.widget.sticky &&
       newStateData.widget.widget_id === oldStateData.widget.widget_id);
 
     if (!_editorPreviewMode) {
@@ -280,11 +280,11 @@ oppia.factory('oppiaPlayerService', [
       messengerService.sendMessage(messengerService.STATE_TRANSITION, {
         oldStateName: _currentStateName,
         jsonAnswer: JSON.stringify(answer),
-        newStateName: data.state_name
+        newStateName: newStateName ? newStateName : 'END'
       });
     }
 
-    _updateStatus(data.params, data.state_name);
+    _updateStatus(newParams, newStateName);
     stopwatch.resetStopwatch();
 
     // TODO(sll): Get rid of this special case for multiple choice.
@@ -296,14 +296,52 @@ oppia.factory('oppiaPlayerService', [
     var readerResponseHtml = _getReaderResponseHtml(
       _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
     if (newStateData) {
-      learnerParamsService.init(data.params);
+      learnerParamsService.init(newParams);
     }
 
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
-      newStateName, isSticky, data.question_html, readerResponseHtml,
-      data.feedback_html);
+      newStateName, isSticky, newQuestionHtml, readerResponseHtml,
+      newFeedbackHtml);
+  };
+
+  var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
+    stopwatch.resetStopwatch();
+    _updateStatus(newParams, initStateName);
+    $rootScope.$broadcast('playerStateChange');
+    callback(initStateName, initHtml);
+  };
+
+  // This should only be called when _exploration is non-null.
+  var _loadInitialState = function(successCallback) {
+    var initStateName = _exploration.init_state_name;
+    var initStateData = stateTransitionService.getInitStateData(
+      _exploration.param_specs, _exploration.param_changes,
+      _exploration.states[initStateName]);
+
+    if (initStateData) {
+      _onInitialStateProcessed(
+        initStateName, initStateData.question_html, initStateData.params,
+        successCallback);
+    } else {
+      console.warn('Server evaluation required.');
+      console.log(
+        'Data sent to server for evaluation: ', _exploration.states[initStateName]);
+
+      var initExplorationUrl = '/explorehandler/init_exploration/' + _explorationId;
+      $http.post(initExplorationUrl, {
+        exp_param_specs: _exploration.param_specs,
+        exp_param_changes: _exploration.param_changes,
+        init_state: _exploration.states[initStateName]
+      }).success(function(initHtmlAndParamsData) {
+        _onInitialStateProcessed(
+          _exploration.init_state_name, initHtmlAndParamsData.init_html,
+          initHtmlAndParamsData.params, successCallback);
+      }).error(function(data) {
+        warningsData.addWarning('Expression parsing error.');
+      });
+    }
   };
 
   return {
@@ -316,7 +354,8 @@ oppia.factory('oppiaPlayerService', [
       }
     },
     /**
-     * Loads the data for the initial state of the exploration.
+     * Initializes an exploration, passing the data for the first state to
+     * successCallback.
      *
      * In editor preview mode, populateExploration() should be called before
      * calling init().
@@ -329,29 +368,16 @@ oppia.factory('oppiaPlayerService', [
      *       state.
      */
     init: function(successCallback) {
+      answerIsBeingProcessed = false;
+
       if (_editorPreviewMode) {
-        
-        var initExplorationUrl = '/createhandler/init_exploration/' + _explorationId;
-        $http.post(initExplorationUrl, {
-          exp_param_specs: _exploration.param_specs,
-          init_state: _exploration.states[_exploration.init_state_name],
-          exp_param_changes: _exploration.param_changes
-        }).success(function(initHtmlAndParamsData) {
-          stopwatch.resetStopwatch();
-          _updateStatus(initHtmlAndParamsData.params, _exploration.init_state_name);
-          $rootScope.$broadcast('playerStateChange');
-          successCallback(
-            _exploration.init_state_name, initHtmlAndParamsData.init_html);
-        });
+        _loadInitialState(successCallback);
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
           isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
-          stopwatch.resetStopwatch();
-          _updateStatus(data.params, data.state_name);
-          $rootScope.$broadcast('playerStateChange');
-          successCallback(data.state_name, data.init_html);
+          _loadInitialState(successCallback);
         }).error(function(data) {
           warningsData.addWarning(
             data.error || 'There was an error loading the exploration.');
@@ -412,24 +438,50 @@ oppia.factory('oppiaPlayerService', [
           });
         }
 
+        var finished = (ruleSpec.dest === 'END');
         var nextStateDictUrl = '/explorehandler/next_state/' + _explorationId;
-        var newStateName = (ruleSpec.dest !== 'END') ? ruleSpec.dest : null;
-        $http.post(nextStateDictUrl, {
-          exp_param_specs: angular.copy(_exploration.param_specs),
-          old_state_name: _currentStateName,
-          input_type: ruleSpec.inputType,
-          params: learnerParamsService.getAllParams(),
-          rule_spec: ruleSpec,
-          new_state: newStateName ? _exploration.states[newStateName] : null,
-          answer: answer
-        }).success(function(data) {
+        var newStateName = finished ? null : ruleSpec.dest;
+
+        // Compute the client evaluation result. This may be null if there are
+        // malformed expressions.
+        var clientEvalResult = stateTransitionService.getNextStateData(
+          ruleSpec,
+          finished ? null : _exploration.states[newStateName],
+          answer);
+
+        if (clientEvalResult) {
+          clientEvalResult['state_name'] = newStateName;
           answerIsBeingProcessed = false;
-          _onStateTransitionProcessed(data, answer, handler, successCallback);
-        }).error(function(data) {
-          answerIsBeingProcessed = false;
-          warningsData.addWarning(
-            data.error || 'There was an error processing your input.');
-        });
+          _onStateTransitionProcessed(
+            clientEvalResult.state_name, clientEvalResult.params,
+            clientEvalResult.question_html, clientEvalResult.feedback_html,
+            answer, handler, successCallback);
+        } else {
+          console.warn('Server evaluation required.');
+          if (!finished) {
+            console.log(
+              'Data sent to server for evaluation: ', _exploration.states[newStateName]);
+          }
+
+          // Make a server call only when client evaluation fails.
+          $http.post(nextStateDictUrl, {
+            exp_param_specs: angular.copy(_exploration.param_specs),
+            old_state_name: _currentStateName,
+            input_type: ruleSpec.inputType,
+            params: learnerParamsService.getAllParams(),
+            rule_spec: ruleSpec,
+            new_state: finished ? null : _exploration.states[newStateName],
+            answer: answer
+          }).success(function(data) {
+            answerIsBeingProcessed = false;
+            _onStateTransitionProcessed(
+              data.state_name, data.params, data.question_html,
+              data.feedback_html, answer, handler, successCallback);
+          }).error(function(data) {
+            answerIsBeingProcessed = false;
+            warningsData.addWarning('Expression parsing error.');
+          });
+        }
       });
     },
     showFeedbackModal: function() {

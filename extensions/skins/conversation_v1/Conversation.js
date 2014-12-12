@@ -36,6 +36,31 @@ oppia.directive('conversationSkin', [function() {
         return oppiaPlayerService.isAnswerBeingProcessed();
       };
 
+      // If the exploration is iframed, send data to its parent about its height so
+      // that the parent can be resized as necessary.
+      $scope.lastRequestedHeight = 0;
+      $scope.lastRequestedScroll = false;
+      $scope.adjustPageHeight = function(scroll, callback) {
+        window.setTimeout(function() {
+          var newHeight = document.body.scrollHeight;
+          if (Math.abs($scope.lastRequestedHeight - newHeight) <= 50.5 &&
+              (!scroll || $scope.lastRequestedScroll)) {
+            return;
+          }
+          // Sometimes setting iframe height to the exact content height still
+          // produces scrollbar, so adding 50 extra px.
+          newHeight += 50;
+          messengerService.sendMessage(messengerService.HEIGHT_CHANGE,
+            {height: newHeight, scroll: scroll});
+          $scope.lastRequestedHeight = newHeight;
+          $scope.lastRequestedScroll = scroll;
+
+          if (callback) {
+            callback();
+          }
+        }, 500);
+      };
+
       $window.addEventListener('beforeunload', function(e) {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
             !oppiaPlayerService.isInPreviewMode()) {
@@ -107,8 +132,10 @@ oppia.directive('conversationSkin', [function() {
           warningsData.clear();
           $scope.hasInteractedAtLeastOnce = true;
 
+          var _oldStateName = $scope.stateName;
+
           $scope.stateName = newStateName;
-          $scope.finished = (newStateName === 'END');
+          $scope.finished = !Boolean(newStateName);
 
           if (!$scope.finished && !isSticky) {
             // The previous widget is not sticky and should be replaced.
@@ -116,11 +143,11 @@ oppia.directive('conversationSkin', [function() {
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }
 
-          // TODO(sll): Check the state change instead of question_html so that it
-          // works correctly when the new state doesn't have a question string.
-          var isQuestion = !!questionHtml;
+          var isQuestion = (_oldStateName !== newStateName) && !!questionHtml;
           if (isQuestion) {
             $scope.mostRecentQuestionIndex = $scope.responseLog.length;
+          } else {
+            questionHtml = '';
           }
 
           // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
@@ -151,31 +178,6 @@ oppia.directive('conversationSkin', [function() {
               messengerService.EXPLORATION_COMPLETED, null);
           }
         });
-      };
-
-      // If the exploration is iframed, send data to its parent about its height so
-      // that the parent can be resized as necessary.
-      $scope.lastRequestedHeight = 0;
-      $scope.lastRequestedScroll = false;
-      $scope.adjustPageHeight = function(scroll, callback) {
-        window.setTimeout(function() {
-          var newHeight = document.body.scrollHeight;
-          if (Math.abs($scope.lastRequestedHeight - newHeight) <= 50.5 &&
-              (!scroll || $scope.lastRequestedScroll)) {
-            return;
-          }
-          // Sometimes setting iframe height to the exact content height still
-          // produces scrollbar, so adding 50 extra px.
-          newHeight += 50;
-          messengerService.sendMessage(messengerService.HEIGHT_CHANGE,
-            {height: newHeight, scroll: scroll});
-          $scope.lastRequestedHeight = newHeight;
-          $scope.lastRequestedScroll = scroll;
-
-          if (callback) {
-            callback();
-          }
-        }, 500);
       };
 
       $window.onresize = function() {

@@ -106,21 +106,19 @@ def get_next_state_dict(
     the new state name, response HTML, and updated parameters.
     """
     finished = (rule_spec.dest == feconf.END_DEST)
-    new_params = (
-        {} if finished
-        else _get_updated_param_dict(
-            old_params, new_state.param_changes, exp_param_specs))
+    new_params = _get_updated_param_dict(
+        old_params, {} if finished else new_state.param_changes,
+        exp_param_specs)
 
     return {
-        'feedback_html': '<div>%s</div>' % jinja_utils.parse_string(
+        'feedback_html': jinja_utils.parse_string(
             rule_spec.get_feedback_string(), old_params),
         'finished': finished,
         'params': new_params,
         'question_html': (
             new_state.content[0].to_html(new_params)
-            if not finished and old_state_name != rule_spec.dest
-            else ''),
-        'state_name': rule_spec.dest,
+            if not finished else ''),
+        'state_name': rule_spec.dest if not finished else None,
     }
 
 
@@ -293,6 +291,36 @@ class StateHitEventHandler(base.BaseHandler):
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
+
+
+class InitExplorationHandler(base.BaseHandler):
+    """Performs a get_init_html_and_params() operation server-side and
+    returns the result. This is done while maintaining no state.
+    """
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
+        exp_param_specs = {
+            ps_name: param_domain.ParamSpec.from_dict(ps_val)
+            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
+        }
+        # A domain object representing the old state.
+        init_state = exp_domain.State.from_dict(self.payload.get('init_state'))
+        # A domain object representing the exploration-level parameter changes.
+        exp_param_changes = [
+            param_domain.ParamChange.from_dict(param_change_dict)
+            for param_change_dict in self.payload.get('exp_param_changes')]
+
+        init_html, init_params = get_init_html_and_params(
+            exp_param_changes, init_state, exp_param_specs)
+
+        self.render_json({
+            'init_html': init_html,
+            'params': init_params,
+        })
 
 
 class ClassifyHandler(base.BaseHandler):

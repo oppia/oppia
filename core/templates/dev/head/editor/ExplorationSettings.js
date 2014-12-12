@@ -22,12 +22,13 @@ oppia.controller('ExplorationSettings', [
     '$scope', '$http', '$window', '$modal', '$rootScope', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
-    'explorationInitStateNameService', 'changeListService', 'warningsData',
-    'explorationStatesService', function(
+    'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
+    'warningsData', 'explorationStatesService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
-      explorationInitStateNameService, changeListService, warningsData, explorationStatesService) {
+      explorationInitStateNameService, explorationParamSpecsService, changeListService,
+      warningsData, explorationStatesService) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -45,9 +46,9 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationLanguageCodeService = explorationLanguageCodeService;
     $scope.explorationRightsService = explorationRightsService;
     $scope.explorationInitStateNameService = explorationInitStateNameService;
+    $scope.explorationParamSpecsService = explorationParamSpecsService;
 
     explorationData.getData().then(function(data) {
-      $scope.paramSpecs = data.param_specs || {};
       $scope.explorationParamChanges = data.param_changes || [];
       $scope.refreshSettingsTab();
     });
@@ -110,13 +111,6 @@ oppia.controller('ExplorationSettings', [
         'param_changes', newValue, oldValue);
     }
   };
-
-  $scope.$watch('paramSpecs', function(newValue, oldValue) {
-    if (oldValue !== undefined && !$scope.isDiscardInProgress
-        && !angular.equals(newValue, oldValue)) {
-      changeListService.editExplorationProperty('param_specs', newValue, oldValue);
-    }
-  });
 
   $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
     if (oldValue !== undefined && !$scope.isDiscardInProgress
