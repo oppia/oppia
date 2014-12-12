@@ -22,29 +22,34 @@ html, body {
   background-color: #eeedee;
 }
 
-/* Additional CSS for the conversation_v1 skin. */
-.conversation-skin-input {
-  padding-left: 7%;
-}
-
-.conversation-answer-feedback-pair {
+/* 
+  Additional CSS for the conversation_v1 skin. 
+  All classes below should start with .conversation-skin  
+ */
+.conversation-skin-answer-feedback-pair {
   padding-top: 20px;
 }
 
-.conversation-response-container {
+.conversation-skin-card-row-container {
   width: 100%;
 }
 
-.conversation-skin-avatar {
+.conversation-skin-card-row {
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.conversation-skin-row-avatar {
   width: 7%;
 }
 
-.conversation-skin-avatar-img {
+.conversation-skin-row-avatar-img {
   width: 30px;
   height: 30px;
 }
 
-.conversation-skin-content {
+.conversation-skin-row-content {
   width: 93%;
 }
 
@@ -67,25 +72,8 @@ html, body {
   text-align: justify;
 }
 
-.conversation-skin-content {
-}
-
 .conversation-skin-learner-answer {
   color: #579287;
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
-
-.conversation-skin-oppia-feedback {
-  margin-bottom: 20px;
-  margin-top: 20px;
-}
-
-.conversation-skin-interaction {
-  margin-top: 20px;
-}
-
-.conversation-skin-endtext {
 }
 
 .affix {

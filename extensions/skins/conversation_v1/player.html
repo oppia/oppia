@@ -27,34 +27,34 @@
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last, 'conversation-skin-old-content': !$last}">
           <md-card class="conversation-skin-card">
-            <table class="conversation-response-container">
-              <tr>
-                <td class="conversation-skin-avatar" valign="top"> 
-                  <img class="conversation-skin-avatar-img" src="/images/oppia_favicon_mint.png"></img>
+            <table class="conversation-skin-card-row-container">
+              <tr class="conversation-skin-card-row">
+                <td class="conversation-skin-row-avatar" valign="top"> 
+                  <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                 </td>
-                <td class="conversation-skin-content protractor-test-conversation-content"
+                <td class="protractor-test-conversation-content"
                      angular-html-bind="state.content">
                 </td>
               </tr>
             </table>
 
-            <div class="conversation-answer-feedback-pair" ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
-              <table class="conversation-response-container">
-                <tr>
-                  <td class="conversation-skin-avatar" valign="top"> 
-                    <img class="conversation-skin-avatar-img" src="/images/user.png"></img>
+            <div class="conversation-skin-answer-feedback-pair" ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
+              <table class="conversation-skin-card-row-container">
+                <tr class="conversation-skin-card-row"> 
+                  <td class="conversation-skin-row-avatar" valign="top"> 
+                    <img class="conversation-skin-row-avatar-img" src="/images/user.png">
                   </td>
-                  <td class="conversation-skin-content conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
+                  <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
                 </tr>
               </table>
-              <div class="conversation-response-container conversation-skin-oppia-feedback protractor-test-conversation-feedback"
+              <div class="conversation-skin-card-row protractor-test-conversation-feedback"
                   aria-live="<[$last ? 'polite' : 'off']>" aria-atomic="true">
-                <table class="conversation-response-container">
-                  <tr>
-                    <td class="conversation-skin-avatar" valign="top"> 
-                      <img class="conversation-skin-avatar-img" src="/images/oppia_favicon_mint.png"></img>
+                <table style="width: 100%;">
+                  <tr class="conversation-skin-card-row">
+                    <td class="conversation-skin-row-avatar" valign="top"> 
+                      <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                     </td>
-                    <td class="conversation-skin-content" angular-html-bind="responsePair.oppiaFeedback"></td>
+                    <td angular-html-bind="responsePair.oppiaFeedback"></td>
                   </tr>
                 </table>
               </div>
@@ -66,12 +66,20 @@
               </button>
             </div>
 
-            <div class="conversation-skin-interaction" ng-show="!finished && $last && !nextCardContent">
+            <div ng-show="!finished && $last && !nextCardContent">
               <!-- This iframe must always be contained within a div in
               which it is the only element. For more information, please
               see the ReaderExploration.js file. -->
               <div ng-hide="isAnswerBeingProcessed()">
-                <div class="conversation-skin-input" angular-html-bind="inputTemplate"></div>
+                <table class="conversation-skin-card-row-container">
+                  <tr class="conversation-skin-card-row">
+                    <td class="conversation-skin-row-avatar" valign="top"> 
+                      <!-- No avatar on user input. Hence This is Empty -->
+                    </td>
+                    <td angular-html-bind="inputTemplate"></td>
+                  </tr>
+                </table>
+                
               </div>
               <div ng-show="isAnswerBeingProcessed()">
                 <center style="font-size: 8em;">
@@ -82,7 +90,7 @@
               </div>
             </div>
 
-            <div class="conversation-skin-endtext" ng-show="finished && $last">
+            <div ng-show="finished && $last">
               Congratulations, you have finished this exploration!
             </div>
           </md-card>
