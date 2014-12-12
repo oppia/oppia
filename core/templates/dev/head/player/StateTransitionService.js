@@ -38,8 +38,10 @@
 //   processValue(345, [{'a': 'b'}]) throws an error.
 //   processValue('345{{a}}', [{}]) throws an error.
 oppia.factory('expressionInterpolationService', [
-    '$filter', 'expressionEvaluatorService', 'oppiaHtmlEscaper',
-    function($filter, expressionEvaluatorService, oppiaHtmlEscaper) {
+    '$filter', 'expressionParserService',
+    'expressionEvaluatorService', 'oppiaHtmlEscaper',
+    function($filter, expressionParserService, expressionEvaluatorService,
+             oppiaHtmlEscaper) {
   return {
     // This method also escapes the resulting HTML.
     processHtml: function(sourceHtml, envs) {
@@ -53,7 +55,9 @@ oppia.factory('expressionInterpolationService', [
               $filter('convertHtmlToUnicode')(p1), envs));
         });
       } catch (e) {
-        if (e instanceof expressionEvaluatorService.ExpressionError) {
+        if (e instanceof expressionParserService.SyntaxError) {
+          return null;
+        } else if (e instanceof expressionEvaluatorService.ExpressionError) {
           return null;
         }
         throw e;
@@ -69,7 +73,9 @@ oppia.factory('expressionInterpolationService', [
             $filter('convertHtmlToUnicode')(p1), envs);
         });
       } catch (e) {
-        if (e instanceof expressionEvaluatorService.ExpressionError) {
+        if (e instanceof expressionParserService.SyntaxError) {
+          return null;
+        } else if (e instanceof expressionEvaluatorService.ExpressionError) {
           return null;
         }
         throw e;
@@ -88,11 +94,9 @@ oppia.factory('expressionInterpolationService', [
       try {
         return expressionEvaluatorService.evaluateExpression(valueExpression, envs);
       } catch (e) {
-        if (e instanceof expressionEvaluatorService.ExpressionError) {
+        if (e instanceof expressionParserService.SyntaxError) {
           return null;
-        }
-        // This can arise if an expression using Jinja syntax is detected.
-        if (e.name === 'SyntaxError') {
+        } else if (e instanceof expressionEvaluatorService.ExpressionError) {
           return null;
         }
         throw e;

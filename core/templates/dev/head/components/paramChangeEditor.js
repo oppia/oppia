@@ -109,6 +109,17 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
         });
       };
 
+      $scope.$on('externalSave', function() {
+        if ($scope.paramChangesMemento !== null) {
+          // An edit view is active.
+          $scope.commitParamChange($scope.activeItem);
+          if ($scope.paramChangesMemento !== null) {
+            // The save failed. Discard the change.
+            $scope.resetEditor();
+          }
+        }
+      });
+
       // Called when an 'add param change' action is triggered.
       $scope.startAddParamChange = function() {
         $scope.resetParamNameChoices();
@@ -176,8 +187,6 @@ oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsServ
             return;
           }
         }
-
-        $scope.$broadcast('externalSave');
 
         var name = $scope.tmpParamChange.name;
         var generator_id = $scope.tmpParamChange.generator_id;

@@ -318,12 +318,12 @@ oppia.factory('expressionEvaluatorService', ['$log', 'expressionParserService',
     '&&': function(args, envs) {
       // TODO(kashida): Make this short-circuit.
       verifyNumArgs(args, 2);
-      return args[0] && args[1];
+      return Boolean(args[0] && args[1]);
     },
     '||': function(args, envs) {
       // TODO(kashida): Make this short-circuit.
       verifyNumArgs(args, 2);
-      return args[0] || args[1];
+      return Boolean(args[0] || args[1]);
     },
     'if': function(args, envs) {
       // TODO(kashida): Make this short-circuit.

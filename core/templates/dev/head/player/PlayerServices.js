@@ -338,6 +338,8 @@ oppia.factory('oppiaPlayerService', [
         _onInitialStateProcessed(
           _exploration.init_state_name, initHtmlAndParamsData.init_html,
           initHtmlAndParamsData.params, successCallback);
+      }).error(function(data) {
+        warningsData.addWarning('Expression parsing error.');
       });
     }
   };
@@ -477,8 +479,7 @@ oppia.factory('oppiaPlayerService', [
               data.feedback_html, answer, handler, successCallback);
           }).error(function(data) {
             answerIsBeingProcessed = false;
-            warningsData.addWarning(
-              data.error || 'There was an error processing your input.');
+            warningsData.addWarning('Expression parsing error.');
           });
         }
       });

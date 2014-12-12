@@ -23,6 +23,9 @@
             <br>
 
             <input class="btn btn-success" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name || INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
+            <div style="color: red;" aria-live="assertive" ng-if="INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
+              The name '<[tmpParamChange.name]>' is reserved. Please choose another name.
+            </div>
           </form>
         </div>
       </div>
