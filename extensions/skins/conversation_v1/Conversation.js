@@ -62,6 +62,7 @@ oppia.directive('conversationSkin', [function() {
 
 
       var _addNewCard = function(contentHtml) {
+        console.log('add New');
         $scope.allResponseStates.push({
           content: contentHtml,
           answerFeedbackPairs: []
@@ -78,7 +79,7 @@ oppia.directive('conversationSkin', [function() {
               {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
           }
         });
-      }
+      };
 
       $scope.isLoggedIn = false;
       $scope.mostRecentQuestionIndex = null;
@@ -108,6 +109,15 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.initializePage();
 
+      // Temporary storage for the next card's content. This is not null iff a 'next card'   
+      // exists (At this point the feedback for the 'current card' is displayed, the user
+      // gets 2seconds to read it and then 'next card' is shown).     
+      $scope.nextCardContent = null;     
+      $scope.continueToNextCard = function() {  
+        _addNewCard($scope.nextCardContent);    
+        $scope.nextCardContent = null;
+      };
+
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
@@ -130,7 +140,18 @@ oppia.directive('conversationSkin', [function() {
 
           // If there is a change in state, use a new card.
           if (oldStateName !== newStateName) {
-            _addNewCard(questionHtml);
+            // If there is a feedback:
+            // Store content for the next card.
+            // Scroll down so that the user can see the feedback.
+            // Pause for 2000ms so that the user can read the feedback.
+            // Show the next card.
+            if (feedbackHtml) {
+              $scope.nextCardContent = questionHtml; 
+              _scrollToLastEntry();
+              $timeout($scope.continueToNextCard, 2000);
+            } else {
+              _addNewCard(questionHtml);
+            }
           }
 
           if ($scope.finished) {
