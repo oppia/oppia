@@ -352,7 +352,7 @@ oppia.controller('ExplorationHistory', [
           $scope.yamlStrs['rightPane'] = '';
         }
 
-        $scope.return = function() {
+        $scope.cancel = function() {
           $modalInstance.dismiss('cancel');
         };
 
