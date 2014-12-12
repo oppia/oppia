@@ -165,7 +165,7 @@ oppia.factory('oppiaPlayerService', [
   var stateHistory = [];
   var _currentStateName = null;
   var answerIsBeingProcessed = false;
-  var _viewerhasEditingRights = false;
+  var _viewerHasEditingRights = false;
 
   var _updateStatus = function(newParams, newStateName) {
     // TODO(sll): Do this more incrementally.
