@@ -7,15 +7,15 @@
       <a class="btn btn-default protractor-test-restart-exploration" ng-click="resetPage()" style="text-align: left;">
         <span class="glyphicon glyphicon-refresh"></span> Restart
       </a>
-      <button class="btn btn-default" ng-click="showFeedbackModal()" style="text-align: left;">
+      <a class="btn btn-default" ng-click="showFeedbackModal()" style="text-align: left;">
         <span class="glyphicon glyphicon-envelope"></span> Feedback
-      </button>
+      </a>
       <a class="btn btn-default" ng-click="openExplorationEditorPage()" style="text-align: left;" target="_blank">
         <span ng-if="hasEditingRights">
           <span class="glyphicon glyphicon-pencil"></span> Edit
         </span>
         <span ng-if="!hasEditingRights">
-          <span class="glyphicon glyphicon-cog"></span> View Source
+          <span class="glyphicon glyphicon-cog"></span> Look Inside
         </span>
       </a>
     </div>
