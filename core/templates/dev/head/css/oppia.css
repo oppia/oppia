@@ -1157,3 +1157,21 @@ oppia-parameter {
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
 }
+
+oppia-expression-error-tag {
+  background-color: #d9534f;
+  border-radius: .25em;
+  color: white;
+  display: inline;
+  font-size: 75%;
+  font-weight: bold;
+  line-height: 1;
+  margin: auto 4px;
+  padding: .2em .6em .3em;
+  text-align: center;
+  vertical-align: baseline;
+  white-space: nowrap;
+}
+oppia-expression-error-tag:after {
+  content: "Expression parsing error!";
+}

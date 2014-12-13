@@ -19,10 +19,8 @@
  * @author kashida@google.com (Koji Ashida)
  */
 
-// Interpolates a string containing expressions, or a value which is
-// represented by an expression. In either case, the string/value
-// is evaluated against the supplied environments. If the interpolation fails,
-// a null value is returned.
+// Interpolates an HTML or a unicode string containing expressions.
+// The input value is evaluated against the supplied environments.
 //
 // Examples:
 //   processHtml('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
@@ -32,37 +30,38 @@
 //   processUnicode('abc{{a}}', [{'a': 'b'}]) gives 'abcb'.
 //   processUnicode('abc{{a}}', [{}]) returns null.
 //   processUnicode('{[a}}', [{'a': '<button></button>'}]) returns '<button></button>'.
-//   processValue('{{a}}', [{'a': 'b'}]) returns 'b'.
-//   processValue('{{a}}', [{}]) returns null.
-//   processValue('a', [{'a': 'b'}]) throws an error.
-//   processValue(345, [{'a': 'b'}]) throws an error.
-//   processValue('345{{a}}', [{}]) throws an error.
 oppia.factory('expressionInterpolationService', [
     '$filter', 'expressionParserService',
     'expressionEvaluatorService', 'oppiaHtmlEscaper',
     function($filter, expressionParserService, expressionEvaluatorService,
              oppiaHtmlEscaper) {
   return {
-    // This method also escapes the resulting HTML.
+    // This method should only be used if its result would immediately be
+    // displayed on the screen without passing through further computation.
+    // It differs from other methods in this service in that it
+    // auto-escapes the returned HTML, and returns an 'error' label if the
+    // evaluation fails.
     processHtml: function(sourceHtml, envs) {
-      try {
-        return sourceHtml.replace(/{{([^}]*)}}/g, function(match, p1) {
+      return sourceHtml.replace(/{{([^}]*)}}/g, function(match, p1) {
+        try {
           // TODO(sll): Remove the call to $filter once we have a
           // custom UI for entering expressions. It is only needed because
           // expressions are currently input inline via the RTE.
           return oppiaHtmlEscaper.unescapedStrToEscapedStr(
             expressionEvaluatorService.evaluateExpression(
               $filter('convertHtmlToUnicode')(p1), envs));
-        });
-      } catch (e) {
-        if (e instanceof expressionParserService.SyntaxError) {
-          return null;
-        } else if (e instanceof expressionEvaluatorService.ExpressionError) {
-          return null;
+        } catch (e) {
+          var EXPRESSION_ERROR_TAG = (
+            '<oppia-expression-error-tag></oppia-expression-error-tag>');
+          if ((e instanceof expressionParserService.SyntaxError) ||
+              (e instanceof expressionEvaluatorService.ExpressionError)) {
+            return EXPRESSION_ERROR_TAG;
+          }
+          throw e;
         }
-        throw e;
-      }
+      });
     },
+    // Returns null if the evaluation fails.
     processUnicode: function(sourceUnicode, envs) {
       try {
         return sourceUnicode.replace(/{{([^}]*)}}/g, function(match, p1) {
@@ -73,30 +72,8 @@ oppia.factory('expressionInterpolationService', [
             $filter('convertHtmlToUnicode')(p1), envs);
         });
       } catch (e) {
-        if (e instanceof expressionParserService.SyntaxError) {
-          return null;
-        } else if (e instanceof expressionEvaluatorService.ExpressionError) {
-          return null;
-        }
-        throw e;
-      }
-    },
-    // valueExpression should be a string of the form '{{...}}'.
-    processValue: function(valueExpression, envs) {
-      valueExpression = valueExpression.trim();
-      if (valueExpression.indexOf('{{') !== 0 ||
-          valueExpression.indexOf('}}') + 2 !== valueExpression.length) {
-        throw 'Invalid value expression: ' + valueExpression;
-      }
-
-      valueExpression = valueExpression.substring(
-        2, valueExpression.length - 2);
-      try {
-        return expressionEvaluatorService.evaluateExpression(valueExpression, envs);
-      } catch (e) {
-        if (e instanceof expressionParserService.SyntaxError) {
-          return null;
-        } else if (e instanceof expressionEvaluatorService.ExpressionError) {
+        if ((e instanceof expressionParserService.SyntaxError) ||
+            (e instanceof expressionEvaluatorService.ExpressionError)) {
           return null;
         }
         throw e;

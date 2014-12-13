@@ -36,7 +36,17 @@ describe('Expression interpolation service', function() {
       expect(
         expressionInterpolationService.processHtml('abc{{a}}', [{'a': '<script></script>'}])
       ).toEqual('abc&lt;script&gt;&lt;/script&gt;');
-      expect(expressionInterpolationService.processHtml('abc{{a}}', [{}])).toBeNull();
+      expect(expressionInterpolationService.processHtml('abc{{a}}', [{}])).toEqual(
+        'abc<oppia-expression-error-tag></oppia-expression-error-tag>');
+      expect(expressionInterpolationService.processHtml(
+        'abc{{a{{b}}}}', [{'a': '1', 'b': '2'}])
+      ).toEqual('abc<oppia-expression-error-tag></oppia-expression-error-tag>}}');
+
+      expect(expressionInterpolationService.processHtml(
+        'abc{{a+b}}', [{'a': '1', 'b': '2'}])).toEqual('abc3');
+      expect(expressionInterpolationService.processHtml(
+        'abc{{a+b}}', [{'a': '1', 'b': 'hello'}])
+      ).toEqual('abc<oppia-expression-error-tag></oppia-expression-error-tag>');
     });
 
     it('should correctly interpolate unicode strings', function() {
@@ -48,16 +58,11 @@ describe('Expression interpolation service', function() {
         expressionInterpolationService.processUnicode('abc{{a}}', [{'a': '<script></script>'}])
       ).toEqual('abc<script></script>');
       expect(expressionInterpolationService.processUnicode('abc{{a}}', [{}])).toBeNull();
-    });
 
-    it('should correctly interpolate values', function() {
-      expect(
-        expressionInterpolationService.processValue('{{a}}', [{'a': 'b'}])
-      ).toEqual('b');
-      expect(function() {
-        expressionInterpolationService.processValue('a', [{'a': 'b'}])
-      }).toThrow();
-      expect(expressionInterpolationService.processValue('{{a}}', [{}])).toBeNull();
+      expect(expressionInterpolationService.processUnicode(
+        'abc{{a+b}}', [{'a': '1', 'b': '2'}])).toEqual('abc3');
+      expect(expressionInterpolationService.processUnicode(
+        'abc{{a+b}}', [{'a': '1', 'b': 'hello'}])).toBeNull();
     });
   });
 });
