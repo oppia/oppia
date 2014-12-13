@@ -26,8 +26,7 @@ import zipfile
 import common
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
-STATIC_DIR = os.path.join('.', 'static')
-STATIC_IMAGES_DIR = os.path.join(STATIC_DIR, 'images')
+STATIC_IMAGES_DIR = os.path.join('.', 'static', 'images')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
 

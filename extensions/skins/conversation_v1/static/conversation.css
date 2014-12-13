@@ -28,10 +28,9 @@ html, body {
  */
 .conversation-skin-exploration-intro-card {
   background: rgb(255,255,255);
-  text-align: justify;
   font-family: 'Roboto';
   text-align: center;
-  padding: 0px 0px 50px 0px;
+  padding: 0 0 50px 0;
 }
 
 .conversation-skin-icons {
@@ -42,7 +41,8 @@ html, body {
 .conversation-skin-exploration-bookmark-rate {
   margin-left: auto;
   margin-right: auto;
-  width: 20%;
+  min-width: 20%; 
+  max-width: 130px;
 }
 
 .conversation-skin-exploration-bookmark {
@@ -69,16 +69,12 @@ html, body {
 }
 
 .conversation-skin-row-avatar {
-  width: 7%;
+  min-width: 40px;
 }
 
 .conversation-skin-row-avatar-img {
-  width: 30px;
+  max-width: 30px;
   height: 30px;
-}
-
-.conversation-skin-row-content {
-  width: 93%;
 }
 
 .conversation-skin-exploration-header {
