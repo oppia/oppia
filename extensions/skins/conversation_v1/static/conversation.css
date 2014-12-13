@@ -26,6 +26,33 @@ html, body {
   Additional CSS for the conversation_v1 skin. 
   All classes below should start with .conversation-skin  
  */
+.conversation-skin-exploration-intro-card {
+  background: rgb(255,255,255);
+  text-align: justify;
+  font-family: 'Roboto';
+  text-align: center;
+  padding: 0px 0px 50px 0px;
+}
+
+.conversation-skin-icons {
+  width: 24px;
+  height: 24px;
+}
+
+.conversation-skin-exploration-bookmark-rate {
+  margin-left: auto;
+  margin-right: auto;
+  width: 20%;
+}
+
+.conversation-skin-exploration-bookmark {
+  float: left;
+}
+
+.conversation-skin-exploration-rate {
+  float: right;
+}
+
 .conversation-skin-answer-feedback-pair {
   padding-top: 20px;
 }
@@ -55,7 +82,8 @@ html, body {
 }
 
 .conversation-skin-exploration-header {
-  padding-left: 7px;
+  text-align: center;
+  font-size: 36px;
 }
 
 .conversation-skin-iframe-container {
@@ -71,6 +99,7 @@ html, body {
   margin-top: 30px;
   padding: 40px;
   text-align: justify;
+  font-family: 'Roboto';
 }
 
 .conversation-skin-learner-answer {
