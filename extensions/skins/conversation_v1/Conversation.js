@@ -62,7 +62,6 @@ oppia.directive('conversationSkin', [function() {
 
 
       var _addNewCard = function(contentHtml) {
-        console.log('add New');
         $scope.allResponseStates.push({
           content: contentHtml,
           answerFeedbackPairs: []
@@ -111,10 +110,11 @@ oppia.directive('conversationSkin', [function() {
 
       // Temporary storage for the next card's content. This is not null iff a 'next card'   
       // exists (At this point the feedback for the 'current card' is displayed, the user
-      // gets 2seconds to read it and then 'next card' is shown).     
+      // gets 2 seconds to read it and then 'next card' is shown).     
       $scope.nextCardContent = null;     
       $scope.continueToNextCard = function() {  
-        _addNewCard($scope.nextCardContent);    
+        _addNewCard($scope.nextCardContent); 
+        _scrollToLastEntry();   
         $scope.nextCardContent = null;
       };
 
