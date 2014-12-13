@@ -118,9 +118,9 @@ oppia.controller('StateInteraction', [
       for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
         if (widgetTemplate.customization_args[i].name == 'imageAndRegions') {
           $scope.answerChoices = [];
-          var segmentedImage = widgetTemplate.customization_args[i].value;
-          for (var j = 0; j < segmentedImage.imageRegions.length; j++) {
-            $scope.answerChoices.push(segmentedImage.imageRegions[j].label);
+          var imageWithRegions = widgetTemplate.customization_args[i].value;
+          for (var j = 0; j < imageWithRegions.imageRegions.length; j++) {
+            $scope.answerChoices.push(imageWithRegions.imageRegions[j].label);
           }
         }
       }

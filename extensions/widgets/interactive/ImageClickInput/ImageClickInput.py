@@ -52,7 +52,7 @@ class ImageClickInput(widget_domain.BaseWidget):
     # must have at least one of these. This attirbute name MUST be prefixed by
     # '_'.
     _handlers = [{
-        'name': 'submit', 'obj_type': 'NonnegativeInt' 
+        'name': 'submit', 'obj_type': 'ListOfRegion' 
     }]
 
     # Additional JS library dependencies that should be loaded in pages

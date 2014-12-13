@@ -16,6 +16,7 @@
 // may be additional customization options for the editor that should be passed
 // in via initArgs.
 
+// TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
   '$rootScope', '$sce', '$compile', 'warningsData', function($rootScope, $sce, $compile, warningsData) {
     return {
@@ -44,6 +45,8 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.rectWidth = $scope.rectHeight = 0;
         // Is user currently dragging?
         $scope.userIsCurrentlyDragging = false;
+        // Dimensions of image
+        $scope.imageWidth = $scope.imageHeight = 0;
 
         $scope.getPreviewUrl = function(imageUrl) {
           return $sce.trustAsResourceUrl(
@@ -90,16 +93,19 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.userIsCurrentlyDragging = false;
           $scope.$parent.value.imageRegions.push({
             label: $scope.$parent.value.imageRegions.length.toString(),
-            region: [
-              convertCoordsToFraction(
-                [$scope.rectX, $scope.rectY], 
-                [$scope.imageWidth, $scope.imageHeight]
-              ),
-              convertCoordsToFraction(
-                [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
-                [$scope.imageHeight, $scope.imageHeight]
-              )
-            ]
+            region: {
+              regionType: 'Rectangle', 
+              regionArea: [
+                convertCoordsToFraction(
+                  [$scope.rectX, $scope.rectY], 
+                  [$scope.imageWidth, $scope.imageHeight]
+                ),
+                convertCoordsToFraction(
+                  [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
+                  [$scope.imageHeight, $scope.imageHeight]
+                )
+              ]
+            }
           });
         };
 

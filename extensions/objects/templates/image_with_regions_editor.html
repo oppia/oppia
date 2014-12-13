@@ -25,16 +25,16 @@
         ng-attr-height="<[rectHeight]>"
         style="fill: blue; opacity: 0.3;">
       </rect>
-      <rect ng-repeat="rect in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[rect.region[0][0]]>"
-        ng-attr-y="<[rect.region[0][1]]>"
-        ng-attr-width="<[rect.region[1][0] - rect.region[0][0]]>"
-        ng-attr-height="<[rect.region[1][1] - rect.region[0][1]]>"
+      <rect ng-repeat="region in $parent.$parent.value.imageRegions"
+        ng-attr-x="<[region.region.regionArea[0][0] * imageWidth]>"
+        ng-attr-y="<[region.region.regionArea[0][1] * imageHeight]>"
+        ng-attr-width="<[(region.region.regionArea[1][0] - region.region.regionArea[0][0]) * imageWidth]>"
+        ng-attr-height="<[(region.region.regionArea[1][1] - region.region.regionArea[0][1]) * imageHeight]>"
         style="fill: blue; opacity: 0.3;">
       </rect>
       <text ng-repeat="region in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[region.region[0][0] + REGION_LABEL_OFFSET_X]>"
-        ng-attr-y="<[region.region[0][1] + REGION_LABEL_OFFSET_Y]>">
+        ng-attr-x="<[region.region.regionArea[0][0] * imageWidth + REGION_LABEL_OFFSET_X]>"
+        ng-attr-y="<[region.region.regionArea[0][1] * imageHeight + REGION_LABEL_OFFSET_Y]>">
         <[region.label]>
       </text>
     </svg>
