@@ -270,7 +270,6 @@ oppia.factory('oppiaPlayerService', [
       var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
       $http.post(stateHitEventHandlerUrl, {
         new_state_name: newStateName,
-        first_time: stateHistory.indexOf(newStateName) === -1,
         exploration_version: version,
         session_id: sessionId,
         client_time_spent_in_secs: stopwatch.getTimeInSecs(),
@@ -322,6 +321,28 @@ oppia.factory('oppiaPlayerService', [
       _exploration.states[initStateName]);
 
     if (initStateData) {
+      if (!_editorPreviewMode) {
+        // Record that the exploration was started.
+        var startExplorationEventHandlerUrl = (
+          '/explorehandler/exploration_start_event/' + _explorationId);
+        $http.post(startExplorationEventHandlerUrl, {
+          params: initStateData.params,
+          session_id: sessionId,
+          state_name: initStateName,
+          version: version
+        });
+
+        // Record the state hit to the event handler.
+        var stateHitEventHandlerUrl = '/explorehandler/state_hit_event/' + _explorationId;
+        $http.post(stateHitEventHandlerUrl, {
+          client_time_spent_in_secs: 0.0,
+          exploration_version: version,
+          new_state_name: initStateName,
+          old_params: initStateData.params,
+          session_id: sessionId
+        });
+      }
+
       _onInitialStateProcessed(
         initStateName, initStateData.question_html, initStateData.params,
         successCallback);
@@ -361,9 +382,10 @@ oppia.factory('oppiaPlayerService', [
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
+          version = data.version,
           isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
-          _viewerHasEditingRights = true;
+          _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
         }).error(function(data) {
           warningsData.addWarning(

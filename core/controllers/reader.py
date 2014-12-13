@@ -67,13 +67,6 @@ def _get_updated_param_dict(param_dict, param_changes, exp_param_specs):
     return new_param_dict
 
 
-def get_init_html_and_params(exp_param_changes, init_state, exp_param_specs):
-    """Gets the HTML and parameters when an exploration is first started."""
-    init_params = _get_updated_param_dict(
-        {}, exp_param_changes + init_state.param_changes, exp_param_specs)
-    return init_state.content[0].to_html(init_params), init_params
-
-
 def classify(
         exp_id, exp_param_specs, state, handler_name, answer, params):
     """Normalize the answer and return the first rulespec that it satisfies."""
@@ -98,28 +91,6 @@ def classify(
             [rule_spec.to_dict() for rule_spec in handler.rule_specs]
         )
     )
-
-
-def get_next_state_dict(
-        exp_param_specs, old_state_name, old_params, rule_spec, new_state):
-    """Given state transition information, returns a dict containing
-    the new state name, response HTML, and updated parameters.
-    """
-    finished = (rule_spec.dest == feconf.END_DEST)
-    new_params = _get_updated_param_dict(
-        old_params, {} if finished else new_state.param_changes,
-        exp_param_specs)
-
-    return {
-        'feedback_html': jinja_utils.parse_string(
-            rule_spec.get_feedback_string(), old_params),
-        'finished': finished,
-        'params': new_params,
-        'question_html': (
-            new_state.content[0].to_html(new_params)
-            if not finished else ''),
-        'state_name': rule_spec.dest if not finished else None,
-    }
 
 
 class ExplorationPage(base.BaseHandler):
@@ -193,8 +164,6 @@ class ExplorationHandler(base.BaseHandler):
 
     def get(self, exploration_id):
         """Populates the data on the individual exploration page."""
-        # TODO(sll): Maybe this should send a complete state machine to the
-        # frontend, and all interaction would happen client-side?
         version = self.request.get('v')
         version = int(version) if version else None
 
@@ -204,31 +173,16 @@ class ExplorationHandler(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
-        init_html, init_params = get_init_html_and_params(
-            exploration.param_changes, exploration.init_state,
-            exploration.param_specs)
-        session_id = utils.generate_random_string(24)
-
         self.values.update({
             'can_edit': (
                 self.user_id and
                 rights_manager.Actor(self.user_id).can_edit(exploration_id)),
             'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
-            'init_html': init_html,
-            'params': init_params,
-            'session_id': session_id,
-            'state_name': exploration.init_state_name,
+            'session_id': utils.generate_random_string(24),
+            'version': version,
         })
         self.render_json(self.values)
-
-        event_services.StartExplorationEventHandler.record(
-            exploration_id, version, exploration.init_state_name,
-            session_id, init_params, feconf.PLAY_TYPE_NORMAL)
-
-        event_services.StateHitEventHandler.record(
-            exploration_id, version, exploration.init_state_name,
-            session_id, init_params, feconf.PLAY_TYPE_NORMAL)
 
 
 class AnswerSubmittedEventHandler(base.BaseHandler):
@@ -278,7 +232,6 @@ class StateHitEventHandler(base.BaseHandler):
     def post(self, exploration_id):
         """Handles POST requests."""
         new_state_name = self.payload.get('new_state_name')
-        first_time = self.payload.get('first_time')
         exploration_version = self.payload.get('exploration_version')
         session_id = self.payload.get('session_id')
         client_time_spent_in_secs = self.payload.get(
@@ -294,36 +247,6 @@ class StateHitEventHandler(base.BaseHandler):
             event_services.StateHitEventHandler.record(
                 exploration_id, exploration_version, new_state_name,
                 session_id, old_params, feconf.PLAY_TYPE_NORMAL)
-
-
-class InitExplorationHandler(base.BaseHandler):
-    """Performs a get_init_html_and_params() operation server-side and
-    returns the result. This is done while maintaining no state.
-    """
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
-        exp_param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
-        }
-        # A domain object representing the old state.
-        init_state = exp_domain.State.from_dict(self.payload.get('init_state'))
-        # A domain object representing the exploration-level parameter changes.
-        exp_param_changes = [
-            param_domain.ParamChange.from_dict(param_change_dict)
-            for param_change_dict in self.payload.get('exp_param_changes')]
-
-        init_html, init_params = get_init_html_and_params(
-            exp_param_changes, init_state, exp_param_specs)
-
-        self.render_json({
-            'init_html': init_html,
-            'params': init_params,
-        })
 
 
 class ClassifyHandler(base.BaseHandler):
@@ -380,6 +303,22 @@ class ReaderFeedbackHandler(base.BaseHandler):
         self.render_json(self.values)
 
 
+class ExplorationStartEventHandler(base.BaseHandler):
+    """Tracks a reader starting an exploration."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @require_playable
+    def post(self, exploration_id):
+        """Handles POST requests."""
+        event_services.StartExplorationEventHandler.record(
+            exploration_id, self.payload.get('version'),
+            self.payload.get('state_name'),
+            self.payload.get('session_id'),
+            self.payload.get('params'),
+            feconf.PLAY_TYPE_NORMAL)
+
+
 class ReaderLeaveHandler(base.BaseHandler):
     """Tracks a reader leaving an exploration before completion."""
 
@@ -425,10 +364,21 @@ def submit_answer_in_tests(
         widget_instance.get_stats_log_html(
             old_state.widget.customization_args, normalized_answer))
 
-    # This line of code is replicated client-side.
     new_state = (
         None if rule_spec.dest == feconf.END_DEST
         else exploration.states[rule_spec.dest])
+    finished = (rule_spec.dest == feconf.END_DEST)
+    new_params = _get_updated_param_dict(
+        params, {} if finished else new_state.param_changes,
+        exp_param_specs)
 
-    return get_next_state_dict(
-        exp_param_specs, state_name, params, rule_spec, new_state)
+    return {
+        'feedback_html': jinja_utils.parse_string(
+            rule_spec.get_feedback_string(), params),
+        'finished': finished,
+        'params': new_params,
+        'question_html': (
+            new_state.content[0].to_html(new_params)
+            if not finished else ''),
+        'state_name': rule_spec.dest if not finished else None,
+    }

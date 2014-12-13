@@ -185,7 +185,7 @@ class EditorTest(BaseEditorControllerTest):
         self.assertEqual(
             exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
-        state_name = exploration_dict['state_name']
+        state_name = exploration_dict['exploration']['init_state_name']
         exploration_dict = self.submit_answer('0', state_name, '0')
 
         state_name = exploration_dict['state_name']
@@ -241,47 +241,6 @@ class EditorTest(BaseEditorControllerTest):
             url, {'resolved_answers': ['blah2', 'blah3']}, csrf_token)
         self.assertEqual(_get_unresolved_answers(), {})
 
-        self.logout()
-
-
-class StatsIntegrationTest(BaseEditorControllerTest):
-    """Test statistics recording using the default exploration."""
-
-    def test_state_stats_for_default_exploration(self):
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0'
-
-        # Check, from the editor perspective, that no stats have been recorded.
-        self.register_editor(self.EDITOR_EMAIL)
-        self.login(self.EDITOR_EMAIL)
-
-        editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
-        self.assertEqual(editor_exploration_dict['num_starts'], 0)
-        self.assertEqual(editor_exploration_dict['num_completions'], 0)
-
-        # Switch to the reader perspective. First submit the first
-        # multiple-choice answer, then submit 'blah'.
-        self.logout()
-        exploration_dict = self.get_json(
-            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
-        self.assertEqual(
-            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
-
-        state_name = exploration_dict['state_name']
-        exploration_dict = self.submit_answer('0', state_name, '0')
-        state_name = exploration_dict['state_name']
-        exploration_dict = self.submit_answer('0', state_name, 'blah')
-        # Ensure that all events get propagated.
-        self.process_and_flush_pending_tasks()
-
-        # Now switch back to the editor perspective.
-        self.login(self.EDITOR_EMAIL)
-        editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
-        self.assertEqual(editor_exploration_dict['num_starts'], 1)
-        self.assertEqual(editor_exploration_dict['num_completions'], 0)
-        # TODO(sll): Add more checks here.
         self.logout()
 
 
@@ -617,8 +576,12 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
             # Check that exploration is really not reverted to old version
             reader_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-            self.assertIn('ABC', reader_dict['init_html'])
-            self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+            init_state_name = reader_dict['exploration']['init_state_name']
+            init_state_data = (
+                reader_dict['exploration']['states'][init_state_name])
+            init_content = init_state_data['content'][0]['value']
+            self.assertIn('ABC', init_content)
+            self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # Revert to version 1
         rev_version = 1
@@ -631,28 +594,45 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         # Check that exploration is really reverted to version 1
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertNotIn('ABC', reader_dict['init_html'])
-        self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertNotIn('ABC', init_content)
+        self.assertIn('Hi, welcome to Oppia!', init_content)
 
     def test_versioning_for_default_exploration(self):
         """Test retrieval of old exploration versions."""
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertIn('ABC', reader_dict['init_html'])
-        self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertIn('ABC', init_content)
+        self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # v1 contains 'Hi, welcome to Oppia!'.
         reader_dict = self.get_json(
             '%s/%s?v=1' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
-        self.assertNotIn('ABC', reader_dict['init_html'])
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertIn('Hi, welcome to Oppia!', init_content)
+        self.assertNotIn('ABC', init_content)
 
         # v2 contains 'ABC'.
         reader_dict = self.get_json(
             '%s/%s?v=2' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertIn('ABC', reader_dict['init_html'])
-        self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertIn('ABC', init_content)
+        self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # v3 does not exist.
         response = self.testapp.get(
