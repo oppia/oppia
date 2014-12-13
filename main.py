@@ -232,15 +232,6 @@ urls = [
     get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
         'reader_classify_handler'),
-    get_redirect_route(
-        r'/explorehandler/next_state/<exploration_id>',
-        reader.NextStateHandler, 'reader_next_state_handler'),
-    # Temporary handler.
-    # TODO(sll): Remove this once we have full support for client-side
-    # expressions.
-    get_redirect_route(
-        r'/explorehandler/init_exploration/<exploration_id>',
-        reader.InitExplorationHandler, 'reader_init_exploration_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,

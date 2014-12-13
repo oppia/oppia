@@ -358,42 +358,6 @@ class ClassifyHandler(base.BaseHandler):
         self.render_json(rule_spec.to_dict_with_obj_type())
 
 
-class NextStateHandler(base.BaseHandler):
-    """Stateless handler that performs a get_new_state_dict() operation
-    server-side and returns the result.
-    """
-
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
-
-    @require_playable
-    def post(self, exploration_id):
-        """Handles POST requests."""
-        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
-        exp_param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
-        }
-        # The old state name.
-        old_state_name = self.payload.get('old_state_name')
-        # The learner's parameter values.
-        params = self.payload.get('params')
-        answer = self.payload.get('answer')
-        params['answer'] = answer
-        # The input type of the answer.
-        input_type = self.payload.get('input_type')
-        # The rule spec matching the learner's answer.
-        rule_spec = exp_domain.RuleSpec.from_dict_and_obj_type(
-            self.payload.get('rule_spec'), input_type)
-        # A domain object representing the new state.
-        new_state_dict = self.payload.get('new_state')
-        new_state = (
-            exp_domain.State.from_dict(new_state_dict) if new_state_dict
-            else None)
-
-        self.render_json(get_next_state_dict(
-            exp_param_specs, old_state_name, params, rule_spec, new_state))
-
-
 class ReaderFeedbackHandler(base.BaseHandler):
     """Submits feedback from the reader."""
 

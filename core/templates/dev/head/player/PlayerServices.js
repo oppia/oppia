@@ -326,22 +326,7 @@ oppia.factory('oppiaPlayerService', [
         initStateName, initStateData.question_html, initStateData.params,
         successCallback);
     } else {
-      console.warn('Server evaluation required.');
-      console.log(
-        'Data sent to server for evaluation: ', _exploration.states[initStateName]);
-
-      var initExplorationUrl = '/explorehandler/init_exploration/' + _explorationId;
-      $http.post(initExplorationUrl, {
-        exp_param_specs: _exploration.param_specs,
-        exp_param_changes: _exploration.param_changes,
-        init_state: _exploration.states[initStateName]
-      }).success(function(initHtmlAndParamsData) {
-        _onInitialStateProcessed(
-          _exploration.init_state_name, initHtmlAndParamsData.init_html,
-          initHtmlAndParamsData.params, successCallback);
-      }).error(function(data) {
-        warningsData.addWarning('Expression parsing error.');
-      });
+      warningsData.addWarning('Expression parsing error.');
     }
   };
 
@@ -441,7 +426,6 @@ oppia.factory('oppiaPlayerService', [
         }
 
         var finished = (ruleSpec.dest === 'END');
-        var nextStateDictUrl = '/explorehandler/next_state/' + _explorationId;
         var newStateName = finished ? null : ruleSpec.dest;
 
         // Compute the client evaluation result. This may be null if there are
@@ -459,30 +443,8 @@ oppia.factory('oppiaPlayerService', [
             clientEvalResult.question_html, clientEvalResult.feedback_html,
             answer, handler, successCallback);
         } else {
-          console.warn('Server evaluation required.');
-          if (!finished) {
-            console.log(
-              'Data sent to server for evaluation: ', _exploration.states[newStateName]);
-          }
-
-          // Make a server call only when client evaluation fails.
-          $http.post(nextStateDictUrl, {
-            exp_param_specs: angular.copy(_exploration.param_specs),
-            old_state_name: _currentStateName,
-            input_type: ruleSpec.inputType,
-            params: learnerParamsService.getAllParams(),
-            rule_spec: ruleSpec,
-            new_state: finished ? null : _exploration.states[newStateName],
-            answer: answer
-          }).success(function(data) {
-            answerIsBeingProcessed = false;
-            _onStateTransitionProcessed(
-              data.state_name, data.params, data.question_html,
-              data.feedback_html, answer, handler, successCallback);
-          }).error(function(data) {
-            answerIsBeingProcessed = false;
-            warningsData.addWarning('Expression parsing error.');
-          });
+          answerIsBeingProcessed = false;
+          warningsData.addWarning('Expression parsing error.');
         }
       });
     },
