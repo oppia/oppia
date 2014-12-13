@@ -231,8 +231,8 @@ urls = [
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
     get_redirect_route(
-        r'/explorehandler/leave/<exploration_id>/<escaped_state_name>',
-        reader.ReaderLeaveHandler, 'reader_leave_handler'),
+        r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
+        reader.ExplorationMaybeLeaveHandler, 'reader_leave_handler'),
     get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
         'reader_classify_handler'),

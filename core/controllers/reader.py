@@ -180,7 +180,7 @@ class ExplorationHandler(base.BaseHandler):
             'exploration': exploration.to_player_dict(),
             'is_logged_in': bool(self.user_id),
             'session_id': utils.generate_random_string(24),
-            'version': version,
+            'version': exploration.version,
         })
         self.render_json(self.values)
 
@@ -319,18 +319,18 @@ class ExplorationStartEventHandler(base.BaseHandler):
             feconf.PLAY_TYPE_NORMAL)
 
 
-class ReaderLeaveHandler(base.BaseHandler):
+class ExplorationMaybeLeaveHandler(base.BaseHandler):
     """Tracks a reader leaving an exploration before completion."""
 
     REQUIRE_PAYLOAD_CSRF_CHECK = False
 
     @require_playable
-    def post(self, exploration_id, escaped_state_name):
+    def post(self, exploration_id):
         """Handles POST requests."""
         event_services.MaybeLeaveExplorationEventHandler.record(
             exploration_id,
             self.payload.get('version'),
-            self.unescape_state_name(escaped_state_name),
+            self.payload.get('state_name'),
             self.payload.get('session_id'),
             self.payload.get('client_time_spent_in_secs'),
             self.payload.get('params'),

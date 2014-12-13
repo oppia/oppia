@@ -503,6 +503,17 @@ oppia.factory('oppiaPlayerService', [
     },
     isAnswerBeingProcessed: function() {
       return answerIsBeingProcessed;
+    },
+    registerMaybeLeaveEvent: function() {
+      var maybeLeaveExplorationUrl = (
+        '/explorehandler/exploration_maybe_leave_event/' + _explorationId);
+      $http.post(maybeLeaveExplorationUrl, {
+        client_time_spent_in_secs: stopwatch.getTimeInSecs(),
+        params: learnerParamsService.getAllParams(),
+        session_id: sessionId,
+        state_name: stateHistory[stateHistory.length - 1],
+        version: version
+      });
     }
   };
 }]);
