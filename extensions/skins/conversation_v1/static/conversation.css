@@ -69,7 +69,8 @@ html, body {
 }
 
 .conversation-skin-row-avatar {
-  min-width: 40px;
+  width: 30px;
+  padding-right: 10px;
 }
 
 .conversation-skin-row-avatar-img {
