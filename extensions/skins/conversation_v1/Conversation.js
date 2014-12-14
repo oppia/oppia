@@ -31,10 +31,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.hasInteractedAtLeastOnce = false;
       $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
       $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
-
-      $scope.isAnswerBeingProcessed = function() {
-        return oppiaPlayerService.isAnswerBeingProcessed();
-      };
+      $scope.isAnswerBeingProcessed = oppiaPlayerService.isAnswerBeingProcessed;
 
       // If the exploration is iframed, send data to its parent about its height so
       // that the parent can be resized as necessary.
@@ -73,10 +70,6 @@ oppia.directive('conversationSkin', [function() {
         }
       });
 
-      $scope.getStyle = function() {
-        return $scope.showPage ? {} : {opacity: 0};
-      };
-
       $scope.resetPage = function() {
         if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
             oppiaPlayerService.isInPreviewMode == false) {
@@ -93,11 +86,31 @@ oppia.directive('conversationSkin', [function() {
         $scope.initializePage();
       };
 
+
+      var _addNewCard = function(contentHtml) {
+        $scope.allResponseStates.push({
+          content: contentHtml,
+          answerFeedbackPairs: []
+        });
+      };
+
+      var _scrollToLastEntry = function() {
+        var lastEntryEls = document.getElementsByClassName(
+          'conversation-skin-last-log-entry');
+        $scope.adjustPageHeight(true, function() {
+          if (lastEntryEls.length > 0) {
+            // TODO(sll): Try and drop this in favor of an Angular-based solution.
+            $('html, body, iframe').animate(
+              {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
+          }
+        });
+      };
+
       $scope.isLoggedIn = false;
       $scope.mostRecentQuestionIndex = null;
 
       $scope.initializePage = function() {
-        $scope.responseLog = [];
+        $scope.allResponseStates = [];
         $scope.inputTemplate = '';
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
@@ -109,33 +122,35 @@ oppia.directive('conversationSkin', [function() {
           $scope.stateName = stateName;
           $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
             $scope.stateName);
-
-          $scope.responseLog = [{
-            previousReaderAnswer: '',
-            feedback: '',
-            question: initHtml,
-          }];
+          _addNewCard(initHtml);
           $scope.mostRecentQuestionIndex = 0;
 
           messengerService.sendMessage(
             messengerService.EXPLORATION_LOADED, null);
           $scope.showPage = true;
           $scope.adjustPageHeight(false, null);
-
           $window.scrollTo(0, 0);
         });
       };
 
       $scope.initializePage();
 
+      // Temporary storage for the next card's content. This is not null iff a 'next card'   
+      // exists (At this point the feedback for the 'current card' is displayed, the user
+      // gets 2 seconds to read it and then 'next card' is shown).     
+      $scope.nextCardContent = null;     
+      $scope.continueToNextCard = function() {  
+        _addNewCard($scope.nextCardContent); 
+        _scrollToLastEntry();   
+        $scope.nextCardContent = null;
+      };
+
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
           warningsData.clear();
           $scope.hasInteractedAtLeastOnce = true;
-
-          var _oldStateName = $scope.stateName;
-
+          var oldStateName = $scope.stateName;
           $scope.stateName = newStateName;
           $scope.finished = !Boolean(newStateName);
 
@@ -145,40 +160,32 @@ oppia.directive('conversationSkin', [function() {
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }
 
-          var isQuestion = (_oldStateName !== newStateName) && !!questionHtml;
-          if (isQuestion) {
-            $scope.mostRecentQuestionIndex = $scope.responseLog.length;
-          } else {
-            questionHtml = '';
-          }
-
-          // The randomSuffix is also needed for 'previousReaderAnswer', 'feedback'
-          // and 'question', so that the aria-live attribute will read it out.
-          // Note that we have to explicitly check for the 'Continue' widget
-          // (which has no corresopnding learner response text), otherwise a
-          // thin sliver of blue will appear.
-          $scope.responseLog.push({
-            previousReaderAnswer: (
-              readerResponseHtml.indexOf('oppia-response-continue') === -1 ?
-              readerResponseHtml + oppiaPlayerService.getRandomSuffix() : ''),
-            feedback: feedbackHtml + oppiaPlayerService.getRandomSuffix(),
-            question: questionHtml + (isQuestion ? oppiaPlayerService.getRandomSuffix() : '')
+          $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs.push({
+            learnerAnswer: readerResponseHtml,
+            oppiaFeedback: feedbackHtml
           });
 
-          var lastEntryEls = document.getElementsByClassName(
-            'conversation-skin-last-log-entry');
-          $scope.adjustPageHeight(true, function() {
-            if (lastEntryEls.length > 0) {
-              // TODO(sll): Try and drop this in favor of an Angular-based solution.
-              $('html, body, iframe').animate(
-                {'scrollTop': lastEntryEls[0].offsetTop}, 'slow', 'swing');
+          // If there is a change in state, use a new card.
+          if (oldStateName !== newStateName) {
+            // If there is a feedback:
+            // Store content for the next card.
+            // Scroll down so that the user can see the feedback.
+            // Pause for 2000ms so that the user can read the feedback.
+            // Show the next card.
+            if (feedbackHtml) {
+              $scope.nextCardContent = questionHtml; 
+              _scrollToLastEntry();
+              $timeout($scope.continueToNextCard, 2000);
+            } else {
+              _addNewCard(questionHtml);
             }
-          });
+          }
 
           if ($scope.finished) {
             messengerService.sendMessage(
               messengerService.EXPLORATION_COMPLETED, null);
           }
+          _scrollToLastEntry();
         });
       };
 
