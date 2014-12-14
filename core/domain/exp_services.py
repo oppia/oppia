@@ -379,7 +379,12 @@ def export_to_zip_file(exploration_id, version=None):
             # not modifiable post-upload.
             # TODO(sll): When allowing editing of files, implement versioning
             # for them.
-            zf.writestr('assets/%s' % filepath, fs.get(filepath, version=1))
+            file_contents = fs.get(filepath, version=1)
+
+            str_filepath = 'assets/%s' % filepath
+            assert isinstance(str_filepath, str)
+            unicode_filepath = str_filepath.decode('utf-8')
+            zf.writestr(unicode_filepath, file_contents)
 
     return o.getvalue()
 
