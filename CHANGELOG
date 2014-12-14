@@ -3,6 +3,44 @@ This file contains a summary of changes to the Oppia code base. For a full chang
     https://code.google.com/p/oppia/source/list
 
 
+v1.2.12 (13 Dec 2014)
+---------------------
+Editor improvements:
+* Add graphical, more intuitive representations for the version history of an exploration.
+* Replace the old Jinja/server-side parameter framework with a client-side one.
+* Add functionality for writing expressions such as {{floor((a+b)/2)}} in content and rule feedback fields.
+* Improve the error messages for invalid parameter changes.
+* Fix the caret sign in the warnings box to point down and remain in the top-right corner.
+
+General UI improvements:
+* Fix issue 462: add a search loading indicator.
+* Fix issue 413: add exploration names to the page titles of the exploration editor and player pages.
+* Add CSS rules specific to Internet Explorer.
+* Fix a bug where some forms were not editable in Internet Explorer due to their use of a custom 'disabled' attribute.
+
+Interactive widgets:
+* Multiple Choice: Limit the button width for multiple choice options to 350px.
+* World Map: make the zoom controls display properly.
+* World Map: trigger a resize event when the map is first loaded in order to show all the map tiles.
+
+Demo explorations:
+* The Lazy Magician: Update the exploration to use the new expressions framework.
+* Three Balls: Update the exploration to use the new expressions framework.
+* Three Balls: Remove an invalid parameter specification in the first state.
+
+Third-party integrations:
+* Update the instructions for integration with Course Builder.
+
+Infrastructure:
+* Upgrade the version of node from 0.10.1 to 0.10.33.
+* Protractor tests: add a test framework for interactive widgets.
+* Karma tests:
+  - Modify the coverage reports to exclude the karma spec files.
+  - Add missing directories to the coverage report.
+  - Add a viewableIfPrivate test to the exploration rights service.
+* Install jsrepl using https://... instead of git://...
+
+
 v1.2.11 (14 Nov 2014)
 ---------------------
 Editor UI fixes
