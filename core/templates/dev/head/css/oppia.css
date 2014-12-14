@@ -191,29 +191,23 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 100%;
 }
 
-.navbar-nav > li > a, .navbar .navbar-brand {
-  color: white;
+.navbar-nav.oppia-navbar-nav > li > a, .navbar .navbar-brand {
+  color: #fff;
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
   text-shadow: 0 1px 0 #092c66;
-}
-
-.navbar .navbar-brand {
-  font-weight: bold;
 }
 
 .navbar .navbar-brand:hover,
 .navbar .navbar-brand:focus {
-  color: white;
-  text-shadow: 0 1px 2px #000;
-}
-
-.navbar-brand sup {
-  font-size: .6em;
+  color: #fff;
 }
 
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
   background: rgb(10, 48, 106);
-  color: white;
+  color: #fff;
 }
 
 .navbar-nav > li.active > a, .navbar-nav > li.active > a:hover,
@@ -223,21 +217,23 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .navbar-default .navbar-container {
-  background: #18447E;
-  border-bottom: 1pt solid #2f2f3f;
+  background: #05a69a;
   box-shadow: 0 1px 5px rgba(12,12,24, .3);
 }
 
 .navbar-default .dropdown-menu {
-  background: #18447E;
+  background: #fff;
 }
 
-.navbar-default .navbar-nav > li > a,
+.navbar-default .navbar-nav > li > a, {
+  color: #fff;
+}
+
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav .open > a:hover,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover {
-  color: white;
+  color: #05a69a;
 }
 
 .navbar-default .navbar-nav > li > a:hover,
@@ -246,7 +242,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .navbar-default .navbar-nav .open > a:focus,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
 .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
-  background: rgb(10, 48, 106);
+  background: #fff;
 }
 
 .navbar-default .navbar-nav > .open > a,
@@ -254,8 +250,18 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
-  background: rgb(10, 48, 106);
-  color: white;
+  background-color: #06b9ac;
+  color: #fff;
+}
+
+.oppia-logo {
+  display: inline-block;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 21px;
+  font-weight: 300;
+  height: 48px;
+  margin-left: 6px;
+  margin-top: -14px;
 }
 
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
@@ -265,11 +271,11 @@ div.wysiwyg iframe.wysiwyg-content-large {
     display: block;
   }
   .nav .dropdown:hover > .dropdown-menu > li > a {
-    color: white;
+    color: #05a69a;
   }
   .nav .dropdown:hover > .dropdown-menu > li > a:hover {
-    background: rgb(10, 48, 106);
-    color: white;
+    background-color: #eee;
+    color: #888;
   }
 }
 
@@ -564,32 +570,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-footer {
-  border-top: 1pt solid #dde0FF;
+  border-top: 1pt solid #eee;
   bottom: 5px;
   height: 3em;
   max-height: 3em;
   position: absolute;
   width: 100%;
-}
-
-.oppia-footer-nav {
-  list-style: none;
-  margin-left: 0;
-  margin-bottom: 0;
-  padding-top: 10px;
-}
-
-.oppia-footer-nav li {
-  display: inline-block;
-}
-
-.oppia-footer-nav a {
-  padding: 10px 20px 10px 0;
-}
-
-.oppia-footer-nav a:hover {
-  background: none;
-  text-decoration: underline;
 }
 
 .oppia-wide-panel {
@@ -611,7 +597,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-wide-panel-title {
   color: #062770;
-  font-family: verdana, arial, helvetica, sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 24pt;
   font-weight: bold;
   margin-bottom: 30px;
@@ -922,12 +908,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding: 5px;
   vertical-align: middle;
   width: 160px;
-}
-
-.oppia-logo {
-  height: 32px;
-  margin-top: -10px;
-  margin-bottom: -5px;
 }
 
 .help {

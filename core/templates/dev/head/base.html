@@ -95,13 +95,12 @@
                 {% block navbar %}
                   <div class="navbar-header">
                     <a class="navbar-brand" href="/">
-                      <img src="/images/logo.png" class="oppia-logo">
-                      Oppia&nbsp;<sup>beta</sup>
+                      <img src="/images/logo/288x288_oppia_white.png" class="oppia-logo">
                     </a>
                   </div>
 
                   <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
+                    <ul class="nav navbar-nav oppia-navbar-nav">
                       <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
                         <a href="/gallery">Gallery</a>
                       </li>
@@ -127,7 +126,7 @@
                       {% endblock %}
                     </ul>
 
-                    <ul class="nav navbar-nav navbar-right">
+                    <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
                       {% if user_email %}
                         {% if username %}
                           <li class="dropdown">
@@ -192,22 +191,11 @@
           {{ warnings_and_loader() }}
         </div>
 
-        <div class="oppia-footer" role="contentinfo">
-          <div class="container">
-            <ul class="oppia-footer-nav col-lg-8 col-md-8 col-sm-8">
-              <li>
-                <a href="/">Home</a>
-              </li>
-              <li>
-                <a href="/gallery">Gallery</a>
-              </li>
-              {% for page in ABOUT_PAGES %}
-                <li>
-                  <a href="{{page['url']}}">{{page['name']}}</a>
-                </li>
-              {% endfor %}
-            </ul>
-            {% if nav_mode in ['explore', 'create'] %}
+        {% if nav_mode in ['explore', 'create'] %}
+          <div class="oppia-footer" role="contentinfo">
+            <div class="container">
+              <div class="col-lg-8 col-md-8 col-sm-8">
+              </div>
               <span class="col-lg-4 col-md-4 col-sm-4" style="margin-top: 10px;">
                 <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
                   <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
@@ -216,10 +204,9 @@
                   <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
                 </span>
               </span>
-            {% endif %}
-            </ul>
+            </div>
           </div>
-        </div>
+        {% endif %}
       </div>
     {% endif %}
 
@@ -240,7 +227,6 @@
       {{ include_js_file('/expressions/evaluator.js') }}
       {{ include_js_file('/expressions/parser.js') }}
     </script>
-
 
     {% block footer_js %}
     {% endblock footer_js %}
