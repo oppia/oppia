@@ -173,7 +173,7 @@ oppia.directive('conversationSkin', [function() {
             // Pause for 2000ms so that the user can read the feedback.
             // Show the next card.
             if (feedbackHtml) {
-              $scope.nextCardContent = questionHtml; 
+              $scope.nextCardContent = questionHtml;
               _scrollToLastEntry();
               $timeout($scope.continueToNextCard, 2000);
             } else {

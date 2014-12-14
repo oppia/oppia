@@ -120,6 +120,12 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
+var scrollElemFinderIntoView = function(elemFinder) {
+  browser.executeScript(function(elem) {
+    elem.scrollIntoView(false);
+  }, elemFinder);
+};
+
 
 
 exports.waitForSystem = waitForSystem;
@@ -139,3 +145,5 @@ exports.openPlayer = openPlayer;
 exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
+
+exports.scrollElemFinderIntoView = scrollElemFinderIntoView;

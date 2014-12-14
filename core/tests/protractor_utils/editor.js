@@ -408,7 +408,10 @@ var enterPreviewMode = function() {
 };
 
 var exitPreviewMode = function() {
-  element(by.css('.protractor-test-exit-preview-mode')).click();
+  var elemFinder = element(by.css('.protractor-test-exit-preview-mode'));
+  general.scrollElemFinderIntoView(elemFinder);
+  general.waitForSystem();
+  elemFinder.click();
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;

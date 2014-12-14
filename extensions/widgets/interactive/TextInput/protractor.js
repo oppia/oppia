@@ -34,10 +34,10 @@ var expectInteractionDetailsToMatch = function(placeholderText, heightOfBox) {
   // TODO (Jacob) add checks for the placeholder text and box height
 };
 
-var submitAnswer = function(answer) {
-  element(by.tagName('oppia-interactive-text-input')).
+var submitAnswer = function(elem, answer) {
+  elem.element(by.tagName('oppia-interactive-text-input')).
     element(by.tagName('textarea')).sendKeys(answer);
-  element(by.tagName('oppia-interactive-text-input')).
+  elem.element(by.tagName('oppia-interactive-text-input')).
     element(by.tagName('button')).click();
 };
 

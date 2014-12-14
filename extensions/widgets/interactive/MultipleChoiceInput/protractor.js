@@ -46,9 +46,10 @@ var expectInteractionDetailsToMatch = function(richTextInstructionsArray) {
   });
 };
 
+// 'elem' is the HTML element containing the form to submit the answer to.
 // 'answer' {String} is the text on the multiple-choice item to select.
-var submitAnswer = function(answer) {
-  element(by.tagName('oppia-interactive-multiple-choice-input')).
+var submitAnswer = function(elem, answer) {
+  elem.element(by.tagName('oppia-interactive-multiple-choice-input')).
     element(by.buttonText(answer)).click();
 };
 

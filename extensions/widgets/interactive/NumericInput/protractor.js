@@ -29,8 +29,8 @@ var expectInteractionDetailsToMatch = function() {
   ).toBe(true);
 };
 
-var submitAnswer = function(answer) {
-  element(by.tagName('oppia-interactive-numeric-input')).
+var submitAnswer = function(elem, answer) {
+  elem.element(by.tagName('oppia-interactive-numeric-input')).
     element(by.tagName('input')).sendKeys(answer + '\n');
 };
 

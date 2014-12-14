@@ -28,8 +28,7 @@ var restartExploration = function() {
 
 var expectExplorationNameToBe = function(name) {
   expect(
-    element(by.css('.conversation-skin-exploration-header')).
-      element(by.tagName('h3')).getText()
+    element(by.css('.protractor-test-exploration-header')).getText()
   ).toBe(name);
 };
 
@@ -40,16 +39,16 @@ var expectExplorationNameToBe = function(name) {
 // can then be sent.
 var expectContentToMatch = function(richTextInstructions) {
   forms.expectRichText(
-    element.all(by.repeater('response in responseLog track by $index')).
+    element.all(by.repeater('state in allResponseStates track by $index')).
       last().element(by.css('.protractor-test-conversation-content'))
   ).toMatch(richTextInstructions);
 };
 
+// Note that the 'latest' feedback may be on either the current or a
+// previous card.
 var expectLatestFeedbackToMatch = function(richTextInstructions) {
   forms.expectRichText(
-    element.all(by.repeater('response in responseLog track by $index')).
-      last().element(by.css('.protractor-test-conversation-feedback')).
-        element(by.xpath('./div')).getText()
+    element.all(by.css('.protractor-test-conversation-feedback')).last()
   ).toMatch(richTextInstructions);
 };
 
@@ -68,18 +67,25 @@ var expectInteractionToMatch = function(widgetName) {
 // `answerData` is a variable that is passed to the corresponding widget's
 // protractor utilities. Its definition and type are widget-specific.
 var submitAnswer = function(widgetName, answerData) {
-  widgets.getInteractive(widgetName).submitAnswer(answerData);
+  widgets.getInteractive(widgetName).submitAnswer(
+    element.all(by.repeater('state in allResponseStates track by $index')).
+      last().element(by.css('.protractor-test-conversation-input')),
+    answerData);
 };
 
 
 var expectExplorationToBeOver = function() {
-  expect(element(by.css('.conversation-skin-response-finished')).
-    isDisplayed()).toBe(true);
+  expect(
+    element.all(by.repeater('state in allResponseStates track by $index')).
+      last().element(by.css('.protractor-test-conversation-finished')).
+        isDisplayed()).toBe(true);
 };
 
 var expectExplorationToNotBeOver = function() {
-  expect(element(by.css('.conversation-skin-response-finished')).
-    isDisplayed()).toBe(false);
+  expect(
+    element.all(by.repeater('state in allResponseStates track by $index')).
+      last().element(by.css('.protractor-test-conversation-finished')).
+        isDisplayed()).toBe(false);
 };
 
 exports.restartExploration = restartExploration;

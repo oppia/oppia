@@ -34,8 +34,8 @@ var expectInteractionDetailsToMatch = function(buttonText) {
   ).toBe(buttonText);
 };
 
-var submitAnswer = function() {
-  element(by.tagName('oppia-interactive-continue')).click();
+var submitAnswer = function(elem) {
+  elem.element(by.tagName('oppia-interactive-continue')).click();
 };
 
 var testSuite = [];

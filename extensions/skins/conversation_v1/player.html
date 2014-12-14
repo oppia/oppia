@@ -24,7 +24,7 @@
       <md-card class="conversation-skin-exploration-intro-card">
         <!-- TODO(mgowano): Remove eclipse image once backend has image info for exploration. -->
         <img src="/images/eclipse.jpg">
-        <h3 role="heading" class="conversation-skin-exploration-header"><[explorationTitle]></h3>
+        <h3 role="heading" class="conversation-skin-exploration-header protractor-test-exploration-header"><[explorationTitle]></h3>
         <div class="conversation-skin-exploration-bookmark-rate">
           <div class="conversation-skin-exploration-bookmark">
             <img class="conversation-skin-icons" src="/images/material-design-icons-1.0.1/ic_bookmark_outline_black_48dp.png">
@@ -43,13 +43,17 @@
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last, 'conversation-skin-old-content': !$last}">
           <md-card class="conversation-skin-card">
-            <table ng-show="state.content" class="conversation-skin-card-row-container">
+            <table class="conversation-skin-card-row-container">
               <tr class="conversation-skin-card-row">
                 <td class="conversation-skin-row-avatar" valign="top"> 
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                 </td>
-                <td class="protractor-test-conversation-content"
-                     angular-html-bind="state.content">
+                <td>
+                  <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
+                       angular-html-bind="state.content"></div>
+                  <div ng-show="$last && finished" class="protractor-test-conversation-finished">
+                    Congratulations, you have finished this exploration!
+                  </div>
                 </td>
               </tr>
             </table>
@@ -81,9 +85,10 @@
                 <table class="conversation-skin-card-row-container">
                   <tr class="conversation-skin-card-row">
                     <td class="conversation-skin-row-avatar" valign="top"> 
-                      <!-- No avatar on user input. Hence This is Empty -->
+                      <!-- No avatar on user input, hence this is empty. -->
                     </td>
-                    <td angular-html-bind="inputTemplate"></td>
+                    <td class="protractor-test-conversation-input"
+                        angular-html-bind="inputTemplate"></td>
                   </tr>
                 </table>
               </div>
@@ -95,17 +100,6 @@
                 </center>
               </div>
             </div>
-
-            <table ng-show="finished && $last" class="conversation-skin-card-row-container">
-              <tr class="conversation-skin-card-row">
-                <td class="conversation-skin-row-avatar" valign="top"> 
-                  <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
-                </td>
-                <td>
-                  Congratulations, you have finished this exploration!
-                </td>
-              </tr>
-            </table>
           </md-card>
         </div>
       </div>
