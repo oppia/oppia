@@ -120,10 +120,12 @@ var expect404Error = function() {
     toMatch('Error 404');
 };
 
-var scrollElemFinderIntoView = function(elemFinder) {
+// TODO(sll): see if it is possible to remove this once the scrolling in
+// ConversationSkin.js is changed to use ng-animate instead of jQuery.
+var scrollElementIntoView = function(element) {
   browser.executeScript(function(elem) {
     elem.scrollIntoView(false);
-  }, elemFinder);
+  }, element);
 };
 
 
@@ -146,4 +148,4 @@ exports.moveToPlayer = moveToPlayer;
 exports.moveToEditor = moveToEditor;
 exports.expect404Error = expect404Error;
 
-exports.scrollElemFinderIntoView = scrollElemFinderIntoView;
+exports.scrollElementIntoView = scrollElementIntoView;

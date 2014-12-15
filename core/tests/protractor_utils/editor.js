@@ -409,7 +409,10 @@ var enterPreviewMode = function() {
 
 var exitPreviewMode = function() {
   var elemFinder = element(by.css('.protractor-test-exit-preview-mode'));
-  general.scrollElemFinderIntoView(elemFinder);
+  // Without this line, if an exploration has been scrolled down, the click
+  // ends up missing the preview button. (This may be because the scrolling
+  // is being done outside Angular.)
+  general.scrollElementIntoView(elemFinder);
   general.waitForSystem();
   elemFinder.click();
 };
