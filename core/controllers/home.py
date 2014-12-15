@@ -24,6 +24,7 @@ from core.domain import subscription_services
 from core.domain import user_jobs
 from core.domain import user_services
 import feconf
+import utils
 
 
 BANNER_ALT_TEXT = config_domain.ConfigProperty(
@@ -42,16 +43,12 @@ SPLASH_PAGE_EXPLORATION_VERSION = config_domain.ConfigProperty(
 
 
 class HomePage(base.BaseHandler):
-    """Visited when user visits /.
-
-    If the user is logged in and is registered as an editor, we show their
-    personal dashboard, otherwise we show the generic splash page.
-    """
+    """Visited when user visits /. Shows the generic splash page."""
     # We use 'gallery' because the createExploration() modal makes a call
     # there.
     PAGE_NAME_FOR_CSRF = 'gallery'
 
-    def _get_splash_page(self):
+    def get(self):
         if SPLASH_PAGE_EXPLORATION_ID.value:
             splash_exp_id = SPLASH_PAGE_EXPLORATION_ID.value
             if not exp_services.get_exploration_by_id(
@@ -69,16 +66,27 @@ class HomePage(base.BaseHandler):
         })
         self.render_template('pages/splash.html')
 
+
+class DashboardPage(base.BaseHandler):
+    """Page for the user's dashboard."""
+    # We use 'gallery' because the createExploration() modal makes a call
+    # there.
+    PAGE_NAME_FOR_CSRF = 'gallery'
+
+    @base.require_user
     def get(self):
-        if (self.user_id and
-                self.username not in config_domain.BANNED_USERNAMES.value and
-                user_services.has_user_registered_as_editor(self.user_id)):
+        if self.username in config_domain.BANNED_USERNAMES.value:
+            raise self.UnauthorizedUserException(
+                'You do not have the credentials to access this page.')
+        elif user_services.has_user_registered_as_editor(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
             })                    
             self.render_template('dashboard/dashboard.html')
         else:
-            self._get_splash_page()
+            self.redirect(utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL,
+                'return_url', '/dashboard'))
 
 
 class DashboardHandler(base.BaseHandler):

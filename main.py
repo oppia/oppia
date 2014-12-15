@@ -143,6 +143,8 @@ urls = [
     webapp2.Route(
         r'%s' % feconf.HOMEPAGE_URL, home.HomePage, 'home_page'),
     get_redirect_route(
+        r'/dashboard', home.DashboardPage, 'dashboard_page'),
+    get_redirect_route(
         r'/dashboardhandler/data', home.DashboardHandler,
         'dashboard_handler'),
 

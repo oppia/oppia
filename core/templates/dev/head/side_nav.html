@@ -3,61 +3,77 @@
     <div class="oppia-sidebar-logo-container">
     </div>
   </div>
-  <ul>
-    {% if username %}
-      <li {% if nav_mode == 'home' %}class="active"{% endif %}>
-        <a href="/">
-          <span class="glyphicon glyphicon-wrench oppia-sidebar-menu-icon"></span>
-          Dashboard
-          <span ng-if="numUnseenNotifications > 0">
-            (<[numUnseenNotifications]>)
-          </span>
+  {% if nav_mode in ['explore', 'create'] %}
+    <ul>
+      {% if username %}
+        <li {% if nav_mode == 'home' %}class="active"{% endif %}>
+          <a href="/dashboard">
+            <span class="glyphicon glyphicon-wrench oppia-sidebar-menu-icon"></span>
+            Dashboard
+            <span ng-if="numUnseenNotifications > 0">
+              (<[numUnseenNotifications]>)
+            </span>
+          </a>
+        </li>
+      {% endif %}
+      <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
+        <a href="/gallery">
+          <span class="glyphicon glyphicon-book oppia-sidebar-menu-icon"></span>
+          Library
         </a>
       </li>
-    {% endif %}
-    <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
-      <a href="/gallery">
-        <span class="glyphicon glyphicon-book oppia-sidebar-menu-icon"></span>
-        Library
-      </a>
-    </li>
-    {% if SHOW_FORUM_PAGE %}
-      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-        <a href="/forum">
-          <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
-          Forum
-        </a>
-      </li>
-    {% endif %}
+      {% if SHOW_FORUM_PAGE %}
+        <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+          <a href="/forum">
+            <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
+            Forum
+          </a>
+        </li>
+      {% endif %}
 
-    <li {% if nav_mode == 'about' %}class="active"{% endif %}>
-      <a href="/about">
-        <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
-        About
-      </a>
-    </li>
-  </ul>
-
-  {% if user_email and (is_moderator or is_super_admin) %}
-  <hr>
-  <ul>
-    {% if is_moderator %}
-      <li>
-        <a href="/moderator" target="_blank">
-          <span class="glyphicon glyphicon-cog oppia-sidebar-menu-icon"></span>
-          Moderator Page
+      <li {% if nav_mode == 'about' %}class="active"{% endif %}>
+        <a href="/about">
+          <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
+          About
         </a>
       </li>
-    {% endif %}
+    </ul>
 
-    {% if is_super_admin %}
-      <li>
-        <a href="/admin" target="_blank">
-          <span class="glyphicon glyphicon-cog oppia-sidebar-menu-icon"></span>
-          Admin Page
-        </a>
-      </li>
-    {% endif %}
-  </ul>
+    <hr>
+    <ul>
+      {% if user_email %}
+        {% if is_moderator %}
+          <li>
+            <a href="/moderator" target="_blank">
+              <span class="glyphicon glyphicon-cog oppia-sidebar-menu-icon"></span>
+              Moderator Page
+            </a>
+          </li>
+        {% endif %}
+
+        {% if is_super_admin %}
+          <li>
+            <a href="/admin" target="_blank">
+              <span class="glyphicon glyphicon-cog oppia-sidebar-menu-icon"></span>
+              Admin Page
+            </a>
+          </li>
+        {% endif %}
+
+        <li>
+          <a href="{{logout_url}}">
+            <span class="glyphicon glyphicon-remove oppia-sidebar-menu-icon"></span>
+            Logout
+          </a>
+        </li>
+      {% else %}
+        <li>
+          <a href="{{login_url}}">
+            <span class="glyphicon glyphicon-user oppia-sidebar-menu-icon"></span>
+            Sign in
+          </a>
+        </li>
+      {% endif %}
+    </ul>
   {% endif %}
 </nav>

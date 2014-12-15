@@ -60,17 +60,8 @@ a {
   color: #0844aa;
   cursor: pointer;
 }
-
 a:hover {
   color: #3f2c76;
-}
-
-.btn-primary {
-  background: #092c66;
-}
-
-.btn-primary:hover {
-  background: #3f2c76;
 }
 
 input.ng-dirty.ng-invalid {
@@ -81,14 +72,6 @@ input.ng-dirty.ng-invalid {
 .table-striped > tbody > tr:nth-child(odd) > td,
 .table-striped > tbody > tr:nth-child(odd) > th {
   background-color: #f0f0f0;
-}
-
-/* Fixes for Google Maps zoom controls. */
-.gm-style img {
-  max-width: none;
-}
-.gm-style label {
-  width: auto; display:inline;
 }
 
 .oppia-form-error {
@@ -116,10 +99,6 @@ input.ng-dirty.ng-invalid {
 
 .oppia-editor form {
   margin: 0;
-}
-
-.oppia-rule-ctrl {
-  padding: 2px 3px;
 }
 
 .oppia-disabled-contenteditable {
@@ -328,17 +307,11 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 100%;
 }
 
-.navbar-nav.oppia-navbar-nav > li > a, .navbar .navbar-brand {
+.navbar-nav.oppia-navbar-nav > li > a {
   color: #fff;
   font-family: "Roboto", "Arial", sans-serif;
   font-size: 16px;
   font-weight: 400;
-  text-shadow: 0 1px 0 #092c66;
-}
-
-.navbar .navbar-brand:hover,
-.navbar .navbar-brand:focus {
-  color: #fff;
 }
 
 .navbar-default .navbar-nav > li > a:hover,
@@ -413,28 +386,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 100%;
 }
 
-.oppia-editor-section-header {
-  color: black;
-  cursor: pointer;
-  text-decoration: none;
-}
-.oppia-editor-section-header:hover {
-  color: black;
-  text-decoration: none;
-}
-
 .oppia-align-center {
   float: none;
   margin: 0 auto;
   text-align: center;
-}
-
-.oppia-no-scroll::-webkit-scrollbar {
-  display: none;
-}
-
-.oppia-code {
-  font-family: Consolas, Monaco, Lucida Console, Liberation Mono, monospace;
 }
 
 .oppia-exploration-ctrl {
@@ -610,42 +565,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
   z-index: 3000;
 }
 
-.oppia-btn {
-  background-image: -webkit-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
-  background-image: -ms-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
-  background-image: -moz-linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
-  background-image: linear-gradient(top, rgba(255, 204, 139, 0.5), rgba(230, 167, 93, 0.5));
-  border-radius: 3px;
-  font: bold 14px/20px Arial, sans-serif;
-  padding: 4px 10px;
-  text-shadow: 0 -1px 0 rgba(0,0,0,0.15);
-  text-transform: uppercase;
-}
-
-.oppia-btn:hover {
-  background: rgb(255, 177, 84);
-}
-
-.oppia-small-font {
-  font-size: 1.0em;
-}
-
 .oppia-editor-prerequisites-form {
   background: #eee;
   border-radius: 5px;
   padding: 5px;
-}
-
-.oppia-license {
-  border: 1px solid black;
-  padding: 0 30px 0 30px;
-  margin-bottom: 10px;
-}
-
-.oppia-editor-reference {
-  border: 1px solid black;
-  border-radius: 5px;
-  padding: 2px 10px;
 }
 
 .oppia-form input.ng-invalid.ng-dirty {
@@ -654,13 +577,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-form input.ng-valid.ng-dirty {
   border: 2px solid #78FA89;
-}
-
-.oppia-contribute-gallery-announcement {
-   border: 1px dashed black;
-   border-radius: 5px;
-   margin: 20px;
-   padding: 10px;
 }
 
 .oppia-gallery-frame {
@@ -677,12 +593,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-grayed {
   color: gray;
   opacity: 0.5;
-}
-
-.oppia-rte-inactive {
-  border: 1px solid #ddd;
-  background-color: #eee;
-  padding: 2px;
 }
 
 .oppia-help {
@@ -711,32 +621,18 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-radius: 20px;
   width: 100%;
 }
-
 .oppia-wide-panel-content, .oppia-about {
   font-size: large;
   margin: 5px auto;
   min-height: 400px;
   padding: 20px;
 }
-
 .oppia-about {
   margin-top: 0;
 }
 
-.oppia-wide-panel-title {
-  color: #062770;
-  font-family: "Open Sans", sans-serif;
-  font-size: 24pt;
-  font-weight: bold;
-  margin-bottom: 30px;
-}
-
 .oppia-exploration-editor-top-row {
   margin-top: 5px;
-}
-
-.oppia-btn-container {
-  padding: 10px;
 }
 
 .oppia-warning {
@@ -744,22 +640,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 80%;
   max-width: 700px;
 }
-
 .oppia-warning-chevron {
   font-size: 10px;
   padding-left: 4px;
   padding-top: 4px;
-}
-
-.oppia-missing-objective-error {
-  background-color: #fcf8e3;
-  border-color: #faebcc;
-  color: #8a6d3b;
-  padding: 3px;
-}
-
-.oppia-cursor-pointer {
-  cursor: pointer;
 }
 
 .oppia-placeholder {
@@ -785,13 +669,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   min-height: 20px;
   padding: 5px 10px 15px 10px;
   margin-top: -20px;
-}
-
-.oppia-section-editor-btn {
-  padding-right: 20px;
-  position: absolute;
-  right: 20px;
-  top: 5px;
 }
 
 .oppia-state-content-display {
@@ -844,14 +721,21 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-top: 2px;
 }
 
-.oppia-customize-widget-arg-description {
-  margin-top: 40px;
+.oppia-editable-section {
+  cursor: pointer;
 }
-
 .oppia-editable-section:hover .oppia-state-content-display,
 .oppia-editable-section:hover .oppia-interaction-preview,
 .oppia-editable-section:hover .oppia-readonly-rule-tile {
   background: #eee;
+}
+
+.oppia-editor-edit-icon {
+  font-size: 16px;
+  opacity: 0.4;
+}
+.oppia-editable-section:hover .oppia-editor-edit-icon {
+  opacity: 1.0;
 }
 
 .oppia-interactive-section-click-handler {
@@ -859,27 +743,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   position: absolute;
   width: 100%;
   z-index: 50;
-}
-
-.oppia-editable-section {
-  cursor: pointer;
-}
-
-.oppia-editor-edit-icon {
-  font-size: 16px;
-  opacity: 0.4;
-}
-
-.oppia-editable-section:hover .oppia-editor-edit-icon {
-  opacity: 1.0;
-}
-
-.oppia-interactive-hint {
-  background: rgba(173, 225, 441, 0.4);
-  border-bottom-left-radius: 8px;
-  border-bottom-right-radius: 8px;
-  margin-top: -30px;
-  padding: 3px 10px;
 }
 
 .oppia-rules {
@@ -904,31 +767,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-top: 10px;
 }
 
-.oppia-rule {
-  height: 30px;
-}
-
 /* Styles for the statistics page. */
-
-.oppia-stats-table {
-  border: 1px solid black;
-  padding: 10px;
-}
-
-.oppia-feedback-status {
-  background-color: #18447E;
-  color: white;
-  display: inline-block;
-  margin: 2px 4px;
-  padding: 2px 7px;
-}
-
-.oppia-feedback-content {
-  display: inline-block;
-  font-family: serif;
-  font-size: larger;
-  color: #444
-}
 
 .oppia-back-arrow {
   float: left;
@@ -1038,35 +877,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 160px;
 }
 
-.help {
-  font-size: .85em;
-  color: #999;
-}
-
 .row {
   margin-bottom: 10px;
 }
 
-#sample-exploration {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-#sample-exploration iframe {
-  border: 2pt solid #dde0FF;
-  -webkit-border-radius: 20px;
-  border-radius: 20px;
-}
-
-.icon {
-  height: 1.6em;
-}
-
 .about-tabs {
   margin-bottom: 0;
-}
-
-.oppia-gallery-nav-tabs {
-  border-bottom: 0;
 }
 
 table.oppia-padded-table {
@@ -1100,8 +916,8 @@ oppia-parameter {
 
 .oppia-post-tutorial-popover {
    display: block;
-   left: -65px;
-   top: 37px;
+   left: -185px;
+   top: 0;
    width: 200px;
 }
 
