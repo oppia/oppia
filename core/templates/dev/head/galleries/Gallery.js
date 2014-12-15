@@ -107,6 +107,62 @@ oppia.controller('Gallery', [
   $scope.currentUserIsModerator = false;
   $scope.searchIsLoading = false;
 
+  // Default color.
+  var _COLOR_TEAL = 'teal';
+  // Social sciences.
+  var _COLOR_SALMON = 'salmon';
+  // Art.
+  var _COLOR_SUNNYSIDE = 'sunnyside';
+  // Mathematics and computing.
+  var _COLOR_SHARKFIN = 'sharkfin';
+  // Science.
+  var _COLOR_GUNMETAL = 'gunmetal';
+
+  var CATEGORY_TO_DEFAULT_COLOR = {
+    'Architecture': _COLOR_SUNNYSIDE,
+    'Art': _COLOR_SUNNYSIDE,
+    'Biology': _COLOR_GUNMETAL,
+    'Business': _COLOR_SALMON,
+    'Chemistry': _COLOR_GUNMETAL,
+    'Coding': _COLOR_SHARKFIN,
+    'Computing': _COLOR_SHARKFIN,
+    'Education': _COLOR_TEAL,
+    'Engineering': _COLOR_GUNMETAL,
+    'Environment': _COLOR_GUNMETAL,
+    'Geography': _COLOR_SALMON,
+    'Government': _COLOR_SALMON,
+    'Languages': _COLOR_SUNNYSIDE,
+    'Law': _COLOR_SALMON,
+    'Life Skills': _COLOR_TEAL,
+    'Mathematics': _COLOR_SHARKFIN,
+    'Medicine': _COLOR_GUNMETAL,
+    'Music': _COLOR_SUNNYSIDE,
+    'Philosophy': _COLOR_SALMON,
+    'Photography': _COLOR_SUNNYSIDE,
+    'Physics': _COLOR_GUNMETAL,
+    'Programming': _COLOR_SHARKFIN,
+    'Psychology': _COLOR_SALMON,
+    'Puzzles': _COLOR_TEAL,
+    'Reading': _COLOR_TEAL,
+    'Religion': _COLOR_SALMON,
+    'Sport': _COLOR_SUNNYSIDE,
+    'Statistics': _COLOR_SHARKFIN,
+    'Welcome': _COLOR_TEAL
+  };
+
+  // TODO(sll): Modify this once explorations can specify their own images.
+  $scope.getImageSrcUrl = function(exploration) {
+    return '/images/gallery/default.png';
+  };
+
+  // TODO(sll): Modify this once explorations can specify their own images.
+  $scope.getImageContainerClass = function(exploration) {
+    console.log(exploration);
+    var color = CATEGORY_TO_DEFAULT_COLOR.hasOwnProperty(exploration.category) ?
+      CATEGORY_TO_DEFAULT_COLOR[exploration.category] : _COLOR_TEAL;
+    return 'oppia-gallery-tile-image-translucent oppia-gallery-tile-image-' + color;
+  };
+
   $scope.getCategoryList = function() {
     return Object.keys($scope.selectedCategories);
   };

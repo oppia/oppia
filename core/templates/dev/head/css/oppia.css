@@ -493,20 +493,53 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tile {
-  background-color: #f6f6f6;
-  border: 1px solid #CCC;
-  border-radius: 3px;
-  box-shadow: 0 1px 2px rgba(100,100,100,0.5);
-  box-sizing: border-box;
-  display: block;
-  float: left;
-  margin-bottom: 10px;
+  background-color: #fff;
+  border: 1px solid #b3b3b3;
+  margin-bottom: 20px;
+  padding: 0;
   width: 100%;
 }
 .oppia-gallery-tile:hover {
   background-color: #ddd;
 }
 
+.oppia-gallery-tile-image-container {
+  position: relative;
+}
+/* This centers the image horizontally and vertically. */
+.oppia-gallery-tile-image {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.oppia-gallery-tile-image-translucent {
+  opacity: 0.7;
+}
+.oppia-gallery-tile-image-teal {
+  background-color: #05a69a;
+}
+.oppia-gallery-tile-image-salmon {
+  background-color: #f35f55;
+}
+.oppia-gallery-tile-image-sunnyside {
+  background-color: #f7a541;
+}
+.oppia-gallery-tile-image-sharkfin {
+  background-color: #058ca6;
+}
+.oppia-gallery-tile-image-gunmetal {
+  background-color: #607d8b;
+}
+
+.oppia-gallery-tile-details-container {
+  margin-left: 8px;
+  padding: 8px;
+  position: relative;
+}
 .oppia-gallery-tile-details:hover {
   text-decoration: none;
 }
@@ -550,11 +583,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-edit-btn {
+  border: 1px solid #b3b3b3;
   font-size: 12px;
   margin-top: 10px;
   position: absolute;
-  right: -9px;
-  top: -19px;
+  right: 7px;
+  top: -11px;
 }
 .oppia-gallery-edit-btn:hover {
   background: #47a447;

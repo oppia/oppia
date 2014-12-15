@@ -114,10 +114,11 @@
 
             <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' track by $index">
               <md-card layout="row" class="oppia-gallery-tile">
-                <a flex="25" href="/explore/<[exploration.id]>">
-                  <img src="/images/logo/128x128_favicon_mint.png"/>
+                <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
+                  <!-- TODO(sll): Make the default image higher-res. -->
+                  <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>" height="128" width="128">
                 </a>
-                <div flex="75" style="position: relative;">
+                <div flex="75" class="oppia-gallery-tile-details-container">
                   <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
                     <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
                     Edit
