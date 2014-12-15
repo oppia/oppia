@@ -112,48 +112,57 @@
               </div>
             </div>
 
-            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' track by $index" class="oppia-gallery-tile">
-              <div style="position: relative;">
-                <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 5px;">
-                  <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
-                  Edit
+            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' track by $index">
+              <md-card layout="row" class="oppia-gallery-tile">
+                <a flex="25" href="/explore/<[exploration.id]>">
+                  <img src="/images/logo/128x128_favicon_mint.png"/>
                 </a>
-                {% if is_moderator %}
-                  <a class="btn btn-default btn-sm hidden-xs pull-right oppia-gallery-edit-btn" ng-if="!exploration.is_editable && currentUserIsModerator" ng-href="/create/<[exploration.id]>" style="position: absolute; right: 5px;">
-                    <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit (as moderator)"></span>
-                    Edit (as moderator)
+                <div flex="75" style="position: relative;">
+                  <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
+                    <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
+                    Edit
                   </a>
-                {% endif %}
+                  {% if is_moderator %}
+                    <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="!exploration.is_editable && currentUserIsModerator" ng-href="/create/<[exploration.id]>">
+                      <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit (as moderator)"></span>
+                      Edit (as moderator)
+                    </a>
+                  {% endif %}
 
-                <a ng-href="/explore/<[exploration.id]>" style="margin-bottom: 2px; text-decoration: none;">
-                  <div class="oppia-gallery-tile-top">
-                    <div class="oppia-gallery-tile-description">
-                      <span class="oppia-gallery-tile-title"><[exploration.title]></span>
+                  <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-details">
+                    <div class="oppia-gallery-tile-title">
+                      <[exploration.title]>
                     </div>
-                  </div>
 
-                  <div class="oppia-gallery-tile-middle" style="color: black;">
-                    <span ng-if="exploration.objective" class="protractor-test-exploration-objective"><[getFormattedObjective(exploration.objective)]></span>
-                    <span ng-if="!exploration.objective"><em>No objective specified.</em></span>
-                  </div>
+                    <div class="oppia-gallery-tile-objective">
+                      <span ng-if="exploration.objective" class="protractor-test-exploration-objective">
+                        <[getFormattedObjective(exploration.objective)]>
+                      </span>
+                      <span ng-if="!exploration.objective">
+                        <em>No objective specified.</em>
+                      </span>
+                    </div>
 
-                  <div class="oppia-gallery-tile-bottom">
-                    <span class="pull-right">
-                      <span class="label label-info">
+                    <div class="oppia-gallery-tile-tags">
+                      <span class="label label-info oppia-gallery-tile-tag">
                         <[exploration.category]>
                       </span>
-                      <span ng-if="exploration.status === 'publicized'" class="label label-primary">
-                        Featured
-                        <span class="glyphicon glyphicon-star"></span>
-                      </span>
-                    </span>
+                    </div>
 
-                    <span class="oppia-gallery-tile-last-updated" ng-if="!gallerySidebarIsActive || screenIsLarge">
-                      Last update: <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                    </span>
+                    <div class="oppia-gallery-tile-metadata">
+                      <span class="oppia-gallery-tile-last-updated" ng-if="!gallerySidebarIsActive || screenIsLarge">
+                        Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                      </span>
+                      <span class="oppia-gallery-tile-rating">
+                        <span ng-if="exploration.status === 'publicized'">
+                          Featured
+                          <span class="glyphicon glyphicon-star"></span>
+                        </span>
+                      </span>
+                    </div>
                   </div>
                 </a>
-              </div>
+              </md-card>
             </div>
           </div>
         </div>
