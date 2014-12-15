@@ -261,7 +261,6 @@ class BaseHandler(webapp2.RequestHandler):
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'FULL_SITE_URL': FULL_SITE_URL.value,
-            'ABOUT_PAGES': feconf.ABOUT_PAGES,
             'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],

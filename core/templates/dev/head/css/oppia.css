@@ -177,6 +177,143 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 /*
+  Styles for the global navigation sidebar menu.
+*/
+.oppia-base-container {
+  height: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  min-height: 100%;
+  position: relative;
+}
+
+.oppia-content-container {
+  height: 100%;
+  left: 0;
+  overflow-y: scroll;
+  position: relative;
+  transition: transform 0.5s;
+  -webkit-transition: -webkit-transform 0.5s;
+  z-index: 99;
+}
+.oppia-content-container::after {
+  background: rgba(0,0,0,0.2);
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+.oppia-sidebar-menu-open .oppia-content-container::after {
+  height: 100%;
+  opacity: 1;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  width: 100%;
+}
+.oppia-sidebar-menu-closed .oppia-content-container::after {
+  opacity: 0;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+}
+
+.oppia-sidebar-menu {
+  background: #fff;
+  color: white;
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  -webkit-transform: translate3d(-100%, 0, 0);
+  transform: translate3d(-100%, 0, 0);
+  width: 250px;
+  z-index: 100;
+}
+.oppia-sidebar-menu-transition {
+  -webkit-transition: all 0.5s;
+  transition: all 0.5s;
+}
+.oppia-sidebar-menu::after {
+  background: rgba(0,0,0,0.2);
+  content: '';
+  display: none;
+  height: 100%;
+  opacity: 1;
+  position: absolute;
+  right: 0;
+  top: 0;
+  -webkit-transition: opacity 0.5s;
+  transition: opacity 0.5s;
+  width: 100%;
+}
+
+.oppia-sidebar-menu-icon {
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.oppia-sidebar-menu ul {
+  list-style: none;
+  margin-bottom: 0;
+  padding-left: 0;
+}
+.oppia-sidebar-menu hr {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+.oppia-sidebar-menu .oppia-sidebar-section-header {
+  color: #888;
+  display: block;
+  margin-left: 10px;
+  padding: 1em 0 0 0;
+  text-decoration: none;
+}
+.oppia-sidebar-menu a {
+  color: #333;
+  display: block;
+  font-weight: bold;
+  padding: 1em 0;
+  text-decoration: none;
+}
+.oppia-sidebar-menu a:hover {
+  background: rgb(243, 248, 255);
+}
+.oppia-sidebar-menu li.active a {
+  background: rgba(243, 248, 255, 0.5);
+}
+
+.oppia-sidebar-logo {
+  height: 32px;
+  margin-bottom: 5px;
+  margin-left: 15px;
+}
+.oppia-sidebar-logo-container {
+  color: #333;
+  margin: 0 auto;
+  width: 120px;
+}
+
+.oppia-sidebar-header {
+  background: #eee;
+  border-bottom: 1px solid #ccc;
+  height: 50px;
+  padding-top: 6px;
+}
+
+.oppia-sidebar-menu-open .oppia-sidebar-menu {
+  box-shadow: 1px 0 3px rgba(0,0,0,0.12), 1px 0 2px rgba(0,0,0,0.24);
+  -webkit-transform: translate3d(0, 0, 0);
+  transform: translate3d(0, 0, 0);
+  visibility: visible;
+}
+.oppia-sidebar-menu-open .oppia-sidebar-menu::after {
+  height: 0;
+  opacity: 0;
+  -webkit-transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  transition: opacity 0.5s, width 0.1s 0.5s, height 0.1s 0.5s;
+  width: 0;
+}
+
+/*
   This is needed for proper display of tabs. See
 
   https://github.com/angular-ui/bootstrap/commit/8620aedba99b05822311
@@ -219,6 +356,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .navbar-default .navbar-container {
   background: #05a69a;
   box-shadow: 0 1px 5px rgba(12,12,24, .3);
+  height: 50px;
 }
 
 .navbar-default .dropdown-menu {
@@ -252,16 +390,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .navbar-default .navbar-nav > .active > a:focus {
   background-color: #06b9ac;
   color: #fff;
-}
-
-.oppia-logo {
-  display: inline-block;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 21px;
-  font-weight: 300;
-  height: 48px;
-  margin-left: 6px;
-  margin-top: -14px;
 }
 
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
@@ -1154,4 +1282,34 @@ oppia-expression-error-tag {
 }
 oppia-expression-error-tag:after {
   content: "Expression parsing error!";
+}
+
+.oppia-navbar {
+  box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
+  cursor: default;
+  z-index: 300;
+}
+.oppia-navbar-menu {
+  margin-left: 10px;
+  margin-top: -1px;
+}
+.oppia-navbar-brand-name {
+  float: left;
+  height: 50px;
+  line-height: 20px;
+  margin-left: -10px;
+  text-decoration: none;
+}
+.oppia-navbar-brand-name:hover {
+  color: white;
+  text-decoration: none;
+}
+.oppia-logo {
+  display: inline-block;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 21px;
+  font-weight: 300;
+  height: 48px;
+  margin-left: 6px;
+  margin-top: 3px;
 }

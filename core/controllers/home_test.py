@@ -31,7 +31,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response.mustcontain(
             'Oppia strives to enable learning by doing.',
             'Explore Gallery', '100% Free',
-            'Gallery', 'About', 'Contact', 'Login',
+            'Gallery', 'About', 'Login',
             # No navbar tabs should be highlighted.
             no=['class="active"', 'Logout', 'Dashboard'])
 

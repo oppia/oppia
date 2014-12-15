@@ -42,7 +42,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
         # Test that the correct navbar tab is active.
         self.assertRegexpMatches(
             response.body,
-            r'class="active">\s+<a href="%s">Gallery' % feconf.GALLERY_URL)
+            r'class="active">\s+<a href="%s">' % feconf.GALLERY_URL)
 
     def test_gallery_handler_demo_exploration(self):
         """Test the gallery data handler on demo explorations."""

@@ -6,12 +6,12 @@
 
 {% block content %}
 
-  <div class="container" ng-controller="Gallery">
+  <div class="container-fluid" ng-controller="Gallery">
     <div class="oppia-main-content">
       <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
           <h3 class="oppia-page-title">
-            Gallery
+            Library
           </h3>
         </div>
 
@@ -26,7 +26,7 @@
                                     'oppia-animate-spin': searchIsLoading}">
                    </span>
                 </div>
-                <input type="text" class="form-control" placeholder="Search Explorations" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+                <input type="text" class="form-control" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
               </div>
             </div>
           </form>

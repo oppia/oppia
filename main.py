@@ -147,10 +147,12 @@ urls = [
         'dashboard_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
-    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(
-        r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
-    get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
+        r'/site_guidelines', pages.AboutPage, 'redirect_to_about_page'),
+    get_redirect_route(
+        r'/contact', pages.AboutPage, 'redirect_to_about_page'),
+
+    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),

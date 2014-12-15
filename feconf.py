@@ -146,23 +146,6 @@ MAX_FILE_SIZE_BYTES = 1048576
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
 
-# An ordered list of links to stand-alone pages to display in the 'About' tab.
-# Each item is a dict with two keys: the human-readable name of the link and
-# the URL of the page.
-ABOUT_PAGES = [{
-    'name': 'About this site',
-    'url': '/about'
-}, {
-    'name': 'How to use Oppia',
-    'url': '/site_guidelines',
-}, {
-    'name': 'Blog',
-    'url': 'https://oppiablog.blogspot.com',
-}, {
-    'name': 'Contact',
-    'url': '/contact',
-}]
-
 # Whether to include a page with the Oppia discussion forum.
 SHOW_FORUM_PAGE = True
 
@@ -282,6 +265,7 @@ NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_GALLERY = 'gallery'
+NAV_MODE_HOME = 'home'
 NAV_MODE_PROFILE = 'profile'
 
 # Event types.

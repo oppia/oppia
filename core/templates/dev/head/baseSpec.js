@@ -35,13 +35,13 @@ describe('Base controller', function() {
       });
     }));
 
-    it('should clone an object', function() {
+    it('should check if an object is empty', function() {
       var a = {'a': 'b'};
-      var b = scope.cloneObject(a);
-      expect(b).toEqual(a);
-      expect(b).not.toBe(a);
-      a['b'] = 'c';
-      expect(b).not.toEqual(a);
+      var isEmpty = scope.isEmpty(a);
+      expect(isEmpty).toEqual(false);
+      var b = {};
+      var isEmpty = scope.isEmpty(b);
+      expect(isEmpty).toEqual(true);
     });
   });
 });

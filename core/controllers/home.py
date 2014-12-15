@@ -73,6 +73,9 @@ class HomePage(base.BaseHandler):
         if (self.user_id and
                 self.username not in config_domain.BANNED_USERNAMES.value and
                 user_services.has_user_registered_as_editor(self.user_id)):
+            self.values.update({
+                'nav_mode': feconf.NAV_MODE_HOME,
+            })                    
             self.render_template('dashboard/dashboard.html')
         else:
             self._get_splash_page()
