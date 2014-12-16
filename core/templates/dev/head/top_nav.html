@@ -10,8 +10,8 @@
         </a>
       </div>
 
-      {% if nav_mode not in ['explore', 'create'] %}
-        <div class="collapse navbar-collapse">
+      <div class="collapse navbar-collapse">
+        {% if nav_mode not in ['explore', 'create'] %}
           <ul class="nav navbar-nav oppia-navbar-nav">
             {% if SHOW_FORUM_PAGE %}
               <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
@@ -22,60 +22,11 @@
               <a href="/about">About</a>
             </li>
           </ul>
+        {% endif %}
 
-          <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
-            <li class="dropdown">
-              {% if user_email %}
-                <a class="dropdown-toggle" data-toggle="dropdown">
-                  {% if username %}
-                    {{username}}
-                  {% else %}
-                    {{user_email}}
-                  {% endif %}
-
-                  {% if is_admin %}
-                    (Admin)
-                  {% elif is_moderator %}
-                    (Moderator)
-                  {% endif %}
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                  <li>
-                    <a href="/dashboard">Dashboard</a>
-                  </li>
-                  {% if is_moderator %}
-                    <li>
-                      <a href="/moderator" target="_blank">
-                        Moderator Page
-                      </a>
-                    </li>
-                  {% endif %}
-
-                  {% if is_super_admin %}
-                    <li>
-                      <a href="/admin" target="_blank">
-                        Admin Page
-                      </a>
-                    </li>
-                  {% endif %}
-
-                  <li>
-                    <a href="{{logout_url}}">Logout</a>
-                  </li>
-                </ul>
-              {% else %}
-                <a href="{{login_url}}">
-                  Sign in
-                </a>
-              {% endif %}
-            </li>
-          </ul>
-        </div>
-      {% elif nav_mode == 'create' %}
-        <!-- TODO(sll): Move this somewhere that is more directly related to the editor page. -->
-        <div class="collapse navbar-collapse">
-          <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
+        <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
+          <!-- TODO(sll): Move this somewhere that is more directly related to the editor page. -->
+          {% if nav_mode == 'create' %}
             <li class="dropdown" ng-controller="EditorHelpTab">
               <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                 <span class="glyphicon glyphicon-question-sign"></span>
@@ -100,9 +51,56 @@
                 <div class="popover-content">If you need help in the future, click here!</div>
               </div>
             </li>
-          </ul>
-        </div>
-      {% endif %}
+          {% endif %}
+
+          <li class="dropdown">
+            {% if user_email %}
+              <a class="dropdown-toggle" data-toggle="dropdown">
+                {% if username %}
+                  {{username}}
+                {% else %}
+                  {{user_email}}
+                {% endif %}
+
+                {% if is_admin %}
+                  (Admin)
+                {% elif is_moderator %}
+                  (Moderator)
+                {% endif %}
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <li>
+                  <a href="/dashboard">Dashboard</a>
+                </li>
+                {% if is_moderator %}
+                  <li>
+                    <a href="/moderator" target="_blank">
+                      Moderator Page
+                    </a>
+                  </li>
+                {% endif %}
+
+                {% if is_super_admin %}
+                  <li>
+                    <a href="/admin" target="_blank">
+                      Admin Page
+                    </a>
+                  </li>
+                {% endif %}
+
+                <li>
+                  <a href="{{logout_url}}">Logout</a>
+                </li>
+              </ul>
+            {% else %}
+              <a href="{{login_url}}">
+                Sign in
+              </a>
+            {% endif %}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </nav>
