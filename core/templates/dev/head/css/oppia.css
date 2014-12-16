@@ -314,6 +314,24 @@ div.wysiwyg iframe.wysiwyg-content-large {
   font-weight: 400;
 }
 
+.oppia-navbar-breadcrumb {
+  color: #fff;
+  cursor: default;
+  font-family: "Roboto", "Arial", sans-serif;
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 20px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+}
+
+.oppia-navbar-breadcrumb-separator {
+  padding-right: 10px;
+}
+.oppia-navbar-breadcrumb-separator:after {
+  content: ">";
+}
+
 .navbar-default .navbar-nav > li > a:hover,
 .navbar-default .navbar-nav > li > a:focus {
   background: rgb(10, 48, 106);

@@ -29,6 +29,20 @@
   {{dependencies_html}}
 {% endblock header_js %}
 
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="EditorNavbarBreadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      <span ng-if="navbarTitle">
+        <[navbarTitle]> (edit)
+      </span>
+      <span ng-if="!navbarTitle">
+        Loading...
+      </span>
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
     <li class="dropdown" ng-controller="EditorHelpTab">
@@ -252,14 +266,6 @@
         <div class="col-lg-4 col-md-4 col-sm-4">
           <div ng-if="!isInPreviewMode">
             <div>
-              <span class="oppia-page-title">
-                <[explorationTitleService.displayed]>
-              </span>
-            </div>
-            <div>
-              <span class="label label-info">
-                <[explorationCategoryService.displayed]>
-              </span>
               <span ng-if="explorationRightsService.isPrivate()" class="label label-primary">
                 Private
               </span>

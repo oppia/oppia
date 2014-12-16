@@ -99,7 +99,10 @@
                     </div>
 
                     <div class="collapse navbar-collapse">
-                      {% if nav_mode not in ['explore', 'create'] %}
+                      {% if nav_mode in ['explore', 'create'] %}
+                        {% block navbar_breadcrumb %}
+                        {% endblock navbar_breadcrumb %}
+                      {% else %}
                         <ul class="nav navbar-nav oppia-navbar-nav">
                           {% if SHOW_FORUM_PAGE %}
                             <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
