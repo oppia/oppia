@@ -18,8 +18,6 @@
 
 __author__ = 'Sean Lip'
 
-import os
-
 from core.domain import fs_domain
 import feconf
 import test_utils

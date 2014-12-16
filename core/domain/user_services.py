@@ -34,11 +34,14 @@ MAX_USERNAME_LENGTH = 50
 class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
-            self, user_id, email, username=None, last_agreed_to_terms=None):
+            self, user_id, email, username=None, last_agreed_to_terms=None,
+            last_started_state_editor_tutorial=None):
         self.user_id = user_id
         self.email = email
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
+        self.last_started_state_editor_tutorial = (
+            last_started_state_editor_tutorial)
 
     def validate(self):
         if not isinstance(self.user_id, basestring):
@@ -143,12 +146,15 @@ def get_users_settings(user_ids):
         if user_ids[ind] == feconf.ADMIN_COMMITTER_ID:
             result.append(UserSettings(
                 'admin', email=feconf.ADMIN_EMAIL_ADDRESS, username='admin',
-                last_agreed_to_terms=datetime.datetime.utcnow()
+                last_agreed_to_terms=datetime.datetime.utcnow(),
+                last_started_state_editor_tutorial=None,
             ))
         elif model:
             result.append(UserSettings(
                 model.id, email=model.email, username=model.username,
-                last_agreed_to_terms=model.last_agreed_to_terms
+                last_agreed_to_terms=model.last_agreed_to_terms,
+                last_started_state_editor_tutorial=(
+                    model.last_started_state_editor_tutorial),
             ))
         else:
             result.append(None)
@@ -172,7 +178,9 @@ def _save_user_settings(user_settings):
         email=user_settings.email,
         username=user_settings.username,
         normalized_username=user_settings.normalized_username,
-        last_agreed_to_terms=user_settings.last_agreed_to_terms
+        last_agreed_to_terms=user_settings.last_agreed_to_terms,
+        last_started_state_editor_tutorial=(
+            user_settings.last_started_state_editor_tutorial)
     ).put()
 
 
@@ -262,3 +270,10 @@ def get_user_id_from_email(email):
 
 def is_super_admin(user_id, request):
     return current_user_services.is_super_admin(user_id, request)
+
+
+def record_user_started_state_editor_tutorial(user_id):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.last_started_state_editor_tutorial = (
+        datetime.datetime.utcnow())
+    _save_user_settings(user_settings)

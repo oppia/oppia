@@ -57,7 +57,7 @@ fi
 echo Checking if webtest is installed in third_party
 if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
   echo Installing webtest framework
-  # a bug in older versions of wget prevents it from properly getting the certificate and downloading pypi
+  # a bug in older versions of wget --no-check-certificate prevents it from properly getting the certificate and downloading pypi
   wget http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip --no-check-certificate -O webtest-download.zip
   unzip webtest-download.zip -d $TOOLS_DIR
   rm webtest-download.zip

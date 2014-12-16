@@ -21,11 +21,14 @@ import logging
 from core.controllers import base
 from core.domain import config_domain
 from core.domain import exp_domain
+from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
 from core.domain import widget_registry
 from core.platform import models
+(base_models, exp_models,) = models.Registry.import_models([
+    models.NAMES.base_model, models.NAMES.exploration])
 current_user_services = models.Registry.import_current_user_services()
 import feconf
 import utils
@@ -53,6 +56,7 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
+
         noninteractive_widget_html = (
             widget_registry.Registry.get_noninteractive_widget_html())
 
@@ -61,8 +65,12 @@ class GalleryPage(base.BaseHandler):
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             'noninteractive_widget_html': jinja2.utils.Markup(
                 noninteractive_widget_html),
-            'gallery_redirect_url': current_user_services.create_login_url(
-                feconf.GALLERY_REDIRECT_URL),
+            'gallery_login_redirect_url': (
+                current_user_services.create_login_url(
+                    feconf.GALLERY_LOGIN_REDIRECT_URL)),
+            'gallery_register_redirect_url': utils.set_url_query_parameter(
+                feconf.EDITOR_PREREQUISITES_URL,
+                'return_url', feconf.GALLERY_CREATE_MODE_URL),
         })
         self.render_template('galleries/gallery.html')
 
@@ -90,26 +98,34 @@ class GalleryHandler(base.BaseHandler):
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 
-        explorations_dict = (
-            exp_services.get_non_private_explorations_summary_dict(
-                user_id=self.user_id))
-        if self.user_id:
-            explorations_dict.update(
-                exp_services.get_private_at_least_viewable_explorations_summary_dict(
-                    self.user_id))
+        query_string = self.request.get('q')
+        if query_string:
+            # The user is performing a search.
+            exp_summaries_dict = (
+                exp_services.get_exploration_summaries_matching_query(
+                    query_string))
+        else:
+            # Get non-private exploration summaries
+            exp_summaries_dict = (
+                exp_services.get_non_private_exploration_summaries())
 
+        # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
+        # individual lookups. Note that this will depend on user_id.
         explorations_list = [{
-            'id': exp_id,
-            'title': exp_data['title'],
-            'category': exp_data['category'],
-            'objective': exp_data['objective'],
+            'id': exp_summary.id,
+            'title': exp_summary.title,
+            'category': exp_summary.category,
+            'objective': exp_summary.objective,
             'language': language_codes_to_short_descs.get(
-                exp_data['language_code'], exp_data['language_code']),
-            'last_updated': exp_data['last_updated'],
-            'status': exp_data['status'],
-            'community_owned': exp_data['community_owned'],
-            'is_editable': exp_data['is_editable'],
-        } for (exp_id, exp_data) in explorations_dict.iteritems()]
+                exp_summary.language_code, exp_summary.language_code),
+            'last_updated': utils.get_time_in_millisecs(
+                exp_summary.exploration_model_last_updated),
+            'status': exp_summary.status,
+            'community_owned': exp_summary.community_owned,
+            'is_editable': exp_services.is_exp_summary_editable(
+                exp_summary,
+                user_id=self.user_id)
+        } for exp_summary in exp_summaries_dict.values()]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
@@ -117,37 +133,31 @@ class GalleryHandler(base.BaseHandler):
                 'You may be running up against the default query limits.'
                 % feconf.DEFAULT_QUERY_LIMIT)
 
-        private_explorations_list = []
-        beta_explorations_list = []
-        released_explorations_list = []
+        public_explorations_list = []
+        featured_explorations_list = []
 
         for e_dict in explorations_list:
-            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PRIVATE:
-                private_explorations_list.append(e_dict)
-            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
-                beta_explorations_list.append(e_dict)
-            elif e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLICIZED:
-                released_explorations_list.append(e_dict)
+            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
+                public_explorations_list.append(e_dict)
+            elif (e_dict['status'] ==
+                    rights_manager.EXPLORATION_STATUS_PUBLICIZED):
+                featured_explorations_list.append(e_dict)
 
-        private_explorations_list = sorted(
-            private_explorations_list, key=lambda x: x['last_updated'],
-            reverse=True)
-        beta_explorations_list = sorted(
-            beta_explorations_list, key=lambda x: x['last_updated'],
+        public_explorations_list = sorted(
+            public_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
         publicized_explorations_list = sorted(
-            released_explorations_list, key=lambda x: x['last_updated'],
+            featured_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
 
         self.values.update({
-            'released': publicized_explorations_list,
-            'beta': beta_explorations_list,
-            'private': private_explorations_list,
+            'featured': publicized_explorations_list,
+            'public': public_explorations_list,
         })
         self.render_json(self.values)
 
 
-class GalleryRedirector(base.BaseHandler):
+class GalleryLoginRedirector(base.BaseHandler):
     """Redirects a logged-in user to the editor prerequisites page or the
     gallery, according as to whether they are logged in or not.
     """
@@ -158,9 +168,9 @@ class GalleryRedirector(base.BaseHandler):
         if not user_services.has_user_registered_as_editor(self.user_id):
             redirect_url = utils.set_url_query_parameter(
                 feconf.EDITOR_PREREQUISITES_URL,
-                'return_url', feconf.GALLERY_URL)
+                'return_url', feconf.GALLERY_CREATE_MODE_URL)
         else:
-            redirect_url = feconf.GALLERY_URL
+            redirect_url = feconf.GALLERY_CREATE_MODE_URL
 
         self.redirect(redirect_url)
 

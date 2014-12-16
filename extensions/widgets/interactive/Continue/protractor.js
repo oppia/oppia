@@ -17,16 +17,30 @@
  * interaction.
  */
 
+var objects = require('../../../objects/protractor.js');
+
+var customizeInteraction = function(elem, buttonText) {
+  if (buttonText) {
+    objects.UnicodeStringEditor(
+      elem.element(by.tagName('schema-based-unicode-editor'))
+    ).setValue(buttonText);
+  }
+};
+ 
 var expectInteractionDetailsToMatch = function(buttonText) {
   expect(
     element(by.tagName('oppia-interactive-continue')).
-    element(by.tagName('button')).getText()
+      element(by.tagName('button')).getText()
   ).toBe(buttonText);
 };
 
-var submitAnswer = function() {
-  element(by.tagName('oppia-interactive-continue')).click();
+var submitAnswer = function(elem) {
+  elem.element(by.tagName('oppia-interactive-continue')).click();
 };
 
+var testSuite = [];
+
+exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.testSuite = testSuite;

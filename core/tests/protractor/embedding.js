@@ -10,7 +10,7 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License. 
+// limitations under the License.
 
 /**
  * @fileoverview End-to-end tests of embedding explorations in other websites.
@@ -18,6 +18,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
+var forms = require('../protractor_utils/forms.js');
 var general = require('../protractor_utils/general.js');
 var users = require('../protractor_utils/users.js');
 var admin = require('../protractor_utils/admin.js');
@@ -28,7 +29,7 @@ describe('Embedding', function() {
   it('should display and play embedded explorations', function() {
 
     var TEST_PAGES = [
-      'embedding_tests_dev_0.0.1.html', 
+      'embedding_tests_dev_0.0.1.html',
       'embedding_tests_dev_0.0.1.min.html',
       'embedding_tests_jsdelivr_0.0.1.min.html'];
     // The length of time the page waits before confirming an exploration
@@ -39,14 +40,14 @@ describe('Embedding', function() {
       general.waitForSystem();
       protractor.getInstance().waitForAngular();
 
-      expect(player.getCurrentQuestionText()).toBe(
-        (version === 1) ?
+      player.expectContentToMatch(
+        forms.toRichText((version === 1) ?
           'Suppose you were given three balls: one red, one blue, and one ' +
           'yellow. How many ways are there to arrange them in a straight line?':
-          'Version 2');
+          'Version 2'));
       player.submitAnswer('NumericInput', 6);
-      expect(player.getCurrentQuestionText()).toBe(
-        'Right! Why do you think it is 6?');
+      player.expectContentToMatch(
+        forms.toRichText('Right! Why do you think it is 6?'));
       player.expectExplorationToNotBeOver();
       player.submitAnswer('TextInput', 'factorial');
       player.expectExplorationToBeOver();
@@ -64,9 +65,7 @@ describe('Embedding', function() {
     admin.reloadExploration('counting');
 
     general.openEditor('4');
-    editor.editContent().open();
-    editor.editContent().setPlainText('Version 2');
-    editor.editContent().close();
+    editor.setContent(forms.toRichText('Version 2'));
     editor.saveChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
@@ -95,12 +94,14 @@ describe('Embedding', function() {
       browser.switchTo().defaultContent();
 
       // Tests of failed loading
-      expect(
-        driver.findElement(
-          by.xpath("//div[@class='protractor-test-missing-id']/div/span")
-        ).getText()).toMatch(
-          'This Oppia exploration could not be loaded because no oppia-id ' + 
-          'attribute was specified in the HTML tag.');
+      var missingIdElement = driver.findElement(
+        by.xpath("//div[@class='protractor-test-missing-id']/div/span"));
+      // Without the following line, protractor does not scroll down to the
+      // element in question.
+      general.scrollElementIntoView(missingIdElement);
+      expect(missingIdElement.getText()).toMatch(
+        'This Oppia exploration could not be loaded because no oppia-id ' +
+        'attribute was specified in the HTML tag.');
       driver.findElement(
         by.xpath(
           "//div[@class='protractor-test-invalid-id-deferred']/oppia/div/button"
@@ -132,7 +133,7 @@ describe('Embedding', function() {
           }
         } catch(err) {}
       }
-      
+
       // We played the exploration twice for each test page.
       var expectedLogs = [];
       for (var i = 0; i < TEST_PAGES.length * 2; i ++) {

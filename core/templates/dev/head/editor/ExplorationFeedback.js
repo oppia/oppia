@@ -25,7 +25,7 @@ oppia.controller('ExplorationFeedback', [
   var THREAD_LIST_HANDLER_URL = '/threadlisthandler/' + expId;
   var THREAD_HANDLER_PREFIX = '/threadhandler/' + expId + '/';
 
-  $scope.getLocaleStringForDateWithoutSeconds = function(millisSinceEpoch) {
+  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
   };

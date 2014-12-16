@@ -1,4 +1,14 @@
 <script type="text/ng-template" id="interactiveWidget/InteractiveMap">
+  <style>
+    /* Fixes for Google Maps zoom controls. */
+    .gm-style img {
+      max-width: none;
+    }
+    .gm-style label {
+      width: auto; display:inline;
+    }
+  </style>
+
   <div>
     <div id="map_canvas" ui-map="map" ui-options="mapOptions"
          style="width: 100%; height: 400px; max-width: 600px; max-height: 400px; margin: auto"

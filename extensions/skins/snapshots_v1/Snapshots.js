@@ -28,9 +28,9 @@ oppia.directive('snapshotsSkin', [function() {
       $scope.initializePage = function() {
         $scope.inputTemplate = '';
         $scope.currentQuestion = '';
-        oppiaPlayerService.init(function(data) {
-          $scope.currentQuestion = data.init_html;
-          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(data.state_name);
+        oppiaPlayerService.init(function(stateName, initHtml) {
+          $scope.currentQuestion = initHtml;
+          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(stateName);
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
         });
       };
@@ -40,7 +40,7 @@ oppia.directive('snapshotsSkin', [function() {
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
             newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
-          if (newStateName === 'END') {
+          if (!newStateName) {
             $scope.currentQuestion = 'You have finished.';
             $scope.inputTemplate = '';
             return;

@@ -19,15 +19,16 @@
  */
 
 oppia.controller('ExplorationSettings', [
-    '$scope', '$http', '$window', '$modal', 'activeInputData', 'explorationData',
+    '$scope', '$http', '$window', '$modal', '$rootScope', 'activeInputData', 'explorationData',
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
-    'explorationInitStateNameService', 'changeListService', 'warningsData', 
-    'explorationStatesService', function(
-      $scope, $http, $window, $modal, activeInputData, explorationData,
+    'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
+    'warningsData', 'explorationStatesService', function(
+      $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
-      explorationInitStateNameService, changeListService, warningsData, explorationStatesService) {
+      explorationInitStateNameService, explorationParamSpecsService, changeListService,
+      warningsData, explorationStatesService) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -45,16 +46,23 @@ oppia.controller('ExplorationSettings', [
     $scope.explorationLanguageCodeService = explorationLanguageCodeService;
     $scope.explorationRightsService = explorationRightsService;
     $scope.explorationInitStateNameService = explorationInitStateNameService;
+    $scope.explorationParamSpecsService = explorationParamSpecsService;
 
     explorationData.getData().then(function(data) {
-      $scope.paramSpecs = data.param_specs || {};
       $scope.explorationParamChanges = data.param_changes || [];
       $scope.refreshSettingsTab();
     });
   };
 
   $scope.refreshSettingsTab = function() {
-    $scope.stateNames = Object.keys(explorationStatesService.getStates());
+    var _states = explorationStatesService.getStates();
+    // Ensure that explorationStatesService has been initialized before getting
+    // the state names from it. (Otherwise, navigating to the settings tab
+    // directly (by entering a URL that ends with /settings) results in a
+    // console error.
+    if (_states) {
+      $scope.stateNames = Object.keys(_states);
+    }
   };
 
   $scope.$on('refreshSettingsTab', $scope.refreshSettingsTab);
@@ -93,6 +101,8 @@ oppia.controller('ExplorationSettings', [
     }
 
     explorationInitStateNameService.saveDisplayedValue();
+
+    $rootScope.$broadcast('refreshGraph');
   };
 
   $scope.saveExplorationParamChanges = function(newValue, oldValue) {
@@ -101,13 +111,6 @@ oppia.controller('ExplorationSettings', [
         'param_changes', newValue, oldValue);
     }
   };
-
-  $scope.$watch('paramSpecs', function(newValue, oldValue) {
-    if (oldValue !== undefined && !$scope.isDiscardInProgress
-        && !angular.equals(newValue, oldValue)) {
-      changeListService.editExplorationProperty('param_specs', newValue, oldValue);
-    }
-  });
 
   $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
     if (oldValue !== undefined && !$scope.isDiscardInProgress

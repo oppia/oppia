@@ -41,6 +41,10 @@ from core.tests import test_utils
 import feconf
 import utils
 
+# TODO(msl): test ExpSummaryModel changes if explorations are updated,
+# reverted, deleted, created, rights changed
+
+
 class ExplorationServicesUnitTests(test_utils.GenericTestBase):
     """Test the exploration services module."""
 
@@ -180,11 +184,11 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         for _id in exp_ids:
             self.assertEqual(result.get(_id).title, exps.get(_id).title)
 
-        self.assertIsNone(result['doesnt_exist'])
+        self.assertNotIn('doesnt_exist', result)
 
         with self.assertRaises(Exception):
-            exp_services.get_multiple_explorations_by_id(exp_ids + ['doesnt_exist'])
-
+            exp_services.get_multiple_explorations_by_id(
+                exp_ids + ['doesnt_exist'])
 
     def test_soft_deletion_of_explorations(self):
         """Test that soft deletion of explorations works correctly."""
@@ -201,10 +205,22 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
             exp_services.get_at_least_editable_summary_dict(self.OWNER_ID),
             {})
 
+        self.assertEqual(
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID),
+            {})
+
         # But the models still exist in the backend.
         self.assertIn(
             self.EXP_ID,
             [exp.id for exp in exp_models.ExplorationModel.get_all(
+                include_deleted_entities=True)]
+        )
+
+        # The exploration summary is deleted however
+        self.assertNotIn(
+            self.EXP_ID,
+            [exp.id for exp in exp_models.ExpSummaryModel.get_all(
                 include_deleted_entities=True)]
         )
 
@@ -229,8 +245,32 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
                 include_deleted_entities=True)]
         )
 
+    def test_summaries_of_hard_deleted_explorations(self):
+        """Test that summaries of hard deleted explorations are
+        correctly deleted."""
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+
+        exp_services.delete_exploration(
+            self.OWNER_ID, self.EXP_ID, force_deletion=True)
+        with self.assertRaises(Exception):
+            exp_services.get_exploration_by_id(self.EXP_ID)
+
+        # The deleted exploration summary does not show up in any queries.
+        self.assertEqual(
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID), {})
+
+        # The exploration summary model has been purged from the backend.
+        self.assertNotIn(
+            self.EXP_ID,
+            [exp.id for exp in exp_models.ExpSummaryModel.get_all(
+                include_deleted_entities=True)]
+        )
+
     def test_explorations_are_removed_from_index_when_deleted(self):
-        """Tests that explorations are removed from the search index when deleted."""
+        """Tests that explorations are removed from the search index when
+        deleted.
+        """
 
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
 
@@ -243,7 +283,6 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         with delete_docs_swap:
             exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
-
 
 
     def test_create_new_exploration_error_cases(self):
@@ -271,6 +310,32 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         self.assertEqual(len(retrieved_exploration.param_specs), 1)
         self.assertEqual(
             retrieved_exploration.param_specs.keys()[0], 'theParameter')
+
+    def test_save_and_retrieve_exploration_summary(self):
+        exploration = self.save_new_default_exploration(
+            self.EXP_ID, self.OWNER_ID)
+        exploration.param_specs = {
+            'theParameter': param_domain.ParamSpec('Int')}
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+
+        # change title and category
+        exp_services.update_exploration(
+            self.OWNER_ID, self.EXP_ID, [{
+                'cmd': 'edit_exploration_property',
+                'property_name': 'title',
+                'new_value': 'A new title'
+            }, {
+                'cmd': 'edit_exploration_property',
+                'property_name': 'category',
+                'new_value': 'A new category'
+            }],
+            'Change title and category')
+
+        retrieved_exp_summary = exp_services.get_exploration_summary_by_id(
+            self.EXP_ID)
+
+        self.assertEqual(retrieved_exp_summary.title, 'A new title')
+        self.assertEqual(retrieved_exp_summary.category, 'A new category')
 
 
 class LoadingAndDeletionOfDemosTest(ExplorationServicesUnitTests):
@@ -500,128 +565,86 @@ states:
             zf.open('A title.yaml').read(), self.UPDATED_YAML_CONTENT)
 
 
-class DictExportUnitTests(ExplorationServicesUnitTests):
-    """Test export methods for explorations represented as zip files."""
+class YAMLExportUnitTests(ExplorationServicesUnitTests):
+    """Test export methods for explorations represented as a dict whose keys
+    are state names and whose values are YAML strings representing the state's
+    contents."""
 
-    SAMPLE_YAML_CONTENT = (
-"""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: The objective
+    _SAMPLE_INIT_STATE_CONTENT = ("""content:
+- type: text
+  value: Welcome to the Oppia editor!<br><br>Anything
+    you type here will be shown to the learner playing
+    your exploration.<br><br>If you need more help getting
+    started, check out the Help link in the navigation
+    bar.
 param_changes: []
-param_specs: {}
-schema_version: 3
-skill_tags: []
-states:
-  %s:
-    content:
-    - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  New state:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: New state
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME)
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: %s
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""") % (feconf.DEFAULT_INIT_STATE_NAME)
 
-    UPDATED_YAML_CONTENT = (
-"""author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: The objective
+    SAMPLE_EXPORTED_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
+        'New state': ("""content:
+- type: text
+  value: ''
 param_changes: []
-param_specs: {}
-schema_version: 3
-skill_tags: []
-states:
-  %s:
-    content:
-    - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  Renamed state:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Renamed state
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-""") % (
-    feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME)
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: New state
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""")
+    }
+
+    UPDATED_SAMPLE_DICT = {
+        feconf.DEFAULT_INIT_STATE_NAME: _SAMPLE_INIT_STATE_CONTENT,
+        'Renamed state': ("""content:
+- type: text
+  value: ''
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: Renamed state
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""")
+    }
 
     def test_export_to_dict(self):
         """Test the export_to_dict() method."""
@@ -631,11 +654,9 @@ states:
         exploration.objective = 'The objective'
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
-        dict_output = exp_services.export_to_dict(self.EXP_ID)
+        dict_output = exp_services.export_states_to_yaml(self.EXP_ID, width=50)
 
-        self.assertTrue('yaml' in dict_output)
-        self.assertEqual(
-            dict_output['yaml'], self.SAMPLE_YAML_CONTENT)
+        self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
     def test_export_by_versions(self):
         """Test export_to_dict() for different versions."""
@@ -658,16 +679,14 @@ states:
         self.assertEqual(exploration.version, 3)
 
         # Download version 2
-        dict_output = exp_services.export_to_dict(self.EXP_ID, 2)
-        self.assertTrue('yaml' in dict_output)
-        self.assertEqual(
-            dict_output['yaml'], self.SAMPLE_YAML_CONTENT)
+        dict_output = exp_services.export_states_to_yaml(
+            self.EXP_ID, version=2, width=50)
+        self.assertEqual(dict_output, self.SAMPLE_EXPORTED_DICT)
 
         # Download version 3
-        dict_output = exp_services.export_to_dict(self.EXP_ID, 3)
-        self.assertTrue('yaml' in dict_output)
-        self.assertEqual(
-            dict_output['yaml'], self.UPDATED_YAML_CONTENT)
+        dict_output = exp_services.export_states_to_yaml(
+            self.EXP_ID, version=3, width=50)
+        self.assertEqual(dict_output, self.UPDATED_SAMPLE_DICT)
 
 
 def _get_change_list(state_name, property_name, new_value):
@@ -768,7 +787,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         """Check that updates cannot be made to non-existent parameters."""
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                r'The parameter myParam .* does not exist .*'):
+                r'The parameter with name \'myParam\' .* does not exist .*'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID, _get_change_list(
                     self.init_state_name, 'param_changes', self.param_changes),
@@ -1522,8 +1541,8 @@ class SearchTests(ExplorationServicesUnitTests):
     def test_index_explorations_given_domain_objects(self):
 
         expected_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_exp_titles = ['title 0','title 1', 'title 2',
-                               'title 3', 'title 4']
+        expected_exp_titles = [
+            'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
         expected_exp_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
 
         def mock_add_documents_to_index(docs, index):
@@ -1555,12 +1574,11 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-
     def test_index_explorations_given_ids(self):
-
         all_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
         expected_exp_ids = all_exp_ids[:-1]
-        all_exp_titles = ['title 0', 'title 1', 'title 2', 'title 3', 'title 4']
+        all_exp_titles = [
+            'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
         expected_exp_titles = all_exp_titles[:-1]
 
         def mock_add_documents_to_index(docs, index):
@@ -1582,8 +1600,8 @@ class SearchTests(ExplorationServicesUnitTests):
                 self.OWNER_ID,
                 all_exp_titles[i])
 
-        # We're only publishing the first 4 explorations, so we're not expecting
-        # the last exploration to be indexed.
+        # We're only publishing the first 4 explorations, so we're not
+        # expecting the last exploration to be indexed.
         for i in xrange(4):
             rights_manager.publish_exploration(
                 self.OWNER_ID,
@@ -1618,7 +1636,7 @@ class SearchTests(ExplorationServicesUnitTests):
 
         self.assertEqual(add_docs_counter.times_called, 1)
 
-    def test_update_public_exploration_status_in_search(self):
+    def test_update_publicized_exploration_status_in_search(self):
 
         def mock_get_doc(doc_id, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
@@ -1627,12 +1645,13 @@ class SearchTests(ExplorationServicesUnitTests):
 
         def mock_add_docs(docs, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            self.assertEqual(docs, [{'is': 'beta'}])
+            self.assertEqual(docs, [{'is': 'featured'}])
 
         def mock_get_rights(exp_id):
             return rights_manager.ExplorationRights(
-                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
-                status=rights_manager.EXPLORATION_STATUS_PUBLIC
+                self.EXP_ID,
+                [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                status=rights_manager.EXPLORATION_STATUS_PUBLICIZED
             )
 
         get_doc_counter = test_utils.CallCounter(mock_get_doc)
@@ -1659,14 +1678,16 @@ class SearchTests(ExplorationServicesUnitTests):
 
         def mock_get_rights(exp_id):
             return rights_manager.ExplorationRights(
-                self.EXP_ID, [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
+                self.EXP_ID,
+                [self.OWNER_ID], [self.EDITOR_ID], [self.VIEWER_ID],
                 status=rights_manager.EXPLORATION_STATUS_PRIVATE
             )
 
         delete_docs_counter = test_utils.CallCounter(mock_delete_docs)
 
         delete_docs_swap = self.swap(
-            search_services, 'delete_documents_from_index', delete_docs_counter)
+            search_services, 'delete_documents_from_index',
+            delete_docs_counter)
         get_rights_swap = self.swap(
             rights_manager, 'get_exploration_rights', mock_get_rights)
 
@@ -1693,10 +1714,7 @@ class SearchTests(ExplorationServicesUnitTests):
             self.assertEqual(ids_only, True)
             self.assertEqual(retries, 3)
 
-            return [{'id': _id} for _id in doc_ids], expected_result_cursor
-
-        explorations = [self.save_new_default_exploration(_id, self.OWNER_ID)
-                        for _id in doc_ids]
+            return doc_ids, expected_result_cursor
 
         with self.swap(search_services, 'search', mock_search):
             result, cursor = exp_services.search_explorations(
@@ -1706,18 +1724,8 @@ class SearchTests(ExplorationServicesUnitTests):
                 cursor=expected_cursor,
             )
 
-        def check_exploration_list_equality(l1, l2):
-            if len(l1) != len(l2):
-                return False
-
-            for i in xrange(len(l1)):
-                if not l1[i].is_equal_to(l2[i]):
-                    return False
-
-            return True
-
         self.assertEqual(cursor, expected_result_cursor)
-        self.assertTrue(check_exploration_list_equality(result, explorations))
+        self.assertEqual(result, doc_ids)
 
 
 class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
@@ -1756,11 +1764,270 @@ class ExplorationChangedEventsTests(ExplorationServicesUnitTests):
             mock_record)
 
         with record_event_swap:
-            rights_manager.create_new_exploration_rights(self.EXP_ID, self.OWNER_ID)
-            rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
-            rights_manager.publicize_exploration(self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublicize_exploration(self.user_id_admin, self.EXP_ID)
-            rights_manager.unpublish_exploration(self.user_id_admin, self.EXP_ID)
+            self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+            rights_manager.create_new_exploration_rights(
+                self.EXP_ID, self.OWNER_ID)
+            rights_manager.publish_exploration(
+                self.OWNER_ID, self.EXP_ID)
+            rights_manager.publicize_exploration(
+                self.user_id_admin, self.EXP_ID)
+            rights_manager.unpublicize_exploration(
+                self.user_id_admin, self.EXP_ID)
+            rights_manager.unpublish_exploration(
+                self.user_id_admin, self.EXP_ID)
 
         self.assertEqual(recorded_ids, [self.EXP_ID, self.EXP_ID,
                                         self.EXP_ID, self.EXP_ID])
+
+
+class ExplorationSummaryTests(ExplorationServicesUnitTests):
+    """Test exploration summaries."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    BOB_NAME = 'bob'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+    def test_is_exp_summary_editable(self):
+        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+
+        # Check that only the owner may edit.
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertTrue(exp_services.is_exp_summary_editable(
+            exp_summary, user_id=self.OWNER_ID))
+        self.assertFalse(exp_services.is_exp_summary_editable(
+            exp_summary, user_id=self.EDITOR_ID))
+        self.assertFalse(exp_services.is_exp_summary_editable(
+            exp_summary, user_id=self.VIEWER_ID))
+
+        # Owner makes viewer a viewer and editor an editor.
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
+            rights_manager.ROLE_VIEWER)
+        rights_manager.assign_role(
+            self.OWNER_ID, self.EXP_ID, self.EDITOR_ID,
+            rights_manager.ROLE_EDITOR)
+
+        # Check that owner and editor may edit, but not viewer.
+        exp_summary = exp_services.get_exploration_summary_by_id(self.EXP_ID)
+        self.assertTrue(exp_services.is_exp_summary_editable(
+            exp_summary, user_id=self.OWNER_ID))
+        self.assertTrue(exp_services.is_exp_summary_editable(
+            exp_summary, user_id=self.EDITOR_ID))
+        self.assertFalse(exp_services.is_exp_summary_editable(
+            exp_summary, user_id=self.VIEWER_ID))
+
+
+class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
+    """Test exploration summaries get_* functions."""
+
+    ALBERT_EMAIL = 'albert@example.com'
+    BOB_EMAIL = 'bob@example.com'
+    ALBERT_NAME = 'albert'
+    BOB_NAME = 'bob'
+
+    EXP_ID_1 = 'eid1'
+    EXP_ID_2 = 'eid2'
+
+    EXPECTED_VERSION_1 = 4
+    EXPECTED_VERSION_2 = 2
+
+    def setUp(self):
+        """Populate the database of explorations and their summaries.
+
+        The sequence of events is:
+        - (1) Albert creates EXP_ID_1.
+        - (2) Bob edits the title of EXP_ID_1.
+        - (3) Albert creates EXP_ID_2.
+        - (4) Albert edits the title of EXP_ID_1.
+        - (5) Albert edits the title of EXP_ID_2.
+        - (6) Bob reverts Albert's last edit to EXP_ID_1.
+        - (7) Albert deletes EXP_ID_1.
+        - Bob tries to publish EXP_ID_2, and is denied access.
+        - (8) Albert publishes EXP_ID_2.
+        """
+        super(ExplorationServicesUnitTests, self).setUp()
+
+        self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
+        self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
+        self.register_editor(self.ALBERT_EMAIL, username=self.ALBERT_NAME)
+        self.register_editor(self.BOB_EMAIL, username=self.BOB_NAME)
+
+        exploration_1 = self.save_new_valid_exploration(
+            self.EXP_ID_1, self.ALBERT_ID)
+
+        exploration_1.title = 'Exploration 1 title'
+        exp_services._save_exploration(
+            self.BOB_ID, exploration_1, 'Changed title.', [])
+
+        exploration_2 = self.save_new_valid_exploration(
+            self.EXP_ID_2, self.ALBERT_ID)
+
+        exploration_1.title = 'Exploration 1 Albert title'
+        exp_services._save_exploration(
+            self.ALBERT_ID, exploration_1,
+            'Changed title to Albert1 title.', [])
+
+        exploration_2.title = 'Exploration 2 Albert title'
+        exp_services._save_exploration(
+            self.ALBERT_ID, exploration_2, 'Changed title to Albert2.', [])
+
+        exp_services.revert_exploration(self.BOB_ID, self.EXP_ID_1, 3, 2)
+
+        with self.assertRaisesRegexp(
+                Exception, 'This exploration cannot be published'):
+            rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
+
+        rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
+
+
+    def test_get_non_private_exploration_summaries(self):
+
+        actual_summaries = exp_services.get_non_private_exploration_summaries()
+
+        expected_summaries = {
+            self.EXP_ID_2: exp_domain.ExplorationSummary(
+                self.EXP_ID_2, 'Exploration 2 Albert title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
+                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+                )}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code', 'skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+    def test_get_all_exploration_summaries(self):
+        actual_summaries = exp_services.get_all_exploration_summaries()
+
+        expected_summaries = {
+            self.EXP_ID_1: exp_domain.ExplorationSummary(
+                self.EXP_ID_1, 'Exploration 1 title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PRIVATE,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
+                actual_summaries[self.EXP_ID_1].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_1].exploration_model_last_updated
+            ),
+            self.EXP_ID_2: exp_domain.ExplorationSummary(
+                self.EXP_ID_2, 'Exploration 2 Albert title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
+                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+            )
+        }
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code', 'skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+
+    def test_get_private_at_least_viewable_exploration_summaries(self):
+
+        actual_summaries = (
+            exp_services.get_private_at_least_viewable_exploration_summaries(
+                self.ALBERT_ID))
+
+        expected_summaries = {
+            self.EXP_ID_1: exp_domain.ExplorationSummary(
+                self.EXP_ID_1, 'Exploration 1 title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PRIVATE,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
+                actual_summaries[self.EXP_ID_1].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_1].exploration_model_last_updated
+                )}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code', 'skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+        # do similar test for Bob
+        actual_summaries = (
+            exp_services.get_private_at_least_viewable_exploration_summaries(
+                self.BOB_ID))
+
+        expected_summaries = {}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries,
+                         expected_summaries)
+
+    def test_get_at_least_editable_exploration_summaries(self):
+        exp_services.delete_exploration(self.ALBERT_ID, self.EXP_ID_1)
+
+        actual_summaries = (
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.ALBERT_ID))
+
+        expected_summaries = {
+            self.EXP_ID_2: exp_domain.ExplorationSummary(
+                self.EXP_ID_2, 'Exploration 2 Albert title',
+                'A category', 'An objective', 'en', [],
+                rights_manager.EXPLORATION_STATUS_PUBLIC,
+                False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
+                actual_summaries[self.EXP_ID_2].exploration_model_created_on,
+                actual_summaries[self.EXP_ID_2].exploration_model_last_updated
+        )}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries.keys(),
+                         expected_summaries.keys())
+        simple_props = ['id', 'title', 'category', 'objective',
+                        'language_code', 'skill_tags', 'status',
+                        'community_owned', 'owner_ids',
+                        'editor_ids', 'viewer_ids', 'version',
+                        'exploration_model_created_on',
+                        'exploration_model_last_updated']
+        for exp_id in actual_summaries.keys():
+            for prop in simple_props:
+                self.assertEqual(getattr(actual_summaries[exp_id], prop),
+                                 getattr(expected_summaries[exp_id], prop))
+
+        # do similar test for Bob
+        actual_summaries = (
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.BOB_ID))
+
+        expected_summaries = {}
+
+        # check actual summaries equal expected summaries
+        self.assertEqual(actual_summaries,
+                         expected_summaries)

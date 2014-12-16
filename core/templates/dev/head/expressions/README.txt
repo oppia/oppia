@@ -24,19 +24,24 @@ parser.js
 evaluator.js
   Implementation of the expression evaluator. Includes the evaluation engine
   as well as the system operators.
-test.js
-  Tests the parser as well as the evaluator.
+parserSpec.js
+  Tests for the parser.
+evaluatorSpec.js
+  Tests for the evaluator.
 
 How to update the parser:
 1. Modify parser.pegjs.
 2. Add tests in test.js for the new or modified grammar.
-3. Run tests by executing
-    bash scripts/run_expression_tests.sh
-  in oppia directory. Note this runs scripts/create_expression_parser.sh as well
-  which updates parser.js. If for whatever reason you need to check in the
-  change without running the tests, you then need to run
-    bash scripts/create_expression_parser.sh
-  directly in order to update parser.js.
+3. Run
+
+      bash scripts/create_expression_parser.sh
+
+   which updates parser.js. Then run the JS tests using
+
+      bash scripts/run_js_tests.sh
+
+   to ensure that the new grammar passes the tests in parserSpec.js and
+   evaluatorSpec.js.
 4. Repeat 1-3 until the desired grammar is written and tested.
 5. Check the changes. You need to check in parser.pegjs as well as parser.js
-  (and probably tests.js).
+  (and probably parserSpec.js and evaluatorSpec.js).

@@ -19,8 +19,8 @@
       </bar-chart>
 
       <h4>Common learner paths</h4>
-      <div style="font-size: smaller">
-        <em>Last updated: <[getLocaleStringForDatetime(lastUpdated)]></em>
+      <div style="font-size: smaller" ng-if="lastUpdated">
+        <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
       </div>
       <div class="container">
         <div class="row">

@@ -271,16 +271,17 @@ class TestBase(unittest.TestCase):
         return exploration
 
     def save_new_valid_exploration(
-            self, exploration_id, owner_id, title='A title'):
+            self, exploration_id, owner_id, title='A title',
+            category='A category', objective='An objective'):
         """Saves a new strictly-validated exploration.
 
         Returns the exploration domain object.
         """
         exploration = exp_domain.Exploration.create_default_exploration(
-            exploration_id, title, 'A category')
+            exploration_id, title, category)
         exploration.states[exploration.init_state_name].widget.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
-        exploration.objective = 'An objective'
+        exploration.objective = objective
         exp_services.save_new_exploration(owner_id, exploration)
         return exploration
 

@@ -29,51 +29,38 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Bite-sized learning journeys',
-            'Browse the explorations gallery', '100% free!',
-            'Gallery', 'About', 'Contact',
-            'Login', 'Create an Oppia account',
+            'Oppia strives to enable learning by doing.',
+            'Explore Gallery', '100% Free',
+            'Gallery', 'About', 'Login',
             # No navbar tabs should be highlighted.
-            no=['class="active"',
-                'Logout', 'Create an exploration', 'Dashboard'])
+            no=['class="active"', 'Logout', 'Dashboard'])
 
     def test_logged_in_but_not_registered_as_editor_homepage(self):
         """Test the logged-in-but-not-editor version of the home page."""
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Login', self.get_expected_login_url('/'),
-            no=['Logout', self.get_expected_logout_url('/')])
+        response = self.testapp.get('/dashboard')
+        self.assertEqual(response.status_int, 302)
+        # This should redirect to the login page.
+        self.assertIn(
+            self.get_expected_login_url('/dashboard'),
+            response.headers['location'])
 
         self.login('reader@example.com')
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Bite-sized learning journeys',
-            'Gallery', 'Logout', 'Create an exploration',
-            self.get_expected_logout_url('/'),
-            no=['Login', 'Create an Oppia account', 'Dashboard',
-                self.get_expected_login_url('/')])
+        response = self.testapp.get('/dashboard')
+        # This should redirect to the registration page.
+        self.assertEqual(response.status_int, 302)
         self.logout()
 
     def test_logged_in_and_registered_as_editor_homepage(self):
         """Test the logged-in-and-editor home page (the 'dashboard')."""
-        response = self.testapp.get('/')
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Login', self.get_expected_login_url('/'),
-            no=['Logout', self.get_expected_logout_url('/')])
-
         self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get('/')
+        response = self.testapp.get('/dashboard')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Dashboard', 'Gallery', 'Logout',
+            'Dashboard', 'Logout',
             self.get_expected_logout_url('/'),
-            no=['Login', 'Create an Oppia account',
-                'Bite-sized learning journeys',
-                self.get_expected_login_url('/')])
+            no=['Login', 'Oppia strives to enable learning by doing.',
+                'Explore Gallery', self.get_expected_login_url('/')])
         self.logout()
 
 
