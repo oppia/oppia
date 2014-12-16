@@ -112,10 +112,7 @@
                         </ul>
                       {% endif %}
 
-                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
-                        {% block local_top_nav_options %}
-                        {% endblock %}
-
+                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px;">
                         <li class="dropdown">
                           {% if user_email %}
                             <a class="dropdown-toggle" data-toggle="dropdown">
@@ -163,6 +160,9 @@
                           {% endif %}
                         </li>
                       </ul>
+
+                      {% block local_top_nav_options %}
+                      {% endblock %}
                     </div>
                   </div>
                 </div>

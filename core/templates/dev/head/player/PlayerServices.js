@@ -158,7 +158,7 @@ oppia.factory('oppiaPlayerService', [
   var explorationDataUrl = (
     '/explorehandler/init/' + _explorationId + (version ? '?v=' + version : ''));
   var sessionId = null;
-  var isLoggedIn = false;
+  var _isLoggedIn = false;
   var _exploration = null;
 
   learnerParamsService.init({});
@@ -198,51 +198,6 @@ oppia.factory('oppiaPlayerService', [
       el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(choices));
     }
     return ($('<div>').append(el)).html();
-  };
-
-  var _feedbackModalCtrl = ['$scope', '$modalInstance', 'isLoggedIn', 'currentStateName', function(
-      $scope, $modalInstance, isLoggedIn, currentStateName) {
-    $scope.isLoggedIn = isLoggedIn;
-    $scope.currentStateName = currentStateName;
-
-    $scope.isSubmitterAnonymized = false;
-    $scope.relatedTo = $scope.currentStateName === _END_DEST ? 'exploration' : 'state';
-    $scope.subject = '';
-    $scope.feedback = '';
-
-    $scope.submit = function(subject, feedback, relatedTo, isSubmitterAnonymized) {
-      $modalInstance.close({
-        subject: subject,
-        feedback: feedback,
-        isStateRelated: relatedTo === 'state',
-        isSubmitterAnonymized: isSubmitterAnonymized
-      });
-    };
-
-    $scope.cancel = function() {
-      $modalInstance.dismiss('cancel');
-    };
-  }];
-
-  var _feedbackModalCallback = function(result) {
-    if (result.feedback) {
-      $http.post('/explorehandler/give_feedback/' + _explorationId, {
-        subject: result.subject,
-        feedback: result.feedback,
-        include_author: !result.isSubmitterAnonymized && isLoggedIn,
-        state_name: result.isStateRelated ? _currentStateName : null
-      });
-
-      $modal.open({
-        templateUrl: 'modals/playerFeedbackConfirmation',
-        backdrop: 'static',
-        controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-          $scope.cancel = function() {
-            $modalInstance.dismiss('cancel');
-          };
-        }]
-      });
-    }
   };
 
   var stopwatch = stopwatchProviderService.getInstance();
@@ -383,7 +338,7 @@ oppia.factory('oppiaPlayerService', [
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
           version = data.version,
-          isLoggedIn = data.is_logged_in;
+          _isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
           _viewerHasEditingRights = data.can_edit;
           _loadInitialState(successCallback);
@@ -419,6 +374,9 @@ oppia.factory('oppiaPlayerService', [
         randomSuffix += ' ';
       }
       return randomSuffix;
+    },
+    isLoggedIn: function() {
+      return _isLoggedIn;
     },
     isInPreviewMode: function() {
       return !!_editorPreviewMode;
@@ -470,37 +428,6 @@ oppia.factory('oppiaPlayerService', [
         }
       });
     },
-    showFeedbackModal: function() {
-      if (_editorPreviewMode) {
-        warningsData.addWarning('The feedback modal is not available in preview mode.');
-        return;
-      }
-
-      $modal.open({
-        templateUrl: 'modals/playerFeedback',
-        backdrop: 'static',
-        resolve: {
-          currentStateName: function() {
-            return _currentStateName;
-          },
-          isLoggedIn: function() {
-            return isLoggedIn;
-          }
-        },
-        controller: _feedbackModalCtrl
-      }).result.then(_feedbackModalCallback);
-    },
-    openExplorationEditorPage: function() {
-      if (_editorPreviewMode) {
-        warningsData.addWarning(
-          '\'Look Inside/Edit\' functionality is not available in ' +
-          'preview mode. In non-preview mode, it will open the exploration ' +
-          'editor page in a new tab.');
-        return;
-      }
-
-      window.open('/create/' + _explorationId, '_blank');
-    },
     isAnswerBeingProcessed: function() {
       return answerIsBeingProcessed;
     },
@@ -515,5 +442,64 @@ oppia.factory('oppiaPlayerService', [
         version: version
       });
     }
+  };
+}]);
+
+
+oppia.controller('LearnerLocalNav', [
+    '$scope', '$http', '$modal', 'oppiaPlayerService',
+    function($scope, $http, $modal, oppiaPlayerService) {
+  var _END_DEST = 'END';
+
+  $scope.explorationId = oppiaPlayerService.getExplorationId();
+
+  $scope.showFeedbackModal = function() {
+    $modal.open({
+      templateUrl: 'modals/playerFeedback',
+      backdrop: 'static',
+      resolve: {},
+      controller: ['$scope', '$modalInstance', 'oppiaPlayerService', function(
+          $scope, $modalInstance, oppiaPlayerService) {
+        $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+        $scope.currentStateName = oppiaPlayerService.getCurrentStateName();
+
+        $scope.isSubmitterAnonymized = false;
+        $scope.relatedTo = $scope.currentStateName === _END_DEST ? 'exploration' : 'state';
+        $scope.subject = '';
+        $scope.feedback = '';
+
+        $scope.submit = function(subject, feedback, relatedTo, isSubmitterAnonymized) {
+          $modalInstance.close({
+            subject: subject,
+            feedback: feedback,
+            isStateRelated: relatedTo === 'state',
+            isSubmitterAnonymized: isSubmitterAnonymized
+          });
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+        };
+      }]
+    }).result.then(function(result) {
+      if (result.feedback) {
+        $http.post('/explorehandler/give_feedback/' + $scope.explorationId, {
+          subject: result.subject,
+          feedback: result.feedback,
+          include_author: !result.isSubmitterAnonymized && oppiaPlayerService.isLoggedIn(),
+          state_name: result.isStateRelated ? oppiaPlayerService.getCurrentStateName() : null
+        });
+
+        $modal.open({
+          templateUrl: 'modals/playerFeedbackConfirmation',
+          backdrop: 'static',
+          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+            $scope.cancel = function() {
+              $modalInstance.dismiss('cancel');
+            };
+          }]
+        });
+      }
+    });
   };
 }]);
