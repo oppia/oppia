@@ -29,6 +29,33 @@
   {{dependencies_html}}
 {% endblock header_js %}
 
+{% block local_top_nav_options %}
+  <li class="dropdown" ng-controller="EditorHelpTab">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      <span class="glyphicon glyphicon-question-sign"></span>
+    </a>
+    <ul class="dropdown-menu">
+      <li class="dropdown">
+        <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
+      </li>
+      <li class="dropdown">
+        <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
+          Planning Your Exploration
+        </a>
+      </li>
+      <li class="dropdown">
+        <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
+          Exploration Design Tips
+        </a>
+      </li>
+    </ul>
+    <div ng-if="postTutorialHelpPopoverIsShown" class="popover left oppia-post-tutorial-popover">
+      <div class="arrow"></div>
+      <div class="popover-content">If you need help in the future, click here!</div>
+    </div>
+  </li>
+{% endblock local_top_nav_options %}
+
 {% block content %}
   {% if announcement %}
     <div class="oppia-align-center oppia-warning">
