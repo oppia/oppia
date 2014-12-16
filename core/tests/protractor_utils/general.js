@@ -122,10 +122,10 @@ var expect404Error = function() {
 
 // TODO(sll): see if it is possible to remove this once the scrolling in
 // ConversationSkin.js is changed to use ng-animate instead of jQuery.
-var scrollElementIntoView = function(element) {
+var scrollElementIntoView = function(elementToScrollTo) {
   browser.executeScript(function(elem) {
     elem.scrollIntoView(false);
-  }, element);
+  }, elementToScrollTo);
 };
 
 
