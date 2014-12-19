@@ -408,13 +408,13 @@ var enterPreviewMode = function() {
 };
 
 var exitPreviewMode = function() {
-  var elemFinder = element(by.css('.protractor-test-exit-preview-mode'));
-  // Without this line, if an exploration has been scrolled down, the click
-  // ends up missing the preview button. (This may be because the scrolling
-  // is being done outside Angular.)
-  general.scrollElementIntoView(elemFinder);
-  general.waitForSystem();
-  elemFinder.click();
+  exitButton = element(by.css('.protractor-test-exit-preview-mode'));
+  // The process of scrolling to the exit button causes the cursor to rest over
+  // the username in the top right, which opens a dropdown menu that then
+  // blocks the "Edit" button. To prevent this we move the cursor away.
+  general.scrollElementIntoView(exitButton);
+  browser.actions().mouseMove(element(by.css('.navbar-header'))).perform();
+  exitButton.click();
 };
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
