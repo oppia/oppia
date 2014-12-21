@@ -40,7 +40,7 @@
     </svg>
     <ul>
       <li ng-repeat="region in $parent.$parent.value.imageRegions">
-        <input type="text" ng-model="region.label"></input>
+        <input type="text" ng-model="regionLabelGetterSetter($index)" ng-model-options="{getterSetter: true}"></input>
         <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion($index)">Delete</button>
       </li>
     </ul>

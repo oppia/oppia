@@ -69,6 +69,34 @@ oppia.directive('imageWithRegionsEditor', [
             }
           );
         });
+
+        function hasDuplicates(array) {
+          array = array.sort();
+          for (var i = 1; i < array.length; i++) {
+            if (array[i-1] === array[i]) {
+              return true;
+            }
+          }
+          return false;
+        }
+
+        $scope.regionLabelGetterSetter = function(index) {
+          return function(label) {
+            if (angular.isDefined(label)) {
+              $scope.$parent.value.imageRegions[index].label = label;
+              if (hasDuplicates($scope.$parent.value.imageRegions.map(
+                function(val) {
+                  return val.label;
+                }
+              ))) {
+                $scope.errorText = "ERROR: Duplicate labels!";
+              } else {
+                $scope.errorText = "";
+              }
+            }
+            return $scope.$parent.value.imageRegions[index].label;
+          };
+        };
         
         function convertCoordsToFraction(coords, dimensions) {
           return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
