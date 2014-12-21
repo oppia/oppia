@@ -107,8 +107,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         `expected_response` will be interpreted as a regex string.
         """
         reader_dict = self.submit_answer(
-            self.EXP_ID, self.last_state_name, answer, params=self.last_params)
-        self.last_params = reader_dict['params']
+            self.EXP_ID, self.last_state_name, answer)
         self.last_state_name = reader_dict['state_name']
         self.assertRegexpMatches(
             reader_dict['feedback_html'], expected_feedback)
@@ -129,10 +128,12 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
 
-        self.last_params = reader_dict['params']
-        self.last_state_name = reader_dict['state_name']
+        self.last_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][self.last_state_name])
+        init_content = init_state_data['content'][0]['value']
        
-        self.assertRegexpMatches(reader_dict['init_html'], expected_response)
+        self.assertRegexpMatches(init_content, expected_response)
         self.assertEqual(reader_dict['exploration']['title'], expected_title)
 
     def test_welcome_exploration(self):
@@ -154,15 +155,18 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
             'town square')
         self.submit_and_compare(0, '', 'Is it')
         self.submit_and_compare(2, '', 'Do you want to play again?')
-        self.submit_and_compare(1, '', 'how do you think he does it?')
-        self.submit_and_compare('middle',
-            'he\'s always picking a number in the middle',
-            'what number the magician picked')
-        self.submit_and_compare(0, 'Exactly!', 'try it out')
-        self.submit_and_compare(10, '', 'best worst case')
-        self.submit_and_compare(
-            0, '', 'to be sure our strategy works in all cases')
-        self.submit_and_compare(0, 'try to guess', '')
+        # TODO(sll): Redo all of the following as a JS test, since the
+        # backend can no longer parse expressions:
+        #
+        # self.submit_and_compare(1, '', 'how do you think he does it?')
+        # self.submit_and_compare('middle',
+        #     'he\'s always picking a number in the middle',
+        #     'what number the magician picked')
+        # self.submit_and_compare(0, 'Exactly!', 'try it out')
+        # self.submit_and_compare(10, '', 'best worst case')
+        # self.submit_and_compare(
+        #     0, '', 'to be sure our strategy works in all cases')
+        # self.submit_and_compare(0, 'try to guess', '')
 
     def test_parametrized_adventure(self):
         """Test a reader's progression through the parametrized adventure."""
@@ -171,8 +175,11 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         self.submit_and_compare(
             'My Name', '', 'Hello, I\'m My Name!.*get a pretty red')
         self.submit_and_compare(0, '', 'fork in the road')
-        self.submit_and_compare(
-            'ne', '', 'Hello, My Name. You have to pay a toll')
+        # TODO(sll): Redo all of the following as a JS test, since the
+        # backend can no longer parse expressions:
+        #
+        # self.submit_and_compare(
+        #     'ne', '', 'Hello, My Name. You have to pay a toll')
 
     def test_huge_answers(self):
         """Test correct behavior if huge answers are submitted."""
@@ -202,7 +209,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         self.login(viewer_email)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
-        state_name_1 = exploration_dict['state_name']
+        state_name_1 = exploration_dict['exploration']['init_state_name']
 
         # Viewer gives 1st feedback
         self.post_json(

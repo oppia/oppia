@@ -21,9 +21,9 @@
 
 // Global utility methods.
 oppia.controller('Base', [
-    '$scope', '$http', '$rootScope', '$window', '$log',
+    '$scope', '$http', '$rootScope', '$window', '$timeout', '$document', '$log',
     'warningsData', 'activeInputData', 'messengerService',
-    function($scope, $http, $rootScope, $window, $log,
+    function($scope, $http, $rootScope, $window, $timeout, $document, $log,
              warningsData, activeInputData, messengerService) {
   $rootScope.DEV_MODE = GLOBALS.DEV_MODE;
 
@@ -89,7 +89,35 @@ oppia.controller('Base', [
     $scope.addContentToIframe(document.getElementById(iframeId), content);
   };
 
-  $scope.cloneObject = function(obj) {
-    return angular.copy(obj);
+  // This method is here because the trigger for the tutorial is in the site
+  // navbar. It broadcasts an event to tell the exploration editor to open the
+  // editor tutorial.
+  $scope.openEditorTutorial = function() {
+    $scope.$broadcast('openEditorTutorial');
   };
+
+  // The following methods and listeners relate to the global navigation sidebar.
+  $scope.openSidebar = function() {
+    if (!$scope.sidebarIsShown) {
+      $scope.sidebarIsShown = true;
+      $scope.pendingSidebarClick = true;
+    }
+  };
+
+  // TODO(sll): use 'touchstart' for mobile.
+  $document.on('click', function(evt) {
+    if (!$scope.pendingSidebarClick) {
+      $scope.sidebarIsShown = false;
+    } else {
+      $scope.pendingSidebarClick = false;
+    }
+    $scope.$apply();
+  });
+
+  $scope.pageHasLoaded = false;
+  $scope.pendingSidebarClick = false;
+  $scope.sidebarIsShown = false;
+  $timeout(function() {
+    $scope.pageHasLoaded = true;
+  }, 500);
 }]);

@@ -45,38 +45,13 @@ class AboutPage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
-            'nav_mode': feconf.NAV_MODE_ABOUT,
-            'SITE_FORUM_URL': SITE_FORUM_URL.value,
-            'SITE_NAME': SITE_NAME.value,
-        })
-        self.render_template('pages/about.html')
-
-
-class SiteGuidelinesPage(base.BaseHandler):
-    """Page with site guidelines."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'nav_mode': feconf.NAV_MODE_ABOUT,
             'MODERATOR_REQUEST_FORUM_URL': (
                 editor.MODERATOR_REQUEST_FORUM_URL.value),
-            'SITE_NAME': SITE_NAME.value,
-        })
-        self.render_template('pages/site_guidelines.html')
-
-
-class ContactPage(base.BaseHandler):
-    """Page with contact details."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.values.update({
-            'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
-            'nav_mode': feconf.NAV_MODE_ABOUT,
             'SITE_FORUM_URL': SITE_FORUM_URL.value,
+            'SITE_NAME': SITE_NAME.value,
+            'nav_mode': feconf.NAV_MODE_ABOUT,
         })
-        self.render_template('pages/contact.html')
+        self.render_template('pages/about.html')
 
 
 class ForumPage(base.BaseHandler):

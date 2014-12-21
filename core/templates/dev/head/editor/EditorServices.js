@@ -377,8 +377,8 @@ oppia.factory('explorationRightsService', [
 
 
 oppia.factory('explorationPropertyService', [
-    '$log', 'changeListService', 'warningsData',
-    function($log, changeListService, warningsData) {
+    '$rootScope', '$log', 'changeListService', 'warningsData',
+    function($rootScope, $log, changeListService, warningsData) {
   // Public base API for data services corresponding to exploration properties
   // (title, category, etc.)
   return {
@@ -396,6 +396,8 @@ oppia.factory('explorationPropertyService', [
       // means that this is the latest value of the property as determined by the
       // frontend change list.
       this.savedMemento = angular.copy(value);
+
+      $rootScope.$broadcast('explorationPropertyChanged');
     },
     // Returns whether the current value has changed from the memento.
     hasChanged: function() {
@@ -436,6 +438,8 @@ oppia.factory('explorationPropertyService', [
       changeListService.editExplorationProperty(
         this.propertyName, this.displayed, this.savedMemento);
       this.savedMemento = angular.copy(this.displayed);
+
+      $rootScope.$broadcast('explorationPropertyChanged');
     },
     // Reverts the displayed value to the saved memento.
     restoreFromMemento: function() {
@@ -523,6 +527,15 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
+oppia.factory('explorationParamSpecsService', [
+    'explorationPropertyService', function(explorationPropertyService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'param_specs';
+  child._isValid = function(value) {
+    return true;
+  };
+  return child;
+}]);
 
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no

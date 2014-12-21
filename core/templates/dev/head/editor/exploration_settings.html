@@ -306,11 +306,11 @@
 
           <div class="col-lg-6 col-md-6 col-sm-6">
             <h5>Parameters used in this exploration</h5>
-            <div ng-show="isEmpty(paramSpecs)">
+            <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
               <em>No parameters used.</em>
             </div>
-            <ol ng-show="!isEmpty(paramSpecs)">
-              <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
+            <ol>
+              <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento">
                 <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
               </li>
             </ol>
@@ -325,9 +325,7 @@
             </h5>
 
             <param-change-editor param-changes="explorationParamChanges"
-                                 param-specs="paramSpecs"
                                  save-param-changes="saveExplorationParamChanges"
-                                 add-exploration-param-spec="addExplorationParamSpec"
                                  is-editable="editabilityService.isEditable()">
             </param-change-editor>
           </div>

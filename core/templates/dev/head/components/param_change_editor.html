@@ -12,22 +12,20 @@
             <select2-dropdown item="tmpParamChange.name" choices="paramNameChoices" placeholder="Choose or type new" new-choice-regex="^[A-Za-z]+$" width="180px">
             </select2-dropdown>
 
-            <span ng-show="tmpParamChange.name">
-              <select class="form-control" ng-model="tmpParamChange.generator_id"
-                      ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS" style="width: 250px;" required>
-              </select>
+            <select class="form-control" ng-model="tmpParamChange.generator_id"
+                    ng-options="key as PREAMBLE_TEXT[key] for (key, value) in ALLOWED_KEYS" style="width: 250px;" required>
+            </select>
 
-              <value-generator-editor generator-id="tmpParamChange.generator_id"
-                                      customization-args="tmpParamChange.customization_args"
-                                      obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
-              </value-generator-editor>
-            </span>
-            <span ng-hide="tmpParamChange.name">
-              to ...
-            </span>
+            <value-generator-editor generator-id="tmpParamChange.generator_id"
+                                    customization-args="tmpParamChange.customization_args"
+                                    obj-type="getObjTypeForParam(tmpParamChange.select2Name.text) || 'UnicodeString'">
+            </value-generator-editor>
             <br>
 
-            <input type="submit" value="Close editor">
+            <input class="btn btn-success" type="submit" value="Save Parameter Change" ng-disabled="!tmpParamChange.name || INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
+            <div style="color: red;" aria-live="assertive" ng-if="INVALID_PARAMETER_NAMES.indexOf(tmpParamChange.name) !== -1">
+              The name '<[tmpParamChange.name]>' is reserved. Please choose another name.
+            </div>
           </form>
         </div>
       </div>

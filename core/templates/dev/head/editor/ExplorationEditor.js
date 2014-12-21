@@ -30,6 +30,7 @@ oppia.controller('ExplorationEditor', [
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
   'explorationStatesService', 'routerService', 'graphDataService', 'focusService', 'stateEditorTutorialFirstTimeService',
+  'explorationParamSpecsService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -38,7 +39,8 @@ oppia.controller('ExplorationEditor', [
     explorationRightsService, explorationInitStateNameService, validatorsService,
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
-    graphDataService, focusService, stateEditorTutorialFirstTimeService) {
+    graphDataService, focusService, stateEditorTutorialFirstTimeService,
+    explorationParamSpecsService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
@@ -48,10 +50,10 @@ oppia.controller('ExplorationEditor', [
     oppiaPlayerService.populateExploration({
       states: explorationStatesService.getStates(),
       init_state_name: explorationInitStateNameService.savedMemento,
-      param_specs: $scope.paramSpecs,
+      param_specs: explorationParamSpecsService.savedMemento,
       title: explorationTitleService.savedMemento,
       // TODO(sll): are these actually editable?
-      param_changes: []
+      param_changes: explorationData.data.param_changes
     });
     $timeout(function() {
       $scope.isInPreviewMode = true;
@@ -514,6 +516,7 @@ oppia.controller('ExplorationEditor', [
       explorationObjectiveService.init(data.objective);
       explorationLanguageCodeService.init(data.language_code);
       explorationInitStateNameService.init(data.init_state_name);
+      explorationParamSpecsService.init(data.param_specs);
 
       $scope.explorationTitleService = explorationTitleService;
       $scope.explorationCategoryService = explorationCategoryService;
@@ -525,8 +528,6 @@ oppia.controller('ExplorationEditor', [
       $scope.currentUserIsModerator = data.is_moderator;
       $scope.defaultSkinId = data.default_skin_id;
       $scope.allSkinIds = data.all_skin_ids;
-
-      $scope.paramSpecs = data.param_specs || {};
 
       $scope.currentUser = data.user;
       $scope.currentVersion = data.version;
@@ -573,21 +574,6 @@ oppia.controller('ExplorationEditor', [
   };
 
   $scope.initExplorationPage();
-
-
-  $scope.addExplorationParamSpec = function(name, type, successCallback) {
-    $log.info('Adding a param spec to the exploration.');
-    if (name in $scope.paramSpecs) {
-      warningsData.addWarning(
-        'Parameter ' + name + ' already exists, so it was not added.');
-      return;
-    }
-
-    var oldParamSpecs = angular.copy($scope.paramSpecs);
-    $scope.paramSpecs[name] = {obj_type: type};
-    changeListService.editExplorationProperty(
-      'param_specs', angular.copy($scope.paramSpecs), oldParamSpecs);
-  };
 
   $scope.showPublishExplorationModal = function() {
     warningsData.clear();
@@ -783,4 +769,13 @@ oppia.controller('EditorHelpTab', [
   $scope.openEditorTutorial = function() {
     $rootScope.$broadcast('openEditorTutorial');
   };
+}]);
+
+
+oppia.controller('EditorNavbarBreadcrumb', [
+    '$scope', 'explorationTitleService', function($scope, explorationTitleService) {
+  $scope.navbarTitle = null;
+  $scope.$on('explorationPropertyChanged', function() {
+    $scope.navbarTitle = explorationTitleService.savedMemento;
+  });
 }]);

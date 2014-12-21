@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Tests for various static pages (like About, Contact, etc.)."""
+"""Tests for various static pages (like the About page)."""
 
 __author__ = 'Sean Lip'
 
@@ -26,4 +26,4 @@ class NoninteractivePagesTest(test_utils.GenericTestBase):
         response = self.testapp.get('/about')
         self.assertEqual(response.status_int, 200)
         self.assertEqual(response.content_type, 'text/html')
-        response.mustcontain('What is Oppia?', 'About this website', 'License')
+        response.mustcontain('What is Oppia?', 'About this site', 'License')
