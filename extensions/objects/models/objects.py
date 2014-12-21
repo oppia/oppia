@@ -610,5 +610,5 @@ class ListOfRegion(BaseObject):
 
     SCHEMA = {
         'type': 'list',
-        'items': NonnegativeInt.SCHEMA
+        'items': UnicodeString.SCHEMA
     }

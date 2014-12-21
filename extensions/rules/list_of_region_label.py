@@ -20,8 +20,9 @@ __author__ = 'Zhan Xiong Chin'
 
 from extensions.rules import base
 
+
 class IsInRegion(base.ListOfRegionRule):
-    description = 'is in the region {{x|NonnegativeInt}}'
+    description = 'is in the region {{x|UnicodeString}}'
     is_generic = False
 
     def _evaluate(self, subject):

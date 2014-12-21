@@ -337,8 +337,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               var _choices = angular.copy($scope.answerChoices);
               $scope.ruleDescriptionChoices = $scope.answerChoices.map(function(choice, ind) {
                 return {
-                  id: ind,
-                  val: choice
+                  val: choice.label,
+                  id: choice.val
                 };
               });
 

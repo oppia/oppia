@@ -69,6 +69,7 @@ oppia.directive('imageWithRegionsEditor', [
             }
           );
         });
+        
         function convertCoordsToFraction(coords, dimensions) {
           return [coords[0] / dimensions[0], coords[1] / dimensions[1]];
         }
@@ -91,22 +92,24 @@ oppia.directive('imageWithRegionsEditor', [
         }
         $scope.onSvgMouseUp = function(evt) {
           $scope.userIsCurrentlyDragging = false;
-          $scope.$parent.value.imageRegions.push({
-            label: $scope.$parent.value.imageRegions.length.toString(),
-            region: {
-              regionType: 'Rectangle', 
-              regionArea: [
-                convertCoordsToFraction(
-                  [$scope.rectX, $scope.rectY], 
-                  [$scope.imageWidth, $scope.imageHeight]
-                ),
-                convertCoordsToFraction(
-                  [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
-                  [$scope.imageHeight, $scope.imageHeight]
-                )
-              ]
-            }
-          });
+          if ($scope.rectWidth != 0 && $scope.rectHeight != 0) {
+            $scope.$parent.value.imageRegions.push({
+              label: $scope.$parent.value.imageRegions.length.toString(),
+              region: {
+                regionType: 'Rectangle', 
+                regionArea: [
+                  convertCoordsToFraction(
+                    [$scope.rectX, $scope.rectY], 
+                    [$scope.imageWidth, $scope.imageHeight]
+                  ),
+                  convertCoordsToFraction(
+                    [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
+                    [$scope.imageHeight, $scope.imageHeight]
+                  )
+                ]
+              }
+            });
+          }
         };
 
         $scope.resetEditor = function() {

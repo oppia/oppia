@@ -39,11 +39,12 @@
       </text>
     </svg>
     <ul>
-    <li ng-repeat="region in $parent.$parent.value.imageRegions">
-      <input type="text" ng-model="region.label"></input>
-      <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion($index)">Delete</button>
-    </li>
+      <li ng-repeat="region in $parent.$parent.value.imageRegions">
+        <input type="text" ng-model="region.label"></input>
+        <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion($index)">Delete</button>
+      </li>
     </ul>
   </div>
+  <br><div style="color: red;"><[errorText]></div>
   <br><button type="button" class="btn btn-default" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>

@@ -111,7 +111,14 @@ oppia.controller('StateInteraction', [
     if ($scope.widgetId == 'MultipleChoiceInput') {
       for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
         if (widgetTemplate.customization_args[i].name == 'choices') {
-          $scope.answerChoices = widgetTemplate.customization_args[i].value;
+          $scope.answerChoices = widgetTemplate.customization_args[i].value.map(
+            function(val, ind) {
+              return {
+                val: ind, 
+                label: val
+              };
+            }
+          );
         }
       }
     } else if ($scope.widgetId == 'ImageClickInput') {
@@ -120,7 +127,10 @@ oppia.controller('StateInteraction', [
           $scope.answerChoices = [];
           var imageWithRegions = widgetTemplate.customization_args[i].value;
           for (var j = 0; j < imageWithRegions.imageRegions.length; j++) {
-            $scope.answerChoices.push(imageWithRegions.imageRegions[j].label);
+            $scope.answerChoices.push({
+              val: imageWithRegions.imageRegions[j].label,
+              label: imageWithRegions.imageRegions[j].label
+            });
           }
         }
       }

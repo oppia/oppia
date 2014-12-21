@@ -39,10 +39,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           var mouseY = (event.pageY - image.offset().top) / image.height();
           var answer = [];
           for (var i = 0; i < imageAndRegions.imageRegions.length; i++) {
-            var region = imageAndRegions.imageRegions[i].region.regionArea;
-            if (region[0][0] <= mouseX && mouseX <= region[1][0] &&
-                region[0][1] <= mouseY && mouseY <= region[1][1]) {
-              answer.push(i);
+            var region = imageAndRegions.imageRegions[i];
+            var regionArea = region.region.regionArea;
+            if (regionArea[0][0] <= mouseX && mouseX <= regionArea[1][0] &&
+                regionArea[0][1] <= mouseY && mouseY <= regionArea[1][1]) {
+              answer.push(region.label);
             }
           }
           $scope.$parent.$parent.submitAnswer(answer, 'submit');
