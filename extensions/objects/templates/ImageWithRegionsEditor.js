@@ -73,7 +73,7 @@ oppia.directive('imageWithRegionsEditor', [
         function hasDuplicates(array) {
           array = array.sort();
           for (var i = 1; i < array.length; i++) {
-            if (array[i-1] === array[i]) {
+            if (array[i - 1] === array[i]) {
               return true;
             }
           }
@@ -85,10 +85,10 @@ oppia.directive('imageWithRegionsEditor', [
             if (angular.isDefined(label)) {
               $scope.$parent.value.imageRegions[index].label = label;
               if (hasDuplicates($scope.$parent.value.imageRegions.map(
-                function(val) {
-                  return val.label;
-                }
-              ))) {
+                    function(val) {
+                      return val.label;
+                    }
+                  ))) {
                 $scope.errorText = "ERROR: Duplicate labels!";
               } else {
                 $scope.errorText = "";
