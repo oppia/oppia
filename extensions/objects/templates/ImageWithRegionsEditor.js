@@ -48,6 +48,9 @@ oppia.directive('imageWithRegionsEditor', [
         // Dimensions of image
         $scope.imageWidth = $scope.imageHeight = 0;
 
+        // Temporary label list
+        var labelList = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
+
         $scope.getPreviewUrl = function(imageUrl) {
           return $sce.trustAsResourceUrl(
             '/imagehandler/' + $rootScope.explorationId + '/' +
@@ -70,8 +73,8 @@ oppia.directive('imageWithRegionsEditor', [
           );
         });
 
-        function hasDuplicates(array) {
-          array = array.sort();
+        function hasDuplicates(originalArray) {
+          var array = originalArray.slice(0).sort();
           for (var i = 1; i < array.length; i++) {
             if (array[i - 1] === array[i]) {
               return true;
@@ -83,18 +86,17 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.regionLabelGetterSetter = function(index) {
           return function(label) {
             if (angular.isDefined(label)) {
-              $scope.$parent.value.imageRegions[index].label = label;
-              if (hasDuplicates($scope.$parent.value.imageRegions.map(
-                    function(val) {
-                      return val.label;
-                    }
-                  ))) {
-                $scope.errorText = "ERROR: Duplicate labels!";
+              labelList[index] = label;
+              if (hasDuplicates(labelList)) {
+                $scope.errorText = 'ERROR: Duplicate labels!';
               } else {
-                $scope.errorText = "";
+                $scope.errorText = '';
+                for (var i = 0; i < labelList.length; i++) {
+                  $scope.$parent.value.imageRegions[i].label = labelList[i];
+                }
               }
             }
-            return $scope.$parent.value.imageRegions[index].label;
+            return labelList[index];
           };
         };
         
@@ -121,8 +123,16 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.onSvgMouseUp = function(evt) {
           $scope.userIsCurrentlyDragging = false;
           if ($scope.rectWidth != 0 && $scope.rectHeight != 0) {
+            var labels = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
+            var newLabel = null;
+            for (var i = 0; i <= labels.length; i++) {
+              if (labels.indexOf(i.toString()) === -1) {
+                newLabel = i.toString();
+                break;
+              }
+            }
             $scope.$parent.value.imageRegions.push({
-              label: $scope.$parent.value.imageRegions.length.toString(),
+              label: newLabel,
               region: {
                 regionType: 'Rectangle', 
                 regionArea: [
@@ -137,6 +147,7 @@ oppia.directive('imageWithRegionsEditor', [
                 ]
               }
             });
+            labelList.push(newLabel);
           }
         };
 
@@ -146,6 +157,7 @@ oppia.directive('imageWithRegionsEditor', [
         };
         $scope.deleteRegion = function(index) {
           $scope.$parent.value.imageRegions.splice(index, 1);
+          labelList.splice(index, 1);
         };
       }
     };
