@@ -390,3 +390,45 @@ describe('Interactive widgets', function() {
     general.checkForConsoleErrors([]);
   });
 });
+
+describe('Exploration history', function() {
+  it('should display the history', function() {
+    users.createUser('user121@example.com', 'user121');
+    users.login('user121@example.com');
+    workflow.createExploration('history', 'history');
+    editor.checkCompareVersions(1, 1);
+
+    // Check adding state
+    editor.createState('second');
+    editor.RuleEditor('default').setDestination('END');
+    editor.moveToState('First State');
+    editor.RuleEditor('default').setDestination('second');
+    editor.saveChanges();
+    editor.checkCompareVersions(1, 2);
+
+    // Check renaming state
+    editor.setStateName('first');
+    editor.saveChanges();
+    editor.checkCompareVersions(1, 3);
+
+    // Check deleting state
+    editor.deleteState('second');
+    editor.moveToState('first');
+    editor.RuleEditor('default').setDestination('END');
+    editor.saveChanges();
+    editor.checkCompareVersions(3, 4);
+
+    // Check reverting changes
+    editor.revertToVersion(1);
+    editor.checkCompareVersions(4, 5);
+
+    // Check comparing v1>v2
+    editor.checkCompareVersions(5, 4);
+
+    users.logout();
+  });
+
+  afterEach(function() {
+    general.checkForConsoleErrors([]);
+  });
+});

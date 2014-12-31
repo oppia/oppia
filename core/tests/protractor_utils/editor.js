@@ -310,7 +310,7 @@ var deleteState = function(stateName) {
       }
     }
     if (! matched) {
-      throw Error('State ' + stateName + ' not found by editor.moveToState');
+      throw Error('State ' + stateName + ' not found by editor.deleteState');
     }
   });
 };
@@ -414,6 +414,72 @@ var exitPreviewMode = function() {
   elemFinder.click();
 };
 
+// HISTORY
+
+// Wrapper for functions involving the history tab
+var runFromHistoryTab = function(callbackFunction) {
+  element(by.linkText('History')).click();
+  var result = callbackFunction();
+  element(by.linkText('Main')).click();
+  return result;
+};
+
+var checkCompareVersions = function(v1, v2) {
+  runFromHistoryTab(function() {
+    var v1Position = null;
+    var v2Position = null;
+    element.all(by.name('compareVer1')).first().then(function(elem) {
+      elem.getAttribute('value').then(function(versionNumber) {
+        v1Position = versionNumber - v1;
+        v2Position = versionNumber - v2;
+        if (v1Position < 0 || v2Position < 0 ||
+            v1Position >= 30 || v2Position >= 30) {
+          throw new Error('Invalid versions for history comparison.');
+        }
+        element.all(by.name('compareVer1')).get(v2Position).click();
+        element.all(by.name('compareVer2')).get(v1Position).click();
+        protractor.getInstance().waitForAngular();
+      });
+    });
+
+    // Click button to show graph if necessary
+    element(by.css('.protractor-test-show-history-graph-button')).isDisplayed()
+        .then(function(isDisplayed) {
+      if (isDisplayed) {
+        element(by.css('.protractor-test-show-history-graph-button')).click();
+      }
+    });
+
+    // Click on all states in graph except 'END'
+    element.all(by.css('.protractor-test-history-graph .node'))
+        .map(function(stateElement) {
+      stateElement.element(by.tagName('text')).getText()
+          .then(function(stateLabel) {
+        if (stateLabel != 'END') {
+          stateElement.click();
+          element(by.css('.modal-footer')).element(by.tagName('button')).click();
+        }
+      });
+    });
+  });
+};
+
+var revertToVersion = function(version) {
+  runFromHistoryTab(function() {
+    var versionPosition = null;
+    element.all(by.name('compareVer1')).first().then(function(elem) {
+      elem.getAttribute('value').then(function(versionNumber) {
+        versionPosition = versionNumber - version;
+        if (versionPosition < 0 || versionPosition >= 30) {
+          throw new Error('Invalid version for reversion.');
+        }
+      });
+    });
+    element.all(by.linkText('Revert')).get(versionPosition).click();
+    element(by.css('.modal-footer')).element(by.buttonText('Revert')).click();
+  });
+};
+
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 
 exports.setStateName = setStateName;
@@ -445,3 +511,7 @@ exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
 exports.enterPreviewMode = enterPreviewMode;
 exports.exitPreviewMode = exitPreviewMode;
+
+exports.runFromHistoryTab = runFromHistoryTab;
+exports.checkCompareVersions = checkCompareVersions;
+exports.revertToVersion = revertToVersion;
