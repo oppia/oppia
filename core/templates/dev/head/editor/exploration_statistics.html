@@ -13,14 +13,23 @@
             ng-change="onSelectExplorationVersion(version)" ng-model="version" ng-options="version for version in versions">
         </select>
       </div>
+<<<<<<< HEAD
       <div class="col-lg-11 col-md-11 col-sm-11">
+=======
+      <div style="margin-left:15px; margin-top:15px">
+>>>>>>> 0988888f598054a370c7e0bae795858a6bc5804e
         <h4>Exploration Completion Rate</h4>
         <bar-chart data="chartData" options="COMPLETION_RATE_CHART_OPTIONS">
         </bar-chart>
 
         <h4>Common learner paths</h4>
+<<<<<<< HEAD
         <div style="font-size: smaller">
           <em>Last updated: <[getLocaleStringForDatetime(lastUpdated)]></em>
+=======
+        <div style="font-size: smaller" ng-if="lastUpdated">
+          <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+>>>>>>> 0988888f598054a370c7e0bae795858a6bc5804e
         </div>
         <div class="container">
           <div class="row">

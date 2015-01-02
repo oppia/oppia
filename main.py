@@ -143,14 +143,18 @@ urls = [
     webapp2.Route(
         r'%s' % feconf.HOMEPAGE_URL, home.HomePage, 'home_page'),
     get_redirect_route(
+        r'/dashboard', home.DashboardPage, 'dashboard_page'),
+    get_redirect_route(
         r'/dashboardhandler/data', home.DashboardHandler,
         'dashboard_handler'),
 
     get_redirect_route(r'/about', pages.AboutPage, 'about_page'),
-    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
     get_redirect_route(
-        r'/site_guidelines', pages.SiteGuidelinesPage, 'site_guidelines_page'),
-    get_redirect_route(r'/contact', pages.ContactPage, 'contact_page'),
+        r'/site_guidelines', pages.AboutPage, 'redirect_to_about_page'),
+    get_redirect_route(
+        r'/contact', pages.AboutPage, 'redirect_to_about_page'),
+
+    get_redirect_route(r'/forum', pages.ForumPage, 'forum_page'),
 
     get_redirect_route(r'/admin', admin.AdminPage, 'admin_page'),
     get_redirect_route(r'/adminhandler', admin.AdminHandler, 'admin_handler'),
@@ -183,8 +187,8 @@ urls = [
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_REDIRECT_URL, galleries.GalleryRedirector,
-        'gallery_redirect'),
+        r'%s' % feconf.GALLERY_LOGIN_REDIRECT_URL,
+        galleries.GalleryLoginRedirector, 'gallery_redirect'),
     get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
@@ -218,6 +222,10 @@ urls = [
         r'%s/<exploration_id>' % feconf.EXPLORATION_INIT_URL_PREFIX,
         reader.ExplorationHandler, 'exploration_handler'),
     get_redirect_route(
+        r'/explorehandler/exploration_start_event/<exploration_id>',
+        reader.ExplorationStartEventHandler,
+        'exploration_start_event_handler'),
+    get_redirect_route(
         r'/explorehandler/state_hit_event/<exploration_id>',
         reader.StateHitEventHandler, 'state_hit_event_handler'),
     get_redirect_route(
@@ -227,14 +235,11 @@ urls = [
         r'/explorehandler/give_feedback/<exploration_id>',
         reader.ReaderFeedbackHandler, 'reader_feedback_handler'),
     get_redirect_route(
-        r'/explorehandler/leave/<exploration_id>/<escaped_state_name>',
-        reader.ReaderLeaveHandler, 'reader_leave_handler'),
+        r'/explorehandler/exploration_maybe_leave_event/<exploration_id>',
+        reader.ExplorationMaybeLeaveHandler, 'reader_leave_handler'),
     get_redirect_route(
         r'/explorehandler/classify/<exploration_id>', reader.ClassifyHandler,
         'reader_classify_handler'),
-    get_redirect_route(
-        r'/explorehandler/next_state/<exploration_id>',
-        reader.NextStateHandler, 'reader_next_state_handler'),
 
     get_redirect_route(
         r'%s/<exploration_id>' % feconf.EDITOR_URL_PREFIX,
@@ -248,6 +253,9 @@ urls = [
     get_redirect_route(
         r'/createhandler/download/<exploration_id>',
         editor.ExplorationDownloadHandler, 'exploration_download_handler'),
+    get_redirect_route(
+        r'/createhandler/download_state/<exploration_id>',
+        editor.StateDownloadHandler, 'state_download_handler'),
     get_redirect_route(
         r'/createhandler/imageupload/<exploration_id>',
         editor.ImageUploadHandler, 'image_upload_handler'),
@@ -275,11 +283,9 @@ urls = [
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
         editor.StateRulesStatsHandler, 'state_rules_stats_handler'),
-    # Temporary handlers to support preview mode.
-    # TODO(sll): Remove this once we have support for client-side expressions.
     get_redirect_route(
-        r'/createhandler/init_exploration/<exploration_id>',
-        editor.InitExplorationHandler, 'editor_init_exploration_handler'),
+        r'/createhandler/started_tutorial_event/<exploration_id>',
+        editor.StartedTutorialEventHandler, 'started_tutorial_event_handler'),
 
     get_redirect_route(
         r'%s' % feconf.RECENT_COMMITS_DATA_URL,
@@ -302,6 +308,10 @@ urls = [
     get_redirect_route(
         r'/widgetrepository/data/<widget_type>',
         widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
+
+    get_redirect_route(
+        r'/notificationshandler', home.NotificationsHandler,
+        'notifications_handler'),
 
     get_redirect_route(
         r'/filereadhandler', services.FileReadHandler, 'file_read_handler'),

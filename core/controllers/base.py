@@ -144,6 +144,8 @@ class BaseHandler(webapp2.RequestHandler):
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
 
+        self.user_has_started_state_editor_tutorial = False
+
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
@@ -152,6 +154,8 @@ class BaseHandler(webapp2.RequestHandler):
 
             self.values['user_email'] = user_settings.email
             self.values['username'] = self.username
+            if user_settings.last_started_state_editor_tutorial:
+                self.user_has_started_state_editor_tutorial = True
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
@@ -257,7 +261,6 @@ class BaseHandler(webapp2.RequestHandler):
             'BEFORE_END_HEAD_TAG_HOOK': jinja2.utils.Markup(
                 BEFORE_END_HEAD_TAG_HOOK.value),
             'FULL_SITE_URL': FULL_SITE_URL.value,
-            'ABOUT_PAGES': feconf.ABOUT_PAGES,
             'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],

@@ -18,39 +18,32 @@
  * @author sll@google.com (Sean Lip)
  */
 
-oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
+oppia.directive('paramChangeEditor', ['warningsData', 'explorationParamSpecsService',
+    function(warningsData, explorationParamSpecsService) {
   // Directive that implements an editor for specifying parameter changes.
   return {
     restrict: 'E',
     scope: {
       paramChanges: '=',
-      paramSpecs: '=',
       saveParamChanges: '=',
-      addExplorationParamSpec: '=',
       isEditable: '='
     },
     templateUrl: 'inline/param_change_editor',
     controller: ['$scope', '$attrs', function($scope, $attrs) {
-      $scope._inArray = function(array, value) {
-        for (var i = 0; i < array.length; i++) {
-          if (array[i] == value) {
-            return true;
-          }
+      $scope.getObjTypeForParam = function(paramName) {
+        if (explorationParamSpecsService.savedMemento.hasOwnProperty(paramName)) {
+          return explorationParamSpecsService.savedMemento[paramName].obj_type;
+        } else {
+          return '';
         }
-        return false;
       };
 
-      $scope.getObjTypeForParam = function(paramName) {
-        if ($scope.paramSpecs && paramName in $scope.paramSpecs) {
-          return $scope.paramSpecs[paramName].obj_type;
-        }
-        return '';
-      };
+      $scope.INVALID_PARAMETER_NAMES = GLOBALS.INVALID_PARAMETER_NAMES;
 
       $scope.DEFAULT_CUSTOMIZATION_ARGS = {
         'Copier': {
           value: '[New parameter value]',
-          parse_with_jinja: false
+          parse_with_jinja: true
         },
         'RandomSelector': {
           list_of_values: []
@@ -78,9 +71,7 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       };
       $scope.HUMAN_READABLE_ARGS_RENDERERS = {
         'Copier': function(customization_args) {
-          return 'to ' + customization_args.value + (
-              customization_args.parse_with_jinja ? ' (evaluating parameters)' : ''
-          );
+          return 'to ' + customization_args.value;
         },
         'RandomSelector': function(customization_args) {
           var result = 'to one of [';
@@ -108,17 +99,26 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       $scope.paramNameChoices = [];
       $scope.resetParamNameChoices = function() {
         // Initialize dropdown options for the parameter name selector.
-        $scope.paramNameChoices = [];
-        if ($scope.paramSpecs) {
-          var paramNames = Object.keys($scope.paramSpecs).sort();
-          for (var i = 0; i < paramNames.length; i++) {
-            $scope.paramNameChoices.push({
-              id: paramNames[i],
-              text: paramNames[i]
-            });
+        $scope.paramNameChoices = Object.keys(
+          explorationParamSpecsService.savedMemento
+        ).sort().map(function(paramName) {
+          return {
+            id: paramName,
+            text: paramName
+          }
+        });
+      };
+
+      $scope.$on('externalSave', function() {
+        if ($scope.paramChangesMemento !== null) {
+          // An edit view is active.
+          $scope.commitParamChange($scope.activeItem);
+          if ($scope.paramChangesMemento !== null) {
+            // The save failed. Discard the change.
+            $scope.resetEditor();
           }
         }
-      }
+      });
 
       // Called when an 'add param change' action is triggered.
       $scope.startAddParamChange = function() {
@@ -139,8 +139,7 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
           }
         }
         for (var j = 0; j < customizationArgsKeys.length; j++) {
-          if (!$scope._inArray($scope.ALLOWED_KEYS[generatorId],
-                              customizationArgsKeys[j])) {
+          if ($scope.ALLOWED_KEYS[generatorId].indexOf(customizationArgsKeys[j]) === -1) {
             delete newCustomizationArgs[customizationArgsKeys[j]];
           }
         }
@@ -166,14 +165,16 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
       };
 
       $scope.commitParamChange = function(index) {
-        if (!$scope.tmpParamChange.name) {
-          warningsData.addWarning('Please specify a parameter name.');
-          return;
-        }
         if ($scope.tmpParamChange.name === '') {
           // This reverses a temporary parameter change addition that has not
           // been edited.
           $scope.deleteParamChange(index);
+          return;
+        }
+        if ($scope.INVALID_PARAMETER_NAMES.indexOf($scope.tmpParamChange.name) !== -1) {
+          warningsData.addWarning(
+            'The parameter name ' + $scope.tmpParamChange.name +
+            ' is reserved. Please choose another.');
           return;
         }
 
@@ -187,31 +188,25 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
           }
         }
 
-        $scope.$broadcast('externalSave');
-
         var name = $scope.tmpParamChange.name;
         var generator_id = $scope.tmpParamChange.generator_id;
         var customization_args = $scope.getCleanCustomizationArgs(
             generator_id, $scope.tmpParamChange.customization_args);
-        var _updateAndSaveParamChangeList = function(
-            index, name, generator_id, customization_args) {
-          $scope.paramChanges[index] = {
-            'name': name,
-            'generator_id': generator_id,
-            'customization_args': customization_args
-          };
-          $scope.saveParamChanges(
-              $scope.paramChanges, angular.copy($scope.paramChangesMemento));
-        };
 
-        if (!$scope.getObjTypeForParam(name)) {
-          // The name is new, so add the parameter to the exploration parameter
-          // list.
-          $scope.addExplorationParamSpec(name, 'UnicodeString');
+        // If the name is new, add the parameter to the exploration parameter
+        // list.
+        if (!explorationParamSpecsService.savedMemento.hasOwnProperty(name)) {
+          explorationParamSpecsService.displayed[name] = {obj_type: 'UnicodeString'};
+          explorationParamSpecsService.saveDisplayedValue();
         }
 
-        _updateAndSaveParamChangeList(
-          index, name, generator_id, customization_args);
+        $scope.paramChanges[index] = {
+          'name': name,
+          'generator_id': generator_id,
+          'customization_args': customization_args
+        };
+        $scope.saveParamChanges(
+          $scope.paramChanges, angular.copy($scope.paramChangesMemento));
 
         $scope.resetEditor();
       };
@@ -222,10 +217,12 @@ oppia.directive('paramChangeEditor', ['warningsData', function(warningsData) {
             'Cannot delete parameter change at position ' + index +
             ': index out of range');
         }
-        $scope.paramChangesMemento = angular.copy($scope.paramChanges);
+        if ($scope.paramChangesMemento === null) {
+          $scope.paramChangesMemento = angular.copy($scope.paramChanges);
+        }
         $scope.paramChanges.splice(index, 1);
         $scope.saveParamChanges(
-            $scope.paramChanges, angular.copy($scope.paramChangesMemento));
+          $scope.paramChanges, angular.copy($scope.paramChangesMemento));
         $scope.resetEditor();
       };
 

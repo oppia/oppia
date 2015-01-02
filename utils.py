@@ -32,7 +32,6 @@ import yaml
 import zipfile
 
 
-
 # Sentinel value for schema verification, indicating that a value can take any
 # type.
 ANY_TYPE = 1
@@ -186,9 +185,9 @@ def to_ascii(string):
         'NFKD', unicode(string)).encode('ascii', 'ignore')
 
 
-def yaml_from_dict(dictionary):
+def yaml_from_dict(dictionary, width=80):
     """Gets the YAML representation of a dict."""
-    return yaml.safe_dump(dictionary, default_flow_style=False)
+    return yaml.safe_dump(dictionary, default_flow_style=False, width=width)
 
 
 def dict_from_yaml(yaml_str):
@@ -391,5 +390,5 @@ def vfs_normpath(path):
     comps = new_comps
     path = slash.join(comps)
     if initial_slashes:
-        path = slash*initial_slashes + path
+        path = slash * initial_slashes + path
     return path or dot

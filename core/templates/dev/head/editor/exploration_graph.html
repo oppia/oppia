@@ -9,7 +9,7 @@
   <div ng-show="isEditable()" class="oppia-add-state-container">
     <form role="form" class="form-inline" ng-submit="addState(newStateName, onClickStateInMinimap)">
       <div class="form-group">
-        <input type="text" class="form-control" ng-model="newStateName" placeholder="New State Name">
+        <input type="text" class="form-control" ng-model="newStateName" placeholder="New State Name" focus-on="newStateNameSubmittedFromStateEditor">
       </div>
       <button type="submit" class="btn btn-default" ng-class="{'btn-success': !!newStateName}">Create</button>
     </form>
@@ -17,16 +17,28 @@
 
   <script type="text/ng-template" id="modals/stateGraph">
     <div class="modal-header">
-      <h3>State Graph Visualization</h3>
+      <h3>Exploration Map</h3>
     </div>
 
     <div class="modal-body" style="overflow-y: hidden; padding-bottom: 0;">
-      <div state-graph-viz style="height: 300px;" graph-data="graphData" allow-panning="true" current-state-id="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true">
+      <div state-graph-viz style="height: 300px;" graph-data="graphData" allow-panning="true" current-state-id="currentStateName" on-click-function="selectState" on-delete-function="deleteState" center-at-current-state="true" is-editable="isEditable">
       </div>
     </div>
 
-    <div class="modal-footer" style="margin-top: 0;">
-      <button class="btn btn-default" ng-click="cancel()">Close</button>
+    <div class="modal-footer" style="margin-top: 0; text-align: inherit;">
+      <span class="pull-right">
+        <button class="btn btn-default" ng-click="cancel()">Close</button>
+      </span>
+
+      <span ng-show="isEditable">
+        <form role="form" class="form-inline" ng-submit="addStateFromModal($parent.$parent.newStateName)">
+          <div class="form-group">
+            <input type="text" class="form-control" ng-model="$parent.$parent.newStateName" placeholder="New State Name" focus-on="newStateNameSubmittedFromModal">
+          </div>
+          <button type="submit" class="btn btn-default" ng-class="{'btn-success': !!$parent.$parent.newStateName}" ng-disabled="!isNewStateNameValid($parent.$parent.newStateName)">Create
+         </button>
+        </form>
+      </span>
     </div>
   </script>
 
@@ -43,7 +55,7 @@
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      <button class="btn btn-danger" ng-click="reallyDelete()">Delete State</button>
+      <button class="btn btn-danger protractor-test-confirm-delete-state" ng-click="reallyDelete()">Delete State</button>
     </div>
   </script>
 </div>

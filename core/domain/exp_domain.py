@@ -173,8 +173,7 @@ class Content(object):
                 'Expected context params for parsing content to be a dict, '
                 'received %s' % params)
 
-        return html_cleaner.clean(
-            '<div>%s</div>' % jinja_utils.parse_string(self.value, params))
+        return html_cleaner.clean(jinja_utils.parse_string(self.value, params))
 
 
 class RuleSpec(object):
@@ -440,9 +439,9 @@ class WidgetInstance(object):
         self.widget_id = widget_id
         # Customization args for the interactive widget view. Parts of these
         # args may be Jinja templates that refer to state parameters.
-        # This is a dict: the keys are names of customization_args and the values
-        # are dicts with a single key, 'value', whose corresponding value is the
-        # value of the customization arg.
+        # This is a dict: the keys are names of customization_args and the
+        # values are dicts with a single key, 'value', whose corresponding
+        # value is the value of the customization arg.
         self.customization_args = customization_args
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
@@ -511,7 +510,8 @@ class WidgetInstance(object):
 
     @classmethod
     def create_default_widget(cls, default_dest_state_name):
-        default_obj_type = WidgetInstance._get_obj_type(feconf.DEFAULT_WIDGET_ID)
+        default_obj_type = WidgetInstance._get_obj_type(
+            feconf.DEFAULT_WIDGET_ID)
         return cls(
             feconf.DEFAULT_WIDGET_ID,
             {},
@@ -666,7 +666,8 @@ class State(object):
         )
 
     @classmethod
-    def create_default_state(cls, default_dest_state_name, is_initial_state=False):
+    def create_default_state(
+            cls, default_dest_state_name, is_initial_state=False):
         text_str = (
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
@@ -710,9 +711,10 @@ class Exploration(object):
         self.last_updated = last_updated
 
     def is_equal_to(self, other):
-        simple_props = ['id', 'title', 'category', 'objective', 'language_code',
-                        'skill_tags', 'blurb', 'author_notes', 'default_skin',
-                        'init_state_name', 'version']
+        simple_props = [
+            'id', 'title', 'category', 'objective', 'language_code',
+            'skill_tags', 'blurb', 'author_notes', 'default_skin',
+            'init_state_name', 'version']
 
         for prop in simple_props:
             if getattr(self, prop) != getattr(other, prop):
@@ -731,7 +733,8 @@ class Exploration(object):
                 return False
 
         for i in xrange(len(self.param_changes)):
-            if self.param_changes[i].to_dict() != other.param_changes[i].to_dict():
+            if (self.param_changes[i].to_dict() !=
+                    other.param_changes[i].to_dict()):
                 return False
 
         return True
@@ -748,9 +751,9 @@ class Exploration(object):
         }
 
         return cls(
-            exploration_id, title, category, objective, language_code, [], '', '',
-            'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict, {}, [],
-            0)
+            exploration_id, title, category, objective, language_code, [], '',
+            '', 'conversation_v1', feconf.DEFAULT_INIT_STATE_NAME, states_dict,
+            {}, [], 0)
 
     @classmethod
     def _require_valid_name(cls, name, name_type):
@@ -891,7 +894,12 @@ class Exploration(object):
             param_change.validate()
             if param_change.name not in self.param_specs:
                 raise utils.ValidationError(
-                    'No parameter named %s exists in this exploration'
+                    'No parameter named \'%s\' exists in this exploration'
+                    % param_change.name)
+            if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                raise utils.ValidationError(
+                    'The exploration-level parameter with name \'%s\' is '
+                    'reserved. Please choose a different name.'
                     % param_change.name)
 
         # TODO(sll): Find a way to verify the param change customization args
@@ -901,13 +909,20 @@ class Exploration(object):
         # link to this one?
 
         # Check that all state param changes are valid.
-        for state in self.states.values():
+        for state_name, state in self.states.iteritems():
             for param_change in state.param_changes:
                 param_change.validate()
                 if param_change.name not in self.param_specs:
                     raise utils.ValidationError(
-                        'The parameter %s was used in a state, but it does '
-                        'not exist in this exploration.' % param_change.name)
+                        'The parameter with name \'%s\' was set in state '
+                        '\'%s\', but it does not exist in the list of '
+                        'parameter specifications for this exploration.'
+                        % (param_change.name, state_name))
+                if param_change.name in feconf.INVALID_PARAMETER_NAMES:
+                    raise utils.ValidationError(
+                        'The parameter name \'%s\' is reserved. Please choose '
+                        'a different name for the parameter being set in '
+                        'state \'%s\'.' % (param_change.name, state_name))
 
         # Check that all rule definitions, destinations and param changes are
         # valid.
@@ -1368,3 +1383,27 @@ class Exploration(object):
         for (state_name, state) in self.states.iteritems():
             result.add(state.widget.widget_id)
         return list(result)
+
+
+class ExplorationSummary(object):
+    """Domain object for an Oppia exploration summary."""
+
+    def __init__(self, exploration_id, title, category, objective,
+                 language_code, skill_tags, status,
+                 community_owned, owner_ids, editor_ids,
+                 viewer_ids, version, exploration_model_created_on,
+                 exploration_model_last_updated):
+        self.id = exploration_id
+        self.title = title
+        self.category = category
+        self.objective = objective
+        self.language_code = language_code
+        self.skill_tags = skill_tags
+        self.status = status
+        self.community_owned = community_owned
+        self.owner_ids = owner_ids
+        self.editor_ids = editor_ids
+        self.viewer_ids = viewer_ids
+        self.version = version
+        self.exploration_model_created_on = exploration_model_created_on
+        self.exploration_model_last_updated = exploration_model_last_updated

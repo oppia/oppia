@@ -37,9 +37,13 @@ describe('Expression parser service', function() {
           'abc'],
       [['#', 'あいうえお'],
           'あいうえお'],
-      [['abc', [1, 2]],
+      [['abc'],
+          'abc()'],
+      [['abc', 1],
+          'abc(1)'],
+      [['abc', 1, 2],
           'abc(1, 2)'],
-      [[[['abc', [1, 2]], []], [3]],
+      [[[['abc', 1, 2]], 3],
           'abc(1, 2)()(3)'],
 
       [['+', 10],
@@ -48,6 +52,7 @@ describe('Expression parser service', function() {
           '-abc'],
       [['-', 0.35], '-.35'],
 
+      [['+', 1, 2], '1     +    2'],
       // There is a double width space after '+'.
       [['+', 1, 2], '\t1 +　2 '],
 

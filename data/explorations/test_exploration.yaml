@@ -1,11 +1,17 @@
 author_notes: ''
 blurb: ''
 default_skin: conversation_v1
-init_state_name: Numeric input
+init_state_name: Continue
 language_code: en
 objective: check all the widgets work
 param_changes: []
-param_specs: {}
+param_specs:
+  a:
+    obj_type: UnicodeString
+  b:
+    obj_type: UnicodeString
+  c:
+    obj_type: UnicodeString
 schema_version: 3
 skill_tags: []
 states:
@@ -33,7 +39,7 @@ states:
             name: OutputEquals
             rule_type: atomic
             subject: answer
-          dest: END
+          dest: Music notes input
           feedback: []
           param_changes: []
         - definition:
@@ -47,8 +53,51 @@ states:
   Continue:
     content:
     - type: text
-      value: Click continue.<br>
-    param_changes: []
+      value: 'Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}
+        should be 1.</div><div><div style="font-size: 14.3999996185303px;">{{c}} should
+        be 2.</div></div><div><span style="font-size: 14px;">{{b}} should be 0.5.</span><br></div><div>{{a*b}}
+        should be 0.5.</div><div><span style="font-size: 14.3999996185303px;">{{-a*b}}
+        should be -0.5.</span><br></div><div><span style="font-size: 14.3999996185303px;">{{a
+        &nbsp; * b &nbsp;}} should be 0.5.</span></div><div>{{abs(-a*b)}} should be
+        0.5.</div><div>{{if a + a == c then ''yes'' else ''no''}} should be ''yes''</div><div><div
+        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{if
+        a == c then ''yes'' else ''no''}} should be ''no''</span><br></div><div style="font-size:
+        14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{floor(a*b)}}
+        should be 0.</span></div></div><div style="font-size: 14.3999996185303px;"><div
+        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{log(2,
+        10)}} should be around 0.3.</span><br></div><div style="font-size: 14.3999996185303px;"><div
+        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{pow(2,
+        10)}} should be 1024.</span></div><div style="font-size: 14.3999996185303px;"><span
+        style="font-size: 14.3999996185303px;">{{3 &lt; 4}} should be true.</span></div><div
+        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{3
+        &gt; 4}} should be false.</span></div><div style="font-size: 14.3999996185303px;"><span
+        style="font-size: 14.3999996185303px;">{{4 &lt;= 4}} should be true.</span></div><div
+        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{4
+        &gt;= 3}} should be true.</span></div><div style="font-size: 14.3999996185303px;"><span
+        style="font-size: 14.3999996185303px;">&lt; should be an unescaped ''less-than''
+        sign.</span></div><div style="font-size: 14.3999996185303px;"><span style="font-size:
+        14.3999996185303px;">&gt; should be an unescaped ''greater-than'' sign.</span></div></div></div>'
+    param_changes:
+    - customization_args:
+        parse_with_jinja: false
+        value: '1'
+      generator_id: Copier
+      name: a
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a}}'
+      generator_id: Copier
+      name: b
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+b}}'
+      generator_id: Copier
+      name: c
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{b/c}}'
+      generator_id: Copier
+      name: b
     widget:
       customization_args:
         buttonText:
@@ -63,74 +112,20 @@ states:
           param_changes: []
       sticky: false
       widget_id: Continue
-  File upload:
-    content:
-    - type: text
-      value: Upload a file containing "aaaaa".<br>
-    param_changes: []
-    widget:
-      customization_args: {}
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              x: aaaaa
-            name: Contains
-            rule_type: atomic
-            subject: answer
-          dest: Continue
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: File upload
-          feedback:
-          - Wrong.
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  Interactive map:
-    content:
-    - type: text
-      value: Click on the USA.<br>
-    param_changes: []
-    widget:
-      customization_args:
-        latitude:
-          value: 0
-        longitude:
-          value: 0
-        zoom:
-          value: 0
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            inputs:
-              d: 30.0
-              p:
-              - 40.0
-              - -105.0
-            name: Within
-            rule_type: atomic
-            subject: answer
-          dest: Code REPL
-          feedback: []
-          param_changes: []
-        - definition:
-            rule_type: default
-          dest: Interactive map
-          feedback:
-          - Wrong.
-          param_changes: []
-      sticky: false
-      widget_id: InteractiveMap
   Multiple choice input:
     content:
     - type: text
-      value: Choose option B.<br>
-    param_changes: []
+      value: 'Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
+        should be 1.</div><div><span style="font-size: 14.3999996185303px;">{{b}}
+        should be 3.</span><br></div><div><div style="font-size: 14.3999996185303px;">{{c}}
+        should be 2.</div></div><div><span style="font-size: 14px;">{{a*b}} should
+        be 3.</span></div></div>'
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+c}}'
+      generator_id: Copier
+      name: b
     widget:
       customization_args:
         choices:
@@ -147,7 +142,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Set input
+          dest: Text input
           feedback: []
           param_changes: []
         - definition:
@@ -165,6 +160,8 @@ states:
     param_changes: []
     widget:
       customization_args:
+        initialSequence:
+          value: []
         sequenceToGuess:
           value:
           - noteDuration:
@@ -192,7 +189,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Interactive map
+          dest: World map
           feedback: []
           param_changes: []
         - definition:
@@ -219,7 +216,7 @@ states:
             name: IsGreaterThan
             rule_type: atomic
             subject: answer
-          dest: File upload
+          dest: Set input
           feedback: []
           param_changes: []
         - definition:
@@ -236,9 +233,7 @@ states:
       value: Enter the set {abc, xyz}<br>
     param_changes: []
     widget:
-      customization_args:
-        element_type:
-          value: UnicodeString
+      customization_args: {}
       handlers:
       - name: submit
         rule_specs:
@@ -250,7 +245,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Text input
+          dest: Code REPL
           feedback: []
           param_changes: []
         - definition:
@@ -267,7 +262,11 @@ states:
       value: Enter the string rrrrr<br>
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -277,7 +276,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Music notes input
+          dest: Numeric input
           feedback: []
           param_changes: []
         - definition:
@@ -288,3 +287,39 @@ states:
           param_changes: []
       sticky: false
       widget_id: TextInput
+  World map:
+    content:
+    - type: text
+      value: Click on the USA.<br>
+    param_changes: []
+    widget:
+      customization_args:
+        latitude:
+          value: 0
+        longitude:
+          value: 0
+        zoom:
+          value: 0
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              d: 30.0
+              p:
+              - 40.0
+              - -105.0
+            name: Within
+            rule_type: atomic
+            subject: answer
+          dest: END
+          feedback: []
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: World map
+          feedback:
+          - Wrong.
+          param_changes: []
+      sticky: false
+      widget_id: InteractiveMap

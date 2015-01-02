@@ -213,10 +213,10 @@
                 It is <strong>not shown</strong> in the gallery.
               </p>
               <p ng-if="explorationRightsService.isPublic()">
-                It is <strong>shown</strong> in the gallery (in Beta mode).
+                It is <strong>shown</strong> in the gallery.
               </p>
               <p ng-if="explorationRightsService.isPublicized()">
-                It is <strong>shown</strong> in the gallery.
+                It is <strong>featured</strong> in the gallery.
               </p>
             </div>
           </div>
@@ -257,8 +257,8 @@
 
               {% if can_publicize %}
                 <p ng-show="explorationRightsService.isPublic()">
-                  <button type="button" class="btn btn-default protractor-test-release-exploration" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                    Move out of beta
+                  <button type="button" class="btn btn-default protractor-test-mark-exploration-featured" ng-click="publicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
+                    Mark "featured"
                     <span ng-if="currentUserIsAdmin">(as admin)</span>
                     <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
                   </button>
@@ -268,7 +268,7 @@
               {% if can_unpublicize %}
                 <p ng-show="explorationRightsService.isPublicized()">
                   <button type="button" class="btn btn-default" ng-click="unpublicizeExploration()" ng-disabled="isExplorationLockedForEditing()">
-                    Move back into beta
+                    Remove "featured" status
                     <span ng-if="currentUserIsAdmin">(as admin)</span>
                     <span ng-if="!currentUserIsAdmin && currentUserIsModerator">(as moderator)</span>
                   </button>
@@ -306,11 +306,11 @@
 
           <div class="col-lg-6 col-md-6 col-sm-6">
             <h5>Parameters used in this exploration</h5>
-            <div ng-show="isEmpty(paramSpecs)">
+            <div ng-show="isEmpty(explorationParamSpecsService.savedMemento)">
               <em>No parameters used.</em>
             </div>
-            <ol ng-show="!isEmpty(paramSpecs)">
-              <li ng-repeat="(paramName, paramSpecValue) in paramSpecs">
+            <ol>
+              <li ng-repeat="(paramName, paramSpecValue) in explorationParamSpecsService.savedMemento">
                 <b><[paramName]></b> (<[paramSpecValue.obj_type]>)
               </li>
             </ol>
@@ -325,9 +325,7 @@
             </h5>
 
             <param-change-editor param-changes="explorationParamChanges"
-                                 param-specs="paramSpecs"
                                  save-param-changes="saveExplorationParamChanges"
-                                 add-exploration-param-spec="addExplorationParamSpec"
                                  is-editable="editabilityService.isEditable()">
             </param-change-editor>
           </div>

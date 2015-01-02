@@ -109,7 +109,7 @@ class UserServicesUnitTests(test_utils.GenericTestBase):
         # Return None for usernames which don't exist.
         self.assertIsNone(
             user_services.get_email_from_username('fakeUsername'))
-    
+
     def test_get_user_id_from_username(self):
         user_id = 'someUser'
         username = 'username'

@@ -519,6 +519,19 @@ class BaseMapReduceJobManager(BaseJobManager):
         root_pipeline_id = metadata[cls._OUTPUT_KEY_ROOT_PIPELINE_ID]
         pipeline.Pipeline.from_id(root_pipeline_id).abort(cancel_message)
 
+    @staticmethod
+    def _entity_created_before_job_queued(entity):
+        """Checks that the given entity was created before the MR job was queued.
+
+        Mapper methods may want to use this as a precomputation check,
+        especially if the datastore classes being iterated over are append-only
+        event logs.
+        """
+        created_on_msec = utils.get_time_in_millisecs(entity.created_on)
+        job_queued_msec = float(context.get().mapreduce_spec.mapper.params[
+            MAPPER_PARAM_KEY_QUEUED_TIME_MSECS])
+        return job_queued_msec >= created_on_msec
+
 
 class MultipleDatastoreEntitiesInputReader(input_readers.InputReader):
     _ENTITY_KINDS_PARAM = 'entity_kinds'

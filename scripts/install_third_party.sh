@@ -38,25 +38,25 @@ fi
 
 # If the OS supports it, download and install node.js and jsrepl.
 echo Checking if node.js is installed in $TOOLS_DIR
-if [ ! -d "$TOOLS_DIR/node-0.10.1" ]; then
+if [ ! -d "$NODE_PATH" ]; then
   echo Installing Node.js
   if [ ${OS} == "Darwin" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.1-darwin-x64
+      NODE_FILE_NAME=node-v0.10.33-darwin-x64
     else
-      NODE_FILE_NAME=node-v0.10.1-darwin-x86
+      NODE_FILE_NAME=node-v0.10.33-darwin-x86
     fi
   elif [ ${OS} == "Linux" ]; then
     if [ ${MACHINE_TYPE} == 'x86_64' ]; then
-      NODE_FILE_NAME=node-v0.10.1-linux-x64
+      NODE_FILE_NAME=node-v0.10.33-linux-x64
     else
-      NODE_FILE_NAME=node-v0.10.1-linux-x86
+      NODE_FILE_NAME=node-v0.10.33-linux-x86
     fi
   fi
 
-  wget http://nodejs.org/dist/v0.10.1/$NODE_FILE_NAME.tar.gz -O node-download.tgz
+  wget http://nodejs.org/dist/v0.10.33/$NODE_FILE_NAME.tar.gz -O node-download.tgz
   tar xzf node-download.tgz --directory $TOOLS_DIR
-  mv $TOOLS_DIR/$NODE_FILE_NAME $TOOLS_DIR/node-0.10.1
+  mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz
 fi
 
@@ -64,7 +64,7 @@ fi
 #
 #   http://blog.npmjs.org/post/78085451721/npms-self-signed-certificate-is-no-more
 #
-$TOOLS_DIR/node-0.10.1/bin/npm config set ca ""
+$NPM_CMD config set ca ""
 
 echo Checking whether jsrepl is installed in third_party
 if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
@@ -104,7 +104,7 @@ if [ ! "$NO_JSREPL" -a ! -d "$THIRD_PARTY_DIR/static/jsrepl" ]; then
     echo Downloading jsrepl
     cd $TOOLS_DIR
     rm -rf jsrepl
-    git clone git://github.com/replit/jsrepl.git
+    git clone https://github.com/replit/jsrepl.git
     cd jsrepl
     # Use a specific version of the JSRepl repository.
     git checkout 13f89c2cab0ee9163e0077102478958a14afb781

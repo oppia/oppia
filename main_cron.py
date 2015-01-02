@@ -21,7 +21,6 @@ import feconf
 from core.controllers import cron
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
-import feconf
 import main
 
 import webapp2

@@ -420,3 +420,99 @@ class LogicErrorCategory(BaseObject):
             'target', 'mistake'
         ]
     }
+
+
+class Graph(BaseObject):
+    """A (mathematical) graph with edges and vertices"""
+
+    description = 'A (mathematical) graph'
+    edit_html_filename = 'graph_editor'
+    edit_js_filename = 'GraphEditor'
+
+    _VERTEX_SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'x',
+            'schema': Real.SCHEMA
+        }, {
+            'name': 'y',
+            'schema': Real.SCHEMA
+        }, {
+            'name': 'label',
+            'schema': UnicodeString.SCHEMA
+        }]
+    }
+    _EDGE_SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'src',
+            'schema': Int.SCHEMA
+        }, {
+            'name': 'dst',
+            'schema': Int.SCHEMA
+        }, {
+            'name': 'weight',
+            'schema': Int.SCHEMA 
+        }]
+    }
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'vertices',
+            'schema': {
+                'type': 'list',
+                'items': _VERTEX_SCHEMA
+            }
+        }, {
+            'name': 'edges',
+            'schema': {
+                'type': 'list',
+                'items': _EDGE_SCHEMA
+            }
+        }, {
+            'name': 'isLabeled',
+            'schema': Boolean.SCHEMA
+        }, {
+            'name': 'isDirected',
+            'schema': Boolean.SCHEMA
+        }, {
+            'name': 'isWeighted',
+            'schema': Boolean.SCHEMA
+        }]
+    }
+    
+    @classmethod
+    def normalize(cls, raw):
+        """Validates and normalizes a raw Python object."""
+        """
+        Checks that there are no self-loops or multiple edges.
+        Checks that unlabeled graphs have all labels empty.
+        Checks that unweighted graphs have all weights set to 1.
+        TODO(czx): Think about support for multigraphs?
+        """
+
+        try:
+            raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
+            
+            if not raw['isLabeled']:
+                for vertex in raw['vertices']:
+                    assert (vertex['label'] == '')
+            
+            for edge in raw['edges']:
+                assert (edge['src'] != edge['dst'])
+                if not raw['isWeighted']:
+                    assert (edge['weight'] == 1.0)
+
+            if raw['isDirected']:
+                edge_pairs = [(edge['src'], edge['dst']) for edge in raw['edges']]
+            else:
+                edge_pairs = (
+                    [(edge['src'], edge['dst']) for edge in raw['edges']] + 
+                    [(edge['dst'], edge['src']) for edge in raw['edges']]
+                )
+            assert len(set(edge_pairs)) == len(edge_pairs)
+            
+        except Exception:
+            raise TypeError('Cannot convert to graph %s' % raw)
+
+        return raw

@@ -24,8 +24,8 @@ oppia.controller('Dashboard', [
     function($scope, $http, $rootScope, warningsData, oppiaDatetimeFormatter,
              createExplorationButtonService) {
   var EXPLORATION_STATUS_PRIVATE = 'private';
-  var EXPLORATION_STATUS_BETA = 'public';
-  var EXPLORATION_STATUS_RELEASED = 'publicized';
+  var EXPLORATION_STATUS_PUBLIC = 'public';
+  var EXPLORATION_STATUS_FEATURED = 'publicized';
   // TODO(sll): Consider replacing this with an actual list of categories when
   // we have found a way to do this that does not involve iterating through all
   // explorations.
@@ -50,6 +50,11 @@ oppia.controller('Dashboard', [
     'Statistics'
   ];
 
+  $scope.navigateToItem = function(activityId, updateType) {
+    window.location.href = (
+      '/create/' + activityId + (updateType === 'feedback_thread' ? '#/feedback': ''));
+  };
+
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(
       millisSinceEpoch);
@@ -70,20 +75,22 @@ oppia.controller('Dashboard', [
   $http.get($scope.dashboardDataUrl).success(function(data) {
     $scope.recentUpdates = data.recent_updates;
     $scope.jobQueuedMsec = data.job_queued_msec;
+    $scope.lastSeenMsec = data.last_seen_msec || 0.0;
+    $scope.currentUsername = data.username;
 
     $scope.privateExplorationIds = [];
-    $scope.betaExplorationIds = [];
-    $scope.releasedExplorationIds = [];
+    $scope.publicExplorationIds = [];
+    $scope.featuredExplorationIds = [];
     $scope.explorations = data.explorations;
 
     for (var expId in $scope.explorations) {
       var status = $scope.explorations[expId].status;
       if (status == EXPLORATION_STATUS_PRIVATE) {
         $scope.privateExplorationIds.push(expId);
-      } else if (status == EXPLORATION_STATUS_BETA) {
-        $scope.betaExplorationIds.push(expId);
-      } else if (status == EXPLORATION_STATUS_RELEASED) {
-        $scope.releasedExplorationIds.push(expId);
+      } else if (status == EXPLORATION_STATUS_PUBLIC) {
+        $scope.publicExplorationIds.push(expId);
+      } else if (status == EXPLORATION_STATUS_FEATURED) {
+        $scope.featuredExplorationIds.push(expId);
       } else {
         throw ('Error: Invalid exploration status ' + status);
       }

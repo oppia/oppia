@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Exploration Player View
+  {{ title }}
 {% endblock subtitle %}
 
 {% block header_js %}
@@ -95,6 +95,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('player/PlayerServices.js') }}
+    {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_skins_js_file(skin_js_url) }}
   </script>
 

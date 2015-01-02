@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview End-to-end tests of the publication and release process, and
+ * @fileoverview End-to-end tests of the publication and featuring process, and
  * the resultant display of explorations in the gallery.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
@@ -27,7 +27,7 @@ var player = require('../protractor_utils/player.js');
 var gallery = require('../protractor_utils/gallery.js');
 
 describe('Gallery view', function() {
-  it('should display private, published and released explorations', function() {
+  it('should display private, published and featured explorations', function() {
     users.createModerator('varda@example.com', 'Varda');
     users.createUser('feanor@exmple.com', 'Feanor');
     users.createUser('celebrimbor@example.com', 'Celebrimbor');
@@ -45,12 +45,11 @@ describe('Gallery view', function() {
 
     users.login('varda@example.com');
     browser.get('/gallery');
-    gallery.tickCheckbox('status', 'Beta');
     gallery.editExploration('Vingilot');
-    // Moderators can edit and release explorations.
+    // Moderators can edit explorations and mark them as featured.
     editor.setLanguage('français');
     editor.saveChanges('change language');
-    workflow.releaseExploration();
+    workflow.markExplorationAsFeatured();
     users.logout();
 
     users.login('celebrimbor@example.com');
@@ -58,19 +57,15 @@ describe('Gallery view', function() {
     editor.setObjective('preserve the works of the elves');
     editor.saveChanges();
 
-    // The situation is now:
-    names = ['silmarils', 'Vingilot', 'Vilya'];
+    // The situation (for non-private explorations) is now:
+    names = ['silmarils', 'Vingilot'];
     properties = {
-      status: ['Beta', 'Released', 'Private'],
-      category: ['gems', 'ships', 'rings'],
-      language: ['Deutsch', 'français', 'English']
+      category: ['gems', 'ships'],
+      language: ['Deutsch', 'français']
     };
 
+    // We now check explorations are visible under the right conditions.
     browser.get('/gallery');
-    // This box is checked by default so we uncheck it.
-    gallery.untickCheckbox('status', 'Released');
-
-    // We next check explorations are visible under the right conditions.
     for (var key in properties) {
       for (var i = 0; i < names.length; i++) {
         gallery.tickCheckbox(key, properties[key][i]);
@@ -90,10 +85,14 @@ describe('Gallery view', function() {
       }
     }
 
-    expect(gallery.getExplorationObjective('Vilya')).toBe(
-      'Preserve the works of the elves');
+    // Private explorations are not shown in the gallery.
+    gallery.expectExplorationToBeHidden('Vilya');
+
+    // The first letter of the objective is automatically capitalized.
+    expect(gallery.getExplorationObjective('Vingilot')).toBe(
+      'Seek the aid of the Valar');
     gallery.playExploration('silmarils');
-    expect(player.getExplorationName()).toBe('silmarils');
+    player.expectExplorationNameToBe('silmarils');
     player.submitAnswer('Continue');
 
     users.logout();

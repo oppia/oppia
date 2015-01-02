@@ -30,7 +30,7 @@ oppia.directive('oppiaInteractiveContinue', [
         $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj($attrs.buttonTextWithValue);
 
         $scope.submitAnswer = function() {
-          $scope.$parent.$parent.submitAnswer(null, 'submit');
+          $scope.$parent.$parent.submitAnswer($scope.buttonText, 'submit');
         };
       }]
     };
@@ -42,6 +42,9 @@ oppia.directive('oppiaResponseContinue', [function() {
   return {
     restrict: 'E',
     scope: {},
-    templateUrl: 'response/Continue'
+    templateUrl: 'response/Continue',
+    controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
+      $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+    }]
   };
 }]);

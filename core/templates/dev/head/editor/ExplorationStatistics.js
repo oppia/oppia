@@ -32,7 +32,7 @@ oppia.controller('ExplorationStatistics', [
   };
   $scope.EXPLORATION_STATS_VERSION_ALL = 'all';
 
-  $scope.getLocaleStringForDatetime = function(millisSinceEpoch) {
+  $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 
@@ -74,7 +74,10 @@ oppia.controller('ExplorationStatistics', [
         legend: 'Students entering state'
       };
       for (var stateName in explorationStatesService.getStates()) {
-        var visits = $scope.stateStats[stateName].firstEntryCount;
+        var visits = 0;
+        if ($scope.stateStats.hasOwnProperty(stateName)) {
+          visits = $scope.stateStats[stateName].firstEntryCount;
+        }
         $scope.statsGraphOpacities[stateName] = Math.max(
           visits / numVisits, 0.05);
       }
