@@ -36,13 +36,13 @@ oppia.controller('ExplorationStatistics', [
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 
-
   $scope.hasTabLoaded = false;
   $scope.$on('refreshStatisticsTab', function(evt) {
     $scope.refreshExplorationStatistics($scope.EXPLORATION_STATS_VERSION_ALL);
     $scope.explorationVersionUrl = '/createhandler/statisticsversion/' + explorationData.explorationId;
     $http.get($scope.explorationVersionUrl).then(function(response) {
       $scope.versions = response.data.versions;
+      $scope.currentVersion = $scope.EXPLORATION_STATS_VERSION_ALL;
     });
   });
 

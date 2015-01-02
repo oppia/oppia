@@ -91,7 +91,7 @@ def get_state_improvements(exploration_id, exploration_version):
         } for state_name in state_names])
 
     statistics = stats_jobs.StatisticsAggregator.get_statistics(
-        exploration_id, exploration_version=exploration_version)
+        exploration_id, exploration_version)
     state_hit_counts = statistics['state_hit_counts']
 
     for ind, state_name in enumerate(state_names):
@@ -143,7 +143,10 @@ def get_versions_for_exploration_stats(exploration_id):
 
 
 def get_exploration_stats(exploration_id, exploration_version):
-    """Returns a dict with state statistics for the given exploration id."""
+    """Returns a dict with state statistics for the given exploration id.
+
+    Note that exploration_version should be a string.
+    """
     exploration = exp_services.get_exploration_by_id(exploration_id)
     exp_stats = stats_jobs.StatisticsAggregator.get_statistics(
         exploration_id, exploration_version)

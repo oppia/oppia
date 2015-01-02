@@ -276,8 +276,10 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
 
         FIRST_STATE_NAME = exp.init_state_name
         SECOND_STATE_NAME = 'State 2'
-        exp.add_states([SECOND_STATE_NAME])
-        exp_services._save_exploration('fake@user.com', exp, '', [])
+        exp_services.update_exploration('fake@user.com', 'eid', [{
+            'cmd': 'add_state',
+            'state_name': SECOND_STATE_NAME,
+        }], 'Add new state')
 
         # Hit the default rule of state 1 once, and the default rule of state 2
         # twice.

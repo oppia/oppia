@@ -273,7 +273,7 @@ urls = [
         editor.ExplorationRightsHandler, 'exploration_rights_handler'),
     get_redirect_route(
         r'/createhandler/snapshots/<exploration_id>',
-        editor.ExplorationStatsVersionsHandler, 'exploration_snapshots_handler'),
+        editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
     get_redirect_route(
         r'/createhandler/statisticsversion/<exploration_id>',
         editor.ExplorationStatsVersionsHandler, 'exploration_stats_versions_handler'),

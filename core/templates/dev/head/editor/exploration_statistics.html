@@ -10,7 +10,9 @@
     <div ng-if="hasExplorationBeenVisited">
       <div>Show stats for version:
         <select class="oppia-select"
-            ng-change="onSelectExplorationVersion(version)" ng-model="version" ng-options="version for version in versions">
+                ng-change="onSelectExplorationVersion(currentVersion)"
+                ng-model="currentVersion"
+                ng-options="version for version in versions">
         </select>
       </div>
       <div class="col-lg-11 col-md-11 col-sm-11">
@@ -25,6 +27,7 @@
         <div class="container">
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
+              <!-- TODO(sll): Instead of using the current graph, use the graph that corresponds to the version of the exploration being looked at (or the current graph if the version is 'none' or 'all'). -->
               <div state-graph-viz graph-data="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
               </div>
             </div>

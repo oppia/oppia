@@ -153,6 +153,14 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             exploration = self.save_new_valid_exploration(exp_id_2, 'owner')
             state_2_1 = exploration.init_state_name
 
+            EMPTY_STATE_HIT_COUNTS_DICT = {
+                'First State': {
+                    'total_entry_count': 0,
+                    'no_answer_count': 0,
+                    'first_entry_count': 0,
+                },
+            }
+
             # Record 2 start events for exp_id_1 and 1 start event for
             # exp_id_2.
             self._record_start(exp_id_1, exp_version, state_1_1, 'session1')
@@ -166,13 +174,13 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertDictContainsSubset({
                 'start_exploration_count': 2,
                 'complete_exploration_count': 0,
-                'state_hit_counts': {},
+                'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
             results = ModifiedStatisticsAggregator.get_statistics(exp_id_2, 'all')
             self.assertDictContainsSubset({
                 'start_exploration_count': 1,
                 'complete_exploration_count': 0,
-                'state_hit_counts': {},
+                'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
 
             # Record 1 more start event for exp_id_1 and 1 more start event
@@ -184,11 +192,11 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
             self.assertDictContainsSubset({
                 'start_exploration_count': 3,
                 'complete_exploration_count': 0,
-                'state_hit_counts': {},
+                'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)
             results = ModifiedStatisticsAggregator.get_statistics(exp_id_2, 'all')
             self.assertDictContainsSubset({
                 'start_exploration_count': 2,
                 'complete_exploration_count': 0,
-                'state_hit_counts': {},
+                'state_hit_counts': EMPTY_STATE_HIT_COUNTS_DICT,
             }, results)

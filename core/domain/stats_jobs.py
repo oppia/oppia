@@ -31,6 +31,7 @@ from google.appengine.ext import ndb
 _NO_SPECIFIED_VERSION_STRING = 'none'
 _ALL_VERSIONS_STRING = 'all'
 
+
 class StatisticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
     num_starts = ndb.IntegerProperty(default=0)
@@ -100,8 +101,9 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
         """
         Args:
           - exploration_id: id of the exploration to get statistics for
-          - exploration_version: which version of the exploration to get statistics for,
-                can be a version number or the strings 'all' or 'none'
+          - exploration_version: str. Which version of the exploration to get
+              statistics for; this can be a version number, the string 'all',
+              or the string 'none'.
 
         Returns a dict with the following keys:
         - 'start_exploration_count': # of times exploration was started
@@ -216,13 +218,6 @@ class StatisticsMRJobManager(
         new_models_start_count = 0
         # Number of times exploration was completed
         new_models_complete_count = 0
-        # {state_name: {'total_entry_count': ...,
-        #               'first_entry_count': ...,
-        #               'no_answer_count': ...}}
-        state_hit_counts = collections.defaultdict(
-            lambda: collections.defaultdict(int))
-        # {state_name: set(session ids that have reached this state)}
-        state_session_ids = collections.defaultdict(set)
         # Session ids that have completed this state
         new_models_end_sessions = set()
         # {session_id: (created-on timestamp of last known maybe leave event,
@@ -231,6 +226,23 @@ class StatisticsMRJobManager(
             lambda: (0, ''))
         old_models_start_count = 0
         old_models_complete_count = 0
+
+        # {state_name: {'total_entry_count': ...,
+        #               'first_entry_count': ...,
+        #               'no_answer_count': ...}}
+        state_hit_counts = collections.defaultdict(
+            lambda: collections.defaultdict(int))
+        for state_name in exploration.states:
+            state_hit_counts[state_name] = {
+                'total_entry_count': 0,
+                'first_entry_count': 0,
+                'no_answer_count': 0,
+            }
+
+        # {state_name: set(session ids that have reached this state)}
+        state_session_ids = collections.defaultdict(set)
+        for state_name in exploration.states:
+            state_session_ids[state_name] = set([])
 
         # Iterate and process each event for this exploration.
         for value_str in stringified_values:
