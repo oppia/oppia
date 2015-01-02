@@ -42,8 +42,7 @@ oppia.controller('ExplorationStatistics', [
     $scope.refreshExplorationStatistics($scope.EXPLORATION_STATS_VERSION_ALL);
     $scope.explorationVersionUrl = '/createhandler/statisticsversion/' + explorationData.explorationId;
     $http.get($scope.explorationVersionUrl).then(function(response) {
-      var data = response.data;
-      $scope.versions = data.versions;
+      $scope.versions = response.data.versions;
     });
   });
 

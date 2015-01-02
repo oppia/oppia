@@ -380,6 +380,7 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
                 cls.exploration_id == exploration_id).fetch(
                     feconf.DEFAULT_QUERY_LIMIT)]
 
+
 def process_submitted_answer(
         exploration_id, exploration_version, state_name, handler_name,
         rule, answer):

@@ -651,7 +651,7 @@ class ExplorationStatisticsHandler(EditorHandler):
             raise self.PageNotFoundException
 
         self.render_json(stats_services.get_exploration_stats(
-            exploration_id, exploration_version=exploration_version))
+            exploration_id, exploration_version))
 
 
 class ExplorationStatsVersionsHandler(EditorHandler):
@@ -664,8 +664,8 @@ class ExplorationStatsVersionsHandler(EditorHandler):
         except:
             raise self.PageNotFoundException
 
-        self.render_json(stats_services.get_versions_for_exploration_stats(
-            exploration_id))
+        self.render_json({'versions': stats_services.get_versions_for_exploration_stats(
+            exploration_id)})
 
 
 class StateRulesStatsHandler(EditorHandler):

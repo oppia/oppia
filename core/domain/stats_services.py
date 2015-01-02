@@ -135,17 +135,18 @@ def get_state_improvements(exploration_id, exploration_version):
         [state for state in ranked_states if state['rank'] != 0],
         key=lambda x: -x['rank'])
 
+
 def get_versions_for_exploration_stats(exploration_id):
     """Returns list of versions for this exploration."""
-    return {
-        'versions': stats_models.ExplorationAnnotationsModel.get_versions(
-            exploration_id)}
+    return stats_models.ExplorationAnnotationsModel.get_versions(
+        exploration_id)
+
 
 def get_exploration_stats(exploration_id, exploration_version):
     """Returns a dict with state statistics for the given exploration id."""
     exploration = exp_services.get_exploration_by_id(exploration_id)
     exp_stats = stats_jobs.StatisticsAggregator.get_statistics(
-        exploration_id, exploration_version=exploration_version)
+        exploration_id, exploration_version)
 
     last_updated = exp_stats['last_updated']
     state_hit_counts = exp_stats['state_hit_counts']

@@ -322,7 +322,8 @@ oppia.directive('stateGraphViz', [
 
       $scope.$watch('graphData()', _redrawGraph, true);
       $scope.$watch('currentStateId()', _redrawGraph);
-      // If a different version is loaded within the page, opacities may change
+      // If statistics for a different version of the exploration are loaded,
+      // this may change the opacities of the nodes.
       $scope.$watch('opacityMap', _redrawGraph);
       $(window).resize(_redrawGraph);
 

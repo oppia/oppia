@@ -97,15 +97,20 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
     # Public query method.
     @classmethod
     def get_statistics(cls, exploration_id, exploration_version):
-        """Returns a dict with the following keys:
+        """
+        Args:
+          - exploration_id: id of the exploration to get statistics for
+          - exploration_version: which version of the exploration to get statistics for,
+                can be a version number or the strings 'all' or 'none'
+
+        Returns a dict with the following keys:
         - 'start_exploration_count': # of times exploration was started
         - 'complete_exploration_count': # of times exploration was completed
         - 'state_hit_counts': a dict containing the hit counts for the states
            in the exploration. It is formatted as follows:
             {
                 state_name: {
-                    'first_entry_count': # of sessions state which hit this
-                        state
+                    'first_entry_count': # of sessions which hit this state
                     'total_entry_count': # of total hits for this state
                     'no_answer_count': # of hits with no answer for this state
                 }
@@ -147,6 +152,8 @@ class StatisticsMRJobManager(
                  * number of completions of the exploration
     """
 
+    _TYPE_STATE_COUNTER_STRING = 'counter'
+    _TYPE_EVENT_STRING = 'event'
     @classmethod
     def _get_continuous_computation_class(cls):
         return StatisticsAggregator
@@ -164,7 +171,7 @@ class StatisticsMRJobManager(
             if isinstance(item, stats_models.StateCounterModel):
                 (exploration_id, state_name) = item.id.split('.')
                 value = {
-                    'type': 'counter',
+                    'type': StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING,
                     'exploration_id': exploration_id,
                     'version': _NO_SPECIFIED_VERSION_STRING,
                     'state_name': state_name,
@@ -180,7 +187,7 @@ class StatisticsMRJobManager(
                 if version is None:
                     version = _NO_SPECIFIED_VERSION_STRING
                 value = {
-                    'type': 'event',
+                    'type': StatisticsMRJobManager._TYPE_EVENT_STRING,
                     'event_type': item.event_type,
                     'session_id': item.session_id,
                     'state_name': item.state_name,
@@ -194,14 +201,14 @@ class StatisticsMRJobManager(
     @staticmethod
     def reduce(key, stringified_values):
         from core.domain import exp_services
-        exp_model = None
+        exploration = None
         (exp_id, version) = key.split(':')
         try:
             if version not in [_NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
-                exp_model = exp_services.get_exploration_by_id(
+                exploration = exp_services.get_exploration_by_id(
                     exp_id, version=version)
             else:
-                exp_services.get_exploration_by_id(exp_id)
+                exploration = exp_services.get_exploration_by_id(exp_id)
         except base_models.BaseModel.EntityNotFoundError:
             return
 
@@ -229,7 +236,7 @@ class StatisticsMRJobManager(
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
             if value['type'] == 'counter':
-                if value['state_name'] == exp_model.init_state_name:
+                if value['state_name'] == exploration.init_state_name:
                     old_models_start_count = value['first_entry_count']
                 if value['state_name'] == feconf.END_DEST:
                     old_models_complete_count = value['first_entry_count'] 
