@@ -993,3 +993,11 @@ oppia-parameter {
 .oppia-rule-dest-select2 .select2-search input {
   background: none;
 }
+
+.oppia-select {
+  background: white;
+  border: #ddd solid 1px;
+  border-radius: 4px;
+  color: #555;
+  padding: 5px;
+}

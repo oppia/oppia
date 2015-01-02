@@ -27,6 +27,8 @@ import utils
 
 from google.appengine.ext import ndb
 
+_NO_SPECIFIED_VERSION_STRING = 'none'
+_ALL_VERSIONS_STRING = 'all'
 
 class StatisticsRealtimeModel(
         jobs.BaseRealtimeDatastoreClassForContinuousComputations):
@@ -93,7 +95,7 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
 
     # Public query method.
     @classmethod
-    def get_statistics(cls, exploration_id, exploration_version='all'):
+    def get_statistics(cls, exploration_id, exploration_version):
         """Returns a dict with the following keys:
         - 'start_exploration_count': # of times exploration was started
         - 'complete_exploration_count': # of times exploration was completed
@@ -112,8 +114,10 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
         state_hit_counts = {}
         last_updated = None
 
+        entity_id = stats_models.ExplorationAnnotationsModel.get_entity_id(
+            exploration_id, exploration_version)
         mr_model = stats_models.ExplorationAnnotationsModel.get(
-            '%s:%s' % (exploration_id, exploration_version), strict=False)
+            entity_id, strict=False)
         if mr_model is not None:
             num_starts += mr_model.num_starts
             num_completions += mr_model.num_completions
@@ -140,6 +144,7 @@ class StatisticsMRJobManager(
        Includes: * number of visits to the exploration
                  * number of completions of the exploration
     """
+
     @classmethod
     def _get_continuous_computation_class(cls):
         return StatisticsAggregator
@@ -148,29 +153,53 @@ class StatisticsMRJobManager(
     def entity_classes_to_map_over(cls):
         return [stats_models.StartExplorationEventLogEntryModel,
                 stats_models.MaybeLeaveExplorationEventLogEntryModel,
-                stats_models.StateHitEventLogEntryModel]
+                stats_models.StateHitEventLogEntryModel,
+                stats_models.StateCounterModel]
 
     @staticmethod
     def map(item):
         if StatisticsMRJobManager._entity_created_before_job_queued(item):
-            value = {
-                'event_type': item.event_type,
-                'session_id': item.session_id,
-                'state_name': item.state_name,
-                'created_on': utils.get_time_in_millisecs(item.created_on),
-                'exploration_id': item.exploration_id,
-                'version': item.exploration_version}
-            yield ('%s:%s' % (item.exploration_id, item.exploration_version),
-                   value)
-            yield ('%s:all' % item.exploration_id, value)
-            yield ('%s:None' % item.exploration_id, {})
+            if isinstance(item, stats_models.StateCounterModel):
+                (exploration_id, state_name) = item.id.split('.')
+                value = {
+                    'type': 'counter',
+                    'exploration_id': exploration_id,
+                    'version': _NO_SPECIFIED_VERSION_STRING,
+                    'state_name': state_name,
+                    'first_entry_count': item.first_entry_count,
+                    'no_answer_count': item.no_answer_count,
+                    'subsequent_entry_count': item.subsequent_entry_count,
+                    'resolved_answer_count': item.resolved_answer_count,
+                    'active_answer_count': item.active_answer_count}
+                yield ('%s:%s' % (exploration_id, _NO_SPECIFIED_VERSION_STRING), value)
+                yield ('%s:%s' % (exploration_id, _ALL_VERSIONS_STRING), value)
+            else:
+                version = item.exploration_version
+                if version is None:
+                    version = _NO_SPECIFIED_VERSION_STRING
+                value = {
+                    'type': 'event',
+                    'event_type': item.event_type,
+                    'session_id': item.session_id,
+                    'state_name': item.state_name,
+                    'created_on': utils.get_time_in_millisecs(item.created_on),
+                    'exploration_id': item.exploration_id,
+                    'version': version}
+                yield ('%s:%s' % (item.exploration_id, item.exploration_version),
+                       value)
+                yield ('%s:%s' % (item.exploration_id, _ALL_VERSIONS_STRING), value)
 
     @staticmethod
     def reduce(key, stringified_values):
+        from core.domain import exp_services
         exp_model = None
         (exp_id, version) = key.split(':')
         try:
-            exp_model = exp_models.ExplorationModel.get(exp_id)
+            if version not in [_NO_SPECIFIED_VERSION_STRING, _ALL_VERSIONS_STRING]:
+                exp_model = exp_services.get_exploration_by_id(
+                    exp_id, version=version)
+            else:
+                exp_services.get_exploration_by_id(exp_id)
         except base_models.BaseModel.EntityNotFoundError:
             return
             
@@ -188,11 +217,28 @@ class StatisticsMRJobManager(
         new_models_end_sessions = set()
         # {session_id: (created-on timestamp of last known maybe leave event, state_name)}
         session_id_to_latest_leave_event = collections.defaultdict(lambda: (0, ''))
+        old_models_start_count = 0
+        old_models_complete_count = 0
 
         # Iterate and process each event for this exploration.
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value == {}:
+            if value['type'] == 'counter':
+                if value['state_name'] == exp_model.init_state_name:
+                    old_models_start_count = value['first_entry_count']
+                if value['state_name'] == feconf.END_DEST:
+                    old_models_complete_count = value['first_entry_count'] 
+                else:
+                    state_hit_counts[state_name]['no_answer_count'] += (
+                        value['first_entry_count']
+                        + value['subsequent_entries_count']
+                        - value['resolved_answer_count']
+                        - value['active_answer_count'])
+                    state_hit_counts[state_name]['first_entry_count'] += (
+                        value['first_entry_count'])
+                    state_hit_counts[state_name]['total_entry_count'] += (
+                        value['first_entry_count']
+                        + value['subsequent_entries_count'])
                 continue
             event_type = value['event_type']
             state_name = value['state_name']
@@ -242,45 +288,11 @@ class StatisticsMRJobManager(
             (_, state_name) = session_id_to_latest_leave_event[session_id]
             state_hit_counts[state_name]['no_answer_count'] += 1
 
-        num_starts = new_models_start_count
-        num_completions = new_models_complete_count
+        num_starts = (
+            old_models_start_count + new_models_start_count)
+        num_completions = (
+            old_models_complete_count + new_models_complete_count)
 
-        if version == 'None' or version == 'all':
-            # Update all stats with old model values
-            old_models_start_count = (
-                stats_models.StateCounterModel.get_or_create(
-                    exp_id, exp_model.init_state_name).first_entry_count)
-            old_models_complete_count = (
-                stats_models.StateCounterModel.get_or_create(
-                    exp_id, feconf.END_DEST).first_entry_count)
-
-            num_starts = (
-                old_models_start_count + new_models_start_count)
-            num_completions = (
-                old_models_complete_count + new_models_complete_count)
-            for state_name in exp_model.states:
-                state_counter = stats_models.StateCounterModel.get_or_create(
-                    exp_id, state_name)
-                state_hit_counts[state_name]['no_answer_count'] += (
-                    state_counter.first_entry_count
-                    + state_counter.subsequent_entries_count
-                    - state_counter.resolved_answer_count
-                    - state_counter.active_answer_count)
-                state_hit_counts[state_name]['first_entry_count'] += (
-                    state_counter.first_entry_count)
-                state_hit_counts[state_name]['total_entry_count'] += (
-                    state_counter.first_entry_count
-                    + state_counter.subsequent_entries_count)
-
-        if version == 'None':
-            version = 'prior to INSERT DATE HERE'
-            key = '%s:%s' % (exp_id, version)
-
-        if num_starts > 0:
-            stats_models.ExplorationAnnotationsModel(
-                id=key,
-                exploration_id=exp_id,
-                version=str(version),
-                num_starts=num_starts,
-                num_completions=num_completions,
-                state_hit_counts=state_hit_counts).put()
+        stats_models.ExplorationAnnotationsModel.create(
+            exp_id, str(version), num_starts, num_completions,
+            state_hit_counts)

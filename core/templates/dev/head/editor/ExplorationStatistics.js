@@ -30,6 +30,7 @@ oppia.controller('ExplorationStatistics', [
     legendPosition: 'right',
     width: 500
   };
+  $scope.EXPLORATION_STATS_VERSION_ALL = 'all';
 
   $scope.getLocaleStringForDatetime = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
@@ -38,12 +39,16 @@ oppia.controller('ExplorationStatistics', [
 
   $scope.hasTabLoaded = false;
   $scope.$on('refreshStatisticsTab', function(evt) {
-    $scope.refreshExplorationStatistics();
+    $scope.refreshExplorationStatistics($scope.EXPLORATION_STATS_VERSION_ALL);
+    $scope.explorationVersionUrl = '/createhandler/statisticsversion/' + explorationData.explorationId;
+    $http.get($scope.explorationVersionUrl).then(function(response) {
+      var data = response.data;
+      $scope.versions = data.versions;
+    });
   });
 
   $scope.hasExplorationBeenVisited = false;
   $scope.refreshExplorationStatistics = function(version) {
-    version = typeof(version)==='undefined' ? explorationData.data.version : version;
     $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId
       + '/' + version;
     $http.get($scope.explorationStatisticsUrl).then(function(response) {
@@ -64,8 +69,6 @@ oppia.controller('ExplorationStatistics', [
         ['', 'Completions', 'Non-completions'],
         ['', numCompletions, numVisits - numCompletions]
       ];
-
-      $scope.versions = data.versions;
 
       $scope.statsGraphOpacities = {
         legend: 'Students entering state'

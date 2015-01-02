@@ -620,6 +620,20 @@ class ExplorationStatisticsHandler(EditorHandler):
             exploration_id, exploration_version=exploration_version))
 
 
+class ExplorationStatsVersionsHandler(EditorHandler):
+    """Returns statistics versions for an exploration."""
+
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        self.render_json(stats_services.get_versions_for_exploration_stats(
+            exploration_id))
+
+
 class StateRulesStatsHandler(EditorHandler):
     """Returns detailed reader answer statistics for a state."""
 
