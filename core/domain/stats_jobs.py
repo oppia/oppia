@@ -222,6 +222,8 @@ class StatisticsMRJobManager(
         # state_name)}
         session_id_to_latest_leave_event = collections.defaultdict(
             lambda: (0, ''))
+        old_models_start_count = 0
+        old_models_complete_count = 0
 
         # Iterate and process each event for this exploration.
         for value_str in stringified_values:
