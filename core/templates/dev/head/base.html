@@ -34,7 +34,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
     <link rel="apple-touch-icon" href="/images/logo.png">
-    <title>Oppia - {% block subtitle %}{% endblock %}</title>
+   <title>{% block maintitle %}Oppia{% endblock %} - {% block subtitle %}{% endblock %}</title>
 
     {% block header_css %}
       {% include 'header_css_libs.html' %}
@@ -80,144 +80,118 @@
     {% if iframed %}
       {{ warnings_and_loader() }}
     {% else %}
-      <div id="wrapper" class="ng-cloak">
-        <div class="oppia-main-body">
-          <!-- nav bar -->
-          <nav class="navbar navbar-default" role="navigation">
-            <div class="navbar-container">
-              <div class="container">
-                <button class="navbar-toggle" type="button" data-toggle="collapse" data-target=".navbar-collapse">
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                  <span class="icon-bar"></span>
-                </button>
+      <div class="oppia-base-container" ng-class="{'oppia-sidebar-menu-open': sidebarIsShown, 'oppia-sidebar-menu-closed': !sidebarIsShown}">
+        <div class="oppia-content-container">
+          <div id="wrapper">
+            <div class="oppia-main-body">
 
-                {% block navbar %}
-                  <div class="navbar-header">
-                    <a class="navbar-brand" href="/">
-                      <img src="/images/logo.png" class="oppia-logo">
-                      Oppia&nbsp;<sup>beta</sup>
-                    </a>
-                  </div>
+              <!-- Top navigation. -->
+              <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
+                <div class="navbar-container">
+                  <div>
+                    <div class="navbar-header" ng-if="!screenIsLarge">
+                      <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu">
+                        <img src="/images/menu.png">
+                      </a>
+                      <a class="oppia-navbar-brand-name" href="/gallery">
+                        <img src="/images/logo/288x288_oppia_white.png" class="oppia-logo">
+                      </a>
+                    </div>
 
-                  <div class="collapse navbar-collapse">
-                    <ul class="nav navbar-nav">
-                      <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
-                        <a href="/gallery">Gallery</a>
-                      </li>
-                      {% if SHOW_FORUM_PAGE %}
-                        <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-                          <a href="/forum">Forum</a>
-                        </li>
-                      {% endif %}
-                      <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                          About
-                          <span class="caret"></span>
-                        </a>
-                        <ul class="dropdown-menu" role="menu">
-                          {% for page in ABOUT_PAGES %}
-                            <li>
-                              <a href="{{page['url']}}">{{page['name']}}</a>
-                            </li>
-                          {% endfor %}
-                        </ul>
-                      </li>
-                      {% block navbar_additions %}
-                      {% endblock %}
-                    </ul>
-
-                    <ul class="nav navbar-nav navbar-right">
-                      {% if user_email %}
-                        {% if username %}
-                          <li class="dropdown">
-                            <a href="/">
-                              Dashboard
-                              <span ng-if="numUnseenNotifications > 0">
-                                (<[numUnseenNotifications]>)
-                              </span>
-                            </a>
-                          </li>
-                        {% endif %}
-
-                        <li class="dropdown">
-                          <a class="dropdown-toggle" data-toggle="dropdown">
-                            {% if username %}
-                              {{username}}
-                            {% else %}
-                              {{user_email}}
-                            {% endif %}
-
-                            {% if is_admin %}
-                              (Admin)
-                            {% elif is_moderator %}
-                              (Moderator)
-                            {% endif %}
-                            <span class="caret"></span>
-                          </a>
-                          <ul class="dropdown-menu" role="menu">
-                            <li>
-                              <a href="{{logout_url}}">Logout</a>
-                            </li>
-
-                            {% if is_moderator %}
-                              <li>
-                                <a href="/moderator" target="_blank">
-                                  Moderator Page
-                                </a>
-                              </li>
-                            {% endif %}
-
-                            {% if is_super_admin %}
-                              <li>
-                                <a href="/admin" target="_blank">
-                                  Admin Page
-                                </a>
-                              </li>
-                            {% endif %}
-                          </ul>
-                        </li>
+                    <div class="collapse navbar-collapse">
+                      {% if nav_mode in ['explore', 'create'] %}
+                        {% block navbar_breadcrumb %}
+                        {% endblock navbar_breadcrumb %}
                       {% else %}
-                        <li>
-                          <a href="{{login_url}}">Login</a>
-                        </li>
+                        <ul class="nav navbar-nav oppia-navbar-nav">
+                          {% if SHOW_FORUM_PAGE %}
+                            <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+                              <a href="/forum">Forum</a>
+                            </li>
+                          {% endif %}
+                          <li {% if nav_mode == 'about' %}class="active"{% endif %}>
+                            <a href="/about">About</a>
+                          </li>
+                        </ul>
                       {% endif %}
-                    </ul>
+
+                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px;">
+                        <li class="dropdown">
+                          {% if user_email %}
+                            <a class="dropdown-toggle" data-toggle="dropdown">
+                              {% if username %}
+                                {{username}}
+                              {% else %}
+                                {{user_email}}
+                              {% endif %}
+
+                              {% if is_admin %}
+                                (Admin)
+                              {% elif is_moderator %}
+                                (Moderator)
+                              {% endif %}
+                              <span class="caret"></span>
+                            </a>
+                            <ul class="dropdown-menu" role="menu">
+                              <li>
+                                <a href="/dashboard">Dashboard</a>
+                              </li>
+                              {% if is_moderator %}
+                                <li>
+                                  <a href="/moderator" target="_blank">
+                                    Moderator Page
+                                  </a>
+                                </li>
+                              {% endif %}
+
+                              {% if is_super_admin %}
+                                <li>
+                                  <a href="/admin" target="_blank">
+                                    Admin Page
+                                  </a>
+                                </li>
+                              {% endif %}
+
+                              <li>
+                                <a href="{{logout_url}}">Logout</a>
+                              </li>
+                            </ul>
+                          {% else %}
+                            <a href="{{login_url}}">
+                              Sign in
+                            </a>
+                          {% endif %}
+                        </li>
+                      </ul>
+
+                      {% block local_top_nav_options %}
+                      {% endblock %}
+                    </div>
                   </div>
-                {% endblock navbar %}
+                </div>
+              </nav>
 
-              </div>
+              {{ warnings_and_loader() }}
             </div>
-          </nav>
-          {{ warnings_and_loader() }}
-        </div>
 
-        <div class="oppia-footer" role="contentinfo">
-          <div class="container">
-            <ul class="oppia-footer-nav col-lg-8 col-md-8 col-sm-8">
-              <li>
-                <a href="/">Home</a>
-              </li>
-              <li>
-                <a href="/gallery">Gallery</a>
-              </li>
-              {% for page in ABOUT_PAGES %}
-                <li>
-                  <a href="{{page['url']}}">{{page['name']}}</a>
-                </li>
-              {% endfor %}
-            </ul>
+            {% include 'side_nav.html' %}
+
             {% if nav_mode in ['explore', 'create'] %}
-              <span class="col-lg-4 col-md-4 col-sm-4" style="margin-top: 10px;">
-                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
-                  <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                </a>
-                <span style="font-size: 0.8em">
-                  <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
-                </span>
-              </span>
+              <div class="oppia-footer" role="contentinfo">
+                <div class="container">
+                  <div class="oppia-footer-nav col-lg-8 col-md-8 col-sm-8">
+                  </div>
+                  <span class="col-lg-4 col-md-4 col-sm-4" style="margin-top: 10px;">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                      <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                    </a>
+                    <span style="font-size: 0.8em">
+                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
+                    </span>
+                  </span>
+                </div>
+              </div>
             {% endif %}
-            </ul>
           </div>
         </div>
       </div>
@@ -240,7 +214,6 @@
       {{ include_js_file('/expressions/evaluator.js') }}
       {{ include_js_file('/expressions/parser.js') }}
     </script>
-
 
     {% block footer_js %}
     {% endblock footer_js %}

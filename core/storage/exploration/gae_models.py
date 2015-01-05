@@ -23,7 +23,6 @@ import datetime
 import core.storage.base_model.gae_models as base_models
 import core.storage.user.gae_models as user_models
 import feconf
-import utils
 
 from google.appengine.ext import ndb
 
@@ -213,7 +212,8 @@ class ExplorationRightsModel(base_models.VersionedModel):
 
     @classmethod
     def get_page_of_non_private(
-            cls, page_size=feconf.DEFAULT_QUERY_LIMIT, urlsafe_start_cursor=None):
+            cls, page_size=feconf.DEFAULT_QUERY_LIMIT,
+            urlsafe_start_cursor=None):
         """Returns a page of non-private exp rights models."""
         return ExplorationRightsModel.query().filter(
             ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
@@ -359,9 +359,11 @@ class ExplorationCommitLogEntryModel(base_models.BaseModel):
             cls.query(), page_size, urlsafe_start_cursor)
 
     @classmethod
-    def get_all_non_private_commits(cls, page_size, urlsafe_start_cursor, max_age=None):
+    def get_all_non_private_commits(
+            cls, page_size, urlsafe_start_cursor, max_age=None):
         if not isinstance(max_age, datetime.timedelta) and max_age is not None:
-            raise ValueError('max_age must be a datetime.timedelta instance or None.')
+            raise ValueError(
+                'max_age must be a datetime.timedelta instance or None.')
 
         query = cls.query(cls.post_commit_is_private == False)
         if max_age:
@@ -469,7 +471,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_private_at_least_viewable(cls, user_id):
-        """Returns an iterable with private exp summaries that are at least 
+        """Returns an iterable with private exp summaries that are at least
         viewable by the given user.
         """
         return ExpSummaryModel.query().filter(
@@ -484,7 +486,7 @@ class ExpSummaryModel(base_models.BaseModel):
 
     @classmethod
     def get_at_least_editable(cls, user_id):
-        """Returns an iterable with exp summaries that are at least 
+        """Returns an iterable with exp summaries that are at least
         editable by the given user.
         """
         return ExpSummaryModel.query().filter(

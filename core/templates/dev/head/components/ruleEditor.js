@@ -29,7 +29,9 @@ oppia.directive('ruleTypeSelector', [function() {
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$filter', function($scope, $element, $filter) {
       var choices = [];
+      var numberOfRuleTypes = 0 ;
       for (var ruleType in $scope.allRuleTypes()) {
+        numberOfRuleTypes++;
         choices.push({
           id: ruleType,
           text: $filter('replaceInputsWithEllipses')(ruleType)
@@ -47,6 +49,10 @@ oppia.directive('ruleTypeSelector', [function() {
           return $filter('truncateAtFirstInput')(object.id);
         }
       });
+      
+      if (numberOfRuleTypes <= 1) {
+        $(select2Node).select2('enable', false);
+      }
 
       // Initialize the dropdown.
       $(select2Node).select2('val', $scope.localValue);
@@ -95,7 +101,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           },
           ui_config: {
-            add_element_text: 'Add Feedback Option'
+            add_element_text: 'Add Variation'
           }
         };
 
@@ -145,6 +151,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
+        $scope.ruleDescriptionMemento = null;
+        $scope.ruleDefinitionMemento = null;
         $scope.removeNullFeedback = function() {
           // Remove null feedback.
           var nonemptyFeedback = [];
@@ -250,7 +258,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.rule.feedback.length === 0 &&
             $scope.rule.dest === editorContextService.getActiveStateName());
         };
-
+      
         $scope.onSelectNewRuleType = function() {
           var description = $scope.currentRuleDescription;
           $scope.rule.description = description;
@@ -281,6 +289,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             } else if (varType == 'NonnegativeInt') {
               // Set a default value.
               $scope.rule.definition.inputs[varName] = 0;
+            } else if (varType == "Graph") {
+              $scope.rule.definition.inputs[varName] = {
+                'vertices': [], 
+                'edges': [], 
+                'isDirected': false, 
+                'isWeighted': false, 
+                'isLabeled': false
+              };
             } else {
               $scope.rule.definition.inputs[varName] = '';
             }

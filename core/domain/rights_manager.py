@@ -225,7 +225,9 @@ def get_page_of_non_private_exploration_rights(
     results, cursor, more = exp_models.ExplorationRightsModel.get_page_of_non_private_exploration_rights(
         page_size=page_size, cursor=cursor
     )
-    return [_get_exploration_rights_from_model(result) for result in results], cursor, more
+    return (
+        [_get_exploration_rights_from_model(result) for result in results],
+        cursor, more)
 
 
 def get_community_owned_exploration_rights():
@@ -686,7 +688,7 @@ def publicize_exploration(committer_id, exploration_id):
         logging.error(
             'User %s tried to publicize exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
-        raise Exception('This exploration cannot be moved out of beta.')
+        raise Exception('This exploration cannot be marked as "featured".')
 
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PUBLICIZED,
@@ -699,11 +701,8 @@ def unpublicize_exploration(committer_id, exploration_id):
         logging.error(
             'User %s tried to unpublicize exploration %s but was refused '
             'permission.' % (committer_id, exploration_id))
-        raise Exception('This exploration cannot be moved back into beta.')
+        raise Exception('This exploration cannot be unmarked as "featured".')
 
     _change_exploration_status(
         committer_id, exploration_id, EXPLORATION_STATUS_PUBLIC,
         'Exploration unpublicized.')
-
-
-

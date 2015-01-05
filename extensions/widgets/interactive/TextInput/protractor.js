@@ -10,24 +10,49 @@
 // distributed under the License is distributed on an "AS-IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
-// limitations under the License. 
+// limitations under the License.
 
 /**
  * @fileoverview End-to-end testing utilities for the Text interaction.
  */
 
-var expectInteractionDetailsToMatch = function() {
+var objects = require('../../../objects/protractor.js');
+
+var customizeInteraction = function(elem, placeholderText, heightOfBox) {
+  objects.UnicodeStringEditor(
+    elem.element(by.tagName('schema-based-unicode-editor'))
+  ).setValue(placeholderText);
+  objects.IntEditor(
+    elem.element(by.tagName('schema-based-int-editor'))
+  ).setValue(heightOfBox);
+};
+
+var expectInteractionDetailsToMatch = function(placeholderText, heightOfBox) {
   expect(
     element(by.tagName('oppia-interactive-text-input')).isPresent()
   ).toBe(true);
+  // TODO (Jacob) add checks for the placeholder text and box height
 };
 
-var submitAnswer = function(answer) {
-  element(by.tagName('oppia-interactive-text-input')).
+var submitAnswer = function(elem, answer) {
+  elem.element(by.tagName('oppia-interactive-text-input')).
     element(by.tagName('textarea')).sendKeys(answer);
-  element(by.tagName('oppia-interactive-text-input')).
+  elem.element(by.tagName('oppia-interactive-text-input')).
     element(by.tagName('button')).click();
 };
 
+var answerObjectType = 'NormalizedString';
+
+var testSuite = [{
+  interactionArguments: ['placeholder', 4],
+  ruleArguments: ['StartsWith', 'valid'],
+  expectedInteractionDetails: ['placeholder', 4],
+  wrongAnswers: ['invalid'],
+  correctAnswers: ['valid']
+}];
+
+exports.customizeInteraction = customizeInteraction;
 exports.expectInteractionDetailsToMatch = expectInteractionDetailsToMatch;
 exports.submitAnswer = submitAnswer;
+exports.answerObjectType = answerObjectType;
+exports.testSuite = testSuite;

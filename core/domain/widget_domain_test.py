@@ -199,19 +199,21 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should be a config .py file, an
-            # html file, a JS file, and a .png file.
+            # html file, a JS file, a .png file and a protractor.js file.
             dir_contents = self._listdir_omit_ignored(widget_dir)
-            self.assertLessEqual(len(dir_contents), 4)
+            self.assertLessEqual(len(dir_contents), 5)
 
             py_file = os.path.join(widget_dir, '%s.py' % widget_id)
             html_file = os.path.join(widget_dir, '%s.html' % widget_id)
             js_file = os.path.join(widget_dir, '%s.js' % widget_id)
             png_file = os.path.join(widget_dir, '%s.png' % widget_id)
+            protractor_file = os.path.join(widget_dir, 'protractor.js')
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
             self.assertTrue(os.path.isfile(js_file))
             self.assertTrue(os.path.isfile(png_file))
+            self.assertTrue(os.path.isfile(protractor_file))
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)

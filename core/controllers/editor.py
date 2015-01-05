@@ -104,7 +104,8 @@ EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     default_value='')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', 'UnicodeString',
-    'A link to the forum for nominating explorations for release.',
+    'A link to the forum for nominating explorations to be featured '
+    'in the gallery',
     default_value='https://moderator/request/forum/url')
 
 
@@ -197,7 +198,7 @@ class ExplorationPage(EditorHandler):
     def get(self, exploration_id):
         """Handles GET requests."""
         try:
-            exp_services.get_exploration_by_id(exploration_id)
+            exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
             raise self.PageNotFoundException
 
@@ -270,7 +271,9 @@ class ExplorationPage(EditorHandler):
                 skins_services.Registry.get_skin_js_url(skin_id)
                 for skin_id in skins_services.Registry.get_all_skin_ids()],
             'skin_templates': jinja2.utils.Markup(skin_templates),
+            'title': exploration.title,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
+            'INVALID_PARAMETER_NAMES': feconf.INVALID_PARAMETER_NAMES,
             'NEW_STATE_TEMPLATE': NEW_STATE_TEMPLATE,
             'SHOW_SKIN_CHOOSER': feconf.SHOW_SKIN_CHOOSER,
         })
@@ -313,6 +316,9 @@ class ExplorationHandler(EditorHandler):
             'version': exploration.version,
             'rights': rights_manager.get_exploration_rights(
                 exploration_id).to_dict(),
+            'show_state_editor_tutorial_on_load': (
+                self.user_id and not
+                self.user_has_started_state_editor_tutorial),
             'ALL_INTERACTIVE_WIDGETS': {
                 widget.id: widget.to_dict()
                 for widget in widget_registry.Registry.get_widgets_of_type(
@@ -513,7 +519,8 @@ class ResolvedAnswersHandler(EditorHandler):
 
 
 class ExplorationDownloadHandler(EditorHandler):
-    """Downloads an exploration as a zip file or JSON."""
+    """Downloads an exploration as a zip file, or dict of YAML strings
+    representing states."""
 
     def get(self, exploration_id):
         """Handles GET requests."""
@@ -524,6 +531,7 @@ class ExplorationDownloadHandler(EditorHandler):
 
         version = self.request.get('v', default_value=exploration.version)
         output_format = self.request.get('output_format', default_value='zip')
+        width = int(self.request.get('width', default_value=80))
 
         # If the title of the exploration has changed, we use the new title
         filename = 'oppia-%s-v%s' % (
@@ -536,11 +544,36 @@ class ExplorationDownloadHandler(EditorHandler):
             self.response.write(
                 exp_services.export_to_zip_file(exploration_id, version))
         elif output_format == feconf.OUTPUT_FORMAT_JSON:
-            self.render_json(
-                exp_services.export_to_dict(exploration_id, version))
+                self.render_json(exp_services.export_states_to_yaml(
+                    exploration_id, version=version, width=width))
         else:
             raise self.InvalidInputException(
                 'Unrecognized output format %s' % output_format)
+
+
+class StateDownloadHandler(EditorHandler):
+    """Downloads a state as a YAML string."""
+
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        try:
+            exploration = exp_services.get_exploration_by_id(exploration_id)
+        except:
+            raise self.PageNotFoundException
+
+        version = self.request.get('v', default_value=exploration.version)
+        width = int(self.request.get('width', default_value=80))
+
+        try:
+            state = self.request.get('state')
+        except:
+            raise self.InvalidInputException('State not found')
+
+        exploration_dict = exp_services.export_states_to_yaml(
+            exploration_id, version=version, width=width)
+        if state not in exploration_dict:
+            raise self.PageNotFoundException
+        self.response.write(exploration_dict[state])
 
 
 class ExplorationResourcesHandler(EditorHandler):
@@ -563,7 +596,8 @@ class ExplorationSnapshotsHandler(EditorHandler):
         """Handles GET requests."""
 
         try:
-            snapshots = exp_services.get_exploration_snapshots_metadata(exploration_id)
+            snapshots = exp_services.get_exploration_snapshots_metadata(
+                exploration_id)
         except:
             raise self.PageNotFoundException
 
@@ -738,30 +772,9 @@ class ChangeListSummaryHandler(EditorHandler):
             })
 
 
-class InitExplorationHandler(EditorHandler):
-    """Performs a get_init_html_and_params() operation server-side and
-    returns the result. This is done while maintaining no state.
-    """
+class StartedTutorialEventHandler(EditorHandler):
+    """Records that this user has started the state editor tutorial."""
 
-    @require_editor
     def post(self, exploration_id):
-        """Handles POST requests."""
-        exp_param_specs_dict = self.payload.get('exp_param_specs', {})
-        exp_param_specs = {
-            ps_name: param_domain.ParamSpec.from_dict(ps_val)
-            for (ps_name, ps_val) in exp_param_specs_dict.iteritems()
-        }
-        # A domain object representing the old state.
-        init_state = exp_domain.State.from_dict(self.payload.get('init_state'))
-        # A domain object representing the exploration-level parameter changes.
-        exp_param_changes = [
-            param_domain.ParamChange.from_dict(param_change_dict)
-            for param_change_dict in self.payload.get('exp_param_changes')]
-
-        init_html, init_params = reader.get_init_html_and_params(
-            exp_param_changes, init_state, exp_param_specs)
-
-        self.render_json({
-            'init_html': init_html,
-            'params': init_params,
-        })
+        """Handles GET requests."""
+        user_services.record_user_started_state_editor_tutorial(self.user_id)

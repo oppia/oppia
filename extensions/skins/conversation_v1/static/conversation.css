@@ -14,42 +14,93 @@
   limitations under the License.
 */
 
-/* Additional CSS for the conversation_v1 skin. */
+/*
+  Note that this affects both the learner mode and the 'editor preview'
+  mode.
+*/
+html, body {
+  background-color: #eeedee;
+}
+
+/* 
+  Additional CSS for the conversation_v1 skin. 
+  All classes below should start with .conversation-skin  
+ */
+.conversation-skin-exploration-intro-card {
+  background: rgb(255,255,255);
+  font-family: 'Roboto';
+  text-align: center;
+  padding: 0 0 50px 0;
+}
+
+.conversation-skin-icons {
+  width: 24px;
+  height: 24px;
+}
+
+.conversation-skin-exploration-bookmark-rate {
+  margin-left: auto;
+  margin-right: auto;
+  min-width: 20%; 
+  max-width: 130px;
+}
+
+.conversation-skin-exploration-bookmark {
+  float: left;
+}
+
+.conversation-skin-exploration-rate {
+  float: right;
+}
+
+.conversation-skin-answer-feedback-pair {
+  padding-top: 20px;
+}
+
+.conversation-skin-card-row-container {
+  width: 100%;
+  margin-top: 10px;
+}
+
+.conversation-skin-card-row {
+  width: 100%;
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+.conversation-skin-row-avatar {
+  width: 30px;
+  padding-right: 10px;
+}
+
+.conversation-skin-row-avatar-img {
+  max-width: 30px;
+  height: 30px;
+}
+
 .conversation-skin-exploration-header {
-  padding-left: 7px;
+  text-align: center;
+  font-size: 36px;
 }
 
 .conversation-skin-iframe-container {
   -webkit-overflow-scrolling: touch;
 }
 
-.conversation-skin-oppia-feedback {
-  margin-top: 30px;
+.conversation-skin-old-content {
+  opacity: 0.8;
 }
 
-.conversation-skin-old-content {
-  opacity: 0.7;
+.conversation-skin-card {
+  background: rgb(255,255,255);
+  margin-top: 30px;
+  padding: 40px;
+  text-align: justify;
+  font-family: 'Roboto';
 }
 
 .conversation-skin-learner-answer {
-  background-color: rgba(200, 231, 247, 0.65);
-  border-radius: 6px;
-  font-style: italic;
-  margin: 35px 0;
-  opacity: 0.7;
-  padding: 5px 20px;
-}
-
-.conversation-skin-response {
-  background: rgba(0,0,0,0.04);
-  border-radius: 6px;
-  margin-top: 30px;
-}
-.conversation-skin-response-finished {
-  background: rgb(228,255,228);
-  border-radius: 6px;
-  margin-top: 30px;
-  padding: 10px 10px;
+  color: #579287;
 }
 
 .affix {

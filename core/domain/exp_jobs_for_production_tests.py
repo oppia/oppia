@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Jobs operating on explorations that can be used for production tests. 
+"""Jobs operating on explorations that can be used for production tests.
 To use these jobs, first need to register them in jobs_registry (at
 the moment they are not displayed there to avoid accidental use)."""
 

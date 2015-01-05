@@ -67,11 +67,12 @@ chown -R $ME $NODE_MODULE_DIR
 chmod -R 744 $NODE_MODULE_DIR
 
 # Adjust the path to include a reference to node.
-export PATH=$TOOLS_DIR/node-0.10.1/bin:$PATH
+export NODE_PATH=$TOOLS_DIR/node-0.10.33
+export PATH=$NODE_PATH/bin:$PATH
 export MACHINE_TYPE=`uname -m`
 export OS=`uname`
 
-export NPM_CMD="$TOOLS_DIR/node-0.10.1/bin/npm"
+export NPM_CMD=$NODE_PATH/bin/npm
 export NPM_INSTALL="$NPM_CMD install"
 
 # Adjust path to support the default Chrome locations for Unix and Mac OS.

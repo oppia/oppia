@@ -50,6 +50,10 @@ var registerAsEditor = function(username) {
   element(by.model('username')).sendKeys(username);
   element(by.model('agreedToTerms')).click();
   element(by.buttonText('Submit and start contributing')).click();
+  // The create modal needs time to load.
+  browser.waitForAngular();
+  general.waitForSystem();
+  element(by.css('.protractor-test-cancel-create')).click();
 };
 
 var createUser = function(email, username) {
@@ -66,14 +70,20 @@ var createAndLoginUser = function(email, username) {
 var createModerator = function(email, username) {
   login(email, true);
   registerAsEditor(username);
-  admin.appendToConfigList('Email addresses of moderators', email);
+  admin.editConfigProperty(
+      'Email addresses of moderators', 'List', function(listEditor) {
+    listEditor.addItem('Unicode').setValue(email);
+  });
   logout();
 };
 
 var createAdmin = function(email, username) {
   login(email, true);
   registerAsEditor(username);
-  admin.appendToConfigList('Email addresses of admins', email);
+  admin.editConfigProperty(
+      'Email addresses of admins', 'List', function(listEditor) {
+    listEditor.addItem('Unicode').setValue(email);
+  });
   logout();
 };
 
