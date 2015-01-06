@@ -260,4 +260,4 @@ logicDemo.controller('TestCtrl', function($scope) {
         })).substring(1));
     }
   };
-})
+});
