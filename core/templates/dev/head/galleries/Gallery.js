@@ -223,12 +223,11 @@ oppia.controller('Gallery', [
   $scope.delayedOnSearchQueryChangeExec = oppiaDebouncer.debounce(
     $scope.onSearchQueryChangeExec, 400);
 
-  $scope.LANGUAGE_CHOICES = [];
-  GLOBALS.ALL_LANGUAGE_NAMES.forEach(function(languageName) {
-    $scope.LANGUAGE_CHOICES.push({
+  $scope.LANGUAGE_CHOICES = GLOBALS.ALL_LANGUAGE_NAMES.map(function(languageName) {
+    return {
       id: languageName,
       text: languageName
-    });
+    };
   });
 
   var _DEFAULT_LANGUAGE = 'English';

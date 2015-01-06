@@ -62,6 +62,9 @@ describe('Gallery controller', function() {
         }],
         'featured': []
       });
+
+      GLOBALS.ALL_LANGUAGE_NAMES = [
+        'English', 'español', 'hrvatski'];
       scope = $rootScope.$new();
       ctrl = $controller('Gallery', {
         $scope: scope,
@@ -80,10 +83,7 @@ describe('Gallery controller', function() {
         'Geography': true,
         'Personal': true
       });
-      expect(scope.selectedLanguages).toEqual({
-        'English': true,
-        'español': true
-      });
+      expect(scope.selectedLanguages).toEqual(['English']);
     });
   });
 });

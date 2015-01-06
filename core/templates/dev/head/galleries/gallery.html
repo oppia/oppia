@@ -92,7 +92,7 @@
           <div class="oppia-gallery-menu" ng-if="gallerySidebarIsActive || screenIsLarge">
             <h3>Languages</h3>
             <div>
-              <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.selectedLanguages" allow-multiple-choices="true" new-choice-regex=".^" width="150">
+              <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.selectedLanguages" allow-multiple-choices="true" new-choice-regex=".^" width="150" placeholder="Filter languages...">
               </select2-dropdown>
             </div>
 
@@ -108,7 +108,13 @@
           <div class="tab-content oppia-gallery-tiles-container">
             <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages).length === 0">
               <div>
-                <em>We don't have any explorations on this topic yet.</em>
+                <em>
+                  We don't have any explorations
+                  <span ng-if="searchQuery">on this topic </span>
+                  <span ng-if="!searchQuery && selectedLanguages.length === 1">for this language </span>
+                  <span ng-if="!searchQuery && selectedLanguages.length !== 1">for these languages </span>
+                  yet.
+                </em>
                 <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
                 {% if not user_email %}
                   <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
