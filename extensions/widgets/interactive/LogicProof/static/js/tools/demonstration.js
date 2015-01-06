@@ -1,4 +1,6 @@
-function TestCtrl($scope) {
+var logicDemo = angular.module('logicDemo', []);
+
+logicDemo.controller('TestCtrl', function($scope) {
 
   $scope.buildIndexer = function(n) {
     var output = [];
@@ -6,7 +8,7 @@ function TestCtrl($scope) {
       output.push(i);
     }
     return output;
-  }
+  };
 
   $scope.buildErrors = function(n) {
     var output = [];
@@ -14,16 +16,17 @@ function TestCtrl($scope) {
       output.push('');
     }
     return output;
-  }
+  };
 
   $scope.questionData = {
     language: logicProofData.BASE_STUDENT_LANGUAGE,
     vocabulary: DEFAULT_VOCABULARY,
     mistake_table: [[], [], [], []],
     general_messages: logicProofData.BASE_GENERAL_MESSAGES
-  }
+  };
+
   $scope.proofString = 'from P\u2227Q we have P\nfrom P\u2227Q we have Q\nfrom Q and P we have Q\u2227P';
- 
+
   $scope.displayMessage = function(message, line) {
     $scope.proofError = '';
     for (var i = 0; i < line; i++) {
@@ -36,7 +39,7 @@ function TestCtrl($scope) {
       $scope.proofError += (message.slice(pointer, pointer + breakPoint) + '\n');
       pointer += breakPoint;
     }
-  }
+  };
 
   $scope.editProof = function() {
     $scope.checkSuccess = false;
@@ -52,7 +55,7 @@ function TestCtrl($scope) {
     } else {
       $scope.proofError = '';
     }
-  }
+  };
 
   $scope.submitProof = function() {
     var questionInstance = logicProofStudent.buildInstance(
@@ -68,7 +71,7 @@ function TestCtrl($scope) {
       $scope.displayMessage(err.message, err.line);
       $scope.checkSuccess = false;
     }
-  }
+  };
 
   // LOCAL CHECK (for testing only)
   $scope.doLocalCheck = function() {
@@ -85,12 +88,12 @@ function TestCtrl($scope) {
         var mistake = questionInstance.mistake_table[i].entries[j];
         if (mistake.name === $scope.mistakeName) {
           $scope.localCheck = logicProofStudent.evaluate(
-            mistake.occurs, {n: parseInt($scope.line)}, 
+            mistake.occurs, {n: parseInt($scope.line)},
             questionInstance.control_model, parameters, {});
         }
       }
     }
-  }
+  };
 
   // QUESTION
   $scope.assumptionsString = 'P\u2227Q';
@@ -114,7 +117,8 @@ function TestCtrl($scope) {
       $scope.questionError = err.message;
       $scope.questionSuccess = false;
     }
-  }
+  };
+
   $scope.submitQuestion();
 
   // LINE TEMPLATES
@@ -134,7 +138,8 @@ function TestCtrl($scope) {
       $scope.LineTemplateErrors = err;
       $scope.lineTemplateSuccess = false;
     }
-  }
+  };
+
   $scope.submitLineTemplates();
 
   // MISTAKE TABLE
@@ -160,6 +165,7 @@ function TestCtrl($scope) {
     $scope.mistakeSuccess.push(true);
     $scope.mistakeErrors.push([]);
   }
+
   $scope.submitMistakes = function(sectionNumber) {
     $scope.checkError = '';
     $scope.checkSuccess = false;
@@ -177,7 +183,7 @@ function TestCtrl($scope) {
       $scope.mistakeSuccess[sectionNumber] = false;
       $scope.mistakeErrors[sectionNumber] = err;
     }
-  }
+  };
 
   // CONTROL FUNCTIONS
   $scope.controlFunctionStrings = DEFAULT_CONTROL_FUNCTION_STRINGS;
@@ -197,6 +203,7 @@ function TestCtrl($scope) {
       $scope.controlFunctionSuccess = false;
     }
   };
+
   $scope.submitControlFunctions();
   // Mistake sections depend on control functions so we build them after.
   for (var i = 0; i < $scope.mistakeStrings.length; i++) {
@@ -231,7 +238,7 @@ function TestCtrl($scope) {
         $scope.REPLACEMENT_PAIRS[i].new);
     }
     return output;
-  }
+  };
 
   // JAVASCRIPT CONSTRUCTION
   $scope.requestJavascript = function() {
@@ -252,5 +259,5 @@ function TestCtrl($scope) {
           control_functions: $scope.questionData.control_functions
         })).substring(1));
     }
-  }
-}
+  };
+});
