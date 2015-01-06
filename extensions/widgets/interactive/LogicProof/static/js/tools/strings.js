@@ -168,6 +168,13 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   variables: '',
   error: []
 }, {
+  name: 'excluded_middle_3',
+  reader_view: 'From ~~R we have R',
+  antecedents: '~~R',
+  results: 'R',
+  variables: '',
+  error: []
+}, {
   name: 'or_eliminate',
   reader_view: 'We know R\u2228S and whichever is true we have T',
   antecedents: 'R\u2228S',
@@ -272,7 +279,7 @@ var DEFAULT_LINE_TEMPLATE_STRINGS = [{
   antecedents: 'R, T',
   results: 'R\u2227S',
   variables: '',
-  error: ['You have shown {{R\u2227T}}, not {{R\u2227S}}.']  
+  error: ['You have shown {{R\u2227T}}, not {{R\u2227S}}.']
 }, {
   name: 'and_introduce_e4',
   reader_view: 'From T and S we have R\u2227S',
