@@ -1,4 +1,6 @@
-function TestCtrl($scope) {
+var logicDemo = angular.module('logicDemo', []);
+
+logicDemo.controller('TestCtrl', function($scope) {
 
   $scope.buildIndexer = function(n) {
     var output = [];
@@ -206,7 +208,7 @@ function TestCtrl($scope) {
   // Mistake sections depend on control functions so we build them after.
   for (var i = 0; i < $scope.mistakeStrings.length; i++) {
     $scope.submitMistakes(i);
-  };
+  }
 
   $scope.REPLACEMENT_PAIRS = [{
     old: '\u2227',
@@ -258,4 +260,4 @@ function TestCtrl($scope) {
         })).substring(1));
     }
   };
-}
+})
