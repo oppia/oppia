@@ -202,7 +202,7 @@ var AutocompleteDropdownEditor = function(elem) {
       element(by.id('select2-drop')).element(by.css('.select2-input')).
         sendKeys(text + '\n');
     },
-    expectOptionsToBe: function (expectedOptions) {
+    expectOptionsToBe: function(expectedOptions) {
       elem.element(by.css('.select2-container')).click();
       element(by.id('select2-drop')).all(by.tagName('li')).map(function(elem) {
         return elem.getText();
@@ -216,7 +216,42 @@ var AutocompleteDropdownEditor = function(elem) {
   };
 };
 
-// This function is sent 'elem', which should be the element immediately 
+var AutocompleteMultiDropdownEditor = function(elem) {
+  return {
+    setValues: function(texts) {
+      // Clear all existing choices.
+      element(by.css('.select2-choices')).all(by.tagName('li')).map(function(elem) {
+        return elem.element(by.css('.select2-search-choice-close'));
+      }).then(function(deleteButtons) {
+        // We iterate in descending order, because clicking on a delete button
+        // removes the element from the DOM. We also omit the last element
+        // because it is the field for new input.
+        for (var i = deleteButtons.length - 2; i >= 0; i--) {
+          deleteButtons[i].click();
+        }
+      });
+
+      for (var i = 0; i < texts.length; i++) {
+        elem.element(by.css('.select2-container')).click();
+        // NOTE: the input field is top-level in the DOM rather than below the
+        // container. The id is assigned when the dropdown is clicked.
+        element(by.css('.select2-input')).sendKeys(texts[i] + '\n');
+      }
+    },
+    expectCurrentSelectionToBe: function(expectedCurrentSelection) {
+      element(by.css('.select2-choices')).all(by.tagName('li')).map(function(elem) {
+        return elem.getText();
+      }).then(function(actualSelection) {
+        // Remove the element corresponding to the last <li>, which actually
+        // corresponds to the field for new input.
+        actualSelection.pop();
+        expect(actualSelection).toEqual(expectedCurrentSelection);
+      });
+    }
+  };
+};
+
+// This function is sent 'elem', which should be the element immediately
 // containing the various elements of a rich text area, for example
 // <div>
 //   plain
@@ -232,12 +267,12 @@ var AutocompleteDropdownEditor = function(elem) {
 //   handler.readWidget('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
-    // We remove all <span> elements since these are plain text that is 
+    // We remove all <span> elements since these are plain text that is
     // sometimes represented just by text nodes.
     elem.all(by.xpath('./*[not(self::span)]')).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
-      // asynchronous and so not allow us to update the textPointer 
+      // asynchronous and so not allow us to update the textPointer
       // synchronously.
       return entry.getText(function(text) {
         return text;
@@ -266,12 +301,12 @@ var expectRichText = function(elem) {
 
 // This supplies functions to verify the contents of an area of the page that
 // was created using a rich-text editor, e.g. <div>text<b>bold</b></div>.
-// 'arrayOfElems': the array of promises of top-level element nodes in the 
+// 'arrayOfElems': the array of promises of top-level element nodes in the
 //   rich-text area, e.g [promise of <b>bold</b>].
-// 'arrayOfTexts': the array of visible texts of top-level element nodes in 
+// 'arrayOfTexts': the array of visible texts of top-level element nodes in
 //   the rich-text area, obtained from getText(), e.g. ['bold'].
-// 'fullText': a string consisting of all the visible text in the rich text 
-//   area (including both element and text nodes, so more than just the 
+// 'fullText': a string consisting of all the visible text in the rich text
+//   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textbold'.
 var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
@@ -281,7 +316,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   var arrayPointer = 0;
   var textPointer = 0;
   // Widgets insert line breaks above and below themselves and these are
-  // recorded in fullText but not arrayOfTexts so we need to track them 
+  // recorded in fullText but not arrayOfTexts so we need to track them
   // specially.
   var justPassedWidget = false;
 
@@ -329,7 +364,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       }
       widgets.getNoninteractive(widgetName).
         expectWidgetDetailsToMatch.apply(null, args);
-      textPointer = textPointer + arrayOfTexts[arrayPointer].length + 
+      textPointer = textPointer + arrayOfTexts[arrayPointer].length +
         (justPassedWidget ? 1 : 2);
       arrayPointer = arrayPointer + 1;
       justPassedWidget = true;
@@ -341,14 +376,14 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 };
 
 // This converts a string into a function that represents rich text, which can then
-// be sent to either editRichText() or expectRichText(). The string should not 
-// contain any html formatting. In the first case the function created will 
+// be sent to either editRichText() or expectRichText(). The string should not
+// contain any html formatting. In the first case the function created will
 // write the given text into the rich text editor (as plain text), and in
 // the second it will verify that the html created by a rich text editor
 // consists of the given text (without any formatting).
-//   This is necessary because the Protractor tests do not have an abstract 
-// representation of a 'rich text object'. This is because we are more 
-// interested in the process of interacting with the page than in the 
+//   This is necessary because the Protractor tests do not have an abstract
+// representation of a 'rich text object'. This is because we are more
+// interested in the process of interacting with the page than in the
 // information thereby conveyed.
 var toRichText = function(text) {
   // The 'handler' should be either a RichTextEditor or RichTextChecker
@@ -393,5 +428,6 @@ exports.RichTextChecker = RichTextChecker;
 exports.toRichText = toRichText;
 
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
+exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 
 exports.getEditor = getEditor;
