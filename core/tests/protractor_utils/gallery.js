@@ -21,6 +21,18 @@
 var editor = require('./editor.js');
 var forms = require('./forms.js');
 
+var setLanguages = function(languages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).setValues(languages);
+};
+
+var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).expectCurrentSelectionToBe(expectedLanguages);
+};
+
 // Here section is expected to be 'category'. The label can be any category.
 // Verifies the previous state of the checkbox, then clicks it.
 var _clickCheckbox = function(section, label, isPreviouslyTicked) {
@@ -101,18 +113,8 @@ var getExplorationObjective = function(name) {
   });
 };
 
-var setLanguages = function(languages) {
-  forms.AutocompleteMultiDropdownEditor(
-    element(by.css('.protractor-test-gallery-language-selector'))
-  ).setValues(languages);
-};
-
-var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
-  forms.AutocompleteMultiDropdownEditor(
-    element(by.css('.protractor-test-gallery-language-selector'))
-  ).expectCurrentSelectionToBe(expectedLanguages);
-};
-
+exports.setLanguages = setLanguages;
+exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
 exports.tickCheckbox = tickCheckbox;
 exports.untickCheckbox = untickCheckbox;
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;
@@ -120,5 +122,3 @@ exports.expectExplorationToBeHidden = expectExplorationToBeHidden;
 exports.playExploration = playExploration;
 exports.editExploration = editExploration;
 exports.getExplorationObjective = getExplorationObjective;
-exports.setLanguages = setLanguages;
-exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;

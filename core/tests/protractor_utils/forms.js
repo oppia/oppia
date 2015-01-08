@@ -197,15 +197,16 @@ var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: function(text) {
       elem.element(by.css('.select2-container')).click();
-      // NOTE: the input field is top-level in the DOM rather than below the
-      // container. The id is assigned when the dropdown is clicked.
+      // NOTE: the input field is top-level in the DOM, and is outside the
+      // context of 'elem'. The 'select2-drop' id is assigned to the input
+      // field when it is 'activated', i.e. when the dropdown is clicked.
       element(by.id('select2-drop')).element(by.css('.select2-input')).
         sendKeys(text + '\n');
     },
     expectOptionsToBe: function(expectedOptions) {
       elem.element(by.css('.select2-container')).click();
-      element(by.id('select2-drop')).all(by.tagName('li')).map(function(elem) {
-        return elem.getText();
+      element(by.id('select2-drop')).all(by.tagName('li')).map(function(optionElem) {
+        return optionElem.getText();
       }).then(function(actualOptions) {
         expect(actualOptions).toEqual(expectedOptions);
       });
@@ -220,8 +221,9 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   return {
     setValues: function(texts) {
       // Clear all existing choices.
-      element(by.css('.select2-choices')).all(by.tagName('li')).map(function(elem) {
-        return elem.element(by.css('.select2-search-choice-close'));
+      elem.element(by.css('.select2-choices'))
+          .all(by.tagName('li')).map(function(choiceElem) {
+        return choiceElem.element(by.css('.select2-search-choice-close'));
       }).then(function(deleteButtons) {
         // We iterate in descending order, because clicking on a delete button
         // removes the element from the DOM. We also omit the last element
@@ -233,14 +235,13 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 
       for (var i = 0; i < texts.length; i++) {
         elem.element(by.css('.select2-container')).click();
-        // NOTE: the input field is top-level in the DOM rather than below the
-        // container. The id is assigned when the dropdown is clicked.
-        element(by.css('.select2-input')).sendKeys(texts[i] + '\n');
+        elem.element(by.css('.select2-input')).sendKeys(texts[i] + '\n');
       }
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {
-      element(by.css('.select2-choices')).all(by.tagName('li')).map(function(elem) {
-        return elem.getText();
+      elem.element(by.css('.select2-choices'))
+          .all(by.tagName('li')).map(function(choiceElem) {
+        return choiceElem.getText();
       }).then(function(actualSelection) {
         // Remove the element corresponding to the last <li>, which actually
         // corresponds to the field for new input.
@@ -422,12 +423,11 @@ exports.ListEditor = ListEditor;
 exports.RealEditor = RealEditor;
 exports.RichTextEditor = RichTextEditor;
 exports.UnicodeEditor = UnicodeEditor;
+exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
+exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;
 exports.toRichText = toRichText;
-
-exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
-exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 
 exports.getEditor = getEditor;
