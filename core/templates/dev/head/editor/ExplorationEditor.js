@@ -750,7 +750,7 @@ oppia.controller('ExplorationEditor', [
 }]);
 
 
-oppia.controller('EditorHelpTab', [
+oppia.controller('EditorNavigation', [
     '$scope', '$rootScope', '$timeout', function($scope, $rootScope, $timeout) {
   $scope.postTutorialHelpPopoverIsShown = false;
 
