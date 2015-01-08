@@ -222,6 +222,38 @@
           </div>
         </div>
 
+        <div ng-if="explorationRightsService.ownerNames.length === 0 && !explorationRightsService.isCloned()">
+          <hr>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h4>Permissions</h4>
+              <div>
+                This exploration is <strong>public</strong> and <strong>community-editable</strong>.
+                <p ng-if="explorationRightsService.isPublic()">
+                  It is <strong>shown</strong> in the gallery.
+                </p>
+                <p ng-if="explorationRightsService.isPublicized()">
+                  It is <strong>featured</strong> in the gallery.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div ng-if="explorationRightsService.isCloned()">
+          <hr>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h4>Status</h4>
+              <div>
+                This exploration was <strong>cloned</strong> from another exploration.
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div ng-if="editabilityService.isEditable()">
           <hr>
 
