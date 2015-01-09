@@ -502,4 +502,30 @@ oppia.controller('LearnerLocalNav', [
       }
     });
   };
+
+  $scope.showEmbedExplorationModal = function() {
+    $modal.open({
+      templateUrl: 'modals/embedExploration',
+      backdrop: 'static',
+      resolve: {
+        explorationId: function() {
+          return $scope.explorationId;
+        },
+        explorationVersion: function() {
+          return $scope.currentVersion;
+        }
+      },
+      controller: ['$scope', '$modalInstance', 'explorationId', 'explorationVersion',
+        function($scope, $modalInstance, explorationId, explorationVersion) {
+          $scope.explorationId = explorationId;
+          $scope.serverName = window.location.protocol + '//' + window.location.host;
+          $scope.explorationVersion = explorationVersion;
+
+          $scope.close = function() {
+            $modalInstance.dismiss('close');
+          };
+        }
+      ]
+    });
+  };
 }]);
