@@ -45,8 +45,38 @@
 
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation">
+    <li>
+      <a href="#" title="Editor" ng-click="selectMainTab()">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#" title="Statistics" ng-click="selectStatsTab()">
+        <span class="glyphicon glyphicon-stats"></span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#" title="Settings" ng-click="selectSettingsTab()">
+        <span class="glyphicon glyphicon-cog"></span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#" title="History" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
+        <span class="glyphicon glyphicon-time"></span>
+      </a>
+    </li>
+
+    <li>
+      <a href="#" title="Feedback" ng-click="selectFeedbackTab()">
+        <span class="glyphicon glyphicon-comment"></span>
+      </a>
+    </li>
+
     <li class="dropdown">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+      <a href="#" title="Help" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-question-sign"></span>
       </a>
       <ul class="dropdown-menu">
@@ -360,35 +390,33 @@
       </div>
 
       <div ng-if="!isInPreviewMode">
-        <tabset>
-          <tab heading="Main" active="getTabStatuses().main.active" select="selectMainTab()">
-            <div class="row">
-              <div class="col-lg-9 col-md-9 col-sm-9">
-                {% include 'editor/state_editor.html' %}
-              </div>
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                {% include 'editor/exploration_graph.html' %}
-                {% include 'editor/state_statistics.html' %}
-              </div>
+        <div ng-show="getTabStatuses().active === 'main'">
+          <div class="row">
+            <div class="col-lg-9 col-md-9 col-sm-9">
+              {% include 'editor/state_editor.html' %}
             </div>
-          </tab>
+            <div class="col-lg-3 col-md-3 col-sm-3">
+              {% include 'editor/exploration_graph.html' %}
+              {% include 'editor/state_statistics.html' %}
+            </div>
+          </div>
+        </div>
 
-          <tab heading="Statistics" active="getTabStatuses().stats.active" select="selectStatsTab()">
-            {% include 'editor/exploration_statistics.html' %}
-          </tab>
+        <div ng-show="getTabStatuses().active === 'stats'">
+          {% include 'editor/exploration_statistics.html' %}
+        </div>
 
-          <tab heading="Settings" active="getTabStatuses().settings.active" select="selectSettingsTab()">
-            {% include 'editor/exploration_settings.html' %}
-          </tab>
+        <div ng-show="getTabStatuses().active === 'settings'">
+          {% include 'editor/exploration_settings.html' %}
+        </div>
 
-          <tab heading="History" active="getTabStatuses().history.active" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
-            {% include 'editor/exploration_history.html' %}
-          </tab>
+        <div ng-show="getTabStatuses().active === 'history'">
+          {% include 'editor/exploration_history.html' %}
+        </div>
 
-          <tab heading="<[feedbackTabHeader]>" active="getTabStatuses().feedback.active" select="selectFeedbackTab()">
-            {% include 'editor/exploration_feedback.html' %}
-          </tab>
-        </tabset>
+        <div ng-show="getTabStatuses().active === 'feedback'">
+          {% include 'editor/exploration_feedback.html' %}
+        </div>
       </div>
 
       <div class="row" ng-if="!!isInPreviewMode" ng-controller="ExplorationPreview">

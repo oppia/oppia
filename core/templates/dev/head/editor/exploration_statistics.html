@@ -1,4 +1,5 @@
 <div ng-controller="ExplorationStatistics">
+  <h2>Statistics</h2>
   <div ng-if="!hasTabLoaded" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
@@ -6,13 +7,12 @@
     <span class="oppia-loading-dot-three">.</span>
   </div>
   <div ng-if="hasTabLoaded">
-    <br>
     <div ng-if="hasExplorationBeenVisited">
-      <h4>Exploration Completion Rate</h4>
+      <h3>Exploration Completion Rate</h3>
       <bar-chart data="chartData" options="COMPLETION_RATE_CHART_OPTIONS">
       </bar-chart>
 
-      <h4>Common learner paths</h4>
+      <h3>Common learner paths</h3>
       <div style="font-size: smaller" ng-if="lastUpdated">
         <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
       </div>

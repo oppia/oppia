@@ -35,7 +35,6 @@ oppia.controller('ExplorationStatistics', [
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 
-
   $scope.hasTabLoaded = false;
   $scope.$on('refreshStatisticsTab', function(evt) {
     $scope.refreshExplorationStatistics();

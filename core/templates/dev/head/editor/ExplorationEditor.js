@@ -86,15 +86,6 @@ oppia.controller('ExplorationEditor', [
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
   $scope.getTabStatuses = routerService.getTabStatuses;
-  $scope.selectMainTab = routerService.navigateToMainTab;
-  $scope.selectStatsTab = routerService.navigateToStatsTab;
-  $scope.selectSettingsTab = routerService.navigateToSettingsTab;
-  $scope.selectHistoryTab = function() {
-    // TODO(sll): Do this on-hover rather than on-click.
-    $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
-    routerService.navigateToHistoryTab();
-  };
-  $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 
   /**************************************************
   * Methods affecting the saving of explorations.
@@ -558,12 +549,11 @@ oppia.controller('ExplorationEditor', [
       $rootScope.loadingMessage = '';
 
       $scope.$broadcast('refreshStatisticsTab');
+      $scope.$broadcast('refreshVersionHistory', {forceRefresh: true});
 
       if (explorationStatesService.getState(editorContextService.getActiveStateName())) {
         $scope.$broadcast('refreshStateEditor');
       }
-
-      $scope.refreshFeedbackTabHeader();
 
       if (successCallback) {
         successCallback();
@@ -604,24 +594,6 @@ oppia.controller('ExplorationEditor', [
           warningsData.clear();
         };
       }]
-    });
-  };
-
-  $scope.feedbackTabHeader = 'Feedback';
-  $scope.feedbackLastUpdatedUrl = (
-    '/feedback_last_updated/' + $scope.explorationId);
-  $scope.refreshFeedbackTabHeader = function() {
-    $scope.feedbackTabHeader = 'Feedback (loading...)';
-    $http.get($scope.feedbackLastUpdatedUrl).then(function(response) {
-      var data = response.data;
-      if (data.last_updated) {
-        $scope.feedbackTabHeader = (
-          'Feedback (updated ' +
-          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(data.last_updated) +
-          ')');
-      } else {
-        $scope.feedbackTabHeader = 'Feedback';
-      }
     });
   };
 
@@ -751,7 +723,8 @@ oppia.controller('ExplorationEditor', [
 
 
 oppia.controller('EditorNavigation', [
-    '$scope', '$rootScope', '$timeout', function($scope, $rootScope, $timeout) {
+    '$scope', '$rootScope', '$timeout', 'routerService', 'explorationRightsService',
+    function($scope, $rootScope, $timeout, routerService, explorationRightsService) {
   $scope.postTutorialHelpPopoverIsShown = false;
 
   $scope.$on('openPostTutorialHelpPopover', function() {
@@ -769,6 +742,14 @@ oppia.controller('EditorNavigation', [
   $scope.openEditorTutorial = function() {
     $rootScope.$broadcast('openEditorTutorial');
   };
+
+  $scope.explorationRightsService = explorationRightsService;
+
+  $scope.selectMainTab = routerService.navigateToMainTab;
+  $scope.selectStatsTab = routerService.navigateToStatsTab;
+  $scope.selectSettingsTab = routerService.navigateToSettingsTab;
+  $scope.selectHistoryTab = routerService.navigateToHistoryTab;
+  $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 }]);
 
 
