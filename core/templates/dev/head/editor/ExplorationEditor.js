@@ -770,3 +770,12 @@ oppia.controller('EditorHelpTab', [
     $rootScope.$broadcast('openEditorTutorial');
   };
 }]);
+
+
+oppia.controller('EditorNavbarBreadcrumb', [
+    '$scope', 'explorationTitleService', function($scope, explorationTitleService) {
+  $scope.navbarTitle = null;
+  $scope.$on('explorationPropertyChanged', function() {
+    $scope.navbarTitle = explorationTitleService.savedMemento;
+  });
+}]);

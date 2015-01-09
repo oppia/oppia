@@ -19,10 +19,21 @@
  */
 
 var editor = require('./editor.js');
+var forms = require('./forms.js');
 
-// Here section can be 'status', 'category' or 'language'.
-// If section = 'status' then label can be 'Featured', 'Public' or 'Private',
-// otherwise it can be any category or language respectively.
+var setLanguages = function(languages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).setValues(languages);
+};
+
+var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).expectCurrentSelectionToBe(expectedLanguages);
+};
+
+// Here section is expected to be 'category'. The label can be any category.
 // Verifies the previous state of the checkbox, then clicks it.
 var _clickCheckbox = function(section, label, isPreviouslyTicked) {
   element(by.css('.protractor-test-gallery-' + section)).all(by.tagName('li')).
@@ -102,6 +113,8 @@ var getExplorationObjective = function(name) {
   });
 };
 
+exports.setLanguages = setLanguages;
+exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
 exports.tickCheckbox = tickCheckbox;
 exports.untickCheckbox = untickCheckbox;
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;

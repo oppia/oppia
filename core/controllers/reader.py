@@ -133,6 +133,7 @@ class ExplorationPage(base.BaseHandler):
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
+            'exploration_title': exploration.title,
             'exploration_version': version,
             'iframed': is_iframed,
             'is_private': rights_manager.is_exploration_private(

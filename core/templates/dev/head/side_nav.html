@@ -16,12 +16,7 @@
           </a>
         </li>
       {% endif %}
-      <li {% if nav_mode == 'gallery' %}class="active"{% endif %}>
-        <a href="/gallery">
-          <span class="glyphicon glyphicon-book oppia-sidebar-menu-icon"></span>
-          Library
-        </a>
-      </li>
+
       {% if SHOW_FORUM_PAGE %}
         <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
           <a href="/forum">
@@ -38,42 +33,15 @@
         </a>
       </li>
     </ul>
-
-    <hr>
+  {% else %}
     <ul>
-      {% if user_email %}
-        {% if is_moderator %}
-          <li>
-            <a href="/moderator" target="_blank">
-              <span class="glyphicon glyphicon-cog oppia-sidebar-menu-icon"></span>
-              Moderator Page
-            </a>
-          </li>
-        {% endif %}
-
-        {% if is_super_admin %}
-          <li>
-            <a href="/admin" target="_blank">
-              <span class="glyphicon glyphicon-cog oppia-sidebar-menu-icon"></span>
-              Admin Page
-            </a>
-          </li>
-        {% endif %}
-
-        <li>
-          <a href="{{logout_url}}">
-            <span class="glyphicon glyphicon-remove oppia-sidebar-menu-icon"></span>
-            Logout
-          </a>
-        </li>
-      {% else %}
-        <li>
-          <a href="{{login_url}}">
-            <span class="glyphicon glyphicon-user oppia-sidebar-menu-icon"></span>
-            Sign in
-          </a>
-        </li>
-      {% endif %}
+      <li>
+        <!-- TODO(sll): Replace this with actual content. -->
+        <a href="#">
+          <span class="glyphicon glyphicon-remove oppia-sidebar-menu-icon"></span>
+          Nothing here yet!
+        </a>
+      </li>
     </ul>
   {% endif %}
 </nav>

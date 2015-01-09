@@ -408,10 +408,13 @@ var enterPreviewMode = function() {
 };
 
 var exitPreviewMode = function() {
-  var elemFinder = element(by.css('.protractor-test-exit-preview-mode'));
-  general.scrollElemFinderIntoView(elemFinder);
-  general.waitForSystem();
-  elemFinder.click();
+  exitButton = element(by.css('.protractor-test-exit-preview-mode'));
+  // The process of scrolling to the exit button causes the cursor to rest over
+  // the username in the top right, which opens a dropdown menu that then
+  // blocks the "Edit" button. To prevent this we move the cursor away.
+  general.scrollElementIntoView(exitButton);
+  browser.actions().mouseMove(element(by.css('.navbar-header'))).perform();
+  exitButton.click();
 };
 
 // HISTORY

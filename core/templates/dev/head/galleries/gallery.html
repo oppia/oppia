@@ -4,15 +4,19 @@
   Gallery
 {% endblock subtitle %}
 
-{% block content %}
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.ALL_LANGUAGE_NAMES = JSON.parse(
+      '{{ALL_LANGUAGE_NAMES|js_string}}');
+  </script>
+{% endblock header_js %}
 
+{% block content %}
   <div class="container-fluid" ng-controller="Gallery">
     <div class="oppia-main-content">
       <div class="row">
         <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
-          <h3 class="oppia-page-title">
-            Library
-          </h3>
         </div>
 
         <div class="col-lg-4 col-md-4 col-sm-4 col-xs-8">
@@ -86,21 +90,31 @@
           </div>
 
           <div class="oppia-gallery-menu" ng-if="gallerySidebarIsActive || screenIsLarge">
-            <h4><strong>Categories</strong></h4>
-            <checkbox-group all-categories-label="All categories" model="selectedCategories" class="protractor-test-gallery-category">
-            </checkbox-group>
+            <h3>Languages</h3>
+            <div>
+              <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.selectedLanguages" allow-multiple-choices="true" new-choice-regex=".^" width="150" placeholder="Filter languages..." class="protractor-test-gallery-language-selector">
+              </select2-dropdown>
+            </div>
 
-            <h4><strong>Languages</strong></h4>
-            <checkbox-group all-categories-label="All languages" model="selectedLanguages" class="protractor-test-gallery-language">
+            <br>
+
+            <h3>Categories</h3>
+            <checkbox-group all-categories-label="All categories" model="selectedCategories" class="protractor-test-gallery-category">
             </checkbox-group>
           </div>
         </div>
 
         <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
           <div class="tab-content oppia-gallery-tiles-container">
-            <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language').length === 0">
+            <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages).length === 0">
               <div>
-                <em>We don't have any explorations on this topic yet.</em>
+                <em>
+                  We don't have any explorations
+                  <span ng-if="searchQuery">on this topic </span>
+                  <span ng-if="!searchQuery && selectedLanguages.length === 1">for this language </span>
+                  <span ng-if="!searchQuery && selectedLanguages.length !== 1">for these languages </span>
+                  yet.
+                </em>
                 <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
                 {% if not user_email %}
                   <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
@@ -112,7 +126,7 @@
               </div>
             </div>
 
-            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedCategoriesFilter:selectedLanguages:'language' track by $index">
+            <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
               <md-card layout="row" class="oppia-gallery-tile">
                 <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
                   <!-- TODO(sll): Make the default image higher-res. -->

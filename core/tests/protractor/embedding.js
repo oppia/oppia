@@ -96,7 +96,9 @@ describe('Embedding', function() {
       // Tests of failed loading
       var missingIdElement = driver.findElement(
         by.xpath("//div[@class='protractor-test-missing-id']/div/span"));
-      general.scrollElemFinderIntoView(missingIdElement);
+      // Without the following line, protractor does not scroll down to the
+      // element in question.
+      general.scrollElementIntoView(missingIdElement);
       expect(missingIdElement.getText()).toMatch(
         'This Oppia exploration could not be loaded because no oppia-id ' +
         'attribute was specified in the HTML tag.');

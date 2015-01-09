@@ -18,6 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// TODO(sll): delete/deprecate 'reset exploration' from the list of
+// events sent to a container page.
+
 oppia.directive('conversationSkin', [function() {
   return {
     restrict: 'E',
@@ -29,8 +32,6 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.showPage = !$scope.iframed;
       $scope.hasInteractedAtLeastOnce = false;
-      $scope.showFeedbackModal = oppiaPlayerService.showFeedbackModal;
-      $scope.openExplorationEditorPage = oppiaPlayerService.openExplorationEditorPage;
       $scope.isAnswerBeingProcessed = oppiaPlayerService.isAnswerBeingProcessed;
 
       // If the exploration is iframed, send data to its parent about its height so
@@ -69,23 +70,6 @@ oppia.directive('conversationSkin', [function() {
           return confirmationMessage;
         }
       });
-
-      $scope.resetPage = function() {
-        if ($scope.hasInteractedAtLeastOnce && !$scope.finished &&
-            oppiaPlayerService.isInPreviewMode == false) {
-          var confirmationMessage = (
-            'Are you sure you want to restart this exploration? Your progress ' +
-            'will be lost.');
-          if (!$window.confirm(confirmationMessage)) {
-            return;
-          };
-        }
-
-        messengerService.sendMessage(
-          messengerService.EXPLORATION_RESET, $scope.stateName);
-        $scope.initializePage();
-      };
-
 
       var _addNewCard = function(contentHtml) {
         $scope.allResponseStates.push({
@@ -135,13 +119,13 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.initializePage();
 
-      // Temporary storage for the next card's content. This is not null iff a 'next card'   
+      // Temporary storage for the next card's content. This is not null iff a 'next card'
       // exists (At this point the feedback for the 'current card' is displayed, the user
-      // gets 2 seconds to read it and then 'next card' is shown).     
-      $scope.nextCardContent = null;     
-      $scope.continueToNextCard = function() {  
-        _addNewCard($scope.nextCardContent); 
-        _scrollToLastEntry();   
+      // gets 2 seconds to read it and then 'next card' is shown).
+      $scope.nextCardContent = null;
+      $scope.continueToNextCard = function() {
+        _addNewCard($scope.nextCardContent);
+        _scrollToLastEntry();
         $scope.nextCardContent = null;
       };
 

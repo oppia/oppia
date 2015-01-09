@@ -30,6 +30,23 @@ oppia.filter('selectedCategoriesFilter', function() {
   };
 });
 
+oppia.filter('selectedLanguagesFilter', function() {
+  return function(items, selectedLanguages) {
+    if (!items) {
+      return [];
+    }
+
+    // If no languages are selected, show all explorations.
+    if (selectedLanguages.length === 0) {
+      return items;
+    }
+
+    return items.filter(function(item) {
+      return selectedLanguages.indexOf(item.language) !== -1;
+    });
+  };
+});
+
 oppia.directive('checkboxGroup', function() {
   return {
     restrict: 'E',
@@ -157,7 +174,6 @@ oppia.controller('Gallery', [
 
   // TODO(sll): Modify this once explorations can specify their own images.
   $scope.getImageContainerClass = function(exploration) {
-    console.log(exploration);
     var color = CATEGORY_TO_DEFAULT_COLOR.hasOwnProperty(exploration.category) ?
       CATEGORY_TO_DEFAULT_COLOR[exploration.category] : _COLOR_TEAL;
     return 'oppia-gallery-tile-image-translucent oppia-gallery-tile-image-' + color;
@@ -207,6 +223,17 @@ oppia.controller('Gallery', [
   $scope.delayedOnSearchQueryChangeExec = oppiaDebouncer.debounce(
     $scope.onSearchQueryChangeExec, 400);
 
+  $scope.LANGUAGE_CHOICES = GLOBALS.ALL_LANGUAGE_NAMES.map(function(languageName) {
+    return {
+      id: languageName,
+      text: languageName
+    };
+  });
+
+  var _DEFAULT_LANGUAGE = 'English';
+  // This is a list.
+  $scope.selectedLanguages = [_DEFAULT_LANGUAGE];
+
   $scope.refreshGalleryData = function(data) {
     $scope.searchIsLoading = false;
     $scope.featuredExplorations = data.featured;
@@ -216,10 +243,9 @@ oppia.controller('Gallery', [
       $scope.publicExplorations);
 
     $scope.selectedCategories = {};
-    $scope.selectedLanguages = {};
     $scope.allExplorationsInOrder.map(function(expDict) {
+      // This is a dict.
       $scope.selectedCategories[expDict.category] = true;
-      $scope.selectedLanguages[expDict.language] = true;
     });
 
     $rootScope.loadingMessage = '';
