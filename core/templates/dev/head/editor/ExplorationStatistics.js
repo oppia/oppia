@@ -20,9 +20,9 @@
 
 oppia.controller('ExplorationStatistics', [
     '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService', 'explorationData',
-    'graphDataService', 'oppiaDatetimeFormatter',
+    'computeGraphService', 'oppiaDatetimeFormatter',
     function($scope, $http, $modal, warningsData, explorationStatesService, explorationData,
-             graphDataService, oppiaDatetimeFormatter) {
+             computeGraphService, oppiaDatetimeFormatter) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -50,8 +50,21 @@ oppia.controller('ExplorationStatistics', [
   $scope.refreshExplorationStatistics = function(version) {
     $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId
       + '/' + version;
-    $http.get($scope.explorationStatisticsUrl).then(function(response) {
-      $scope.graphData = graphDataService.getGraphData();
+    $http.get($scope.explorationStatisticsUrl).then(function(response) {      
+      var versionString;
+      if (version == 'all' || version == 'none') {
+        versionString = '';
+      } else {
+        versionString = '?v=' + version;
+      }
+      var explorationDataUrl = '/createhandler/data/' 
+       + explorationData.explorationId + versionString;
+
+      $http.get(explorationDataUrl).then(function(response) {
+        var states = response.data.states;
+        var initStateName = response.data.init_state_name;
+        $scope.graphData = computeGraphService.compute(initStateName, states);
+      });
 
       var data = response.data;
       var numVisits = data.num_starts;

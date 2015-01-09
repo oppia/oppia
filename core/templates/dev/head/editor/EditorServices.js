@@ -822,29 +822,9 @@ oppia.factory('newStateTemplateService', [function() {
 }]);
 
 
-// Service for computing graph data.
-oppia.factory('graphDataService', [
-    'explorationStatesService', 'explorationInitStateNameService',
-    function(explorationStatesService, explorationInitStateNameService) {
+oppia.factory('computeGraphService', [function() {
 
-  var _graphData = null;
-
-  // Returns an object which can be treated as the input to a visualization
-  // for a directed graph. The returned object has the following keys:
-  //   - nodes: an object whose keys are node ids (equal to node names) and whose
-  //      values are node names
-  //   - links: a list of objects. Each object represents a directed link between
-  //      two notes, and has keys 'source' and 'target', the values of which are
-  //      the names of the corresponding nodes.
-  //   - initStateName: the name of the initial state.
-  //   - finalStateName: the name of the final state.
-  var _recomputeGraphData = function() {
-    if (!explorationInitStateNameService.savedMemento) {
-      return;
-    }
-
-    var states = explorationStatesService.getStates();
-
+  var _computeGraphData = function(initStateId, states) {
     var nodes = {};
     var links = [];
     for (var stateName in states) {
@@ -863,12 +843,47 @@ oppia.factory('graphDataService', [
     }
     nodes[END_DEST] = END_DEST;
 
-    _graphData = {
+    return {
       nodes: nodes,
       links: links,
-      initStateId: explorationInitStateNameService.savedMemento,
+      initStateId: initStateId,
       finalStateId: END_DEST
     };
+  };
+
+  return {
+    compute: function(initStateId, states) {
+      return _computeGraphData(initStateId, states);
+    }
+  };
+}]);
+
+
+// Service for computing graph data.
+oppia.factory('graphDataService', [
+    'explorationStatesService', 'explorationInitStateNameService',
+    'computeGraphService', function(explorationStatesService,
+    explorationInitStateNameService, computeGraphService) {
+
+  var _graphData = null;
+
+  // Returns an object which can be treated as the input to a visualization
+  // for a directed graph. The returned object has the following keys:
+  //   - nodes: an object whose keys are node ids (equal to node names) and whose
+  //      values are node names
+  //   - links: a list of objects. Each object represents a directed link between
+  //      two notes, and has keys 'source' and 'target', the values of which are
+  //      the names of the corresponding nodes.
+  //   - initStateName: the name of the initial state.
+  //   - finalStateName: the name of the final state.
+  var _recomputeGraphData = function() {
+    if (!explorationInitStateNameService.savedMemento) {
+      return;
+    }
+
+    var states = explorationStatesService.getStates();
+    var initStateId = explorationInitStateNameService.savedMemento;
+    _graphData = computeGraphService.compute(initStateId, states);
   };
 
   return {
