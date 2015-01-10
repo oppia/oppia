@@ -328,9 +328,9 @@ var expectStateNamesToBe = function(names) {
 // All functions involving the settings tab should be sent through this
 // wrapper.
 var runFromSettingsTab = function(callbackFunction) {
-  element(by.linkText('Settings')).click();
+  element(by.css('.protractor-editor-settings-tab')).click();
   var result = callbackFunction();
-  element(by.linkText('Main')).click();
+  element(by.css('.protractor-editor-main-tab')).click();
   return result;
 };
 

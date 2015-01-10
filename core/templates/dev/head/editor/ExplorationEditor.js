@@ -744,7 +744,7 @@ oppia.controller('EditorNavigation', [
   };
 
   $scope.explorationRightsService = explorationRightsService;
-
+  $scope.getTabStatuses = routerService.getTabStatuses;
   $scope.selectMainTab = routerService.navigateToMainTab;
   $scope.selectStatsTab = routerService.navigateToStatsTab;
   $scope.selectSettingsTab = routerService.navigateToSettingsTab;

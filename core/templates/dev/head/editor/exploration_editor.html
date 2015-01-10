@@ -45,31 +45,31 @@
 
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation">
-    <li>
-      <a href="#" title="Editor" ng-click="selectMainTab()">
+    <li ng-class="{'active': getTabStatuses().active === 'main'}">
+      <a href="#" title="Editor" ng-click="selectMainTab()" class="protractor-editor-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
     </li>
 
-    <li>
+    <li ng-class="{'active': getTabStatuses().active === 'stats'}">
       <a href="#" title="Statistics" ng-click="selectStatsTab()">
         <span class="glyphicon glyphicon-stats"></span>
       </a>
     </li>
 
-    <li>
-      <a href="#" title="Settings" ng-click="selectSettingsTab()">
+    <li ng-class="{'active': getTabStatuses().active === 'settings'}">
+      <a href="#" title="Settings" ng-click="selectSettingsTab()" class="protractor-editor-settings-tab">
         <span class="glyphicon glyphicon-cog"></span>
       </a>
     </li>
 
-    <li>
+    <li ng-class="{'active': getTabStatuses().active === 'history'}">
       <a href="#" title="History" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
         <span class="glyphicon glyphicon-time"></span>
       </a>
     </li>
 
-    <li>
+    <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
       <a href="#" title="Feedback" ng-click="selectFeedbackTab()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
