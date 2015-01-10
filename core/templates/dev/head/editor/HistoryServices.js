@@ -175,6 +175,9 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
 
     for (var i = 0; i < nodeList.length; i++) {
       var changeList = versionsTreeService.getChangeList(nodeList[i]);
+      if (!directionForwards) {
+        changeList.reverse();
+      }
       for (var j = 0; j < changeList.length; j++) {
         var change = changeList[j];
         if ((directionForwards && change.cmd == 'add_state') ||

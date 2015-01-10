@@ -126,6 +126,12 @@ XSSI_PREFIX = ')]}\'\n'
 # A regular expression for alphanumeric characters
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
+# Invalid names for parameters used in expressions.
+AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
+INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
+    'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
+    'pow', 'round', 'then']
+
 # Committer id for system actions.
 ADMIN_COMMITTER_ID = 'admin'
 ADMIN_EMAIL_ADDRESS = 'testadmin@example.com'
@@ -139,23 +145,6 @@ MAX_FILE_SIZE_BYTES = 1048576
 
 # The default language code for an exploration.
 DEFAULT_LANGUAGE_CODE = 'en'
-
-# An ordered list of links to stand-alone pages to display in the 'About' tab.
-# Each item is a dict with two keys: the human-readable name of the link and
-# the URL of the page.
-ABOUT_PAGES = [{
-    'name': 'About this site',
-    'url': '/about'
-}, {
-    'name': 'How to use Oppia',
-    'url': '/site_guidelines',
-}, {
-    'name': 'Blog',
-    'url': 'https://oppiablog.blogspot.com',
-}, {
-    'name': 'Contact',
-    'url': '/contact',
-}]
 
 # Whether to include a page with the Oppia discussion forum.
 SHOW_FORUM_PAGE = True
@@ -210,6 +199,9 @@ ALLOWED_WIDGETS = {
         'MusicNotesInput': {
             'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MusicNotesInput')
         },
+        'GraphInput': {
+            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'GraphInput')
+        },
     }
 }
 
@@ -235,7 +227,8 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_of_widgets.yaml', 'Test of widgets', 'Test')
+    ('test_exploration.yaml', 'Test of expressions and widgets', 'Test'),
+    ('modeling_graphs', 'Graph Modeling', 'Mathematics')
 ]
 
 # TODO(sll): Add all other URLs here.
@@ -253,8 +246,9 @@ FEEDBACK_LAST_UPDATED_URL_PREFIX = '/feedback_last_updated'
 FEEDBACK_THREAD_URL_PREFIX = '/threadhandler'
 FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 GALLERY_URL = '/gallery'
+GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
-GALLERY_REDIRECT_URL = '/gallery_redirect'
+GALLERY_LOGIN_REDIRECT_URL = '/gallery_login_redirect'
 HOMEPAGE_URL = '/'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
@@ -271,6 +265,7 @@ NAV_MODE_CONTACT = 'contact'
 NAV_MODE_CREATE = 'create'
 NAV_MODE_EXPLORE = 'explore'
 NAV_MODE_GALLERY = 'gallery'
+NAV_MODE_HOME = 'home'
 NAV_MODE_PROFILE = 'profile'
 
 # Event types.

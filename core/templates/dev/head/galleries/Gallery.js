@@ -30,6 +30,23 @@ oppia.filter('selectedCategoriesFilter', function() {
   };
 });
 
+oppia.filter('selectedLanguagesFilter', function() {
+  return function(items, selectedLanguages) {
+    if (!items) {
+      return [];
+    }
+
+    // If no languages are selected, show all explorations.
+    if (selectedLanguages.length === 0) {
+      return items;
+    }
+
+    return items.filter(function(item) {
+      return selectedLanguages.indexOf(item.language) !== -1;
+    });
+  };
+});
+
 oppia.directive('checkboxGroup', function() {
   return {
     restrict: 'E',
@@ -100,16 +117,66 @@ oppia.directive('checkboxGroup', function() {
 
 oppia.controller('Gallery', [
     '$scope', '$http', '$rootScope', '$window', 'createExplorationButtonService',
-    'oppiaDatetimeFormatter',
+    'oppiaDatetimeFormatter', 'oppiaDebouncer', 'urlService',
     function($scope, $http, $rootScope, $window, createExplorationButtonService,
-             oppiaDatetimeFormatter) {
+             oppiaDatetimeFormatter, oppiaDebouncer, urlService) {
   $scope.galleryDataUrl = '/galleryhandler/data';
   $scope.currentUserIsModerator = false;
+  $scope.searchIsLoading = false;
 
-  $scope.selectedStatuses = {
-    'publicized': true,
-    'public': false,
-    'private': false
+  // Default color.
+  var _COLOR_TEAL = 'teal';
+  // Social sciences.
+  var _COLOR_SALMON = 'salmon';
+  // Art.
+  var _COLOR_SUNNYSIDE = 'sunnyside';
+  // Mathematics and computing.
+  var _COLOR_SHARKFIN = 'sharkfin';
+  // Science.
+  var _COLOR_GUNMETAL = 'gunmetal';
+
+  var CATEGORY_TO_DEFAULT_COLOR = {
+    'Architecture': _COLOR_SUNNYSIDE,
+    'Art': _COLOR_SUNNYSIDE,
+    'Biology': _COLOR_GUNMETAL,
+    'Business': _COLOR_SALMON,
+    'Chemistry': _COLOR_GUNMETAL,
+    'Coding': _COLOR_SHARKFIN,
+    'Computing': _COLOR_SHARKFIN,
+    'Education': _COLOR_TEAL,
+    'Engineering': _COLOR_GUNMETAL,
+    'Environment': _COLOR_GUNMETAL,
+    'Geography': _COLOR_SALMON,
+    'Government': _COLOR_SALMON,
+    'Languages': _COLOR_SUNNYSIDE,
+    'Law': _COLOR_SALMON,
+    'Life Skills': _COLOR_TEAL,
+    'Mathematics': _COLOR_SHARKFIN,
+    'Medicine': _COLOR_GUNMETAL,
+    'Music': _COLOR_SUNNYSIDE,
+    'Philosophy': _COLOR_SALMON,
+    'Photography': _COLOR_SUNNYSIDE,
+    'Physics': _COLOR_GUNMETAL,
+    'Programming': _COLOR_SHARKFIN,
+    'Psychology': _COLOR_SALMON,
+    'Puzzles': _COLOR_TEAL,
+    'Reading': _COLOR_TEAL,
+    'Religion': _COLOR_SALMON,
+    'Sport': _COLOR_SUNNYSIDE,
+    'Statistics': _COLOR_SHARKFIN,
+    'Welcome': _COLOR_TEAL
+  };
+
+  // TODO(sll): Modify this once explorations can specify their own images.
+  $scope.getImageSrcUrl = function(exploration) {
+    return '/images/gallery/default.png';
+  };
+
+  // TODO(sll): Modify this once explorations can specify their own images.
+  $scope.getImageContainerClass = function(exploration) {
+    var color = CATEGORY_TO_DEFAULT_COLOR.hasOwnProperty(exploration.category) ?
+      CATEGORY_TO_DEFAULT_COLOR[exploration.category] : _COLOR_TEAL;
+    return 'oppia-gallery-tile-image-translucent oppia-gallery-tile-image-' + color;
   };
 
   $scope.getCategoryList = function() {
@@ -132,27 +199,72 @@ oppia.controller('Gallery', [
   $scope.showUploadExplorationModal = (
     createExplorationButtonService.showUploadExplorationModal);
 
+  $scope.searchQuery = '';
+
+  $scope.onSearchQueryChange = function(evt) {
+    // Query immediately when the enter or space key is pressed.
+    if (evt.keyCode == 13 || evt.keyCode == 32) {
+      $scope.onSearchQueryChangeExec();
+    } else {
+      $scope.delayedOnSearchQueryChangeExec();
+    }
+  };
+
+  $scope.onSearchQueryChangeExec = function() {
+    if (!$scope.searchQuery) {
+      $http.get($scope.galleryDataUrl).success($scope.refreshGalleryData);
+    } else {
+      $scope.searchIsLoading = true;
+      $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
+        $scope.refreshGalleryData);
+    }
+  };
+
+  $scope.delayedOnSearchQueryChangeExec = oppiaDebouncer.debounce(
+    $scope.onSearchQueryChangeExec, 400);
+
+  $scope.LANGUAGE_CHOICES = GLOBALS.ALL_LANGUAGE_NAMES.map(function(languageName) {
+    return {
+      id: languageName,
+      text: languageName
+    };
+  });
+
+  var _DEFAULT_LANGUAGE = 'English';
+  // This is a list.
+  $scope.selectedLanguages = [_DEFAULT_LANGUAGE];
+
+  $scope.refreshGalleryData = function(data) {
+    $scope.searchIsLoading = false;
+    $scope.featuredExplorations = data.featured;
+    $scope.publicExplorations = data['public'];
+
+    $scope.allExplorationsInOrder = $scope.featuredExplorations.concat(
+      $scope.publicExplorations);
+
+    $scope.selectedCategories = {};
+    $scope.allExplorationsInOrder.map(function(expDict) {
+      // This is a dict.
+      $scope.selectedCategories[expDict.category] = true;
+    });
+
+    $rootScope.loadingMessage = '';
+  };
+
   // Retrieves gallery data from the server.
   $http.get($scope.galleryDataUrl).success(function(data) {
     if (data.is_moderator) {
       $scope.currentUserIsModerator = true;
     }
 
-    $scope.releasedExplorations = data.released;
-    $scope.betaExplorations = data.beta;
-    $scope.privateExplorations = data['private'];
+    $scope.refreshGalleryData(data);
 
-    $scope.allExplorationsInOrder = $scope.releasedExplorations.concat(
-      $scope.betaExplorations).concat($scope.privateExplorations);
-
-    $scope.selectedCategories = {};
-    $scope.selectedLanguages = {};
-    $scope.allExplorationsInOrder.map(function(expDict) {
-      $scope.selectedCategories[expDict.category] = true;
-      $scope.selectedLanguages[expDict.language] = true;
-    });
-
-    $rootScope.loadingMessage = '';
+    if (data.username) {
+      var urlParams = urlService.getUrlParams();
+      if (urlParams.mode === 'create') {
+        $scope.showCreateExplorationModal($scope.getCategoryList());
+      }
+    }
   });
 
   $scope.gallerySidebarIsActive = false;

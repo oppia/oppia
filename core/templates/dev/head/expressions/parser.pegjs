@@ -254,12 +254,12 @@ PrimaryExpression
 
 CallExpression
   = name:Identifier __ args:(Arguments)+ {
-      var result = [name, args.shift()];
-      while (args.length > 0) {
-        result = [result, args.shift()];
-      }
-      return result;
+    var result = [name].concat(args.shift());
+    while (args.length > 0) {
+      result = [result].concat(args.shift());
     }
+    return result;
+  }
 
 Arguments
   = "(" __ args:ArgumentList? __ ")" {
@@ -371,9 +371,9 @@ LogicalOROperator
   = "||" !"=" { return "||"; }
 
 Expression
-  = condition:LogicalORExpression __
-    "?" __ trueExpression:Expression __
-    ":" __ falseExpression:Expression {
-      return ['?', condition, trueExpression, falseExpression];
+  = "if" __ condition:LogicalORExpression __
+    "then" __ trueExpression:Expression __
+    "else" __ falseExpression:Expression {
+      return ['if', condition, trueExpression, falseExpression];
     }
   / LogicalORExpression

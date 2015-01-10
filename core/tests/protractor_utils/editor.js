@@ -19,8 +19,21 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-forms = require('./forms.js');
-general = require('./general.js');
+var forms = require('./forms.js');
+var general = require('./general.js');
+var widgets = require('../../../extensions/widgets/protractor.js');
+var rules = require('../../../extensions/rules/protractor.js');
+
+var exitTutorialIfNecessary = function() {
+  // If the editor tutorial shows up, exit it.
+  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    } else if (buttons.length !== 0) {
+      throw 'Expected to find at most one \'exit tutorial\' button';
+    }
+  });
+};
 
 var setStateName = function(name) {
   var nameElement = element(by.css('.oppia-state-name-container'))
@@ -30,68 +43,173 @@ var setStateName = function(name) {
   nameElement.element(by.buttonText('Done')).click();
 };
 
-// Content & non-interactive widgets. It is necessary to run open() at the
-// start and close() at the end.
-var editContent = function() {
-  var operations = forms.editRichText(element(by.css('.oppia-state-content')));
-  operations.open = function() {
-    element(by.css('.protractor-test-edit-content')).click();
-  };
-  operations.close = function() {
-    element(by.css('.oppia-state-content')).
-      element(by.buttonText('Save Content')).click();
-  };
-  return operations;
+var expectCurrentStateToBe = function(name) {
+  expect(
+    element(by.css('.oppia-state-name-container')).getText()
+  ).toMatch(name);
 };
 
+// CONTENT
 
-// Interactive widgets
-var _openWidgetEditor = function() {
-  element(by.css('.protractor-test-edit-interaction')).click();
+// 'richTextInstructions' is a function that is sent a RichTextEditor which it
+// can then use to alter the state content, for example by calling
+// .appendBoldText(...).
+var setContent = function(richTextInstructions) {
+  element(by.css('.protractor-test-edit-content')).click();
+  var richTextEditor = forms.RichTextEditor(
+    element(by.css('.oppia-state-content')));
+  richTextEditor.clear();
+  richTextInstructions(richTextEditor);
+  element(by.css('.oppia-state-content')).
+    element(by.buttonText('Save Content')).click();
 };
 
-var _closeWidgetEditor = function() {
-  element(by.css('.protractor-test-save-interaction')).click();
+// This receives a function richTextInstructions used to verify the display of
+// the state's content visible when the content editor is closed. The
+// richTextInstructions will be supplied with a handler of the form
+// forms.RichTextChecker and can then perform checks such as
+//   handler.readBoldText('bold')
+//   handler.readWidget('Collapsible', 'outer', 'inner')
+// These would verify that the content consists of the word 'bold' in bold
+// followed by a Collapsible widget with the given arguments, and nothing else.
+// Note that this fails for collapsibles and tabs since it is not possible to
+// click on them to view their contents, as clicks instead open the rich text
+// editor.
+var expectContentToMatch = function(richTextInstructions) {
+  // The .last() is necessary because we want the second of two <span>s; the
+  // first holds the placeholder text for the exploration content.
+  forms.expectRichText(
+    element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
+  ).toMatch(richTextInstructions);
 };
 
-var _selectWidget = function(widgetName) {
+var expectContentTextToEqual = function(text) {
+  forms.expectRichText(
+    element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
+  ).toEqual(text);
+};
+
+// INTERACTIVE WIDGETS
+
+// Additional arguments may be sent to this function, and they will be
+// passed on to the relevant widget editor.
+var setInteraction = function(widgetName) {
   element(by.css('.protractor-test-select-interaction-id')).
-    element(by.cssContainingText('option', widgetName)).click();
-};
+    element(by.css('option[value=' + widgetName + ']')).click();
 
-var selectNumericWidget = function() {
-  _selectWidget('Numeric');
-};
+  if (arguments.length > 1) {
+    element(by.css('.protractor-test-edit-interaction')).click();
 
-var selectContinueWidget = function(buttonText) {
-  _selectWidget('Continue Button');
+    var elem = element(by.css('.oppia-interactive-widget-editor'));
 
-  _openWidgetEditor();
-  if (buttonText) {
-    forms.editUnicode(element(by.css('.protractor-test-widget-args'))).
-      setText(buttonText);
+    // Need to convert arguments to an actual array, discarding widgetName. We
+    // also send the interaction editor element, within which the customizer
+    // should act.
+    var args = [elem];
+    for (var i = 1; i < arguments.length; i++) {
+      args.push(arguments[i]);
+    }
+    widgets.getInteractive(widgetName).customizeInteraction.apply(null, args);
+
+    element(by.css('.protractor-test-save-interaction')).click();
   }
-  _closeWidgetEditor();
 };
 
-// textArray should be a non-empty array of strings (to be the options)
-var selectSimpleMultipleChoiceWidget = function(textArray) {
-  _selectWidget('Multiple Choice');
-
-  _openWidgetEditor();
-  var customizer = forms.editList(
-    element(by.css('.protractor-test-widget-args')));
-  customizer.editRichTextEntry(0).setPlainText(textArray[0]);
-  for (var i = 1; i < textArray.length; i++) {
-    var newEntry = customizer.appendEntry('Add multiple choice option');
-    forms.editRichText(newEntry).appendPlainText(textArray[i]);
+// Likewise this can receive additional arguments
+var expectInteractionToMatch = function(widgetName) {
+  // Convert additional arguments to an array to send on.
+  var args = [];
+  for (var i = 1; i < arguments.length; i++) {
+    args.push(arguments[i]);
   }
-  _closeWidgetEditor();
+  widgets.getInteractive(widgetName).
+    expectInteractionDetailsToMatch.apply(null, args);
 };
 
+// RULES
+
+// This function selects a rule for the current interaction and enters the
+// entries of the parameterValues array as its parameters; the parameterValues
+// should be specified after the ruleName as additional arguments. For example
+// with widget 'NumericInput' and rule 'Equals' then there is a single
+// parameter which the given answer is required to equal.
+var _selectRule = function(ruleElement, widgetName, ruleName) {
+  var parameterValues = [];
+  for (var i = 3; i < arguments.length; i++) {
+    parameterValues.push(arguments[i]);
+  }
+
+  var ruleDescription = rules.getDescription(
+    widgets.getInteractive(widgetName).answerObjectType, ruleName);
+
+  var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
+    undefined : ruleDescription.indexOf('{{');
+  // From the ruleDescription string we can deduce both the description used
+  // in the page (which will have the form "is equal to ...") and the types
+  // of the parameter objects, which will later tell us which object editors
+  // to use to enter the parameterValues.
+  var ruleDescriptionInDropdown = ruleDescription.substring(0, parameterStart);
+  var parameterTypes = [];
+  while (parameterStart !== undefined) {
+    var parameterEnd = ruleDescription.indexOf('}}', parameterStart) + 2;
+    var nextParameterStart =
+      (ruleDescription.indexOf('{{', parameterEnd) === -1) ?
+      undefined : ruleDescription.indexOf('{{', parameterEnd);
+    ruleDescriptionInDropdown = ruleDescriptionInDropdown + '...' +
+      ruleDescription.substring(parameterEnd, nextParameterStart);
+    parameterTypes.push(
+      ruleDescription.substring(
+        ruleDescription.indexOf('|', parameterStart) + 1, parameterEnd - 2));
+    parameterStart = nextParameterStart;
+  }
+
+  expect(parameterValues.length).toEqual(parameterTypes.length);
+
+  ruleElement.element(by.css('.protractor-test-rule-description')).click();
+
+  element.all(by.id('select2-drop')).map(function(selectorElement) {
+    selectorElement.element(by.cssContainingText(
+      'li.select2-results-dept-0', ruleDescriptionInDropdown
+    )).then(function(optionElement) {
+      optionElement.click();
+      protractor.getInstance().waitForAngular();
+    });
+  });
+
+  // Now we enter the parameters
+  for (var i = 0; i < parameterValues.length; i++) {
+    var parameterElement = ruleElement.element(
+      by.repeater('item in ruleDescriptionFragments track by $index'
+    ).row(i * 2 + 1));
+    var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
+
+    if (widgetName === 'MultipleChoiceInput') {
+      // This is a special case as it uses a dropdown to set a NonnegativeInt
+      parameterElement.element(
+        by.cssContainingText('option', parameterValues[i])
+      ).click();
+    } else {
+      parameterEditor.setValue(parameterValues[i]);
+    }
+  }
+};
+
+// This clicks the "add new rule" button and then selects the rule type and
+// enters its parameters, and closes the rule editor. Any number of rule
+// parameters may be specified after the ruleName.
+var addRule = function(widgetName, ruleName) {
+  element(by.css('.oppia-add-rule-button')).click();
+  var ruleElement = element(by.css('.protractor-test-temporary-rule'))
+  var args = [ruleElement];
+  for (var i = 0; i < arguments.length; i++) {
+    args.push(arguments[i]);
+  }
+  _selectRule.apply(null, args);
+  ruleElement.element(by.css('.protractor-test-save-rule')).click();
+};
 
 // Rules are zero-indexed; 'default' denotes the default rule.
-var editRule = function(ruleNum) {
+var RuleEditor = function(ruleNum) {
   var elem = (ruleNum === 'default') ?
     element(by.css('.protractor-test-default-rule')):
     element(by.repeater('rule in handler track by $index').row(ruleNum));
@@ -107,143 +225,62 @@ var editRule = function(ruleNum) {
   });
 
   return {
-    // Note: this does NOT save the rule after the feedback is entered.
-    editFeedback: function() {
-      var feedbackElement = elem.element(by.css('.oppia-feedback-bubble'));
-      return forms.editList(feedbackElement);
+    // Any number of parameters may be specified after the ruleName
+    setDescription: function(widgetName, ruleName) {
+      var args = [elem];
+      for (var i = 0; i < arguments.length; i++) {
+        args.push(arguments[i]);
+      }
+      _selectRule.apply(null, args);
+    },
+    setFeedback: function(index, richTextInstructions) {
+      var feedbackEditor = forms.ListEditor(
+        elem.element(by.css('.oppia-feedback-bubble'))
+      ).editItem(index, 'RichText');
+      feedbackEditor.clear();
+      richTextInstructions(feedbackEditor);
+    },
+    addFeedback: function() {
+      forms.ListEditor(elem.element(by.css('.oppia-feedback-bubble'))).
+        addItem();
+    },
+    deleteFeedback: function(index) {
+      forms.ListEditor(elem.element(by.css('.oppia-feedback-bubble'))).
+        deleteItem(index);
     },
     // Enter 'END' for the end state.
-    // NB: This saves the rule after the destination is selected.
+    // This saves the rule after the destination is selected.
     setDestination: function(destinationName) {
       var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
-      forms.editAutocompleteDropdown(destinationElement).
-        setText(destinationName);
+      forms.AutocompleteDropdownEditor(destinationElement).
+        setValue(destinationName);
       elem.element(by.css('.protractor-test-save-rule')).click();
+    },
+    expectAvailableDestinationsToBe: function(stateNames) {
+      forms.AutocompleteDropdownEditor(
+        elem.element(by.css('.oppia-dest-bubble'))
+      ).expectOptionsToBe(stateNames);
+    },
+    delete: function() {
+      element(by.css('.protractor-test-delete-rule')).click();
+      browser.driver.switchTo().alert().accept();
     }
   }
 };
 
-// This function selects the rule to be used and enters the relevant parameters.
-// It assumes that the rule editor is already open.
-// parameterArray is an array of elements of the form {
-//    value: the value specified for the parameter to take
-//    fragmentNum: the index in the list of rule fragments of the parameter
-//    type: the type of the parameter
-// }
-var _editRuleType = function(ruleElement, ruleDescription, parameterArray) {
-  ruleElement.element(by.css('.protractor-test-rule-description')).click();
-  element(by.id('select2-drop')).element(
-      by.cssContainingText('li.select2-results-dept-0', ruleDescription)).then(
-      function(optionElt) {
-    optionElt.click();
-    protractor.getInstance().waitForAngular();
+// STATE GRAPH
 
-    // Now we enter the parameters
-    for (var i = 0; i < parameterArray.length; i++) {
-      var parameterElement = ruleElement.element(
-        by.repeater('item in ruleDescriptionFragments track by $index'
-      ).row(parameterArray[i].fragmentNum));
-
-      if (parameterArray[i].type === 'real') {
-        forms.editReal(parameterElement).setValue(parameterArray[i].value);
-      } else if (parameterArray[i].type === 'unicode') {
-        forms.editUnicode(parameterElement).setText(parameterArray[i].value);
-      } else if (parameterArray[i].type === 'choice') {
-        parameterElement.element(
-          by.cssContainingText('option', parameterArray[i].value
-        )).click();
-      } else {
-        throw Error(
-          'Unknown type ' + parameterArray[i].type +
-          ' sent to editor._editRuleType');
-      }
-    }
-  });
-};
-
-var _addRule = function(ruleDescription, parameterArray) {
-  element(by.css('.oppia-add-rule-button')).click();
-  var newRuleElt = element(by.css('.protractor-test-temporary-rule'));
-  _editRuleType(newRuleElt, ruleDescription, parameterArray);
-  newRuleElt.element(by.css('.protractor-test-save-rule')).click();
-};
-
-var addNumericRule = {
-  IsInclusivelyBetween: function(a, b) {
-    _addRule('is between ... and ..., inclusive', [{
-      value: a,
-      fragmentNum: 1,
-      type: 'real'
-    }, {
-      value: b,
-      fragmentNum: 3,
-      type: 'real'
-    }]);
-  },
-  Equals: function(a) {
-    _addRule('is equal to ...', [{
-      value: a,
-      fragmentNum: 1,
-      type: 'real'
-    }]);
-  },
-  IsGreaterThanOrEqualTo: function(a) {
-    _addRule('is greater than or equal to ...', [{
-      value: a,
-      fragmentNum: 1,
-      type: 'real'
-    }]);
-  },
-  IsGreaterThan: function(a) {
-    _addRule('is greater than ...', [{
-      value: a,
-      fragmentNum: 1,
-      type: 'real'
-    }]);
-  },
-  IsLessThanOrEqualTo: function(a) {
-    _addRule('is less than or equal to ...', [{
-      value: a,
-      fragmentNum: 1,
-      type: 'real'
-    }]);
-  },
-  IsLessThan: function(a) {
-    _addRule('is less than ...', [{
-      value: a,
-      fragmentNum: 1,
-      type: 'real'
-    }]);
-  },
-  IsWithinTolerance: function(a, b) {
-    _addRule('is within ... of ...', [{
-      value: a,
-      fragmentNum: 1,
-      type: 'real'
-    }, {
-      value: b,
-      fragmentNum: 3,
-      type: 'real'
-    }]);
-  }
-};
-
-var addMultipleChoiceRule = {
-  Equals: function(a) {
-    _addRule('is equal to ...', {
-      value: a,
-      fragmentNum: 1,
-      // In the backend this is a non-negative int, but that parameter is
-      // presented in the client as a dropdown so we use that here.
-      type: 'choice'
-    });
-  }
+var createState = function(newStateName) {
+  element(by.css('.oppia-add-state-container')).
+    element(by.tagName('input')).sendKeys(newStateName);
+  element(by.css('.oppia-add-state-container')).
+    element(by.tagName('button')).click();
 };
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
   element.all(by.css('.node')).map(function(stateElement) {
-    return stateElement.element(by.tagName('title')).getText();
+    return stateElement.element(by.tagName('text')).getText();
   }).then(function(listOfNames) {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
@@ -257,6 +294,36 @@ var moveToState = function(targetName) {
     }
   });
 };
+
+var deleteState = function(stateName) {
+  element.all(by.css('.node')).map(function(stateElement) {
+    return stateElement.element(by.tagName('text')).getText();
+  }).then(function(listOfNames) {
+    var matched = false;
+    for (var i = 0; i < listOfNames.length; i++) {
+      if (listOfNames[i] === stateName) {
+        element.all(by.css('.node')).get(i).element(by.tagName('g')).click();
+        protractor.getInstance().waitForAngular();
+        general.waitForSystem();
+        element(by.css('.protractor-test-confirm-delete-state')).click();
+        matched = true;
+      }
+    }
+    if (! matched) {
+      throw Error('State ' + stateName + ' not found by editor.moveToState');
+    }
+  });
+};
+
+var expectStateNamesToBe = function(names) {
+  element.all(by.css('.node')).map(function(stateNode) {
+    return stateNode.element(by.tagName('text')).getText();
+  }).then(function(stateNames) {
+    expect(stateNames).toEqual(names);
+  });
+};
+
+// SETTINGS
 
 // All functions involving the settings tab should be sent through this
 // wrapper.
@@ -295,6 +362,26 @@ var setLanguage = function(language) {
   });
 };
 
+var expectAvailableFirstStatesToBe = function(names) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationInitStateName')).
+        all(by.tagName('option')).map(function(elem) {
+      return elem.getText();
+    }).then(function(options) {
+      expect(options).toEqual(names);
+    });
+  });
+};
+
+var setFirstState = function(stateName) {
+  runFromSettingsTab(function() {
+    element(by.id('explorationInitStateName')).
+      element(by.cssContainingText('option', stateName)).click();
+  });
+};
+
+// CONTROLS
+
 var saveChanges = function(commitMessage) {
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
@@ -310,23 +397,54 @@ var saveChanges = function(commitMessage) {
   });
 };
 
+var discardChanges = function() {
+  element(by.css('.protractor-test-save-discard-toggle')).click();
+  element(by.css('.protractor-test-discard-changes')).click();
+  browser.driver.switchTo().alert().accept();
+};
+
+var enterPreviewMode = function() {
+  element(by.css('.protractor-test-enter-preview-mode')).click();
+};
+
+var exitPreviewMode = function() {
+  exitButton = element(by.css('.protractor-test-exit-preview-mode'));
+  // The process of scrolling to the exit button causes the cursor to rest over
+  // the username in the top right, which opens a dropdown menu that then
+  // blocks the "Edit" button. To prevent this we move the cursor away.
+  general.scrollElementIntoView(exitButton);
+  browser.actions().mouseMove(element(by.css('.navbar-header'))).perform();
+  exitButton.click();
+};
+
+exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
+
 exports.setStateName = setStateName;
-exports.editContent = editContent;
+exports.expectCurrentStateToBe = expectCurrentStateToBe;
 
-exports.selectNumericWidget = selectNumericWidget;
-exports.selectContinueWidget = selectContinueWidget;
-exports.selectSimpleMultipleChoiceWidget = selectSimpleMultipleChoiceWidget;
+exports.setContent = setContent;
+exports.expectContentToMatch = expectContentToMatch;
 
-exports.editRule = editRule;
-exports.addNumericRule = addNumericRule;
-exports.addMultipleChoiceRule = addMultipleChoiceRule;
+exports.setInteraction = setInteraction;
+exports.expectInteractionToMatch = expectInteractionToMatch;
 
+exports.addRule = addRule;
+exports.RuleEditor = RuleEditor;
+
+exports.createState = createState;
 exports.moveToState = moveToState;
+exports.deleteState = deleteState;
+exports.expectStateNamesToBe = expectStateNamesToBe;
 
 exports.runFromSettingsTab = runFromSettingsTab;
 exports.setTitle = setTitle;
 exports.setCategory = setCategory;
 exports.setObjective = setObjective;
 exports.setLanguage = setLanguage;
+exports.expectAvailableFirstStatesToBe = expectAvailableFirstStatesToBe;
+exports.setFirstState = setFirstState;
 
 exports.saveChanges = saveChanges;
+exports.discardChanges = discardChanges;
+exports.enterPreviewMode = enterPreviewMode;
+exports.exitPreviewMode = exitPreviewMode;

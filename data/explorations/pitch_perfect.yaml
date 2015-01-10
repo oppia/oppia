@@ -1578,8 +1578,8 @@ states:
       value: "In this exploration, we're going to learn the basics of music theory.\
         \ Now don't be afraid, it's not all that hard, and the good thing is, you've\
         \ been training your ear for it your whole life.\_<div><br></div><div>Music\
-        \ is made up of notes and rests. Listen to the desired sequence of notes by\
-        \ pressing the button, artfully named, \"Play Desired Sequence\", and then\
+        \ is made up of notes and rests. Listen to the target sequence of notes by\
+        \ pressing the button, artfully named, \"Play Target Sequence\", and then\
         \ try to match it by dragging notes onto the staff.\_</div><div><br></div><div>For\
         \ now let's start small with just one note. Don't worry about getting it right\
         \ the first time. Your ears will grow with time.</div>"

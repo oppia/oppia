@@ -3,11 +3,11 @@
 {% block id %}rules{% endblock %}
 
 {% block row %}
-  <div ng-repeat="(handlerName, handler) in widgetHandlers">
-    <div class="col-lg-2 col-md-2 col-sm-2">
-    </div>
+  <div class="col-lg-2 col-md-2 col-sm-2">
+  </div>
 
-    <div class="col-lg-10 col-md-10 col-sm-10 oppia-rules" id="tutorialStateRules">
+  <div class="col-lg-10 col-md-10 col-sm-10 oppia-rules" id="tutorialStateRules">
+    <div ng-repeat="(handlerName, handler) in widgetHandlers">
       <div class="row" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
         <!-- An HTML element marked ui-sortable should contain only one element,
         and this element should have an ng-repeat defined on it. See the

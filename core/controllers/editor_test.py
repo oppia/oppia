@@ -64,6 +64,9 @@ class EditorTest(BaseEditorControllerTest):
         self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
 
+        # Check if exploration title was loaded.
+        self.assertIn('Welcome to Oppia!', response.body)
+
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
@@ -182,7 +185,7 @@ class EditorTest(BaseEditorControllerTest):
         self.assertEqual(
             exploration_dict['exploration']['title'], 'Welcome to Oppia!')
 
-        state_name = exploration_dict['state_name']
+        state_name = exploration_dict['exploration']['init_state_name']
         exploration_dict = self.submit_answer('0', state_name, '0')
 
         state_name = exploration_dict['state_name']
@@ -241,134 +244,101 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
 
-class StatsIntegrationTest(BaseEditorControllerTest):
-    """Test statistics recording using the default exploration."""
+class DownloadIntegrationTest(BaseEditorControllerTest):
+    """Test handler for exploration and state download."""
 
-    def test_state_stats_for_default_exploration(self):
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0'
-
-        # Check, from the editor perspective, that no stats have been recorded.
-        self.register_editor(self.EDITOR_EMAIL)
-        self.login(self.EDITOR_EMAIL)
-
-        editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
-        self.assertEqual(editor_exploration_dict['num_starts'], 0)
-        self.assertEqual(editor_exploration_dict['num_completions'], 0)
-
-        # Switch to the reader perspective. First submit the first
-        # multiple-choice answer, then submit 'blah'.
-        self.logout()
-        exploration_dict = self.get_json(
-            '%s/0' % feconf.EXPLORATION_INIT_URL_PREFIX)
-        self.assertEqual(
-            exploration_dict['exploration']['title'], 'Welcome to Oppia!')
-
-        state_name = exploration_dict['state_name']
-        exploration_dict = self.submit_answer('0', state_name, '0')
-        state_name = exploration_dict['state_name']
-        exploration_dict = self.submit_answer('0', state_name, 'blah')
-        # Ensure that all events get propagated.
-        self.process_and_flush_pending_tasks()
-
-        # Now switch back to the editor perspective.
-        self.login(self.EDITOR_EMAIL)
-        editor_exploration_dict = self.get_json(EXPLORATION_STATISTICS_URL)
-        self.assertEqual(editor_exploration_dict['num_starts'], 1)
-        self.assertEqual(editor_exploration_dict['num_completions'], 0)
-        # TODO(sll): Add more checks here.
-        self.logout()
-
-
-class ExplorationDownloadIntegrationTest(BaseEditorControllerTest):
-    """Test handler for exploration download."""
-
-    SAMPLE_JSON_CONTENT = (
-""")]}'
-{"yaml": "author_notes: ''
-blurb: ''
-default_skin: conversation_v1
-init_state_name: %s
-language_code: en
-objective: Test JSON download
+    SAMPLE_JSON_CONTENT = {
+        "State A": ("""content:
+- type: text
+  value: ''
 param_changes: []
-param_specs: {}
-schema_version: 3
-skill_tags: []
-states:
-  %s:
-    content:
-    - type: text
-      value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
-        to the learner playing your exploration.<br><br>If you need more help getting
-        started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: %s
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  State A:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: State A
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-  State B:
-    content:
-    - type: text
-      value: ''
-    param_changes: []
-    widget:
-      customization_args:
-        placeholder:
-          value: Type your answer here.
-        rows:
-          value: 1
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: State B
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: TextInput
-"}""" % (
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME,
-    feconf.DEFAULT_INIT_STATE_NAME
-)).replace('<', '\\u003c').replace('>', '\\u003e')
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: State A
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+"""),
+        "State B": ("""content:
+- type: text
+  value: ''
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: State B
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+"""),
+        feconf.DEFAULT_INIT_STATE_NAME: ("""content:
+- type: text
+  value: Welcome to the Oppia editor!<br><br>Anything
+    you type here will be shown to the learner playing
+    your exploration.<br><br>If you need more help getting
+    started, check out the Help link in the navigation
+    bar.
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: %s
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""") % feconf.DEFAULT_INIT_STATE_NAME
+    }
 
+    SAMPLE_STATE_STRING = (
+"""content:
+- type: text
+  value: ''
+param_changes: []
+widget:
+  customization_args:
+    placeholder:
+      value: Type your answer here.
+    rows:
+      value: 1
+  handlers:
+  - name: submit
+    rule_specs:
+    - definition:
+        rule_type: default
+      dest: State A
+      feedback: []
+      param_changes: []
+  sticky: false
+  widget_id: TextInput
+""")
 
     def test_exploration_download_handler_for_default_exploration(self):
 
@@ -426,14 +396,44 @@ states:
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         # Download to JSON string using download handler
+        self.maxDiff = None
         EXPLORATION_DOWNLOAD_URL = (
-            '/createhandler/download/%s?output_format=%s' %
+            '/createhandler/download/%s?output_format=%s&width=50' %
             (EXP_ID, feconf.OUTPUT_FORMAT_JSON))
-        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+        response = self.get_json(EXPLORATION_DOWNLOAD_URL)
 
-        # Check downloaded JSON string
-        self.assertEqual(self.SAMPLE_JSON_CONTENT,
-                         response.body.decode('string_escape'))
+        # Check downloaded dict
+        self.assertEqual(self.SAMPLE_JSON_CONTENT, response)
+
+        self.logout()
+
+    def test_state_download_handler_for_default_exploration(self):
+
+        # Register and log in as an editor.
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+        self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        # Create a simple exploration
+        EXP_ID = 'eid'
+        exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID, 'The title for states download handler test!',
+            'This is just a test category')
+        exploration.add_states(['State A', 'State 2', 'State 3'])
+        exp_services.save_new_exploration(self.OWNER_ID, exploration)
+        exploration.rename_state('State 2', 'State B')
+        exploration.delete_state('State 3')
+        exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
+        response = self.testapp.get('/create/%s' % EXP_ID)
+
+        # Check download state as YAML string
+        self.maxDiff = None
+        state_name = 'State%20A'
+        EXPLORATION_DOWNLOAD_URL = (
+            '/createhandler/download_state/%s?state=%s&width=50' %
+            (EXP_ID, state_name))
+        response = self.testapp.get(EXPLORATION_DOWNLOAD_URL)
+        self.assertEqual(self.SAMPLE_STATE_STRING, response.body)
 
         self.logout()
 
@@ -576,8 +576,12 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
             # Check that exploration is really not reverted to old version
             reader_dict = self.get_json(
                 '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-            self.assertIn('ABC', reader_dict['init_html'])
-            self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+            init_state_name = reader_dict['exploration']['init_state_name']
+            init_state_data = (
+                reader_dict['exploration']['states'][init_state_name])
+            init_content = init_state_data['content'][0]['value']
+            self.assertIn('ABC', init_content)
+            self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # Revert to version 1
         rev_version = 1
@@ -590,28 +594,45 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         # Check that exploration is really reverted to version 1
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertNotIn('ABC', reader_dict['init_html'])
-        self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertNotIn('ABC', init_content)
+        self.assertIn('Hi, welcome to Oppia!', init_content)
 
     def test_versioning_for_default_exploration(self):
         """Test retrieval of old exploration versions."""
         # The latest version contains 'ABC'.
         reader_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertIn('ABC', reader_dict['init_html'])
-        self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertIn('ABC', init_content)
+        self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # v1 contains 'Hi, welcome to Oppia!'.
         reader_dict = self.get_json(
             '%s/%s?v=1' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertIn('Hi, welcome to Oppia!', reader_dict['init_html'])
-        self.assertNotIn('ABC', reader_dict['init_html'])
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertIn('Hi, welcome to Oppia!', init_content)
+        self.assertNotIn('ABC', init_content)
 
         # v2 contains 'ABC'.
         reader_dict = self.get_json(
             '%s/%s?v=2' % (feconf.EXPLORATION_INIT_URL_PREFIX, self.EXP_ID))
-        self.assertIn('ABC', reader_dict['init_html'])
-        self.assertNotIn('Hi, welcome to Oppia!', reader_dict['init_html'])
+        init_state_name = reader_dict['exploration']['init_state_name']
+        init_state_data = (
+            reader_dict['exploration']['states'][init_state_name])
+        init_content = init_state_data['content'][0]['value']
+        self.assertIn('ABC', init_content)
+        self.assertNotIn('Hi, welcome to Oppia!', init_content)
 
         # v3 does not exist.
         response = self.testapp.get(

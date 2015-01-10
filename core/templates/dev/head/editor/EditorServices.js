@@ -140,6 +140,9 @@ oppia.factory('editabilityService', [function() {
     onEndTutorial: function() {
       inTutorialMode = false;
     },
+    isEditableOutsideTutorialMode: function() {
+      return isEditable;
+    },
     isEditable: function() {
       return isEditable && !inTutorialMode;
     },
@@ -374,8 +377,8 @@ oppia.factory('explorationRightsService', [
 
 
 oppia.factory('explorationPropertyService', [
-    '$log', 'changeListService', 'warningsData',
-    function($log, changeListService, warningsData) {
+    '$rootScope', '$log', 'changeListService', 'warningsData',
+    function($rootScope, $log, changeListService, warningsData) {
   // Public base API for data services corresponding to exploration properties
   // (title, category, etc.)
   return {
@@ -384,8 +387,7 @@ oppia.factory('explorationPropertyService', [
         throw 'Exploration property name cannot be null.';
       }
 
-      $log.info('Initializing exploration property: ' + this.propertyName);
-      $log.info(value);
+      $log.info('Initializing exploration ' + this.propertyName + ':', value);
 
       // The current value of the property (which may not have been saved to the
       // frontend yet). In general, this will be bound directly to the UI.
@@ -394,6 +396,8 @@ oppia.factory('explorationPropertyService', [
       // means that this is the latest value of the property as determined by the
       // frontend change list.
       this.savedMemento = angular.copy(value);
+
+      $rootScope.$broadcast('explorationPropertyChanged');
     },
     // Returns whether the current value has changed from the memento.
     hasChanged: function() {
@@ -434,6 +438,8 @@ oppia.factory('explorationPropertyService', [
       changeListService.editExplorationProperty(
         this.propertyName, this.displayed, this.savedMemento);
       this.savedMemento = angular.copy(this.displayed);
+
+      $rootScope.$broadcast('explorationPropertyChanged');
     },
     // Reverts the displayed value to the saved memento.
     restoreFromMemento: function() {
@@ -521,6 +527,15 @@ oppia.factory('explorationInitStateNameService', [
   return child;
 }]);
 
+oppia.factory('explorationParamSpecsService', [
+    'explorationPropertyService', function(explorationPropertyService) {
+  var child = Object.create(explorationPropertyService);
+  child.propertyName = 'param_specs';
+  child._isValid = function(value) {
+    return true;
+  };
+  return child;
+}]);
 
 // Data service for keeping track of the exploration's states. Note that this
 // is unlike the other exploration property services, in that it keeps no
@@ -698,8 +713,7 @@ oppia.factory('statePropertyService', [
         throw 'State property name cannot be null.';
       }
 
-      $log.info('Initializing state property: ' + this.propertyName);
-      $log.info(value);
+      $log.info('Initializing state ' + this.propertyName + ':', value);
 
       // A reference to the state dict that should be updated.
       this.statesAccessorDict = statesAccessorDict;
@@ -867,6 +881,36 @@ oppia.factory('graphDataService', [
     },
     getGraphData: function() {
       return angular.copy(_graphData);
+    }
+  };
+}]);
+
+
+// Service for the state editor tutorial.
+oppia.factory('stateEditorTutorialFirstTimeService', ['$http', '$rootScope', function($http, $rootScope) {
+  // Whether this is the first time the tutorial has been seen by this user.
+  var _currentlyInFirstVisit = true;
+
+  return {
+    // After the first call to it in a client session, this does nothing.
+    init: function(firstTime, explorationId) {
+      if (!firstTime || !_currentlyInFirstVisit) {
+        _currentlyInFirstVisit = false;
+      }
+
+      if (_currentlyInFirstVisit) {
+        $rootScope.$broadcast('openEditorTutorial');
+        $http.post('/createhandler/started_tutorial_event/' + explorationId).error(function() {
+          console.error('Warning: could not record tutorial start event.');
+        });
+      }
+    },
+    markTutorialFinished: function() {
+      if (_currentlyInFirstVisit) {
+        $rootScope.$broadcast('openPostTutorialHelpPopover');
+      }
+
+      _currentlyInFirstVisit = false;
     }
   };
 }]);

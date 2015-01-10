@@ -31,8 +31,8 @@ describe('Gallery controller', function() {
     beforeEach(inject(function(_$httpBackend_, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/galleryhandler/data').respond({
-        allow_yaml_file_upload: false,
-        beta: [{
+        'allow_yaml_file_upload': false,
+        'public': [{
           id: '5',
           title: 'Landmarks',
           category: 'Geography',
@@ -60,8 +60,11 @@ describe('Gallery controller', function() {
           community_owned: false,
           status: 'public'
         }],
-        released: []
+        'featured': []
       });
+
+      GLOBALS.ALL_LANGUAGE_NAMES = [
+        'English', 'español', 'hrvatski'];
       scope = $rootScope.$new();
       ctrl = $controller('Gallery', {
         $scope: scope,
@@ -80,15 +83,7 @@ describe('Gallery controller', function() {
         'Geography': true,
         'Personal': true
       });
-      expect(scope.selectedLanguages).toEqual({
-        'English': true,
-        'español': true
-      });
-      expect(scope.selectedStatuses).toEqual({
-        'private': false,
-        'public': false,
-        'publicized': true
-      });
+      expect(scope.selectedLanguages).toEqual(['English']);
     });
   });
 });

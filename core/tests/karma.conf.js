@@ -7,6 +7,7 @@ module.exports = function(config) {
       'third_party/static/jqueryui-1.10.3/jquery-ui.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-animate.min.js',
+      'third_party/static/angularjs-1.3.0-rc.5/angular-aria.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-resource.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-sanitize.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-mocks.js',
@@ -15,18 +16,19 @@ module.exports = function(config) {
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
       'third_party/static/ui-sortable-0.12.6/src/sortable.js',
+      'third_party/static/bower-material-0.6.0-rc1/angular-material.js',
+      'third_party/static/hammer-js-2.0.4/hammer.js',
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
-      // and extensions/widgets/... are switched. The test framework may
-      // be flaky.
+      // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
-      'extensions/widgets/interactive/**/*.js',
+      'extensions/**/*.js',
       'extensions/widgets/interactive/**/*.html'
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
-      'extensions/widgets/interactive/**/protractor.js'
+      'extensions/**/protractor.js'
     ],
     preprocessors: {
       'core/templates/dev/head/*.js': ['coverage'],
@@ -40,20 +42,22 @@ module.exports = function(config) {
       // statistics generated for them, and that if a directory is omitted by
       // accident, that directory will not have coverage statistics generated
       // for it, which is easily fixed.
-      'core/templates/dev/head/admin/*.js': ['coverage'],
-      'core/templates/dev/head/components/*.js': ['coverage'],
-      'core/templates/dev/head/css/*.js': ['coverage'],
-      'core/templates/dev/head/editor/*.js': ['coverage'],
-      'core/templates/dev/head/error/*.js': ['coverage'],
-      'core/templates/dev/head/forms/*.js': ['coverage'],
-      'core/templates/dev/head/galleries/*.js': ['coverage'],
-      'core/templates/dev/head/moderator/*.js': ['coverage'],
-      'core/templates/dev/head/pages/*.js': ['coverage'],
-      'core/templates/dev/head/player/*.js': ['coverage'],
-      'core/templates/dev/head/profile/*.js': ['coverage'],
-      'core/templates/dev/head/services/*.js': ['coverage'],
-      'core/templates/dev/head/tests/*.js': ['coverage'],
-      'extensions/widgets/interactive/**/*.js': ['coverage'],
+      'core/templates/dev/head/admin/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/components/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/css/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/dashboard/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/editor/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/error/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/expressions/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/forms/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/galleries/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/moderator/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/pages/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/player/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/profile/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/services/!(*Spec).js': ['coverage'],
+      'core/templates/dev/head/tests/!(*Spec).js': ['coverage'],
+      'extensions/**/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/*.html': ['ng-html2js'],
       'extensions/widgets/interactive/**/*.html': ['ng-html2js']
     },

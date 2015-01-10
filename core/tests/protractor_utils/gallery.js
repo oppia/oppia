@@ -18,9 +18,22 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-// Here section can be 'status', 'category' or 'language'.
-// If section = 'status' then label can be 'Released', 'Beta' or 'Private',
-// otherwise it can be any category or language respectively.
+var editor = require('./editor.js');
+var forms = require('./forms.js');
+
+var setLanguages = function(languages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).setValues(languages);
+};
+
+var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).expectCurrentSelectionToBe(expectedLanguages);
+};
+
+// Here section is expected to be 'category'. The label can be any category.
 // Verifies the previous state of the checkbox, then clicks it.
 var _clickCheckbox = function(section, label, isPreviouslyTicked) {
   element(by.css('.protractor-test-gallery-' + section)).all(by.tagName('li')).
@@ -43,7 +56,7 @@ var _clickCheckbox = function(section, label, isPreviouslyTicked) {
     for (var i = 0; i < results.length; i++) {
       foundCheckbox = foundCheckbox || results[i];
     }
-    if (! foundCheckbox) {
+    if (!foundCheckbox) {
       throw Error('Checkbox ' + label + ' not found in section ' + section);
     }
   });
@@ -90,6 +103,7 @@ var editExploration = function(name) {
   _getExplorationElements(name).then(function(elems) {
     elems[0].element(by.css('.protractor-test-edit-exploration')).click();
   });
+  editor.exitTutorialIfNecessary();
 };
 
 var getExplorationObjective = function(name) {
@@ -99,6 +113,8 @@ var getExplorationObjective = function(name) {
   });
 };
 
+exports.setLanguages = setLanguages;
+exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
 exports.tickCheckbox = tickCheckbox;
 exports.untickCheckbox = untickCheckbox;
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;

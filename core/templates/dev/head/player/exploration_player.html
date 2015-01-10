@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block subtitle %}
-  Exploration Player View
+  {{ title }}
 {% endblock subtitle %}
 
 {% block header_js %}
@@ -14,6 +14,37 @@
 
   {{widget_dependencies_html}}
 {% endblock header_js %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      {{exploration_title}}
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block local_top_nav_options %}
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
+      ng-controller="LearnerLocalNav">
+    <!-- TODO(sll): Implement this, and change the title and color accordingly after doing so. -->
+    <li class="dropdown">
+      <a href="#" title="Share (not yet implemented)" class="dropdown-toggle" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-share" style="color: #666"></span>
+      </a>
+    </li>
+    <li>
+      <a href="#" title="Give feedback" ng-click="showFeedbackModal()">
+        <span class="glyphicon glyphicon-comment"></span>
+      </a>
+    </li>
+    <li>
+      <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+    </li>
+  </ul>
+{% endblock local_top_nav_options %}
 
 {% block content %}
   {{ skin_tag }}
@@ -95,6 +126,7 @@
   {{ super() }}
   <script>
     {{ include_js_file('player/PlayerServices.js') }}
+    {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_skins_js_file(skin_js_url) }}
   </script>
 

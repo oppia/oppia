@@ -6,10 +6,8 @@ language_code: en
 objective: discover the binary search algorithm
 param_changes:
 - customization_args:
-    list_of_values:
-    - ''
-    - '0'
-  generator_id: RandomSelector
+    value: '0'
+  generator_id: Copier
   name: redux
 param_specs:
   MagicianNumber:
@@ -103,7 +101,9 @@ states:
             rule_type: atomic
             subject: answer
           dest: Explain two guesses
-          feedback: []
+          feedback:
+          - "\_\"Oh yeah! when the magician responds to our guess, he also tells us\
+            \ if his number is bigger or smaller!\""
           param_changes: []
         - definition:
             inputs:
@@ -146,7 +146,29 @@ states:
             subject: answer
           dest: After three case
           feedback:
-          - '"I see! If we guess the number in the middle (which is 2 in our case,
+          - '"I see! If we guess the number in the middle (which is 2 in our case),
+            then no matter what the magician answers, we''ll eliminate two numbers!"'
+          param_changes: []
+        - definition:
+            inputs:
+              x: between
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: After three case
+          feedback:
+          - '"I see! If we guess the number in the middle (which is 2 in our case),
+            then no matter what the magician answers, we''ll eliminate two numbers!"'
+          param_changes: []
+        - definition:
+            inputs:
+              x: half
+            name: Contains
+            rule_type: atomic
+            subject: answer
+          dest: After three case
+          feedback:
+          - '"I see! If we guess the number in the middle (which is 2 in our case),
             then no matter what the magician answers, we''ll eliminate two numbers!"'
           param_changes: []
         - definition:
@@ -201,7 +223,7 @@ states:
           feedback:
           - '"OK, but what if the magician says that his number is greater than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between {{[answer|int]|sum(start=1)}} and 7. That''s {{[7|int]|sum(start=-answer)}}
+            between {{answer+1}} and 7. That''s {{7-answer}}
             possible options! I don''t think we could do that in 2 tries."'
           param_changes: []
         - definition:
@@ -214,7 +236,7 @@ states:
           feedback:
           - '"OK, but what if the magician says that his number is smaller than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between 1 and {{[answer|int]|sum(start=-1)}}. That''s {{[answer|int]|sum(start=-1)}}
+            between 1 and {{answer-1}}. That''s {{answer-1}}
             possible options! I don''t think we could do that in 2 tries. We can do
             between 1 and 3 in 2 tries though..."'
           param_changes: []
@@ -283,7 +305,11 @@ states:
         out to be a bit smaller!"<br><br>"So that must mean..."'
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -335,10 +361,16 @@ states:
         it), we know exactly what number to guess!"<br><oppia-noninteractive-image
         filepath-with-value="&amp;quot;2tree.png&amp;quot;"></oppia-noninteractive-image><br>"So
         maybe we don't save TOO much time by being able to guess a number between
-        1-3 in just two tries... but I wonder what we could do with one more try?"</p>
+        1-3 in just two tries... but I wonder what we could do with one more try?"</p><p>"If
+        we had three tries, what kind of range of numbers would we be able to always
+        guess?"</p>
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
       handlers:
       - name: submit
         rule_specs:
@@ -468,12 +500,12 @@ states:
   Discussion Start:
     content:
     - type: text
-      value: <div>{{"'So, how do you think he does it?' asks your friend." if 1==(redux|int)
+      value: <div>{{if redux == 1 then "'So, how do you think he does it?' asks your friend."
         else "Ah, so where were we again?"}}</div>
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{(redux|int)+1}}'
+        value: '{{redux+1}}'
       generator_id: Copier
       name: redux
     widget:
@@ -603,15 +635,15 @@ states:
           dest: Add one more
           feedback:
           - '"So if the magician said it was smaller than that, we would be back to
-            the ''between 1 and {{[answer|int]|sum(start=-1)}}'' case!"
+            the ''between 1 and {{answer-1}}'' case!"
 
 
             "And of course if it was equal to {{answer}}, we would be done!"
 
 
             "But what if he said it was bigger than {{answer}}? Then we would still
-            have to guess a number between {{[answer|int]|sum(start=1)}} and 6...
-            But wait, that''s the same thing as between 1 and {{[6]|sum(start=-answer|int)}},
+            have to guess a number between {{answer+1}} and 6...
+            But wait, that''s the same thing as between 1 and {{6-answer}},
             just shifted over a bit!"'
           param_changes: []
         - definition:
@@ -624,7 +656,7 @@ states:
           feedback:
           - '"But what if the magician says that his number is greater than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between {{[answer|int]|sum(start=1)}} and 6. That''s {{[6|int]|sum(start=-answer)}}
+            between {{answer+1}} and 6. That''s {{6-answer}}
             possible options! I don''t think we could do that in 2 tries."<div>"No,
             we have to guess something else for numbers between 1 and 6..."</div>'
           param_changes: []
@@ -638,7 +670,7 @@ states:
           feedback:
           - '"But what if the magician says that his number is smaller than {{answer}}?
             Then we would only have two tries left, but we would have to guess a number
-            between 1 and {{[answer|int]|sum(start=-1)}}. That''s {{[answer|int]|sum(start=-1)}}
+            between 1 and {{answer-1}}. That''s {{answer-1}}
             possible options! I don''t think we could do that in 2 tries. We can do
             between 1 and 3 in 2 tries though."<div><div>"What number could we guess
             between 1 and 6 that might bring us back to the ''between 1 and 3'' case?"</div></div><div><br></div>'
@@ -800,7 +832,7 @@ states:
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+        value: '{{floor((lowest+highest)/2)}}'
       generator_id: Copier
       name: guess
     widget:
@@ -974,22 +1006,17 @@ states:
             rule_type: default
           dest: Middle try it out
           feedback:
-          - 'If it''s less than {{(answer|int)+1}}, then the number is between 1 and
-            {{answer}}. That is a range of {{answer}} numbers. {{"Oh wait, it doesn''t
-            make sense for the number to be less than 1! We''re guessing a number
-            between 1 and 10!" if 0==(answer|int) else ""}}
-
-
-            If it IS {{(answer|int)+1}}, then we''re done! that''s definitely not
-            the worst case though.
-
-
-            if it''s bigger than {{(answer|int)+1}}, then it''s between {{(answer|int)+2}}
-            and 10. That''s a range of {{9-(answer|int)}} numbers. {{"Oh wait, it
-            doesn''t make sense for the number to be bigger than 10! We''re guessing
-            a number between 1 and 10!" if 9==(answer|int) else ""}}<br><div>So, the
-            worst case is if the real number is {{"greater than" if 6==(answer|int)
-            else "less than"}} {{answer}}!<br></div>'
+          - "If it's less than {{answer+1}}, then the number is between 1 and {{answer}}.\
+            \ That is a range of <b>{{answer}} numbers</b>.\_<div>{{if answer==0 then\
+            \ \"Oh wait, it doesn't make sense for the number to be less than 1! We're\
+            \ guessing a number between 1 and 10!\" else \"\"}}\_\n</div><div>If it\
+            \ IS {{answer+1}}, then we're done! that's definitely not the worst case\
+            \ though.\n\nif it's bigger than {{answer+1}}, then it's between {{answer+2}}\
+            \ and 10. That's a range of <b>{{9-answer}} numbers</b>.\_<div>{{if answer==9\
+            \ then \"Oh wait, it doesn't make sense for the number to be bigger than\
+            \ 10! We're guessing a number between 1 and 10!\" else \"\"}}<br><div>So,\
+            \ the worst case is if the real number is {{if answer-5==abs(answer-5) then \"less than\"\
+            \ else \"greater than\"}} {{answer+1}}!<br></div></div></div>"
           param_changes: []
       sticky: false
       widget_id: MultipleChoiceInput
@@ -1159,7 +1186,9 @@ states:
       value: '"Pretty good! That only took you {{tries}} tries!"'
     param_changes: []
     widget:
-      customization_args: {}
+      customization_args:
+        buttonText:
+          value: Continue
       handlers:
       - name: submit
         rule_specs:
@@ -1177,7 +1206,7 @@ states:
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{[tries|int]|sum(start=1)}}'
+        value: '{{tries+1}}'
       generator_id: Copier
       name: tries
     widget:
@@ -1378,18 +1407,18 @@ states:
           dest: Reduce2 - what was the guess
           feedback:
           - '"Hmm, but if the number was less than {{answer}}, wouldn''t it be between
-            1 and {{[answer|int]|sum(start=-1)}}?"'
+            1 and {{answer-1}}?"'
           param_changes: []
       sticky: false
       widget_id: NumericInput
   Think of a number:
     content:
     - type: text
-      value: '"OK, think of a number between {{lowest}} and {{highest|int-1}}"!'
+      value: '"OK, think of a number between {{lowest}} and {{highest-1}}"!'
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{answer|int+1}}'
+        value: '{{answer+1}}'
       generator_id: Copier
       name: highest
     - customization_args:
@@ -1597,7 +1626,7 @@ states:
         we can definitely guess that number in 2 more tries!"</div><div><oppia-noninteractive-image
         filepath-with-value="&amp;quot;3tree-half.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"OK,
         now suppose we guessed 4 but the magician told us his number was bigger than
-        that!"</div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;3guessBigger.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"Now
+        that!"</div><div><oppia-noninteractive-image filepath-with-value="&amp;quot;3guessbigger.png&amp;quot;"></oppia-noninteractive-image><br></div><div>"Now
         we have two tries left, and we know that the number is between 5 and SOMETHING...
         and we''re trying to figure out what that SOMETHING can be, so that we can
         still do this in two tries."</div><div><br></div><div>"I have a feeling that
@@ -1650,7 +1679,7 @@ states:
             subject: answer
           dest: What if it was bigger than 4
           feedback:
-          - But there are {{[answer|int]|sum(start=-4)}} numbers between 5 and {{answer}}!
+          - But there are {{answer-4}} numbers between 5 and {{answer}}!
             I don't think we can always find the right number in 2 tries if the range
             is that big.
           param_changes: []
@@ -1682,7 +1711,7 @@ states:
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{'''' if (tries|int)<=5 else ''false''}}'
+        value: '{{if tries<=5 then '''' else ''false''}}'
       generator_id: Copier
       name: OptimalityProxy
     widget:
@@ -1706,37 +1735,37 @@ states:
     param_changes:
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+        value: '{{if highest-lowest<=3 then lowest+1 else -1}}'
       generator_id: Copier
       name: worstnum
     - customization_args:
         parse_with_jinja: true
-        value: '{{highest|int-lowest|int-1}}'
+        value: '{{highest-lowest-1}}'
       generator_id: Copier
       name: rangeSize
     - customization_args:
         parse_with_jinja: true
-        value: '{{tries|int+1}}'
+        value: '{{tries+1}}'
       generator_id: Copier
       name: tries
     - customization_args:
         parse_with_jinja: true
-        value: '{{(highest|int+lowest|int)/2}}'
+        value: '{{(highest+lowest)/2}}'
       generator_id: Copier
       name: middle
     - customization_args:
         parse_with_jinja: true
-        value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+        value: '{{pow(2, floor(log(rangeSize, 2))) - 1}}'
       generator_id: Copier
       name: largestValidRange
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+largestValidRange|int+1}}'
+        value: '{{lowest+largestValidRange+1}}'
       generator_id: Copier
       name: upperBound
     - customization_args:
         parse_with_jinja: true
-        value: '{{highest|int-largestValidRange|int-1}}'
+        value: '{{highest-largestValidRange-1}}'
       generator_id: Copier
       name: lowerBound
     widget:
@@ -1811,7 +1840,7 @@ states:
 
             Suppose I say that the number is smaller than that. Then we know that
             the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer|int-lowest|int-2}} numbers!
+            But that still leaves a range of {{answer-lowest-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"</div>'
           param_changes: []
@@ -1827,7 +1856,7 @@ states:
 
             Suppose I say that the number is bigger than that. Then we know that the
             number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest|int-answer|int-2}} numbers!
+            But that still leaves a range of {{highest-answer-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -1943,7 +1972,7 @@ states:
       name: lowest
     - customization_args:
         parse_with_jinja: true
-        value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+        value: '{{floor((lowest+highest)/2)}}'
       generator_id: Copier
       name: guess
     - customization_args:
@@ -1953,7 +1982,7 @@ states:
       name: precomputeLowest
     - customization_args:
         parse_with_jinja: true
-        value: '{{[precomputeLowest|int/2]|sum(start=highest|int/2)|int}}'
+        value: '{{floor((precomputeLowest+highest)/2)}}'
       generator_id: Copier
       name: precomputeGuess
     widget:
@@ -2013,7 +2042,7 @@ states:
       name: highest
     - customization_args:
         parse_with_jinja: true
-        value: '{{[lowest|int/2]|sum(start=highest|int/2)|int}}'
+        value: '{{floor((lowest+highest)/2)}}'
       generator_id: Copier
       name: guess
     - customization_args:
@@ -2023,7 +2052,7 @@ states:
       name: precomputeHighest
     - customization_args:
         parse_with_jinja: true
-        value: '{{[lowest|int/2]|sum(start=precomputeHighest|int/2)|int}}'
+        value: '{{floor((lowest+precomputeHighest)/2)}}'
       generator_id: Copier
       name: precomputeGuess
     widget:
@@ -2112,12 +2141,12 @@ states:
       name: comparison
     - customization_args:
         parse_with_jinja: true
-        value: '{{ lowest if comparison=="smaller" else guess}}'
+        value: '{{if comparison=="smaller" then lowest else guess}}'
       generator_id: Copier
       name: newLowest
     - customization_args:
         parse_with_jinja: true
-        value: '{{ highest if comparison=="bigger" else guess}}'
+        value: '{{if comparison=="bigger" then highest else guess}}'
       generator_id: Copier
       name: newHighest
     widget:
@@ -2213,37 +2242,37 @@ states:
       name: guess
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+        value: '{{if highest-lowest<=3 then lowest+1 else -1}}'
       generator_id: Copier
       name: worstnum
     - customization_args:
         parse_with_jinja: true
-        value: '{{highest|int-lowest|int-1}}'
+        value: '{{highest-lowest-1}}'
       generator_id: Copier
       name: rangeSize
     - customization_args:
         parse_with_jinja: true
-        value: '{{tries|int+1}}'
+        value: '{{tries+1}}'
       generator_id: Copier
       name: tries
     - customization_args:
         parse_with_jinja: true
-        value: '{{(highest|int+lowest|int)/2}}'
+        value: '{{(highest+lowest)/2}}'
       generator_id: Copier
       name: middle
     - customization_args:
         parse_with_jinja: true
-        value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+        value: '{{pow(2, floor(log(rangeSize, 2))) - 1}}'
       generator_id: Copier
       name: largestValidRange
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+largestValidRange|int+1}}'
+        value: '{{lowest+largestValidRange+1}}'
       generator_id: Copier
       name: upperBound
     - customization_args:
         parse_with_jinja: true
-        value: '{{highest|int-largestValidRange|int-1}}'
+        value: '{{highest-largestValidRange-1}}'
       generator_id: Copier
       name: lowerBound
     widget:
@@ -2318,7 +2347,7 @@ states:
 
             Suppose I say that the number is smaller than that. Then we know that
             the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer|int-lowest|int-2}} numbers!
+            But that still leaves a range of {{answer-lowest-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -2334,7 +2363,7 @@ states:
 
             Suppose I say that the number is bigger than that. Then we know that the
             number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest|int-answer|int-2}} numbers!
+            But that still leaves a range of {{highest-answer-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -2369,37 +2398,37 @@ states:
       name: guess
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+1 if (highest|int-lowest|int)<=3 else -1}}'
+        value: '{{if highest-lowest <= 3 then lowest+1 else -1}}'
       generator_id: Copier
       name: worstnum
     - customization_args:
         parse_with_jinja: true
-        value: '{{highest|int-lowest|int-1}}'
+        value: '{{highest-lowest-1}}'
       generator_id: Copier
       name: rangeSize
     - customization_args:
         parse_with_jinja: true
-        value: '{{tries|int+1}}'
+        value: '{{tries+1}}'
       generator_id: Copier
       name: tries
     - customization_args:
         parse_with_jinja: true
-        value: '{{(highest|int+lowest|int)/2}}'
+        value: '{{(highest+lowest)/2}}'
       generator_id: Copier
       name: middle
     - customization_args:
         parse_with_jinja: true
-        value: '{{2**((rangeSize|float)|log2_floor)-1}}'
+        value: '{{pow(2, floor(log(rangeSize, 2))) - 1}}'
       generator_id: Copier
       name: largestValidRange
     - customization_args:
         parse_with_jinja: true
-        value: '{{lowest|int+largestValidRange|int+1}}'
+        value: '{{lowest+largestValidRange+1}}'
       generator_id: Copier
       name: upperBound
     - customization_args:
         parse_with_jinja: true
-        value: '{{highest|int-largestValidRange|int-1}}'
+        value: '{{highest-largestValidRange-1}}'
       generator_id: Copier
       name: lowerBound
     widget:
@@ -2474,7 +2503,7 @@ states:
 
             Suppose I say that the number is smaller than that. Then we know that
             the number has to be bigger than {{lowest}} but smaller than {{answer}}.
-            But that still leaves a range of {{answer|int-lowest|int-2}} numbers!
+            But that still leaves a range of {{answer-lowest-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []
@@ -2490,7 +2519,7 @@ states:
 
             Suppose I say that the number is bigger than that. Then we know that the
             number has to be bigger than {{answer}} but smaller than {{highest}}.
-            But that still leaves a range of {{highest|int-answer|int-2}} numbers!
+            But that still leaves a range of {{highest-answer-2}} numbers!
             I think that''s too many."<div>"We should always pick numbers in the middle
             of the possible range, remember?"<br></div>'
           param_changes: []

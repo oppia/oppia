@@ -40,10 +40,6 @@ oppia.controller('StateEditor', [
   });
 
   $scope.initStateEditor = function() {
-    explorationData.getData().then(function(data) {
-      $scope.paramSpecs = data.param_specs || {};
-    });
-
     $scope.stateNameEditorIsShown = false;
 
     $scope.stateName = editorContextService.getActiveStateName();
@@ -131,6 +127,13 @@ oppia.controller('StateEditor', [
         editorContextService.getActiveStateName(), _stateData);
     }
     $scope.contentMemento = null;
+  };
+
+  $scope.cancelEdit = function() {
+     var _stateData = explorationStatesService.getState(
+       editorContextService.getActiveStateName());
+     $scope.content = angular.copy(_stateData.content);
+     $scope.contentMemento = null;
   };
 
   $scope.saveStateParamChanges = function(newValue, oldValue) {

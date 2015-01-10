@@ -20,7 +20,8 @@ import collections
 from core import jobs
 from core.platform import models
 (base_models, stats_models, exp_models,) = models.Registry.import_models([
-    models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration])
+    models.NAMES.base_model, models.NAMES.statistics, models.NAMES.exploration
+])
 transaction_services = models.Registry.import_transaction_services()
 import feconf
 import utils
@@ -101,7 +102,8 @@ class StatisticsAggregator(jobs.BaseContinuousComputationManager):
            in the exploration. It is formatted as follows:
             {
                 state_name: {
-                    'first_entry_count': # of sessions state which hit this state
+                    'first_entry_count': # of sessions state which hit this
+                        state
                     'total_entry_count': # of total hits for this state
                     'no_answer_count': # of hits with no answer for this state
                 }
@@ -166,7 +168,7 @@ class StatisticsMRJobManager(
             exp_model = exp_models.ExplorationModel.get(key)
         except base_models.BaseModel.EntityNotFoundError:
             return
-            
+
         # Number of times exploration was started
         new_models_start_count = 0
         # Number of times exploration was completed
@@ -174,13 +176,16 @@ class StatisticsMRJobManager(
         # {state_name: {'total_entry_count': ...,
         #               'first_entry_count': ...,
         #               'no_answer_count': ...}}
-        state_hit_counts = collections.defaultdict(lambda: collections.defaultdict(int))
+        state_hit_counts = collections.defaultdict(
+            lambda: collections.defaultdict(int))
         # {state_name: set(session ids that have reached this state)}
         state_session_ids = collections.defaultdict(set)
         # Session ids that have completed this state
         new_models_end_sessions = set()
-        # {session_id: (created-on timestamp of last known maybe leave event, state_name)}
-        session_id_to_latest_leave_event = collections.defaultdict(lambda: (0, ''))
+        # {session_id: (created-on timestamp of last known maybe leave event,
+        # state_name)}
+        session_id_to_latest_leave_event = collections.defaultdict(
+            lambda: (0, ''))
 
         # Iterate and process each event for this exploration.
         for value_str in stringified_values:
@@ -215,7 +220,7 @@ class StatisticsMRJobManager(
                 state_hit_counts[state_name]['total_entry_count'] += 1
                 state_session_ids[state_name].add(session_id)
 
-        # After iterating through all events, take the size of the set of 
+        # After iterating through all events, take the size of the set of
         # session ids as the first entry count.
         for state_name in state_session_ids:
             state_hit_counts[state_name]['first_entry_count'] = len(

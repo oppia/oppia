@@ -23,8 +23,10 @@
 // 'see' the GLOBALS variable that is defined in base.html. We should fix this
 // in order to make the testing and production environments match.
 var oppia = angular.module(
-  'oppia',
-  ['ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.sortable'].concat(
+  'oppia', [
+    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
+    'ui.sortable'
+  ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));
 
@@ -319,6 +321,46 @@ oppia.factory('urlService', ['$window', function($window) {
     },
     isIframed: function() {
       return !!(this.getUrlParams().iframed);
+    }
+  };
+}]);
+
+// Service for debouncing function calls.
+oppia.factory('oppiaDebouncer', ['$log', function($log) {
+  return {
+    // Returns a function that will not be triggered as long as it continues to
+    // be invoked. The function only gets executed after it stops being called
+    // for `wait` milliseconds.
+    debounce: function(func, millisecsToWait) {
+      var timeout;
+      var context;
+      var args;
+      var timestamp;
+      var result;
+
+      var later = function() {
+        var last = new Date().getTime() - timestamp;
+        if (last < millisecsToWait && last > 0) {
+          timeout = setTimeout(later, millisecsToWait - last);
+        } else {
+          timeout = null;
+          result = func.apply(context, args);
+          if (!timeout) {
+            context = null;
+            args = null;
+          }
+        }
+      }
+
+      return function() {
+        context = this;
+        args = arguments;
+        timestamp = new Date().getTime();
+        if (!timeout) {
+          timeout = setTimeout(later, millisecsToWait);
+        }
+        return result;
+      };
     }
   };
 }]);

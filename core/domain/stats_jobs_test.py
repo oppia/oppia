@@ -18,8 +18,6 @@ __author__ = 'Stephanie Federwisch'
 
 """Tests for statistics continuous computations."""
 
-import datetime
-
 from core import jobs_registry
 from core.domain import event_services
 from core.domain import stats_jobs
@@ -71,7 +69,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
             exp_version = 1
-            exploration = self.save_new_valid_exploration(exp_id, 'owner') 
+            exploration = self.save_new_valid_exploration(exp_id, 'owner')
             state = exploration.init_state_name
 
             self._record_start(exp_id, exp_version, state, 'session1')
@@ -92,7 +90,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
             exp_version = 1
-            exploration = self.save_new_valid_exploration(exp_id, 'owner') 
+            exploration = self.save_new_valid_exploration(exp_id, 'owner')
             state = exploration.init_state_name
 
             self._record_start(exp_id, exp_version, state, 'session1')
@@ -117,7 +115,7 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
                 self.ALL_CONTINUOUS_COMPUTATION_MANAGERS_FOR_TESTS):
             exp_id = 'eid'
             exp_version = 1
-            exploration = self.save_new_valid_exploration(exp_id, 'owner') 
+            exploration = self.save_new_valid_exploration(exp_id, 'owner')
             state = exploration.init_state_name
 
             self._record_start(exp_id, exp_version, state, 'session1')
@@ -146,10 +144,10 @@ class StatsAggregatorUnitTests(test_utils.GenericTestBase):
 
             exp_version = 1
             exp_id_1 = 'eid1'
-            exploration = self.save_new_valid_exploration(exp_id_1, 'owner') 
+            exploration = self.save_new_valid_exploration(exp_id_1, 'owner')
             state_1_1 = exploration.init_state_name
             exp_id_2 = 'eid2'
-            exploration = self.save_new_valid_exploration(exp_id_2, 'owner') 
+            exploration = self.save_new_valid_exploration(exp_id_2, 'owner')
             state_2_1 = exploration.init_state_name
 
             EMPTY_STATE_HIT_COUNTS_DICT = {

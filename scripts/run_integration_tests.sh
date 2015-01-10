@@ -38,6 +38,13 @@ function cleanup {
   while ( nc -vz localhost 4444 >/dev/null 2>&1 ); do sleep 1; done
   while ( nc -vz localhost 4445 >/dev/null 2>&1 ); do sleep 1; done
 
+  if [ -d "../protractor-screenshots" ]; then
+    echo ""
+    echo "You can view screenshots of the failed tests in"
+    echo "../protractor-screenshots/"
+    echo ""
+  fi
+
   echo Done!
 }
 
@@ -79,11 +86,15 @@ if [ ! -d "$NODE_MODULE_DIR/karma-ng-html2js-preprocessor" ]; then
 fi
 
 echo Checking whether Protractor is installed in $TOOLS_DIR
-CURRENT_PROTRACTOR_VERSION="$($NPM_CMD list protractor)"
-EXPECTED_PROTRACTOR_VERSION="protractor@1.2.0"
-if [[ "$CURRENT_PROTRACTOR_VERSION" != *"$EXPECTED_PROTRACTOR_VERSION"* ]]; then
+if [ ! -d "$NODE_MODULE_DIR/protractor" ]; then
   echo Installing Protractor
   $NPM_INSTALL protractor@1.2.0
+fi
+
+echo Checking whether Protractor screenshot reporter is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/protractor-screenshot-reporter" ]; then
+  echo Installing Protractor screenshot reporter
+  $NPM_INSTALL protractor-screenshot-reporter@0.0.5
 fi
 
 $NODE_MODULE_DIR/.bin/webdriver-manager update
@@ -111,6 +122,11 @@ trap cleanup EXIT
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
 while ! nc -vz localhost 4445; do sleep 1; done
+
+# Delete outdated screenshots
+if [ -d "../protractor-screenshots" ]; then
+  rm -r ../protractor-screenshots
+fi
 
 # Run the integration tests.
 $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js

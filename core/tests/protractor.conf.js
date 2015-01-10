@@ -1,3 +1,5 @@
+var ScreenShotReporter = require('protractor-screenshot-reporter');
+
 // A reference configuration file.
 exports.config = {
   // ----- How to setup Selenium -----
@@ -50,7 +52,7 @@ exports.config = {
   allScriptsTimeout: 50000,
 
   // ----- What tests to run -----
-  //  
+  //
   // Spec patterns are relative to the location of this config.
   specs: [
     'protractor/*.js'
@@ -105,6 +107,18 @@ exports.config = {
     // will be available. For example, you can add a Jasmine reporter with:
     //     jasmine.getEnv().addReporter(new jasmine.JUnitXmlReporter(
     //         'outputdir/', true, true));
+
+    // This takes screenshots of failed tests. For more information see
+    // https://www.npmjs.com/package/protractor-screenshot-reporter
+    jasmine.getEnv().addReporter(new ScreenShotReporter({
+      // Directory for screenshots
+      baseDirectory: '../protractor-screenshots',
+      // Function to build filenames of screenshots
+      pathBuilder: function pathBuilder(spec, descriptions, results, capabilities) {
+        return descriptions[1] + ' ' + descriptions[0];
+      },
+      takeScreenShotsOnlyForFailedSpecs: true
+    }));
   },
 
   // The params object will be passed directly to the protractor instance,
@@ -139,7 +153,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 300000
+    defaultTimeoutInterval: 400000
   },
 
   // ----- Options to be passed to mocha -----
