@@ -178,8 +178,7 @@ class StatisticsMRJobManager(
                     'version': _NO_SPECIFIED_VERSION_STRING,
                     'state_name': state_name,
                     'first_entry_count': item.first_entry_count,
-                    'no_answer_count': item.no_answer_count,
-                    'subsequent_entry_count': item.subsequent_entry_count,
+                    'subsequent_entries_count': item.subsequent_entries_count,
                     'resolved_answer_count': item.resolved_answer_count,
                     'active_answer_count': item.active_answer_count}
                 yield ('%s:%s' % (exploration_id, _NO_SPECIFIED_VERSION_STRING), value)
@@ -244,10 +243,11 @@ class StatisticsMRJobManager(
         for state_name in exploration.states:
             state_session_ids[state_name] = set([])
 
+
         # Iterate and process each event for this exploration.
         for value_str in stringified_values:
             value = ast.literal_eval(value_str)
-            if value['type'] == 'counter':
+            if value['type'] == StatisticsMRJobManager._TYPE_STATE_COUNTER_STRING:
                 if value['state_name'] == exploration.init_state_name:
                     old_models_start_count = value['first_entry_count']
                 if value['state_name'] == feconf.END_DEST:
