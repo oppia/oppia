@@ -63,7 +63,7 @@ oppia.controller('ExplorationStatistics', [
       $http.get(explorationDataUrl).then(function(response) {
         var states = response.data.states;
         var initStateName = response.data.init_state_name;
-        $scope.graphData = computeGraphService.compute(initStateName, states);
+        $scope.statsGraphData = computeGraphService.compute(initStateName, states);
       });
 
       var data = response.data;

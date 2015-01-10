@@ -831,8 +831,8 @@ oppia.factory('computeGraphService', [function() {
       nodes[stateName] = stateName;
 
       var handlers = states[stateName].widget.handlers;
-      for (h = 0; h < handlers.length; h++) {
-        ruleSpecs = handlers[h].rule_specs;
+      for (var h = 0; h < handlers.length; h++) {
+        var ruleSpecs = handlers[h].rule_specs;
         for (i = 0; i < ruleSpecs.length; i++) {
           links.push({
             source: stateName,
