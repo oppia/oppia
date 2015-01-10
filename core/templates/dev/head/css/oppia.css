@@ -1199,3 +1199,11 @@ oppia-expression-error-tag:after {
   margin-left: 6px;
   margin-top: 3px;
 }
+
+.oppia-select {
+  background: white;
+  border: #ddd solid 1px;
+  border-radius: 4px;
+  color: #555;
+  padding: 5px;
+}

@@ -20,9 +20,9 @@
 
 oppia.controller('ExplorationStatistics', [
     '$scope', '$http', '$modal', 'warningsData', 'explorationStatesService', 'explorationData',
-    'graphDataService', 'oppiaDatetimeFormatter',
+    'computeGraphService', 'oppiaDatetimeFormatter',
     function($scope, $http, $modal, warningsData, explorationStatesService, explorationData,
-             graphDataService, oppiaDatetimeFormatter) {
+             computeGraphService, oppiaDatetimeFormatter) {
   $scope.COMPLETION_RATE_CHART_OPTIONS = {
     chartAreaWidth: 300,
     colors: ['green', 'firebrick'],
@@ -30,22 +30,41 @@ oppia.controller('ExplorationStatistics', [
     legendPosition: 'right',
     width: 500
   };
+  $scope.EXPLORATION_STATS_VERSION_ALL = 'all';
 
   $scope.getLocaleAbbreviatedDatetimeString = function(millisSinceEpoch) {
     return oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(millisSinceEpoch);
   };
 
-
   $scope.hasTabLoaded = false;
   $scope.$on('refreshStatisticsTab', function(evt) {
-    $scope.refreshExplorationStatistics();
+    $scope.refreshExplorationStatistics($scope.EXPLORATION_STATS_VERSION_ALL);
+    $scope.explorationVersionUrl = '/createhandler/statisticsversion/' + explorationData.explorationId;
+    $http.get($scope.explorationVersionUrl).then(function(response) {
+      $scope.versions = response.data.versions;
+      $scope.currentVersion = $scope.EXPLORATION_STATS_VERSION_ALL;
+    });
   });
 
   $scope.hasExplorationBeenVisited = false;
-  $scope.refreshExplorationStatistics = function() {
-    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId;
-    $http.get($scope.explorationStatisticsUrl).then(function(response) {
-      $scope.graphData = graphDataService.getGraphData();
+  $scope.refreshExplorationStatistics = function(version) {
+    $scope.explorationStatisticsUrl = '/createhandler/statistics/' + explorationData.explorationId
+      + '/' + version;
+    $http.get($scope.explorationStatisticsUrl).then(function(response) {      
+      var versionString;
+      if (version == 'all' || version == 'none') {
+        versionString = '';
+      } else {
+        versionString = '?v=' + version;
+      }
+      var explorationDataUrl = '/createhandler/data/' 
+       + explorationData.explorationId + versionString;
+
+      $http.get(explorationDataUrl).then(function(response) {
+        var states = response.data.states;
+        var initStateName = response.data.init_state_name;
+        $scope.statsGraphData = computeGraphService.compute(initStateName, states);
+      });
 
       var data = response.data;
       var numVisits = data.num_starts;
@@ -88,6 +107,10 @@ oppia.controller('ExplorationStatistics', [
 
       $scope.hasTabLoaded = true;
     });
+  };
+
+  $scope.onSelectExplorationVersion = function(version) {
+    $scope.refreshExplorationStatistics(version);
   };
 
   $scope.onClickStateInStatsGraph = function(stateName) {

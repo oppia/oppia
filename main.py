@@ -275,7 +275,10 @@ urls = [
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
     get_redirect_route(
-        r'/createhandler/statistics/<exploration_id>',
+        r'/createhandler/statisticsversion/<exploration_id>',
+        editor.ExplorationStatsVersionsHandler, 'exploration_stats_versions_handler'),
+    get_redirect_route(
+        r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',

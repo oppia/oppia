@@ -8,18 +8,27 @@
   <div ng-if="hasTabLoaded">
     <br>
     <div ng-if="hasExplorationBeenVisited">
-      <h4>Exploration Completion Rate</h4>
-      <bar-chart data="chartData" options="COMPLETION_RATE_CHART_OPTIONS">
-      </bar-chart>
-
-      <h4>Common learner paths</h4>
-      <div style="font-size: smaller" ng-if="lastUpdated">
-        <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+      <div>Show stats for version:
+        <select class="oppia-select"
+                ng-change="onSelectExplorationVersion(currentVersion)"
+                ng-model="currentVersion"
+                ng-options="version for version in versions">
+        </select>
       </div>
-      <div class="container">
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <div state-graph-viz graph-data="graphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
+      <div class="col-lg-11 col-md-11 col-sm-11">
+        <h4>Exploration Completion Rate</h4>
+        <bar-chart data="chartData" options="COMPLETION_RATE_CHART_OPTIONS">
+        </bar-chart>
+
+        <h4>Common learner paths</h4>
+        <div style="font-size: smaller" ng-if="lastUpdated">
+          <em>Last updated: <[getLocaleAbbreviatedDatetimeString(lastUpdated)]></em>
+        </div>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <div state-graph-viz graph-data="statsGraphData" node-fill="darkseagreen" opacity-map="statsGraphOpacities" highlight-states="highlightStates" state-stats="stateStats" on-click-function="onClickStateInStatsGraph">
+              </div>
             </div>
           </div>
         </div>
