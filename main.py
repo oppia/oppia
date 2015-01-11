@@ -140,8 +140,6 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
-    webapp2.Route(
-        r'%s' % feconf.HOMEPAGE_URL, home.HomePage, 'home_page'),
     get_redirect_route(
         r'/dashboard', home.DashboardPage, 'dashboard_page'),
     get_redirect_route(
@@ -171,6 +169,7 @@ urls = [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
 
+    get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
         r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(

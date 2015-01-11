@@ -48,6 +48,10 @@ CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     'An announcement to display on top of the contribute gallery page.',
     default_value='')
 
+BANNER_ALT_TEXT = config_domain.ConfigProperty(
+    'banner_alt_text', 'UnicodeString',
+    'The alt text for the site banner image', default_value='')
+
 
 def _get_short_language_description(full_language_description):
     if ' (' not in full_language_description:
@@ -64,7 +68,6 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-
         noninteractive_widget_html = (
             widget_registry.Registry.get_noninteractive_widget_html())
 
@@ -81,7 +84,8 @@ class GalleryPage(base.BaseHandler):
                 'return_url', feconf.GALLERY_CREATE_MODE_URL),
             'ALL_LANGUAGE_NAMES': [
                 _get_short_language_description(lc['description'])
-                for lc in feconf.ALL_LANGUAGE_CODES]
+                for lc in feconf.ALL_LANGUAGE_CODES],
+            'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
         })
         self.render_template('galleries/gallery.html')
 
