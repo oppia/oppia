@@ -150,34 +150,6 @@
       </div>
     </script>
 
-    <script type="text/ng-template" id="modals/embedExploration">
-      <div class="modal-header">
-        <h3>Embed exploration in another web page</h3>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          To embed this exploration, copy the following HTML into the source code of your webpage:
-        </p>
-
-        <pre>
-&lt;oppia oppia-id="<[explorationId]>" src="<[serverName]>"
-       exploration-version="<[explorationVersion]>"&gt;
-&lt;/oppia&gt;
-
-&lt;script src="https://cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"&gt;
-&lt;/script&gt;</pre>
-
-        <p>
-          Note that the last two lines only need to be included once in the embedding webpage, even if you are embedding multiple explorations. For more information, please have a look at our <a href="https://code.google.com/p/oppia/wiki/EmbeddingYourExploration">documentation</a>.
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="close()">Close</button>
-      </div>
-    </script>
-
     <script type="text/ng-template" id="modals/deleteExploration">
       <div class="modal-header">
         <h3>Delete Exploration</h3>
@@ -447,6 +419,7 @@
     {% include 'components/rule_editor.html' %}
   </script>
 
+  {% include 'components/exploration_embed_button.html' %}
   {% include 'components/visualizations.html' %}
 
 {% endblock content %}
@@ -459,6 +432,7 @@
     {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
+    {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}

@@ -30,7 +30,7 @@ oppia.controller('ExplorationEditor', [
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
   'explorationStatesService', 'routerService', 'graphDataService', 'focusService', 'stateEditorTutorialFirstTimeService',
-  'explorationParamSpecsService',
+  'explorationParamSpecsService', 'embedExplorationButtonService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -40,10 +40,11 @@ oppia.controller('ExplorationEditor', [
     editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
     graphDataService, focusService, stateEditorTutorialFirstTimeService,
-    explorationParamSpecsService) {
+    explorationParamSpecsService, embedExplorationButtonService) {
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
+  $scope.embedExplorationButtonService = embedExplorationButtonService;
 
   $scope.enterPreviewMode = function() {
     $rootScope.$broadcast('externalSave');
@@ -458,34 +459,6 @@ oppia.controller('ExplorationEditor', [
   };
 
   $scope.warningsList = [];
-
-  $scope.showEmbedExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/embedExploration',
-      backdrop: 'static',
-      resolve: {
-        explorationId: function() {
-          return $scope.explorationId;
-        },
-        explorationVersion: function() {
-          return $scope.currentVersion;
-        }
-      },
-      controller: ['$scope', '$modalInstance', 'explorationId', 'explorationVersion',
-        function($scope, $modalInstance, explorationId, explorationVersion) {
-          $scope.explorationId = explorationId;
-          $scope.serverName = window.location.protocol + '//' + window.location.host;
-          $scope.explorationVersion = explorationVersion;
-
-          $scope.close = function() {
-            $modalInstance.dismiss('close');
-            warningsData.clear();
-          };
-        }
-      ]
-    });
-  };
 
   $scope.initializeNewActiveInput = function(newActiveInput) {
     // TODO(sll): Rework this so that in general it saves the current active

@@ -31,27 +31,20 @@
       <a href="#" title="Share" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-share"></span>
       </a>
-      <ul class="dropdown-menu" role="menu" style="min-width: 30px; width: 47px;">
-
+      <ul class="dropdown-menu oppia-share-dropdown oppia-share-items" role="menu">
         <li>
-          <!-- TODO(wagnerdmike) use <[serverName]> instead of oppia.org for url -->
-          <a href="https://plus.google.com/share?url=http://www.oppia.org/explore/<[explorationId]>"
+          <a href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
              onclick="javascript:window.open(this.href,
-                      '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
-             style="padding-left: 15%;">
+                      '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
             <img src="https://www.gstatic.com/images/icons/gplus-64.png"
-                 alt="Share on Google+"
-                 style="max-width: 30px;"/>
+                 alt="Share on Google+"/>
           </a>
         </li>
-
         <li>
-          <a href="#" ng-click="showEmbedExplorationModal()"
-               style="padding: 0 23% 0; font-size: 20px; font-weight: bolder;">
-            <p style="margin: 0; line-height: 36px;"><></p>
+          <a href="#" ng-click="showEmbedModal(explorationId)">
+            <span>&lt;&gt</span>
           </a>
         </li>
-
       </ul>
     </li>
     <li>
@@ -142,95 +135,13 @@
     </div>
   </script>
 
-  <script type="text/ng-template" id="modals/playerShare">
-    <div class="modal-header">
-      <h3>Share this exploration</h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        <em>
-          This form is meant for sharing this exploration.
-        </em>
-      </p>
-
-      <div role="form">
-        <div class="form-group">
-          <label for="subject">Subject</label>
-          <input type="text" class="form-control" id="subject" ng-model="subject">
-        </div>
-        <label for="feedback">Feedback</label>
-        <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
-        <!-- Note that, for this to use the correct $scope.relatedTo, it must be an ng-show and not an ng-if. -->
-        <div ng-show="currentStateName !== 'END'">
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
-              This feedback relates to the current question.
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
-              This feedback relates to the exploration as a whole.
-            </label>
-          </div>
-        </div>
-        <div ng-show="isLoggedIn">
-          <hr>
-          <div class="checkbox">
-            <label>
-              <input type="checkbox" ng-model="isSubmitterAnonymized">
-              Give feedback anonymously
-            </label>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
-    </div>
-  </script>
-
-  <script type="text/ng-template" id="modals/embedExploration">
-    <div class="modal-header">
-      <h3>Embed exploration in another web page</h3>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        To embed this exploration, copy the following HTML into the source
-        code of your webpage:
-      </p>
-
-      <pre>
-&lt;oppia oppia-id="<[explorationId]>" src="<[serverName]>"
-     exploration-version="<[explorationVersion]>"&gt;
-&lt;/oppia&gt;
-
-&lt;script src="https://cdn.jsdelivr.net/oppia/0.0.1/oppia-player.min.js"&gt;
-&lt;/script&gt;</pre>
-
-      <p>
-        Note that the last two lines only need to be included once in the
-        embedding webpage, even if you are embedding multiple explorations.
-        For more information, please have a look at our
-        <a href="https://code.google.com/p/oppia/wiki/EmbeddingYourExploration">
-        documentation</a>.
-      </p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn btn-default" ng-click="close()">Close</button>
-    </div>
-  </script>
+  {% include 'components/exploration_embed_button.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_skins_js_file(skin_js_url) }}
