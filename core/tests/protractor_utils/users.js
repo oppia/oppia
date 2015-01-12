@@ -47,8 +47,8 @@ var logout = function() {
 var registerAsEditor = function(username) {
   browser.get('/gallery');
   element(by.css('.protractor-test-create-exploration')).click();
-  element(by.css('.protractor-test-username')).sendKeys(username);
-  element(by.css('.protractor-test-agree-to-terms')).click();
+  element(by.css('.protractor-test-username-input')).sendKeys(username);
+  element(by.css('.protractor-test-agree-to-terms-checkbox')).click();
   element(by.css('.protractor-test-register-user')).click();
   // The create modal needs time to load.
   browser.waitForAngular();

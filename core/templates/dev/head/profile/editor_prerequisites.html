@@ -52,7 +52,7 @@
               <label for="username">My preferred Oppia username (to be shown in the exploration change logs)</label>
               <div class="row">
                 <div class="col-lg-5 col-md-5 col-sm-5">
-                  <input type="text" ng-model="username" id="username" class="form-control protractor-test-username" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false">
+                  <input type="text" ng-model="username" id="username" class="form-control protractor-test-username-input" ng-blur="onUsernameInputFormBlur(username)" ng-change="updateWarningText(username)" ng-trim="false">
                 </div>
                 <div class="col-lg-7 col-md-7 col-sm-7" style="color: red;" aria-live="assertive" ng-show="blurredAtLeastOnce">
                   <[warningText]>
@@ -62,7 +62,7 @@
 
             <div class="checkbox">
               <label>
-                <input type="checkbox" ng-model="agreedToTerms" class="protractor-test-agree-to-terms">
+                <input type="checkbox" ng-model="agreedToTerms" class="protractor-test-agree-to-terms-checkbox">
                 {{agreement}}
               </label>
             </div>

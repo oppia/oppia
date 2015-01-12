@@ -118,7 +118,7 @@ var moveToEditor = function() {
 };
 
 var expect404Error = function() {
-  expect(element(by.css('.protractor-test-wide-panel-content')).getText()).
+  expect(element(by.css('.protractor-test-error-container')).getText()).
     toMatch('Error 404');
 };
 
