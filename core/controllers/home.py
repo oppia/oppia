@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
-from core.controllers import pages
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import subscription_services
@@ -53,7 +52,7 @@ class DashboardPage(base.BaseHandler):
         elif user_services.has_user_registered_as_editor(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
-            })                    
+            })
             self.render_template('dashboard/dashboard.html')
         else:
             self.redirect(utils.set_url_query_parameter(
@@ -96,9 +95,24 @@ class DashboardHandler(base.BaseHandler):
         subscription_services.record_user_has_seen_notifications(
             self.user_id, job_queued_msec if job_queued_msec else 0.0)
 
+        editable_exp_summaries = (
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.user_id))
+
         self.values.update({
-            'explorations': exp_services.get_at_least_editable_summary_dict(
-                self.user_id),
+            'explorations': {
+                exp_summary.id: {
+                    'title': exp_summary.title,
+                    'category': exp_summary.category,
+                    'objective': exp_summary.objective,
+                    'language_code': exp_summary.language_code,
+                    'last_updated': utils.get_time_in_millisecs(
+                        exp_summary.exploration_model_last_updated),
+                    'status': exp_summary.status,
+                    'community_owned': exp_summary.community_owned,
+                    'is_editable': True,
+                } for exp_summary in editable_exp_summaries.values()
+            },
             # This may be None if no job has ever run for this user.
             'job_queued_msec': job_queued_msec,
             # This may be None if this is the first time the user has seen
