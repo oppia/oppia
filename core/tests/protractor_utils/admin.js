@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for interacting with the admin page, for use in 
+ * @fileoverview Utilities for interacting with the admin page, for use in
  * Protractor tests.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
@@ -24,17 +24,17 @@ var forms = require('./forms.js');
 
 // 'propertyName' is the name of the property as given in the left-hand column.
 // 'objectType' is the type of the property, e.g. 'Unicode' or 'List'.
-// 'editingInstructions' is  a function that is sent an editor for the 
+// 'editingInstructions' is  a function that is sent an editor for the
 // objectType which it can then act on, for example by adding elements to a list.
 var editConfigProperty = function(propertyName, objectType, editingInstructions) {
   browser.get(general.ADMIN_URL_SUFFIX);
-  element.all(
-      by.repeater('(configPropertyId, configPropertyData) in configProperties')
-    ).map(function(configProperty) {
-    return configProperty.element(by.tagName('em')).getText().then(function(title) {
+  element.all(by.css('.protractor-test-config-property')).
+      map(function(configProperty) {
+    return configProperty.element(by.css('.protractor-test-config-title')).
+        getText().then(function(title) {
       if (title.match(propertyName)) {
         editingInstructions(forms.getEditor(objectType)(configProperty));
-        element(by.buttonText('Save')).click();
+        element(by.css('.protractor-test-config-save')).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the saving to complete.
         protractor.getInstance().waitForAngular();
@@ -62,7 +62,9 @@ var reloadExploration = function(name) {
       ).getText().then(function(title) {
       // We use match here in case there is whitespace around the name
       if (title.match(name + '.yaml')) {
-        explorationElement.element(by.buttonText('Reload')).click();
+        explorationElement.element(
+          by.css('.protractor-test-reload-exploration-button')
+        ).click();
         browser.driver.switchTo().alert().accept();
         // Time is needed for the reloading to complete.
         protractor.getInstance().waitForAngular();

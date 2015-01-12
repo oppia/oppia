@@ -77,7 +77,7 @@
               <br>
 
               <h3>Categories</h3>
-              <checkbox-group all-categories-label="All categories" model="selectedCategories" class="protractor-test-gallery-category">
+              <checkbox-group all-categories-label="All categories" model="selectedCategories">
               </checkbox-group>
             </div>
           </div>
@@ -131,7 +131,7 @@
               </div>
 
               <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
-                <md-card layout="row" class="oppia-gallery-tile">
+                <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
                   <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
                     <!-- TODO(sll): Make the default image higher-res. -->
                     <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>" height="128" width="128">
@@ -149,7 +149,7 @@
                     {% endif %}
 
                     <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-details">
-                      <div class="oppia-gallery-tile-title">
+                      <div class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
                         <[exploration.title]>
                       </div>
 
@@ -198,9 +198,9 @@
           <strong><[allCategoriesLabel]></strong>
         </label>
       </li>
-      <li ng-repeat="(category, status) in model" class="checkbox">
+      <li ng-repeat="(category, status) in model" class="checkbox protractor-test-gallery-category">
         <label>
-          <input type="checkbox" ng-model="individualCategoryCheckboxStatuses[category]" ng-change="onChangeSelection(false)">
+          <input type="checkbox" ng-model="individualCategoryCheckboxStatuses[category]" ng-change="onChangeSelection(false)" class="protractor-test-gallery-checkbox">
           <[category]>
         </label>
       </li>
