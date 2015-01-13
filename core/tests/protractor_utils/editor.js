@@ -280,7 +280,7 @@ var createState = function(newStateName) {
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
-    return stateElement.element(by.css('.protractor-test-node-name')).
+    return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
   }).then(function(listOfNames) {
     var matched = false;
@@ -298,7 +298,7 @@ var moveToState = function(targetName) {
 
 var deleteState = function(stateName) {
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
-    return stateElement.element(by.css('.protractor-test-node-name')).
+    return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
   }).then(function(listOfNames) {
     var matched = false;
@@ -320,7 +320,7 @@ var deleteState = function(stateName) {
 
 var expectStateNamesToBe = function(names) {
   element.all(by.css('.protractor-test-node')).map(function(stateNode) {
-    return stateNode.element(by.css('.protractor-test-node-name')).getText();
+    return stateNode.element(by.css('.protractor-test-node-label')).getText();
   }).then(function(stateNames) {
     expect(stateNames).toEqual(names);
   });
