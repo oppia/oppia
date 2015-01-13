@@ -11,13 +11,13 @@
                 <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
                   <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
+                    <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
                   </div>
                 </div>
                 <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
                   <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
+                    <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
                     <span class="help-block" style="font-size: smaller">
                       What does this exploration help people to do?
                     </span>
@@ -26,13 +26,13 @@
                 <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
                   <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+                    <input id="explorationCategory" type="text" class="form-control protractor-test-exploration-category-input" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">Language</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <select id="explorationLanguageCode" class="form-control" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
+                    <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
                     </select>
                     <span class="help-block" style="font-size: smaller">
                       <em>
@@ -44,7 +44,7 @@
                 <div class="form-group">
                   <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <select id="explorationInitStateName" class="form-control" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames">
+                    <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames">
                     </select>
                   </div>
                 </div>

@@ -18,12 +18,12 @@
       </div>
       <div class="row">
         <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-state-content-display well" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}">
+          <div class="oppia-state-content-display well protractor-test-state-edit-content" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}">
             <span ng-show="content[0].value == ''" class="oppia-placeholder">
               You can give context to the learner here, and ask a question -- then,
               in the space below, choose a suitable way for the learner to respond.
             </span>
-            <span angular-html-bind="content[0].value"></span>
+            <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
           </div>
         </div>
       </div>
@@ -31,10 +31,10 @@
   </div>
 
   <!-- The margin-bottom here preserves parity with the 'well' in the readonly mode. -->
-  <div ng-if="!!contentMemento" class="oppia-state-item-editor-div">
+  <div ng-if="!!contentMemento" class="oppia-state-item-editor-div protractor-test-state-content-editor">
     <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
     </schema-based-editor>
-    <button type="button" class="btn btn-success oppia-save-state-item-button" ng-click="saveTextContent()">Save Content</button>
+    <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content" ng-click="saveTextContent()">Save Content</button>
     <button type="button" class="btn btn-default"` ng-click="cancelEdit()">Cancel</button>
   </div>
 {% endblock %}
