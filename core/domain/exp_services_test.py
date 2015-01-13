@@ -73,52 +73,6 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
 class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
     """Tests query methods."""
 
-    def test_get_explicit_viewer_explorations_summary_dict(self):
-        self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
-        rights_manager.assign_role(
-            self.OWNER_ID, self.EXP_ID, self.VIEWER_ID,
-            rights_manager.ROLE_VIEWER)
-
-        exp = exp_services.get_exploration_by_id(self.EXP_ID)
-
-        self.assertEqual(
-            exp_services.get_explicit_viewer_explorations_summary_dict(
-                self.VIEWER_ID),
-            {
-                self.EXP_ID: {
-                    'title': 'A title',
-                    'category': 'A category',
-                    'objective': '',
-                    'language_code': feconf.DEFAULT_LANGUAGE_CODE,
-                    'last_updated': utils.get_time_in_millisecs(
-                        exp.last_updated),
-                    'is_editable': False,
-                    'community_owned': False,
-                    'status': rights_manager.EXPLORATION_STATUS_PRIVATE,
-                }
-            }
-        )
-        self.assertEqual(
-            exp_services.get_explicit_viewer_explorations_summary_dict(
-                self.EDITOR_ID), {})
-        self.assertEqual(
-            exp_services.get_explicit_viewer_explorations_summary_dict(
-                self.OWNER_ID), {})
-
-        # Set the exploration's status to published. This removes all viewer
-        # ids.
-        rights_manager.publish_exploration(self.OWNER_ID, self.EXP_ID)
-
-        self.assertEqual(
-            exp_services.get_explicit_viewer_explorations_summary_dict(
-                self.VIEWER_ID), {})
-        self.assertEqual(
-            exp_services.get_explicit_viewer_explorations_summary_dict(
-                self.EDITOR_ID), {})
-        self.assertEqual(
-            exp_services.get_explicit_viewer_explorations_summary_dict(
-                self.OWNER_ID), {})
-
     def test_count_explorations(self):
         """Test count_explorations()."""
 
@@ -131,20 +85,45 @@ class ExplorationQueriesUnitTests(ExplorationServicesUnitTests):
             'A_new_exploration_id', self.OWNER_ID)
         self.assertEqual(exp_services.count_explorations(), 2)
 
-    def test_get_exploration_titles(self):
-        self.assertEqual(exp_services.get_exploration_titles([]), {})
+    def test_get_exploration_titles_and_categories(self):
+        self.assertEqual(
+            exp_services.get_exploration_titles_and_categories([]), {})
 
         self.save_new_default_exploration('A', self.OWNER_ID, 'TitleA')
-        self.assertEqual(exp_services.get_exploration_titles(['A']),
-            {'A': 'TitleA'})
+        self.assertEqual(
+            exp_services.get_exploration_titles_and_categories(['A']), {
+                'A': {
+                    'category': 'A category',
+                    'title': 'TitleA'
+                }
+            })
 
         self.save_new_default_exploration('B', self.OWNER_ID, 'TitleB')
-        self.assertEqual(exp_services.get_exploration_titles(['A']),
-            {'A': 'TitleA'})
-        self.assertEqual(exp_services.get_exploration_titles(['A', 'B']),
-            {'A': 'TitleA', 'B': 'TitleB'})
-        self.assertEqual(exp_services.get_exploration_titles(['A', 'C']),
-            {'A': 'TitleA'})
+        self.assertEqual(
+            exp_services.get_exploration_titles_and_categories(['A']), {
+                'A': {
+                    'category': 'A category',
+                    'title': 'TitleA'
+                }
+            })
+        self.assertEqual(
+            exp_services.get_exploration_titles_and_categories(['A', 'B']), {
+                'A': {
+                    'category': 'A category',
+                    'title': 'TitleA',
+                },
+                'B': {
+                    'category': 'A category',
+                    'title': 'TitleB',
+                },
+            })
+        self.assertEqual(
+            exp_services.get_exploration_titles_and_categories(['A', 'C']), {
+                'A': {
+                    'category': 'A category',
+                    'title': 'TitleA'
+                }
+            })
 
 
 class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
@@ -195,16 +174,16 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
         # TODO(sll): Add tests for deletion of states and version snapshots.
 
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+        # The exploration shows up in queries.
+        self.assertEqual(
+            len(exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID)), 1)
 
         exp_services.delete_exploration(self.OWNER_ID, self.EXP_ID)
         with self.assertRaises(Exception):
             exp_services.get_exploration_by_id(self.EXP_ID)
 
         # The deleted exploration does not show up in any queries.
-        self.assertEqual(
-            exp_services.get_at_least_editable_summary_dict(self.OWNER_ID),
-            {})
-
         self.assertEqual(
             exp_services.get_at_least_editable_exploration_summaries(
                 self.OWNER_ID),
@@ -227,6 +206,10 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
     def test_hard_deletion_of_explorations(self):
         """Test that hard deletion of explorations works correctly."""
         self.save_new_default_exploration(self.EXP_ID, self.OWNER_ID)
+        # The exploration shows up in queries.
+        self.assertEqual(
+            len(exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID)), 1)
 
         exp_services.delete_exploration(
             self.OWNER_ID, self.EXP_ID, force_deletion=True)
@@ -235,7 +218,8 @@ class ExplorationCreateAndDeleteUnitTests(ExplorationServicesUnitTests):
 
         # The deleted exploration does not show up in any queries.
         self.assertEqual(
-            exp_services.get_at_least_editable_summary_dict(self.OWNER_ID),
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.OWNER_ID),
             {})
 
         # The exploration model has been purged from the backend.
