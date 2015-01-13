@@ -48,7 +48,7 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should create content and working multiple choice widgets', function() {
+  it('should create content and multiple choice interactions', function() {
     users.createUser('user2@example.com', 'user2');
     users.login('user2@example.com');
 
@@ -77,7 +77,7 @@ describe('State editor', function() {
     users.logout();
   });
 
-  it('should respect numeric widget rules and display feedback', function() {
+  it('should obey numeric interaction rules and display feedback', function() {
     users.createUser('user3@example.com', 'user3');
     users.login('user3@example.com');
 
@@ -234,30 +234,30 @@ describe('Full exploration editor', function() {
   });
 });
 
-describe('Non-interactive widgets', function() {
+describe('Rich-text editor extensions', function() {
   it('should display correctly', function() {
     users.createUser('user11@example.com', 'user11');
     users.login('user11@example.com')
 
-    workflow.createExploration('widgets', 'maths');
+    workflow.createExploration('extensions', 'maths');
 
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendPlainText('plainly');
       richTextEditor.appendBoldText('bold');
-      richTextEditor.addWidget('Collapsible', 'title', forms.toRichText('inner'));
-      // TODO (Jacob) add image widget test
-      richTextEditor.addWidget('Link', 'http://google.com/', true);
-      richTextEditor.addWidget('Math', 'abc');
+      richTextEditor.addExtension('Collapsible', 'title', forms.toRichText('inner'));
+      // TODO (Jacob) add image extension test
+      richTextEditor.addExtension('Link', 'http://google.com/', true);
+      richTextEditor.addExtension('Math', 'abc');
       richTextEditor.appendUnderlineText('underlined');
       richTextEditor.appendPlainText('extra');
-      richTextEditor.addWidget('Tabs', [{
+      richTextEditor.addExtension('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-      richTextEditor.addWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextEditor.addExtension('Video', 'ANeHmk22a6Q', 10, 100, false);
     })
     editor.saveChanges();
 
@@ -265,36 +265,36 @@ describe('Non-interactive widgets', function() {
     player.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readPlainText('plainly');
       richTextChecker.readBoldText('bold');
-      richTextChecker.readWidget('Collapsible', 'title', forms.toRichText('inner'));
-      richTextChecker.readWidget('Link', 'http://google.com/', true);
-      richTextChecker.readWidget('Math', 'abc');
+      richTextChecker.readExtension('Collapsible', 'title', forms.toRichText('inner'));
+      richTextChecker.readExtension('Link', 'http://google.com/', true);
+      richTextChecker.readExtension('Math', 'abc');
       richTextChecker.readUnderlineText('underlined');
       richTextChecker.readPlainText('extra');
-      richTextChecker.readWidget('Tabs', [{
+      richTextChecker.readExtension('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-      richTextChecker.readWidget('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readExtension('Video', 'ANeHmk22a6Q', 10, 100, false);
     });
 
     users.logout();
   });
 
-  it('should allow nesting of widgets inside one another', function() {
+  it('should allow nesting of RTE extensions inside one another', function() {
     users.createUser('user12@example.com', 'user12');
     users.login('user12@example.com')
 
-    workflow.createExploration('widgets', 'maths');
+    workflow.createExploration('extensions', 'maths');
 
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendItalicText('slanted');
-      richTextEditor.addWidget(
+      richTextEditor.addExtension(
           'Collapsible', 'heading', function(collapsibleEditor) {
-        // TODO (Jacob) add sub-widgets when issue 423 is fixed
-        collapsibleEditor.addWidget('Tabs', [{
+        // TODO (Jacob) add sub-extensions when issue 423 is fixed
+        collapsibleEditor.addExtension('Tabs', [{
           title: 'no1',
           content: function(tab1Editor) {
             tab1Editor.setPlainText('boring');
@@ -305,7 +305,7 @@ describe('Non-interactive widgets', function() {
             tab2Editor.appendBoldText('fun!');
           }
         }]);
-        collapsibleEditor.addWidget('Math', 'xyz');
+        collapsibleEditor.addExtension('Math', 'xyz');
       });
     });
     editor.saveChanges();
@@ -313,9 +313,9 @@ describe('Non-interactive widgets', function() {
     general.moveToPlayer();
     player.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readItalicText('slanted');
-      richTextChecker.readWidget(
+      richTextChecker.readExtension(
           'Collapsible', 'heading', function(collapsibleChecker) {
-        collapsibleChecker.readWidget('Tabs', [{
+        collapsibleChecker.readExtension('Tabs', [{
           title: 'no1',
           content: function(tab1Checker) {
             tab1Checker.readPlainText('boring');
@@ -326,7 +326,7 @@ describe('Non-interactive widgets', function() {
             tab2Checker.readBoldText('fun!');
           }
         }]);
-        collapsibleChecker.readWidget('Math', 'xyz');
+        collapsibleChecker.readExtension('Math', 'xyz');
       });
     });
 
@@ -351,31 +351,31 @@ describe('Non-interactive widgets', function() {
   });
 });
 
-describe('Interactive widgets', function() {
+describe('Interactions', function() {
   it('should pass their own test suites', function() {
     users.createUser('user21@example.com', 'user21');
     users.login('user21@example.com');
-    workflow.createExploration('widgets', 'history');
+    workflow.createExploration('interactions', 'history');
     editor.RuleEditor('default').setFeedback(0, forms.toRichText('no'));
 
-    for (var widgetName in widgets.INTERACTIVE_WIDGETS) {
-      var widget = widgets.INTERACTIVE_WIDGETS[widgetName];
-      for (var i = 0; i < widget.testSuite.length; i++) {
-        var test = widget.testSuite[i];
+    for (var interactionName in widgets.INTERACTIVE_WIDGETS) {
+      var interaction = widgets.INTERACTIVE_WIDGETS[interactionName];
+      for (var i = 0; i < interaction.testSuite.length; i++) {
+        var test = interaction.testSuite[i];
         editor.setInteraction.apply(
-          null, [widgetName].concat(test.interactionArguments));
-        editor.addRule.apply(null, [widgetName].concat(test.ruleArguments));
+          null, [interactionName].concat(test.interactionArguments));
+        editor.addRule.apply(null, [interactionName].concat(test.ruleArguments));
         editor.RuleEditor(0).setFeedback(0, forms.toRichText('yes'));
 
         editor.enterPreviewMode();
         editor.expectInteractionToMatch.apply(
-          null, [widgetName].concat(test.expectedInteractionDetails));
+          null, [interactionName].concat(test.expectedInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
-          player.submitAnswer(widgetName, test.wrongAnswers[j]);
+          player.submitAnswer(interactionName, test.wrongAnswers[j]);
           player.expectLatestFeedbackToMatch(forms.toRichText('no'));
         }
         for (var j = 0; j < test.correctAnswers.length; j++) {
-          player.submitAnswer(widgetName, test.correctAnswers[j]);
+          player.submitAnswer(interactionName, test.correctAnswers[j]);
           player.expectLatestFeedbackToMatch(forms.toRichText('yes'));
         }
         editor.exitPreviewMode();

@@ -94,7 +94,7 @@
                 </path>
               </g>
 
-              <g class="node" ng-repeat="node in nodeList">
+              <g class="node protractor-test-node" ng-repeat="node in nodeList">
                 <rect rx="4" ry="4" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                       ng-class="{clickable: canNavigateToNode(node.id), 'init-node': node.isInitNode, 'end-node': node.isEndNode, 'bad-node': node.isBadNode, 'normal-node': node.isNormalNode}"
@@ -102,11 +102,11 @@
                       ng-click="onClickFunction(node.id)">
                 </rect>
                 <title><[getNodeTitle(node)]></title>
-                <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>">
+                <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">
                   <tspan><[getTruncatedLabel(node.label)]></tspan>
                   <tspan ng-attr-x="<[node.xLabel]>" dy="1em" style="fill:gray"><[getTruncatedLabel(node.secondaryLabel)]></tspan>
                 </text>
-                <g ng-if="isEditable && onDeleteFunction && node.canDelete">
+                <g ng-if="isEditable && onDeleteFunction && node.canDelete" class="protractor-test-delete-node">
                   <rect height="15" width="15" opacity="0" stroke-width="0"
                         ng-attr-x="<[node.x0 + node.width]>" ng-attr-y="<[node.y0]>"
                         transform="translate(0, -15)"

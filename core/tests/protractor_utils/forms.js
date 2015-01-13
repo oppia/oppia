@@ -160,23 +160,23 @@ var RichTextEditor = function(elem) {
     appendHorizontalRule: function() {
       _clickContentMenuButton('insertHorizontalRule');
     },
-    // This adds and customizes non-interactive widgets.
+    // This adds and customizes RTE extensions.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    addWidget: function(widgetName) {
-      _clickContentMenuButton('custom-command-' + widgetName.toLowerCase());
+    // passed on to the relevant extension editor.
+    addExtension: function(extensionName) {
+      _clickContentMenuButton('custom-command-' + extensionName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which modal to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the extension
+      // which modal to act on but drop the extensionName.
       var args = [modal];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).customizeWidget.apply(null, args);
-      modal.element(by.css('.protractor-test-close-widget-editor')).click();
+      widgets.getNoninteractive(extensionName).customizeWidget.apply(null, args);
+      modal.element(by.css('.protractor-test-close-extension-editor')).click();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -265,7 +265,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 // should consist of:
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
-//   handler.readWidget('Math', ...);
+//   handler.readExtension('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
     // We remove all <span> elements since these are plain text that is
@@ -316,10 +316,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   // arrayPointer traverses both arrays simultaneously.
   var arrayPointer = 0;
   var textPointer = 0;
-  // Widgets insert line breaks above and below themselves and these are
+  // Extensions insert line breaks above and below themselves and these are
   // recorded in fullText but not arrayOfTexts so we need to track them
   // specially.
-  var justPassedWidget = false;
+  var justPassedExtension = false;
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
@@ -327,7 +327,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
-    justPassedWidget = false;
+    justPassedExtension = false;
   };
 
   return {
@@ -337,7 +337,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
       textPointer = textPointer + text.length;
-      justPassedWidget = false;
+      justPassedExtension = false;
     },
     readBoldText: function(text) {
       _readFormattedText(text, 'b');
@@ -350,25 +350,25 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     },
     // TODO (Jacob) add functions for other rich text components
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    readWidget: function(widgetName) {
+    // passed on to the relevant extension editor.
+    readExtension: function(extensionName) {
       var elem = arrayOfElems[arrayPointer];
       expect(elem.getTagName()).
-        toBe('oppia-noninteractive-' + widgetName.toLowerCase());
+        toBe('oppia-noninteractive-' + extensionName.toLowerCase());
       expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which element to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the extension
+      // which element to act on but drop the extensionName.
       var args = [elem];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).
+      widgets.getNoninteractive(extensionName).
         expectWidgetDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
-        (justPassedWidget ? 1 : 2);
+        (justPassedExtension ? 1 : 2);
       arrayPointer = arrayPointer + 1;
-      justPassedWidget = true;
+      justPassedExtension = true;
     },
     expectEnd: function() {
       expect(arrayPointer).toBe(arrayOfElems.length);

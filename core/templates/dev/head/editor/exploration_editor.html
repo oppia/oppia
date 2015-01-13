@@ -203,7 +203,7 @@
         <p>
           <span ng-if="commitMessageIsOptional">(Optional)</span>
           Please enter a brief description of what you have changed:
-          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened"></textarea>
+          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input"></textarea>
         </p>
 
         <div ng-if="explorationChangesExist">
@@ -380,7 +380,7 @@
 
       <div ng-if="!isInPreviewMode">
         <tabset>
-          <tab heading="Main" active="getTabStatuses().main.active" select="selectMainTab()">
+          <tab heading="Main" active="getTabStatuses().main.active" select="selectMainTab()" class="protractor-test-main-tab">
             <div class="row">
               <div class="col-lg-9 col-md-9 col-sm-9">
                 {% include 'editor/state_editor.html' %}
@@ -396,7 +396,7 @@
             {% include 'editor/exploration_statistics.html' %}
           </tab>
 
-          <tab heading="Settings" active="getTabStatuses().settings.active" select="selectSettingsTab()">
+          <tab heading="Settings" active="getTabStatuses().settings.active" select="selectSettingsTab()" class="protractor-test-settings-tab">
             {% include 'editor/exploration_settings.html' %}
           </tab>
 
