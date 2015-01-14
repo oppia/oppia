@@ -52,3 +52,17 @@ oppia.directive('oppiaInteractiveImageClickInput', [
     };
   }
 ]);
+
+
+oppia.directive('oppiaResponseImageClickInput', [
+  'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
+    return {
+      restrict: 'E',
+      scope: {},
+      templateUrl: 'response/ImageClickInput',
+      controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
+        $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+      }]
+    };
+  }
+]);

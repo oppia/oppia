@@ -525,12 +525,12 @@ class NormalizedRectangle2D(BaseObject):
 
     SCHEMA = {
         'type': 'list',
-        'length': 2,
-        'items': [{
+        'len': 2,
+        'items': {
             'type': 'list',
             'len': 2,
             'items': Real.SCHEMA
-        }]
+        }
     }
     
     @classmethod
