@@ -45,7 +45,7 @@
               <th class="col-lg-2 col-md-2 col-sm-2">
               </th>
             </tr>
-            <tr ng-repeat="t in threads|orderBy:'-last_updated'">
+            <tr ng-repeat="t in threads|orderBy:'-last_updated'" ng-click="setCurrentThread(t.thread_id)" class="oppia-feedback-tab-row">
               <td class="col-lg-1 col-md-1 col-sm-1">
                 <span ng-class="getLabelClass(t.status)"><[getHumanReadableStatus(t.status)]></span>
               </td>
@@ -60,7 +60,6 @@
                 <span><[getLocaleAbbreviatedDatetimeString(t.last_updated)]></span>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
-                <button class="btn btn-default btn-xs" ng-click="setCurrentThread(t.thread_id)">View</button>
               </td>
             </tr>
           </table>
