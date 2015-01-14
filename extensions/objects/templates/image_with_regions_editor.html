@@ -25,11 +25,11 @@
         ng-attr-height="<[rectHeight]>"
         style="fill: blue; opacity: 0.3;">
       </rect>
-      <rect ng-repeat="region in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[region.region.regionArea[0][0] * imageWidth]>"
-        ng-attr-y="<[region.region.regionArea[0][1] * imageHeight]>"
-        ng-attr-width="<[(region.region.regionArea[1][0] - region.region.regionArea[0][0]) * imageWidth]>"
-        ng-attr-height="<[(region.region.regionArea[1][1] - region.region.regionArea[0][1]) * imageHeight]>"
+      <rect ng-repeat="labeledRegion in $parent.$parent.value.imageRegions"
+        ng-attr-x="<[labeledRegion.region.regionArea[0][0] * imageWidth]>"
+        ng-attr-y="<[labeledRegion.region.regionArea[0][1] * imageHeight]>"
+        ng-attr-width="<[(labeledRegion.region.regionArea[1][0] - labeledRegion.region.regionArea[0][0]) * imageWidth]>"
+        ng-attr-height="<[(labeledRegion.region.regionArea[1][1] - labeledRegion.region.regionArea[0][1]) * imageHeight]>"
         style="fill: blue; opacity: 0.3;">
       </rect>
       <text ng-repeat="region in $parent.$parent.value.imageRegions"

@@ -131,7 +131,7 @@ oppia.directive('imageWithRegionsEditor', [
                 break;
               }
             }
-            $scope.$parent.value.imageRegions.push({
+            var newRegion = {
               label: newLabel,
               region: {
                 regionType: 'Rectangle', 
@@ -142,11 +142,13 @@ oppia.directive('imageWithRegionsEditor', [
                   ),
                   convertCoordsToFraction(
                     [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
-                    [$scope.imageHeight, $scope.imageHeight]
+                    [$scope.imageWidth, $scope.imageHeight]
                   )
                 ]
               }
-            });
+            };
+            console.log(newRegion);
+            $scope.$parent.value.imageRegions.push(newRegion);
             labelList.push(newLabel);
           }
         };
