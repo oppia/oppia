@@ -147,7 +147,6 @@ oppia.directive('imageWithRegionsEditor', [
                 ]
               }
             };
-            console.log(newRegion);
             $scope.$parent.value.imageRegions.push(newRegion);
             labelList.push(newLabel);
           }
