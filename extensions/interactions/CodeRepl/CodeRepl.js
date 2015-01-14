@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the CodeRepl interactive widget.
+ * Directive for the CodeRepl interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -89,7 +89,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
         });
 
         jsrepl.loadLanguage($scope.language, function() {
-          console.log('Code REPL widget initialized.');
           $scope.hasLoaded = true;
           $scope.$apply();
         });

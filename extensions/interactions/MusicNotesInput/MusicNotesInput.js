@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * Directive for the MusicNotesInput interactive widget.
+ * Directive for the MusicNotesInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',
@@ -110,7 +110,7 @@ oppia.directive('oppiaInteractiveMusicNotesInput', [
         var noteChoicesElt = $element.find('.oppia-music-input-note-choices');
         var staffContainerElt = $element.find('.oppia-music-input-staff');
 
-        // Sets grid positions and initializes widget after staff has loaded.
+        // Sets grid positions and initializes the view after staff has loaded.
         setTimeout(function() {
           $scope.init();
         }, 300);

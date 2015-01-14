@@ -14,7 +14,7 @@
 
 
 /**
- * @fileoverview Unit tests for the interactive MusicNotesInput widget.
+ * @fileoverview Unit tests for the MusicNotesInput interaction.
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -51,7 +51,7 @@ describe('MusicNotesInput interaction', function() {
       $httpBackend.verifyNoOutstandingRequest();
     });
 
-    it('loads the music widget template', function() {
+    it('loads the music staff template', function() {
       expect(elt.html()).toContain('oppia-music-input-valid-note-area');
       expect(elt.html()).toContain('Play Target Sequence');
       expect(elt.html()).toContain('Play Current Sequence');

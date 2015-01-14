@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for using the Video widget during
+ * @fileoverview Utilities for using the Video component during
  * end-to-end testing with Protractor.js
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)

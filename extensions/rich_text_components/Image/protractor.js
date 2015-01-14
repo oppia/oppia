@@ -13,8 +13,8 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for using the Image widget during end-to-end testing
- * with Protractor.js
+ * @fileoverview Utilities for using the Image component during end-to-end
+ * testing with Protractor.js
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */

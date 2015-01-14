@@ -14,7 +14,7 @@
 
 
 /**
- * Directive for the InteractiveMap interactive widget.
+ * Directive for the InteractiveMap interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',

@@ -14,7 +14,7 @@
 
 
 /**
- * Directive for the MultipleChoiceInput interactive widget.
+ * Directive for the MultipleChoiceInput interaction.
  *
  * IMPORTANT NOTE: The naming convention for customization args that are passed
  * into the directive is: the name of the parameter, followed by 'With',

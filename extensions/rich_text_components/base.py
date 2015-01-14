@@ -87,8 +87,8 @@ class BaseRichTextComponent(object):
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
     def to_dict(self):
-        """Gets a dict representing this widget. Only default values are
-        provided.
+        """Gets a dict representing this component. Only the default values for
+        customization args are provided.
         """
         return {
             'widget_id': self.id,
