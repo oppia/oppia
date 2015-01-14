@@ -270,41 +270,50 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
   };
 }]);
 
-// Service for noninteractive and interactive widget definitions.
-oppia.factory('widgetDefinitionsService', ['$http', '$log', '$q', function($http, $log, $q) {
-  var _definitions = {
-    noninteractive: null,
-    interactive: null
-  };
+// Service for caching RTE component definitions.
+oppia.factory('rteComponentRepositoryService', [
+    '$http', '$log', '$q', function($http, $log, $q) {
+  var _cachedRteComponentRepository = null;
 
   return {
-    _getDefinitions: function(widgetType) {
-      if (_definitions[widgetType]) {
-        $log.info('Found ' + widgetType + ' widget definitions in cache.');
+    // Returns a promise, caching the results.
+    getRteComponentRepository: function() {
+      if (_cachedRteComponentRepository) {
         var deferred = $q.defer();
-        deferred.resolve(angular.copy(_definitions[widgetType]));
+        deferred.resolve(angular.copy(_cachedRteComponentRepository));
         return deferred.promise;
       } else {
-        // Retrieve data from the server.
-        return $http.get('/widgetrepository/data/' + widgetType).then(function(response) {
-          $log.info('Retrieved ' + widgetType + ' widget data.');
-          _definitions[widgetType] = response.data.widgetRepository;
-          return angular.copy(_definitions[widgetType]);
+        return $http.get('/rich_text_component_repository/data').then(function(response) {
+          _cachedRteComponentRepository = response.data.repository;
+          return angular.copy(_cachedRteComponentRepository);
+        });
+      }
+    }
+  };
+}]);
+
+oppia.factory('interactionRepositoryService', [
+    '$http', '$log', '$q', function($http, $log, $q) {
+  var _cachedInteractionRepository = null;
+
+  return {
+    // Returns a promise, caching the results.
+    getInteractionRepository: function() {
+      if (_cachedInteractionRepository) {
+        var deferred = $q.defer();
+        deferred.resolve(angular.copy(_cachedInteractionRepository));
+        return deferred.promise;
+      } else {
+        return $http.get('/interaction_repository/data').then(function(response) {
+          _cachedInteractionRepository[widgetType] = response.data.repository;
+          return angular.copy(_cachedInteractionRepository);
         });
       }
     },
-    // Returns a promise, caching the results.
-    getNoninteractiveDefinitions: function() {
-      return this._getDefinitions('noninteractive');
-    },
-    // Returns a promise, caching the results.
-    getInteractiveDefinitions: function() {
-      return this._getDefinitions('interactive');
-    },
     // This is used in the ExplorationEditor in order to prevent a second
     // RPC to the backend.
-    setInteractiveDefinitions: function(interactiveDefinitions) {
-      _definitions['interactive'] = interactiveDefinitions;
+    setInteractionRepository: function(interactionRepository) {
+      _cachedInteractionRepository = interactionRepository;
     }
   };
 }]);

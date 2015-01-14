@@ -472,8 +472,8 @@ oppia.factory('schemaDefaultValueService', [function() {
 
 // Directive for the rich text editor component.
 oppia.directive('richTextEditor', [
-  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'widgetDefinitionsService',
-  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, widgetDefinitionsService) {
+  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'rteComponentRepositoryService',
+  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, rteComponentRepositoryService) {
     return {
       restrict: 'E',
       scope: {
@@ -536,7 +536,7 @@ oppia.directive('richTextEditor', [
         $scope._convertHtmlToRte = function(html) {
           var elt = $('<div>' + html + '</div>');
 
-          $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
+          $scope._RICH_TEXT_COMPONENTS.forEach(function(widgetDefn) {
             elt.find('oppia-noninteractive-' + widgetDefn.name).replaceWith(function() {
               return $scope._createRteElement(
                 widgetDefn, $scope._createCustomizationArgDictFromAttrs(this.attributes));
@@ -550,7 +550,7 @@ oppia.directive('richTextEditor', [
         $scope._convertRteToHtml = function(rte) {
           var elt = $('<div>' + rte + '</div>');
 
-          $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefn) {
+          $scope._RICH_TEXT_COMPONENTS.forEach(function(widgetDefn) {
             elt.find('img.oppia-noninteractive-' + widgetDefn.name).replaceWith(function() {
               var jQueryElt = $('<' + this.className + '/>');
               for (var i = 0; i < this.attributes.length; i++) {
@@ -568,7 +568,7 @@ oppia.directive('richTextEditor', [
 
         $scope.openRteCustomizationModal = function(widgetDefinition, attrsCustomizationArgsDict) {
           $modal.open({
-            templateUrl: 'modals/customizeWidget',
+            templateUrl: 'modals/customizeRteComponent',
             backdrop: 'static',
             resolve: {
               widgetDefinition: function() {
@@ -658,18 +658,15 @@ oppia.directive('richTextEditor', [
         $scope.hasFullyLoaded = false;
 
         $scope.init = function() {
-          widgetDefinitionsService.getNoninteractiveDefinitions().then(function(widgetDefns) {
-            $scope._NONINTERACTIVE_WIDGETS = [];
+          rteComponentRepositoryService.getRteComponentRepository().then(function(rteComponents) {
+            $scope._RICH_TEXT_COMPONENTS = [];
             if (!$scope.disallowOppiaWidgets) {
-              var widgetIds = [];
-              for (var widgetId in widgetDefns) {
-                widgetIds.push(widgetId);
-              }
-              widgetIds.sort().forEach(function(widgetId) {
-                widgetDefns[widgetId].backendName = widgetDefns[widgetId].name;
-                widgetDefns[widgetId].name = widgetDefns[widgetId].frontend_name;
-                widgetDefns[widgetId].iconDataUrl = widgetDefns[widgetId].icon_data_url;
-                $scope._NONINTERACTIVE_WIDGETS.push(widgetDefns[widgetId]);
+              var componentIds = Object.keys(rteComponents);
+              componentIds.sort().forEach(function(componentId) {
+                rteComponents[componentId].backendName = rteComponents[componentId].name;
+                rteComponents[componentId].name = rteComponents[componentId].frontend_name;
+                rteComponents[componentId].iconDataUrl = rteComponents[componentId].icon_data_url;
+                $scope._RICH_TEXT_COMPONENTS.push(rteComponents[componentId]);
               });
             }
 
@@ -712,7 +709,7 @@ oppia.directive('richTextEditor', [
             });
 
             // Add the non-interactive widget controls to the RTE.
-            $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefinition) {
+            $scope._RICH_TEXT_COMPONENTS.forEach(function(widgetDefinition) {
               $(rteNode).wysiwyg('addControl', widgetDefinition.name, {
                 groupIndex: 1,
                 icon: widgetDefinition.iconDataUrl,
@@ -730,7 +727,7 @@ oppia.directive('richTextEditor', [
             $scope.editorDoc = $(rteNode).wysiwyg('document')[0].body;
 
             // Add dblclick handlers to the various nodes.
-            $scope._NONINTERACTIVE_WIDGETS.forEach(function(widgetDefinition) {
+            $scope._RICH_TEXT_COMPONENTS.forEach(function(widgetDefinition) {
               var elts = Array.prototype.slice.call(
                 $scope.editorDoc.querySelectorAll(
                   '.oppia-noninteractive-' + widgetDefinition.name));
@@ -1205,7 +1202,7 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
 
 // TODO(sll): The 'Cancel' button should revert the text in the HTML box to its
 // original state.
-// TODO(sll): The noninteractive widgets in the RTE do not work.
+// TODO(sll): The RTE extensions in the RTE do not work.
 oppia.directive('schemaBasedHtmlEditor', [function() {
   return {
     scope: {

@@ -19,7 +19,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('./forms.js');
 
 var restartExploration = function() {
@@ -33,7 +33,7 @@ var expectExplorationNameToBe = function(name) {
 };
 
 // This verifies the question just asked, including formatting and
-// non-interactive widgets. To do so the richTextInstructions function will be
+// rich-text components. To do so the richTextInstructions function will be
 // sent a handler (as given in forms.RichTextChecker) to which calls such as
 //   handler.readItalicText('slanted');
 // can then be sent.
@@ -53,21 +53,21 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
 };
 
 // Additional arguments may be sent to this function, and they will be
-// passed on to the relevant widget's detail checker.
-var expectInteractionToMatch = function(widgetName) {
+// passed on to the relevant interactions's detail checker.
+var expectInteractionToMatch = function(interactionName) {
   // Convert additional arguments to an array to send on.
   var args = [];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  widgets.getInteractive(widgetName).
+  interactions.getInteraction(interactionName).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
-// `answerData` is a variable that is passed to the corresponding widget's
-// protractor utilities. Its definition and type are widget-specific.
-var submitAnswer = function(widgetName, answerData) {
-  widgets.getInteractive(widgetName).submitAnswer(
+// `answerData` is a variable that is passed to the corresponding interaction's
+// protractor utilities. Its definition and type are interaction-specific.
+var submitAnswer = function(interactionName, answerData) {
+  interactions.getInteraction(interactionName).submitAnswer(
     element.all(by.repeater('state in allResponseStates track by $index')).
       last().element(by.css('.protractor-test-conversation-input')),
     answerData);

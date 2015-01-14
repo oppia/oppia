@@ -19,7 +19,9 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
+var rteComponents = require(
+  '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 
 var DictionaryEditor = function(elem) {
@@ -160,23 +162,25 @@ var RichTextEditor = function(elem) {
     appendHorizontalRule: function() {
       _clickContentMenuButton('insertHorizontalRule');
     },
-    // This adds and customizes non-interactive widgets.
+    // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    addWidget: function(widgetName) {
-      _clickContentMenuButton('custom-command-' + widgetName.toLowerCase());
+    // passed on to the relevant RTE component editor.
+    addRteComponent: function(componentName) {
+      _clickContentMenuButton('custom-command-' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which modal to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which modal to act on but drop the componentName.
       var args = [modal];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).customizeWidget.apply(null, args);
-      modal.element(by.css('.protractor-test-close-widget-editor')).click();
+      rteComponents.getComponent(componentName).customizeComponent.apply(
+        null, args);
+      modal.element(
+        by.css('.protractor-test-close-rte-component-editor')).click();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -265,7 +269,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 // should consist of:
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
-//   handler.readWidget('Math', ...);
+//   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
     // We remove all <span> elements since these are plain text that is
@@ -316,10 +320,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   // arrayPointer traverses both arrays simultaneously.
   var arrayPointer = 0;
   var textPointer = 0;
-  // Widgets insert line breaks above and below themselves and these are
+  // RTE components insert line breaks above and below themselves and these are
   // recorded in fullText but not arrayOfTexts so we need to track them
   // specially.
-  var justPassedWidget = false;
+  var justPassedRteComponent = false;
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
@@ -327,7 +331,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
-    justPassedWidget = false;
+    justPassedRteComponent = false;
   };
 
   return {
@@ -337,7 +341,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
       textPointer = textPointer + text.length;
-      justPassedWidget = false;
+      justPassedRteComponent = false;
     },
     readBoldText: function(text) {
       _readFormattedText(text, 'b');
@@ -348,27 +352,27 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     readUnderlineText: function(text) {
       _readFormattedText(text, 'u');
     },
-    // TODO (Jacob) add functions for other rich text components
+    // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    readWidget: function(widgetName) {
+    // passed on to the relevant RTE component editor.
+    readRteComponent: function(componentName) {
       var elem = arrayOfElems[arrayPointer];
       expect(elem.getTagName()).
-        toBe('oppia-noninteractive-' + widgetName.toLowerCase());
+        toBe('oppia-noninteractive-' + componentName.toLowerCase());
       expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which element to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which element to act on but drop the componentName.
       var args = [elem];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).
-        expectWidgetDetailsToMatch.apply(null, args);
+      rteComponents.getComponent(componentName).
+        expectComponentDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
-        (justPassedWidget ? 1 : 2);
+        (justPassedRteComponent ? 1 : 2);
       arrayPointer = arrayPointer + 1;
-      justPassedWidget = true;
+      justPassedRteComponent = true;
     },
     expectEnd: function() {
       expect(arrayPointer).toBe(arrayOfElems.length);

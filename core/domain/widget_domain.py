@@ -161,8 +161,7 @@ class BaseWidget(object):
 
         try:
             return utils.get_file_contents(os.path.join(
-                feconf.WIDGETS_DIR, feconf.INTERACTIVE_PREFIX, self.id,
-                'stats_response.html'))
+                feconf.INTERACTIONS_DIR, self.id, 'stats_response.html'))
         except IOError:
             return '{{answer}}'
 
@@ -177,10 +176,13 @@ class BaseWidget(object):
         For interactive widgets, there are two (the additional one is for
         displaying the learner's response).
         """
+        base_dir = (
+            feconf.INTERACTIONS_DIR if self.type == 'interactive'
+            else feconf.RTE_EXTENSIONS_DIR)
         js_directives = utils.get_file_contents(os.path.join(
-            feconf.WIDGETS_DIR, self.type, self.id, '%s.js' % self.id))
+            base_dir, self.id, '%s.js' % self.id))
         html_templates = utils.get_file_contents(os.path.join(
-            feconf.WIDGETS_DIR, self.type, self.id, '%s.html' % self.id))
+            base_dir, self.id, '%s.html' % self.id))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
     def to_dict(self):

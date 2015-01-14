@@ -68,14 +68,9 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        noninteractive_widget_html = (
-            widget_registry.Registry.get_noninteractive_widget_html())
-
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
-            'noninteractive_widget_html': jinja2.utils.Markup(
-                noninteractive_widget_html),
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
                     feconf.GALLERY_LOGIN_REDIRECT_URL)),

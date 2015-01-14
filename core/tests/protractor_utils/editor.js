@@ -21,7 +21,7 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 var exitTutorialIfNecessary = function() {
@@ -69,12 +69,12 @@ var setContent = function(richTextInstructions) {
 // richTextInstructions will be supplied with a handler of the form
 // forms.RichTextChecker and can then perform checks such as
 //   handler.readBoldText('bold')
-//   handler.readWidget('Collapsible', 'outer', 'inner')
+//   handler.readRteComponent('Collapsible', 'outer', 'inner')
 // These would verify that the content consists of the word 'bold' in bold
-// followed by a Collapsible widget with the given arguments, and nothing else.
-// Note that this fails for collapsibles and tabs since it is not possible to
-// click on them to view their contents, as clicks instead open the rich text
-// editor.
+// followed by a Collapsible component with the given arguments, and nothing
+// else. Note that this fails for collapsibles and tabs since it is not
+// possible to click on them to view their contents, as clicks instead open the
+// rich text editor.
 var expectContentToMatch = function(richTextInstructions) {
   // The .last() is necessary because we want the second of two <span>s; the
   // first holds the placeholder text for the exploration content.
@@ -89,40 +89,41 @@ var expectContentTextToEqual = function(text) {
   ).toEqual(text);
 };
 
-// INTERACTIVE WIDGETS
+// INTERACTIONS
 
 // Additional arguments may be sent to this function, and they will be
-// passed on to the relevant widget editor.
-var setInteraction = function(widgetName) {
+// passed on to the relevant interaction editor.
+var setInteraction = function(interactionName) {
   element(by.css('.protractor-test-select-interaction-id')).
-    element(by.css('option[value=' + widgetName + ']')).click();
+    element(by.css('option[value=' + interactionName + ']')).click();
 
   if (arguments.length > 1) {
     element(by.css('.protractor-test-edit-interaction')).click();
 
-    var elem = element(by.css('.oppia-interactive-widget-editor'));
+    var elem = element(by.css('.oppia-interaction-editor'));
 
-    // Need to convert arguments to an actual array, discarding widgetName. We
-    // also send the interaction editor element, within which the customizer
-    // should act.
+    // Need to convert arguments to an actual array, discarding
+    // interactionName. We also send the interaction editor element, within
+    // which the customizer should act.
     var args = [elem];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    widgets.getInteractive(widgetName).customizeInteraction.apply(null, args);
+    interactions.getInteraction(interactionName).customizeInteraction.apply(
+      null, args);
 
     element(by.css('.protractor-test-save-interaction')).click();
   }
 };
 
 // Likewise this can receive additional arguments
-var expectInteractionToMatch = function(widgetName) {
+var expectInteractionToMatch = function(interactionName) {
   // Convert additional arguments to an array to send on.
   var args = [];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  widgets.getInteractive(widgetName).
+  interactions.getInteraction(interactionName).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
@@ -131,16 +132,16 @@ var expectInteractionToMatch = function(widgetName) {
 // This function selects a rule for the current interaction and enters the
 // entries of the parameterValues array as its parameters; the parameterValues
 // should be specified after the ruleName as additional arguments. For example
-// with widget 'NumericInput' and rule 'Equals' then there is a single
+// with interaction 'NumericInput' and rule 'Equals' then there is a single
 // parameter which the given answer is required to equal.
-var _selectRule = function(ruleElement, widgetName, ruleName) {
+var _selectRule = function(ruleElement, interactionName, ruleName) {
   var parameterValues = [];
   for (var i = 3; i < arguments.length; i++) {
     parameterValues.push(arguments[i]);
   }
 
   var ruleDescription = rules.getDescription(
-    widgets.getInteractive(widgetName).answerObjectType, ruleName);
+    interactions.getInteraction(interactionName).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
@@ -183,7 +184,7 @@ var _selectRule = function(ruleElement, widgetName, ruleName) {
     ).row(i * 2 + 1));
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
 
-    if (widgetName === 'MultipleChoiceInput') {
+    if (interactionName === 'MultipleChoiceInput') {
       // This is a special case as it uses a dropdown to set a NonnegativeInt
       parameterElement.element(
         by.cssContainingText('option', parameterValues[i])
@@ -197,7 +198,7 @@ var _selectRule = function(ruleElement, widgetName, ruleName) {
 // This clicks the "add new rule" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
-var addRule = function(widgetName, ruleName) {
+var addRule = function(interactionName, ruleName) {
   element(by.css('.oppia-add-rule-button')).click();
   var ruleElement = element(by.css('.protractor-test-temporary-rule'))
   var args = [ruleElement];
@@ -226,7 +227,7 @@ var RuleEditor = function(ruleNum) {
 
   return {
     // Any number of parameters may be specified after the ruleName
-    setDescription: function(widgetName, ruleName) {
+    setDescription: function(interactionName, ruleName) {
       var args = [elem];
       for (var i = 0; i < arguments.length; i++) {
         args.push(arguments[i]);

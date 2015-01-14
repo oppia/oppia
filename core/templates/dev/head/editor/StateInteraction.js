@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Controllers for a state's interactive widget editor.
+ * @fileoverview Controllers for a state's interaction editor.
  *
  * @author sll@google.com (Sean Lip)
  */
@@ -48,12 +48,18 @@ oppia.factory('widgetDetailsCache', [function() {
 
 
 oppia.controller('StateInteraction', [
-    '$scope', '$http', '$filter', '$modal', '$window', 'warningsData', 'editorContextService', 'changeListService',
-    'oppiaHtmlEscaper', 'widgetDefinitionsService', 'stateWidgetIdService', 'stateCustomizationArgsService', 'stateWidgetStickyService',
-    'editabilityService', 'explorationStatesService', 'graphDataService', 'widgetDetailsCache',
-    function($scope, $http, $filter, $modal, $window, warningsData, editorContextService, changeListService,
-      oppiaHtmlEscaper, widgetDefinitionsService, stateWidgetIdService, stateCustomizationArgsService, stateWidgetStickyService,
-      editabilityService, explorationStatesService, graphDataService, widgetDetailsCache) {
+    '$scope', '$http', '$filter', '$modal', '$window', 'warningsData',
+    'editorContextService', 'changeListService', 'oppiaHtmlEscaper',
+    'interactionRepositoryService', 'stateWidgetIdService',
+    'stateCustomizationArgsService', 'stateWidgetStickyService',
+    'editabilityService', 'explorationStatesService', 'graphDataService',
+    'widgetDetailsCache',
+    function($scope, $http, $filter, $modal, $window, warningsData,
+      editorContextService, changeListService, oppiaHtmlEscaper,
+      interactionRepositoryService, stateWidgetIdService,
+      stateCustomizationArgsService, stateWidgetStickyService,
+      editabilityService, explorationStatesService, graphDataService,
+      widgetDetailsCache) {
   // Variables storing specifications for the widget parameters and possible
   // rules.
   $scope.widgetHandlerSpecs = [];
@@ -96,7 +102,7 @@ oppia.controller('StateInteraction', [
     $scope.widgetId = $scope.getCurrentWidgetId();
     var stateCustomizationArgs = stateCustomizationArgsService.savedMemento;
 
-    var widgetTemplate = angular.copy($scope.allInteractiveWidgets[$scope.widgetId]);
+    var widgetTemplate = angular.copy($scope.interactionRepository[$scope.widgetId]);
     for (var i = 0; i < widgetTemplate.customization_args.length; i++) {
       var caName = widgetTemplate.customization_args[i].name;
       widgetTemplate.customization_args[i].value = (
@@ -119,7 +125,7 @@ oppia.controller('StateInteraction', [
     stateWidgetStickyService.restoreFromMemento();
 
     $scope.widgetHandlerSpecs = widgetTemplate.handler_specs;
-    $scope.widgetPreviewHtml = $scope._getWidgetPreviewTag(
+    $scope.interactionPreviewHtml = $scope._getWidgetPreviewTag(
       $scope.widgetId, widgetTemplate.customization_args);
     $scope.interactionCustomizerIsShown = false;
     $scope.tmpWidget = null;
@@ -133,10 +139,10 @@ oppia.controller('StateInteraction', [
 
     // TODO(sll): Build a file containing this data and serve it statically,
     // since it rarely changes. (But don't cache it, since it does change.)
-    widgetDefinitionsService.getInteractiveDefinitions().then(function(widgetDefinitions) {
+    interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
       $scope.tmpRule = null;
       $scope.stateName = editorContextService.getActiveStateName();
-      $scope.allInteractiveWidgets = widgetDefinitions;
+      $scope.interactionRepository = interactionRepository;
 
       stateWidgetIdService.init(
         $scope.stateName, stateData.widget.widget_id,
@@ -177,7 +183,7 @@ oppia.controller('StateInteraction', [
       $scope.$broadcast('schemaBasedFormsShown');
 
       $scope.tmpWidget = angular.copy(
-        $scope.allInteractiveWidgets[$scope.getCurrentWidgetId()]);
+        $scope.interactionRepository[$scope.getCurrentWidgetId()]);
       for (var i = 0; i < $scope.tmpWidget.customization_args.length; i++) {
         var caName = $scope.tmpWidget.customization_args[i].name;
         $scope.tmpWidget.customization_args[i].value = (
@@ -224,7 +230,7 @@ oppia.controller('StateInteraction', [
       stateCustomizationArgsService.displayed = _cachedCustomizationAndHandlers.customization;
       $scope.widgetHandlers = _cachedCustomizationAndHandlers.handlers;
     } else {
-      var newWidget = angular.copy($scope.allInteractiveWidgets[newWidgetId]);
+      var newWidget = angular.copy($scope.interactionRepository[newWidgetId]);
       for (var i = 0; i < newWidget.customization_args.length; i++) {
         newWidget.customization_args[i].value = (
           newWidget.customization_args[i].default_value);

@@ -24,7 +24,7 @@ module.exports = function(config) {
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
       'extensions/**/*.js',
-      'extensions/widgets/interactive/**/*.html'
+      'extensions/interactions/**/*.html'
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -59,7 +59,7 @@ module.exports = function(config) {
       'core/templates/dev/head/tests/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/*.html': ['ng-html2js'],
-      'extensions/widgets/interactive/**/*.html': ['ng-html2js']
+      'extensions/interactions/**/*.html': ['ng-html2js']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {

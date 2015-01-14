@@ -24,6 +24,7 @@ from core.controllers import base
 from core.domain import fs_domain
 from core.domain import obj_services
 from core.domain import value_generators_domain
+from core.domain import widget_registry
 import feconf
 
 
@@ -87,7 +88,7 @@ class StaticFileHandler(base.BaseHandler):
     """Handles static file serving on non-GAE platforms."""
 
     def get(self):
-
+        """Handles GET requests."""
         file_path = self.request.path
         for path in feconf.PATH_MAP:
             if file_path.startswith(path):
@@ -101,3 +102,29 @@ class StaticFileHandler(base.BaseHandler):
                 self.response.write(f.read())
         except Exception:
             self.response.set_status(404)
+
+
+class InteractionRepositoryHandler(base.BaseHandler):
+    """Populates the interaction repository."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'repository': {
+                interaction.id: interaction.to_dict() for interaction in
+                widget_registry.Registry.get_widgets_of_type('interactive')
+            }
+        })
+
+
+class RteComponentRepositoryHandler(base.BaseHandler):
+    """Populates the RTE component repository."""
+
+    def get(self):
+        """Handles GET requests."""
+        self.render_json({
+            'repository': {
+                rte_component.id: rte_component.to_dict() for rte_component in
+                widget_registry.Registry.get_widgets_of_type('noninteractive')
+            }
+        })

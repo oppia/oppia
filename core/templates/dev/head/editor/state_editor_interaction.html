@@ -2,7 +2,7 @@
 
 {% block label %}interaction{% endblock %}
 
-{% block cls %}oppia-interactive-widget-display{% endblock %}
+{% block cls %}oppia-interaction-display{% endblock %}
 
 {% block center %}
   <div ng-if="!hasLoaded" class="oppia-align-center">
@@ -19,8 +19,8 @@
            ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
            ng-disabled="!hasLoaded">
 
-        <!-- We use a transparent div overlay here so that buttons within the widget
-        do not receive the click events. -->
+        <!-- We use a transparent div overlay here so that buttons within the
+        interaction itself do not receive the click events. -->
         <div class="oppia-interactive-section-click-handler" ng-click="showInteractionCustomizer()">
         </div>
 
@@ -30,22 +30,22 @@
           </div>
           <div class="col-lg-4 col-md-4 col-sm-4">
             <select ng-show="editabilityService.isEditable()"
-                    class="form-control oppia-widget-selector protractor-test-select-interaction-id"
-                    ng-model="$parent.$parent.widgetId" ng-options="widget_id as widget.name for (widget_id, widget) in allInteractiveWidgets"
+                    class="form-control oppia-interaction-selector protractor-test-select-interaction-id"
+                    ng-model="$parent.$parent.widgetId" ng-options="interactionId as interaction.name for (interactionId, interaction) in interactionRepository"
                     ng-change="onChangeInteractionType(widgetId)">
             </select>
           </div>
         </div>
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <div angular-html-bind="widgetPreviewHtml" class="oppia-interaction-preview well"></div>
+            <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview well"></div>
           </div>
         </div>
       </div>
     </div>
 
     <div ng-if="interactionCustomizerIsShown" class="oppia-state-item-editor-div">
-      <div class="oppia-interactive-widget-editor">
+      <div class="oppia-interaction-editor">
         <h3>Customize Interaction</h3>
         <br>
 

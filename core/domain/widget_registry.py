@@ -35,11 +35,9 @@ class Registry(object):
     # Maps a widget_type to a (registry_dict, source_dir) pair.
     WIDGET_TYPE_MAPPING = {
         feconf.INTERACTIVE_PREFIX: (
-            interactive_widgets, feconf.INTERACTIVE_WIDGETS_DIR
-        ),
+            interactive_widgets, feconf.INTERACTIONS_DIR),
         feconf.NONINTERACTIVE_PREFIX: (
-            noninteractive_widgets, feconf.NONINTERACTIVE_WIDGETS_DIR
-        ),
+            noninteractive_widgets, feconf.RTE_EXTENSIONS_DIR),
     }
 
     @classmethod
@@ -47,14 +45,17 @@ class Registry(object):
         registry_dict = cls.WIDGET_TYPE_MAPPING[widget_type][0]
         registry_dict.clear()
 
-        # Assemble all extensions/widgets/[WIDGET_TYPE]/[WIDGET_ID] paths.
-        ALL_WIDGET_PATHS = [
-            defn['dir'] for (widget, defn) in
-            feconf.ALLOWED_WIDGETS[widget_type].iteritems()
-        ]
+        allowed_widgets = (
+            feconf.ALLOWED_INTERACTIONS
+            if widget_type == feconf.INTERACTIVE_PREFIX
+            else feconf.ALLOWED_RTE_EXTENSIONS)
+
+        # Assemble all paths to the extensions.
+        EXTENSION_PATHS = [
+            defn['dir'] for (widget, defn) in allowed_widgets.iteritems()]
 
         # Crawl the directories and add new widget instances to the registries.
-        for loader, name, _ in pkgutil.iter_modules(path=ALL_WIDGET_PATHS):
+        for loader, name, _ in pkgutil.iter_modules(path=EXTENSION_PATHS):
             module = loader.find_module(name).load_module(name)
             clazz = getattr(module, name)
             if clazz.__name__ in registry_dict:

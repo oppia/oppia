@@ -105,14 +105,14 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
         """Check whether a string is alphanumeric."""
         return bool(re.compile("^[a-zA-Z0-9_]+$").match(string))
 
-    def test_allowed_widgets(self):
-        """Do sanity checks on the ALLOWED_WIDGETS dict in feconf.py."""
-        widget_registries = [
-            feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX],
-            feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]
+    def test_allowed_extensions(self):
+        """Do sanity checks on the ALLOWED_EXTENSIONS dicts in feconf.py."""
+        extension_registries = [
+            feconf.ALLOWED_RTE_EXTENSIONS,
+            feconf.ALLOWED_INTERACTIONS,
         ]
 
-        for registry in widget_registries:
+        for registry in extension_registries:
             for (widget_name, definition) in registry.iteritems():
                 contents = os.listdir(
                     os.path.join(os.getcwd(), definition['dir']))
@@ -124,11 +124,11 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
         self.assertEqual(
             len(widget_registry.Registry.interactive_widgets),
-            len(feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX])
+            len(feconf.ALLOWED_INTERACTIONS)
         )
         self.assertEqual(
             len(widget_registry.Registry.noninteractive_widgets),
-            len(feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX])
+            len(feconf.ALLOWED_RTE_EXTENSIONS)
         )
 
     def test_image_data_urls_for_noninteractive_widgets(self):
@@ -136,14 +136,12 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
         widget_registry.Registry.refresh()
 
         widget_list = widget_registry.Registry.noninteractive_widgets
-        allowed_widgets = feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX]
-        for widget_name in allowed_widgets:
+        for (ext_name, ext_spec) in feconf.ALLOWED_RTE_EXTENSIONS.iteritems():
             image_filepath = os.path.join(
-                os.getcwd(), allowed_widgets[widget_name]['dir'],
-                '%s.png' % widget_name)
+                os.getcwd(), ext_spec['dir'], '%s.png' % ext_name)
             self.assertEqual(
                 utils.convert_png_to_data_url(image_filepath),
-                widget_list[widget_name].icon_data_url
+                widget_list[ext_name].icon_data_url
             )
 
     def _validate_customization_arg_specs(self, customization_args):
@@ -189,13 +187,13 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
         noninteractive_bindings = (
             widget_registry.Registry.noninteractive_widgets)
 
-        for widget_id in feconf.ALLOWED_WIDGETS[feconf.NONINTERACTIVE_PREFIX]:
+        for widget_id in feconf.ALLOWED_RTE_EXTENSIONS:
             # Check that the widget_id name is valid.
             self.assertTrue(self._is_camel_cased(widget_id))
 
             # Check that the widget directory exists.
             widget_dir = os.path.join(
-                feconf.NONINTERACTIVE_WIDGETS_DIR, widget_id)
+                feconf.RTE_EXTENSIONS_DIR, widget_id)
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should be a config .py file, an
@@ -254,13 +252,12 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
         """Test that the default interactive widgets are valid."""
         interactive_bindings = widget_registry.Registry.interactive_widgets
 
-        for widget_id in feconf.ALLOWED_WIDGETS[feconf.INTERACTIVE_PREFIX]:
+        for widget_id in feconf.ALLOWED_INTERACTIONS:
             # Check that the widget_id name is valid.
             self.assertTrue(self._is_camel_cased(widget_id))
 
             # Check that the widget directory exists.
-            widget_dir = os.path.join(
-                feconf.INTERACTIVE_WIDGETS_DIR, widget_id)
+            widget_dir = os.path.join(feconf.INTERACTIONS_DIR, widget_id)
             self.assertTrue(os.path.isdir(widget_dir))
 
             # In this directory there should only be a config .py file, an

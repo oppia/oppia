@@ -28,7 +28,7 @@ oppia.controller('ExplorationEditor', [
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
+  'oppiaDatetimeFormatter', 'interactionRepositoryService', 'newStateTemplateService', 'oppiaPlayerService',
   'explorationStatesService', 'routerService', 'graphDataService', 'focusService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService',
   function(
@@ -37,7 +37,7 @@ oppia.controller('ExplorationEditor', [
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
-    editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
+    editabilityService, oppiaDatetimeFormatter, interactionRepositoryService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
     graphDataService, focusService, stateEditorTutorialFirstTimeService,
     explorationParamSpecsService) {
@@ -508,7 +508,7 @@ oppia.controller('ExplorationEditor', [
   // page load.
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
-      widgetDefinitionsService.setInteractiveDefinitions(data.ALL_INTERACTIVE_WIDGETS);
+      interactionRepositoryService.setInteractionRepository(data.ALL_INTERACTIONS);
       explorationStatesService.setStates(data.states);
 
       explorationTitleService.init(data.title);

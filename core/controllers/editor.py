@@ -319,7 +319,7 @@ class ExplorationHandler(EditorHandler):
             'show_state_editor_tutorial_on_load': (
                 self.user_id and not
                 self.user_has_started_state_editor_tutorial),
-            'ALL_INTERACTIVE_WIDGETS': {
+            'ALL_INTERACTIONS': {
                 widget.id: widget.to_dict()
                 for widget in widget_registry.Registry.get_widgets_of_type(
                     feconf.INTERACTIVE_PREFIX)
