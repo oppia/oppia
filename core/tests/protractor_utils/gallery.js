@@ -19,17 +19,29 @@
  */
 
 var editor = require('./editor.js');
+var forms = require('./forms.js');
 
-// Here section can be 'status', 'category' or 'language'.
-// If section = 'status' then label can be 'Featured', 'Public' or 'Private',
-// otherwise it can be any category or language respectively.
+var setLanguages = function(languages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).setValues(languages);
+};
+
+var expectCurrentLanguageSelectionToBe = function(expectedLanguages) {
+  forms.AutocompleteMultiDropdownEditor(
+    element(by.css('.protractor-test-gallery-language-selector'))
+  ).expectCurrentSelectionToBe(expectedLanguages);
+};
+
+// Here section is expected to be 'category'. The label can be any category.
 // Verifies the previous state of the checkbox, then clicks it.
 var _clickCheckbox = function(section, label, isPreviouslyTicked) {
-  element(by.css('.protractor-test-gallery-' + section)).all(by.tagName('li')).
+  element.all(by.css('.protractor-test-gallery-' + section)).
       map(function(option) {
     return option.getText().then(function(text) {
       if (text === label) {
-        var checkbox = option.element(by.tagName('input'));
+        var checkbox =
+          option.element(by.css('.protractor-test-gallery-checkbox'));
         if (isPreviouslyTicked) {
           expect(checkbox.isSelected()).toBeTruthy();
         } else {
@@ -61,10 +73,10 @@ var untickCheckbox = function(section, label) {
 
 // Returns a promise of all explorations with the given name.
 var _getExplorationElements = function(name) {
-  return element.all(by.css('.oppia-gallery-tile')).filter(
+  return element.all(by.css('.protractor-test-gallery-tile')).filter(
       function(tile, index) {
-    return tile.element(by.css('.oppia-gallery-tile-title')).getText().then(
-        function(tileTitle) {
+    return tile.element(by.css('.protractor-test-gallery-tile-title')).
+        getText().then(function(tileTitle) {
       return (tileTitle === name);
     });
   });
@@ -84,7 +96,7 @@ var expectExplorationToBeHidden = function(name) {
 
 var playExploration = function(name) {
   _getExplorationElements(name).then(function(elems) {
-    elems[0].element(by.css('.oppia-gallery-tile-title')).click();
+    elems[0].element(by.css('.protractor-test-gallery-tile-title')).click();
   });
 };
 
@@ -102,6 +114,8 @@ var getExplorationObjective = function(name) {
   });
 };
 
+exports.setLanguages = setLanguages;
+exports.expectCurrentLanguageSelectionToBe = expectCurrentLanguageSelectionToBe;
 exports.tickCheckbox = tickCheckbox;
 exports.untickCheckbox = untickCheckbox;
 exports.expectExplorationToBeVisible = expectExplorationToBeVisible;

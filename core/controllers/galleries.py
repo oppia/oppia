@@ -48,6 +48,18 @@ CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     'An announcement to display on top of the contribute gallery page.',
     default_value='')
 
+BANNER_ALT_TEXT = config_domain.ConfigProperty(
+    'banner_alt_text', 'UnicodeString',
+    'The alt text for the site banner image', default_value='')
+
+
+def _get_short_language_description(full_language_description):
+    if ' (' not in full_language_description:
+        return full_language_description
+    else:
+        ind = full_language_description.find(' (')
+        return full_language_description[:ind]
+
 
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
@@ -56,7 +68,6 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-
         noninteractive_widget_html = (
             widget_registry.Registry.get_noninteractive_widget_html())
 
@@ -71,19 +82,16 @@ class GalleryPage(base.BaseHandler):
             'gallery_register_redirect_url': utils.set_url_query_parameter(
                 feconf.EDITOR_PREREQUISITES_URL,
                 'return_url', feconf.GALLERY_CREATE_MODE_URL),
+            'ALL_LANGUAGE_NAMES': [
+                _get_short_language_description(lc['description'])
+                for lc in feconf.ALL_LANGUAGE_CODES],
+            'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
         })
         self.render_template('galleries/gallery.html')
 
 
 class GalleryHandler(base.BaseHandler):
     """Provides data for the exploration gallery page."""
-
-    def _get_short_language_description(self, full_language_description):
-        if ' (' not in full_language_description:
-            return full_language_description
-        else:
-            ind = full_language_description.find(' (')
-            return full_language_description[:ind]
 
     def get(self):
         """Handles GET requests."""
@@ -94,7 +102,7 @@ class GalleryHandler(base.BaseHandler):
         # explorations in 'Other'.
 
         language_codes_to_short_descs = {
-            lc['code']: self._get_short_language_description(lc['description'])
+            lc['code']: _get_short_language_description(lc['description'])
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 

@@ -25,6 +25,8 @@ oppia.directive('select2Dropdown', [function() {
     scope: {
       choices: '=',
       item: '=',
+      // The regex used to validate newly-entered choices that do not
+      // already exist. Use ".^" to reject all new choices.
       newChoiceRegex: '@',
       placeholder: '@',
       width: '@',
@@ -36,7 +38,10 @@ oppia.directive('select2Dropdown', [function() {
       formatNewSelection: '=',
       // An additional CSS class to add to the select2 dropdown. May be
       // undefined.
-      dropdownCssClass: '@'
+      dropdownCssClass: '@',
+      // Whether to allow multiple choices. In order to do so, the value of
+      // this attribute must be the exact string 'true'.
+      allowMultipleChoices: '@'
     },
     template: '<input type="hidden">',
     controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
@@ -54,6 +59,7 @@ oppia.directive('select2Dropdown', [function() {
         data: $scope.choices,
         placeholder: $scope.placeholder,
         allowClear: false,
+        multiple: $scope.allowMultipleChoices === 'true',
         width: $scope.width || '250px',
         createSearchChoice: function(term, data) {
           if ($(data).filter(function() {

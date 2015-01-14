@@ -826,10 +826,48 @@ oppia.factory('newStateTemplateService', [function() {
 }]);
 
 
+oppia.factory('computeGraphService', [function() {
+
+  var _computeGraphData = function(initStateId, states) {
+    var nodes = {};
+    var links = [];
+    for (var stateName in states) {
+      nodes[stateName] = stateName;
+
+      var handlers = states[stateName].widget.handlers;
+      for (var h = 0; h < handlers.length; h++) {
+        var ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          links.push({
+            source: stateName,
+            target: ruleSpecs[i].dest,
+          });
+        }
+      }
+    }
+    nodes[END_DEST] = END_DEST;
+
+    return {
+      nodes: nodes,
+      links: links,
+      initStateId: initStateId,
+      finalStateId: END_DEST
+    };
+  };
+
+  return {
+    compute: function(initStateId, states) {
+      return _computeGraphData(initStateId, states);
+    }
+  };
+}]);
+
+
 // Service for computing graph data.
 oppia.factory('graphDataService', [
     'explorationStatesService', 'explorationInitStateNameService',
-    function(explorationStatesService, explorationInitStateNameService) {
+    'computeGraphService', function(explorationStatesService,
+    explorationInitStateNameService, computeGraphService) {
 
   var _graphData = null;
 
@@ -848,31 +886,8 @@ oppia.factory('graphDataService', [
     }
 
     var states = explorationStatesService.getStates();
-
-    var nodes = {};
-    var links = [];
-    for (var stateName in states) {
-      nodes[stateName] = stateName;
-
-      var handlers = states[stateName].widget.handlers;
-      for (h = 0; h < handlers.length; h++) {
-        ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
-          links.push({
-            source: stateName,
-            target: ruleSpecs[i].dest,
-          });
-        }
-      }
-    }
-    nodes[END_DEST] = END_DEST;
-
-    _graphData = {
-      nodes: nodes,
-      links: links,
-      initStateId: explorationInitStateNameService.savedMemento,
-      finalStateId: END_DEST
-    };
+    var initStateId = explorationInitStateNameService.savedMemento;
+    _graphData = computeGraphService.compute(initStateId, states);
   };
 
   return {

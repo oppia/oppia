@@ -179,67 +179,14 @@ def is_exp_summary_editable(exp_summary, user_id=None):
 
 
 # Query methods.
-def _get_explorations_summary_dict(exploration_rights, user_id=None):
-    """Returns exploration summaries corresponding to the given rights objects.
-
-    The summary is a dict that is keyed by exploration id. Each value is a dict
-    with the following keys: title, category, objective, language_code,
-    last_updated, status, community_owned and is_editable. The is_editable
-    field is computed with respect to the given user_id, if it is provided;
-    otherwise it is False.
-    """
-    id_to_rights = {rights.id: rights for rights in exploration_rights}
-    exp_ids = [rights.id for rights in exploration_rights]
-    memcached_keys = [
-        _get_exploration_memcache_key(exp_id) for exp_id in exp_ids]
-    memcached_explorations = memcache_services.get_multi(memcached_keys)
-
-    uncached_exp_ids = []
-    for ind, key in enumerate(memcached_keys):
-        if key not in memcached_explorations:
-            uncached_exp_ids.append(exp_ids[ind])
-    exploration_models = exp_models.ExplorationModel.get_multi(
-        uncached_exp_ids)
-
-    exps_to_cache = {}
-    for ind, model in enumerate(exploration_models):
-        if model:
-            exps_to_cache[_get_exploration_memcache_key(model.id)] = (
-                get_exploration_from_model(model))
-        else:
-            logging.error(
-                'Could not find exploration %s' % uncached_exp_ids[ind])
-    memcache_services.set_multi(exps_to_cache)
-
-    result = {}
-    for exploration in (
-            memcached_explorations.values() + exps_to_cache.values()):
-        result[exploration.id] = {
-            'title': exploration.title,
-            'category': exploration.category,
-            'objective': exploration.objective,
-            'language_code': exploration.language_code,
-            'last_updated': utils.get_time_in_millisecs(
-                exploration.last_updated),
-            'status': id_to_rights[exploration.id].status,
-            'community_owned': id_to_rights[exploration.id].community_owned,
-            'is_editable': (
-                user_id is not None and (
-                    user_id in id_to_rights[exploration.id].editor_ids
-                    or user_id in id_to_rights[exploration.id].owner_ids
-                    or id_to_rights[exploration.id].community_owned)),
-        }
-
-    # TODO(sll): Return a list sorted by last_updated instead, and amend the
-    # docstring.
-    return result
-
-
 def get_exploration_titles_and_categories(exp_ids):
     """Returns exploration titles and categories for the given ids.
 
     The result is a dict with exploration ids as keys. The corresponding values
     are dicts with the keys 'title' and 'category'.
+
+    Any invalid exp_ids will not be included in the return dict. No error will
+    be raised.
     """
     explorations = [
         (get_exploration_from_model(e) if e else None)
@@ -255,26 +202,6 @@ def get_exploration_titles_and_categories(exp_ids):
                 'title': exploration.title,
                 'category': exploration.category,
             }
-    return result
-
-
-def get_exploration_titles(exp_ids):
-    """Returns exploration titles for the given ids.
-
-    The result is a dict with exploration ids as keys and their corresponding
-    titles as the values.
-    """
-    explorations = [
-        (get_exploration_from_model(e) if e else None)
-        for e in exp_models.ExplorationModel.get_multi(exp_ids)]
-
-    result = {}
-    for ind, exploration in enumerate(explorations):
-        if exploration is None:
-            logging.error(
-                'Could not find exploration corresponding to id')
-        else:
-            result[exploration.id] = exploration.title
     return result
 
 
@@ -328,32 +255,6 @@ def get_at_least_editable_exploration_summaries(user_id):
     return _get_exploration_summary_dicts_from_models(
         exp_models.ExpSummaryModel.get_at_least_editable(
             user_id=user_id))
-
-
-def get_explicit_viewer_explorations_summary_dict(user_id):
-    """Returns a summary of some viewable explorations for this user.
-
-    These explorations have the user explicitly listed in the viewer_ids field.
-    This means that the user can view this exploration, but is not an owner of
-    it, and cannot edit it.
-
-    There may be other explorations that this user can view -- namely, those
-    that he/she owns or is allowed to edit -- that are not returned by this
-    query.
-    """
-    return _get_explorations_summary_dict(
-        rights_manager.get_viewable_exploration_rights(user_id),
-        user_id=user_id)
-
-
-def get_at_least_editable_summary_dict(user_id):
-    """Returns a summary of explorations that are at least editable by this
-    user.
-    """
-    # TODO(msl): use stored exploration summaries for this
-    return  _get_explorations_summary_dict(
-        rights_manager.get_at_least_editable_exploration_rights(user_id),
-        user_id=user_id)
 
 
 def count_explorations():

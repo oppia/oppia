@@ -24,7 +24,8 @@
 // in order to make the testing and production environments match.
 var oppia = angular.module(
   'oppia', [
-    'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap', 'ui.sortable'
+    'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
+    'ui.sortable'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));

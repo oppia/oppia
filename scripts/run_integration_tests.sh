@@ -38,6 +38,13 @@ function cleanup {
   while ( nc -vz localhost 4444 >/dev/null 2>&1 ); do sleep 1; done
   while ( nc -vz localhost 4445 >/dev/null 2>&1 ); do sleep 1; done
 
+  if [ -d "../protractor-screenshots" ]; then
+    echo ""
+    echo "You can view screenshots of the failed tests in"
+    echo "../protractor-screenshots/"
+    echo ""
+  fi
+
   echo Done!
 }
 
@@ -84,6 +91,12 @@ if [ ! -d "$NODE_MODULE_DIR/protractor" ]; then
   $NPM_INSTALL protractor@1.2.0
 fi
 
+echo Checking whether Protractor screenshot reporter is installed in $TOOLS_DIR
+if [ ! -d "$NODE_MODULE_DIR/protractor-screenshot-reporter" ]; then
+  echo Installing Protractor screenshot reporter
+  $NPM_INSTALL protractor-screenshot-reporter@0.0.5
+fi
+
 $NODE_MODULE_DIR/.bin/webdriver-manager update
 
 if ( nc -vz localhost 8181 ); then
@@ -109,6 +122,11 @@ trap cleanup EXIT
 # Wait for the servers to come up.
 while ! nc -vz localhost 4444; do sleep 1; done
 while ! nc -vz localhost 4445; do sleep 1; done
+
+# Delete outdated screenshots
+if [ -d "../protractor-screenshots" ]; then
+  rm -r ../protractor-screenshots
+fi
 
 # Run the integration tests.
 $NODE_MODULE_DIR/.bin/protractor core/tests/protractor.conf.js

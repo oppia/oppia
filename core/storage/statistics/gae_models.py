@@ -342,6 +342,10 @@ class StateHitEventLogEntryModel(base_models.BaseModel):
 class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     """Batch model for storing MapReduce calculation output for
     exploration-level statistics."""
+    # Id of exploration.
+    exploration_id = ndb.StringProperty(indexed=True)
+    # Version of exploration.
+    version = ndb.StringProperty(indexed=False)
     # Number of students who started the exploration
     num_starts = ndb.IntegerProperty(indexed=False)
     # Number of students who have completed the exploration
@@ -351,6 +355,30 @@ class ExplorationAnnotationsModel(base_models.BaseMapReduceBatchResultsModel):
     #               'total_entry_count': ...,
     #               'no_answer_count': ...}}
     state_hit_counts = ndb.JsonProperty(indexed=False)
+
+    @classmethod
+    def get_entity_id(cls, exploration_id, exploration_version):
+        return '%s:%s' % (exploration_id, exploration_version)
+
+    @classmethod
+    def create(
+        cls, exp_id, version, num_starts, num_completions, state_hit_counts):
+        """Creates a new ExplorationAnnotationsModel."""
+        entity_id = cls.get_entity_id(exp_id, version)
+        cls(
+            id=entity_id,
+            exploration_id=exp_id,
+            version=version,
+            num_starts=num_starts,
+            num_completions=num_completions,
+            state_hit_counts=state_hit_counts).put()
+
+    @classmethod
+    def get_versions(cls, exploration_id):
+        return [annotations.version for annotations in
+            cls.get_all().filter(
+                cls.exploration_id == exploration_id).fetch(
+                    feconf.DEFAULT_QUERY_LIMIT)]
 
 
 def process_submitted_answer(

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Utilities for user creation, login and privileging when 
+ * @fileoverview Utilities for user creation, login and privileging when
  * carrrying out end-to-end testing with protractor.
  *
  * @author Jacob Davis (jacobdavis11@gmail.com)
@@ -47,9 +47,9 @@ var logout = function() {
 var registerAsEditor = function(username) {
   browser.get('/gallery');
   element(by.css('.protractor-test-create-exploration')).click();
-  element(by.model('username')).sendKeys(username);
-  element(by.model('agreedToTerms')).click();
-  element(by.buttonText('Submit and start contributing')).click();
+  element(by.css('.protractor-test-username-input')).sendKeys(username);
+  element(by.css('.protractor-test-agree-to-terms-checkbox')).click();
+  element(by.css('.protractor-test-register-user')).click();
   // The create modal needs time to load.
   browser.waitForAngular();
   general.waitForSystem();
