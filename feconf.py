@@ -57,9 +57,6 @@ END_DEST = 'END'
 # The default number of items to show on a page in a paged view.
 DEFAULT_PAGE_SIZE = 50
 
-# The default widget used for a new state.
-DEFAULT_WIDGET_ID = 'TextInput'
-
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First State'
 # The default content text for the initial state of an exploration.
@@ -81,10 +78,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'png': ['png'],
     'gif': ['gif']
 }
-
-# Prefixes for widget ids in the datastore.
-INTERACTIVE_PREFIX = 'interactive'
-NONINTERACTIVE_PREFIX = 'noninteractive'
 
 DEFAULT_EDITOR_PREREQUISITES_AGREEMENT = """
 I understand and agree that any contributions I make to this site will be
@@ -164,35 +157,35 @@ ALLOWED_RTE_EXTENSIONS = {
     },
 }
 ALLOWED_INTERACTIONS = {
+    'CodeRepl': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'CodeRepl')
+    },
     'Continue': {
         'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
     },
-    'MultipleChoiceInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'MultipleChoiceInput')
-    },
-    'NumericInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'NumericInput')
-    },
-    'TextInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'TextInput')
+    'GraphInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
     },
     'InteractiveMap': {
         'dir': os.path.join(INTERACTIONS_DIR, 'InteractiveMap')
     },
-    'SetInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'SetInput')
-    },
-    'CodeRepl': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'CodeRepl')
-    },
     'LogicProof': {
         'dir': os.path.join(INTERACTIONS_DIR, 'LogicProof')
+    },
+    'MultipleChoiceInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'MultipleChoiceInput')
     },
     'MusicNotesInput': {
         'dir': os.path.join(INTERACTIONS_DIR, 'MusicNotesInput')
     },
-    'GraphInput': {
-        'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
+    'NumericInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'NumericInput')
+    },
+    'SetInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'SetInput')
+    },
+    'TextInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'TextInput')
     },
 }
 
@@ -287,7 +280,7 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# The name for the default handler of a widget.
+# The name for the default handler of an interaction.
 SUBMIT_HANDLER_NAME = 'submit'
 
 # List of supported language codes. Each description has a

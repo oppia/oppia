@@ -31,8 +31,8 @@
           <div class="col-lg-4 col-md-4 col-sm-4">
             <select ng-show="editabilityService.isEditable()"
                     class="form-control oppia-interaction-selector protractor-test-select-interaction-id"
-                    ng-model="$parent.$parent.widgetId" ng-options="interactionId as interaction.name for (interactionId, interaction) in interactionRepository"
-                    ng-change="onChangeInteractionType(widgetId)">
+                    ng-model="$parent.$parent.interactionId" ng-options="interactionId as interaction.name for (interactionId, interaction) in interactionRepository"
+                    ng-change="onChangeInteractionType(interactionId)">
             </select>
           </div>
         </div>
@@ -51,8 +51,8 @@
 
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <form name="form.schemaForm" class="protractor-test-widget-args">
-              <div ng-repeat="customizationArg in tmpWidget.customization_args">
+            <form name="form.schemaForm">
+              <div ng-repeat="customizationArg in tmpInteraction.customization_args">
                 <span><[customizationArg.description]></span>
                 <div>
                   <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
@@ -62,13 +62,13 @@
               </div>
             </form>
 
-            <div ng-if="!isEmpty(tmpWidget.customization_args)">
+            <div ng-if="!isEmpty(tmpInteraction.customization_args)">
               <hr>
             </div>
 
             <div class="checkbox">
               <label>
-                <input type="checkbox" ng-model="stateWidgetStickyService.displayed" ng-disabled="!editabilityService.isEditable()">
+                <input type="checkbox" ng-model="stateInteractionStickyService.displayed" ng-disabled="!editabilityService.isEditable()">
                 Reuse the previous state's interaction, if possible.
                 <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
                   <span class="glyphicon glyphicon-question-sign"></span>
@@ -79,8 +79,8 @@
         </div>
       </div>
 
-      <div ng-if="tmpWidget">
-        <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-interaction" ng-click="saveInteractionCustomizations(tmpWidget)" ng-disabled="form.schemaForm.$invalid">
+      <div ng-if="tmpInteraction">
+        <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-interaction" ng-click="saveInteractionCustomizations(tmpInteraction)" ng-disabled="form.schemaForm.$invalid">
           Save Interaction
         </button>
         <button type="button" class="btn btn-default" ng-click="resetInteractionCustomizer()">

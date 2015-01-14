@@ -22,9 +22,10 @@ import urllib
 
 from core.controllers import base
 from core.domain import fs_domain
+from core.domain import interaction_registry
 from core.domain import obj_services
+from core.domain import rte_component_registry
 from core.domain import value_generators_domain
-from core.domain import widget_registry
 import feconf
 
 
@@ -111,8 +112,9 @@ class InteractionRepositoryHandler(base.BaseHandler):
         """Handles GET requests."""
         self.render_json({
             'repository': {
-                interaction.id: interaction.to_dict() for interaction in
-                widget_registry.Registry.get_widgets_of_type('interactive')
+                interaction.id: interaction.to_dict()
+                for interaction in
+                interaction_registry.Registry.get_all_interactions()
             }
         })
 
@@ -124,7 +126,8 @@ class RteComponentRepositoryHandler(base.BaseHandler):
         """Handles GET requests."""
         self.render_json({
             'repository': {
-                rte_component.id: rte_component.to_dict() for rte_component in
-                widget_registry.Registry.get_widgets_of_type('noninteractive')
+                rte_component.id: rte_component.to_dict()
+                for rte_component in
+                rte_component_registry.Registry.get_all_rte_components()
             }
         })

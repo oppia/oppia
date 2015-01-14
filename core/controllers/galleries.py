@@ -25,7 +25,6 @@ from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
-from core.domain import widget_registry
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])

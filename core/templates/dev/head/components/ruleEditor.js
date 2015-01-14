@@ -49,7 +49,7 @@ oppia.directive('ruleTypeSelector', [function() {
           return $filter('truncateAtFirstInput')(object.id);
         }
       });
-      
+
       if (numberOfRuleTypes <= 1) {
         $(select2Node).select2('enable', false);
       }
@@ -79,7 +79,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     scope: {
       rule: '=',
       answerChoices: '=',
-      widgetHandlerSpecs: '=',
+      interactionHandlerSpecs: '=',
       isTmpRule: '&',
       saveRule: '=',
       cancelEdit: '&',
@@ -112,11 +112,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.allRuleTypes = {};
         $scope.generateAllRuleTypes = function() {
-          for (var i = 0; i < $scope.widgetHandlerSpecs.length; i++) {
-            if ($scope.widgetHandlerSpecs[i].name == 'submit') {
+          for (var i = 0; i < $scope.interactionHandlerSpecs.length; i++) {
+            if ($scope.interactionHandlerSpecs[i].name == 'submit') {
               $scope.allRuleTypes = {};
-              for (var description in $scope.widgetHandlerSpecs[i].rules) {
-                $scope.allRuleTypes[description] = $scope.widgetHandlerSpecs[i].rules[description].classifier;
+              for (var description in $scope.interactionHandlerSpecs[i].rules) {
+                $scope.allRuleTypes[description] = $scope.interactionHandlerSpecs[i].rules[description].classifier;
               }
               return;
             }
@@ -220,7 +220,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
-        $scope.$watch('widgetHandlerSpecs', function() {
+        $scope.$watch('interactionHandlerSpecs', function() {
           $scope.generateAllRuleTypes();
         });
 
@@ -258,7 +258,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.rule.feedback.length === 0 &&
             $scope.rule.dest === editorContextService.getActiveStateName());
         };
-      
+
         $scope.onSelectNewRuleType = function() {
           var description = $scope.currentRuleDescription;
           $scope.rule.description = description;
@@ -291,10 +291,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
               $scope.rule.definition.inputs[varName] = 0;
             } else if (varType == "Graph") {
               $scope.rule.definition.inputs[varName] = {
-                'vertices': [], 
-                'edges': [], 
-                'isDirected': false, 
-                'isWeighted': false, 
+                'vertices': [],
+                'edges': [],
+                'isDirected': false,
+                'isWeighted': false,
                 'isLabeled': false
               };
             } else {
@@ -331,7 +331,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
 
             if ($scope.answerChoices && $scope.answerChoices.length) {
-              // This rule is for a multiple-choice widget.
+              // This rule is for a multiple-choice interaction.
               // TODO(sll): Remove the need for this special case for multiple-choice
               // input.
               var _choices = angular.copy($scope.answerChoices);

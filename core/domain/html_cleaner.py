@@ -19,8 +19,7 @@
 __author__ = 'Sean Lip'
 
 import bleach
-from core.domain import widget_registry
-import feconf
+from core.domain import rte_component_registry
 import logging
 import urlparse
 
@@ -67,8 +66,8 @@ def clean(user_submitted_html):
     This only allows HTML from a restricted set of tags, attrs and styles. It
     strips out unrecognized tags.
     """
-    oppia_custom_tags = widget_registry.Registry.get_tag_list_with_attrs(
-        feconf.NONINTERACTIVE_PREFIX)
+    oppia_custom_tags = (
+        rte_component_registry.Registry.get_tag_list_with_attrs())
 
     core_tags = ATTRS_WHITELIST.copy()
     core_tags.update(oppia_custom_tags)

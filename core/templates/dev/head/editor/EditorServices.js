@@ -778,9 +778,9 @@ oppia.factory('statePropertyService', [
   };
 }]);
 
-// A data service that stores the current widget id.
+// A data service that stores the current interaction id.
 // TODO(sll): Add validation.
-oppia.factory('stateWidgetIdService', [
+oppia.factory('stateInteractionIdService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_id';
@@ -788,7 +788,7 @@ oppia.factory('stateWidgetIdService', [
 }]);
 
 // A data service that stores the current state customization args for the
-// widget. This is a dict mapping customization arg names to dicts of the
+// interaction. This is a dict mapping customization arg names to dicts of the
 // form {value: customization_arg_value}.
 // TODO(sll): Add validation.
 oppia.factory('stateCustomizationArgsService', [
@@ -798,9 +798,9 @@ oppia.factory('stateCustomizationArgsService', [
   return child;
 }]);
 
-// A data service that stores the current sticky status for the widget.
+// A data service that stores the current sticky status for the interaction.
 // TODO(sll): Add validation.
-oppia.factory('stateWidgetStickyService', [
+oppia.factory('stateInteractionStickyService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_sticky';

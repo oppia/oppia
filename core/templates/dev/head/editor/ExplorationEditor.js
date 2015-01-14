@@ -77,8 +77,9 @@ oppia.controller('ExplorationEditor', [
   var _pathnameArray = window.location.pathname.split('/');
   $scope.explorationId = _pathnameArray[_pathnameArray.length - 1];
   // The exploration id needs to be attached to the root scope in order for
-  // the file picker widget to work. (Note that an alternative approach might
-  // also be to replicate this URL-based calculation in the file picker widget.)
+  // the file picker RTE component to work. (Note that an alternative approach
+  // might also be to replicate this URL-based calculation in the file picker
+  // RTE component.)
   $rootScope.explorationId = $scope.explorationId;
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;

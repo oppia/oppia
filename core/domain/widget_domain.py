@@ -83,11 +83,12 @@ class BaseWidget(object):
     This class is not meant to be user-editable. The only methods on it should
     be get()-type methods.
     """
+
     @property
     def type(self):
         return (
-            feconf.INTERACTIVE_PREFIX if self.is_interactive
-            else feconf.NONINTERACTIVE_PREFIX
+            self._INTERACTIVE_PREFIX if self.is_interactive
+            else self._NONINTERACTIVE_PREFIX
         )
 
     @property
@@ -177,7 +178,7 @@ class BaseWidget(object):
         displaying the learner's response).
         """
         base_dir = (
-            feconf.INTERACTIONS_DIR if self.type == 'interactive'
+            feconf.INTERACTIONS_DIR if self.is_interactive
             else feconf.RTE_EXTENSIONS_DIR)
         js_directives = utils.get_file_contents(os.path.join(
             base_dir, self.id, '%s.js' % self.id))
@@ -203,7 +204,7 @@ class BaseWidget(object):
             } for ca_spec in self.customization_arg_specs]
         }
 
-        if self.type == feconf.INTERACTIVE_PREFIX:
+        if self.is_interactive:
             # Add widget handler information for interactive widgets.
             result['handler_specs'] = [h.to_dict() for h in self.handlers]
             for idx, handler in enumerate(self.handlers):
@@ -211,7 +212,7 @@ class BaseWidget(object):
                     rule_cls.description,
                     {'classifier': rule_cls.__name__}
                 ) for rule_cls in handler.rules)
-        elif self.type == feconf.NONINTERACTIVE_PREFIX:
+        else:
             # Add RTE toolbar information for noninteractive widgets.
             result.update({
                 'frontend_name': self.frontend_name,

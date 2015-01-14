@@ -29,10 +29,10 @@ import string
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import skins_services
-from core.domain import widget_registry
 import feconf
 import jinja_utils
 import utils
@@ -395,15 +395,18 @@ class AnswerHandlerInstance(object):
 class WidgetInstance(object):
     """Value object for a widget instance."""
 
+    # The default interaction used for a new state.
+    _DEFAULT_INTERACTION_ID = 'TextInput'
+
     def _get_full_customization_args(self):
-        """Populates the customization_args dict of the widget with default
-        values, if any of the expected customization_args are missing.
+        """Populates the customization_args dict of the interaction with
+        default values, if any of the expected customization_args are missing.
         """
         full_customization_args_dict = copy.deepcopy(self.customization_args)
 
-        widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, self.widget_id)
-        for ca_spec in widget.customization_arg_specs:
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            self.widget_id)
+        for ca_spec in interaction.customization_arg_specs:
             if ca_spec.name not in full_customization_args_dict:
                 full_customization_args_dict[ca_spec.name] = {
                     'value': ca_spec.default_value
@@ -420,9 +423,8 @@ class WidgetInstance(object):
 
     @classmethod
     def _get_obj_type(cls, widget_class_name):
-        return widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, widget_class_name
-        )._handlers[0]['obj_type']
+        return interaction_registry.Registry.get_interaction_by_id(
+            widget_class_name)._handlers[0]['obj_type']
 
     @classmethod
     def from_dict(cls, widget_dict):
@@ -456,8 +458,8 @@ class WidgetInstance(object):
                 'Expected widget id to be a string, received %s'
                 % self.widget_id)
         try:
-            widget = widget_registry.Registry.get_widget_by_id(
-                feconf.INTERACTIVE_PREFIX, self.widget_id)
+            widget = interaction_registry.Registry.get_interaction_by_id(
+                self.widget_id)
         except KeyError:
             raise utils.ValidationError(
                 'Invalid widget name: %s' % self.widget_id)
@@ -511,9 +513,9 @@ class WidgetInstance(object):
     @classmethod
     def create_default_widget(cls, default_dest_state_name):
         default_obj_type = WidgetInstance._get_obj_type(
-            feconf.DEFAULT_WIDGET_ID)
+            cls._DEFAULT_INTERACTION_ID)
         return cls(
-            feconf.DEFAULT_WIDGET_ID,
+            cls._DEFAULT_INTERACTION_ID,
             {},
             [AnswerHandlerInstance.get_default_handler(
                 default_dest_state_name, default_obj_type)]
@@ -588,8 +590,8 @@ class State(object):
                 % ruleset)
 
         widget_handlers = [AnswerHandlerInstance('submit', [])]
-        generic_widget = widget_registry.Registry.get_widget_by_id(
-            'interactive', self.widget.widget_id)
+        generic_widget = interaction_registry.Registry.get_interaction_by_id(
+            self.widget.widget_id)
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
@@ -1207,10 +1209,8 @@ class Exploration(object):
         for handler in state_dict['widget']['handlers']:
             for rule_spec in handler['rule_specs']:
 
-                widget = widget_registry.Registry.get_widget_by_id(
-                    feconf.INTERACTIVE_PREFIX,
-                    state_dict['widget']['widget_id']
-                )
+                widget = interaction_registry.Registry.get_interaction_by_id(
+                    state_dict['widget']['widget_id'])
 
                 rule_spec['description'] = rule_domain.get_rule_description(
                     rule_spec['definition'],
@@ -1377,12 +1377,10 @@ class Exploration(object):
             'param_specs': self.param_specs_dict,
         }
 
-    def get_interactive_widget_ids(self):
-        """Get all interactive widget ids used in this exploration."""
-        result = set([])
-        for (state_name, state) in self.states.iteritems():
-            result.add(state.widget.widget_id)
-        return list(result)
+    def get_interaction_ids(self):
+        """Get all interaction ids used in this exploration."""
+        return list(set([
+            state.widget.widget_id for state in self.states.values()]))
 
 
 class ExplorationSummary(object):

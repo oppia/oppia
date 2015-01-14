@@ -30,7 +30,7 @@ oppia.directive('snapshotsSkin', [function() {
         $scope.currentQuestion = '';
         oppiaPlayerService.init(function(stateName, initHtml) {
           $scope.currentQuestion = initHtml;
-          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(stateName);
+          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName);
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
         });
       };
@@ -48,7 +48,7 @@ oppia.directive('snapshotsSkin', [function() {
 
           if (!isSticky) {
             // The previous widget is not sticky and should be replaced.
-            $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
+            $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }
 

@@ -305,7 +305,7 @@ oppia.factory('interactionRepositoryService', [
         return deferred.promise;
       } else {
         return $http.get('/interaction_repository/data').then(function(response) {
-          _cachedInteractionRepository[widgetType] = response.data.repository;
+          _cachedInteractionRepository = response.data.repository;
           return angular.copy(_cachedInteractionRepository);
         });
       }

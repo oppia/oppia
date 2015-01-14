@@ -176,11 +176,11 @@ oppia.factory('oppiaPlayerService', [
 
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
   // a common standalone service.
-  var _getInteractiveWidgetHtml = function(widgetId, widgetCustomizationArgSpecs) {
+  var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs) {
     var el = $(
-      '<oppia-interactive-' + $filter('camelCaseToHyphens')(widgetId) + '>');
-    for (var caSpecName in widgetCustomizationArgSpecs) {
-      var caSpecValue = widgetCustomizationArgSpecs[caSpecName].value;
+      '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
+    for (var caSpecName in interactionCustomizationArgSpecs) {
+      var caSpecValue = interactionCustomizationArgSpecs[caSpecName].value;
       // TODO(sll): Evaluate any values here that correspond to expressions.
       el.attr(
         $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
@@ -189,9 +189,9 @@ oppia.factory('oppiaPlayerService', [
     return ($('<div>').append(el)).html();
   };
 
-  var _getReaderResponseHtml = function(widgetId, answer, isSticky, choices) {
+  var _getReaderResponseHtml = function(interactionId, answer, isSticky, choices) {
     var el = $(
-      '<oppia-response-' + $filter('camelCaseToHyphens')(widgetId) + '>');
+      '<oppia-response-' + $filter('camelCaseToHyphens')(interactionId) + '>');
     el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
     el.attr('state-sticky', oppiaHtmlEscaper.objToEscapedJson(isSticky));
     if (choices) {
@@ -209,9 +209,9 @@ oppia.factory('oppiaPlayerService', [
     var oldStateData = _exploration.states[oldStateName];
     // NB: This may be undefined if newStateName === END_DEST.
     var newStateData = _exploration.states[newStateName];
-    // TODO(sll): If the new state widget is the same as the old state widget,
-    // and the new state widget is sticky, do not render the reader response.
-    // The interactive widget in the frontend should take care of this.
+    // TODO(sll): If the new interaction is the same as the old interaction,
+    // and the new interaction is sticky, do not render the reader response.
+    // The interaction in the frontend should take care of this.
     // TODO(sll): This special-casing is not great; we should make the
     // interface for updating the frontend more generic so that all the updates
     // happen in the same place. Perhaps in the non-sticky case we should call
@@ -243,13 +243,13 @@ oppia.factory('oppiaPlayerService', [
     stopwatch.resetStopwatch();
 
     // TODO(sll): Get rid of this special case for multiple choice.
-    var oldWidgetChoices = null;
+    var oldInteractionChoices = null;
     if (_exploration.states[oldStateName].widget.customization_args.choices) {
-      oldWidgetChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
+      oldInteractionChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
     }
 
     var readerResponseHtml = _getReaderResponseHtml(
-      _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldWidgetChoices);
+      _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldInteractionChoices);
     if (newStateData) {
       learnerParamsService.init(newParams);
     }
@@ -357,8 +357,8 @@ oppia.factory('oppiaPlayerService', [
     getCurrentStateName: function() {
       return _currentStateName;
     },
-    getInteractiveWidgetHtml: function(stateName) {
-      return _getInteractiveWidgetHtml(
+    getInteractionHtml: function(stateName) {
+      return _getInteractionHtml(
         _exploration.states[stateName].widget.widget_id,
         _exploration.states[stateName].widget.customization_args);
     },

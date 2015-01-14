@@ -21,9 +21,10 @@ import re
 import string
 
 from core.domain import dependency_registry
+from core.domain import interaction_registry
 from core.domain import obj_services
+from core.domain import rte_component_registry
 from core.domain import widget_domain
-from core.domain import widget_registry
 from core.tests import test_utils
 import feconf
 import schema_utils
@@ -60,8 +61,8 @@ class WidgetUnitTests(test_utils.GenericTestBase):
 
         TEXT_INPUT_ID = 'TextInput'
 
-        widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, TEXT_INPUT_ID)
+        widget = interaction_registry.Registry.get_interaction_by_id(
+            TEXT_INPUT_ID)
         self.assertEqual(widget.id, TEXT_INPUT_ID)
         self.assertEqual(widget.name, 'Text')
 
@@ -120,29 +121,22 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
     def test_widget_counts(self):
         """Test that the correct number of widgets are loaded."""
-        widget_registry.Registry.refresh()
-
         self.assertEqual(
-            len(widget_registry.Registry.interactive_widgets),
-            len(feconf.ALLOWED_INTERACTIONS)
-        )
+            len(interaction_registry.Registry.get_all_interactions()),
+            len(feconf.ALLOWED_INTERACTIONS))
         self.assertEqual(
-            len(widget_registry.Registry.noninteractive_widgets),
-            len(feconf.ALLOWED_RTE_EXTENSIONS)
-        )
+            len(rte_component_registry.Registry.get_all_rte_components()),
+            len(feconf.ALLOWED_RTE_EXTENSIONS))
 
-    def test_image_data_urls_for_noninteractive_widgets(self):
-        """Test the data urls for the noninteractive widget editor icons."""
-        widget_registry.Registry.refresh()
-
-        widget_list = widget_registry.Registry.noninteractive_widgets
-        for (ext_name, ext_spec) in feconf.ALLOWED_RTE_EXTENSIONS.iteritems():
+    def test_image_data_urls_for_rte_components(self):
+        """Test the data urls for the RTE component icons."""
+        component_list = rte_component_registry.Registry._rte_components
+        for (cpt_name, cpt_spec) in feconf.ALLOWED_RTE_EXTENSIONS.iteritems():
             image_filepath = os.path.join(
-                os.getcwd(), ext_spec['dir'], '%s.png' % ext_name)
+                os.getcwd(), cpt_spec['dir'], '%s.png' % cpt_name)
             self.assertEqual(
                 utils.convert_png_to_data_url(image_filepath),
-                widget_list[ext_name].icon_data_url
-            )
+                component_list[cpt_name].icon_data_url)
 
     def _validate_customization_arg_specs(self, customization_args):
         for ca_spec in customization_args:
@@ -169,7 +163,7 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                     ca_spec['default_value'],
                     obj_class.normalize(ca_spec['default_value']))
 
-    def _validate_widget_dependencies(self, dependency_ids):
+    def _validate_dependencies(self, dependency_ids):
         # Check that all dependency ids are valid.
         for dependency_id in dependency_ids:
             dependency_registry.Registry.get_dependency_html(dependency_id)
@@ -182,30 +176,33 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
             names = [name for name in names if not name.endswith(suffix)]
         return names
 
-    def test_default_noninteractive_widgets_are_valid(self):
-        """Test that the default noninteractive widgets are valid."""
-        noninteractive_bindings = (
-            widget_registry.Registry.noninteractive_widgets)
+    def test_default_rte_components_are_valid(self):
+        """Test that the default RTE components are valid."""
 
-        for widget_id in feconf.ALLOWED_RTE_EXTENSIONS:
-            # Check that the widget_id name is valid.
-            self.assertTrue(self._is_camel_cased(widget_id))
+        _COMPONENT_CONFIG_SCHEMA = [
+            ('name', basestring), ('category', basestring),
+            ('description', basestring), ('_customization_arg_specs', list)
+        ]
 
-            # Check that the widget directory exists.
-            widget_dir = os.path.join(
-                feconf.RTE_EXTENSIONS_DIR, widget_id)
-            self.assertTrue(os.path.isdir(widget_dir))
+        for component_id in feconf.ALLOWED_RTE_EXTENSIONS:
+            # Check that the component id is valid.
+            self.assertTrue(self._is_camel_cased(component_id))
+
+            # Check that the component directory exists.
+            component_dir = os.path.join(
+                feconf.RTE_EXTENSIONS_DIR, component_id)
+            self.assertTrue(os.path.isdir(component_dir))
 
             # In this directory there should be a config .py file, an
             # html file, a JS file, a .png file and a protractor.js file.
-            dir_contents = self._listdir_omit_ignored(widget_dir)
+            dir_contents = self._listdir_omit_ignored(component_dir)
             self.assertLessEqual(len(dir_contents), 5)
 
-            py_file = os.path.join(widget_dir, '%s.py' % widget_id)
-            html_file = os.path.join(widget_dir, '%s.html' % widget_id)
-            js_file = os.path.join(widget_dir, '%s.js' % widget_id)
-            png_file = os.path.join(widget_dir, '%s.png' % widget_id)
-            protractor_file = os.path.join(widget_dir, 'protractor.js')
+            py_file = os.path.join(component_dir, '%s.py' % component_id)
+            html_file = os.path.join(component_dir, '%s.html' % component_id)
+            js_file = os.path.join(component_dir, '%s.js' % component_id)
+            png_file = os.path.join(component_dir, '%s.png' % component_id)
+            protractor_file = os.path.join(component_dir, 'protractor.js')
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
@@ -215,62 +212,65 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
-            self.assertIn('oppiaNoninteractive%s' % widget_id, js_file_content)
+            self.assertIn(
+                'oppiaNoninteractive%s' % component_id, js_file_content)
             self.assertIn(
                 '<script type="text/ng-template" '
-                'id="noninteractiveWidget/%s"' % widget_id,
+                'id="noninteractiveWidget/%s"' % component_id,
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 
-            WIDGET_CONFIG_SCHEMA = [
-                ('name', basestring), ('category', basestring),
-                ('description', basestring), ('_customization_arg_specs', list)
-            ]
+            component = rte_component_registry.Registry._rte_components[
+                component_id]
 
-            widget = noninteractive_bindings[widget_id]
-
-            # Check that the specified widget id is the same as the class name.
-            self.assertTrue(widget_id, widget.__class__.__name__)
+            # Check that the specified component id is the same as the class
+            # name.
+            self.assertTrue(component_id, component.__class__.__name__)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
-            for item, item_type in WIDGET_CONFIG_SCHEMA:
+            for item, item_type in _COMPONENT_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
-                    getattr(widget, item), item_type
-                ))
+                    getattr(component, item), item_type))
                 # The string attributes should be non-empty.
                 if item_type == basestring:
-                    self.assertTrue(getattr(widget, item))
+                    self.assertTrue(getattr(component, item))
 
             self._validate_customization_arg_specs(
-                widget._customization_arg_specs)
+                component._customization_arg_specs)
 
-            self._validate_widget_dependencies(widget.dependency_ids)
+            self._validate_dependencies(component.dependency_ids)
 
-    def test_default_interactive_widgets_are_valid(self):
-        """Test that the default interactive widgets are valid."""
-        interactive_bindings = widget_registry.Registry.interactive_widgets
+    def test_default_interactions_are_valid(self):
+        """Test that the default interactions are valid."""
 
-        for widget_id in feconf.ALLOWED_INTERACTIONS:
-            # Check that the widget_id name is valid.
-            self.assertTrue(self._is_camel_cased(widget_id))
+        WIDGET_CONFIG_SCHEMA = [
+            ('name', basestring), ('category', basestring),
+            ('description', basestring), ('_handlers', list),
+            ('_customization_arg_specs', list)
+        ]
 
-            # Check that the widget directory exists.
-            widget_dir = os.path.join(feconf.INTERACTIONS_DIR, widget_id)
-            self.assertTrue(os.path.isdir(widget_dir))
+        for interaction_id in feconf.ALLOWED_INTERACTIONS:
+            # Check that the interaction id is valid.
+            self.assertTrue(self._is_camel_cased(interaction_id))
+
+            # Check that the interaction directory exists.
+            interaction_dir = os.path.join(
+                feconf.INTERACTIONS_DIR, interaction_id)
+            self.assertTrue(os.path.isdir(interaction_dir))
 
             # In this directory there should only be a config .py file, an
             # html file, a JS file, (optionally) a directory named 'static',
-            # (optionally) a widget JS test file, (optionally) a
-            # stats_response.html file and (optionally) a protractor.js file.
-            dir_contents = self._listdir_omit_ignored(widget_dir)
+            # (optionally) a JS test file, (optionally) a stats_response.html
+            # file and (optionally) a protractor.js file.
+            dir_contents = self._listdir_omit_ignored(interaction_dir)
 
             optional_dirs_and_files_count = 0
 
             try:
                 self.assertIn('static', dir_contents)
-                static_dir = os.path.join(widget_dir, 'static')
+                static_dir = os.path.join(interaction_dir, 'static')
                 self.assertTrue(os.path.isdir(static_dir))
                 optional_dirs_and_files_count += 1
             except Exception:
@@ -278,21 +278,21 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
             try:
                 self.assertTrue(os.path.isfile(
-                    os.path.join(widget_dir, 'stats_response.html')))
+                    os.path.join(interaction_dir, 'stats_response.html')))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    widget_dir, '%sSpec.js' % widget_id)))
+                    interaction_dir, '%sSpec.js' % interaction_id)))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
 
             try:
                 self.assertTrue(os.path.isfile(os.path.join(
-                    widget_dir, 'protractor.js')))
+                    interaction_dir, 'protractor.js')))
                 optional_dirs_and_files_count += 1
             except Exception:
                 pass
@@ -302,9 +302,10 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                 dir_contents
             )
 
-            py_file = os.path.join(widget_dir, '%s.py' % widget_id)
-            html_file = os.path.join(widget_dir, '%s.html' % widget_id)
-            js_file = os.path.join(widget_dir, '%s.js' % widget_id)
+            py_file = os.path.join(interaction_dir, '%s.py' % interaction_id)
+            html_file = os.path.join(
+                interaction_dir, '%s.html' % interaction_id)
+            js_file = os.path.join(interaction_dir, '%s.js' % interaction_id)
 
             self.assertTrue(os.path.isfile(py_file))
             self.assertTrue(os.path.isfile(html_file))
@@ -312,46 +313,42 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
 
             js_file_content = utils.get_file_contents(js_file)
             html_file_content = utils.get_file_contents(html_file)
-            self.assertIn('oppiaInteractive%s' % widget_id, js_file_content)
-            self.assertIn('oppiaResponse%s' % widget_id, js_file_content)
+            self.assertIn(
+                'oppiaInteractive%s' % interaction_id, js_file_content)
+            self.assertIn('oppiaResponse%s' % interaction_id, js_file_content)
             self.assertIn(
                 '<script type="text/ng-template" '
-                'id="interactiveWidget/%s"' % widget_id,
+                'id="interactiveWidget/%s"' % interaction_id,
                 html_file_content)
             self.assertIn(
-                '<script type="text/ng-template" id="response/%s"' % widget_id,
+                '<script type="text/ng-template" id="response/%s"' %
+                    interaction_id,
                 html_file_content)
             self.assertNotIn('<script>', js_file_content)
             self.assertNotIn('</script>', js_file_content)
 
-            WIDGET_CONFIG_SCHEMA = [
-                ('name', basestring), ('category', basestring),
-                ('description', basestring), ('_handlers', list),
-                ('_customization_arg_specs', list)
-            ]
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                interaction_id)
 
-            widget = interactive_bindings[widget_id]
-
-            # Check that the specified widget id is the same as the class name.
-            self.assertTrue(widget_id, widget.__class__.__name__)
+            # Check that the specified interaction id is the same as the class
+            # name.
+            self.assertTrue(interaction_id, interaction.__class__.__name__)
 
             # Check that the configuration file contains the correct
             # top-level keys, and that these keys have the correct types.
             for item, item_type in WIDGET_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
-                    getattr(widget, item), item_type
-                ))
+                    getattr(interaction, item), item_type))
                 # The string attributes should be non-empty.
                 if item_type == basestring:
-                    self.assertTrue(getattr(widget, item))
+                    self.assertTrue(getattr(interaction, item))
 
             # Check that at least one handler exists.
             self.assertTrue(
-                len(widget.handlers),
-                msg='Widget %s has no handlers defined' % widget_id
-            )
+                len(interaction.handlers),
+                msg='Interaction %s has no handlers defined' % interaction_id)
 
-            for handler in widget._handlers:
+            for handler in interaction._handlers:
                 HANDLER_KEYS = ['name', 'obj_type']
                 self.assertItemsEqual(HANDLER_KEYS, handler.keys())
                 self.assertTrue(isinstance(handler['name'], basestring))
@@ -360,14 +357,12 @@ class WidgetDataUnitTests(test_utils.GenericTestBase):
                     handler['obj_type'])
 
             # Check that all handler names are unique.
-            names = [handler.name for handler in widget.handlers]
+            names = [handler.name for handler in interaction.handlers]
             self.assertEqual(
-                len(set(names)),
-                len(names),
-                'Widget %s has duplicate handler names' % widget_id
-            )
+                len(set(names)), len(names),
+                'Interaction %s has duplicate handler names' % interaction_id)
 
             self._validate_customization_arg_specs(
-                widget._customization_arg_specs)
+                interaction._customization_arg_specs)
 
-            self._validate_widget_dependencies(widget.dependency_ids)
+            self._validate_dependencies(interaction.dependency_ids)
