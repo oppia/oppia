@@ -44,14 +44,10 @@ class Registry(object):
         for loader, name, _ in pkgutil.iter_modules(path=EXTENSION_PATHS):
             module = loader.find_module(name).load_module(name)
             clazz = getattr(module, name)
-            # TODO(sll): Move this check to tests.
-            if clazz.__name__ in cls._rte_components:
-                raise Exception(
-                    'Duplicate RTE component name %s' % clazz.__name__)
 
             ancestor_names = [
                 base_class.__name__ for base_class in clazz.__bases__]
-            if 'BaseWidget' in ancestor_names:
+            if 'BaseRichTextComponent' in ancestor_names:
                 cls._rte_components[clazz.__name__] = clazz()
 
     @classmethod

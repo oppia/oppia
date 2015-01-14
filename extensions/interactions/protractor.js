@@ -20,27 +20,27 @@
 
 /* Each interaction's protractor file must implement the following:
  * customizeInteraction: a function that receives an element containing the
- *   widget editor followed by some number of arguments used to customize the
- *   widget in question (e.g options for the MultipleChoiceInput).
+ *   interaction editor followed by some number of arguments used to customize the
+ *   interaction in question (e.g options for the MultipleChoiceInput).
  * expectInteractionDetailsToMatch: a function that receives arguments
- *   describing the way the widget is expected to look, and is run in the
- *   player to verify the widget actually looks this way.
+ *   describing the way the interaction is expected to look, and is run in the
+ *   player to verify the interaction actually looks this way.
  * submitAnswer: a function that is sent a single 'answer' argument and should
- *   then use it to answer the widget in this way, for example by selecting an
- *   option in MultipleChoiceInput.
- * answerObjectType: the name of the type of object returned by the widget.
+ *   then use it to answer the interaction in this way, for example by
+ *   selecting an option in MultipleChoiceInput.
+ * answerObjectType: the name of the type of object returned by the interaction.
  * testSuite: an array of dictionaries each containing:
  * - interactionArguments: an array of arguments that will be splatted and sent
- *   (together with the editor element) to the widget's customizeInteraction()
- *   function.
+ *   (together with the editor element) to the interaction's
+ *   customizeInteraction() function.
  * - ruleArguments: an array of arguments, the first of which should be the
  *   name of the rule to be used and the rest parameters for that rule.
  * - expectedInteractionDetails: an array of arguments that will be splatted and
- *   sent to expectInteractionDetailsToMatch when the widget is being run in
- *   the player.
+ *   sent to expectInteractionDetailsToMatch when the interaction is being run
+ *   in the player.
  * - wrongAnswers: an array of arguments that will be submitted in sequence via
- *   the widget's submitAnswer() function; it will be verified that all these
- *   answers fail to satisfy the given rule.
+ *   the interaction's submitAnswer() function; it will be verified that all
+ *   these answers fail to satisfy the given rule.
  * - correctAnswers: likewise, but these should satisfy the rule.
  */
 

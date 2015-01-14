@@ -14,23 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.rich_text_components import base
 
 
-class Collapsible(widget_domain.BaseWidget):
+class Collapsible(base.BaseRichTextComponent):
     """A rich-text component representing a collapsible block."""
 
-    # The human-readable name of the rich-text component.
     name = 'Collapsible'
-
-    # The category the rich-text component falls under in the repository.
     category = 'Basic Input'
-
-    # A description of the rich-text component.
     description = 'A collapsible block of HTML.'
+    frontend_name = 'collapsible'
+    tooltip = 'Insert collapsible block'
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'heading',
         'description': 'The heading for the collapsible block',
@@ -47,13 +42,6 @@ class Collapsible(widget_domain.BaseWidget):
         'default_value': 'You have opened the collapsible block.'
     }]
 
-    # The HTML tag name for this rich-text component.
-    frontend_name = 'collapsible'
-    # The tooltip for the icon in the rich-text editor.
-    tooltip = 'Insert collapsible block'
-    # The icon to show in the rich-text editor. This is a representation of the
-    # .png file in this rich-text component folder, generated with the
-    # utils.convert_png_to_data_url() function.
     icon_data_url = (
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAA'
         'ABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZ'

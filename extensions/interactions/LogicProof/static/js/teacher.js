@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Components used by the LogicProof widget editor.
+ * @fileoverview Components used by the LogicProof interaction editor.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
@@ -23,7 +23,7 @@ var logicProofTeacher = (function() {
  /**
   * A question is composed of the formulas the student may assume and the
   * formula she must prove; it will be different for each state in which the
-  * widget is used.
+  * interaction is used.
   * @param assumptionsString: typed by the teacher to describe the assumptions
   *        the student is allowed to make.
   * @param targetString: typed by the teacher to describe what the student is
@@ -35,9 +35,9 @@ var logicProofTeacher = (function() {
   *           operators: the operators occurring in the question including both
   *             ordinary ones (like ∧) and specific ones (like f).
   *           assumptions: an array of Expressions, which will form the
-  *             'assumptions' key in the widget.
+  *             'assumptions' key in the interaction.
   *           results: an array of length one built from the targetString which
-  *             will form the 'results' key in the widget.
+  *             will form the 'results' key in the interaction.
   *         }
   * @raises If the given strings cannot be parsed, or are mal-typed or use
   *         words that are reserved for the vocabulary.

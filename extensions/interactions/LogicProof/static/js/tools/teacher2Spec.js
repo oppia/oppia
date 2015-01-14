@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LogicProof widget teacher2 components.
+ * @fileoverview Unit tests for LogicProof interaction teacher2 components.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 

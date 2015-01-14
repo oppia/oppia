@@ -24,7 +24,7 @@ oppia.directive('oppiaInteractiveTextInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/TextInput',
+      templateUrl: 'interaction/TextInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LogicProof widget student components.
+ * @fileoverview Unit tests for LogicProof interaction student components.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
@@ -221,7 +221,7 @@ sampleControlModel.evaluation_rules['scoper'] = {
   description:'The most recent line (not including n) in whose scope line n is'
 };
 
-var sampleWidget = {
+var sampleInteraction = {
   assumptions: [],
   results: [{
     top_kind_name: 'variable',
@@ -558,7 +558,7 @@ describe('Throw lines messages', function() {
   it('should throw the error messages for sample lines correctly', function() {
     expect(errorWrapper(function() {
       logicProofStudent.throwLineMessages(
-        sampleWidget.line_templates[2].error, 'name', {
+        sampleInteraction.line_templates[2].error, 'name', {
           T: logicProofParser.parse('x=y', 'expression'),
           U: logicProofParser.parse('A2(x,y)', 'expression')
         }, logicProofData.BASE_STUDENT_LANGUAGE.operators)
@@ -580,7 +580,7 @@ describe('Match line to template', function() {
     expect(
       matchLineToTemplate(
         'from A(x,y) and A(y,z) we have A(x,y)\u2227A(y,z)',
-        sampleWidget.line_templates[0])
+        sampleInteraction.line_templates[0])
     ).toEqual({
       R: logicProofParser.parse('A(x,y)', 'expression'),
       S: logicProofParser.parse('A(y,z)', 'expression')
@@ -588,7 +588,7 @@ describe('Match line to template', function() {
 
     expect(
       matchLineToTemplate(
-        'z was arbitrary so \u2200x.x=2', sampleWidget.line_templates[1])
+        'z was arbitrary so \u2200x.x=2', sampleInteraction.line_templates[1])
     ).toEqual({
         a: logicProofParser.parse('z', 'expression'),
         p: logicProofParser.parse('x=2', 'expression'),
@@ -600,14 +600,14 @@ describe('Match line to template', function() {
     expect(
       errorWrapper(
         matchLineToTemplate, 'from p and q we have q\u2227p',
-        sampleWidget.line_templates[0])
+        sampleInteraction.line_templates[0])
     ).toThrow('This line could not be identified as valid - please check the' +
       ' list of possible lines.');
 
     expect(
       errorWrapper(
         matchLineToTemplate, 'z was arbitrary from \u2200x.x=2',
-        sampleWidget.line_templates[1])
+        sampleInteraction.line_templates[1])
     ).toThrow('This line could not be identified as valid - please check the' +
       ' list of possible lines.');
   });
@@ -616,7 +616,7 @@ describe('Match line to template', function() {
 describe('Line to have known layout as student types', function() {
   var requireIdentifiable = function(lineString) {
     return logicProofStudent.requireIdentifiableLine(
-      lineString, sampleWidget.line_templates,
+      lineString, sampleInteraction.line_templates,
       logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY,
       logicProofData.BASE_GENERAL_MESSAGES
     );
@@ -639,14 +639,14 @@ describe('Require all lines to have known layouts as student types',
     it('should accept known layouts', function() {
       expect(
         logicProofStudent.validateProof(
-          'from A and B we have A\u2227B\n', sampleWidget)
+          'from A and B we have A\u2227B\n', sampleInteraction)
       ).toEqual(undefined);
     });
 
   it('should reject unknown layouts', function() {
     expect(function() {
       logicProofStudent.validateProof(
-        'from A and B we have A\u2227\n', sampleWidget);
+        'from A and B we have A\u2227\n', sampleInteraction);
     }).toThrow('We could not identify \'A\u2227\'; please make sure you' +
       ' are using vocabulary from the given list, and don\'t have two ' +
       'consecutive expressions.');
@@ -657,7 +657,7 @@ describe('Build, validate and display line', function() {
   var buildThenDisplay = function(lineString) {
     return displayLine(
       logicProofStudent.buildLine(
-        lineString, sampleWidget.line_templates,
+        lineString, sampleInteraction.line_templates,
         logicProofData.BASE_STUDENT_LANGUAGE, logicProofData.BASE_VOCABULARY
       ), logicProofData.BASE_STUDENT_LANGUAGE.operators
     );
@@ -720,7 +720,7 @@ describe('Build, validate and display line', function() {
 describe('Build, validate and display proof', function() {
   var buildThenDisplay = function(proofString) {
     return displayProof(
-      logicProofStudent.buildProof(proofString, sampleWidget),
+      logicProofStudent.buildProof(proofString, sampleInteraction),
       logicProofData.BASE_STUDENT_LANGUAGE.operators);
   }
 
@@ -801,25 +801,25 @@ describe('Evaluate a logical expression', function() {
       logicProofShared.displayExpressionArray(
         testEvaluate('antecedents(2)', 'set_of_formulas', {}, {
           proof: logicProofStudent.buildProof([
-            'from r and s we have r\u2227s', 
+            'from r and s we have r\u2227s',
             'from r\u2227s and s we have (r\u2227s)\u2227s'
-            ].join('\n'), sampleWidget)
+            ].join('\n'), sampleInteraction)
         }), logicProofData.BASE_CONTROL_LANGUAGE.operators)
     ).toEqual('r\u2227s, s');
 
     expect(testEvaluate('scoper(num_lines())', 'integer', {}, {
       proof: logicProofStudent.buildProof(
         'from r and s we have r\u2227s\n  from r\u2227s and s we have (r\u2227s)\u2227s',
-        sampleWidget)
+        sampleInteraction)
     })).toEqual(1);
 
     expect(
       logicProofStudent.evaluate(
-        sampleWidget.mistake_table[0].entries[0].occurs, {n: 3},
-        sampleWidget.control_model, {
+        sampleInteraction.mistake_table[0].entries[0].occurs, {n: 3},
+        sampleInteraction.control_model, {
           proof: logicProofStudent.buildProof(
             'a was arbitrary hence \u2200x.p\n  from p and q we have' +
-            ' p\u2227q\n  a was arbitrary hence \u2200x.q', sampleWidget)
+            ' p\u2227q\n  a was arbitrary hence \u2200x.q', sampleInteraction)
       }, {})).toEqual(false);
   });
 });
@@ -827,8 +827,8 @@ describe('Evaluate a logical expression', function() {
 describe('Render mistake messages', function() {
   var render = function(mistakeEntry, lineInProof, proofString) {
     return logicProofStudent.renderMistakeMessages(
-      mistakeEntry, lineInProof, sampleWidget.control_model, {
-        proof: logicProofStudent.buildProof(proofString, sampleWidget)
+      mistakeEntry, lineInProof, sampleInteraction.control_model, {
+        proof: logicProofStudent.buildProof(proofString, sampleInteraction)
       }, logicProofData.BASE_STUDENT_LANGUAGE.operators)
   }
 
@@ -837,7 +837,7 @@ describe('Render mistake messages', function() {
 
     expect(
       render(
-        sampleWidget.mistake_table[0].entries[0] ,2, [
+        sampleInteraction.mistake_table[0].entries[0] ,2, [
         'a was arbitrary hence \u2200x.p',
         '  from p and q we have p\u2227q',
         '  b was arbitrary hence \u2200x.q'].join('\n'))[0]
@@ -846,15 +846,15 @@ describe('Render mistake messages', function() {
 
     expect(
       render(
-        sampleWidget.mistake_table[1].entries[0], 1,
+        sampleInteraction.mistake_table[1].entries[0], 1,
         'a was arbitrary hence \u2200x.p\n  from p and q we have p\u2227q')[0]
     ).toEqual('The last line of a proof should not be indented; you need to ' +
-      'prove that the given formulas holds just from the original ' + 
+      'prove that the given formulas holds just from the original ' +
       'assumptions, not the additional assumption of \u2200x.p.');
 
     expect(
       render(
-        sampleWidget.mistake_table[1].entries[0], 0, [
+        sampleInteraction.mistake_table[1].entries[0], 0, [
         'a was arbitrary hence \u2200x.p',
         '  from p and q we have p\u2227q'].join('\n'))
     ).toEqual([]);
@@ -864,13 +864,13 @@ describe('Render mistake messages', function() {
 describe('Check proof makes no mistakes from the mistake table', function() {
   var testCheck = function(proofString) {
     return logicProofStudent.checkProof(
-      logicProofStudent.buildProof(proofString, sampleWidget), sampleWidget);
+      logicProofStudent.buildProof(proofString, sampleInteraction), sampleInteraction);
   }
 
   it('should allow proofs that make no mistake', function() {
     expect(
       testCheck([
-        'from p and q we have p\u2227q', 
+        'from p and q we have p\u2227q',
         'from p and p\u2227q we have p\u2227(p\u2227q)'].join('\n'))
     ).toBeUndefined();
   });

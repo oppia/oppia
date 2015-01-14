@@ -18,11 +18,11 @@ oppia.directive('oppiaInteractiveLogicProof', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/LogicProof',
+      templateUrl: 'interaction/LogicProof',
       controller: ['$scope', '$attrs', '$modal', function($scope, $attrs, $modal) {
         $scope.localQuestionData = oppiaHtmlEscaper.escapedJsonToObj($attrs.questionWithValue);
 
-        // This is the information about how to mark a question (e.g. the 
+        // This is the information about how to mark a question (e.g. the
         // permited line templates) that is stored in defaultData.js within
         // the dependencies.
         $scope.questionData = angular.copy(LOGIC_PROOF_DEFAULT_QUESTION_DATA);
@@ -41,16 +41,16 @@ oppia.directive('oppiaInteractiveLogicProof', [
         $scope.expressions.push($scope.questionData.results[0]);
         $scope.topTypes.push('boolean');
         $scope.typing = logicProofShared.assignTypesToExpressionArray(
-          $scope.expressions, $scope.topTypes, logicProofData.BASE_STUDENT_LANGUAGE, 
+          $scope.expressions, $scope.topTypes, logicProofData.BASE_STUDENT_LANGUAGE,
           ['variable', 'constant', 'prefix_function']
         );
         $scope.questionData.language.operators = $scope.typing[0].operators;
-        
+
         $scope.assumptionsString = logicProofShared.displayExpressionArray(
-          $scope.questionData.assumptions, 
+          $scope.questionData.assumptions,
           $scope.questionData.language.operators);
         $scope.targetString = logicProofShared.displayExpression(
-          $scope.questionData.results[0], 
+          $scope.questionData.results[0],
           $scope.questionData.language.operators);
         $scope.questionString = ($scope.assumptionsString === '') ?
             'Prove ' + $scope.targetString + '.':
@@ -75,7 +75,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
           // for discussion.
           setTimeout(function() {
             editor.refresh();
-          }, 500);          
+          }, 500);
 
           // NOTE: we must use beforeChange rather than change here to avoid an
           // infinite loop (which code-mirror will not catch).
@@ -83,7 +83,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
             var convertedText = logicProofConversion.convertToLogicCharacters(
               change.text.join('\n'));
             if (convertedText !== change.text.join('\n')) {
-              // We update using the converted text, then cancel its being 
+              // We update using the converted text, then cancel its being
               // overwritten by the original text.
               editor.doc.replaceRange(convertedText, change.from, change.to);
               change.cancel();
@@ -119,8 +119,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           } catch(err) {
             $scope.proofError = $scope.displayMessage(err.message, err.line);
             $scope.mistakeMark = editor.doc.markText(
-              {line: err.line, ch: 0}, 
-              {line: err.line, ch: 100}, 
+              {line: err.line, ch: 0},
+              {line: err.line, ch: 100},
               {className: 'logic-proof-erroneous-line'});
           }
           // NOTE: this line is necessary to force angular to refresh the
@@ -143,8 +143,8 @@ oppia.directive('oppiaInteractiveLogicProof', [
           return (errorLineNum === undefined) ?
             [numberedLines.join('\n')] :
             [
-              numberedLines.slice(0, errorLineNum).join('\n'), 
-              numberedLines[errorLineNum], 
+              numberedLines.slice(0, errorLineNum).join('\n'),
+              numberedLines[errorLineNum],
               numberedLines.slice(errorLineNum + 1, numberedLines.length).join('\n')
             ];
         };
@@ -171,9 +171,9 @@ oppia.directive('oppiaInteractiveLogicProof', [
             submission.error_code = err.code;
             submission.error_message = err.message;
             submission.error_line_number = err.line;
-            submission.displayed_message = 
+            submission.displayed_message =
               $scope.displayMessage(err.message, err.line);
-            submission.displayed_proof = 
+            submission.displayed_proof =
               $scope.displayProof($scope.proofString, err.line);
           }
           if (submission.correct) {

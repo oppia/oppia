@@ -24,7 +24,7 @@ oppia.directive('oppiaNoninteractiveVideo', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'noninteractiveWidget/Video',
+      templateUrl: 'richTextComponent/Video',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         var start = oppiaHtmlEscaper.escapedJsonToObj($attrs.startWithValue),
             end = oppiaHtmlEscaper.escapedJsonToObj($attrs.endWithValue);

@@ -24,7 +24,7 @@ oppia.directive('oppiaNoninteractiveMath', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'noninteractiveWidget/Math',
+      templateUrl: 'richTextComponent/Math',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.rawLatex = oppiaHtmlEscaper.escapedJsonToObj($attrs.rawLatexWithValue);
       }]

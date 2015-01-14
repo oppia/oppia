@@ -24,7 +24,7 @@ oppia.directive('oppiaNoninteractiveLink', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'noninteractiveWidget/Link',
+      templateUrl: 'richTextComponent/Link',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         if (!$attrs.openLinkInSameWindowWithValue) {
           // This is done for backward-compatibility.

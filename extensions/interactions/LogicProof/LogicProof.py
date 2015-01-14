@@ -16,24 +16,20 @@
 
 __author__ = 'Jacob Davis'
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class LogicProof(widget_domain.BaseWidget):
+class LogicProof(base.BaseInteraction):
     """Interaction for entering logic proofs."""
 
-    # The human-readable name of the interaction.
     name = 'Logic Proof'
-
-    # The category the interaction falls under in the repository.
     category = 'Custom'
-
-    # A description of the interaction.
     description = (
         'Allows learners to write proofs for simple logical statements.')
+    _dependency_ids = ['logic_proof', 'codemirror']
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'CheckedProof'}]
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'question',
         'description': 'Question to ask.',
@@ -57,15 +53,3 @@ class LogicProof(widget_domain.BaseWidget):
             'default_proof_string': ''
         },
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'CheckedProof'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = ['logic_proof', 'codemirror']

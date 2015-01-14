@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.rich_text_components import base
 
 
 TAB_CONTENT_SCHEMA = {
@@ -38,20 +38,15 @@ TAB_CONTENT_SCHEMA = {
 }
 
 
-class Tabs(widget_domain.BaseWidget):
+class Tabs(base.BaseRichTextComponent):
     """A rich-text component representing a series of tabs."""
 
-    # The human-readable name of the rich-text component.
     name = 'Tabs'
-
-    # The category the rich-text component falls under in the repository.
     category = 'Basic Input'
-
-    # A description of the rich-text component.
     description = 'A series of tabs.'
+    frontend_name = 'tabs'
+    tooltip = 'Insert tabs (e.g. for hints)'
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'tab_contents',
         'description': 'The tab titles and contents.',
@@ -72,13 +67,6 @@ class Tabs(widget_domain.BaseWidget):
         }],
     }]
 
-    # The HTML tag name for this rich-text component.
-    frontend_name = 'tabs'
-    # The tooltip for the icon in the rich-text editor.
-    tooltip = 'Insert tabs (e.g. for hints)'
-    # The icon to show in the rich-text editor. This is a representation of the
-    # .png file in this rich-text component folder, generated with the
-    # utils.convert_png_to_data_url() function.
     icon_data_url = (
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAA'
         'ABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZ'

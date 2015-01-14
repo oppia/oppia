@@ -14,23 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class Continue(widget_domain.BaseWidget):
+class Continue(base.BaseInteraction):
     """Interaction that takes the form of a simple 'Continue' button."""
 
-    # The human-readable name of the interaction.
     name = 'Continue Button'
-
-    # The category the interaction falls under in the repository.
     category = 'Basic Input'
-
-    # A description of the interaction.
     description = 'A simple \'go to next state\' button.'
+    _dependency_ids = []
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'Null'}]
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'buttonText',
         'description': 'The text to display on the button.',
@@ -39,15 +35,3 @@ class Continue(widget_domain.BaseWidget):
         },
         'default_value': 'Continue',
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Null'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = []

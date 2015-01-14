@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Complete tests for LogicProof widget js.
+ * @fileoverview Complete tests for LogicProof interaction JS.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
@@ -61,7 +61,7 @@ describe('Full system', function() {
 
     expect(completeCheck('p', 'p', 'we know p')).toBeUndefined();
 
-    // TODO: add back additional tests from commit 2d9335019521 when speed 
+    // TODO: add back additional tests from commit 2d9335019521 when speed
     // issues are fixed.
 
     expect(

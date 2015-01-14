@@ -157,6 +157,7 @@ class Content(object):
 
     def validate(self):
         # TODO(sll): Add HTML sanitization checking.
+        # TODO(sll): Validate customization args for rich-text components.
         if not self.type == 'text':
             raise utils.ValidationError('Invalid content type: %s' % self.type)
         if not isinstance(self.value, basestring):

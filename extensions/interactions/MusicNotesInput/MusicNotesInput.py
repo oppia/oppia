@@ -14,25 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class MusicNotesInput(widget_domain.BaseWidget):
+class MusicNotesInput(base.BaseInteraction):
     """Interaction for music notes input."""
 
-    # The human-readable name of the interaction.
     name = 'Music Notes'
-
-    # The category the interaction falls under in the repository.
     category = 'Custom'
-
-    # A description of the interaction.
     description = (
         'Allows learners to drag and drop notes onto the lines of a music '
         'staff.')
+    _dependency_ids = ['midijs']
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'MusicPhrase'}]
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'sequenceToGuess',
         'description': 'The sequence of notes that the reader should guess.',
@@ -50,15 +46,3 @@ class MusicNotesInput(widget_domain.BaseWidget):
         },
         'default_value': [],
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'MusicPhrase'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = ['midijs']

@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Unit tests for LogicProof widget shared components.
+ * @fileoverview Unit tests for the shared components of the LogicProof interaction.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
@@ -221,7 +221,7 @@ describe('Parse lines', function() {
     expect(
       errorWrapper(parse, 'from A=>B B have B')
     ).toThrow('We could not identify \'B\'; please make sure you are using ' +
-      'vocabulary from the given list, and don\'t have two consecutive ' + 
+      'vocabulary from the given list, and don\'t have two consecutive ' +
       'expressions.')
   });
 });

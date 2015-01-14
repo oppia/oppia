@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Classes relating to widget definitions.
+"""Base class for defining interactions.
 
 A note on terminology: state_customization_args refers to the values of
 customization args that are provided by an exploration editor. They are
@@ -68,7 +68,7 @@ class AnswerHandler(object):
 
 
 class CustomizationArgSpec(object):
-    """Value object for a widget customization arg specification."""
+    """Value object for a customization arg specification."""
 
     def __init__(self, name, description, schema, default_value):
         self.name = name
@@ -77,39 +77,35 @@ class CustomizationArgSpec(object):
         self.default_value = default_value
 
 
-class BaseWidget(object):
-    """Base widget definition class.
+class BaseInteraction(object):
+    """Base interaction definition class.
 
     This class is not meant to be user-editable. The only methods on it should
     be get()-type methods.
     """
 
-    @property
-    def type(self):
-        return (
-            self._INTERACTIVE_PREFIX if self.is_interactive
-            else self._NONINTERACTIVE_PREFIX
-        )
+    # The human-readable name of the interaction. Overridden in subclasses.
+    name = ''
+    # The category the interaction falls under in the repository. Overridden in
+    # subclasses.
+    category = ''
+    # A description of the interaction. Overridden in subclasses.
+    description = ''
+    # Additional JS library dependencies that should be loaded in pages
+    # containing this interaction. These should correspond to names of files in
+    # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
+    _dependency_ids = []
+    # Actions that the learner can perform on this interaction which trigger a
+    # feedback response, and the associated input types. Each interaction must
+    # have at least one of these. Overridden in subclasses.
+    _handlers = []
+    # Customization arg specifications for the component, including their
+    # descriptions, schemas and default values. Overridden in subclasses.
+    _customization_arg_specs = []
 
     @property
     def id(self):
         return self.__class__.__name__
-
-    # The human-readable name of the widget. Overridden in subclasses.
-    name = ''
-    # The category in the widget repository to which this widget belongs.
-    # Overridden in subclasses.
-    category = ''
-    # The description of the widget. Overridden in subclasses.
-    description = ''
-    # Customization arg specifications for displaying this widget. The default
-    # values for these can be overridden when the widget is used within a
-    # state. Overridden in subclasses.
-    _customization_arg_specs = []
-    # Answer handlers. Overridden in subclasses.
-    _handlers = []
-    # JS library dependency ids. Overridden in subclasses.
-    _dependency_ids = []
 
     @property
     def customization_arg_specs(self):
@@ -119,29 +115,20 @@ class BaseWidget(object):
 
     @property
     def handlers(self):
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
         return [AnswerHandler(**ah) for ah in self._handlers]
 
     @property
     def dependency_ids(self):
         return copy.deepcopy(self._dependency_ids)
 
-    @property
-    def is_interactive(self):
-        """A widget is interactive iff its handlers array is non-empty."""
-        return bool(self._handlers)
-
     def normalize_answer(self, answer, handler_name):
-        """Normalizes a reader's input to this widget."""
+        """Normalizes a learner's input to this interaction."""
         for handler in self.handlers:
             if handler.name == handler_name:
                 return handler.obj_class.normalize(answer)
 
         raise Exception(
-            'Could not find handler in widget %s with name %s' %
+            'Could not find handler in interaction %s with name %s' %
             (self.name, handler_name))
 
     def validate_customization_arg_values(self, customization_args):
@@ -156,10 +143,6 @@ class BaseWidget(object):
     @property
     def _stats_log_template(self):
         """The template for reader responses in the stats log."""
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
         try:
             return utils.get_file_contents(os.path.join(
                 feconf.INTERACTIONS_DIR, self.id, 'stats_response.html'))
@@ -168,29 +151,24 @@ class BaseWidget(object):
 
     @property
     def html_body(self):
-        """The HTML code containing directives and templates for the widget.
+        """The HTML code containing directives and templates for the
+        interaction. This contains everything needed to display the interaction
+        once the necessary attributes are supplied.
 
-        This contains everything needed to display the widget once the
-        necessary attributes are supplied.
-
-        For noninteractive widgets, there is one directive/template pair.
-        For interactive widgets, there are two (the additional one is for
-        displaying the learner's response).
+        Each interaction has two directive/template pairs, one for the
+        interaction itself and the other for displaying the learner's response
+        in a read-only view after it has been submitted.
         """
-        base_dir = (
-            feconf.INTERACTIONS_DIR if self.is_interactive
-            else feconf.RTE_EXTENSIONS_DIR)
         js_directives = utils.get_file_contents(os.path.join(
-            base_dir, self.id, '%s.js' % self.id))
+            feconf.INTERACTIONS_DIR, self.id, '%s.js' % self.id))
         html_templates = utils.get_file_contents(os.path.join(
-            base_dir, self.id, '%s.html' % self.id))
+            feconf.INTERACTIONS_DIR, self.id, '%s.html' % self.id))
         return '<script>%s</script>\n%s' % (js_directives, html_templates)
 
     def to_dict(self):
-        """Gets a dict representing this widget. Only default values are
+        """Gets a dict representing this interaction. Only default values are
         provided.
         """
-
         result = {
             'widget_id': self.id,
             'name': self.name,
@@ -204,26 +182,18 @@ class BaseWidget(object):
             } for ca_spec in self.customization_arg_specs]
         }
 
-        if self.is_interactive:
-            # Add widget handler information for interactive widgets.
-            result['handler_specs'] = [h.to_dict() for h in self.handlers]
-            for idx, handler in enumerate(self.handlers):
-                result['handler_specs'][idx]['rules'] = dict((
-                    rule_cls.description,
-                    {'classifier': rule_cls.__name__}
-                ) for rule_cls in handler.rules)
-        else:
-            # Add RTE toolbar information for noninteractive widgets.
-            result.update({
-                'frontend_name': self.frontend_name,
-                'tooltip': self.tooltip,
-                'icon_data_url': self.icon_data_url,
-            })
+        # Add information about the handlers.
+        result['handler_specs'] = [h.to_dict() for h in self.handlers]
+        for idx, handler in enumerate(self.handlers):
+            result['handler_specs'][idx]['rules'] = dict((
+                rule_cls.description,
+                {'classifier': rule_cls.__name__}
+            ) for rule_cls in handler.rules)
 
         return result
 
     def get_handler_by_name(self, handler_name):
-        """Get the handler for a widget, given the name of the handler."""
+        """Get the handler for an interaction, given the handler's name."""
         try:
             return next(h for h in self.handlers if h.name == handler_name)
         except StopIteration:
@@ -242,14 +212,10 @@ class BaseWidget(object):
                 % (rule_name, handler_name))
 
     def get_stats_log_html(self, state_customization_args, answer):
-        """Gets the HTML for recording a reader response for the stats log.
+        """Gets the HTML for recording a learner's response in the stats log.
 
         Returns an HTML string.
         """
-        if not self.is_interactive:
-            raise Exception(
-                'This method should only be called for interactive widgets.')
-
         customization_args = {
             ca_spec.name: (
                 state_customization_args[ca_spec.name]['value']

@@ -24,7 +24,7 @@ oppia.directive('oppiaNoninteractiveCollapsible', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'noninteractiveWidget/Collapsible',
+      templateUrl: 'richTextComponent/Collapsible',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.heading = oppiaHtmlEscaper.escapedJsonToObj($attrs.headingWithValue);
         $scope.content = oppiaHtmlEscaper.escapedJsonToObj($attrs.contentWithValue);

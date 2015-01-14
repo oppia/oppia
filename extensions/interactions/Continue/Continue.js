@@ -25,7 +25,7 @@ oppia.directive('oppiaInteractiveContinue', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/Continue',
+      templateUrl: 'interaction/Continue',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.buttonText = oppiaHtmlEscaper.escapedJsonToObj($attrs.buttonTextWithValue);
 

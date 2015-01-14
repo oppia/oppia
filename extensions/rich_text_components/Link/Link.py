@@ -14,23 +14,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.rich_text_components import base
 
 
-class Link(widget_domain.BaseWidget):
+class Link(base.BaseRichTextComponent):
     """A rich-text component for displaying links."""
 
-    # The human-readable name of the rich-text component.
     name = 'Link'
-
-    # The category the rich-text component falls under in the repository.
     category = 'Basic Input'
-
-    # A description of the rich-text component.
     description = 'A link to a URL.'
+    frontend_name = 'link'
+    tooltip = 'Insert link'
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'url',
         'description': (
@@ -49,13 +44,6 @@ class Link(widget_domain.BaseWidget):
         'default_value': False,
     }]
 
-    # The HTML tag name for this rich-text component.
-    frontend_name = 'link'
-    # The tooltip for the icon in the rich-text editor.
-    tooltip = 'Insert link'
-    # The icon to show in the rich-text editor. This is a representation of the
-    # .png file in this rich-text component folder, generated with the
-    # utils.convert_png_to_data_url() function.
     icon_data_url = (
         'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAQAAAC1%2BjfqA'
         'AAABGdBTUEAAK/INwWK6QAAABl0RVh0%0AU29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXH'

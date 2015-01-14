@@ -20,7 +20,7 @@
  */
 
 var interactions = require('../../../extensions/interactions/protractor.js');
-var rteComponents = require(
+var richTextComponents = require(
   '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 
@@ -177,10 +177,10 @@ var RichTextEditor = function(elem) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      rteComponents.getComponent(componentName).customizeComponent.apply(
+      richTextComponents.getComponent(componentName).customizeComponent.apply(
         null, args);
       modal.element(
-        by.css('.protractor-test-close-rte-component-editor')).click();
+        by.css('.protractor-test-close-rich-text-component-editor')).click();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -367,7 +367,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      rteComponents.getComponent(componentName).
+      richTextComponents.getComponent(componentName).
         expectComponentDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
         (justPassedRteComponent ? 1 : 2);

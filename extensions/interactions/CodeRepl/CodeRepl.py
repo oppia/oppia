@@ -14,24 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class CodeRepl(widget_domain.BaseWidget):
+class CodeRepl(base.BaseInteraction):
     """Interaction that allows programs to be input."""
 
-    # The human-readable name of the interaction.
     name = 'Code'
-
-    # The category the interaction falls under in the repository.
     category = 'Custom'
+    description = 'Allows learners to enter code and get it evaluated.'
+    _dependency_ids = ['jsrepl', 'codemirror']
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'CodeEvaluation'}]
 
-    # A description of the interaction.
-    description = (
-        'Allows learners to enter code and get it evaluated.')
-
-    # Customization args and their descriptions, schemas and default
-    # values.
     # Language options 'lua' and 'scheme' have been removed for possible
     # later re-release.
     _customization_arg_specs = [{
@@ -75,15 +70,3 @@ class CodeRepl(widget_domain.BaseWidget):
         },
         'default_value': ''
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'CodeEvaluation'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = ['jsrepl', 'codemirror']

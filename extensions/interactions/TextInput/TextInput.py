@@ -14,23 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class TextInput(widget_domain.BaseWidget):
+class TextInput(base.BaseInteraction):
     """Interaction for entering text strings."""
 
-    # The human-readable name of the interaction.
     name = 'Text'
-
-    # The category the interaction falls under in the repository.
     category = 'Basic Input'
-
-    # A description of the interaction.
     description = 'Allows learners to enter arbitrary text strings.'
+    _dependency_ids = []
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'NormalizedString'}]
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     # NB: There used to be an integer-typed parameter here called 'columns'
     # that was removed in revision 628942010573. Some text interactions in
     # older explorations may have this customization parameter still set
@@ -61,15 +57,3 @@ class TextInput(widget_domain.BaseWidget):
         },
         'default_value': 1,
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'NormalizedString'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = []

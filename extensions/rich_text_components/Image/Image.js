@@ -24,7 +24,7 @@ oppia.directive('oppiaNoninteractiveImage', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'noninteractiveWidget/Image',
+      templateUrl: 'richTextComponent/Image',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.filepath = oppiaHtmlEscaper.escapedJsonToObj($attrs.filepathWithValue);
         $scope.imageUrl = $sce.trustAsResourceUrl(

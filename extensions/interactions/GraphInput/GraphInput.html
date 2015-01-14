@@ -1,17 +1,17 @@
-<script type="text/ng-template" id="interactiveWidget/GraphInput">
+<script type="text/ng-template" id="interaction/GraphInput">
   <style>
     .oppia-graph-input-viz-container {
       border: 1px solid black;
     }
   </style>
   <div>
-    <graph-viz graph="graph" 
-      can-add-vertex="canAddVertex" 
-      can-delete-vertex="canDeleteVertex" 
-      can-edit-vertex-label="canEditVertexLabel" 
-      can-move-vertex="canMoveVertex" 
-      can-add-edge="canAddEdge" 
-      can-delete-edge="canDeleteEdge" 
+    <graph-viz graph="graph"
+      can-add-vertex="canAddVertex"
+      can-delete-vertex="canDeleteVertex"
+      can-edit-vertex-label="canEditVertexLabel"
+      can-move-vertex="canMoveVertex"
+      can-add-edge="canAddEdge"
+      can-delete-edge="canDeleteEdge"
       can-edit-edge-weight="canEditEdgeWeight">
     </graph-viz>
     <button class="btn btn-default" ng-click="submitGraph()">Submit</button>
@@ -63,8 +63,8 @@
       </g>
       <g ng-repeat="vertex in graph.vertices"
         ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)">
-        <text ng-if="graph.isLabeled" 
-          x="0" 
+        <text ng-if="graph.isLabeled"
+          x="0"
           y="-10"
           class="unselectable-text">
           <[vertex.label]>
@@ -123,8 +123,8 @@
             ng-attr-style="stroke: black; fill: white; stroke-width: <[graph[button.option] ? 3 : 1]>;"
             ng-click="toggleGraphOption(button.option)">
           </rect>
-          <text class="unselectable-text unclickable-text" 
-            x="45" 
+          <text class="unselectable-text unclickable-text"
+            x="45"
             ng-attr-y="<[30 + 50 * $index]>"
             style="text-anchor: middle">
             <[button.text]>
@@ -151,7 +151,7 @@
           <[button.description]>
         </text>
       </g>
-      
+
       <line ng-if="state.addEdgeVertex !== null"
         ng-attr-x1="<[graph.vertices[state.addEdgeVertex].x]>"
         ng-attr-y1="<[graph.vertices[state.addEdgeVertex].y]>"
@@ -191,8 +191,8 @@
       <g
         ng-repeat="vertex in graph.vertices"
         ng-attr-transform="translate(<[vertex.x]>, <[vertex.y]>)">
-        <text ng-if="graph.isLabeled" 
-          x="0" 
+        <text ng-if="graph.isLabeled"
+          x="0"
           y="-10"
           ng-click="onClickVertex($index)"
           ng-mouseenter="state.hoveredVertex = $index"

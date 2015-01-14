@@ -14,24 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class InteractiveMap(widget_domain.BaseWidget):
+class InteractiveMap(base.BaseInteraction):
     """Interaction for pinpointing a location on a map."""
 
-    # The human-readable name of the interaction.
     name = 'World Map'
-
-    # The category the interaction falls under in the repository.
     category = 'Custom'
+    description = 'Allows learners to specify a position on a world map.'
+    _dependency_ids = ['google_maps']
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'CoordTwoDim'}]
 
-    # A description of the interaction.
-    description = (
-        'Allows learners to specify a position on a world map.')
-
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'latitude',
         'description': 'Starting map center latitude (-90 to 90).',
@@ -68,15 +63,3 @@ class InteractiveMap(widget_domain.BaseWidget):
         },
         'default_value': 0.0,
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'CoordTwoDim'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = ['google_maps']

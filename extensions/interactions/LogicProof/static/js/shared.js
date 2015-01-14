@@ -14,7 +14,7 @@
 
 /**
  * @fileoverview Components used by both the editor and reader of the
- *  LogicProof widget.
+ *  LogicProof interaction.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
@@ -29,9 +29,9 @@ var logicProofShared = (function() {
 
   ////////////////// ERROR-HANDLING  //////////////////////////////////////////
 
-  // UserErrors have codes that refer to entries in the errorDictionary (which 
-  // is either logicProofData.BASE_GENERAL_MESSAGES or 
-  // logicProofTeacher.TEACHER_ERROR_MESSAGES), from which a human-readable 
+  // UserErrors have codes that refer to entries in the errorDictionary (which
+  // is either logicProofData.BASE_GENERAL_MESSAGES or
+  // logicProofTeacher.TEACHER_ERROR_MESSAGES), from which a human-readable
   // message can be constructed.
   function UserError(code, parameters) {
     this.name = 'UserError';

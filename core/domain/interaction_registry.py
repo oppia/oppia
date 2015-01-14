@@ -21,7 +21,6 @@ __author__ = 'Sean Lip'
 import pkgutil
 
 import feconf
-import utils
 
 
 class Registry(object):
@@ -44,14 +43,10 @@ class Registry(object):
         for loader, name, _ in pkgutil.iter_modules(path=EXTENSION_PATHS):
             module = loader.find_module(name).load_module(name)
             clazz = getattr(module, name)
-            # TODO(sll): Move this check to a test.
-            if clazz.__name__ in cls._interactions:
-                raise Exception(
-                    'Duplicate interaction name %s' % clazz.__name__)
 
             ancestor_names = [
                 base_class.__name__ for base_class in clazz.__bases__]
-            if 'BaseWidget' in ancestor_names:
+            if 'BaseInteraction' in ancestor_names:
                 cls._interactions[clazz.__name__] = clazz()
 
     @classmethod

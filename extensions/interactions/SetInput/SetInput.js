@@ -24,7 +24,7 @@ oppia.directive('oppiaInteractiveSetInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/SetInput',
+      templateUrl: 'interaction/SetInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.schema = {
           type: 'list',

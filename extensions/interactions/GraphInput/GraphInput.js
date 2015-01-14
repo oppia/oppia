@@ -25,25 +25,25 @@ oppia.directive('oppiaInteractiveGraphInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/GraphInput',
+      templateUrl: 'interaction/GraphInput',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         $scope.errorMessage = '';
         $scope.graph = {'vertices': [], 'edges': [], 'isDirected': false, 'isWeighted': false, 'isLabeled': false};
 
         $scope.submitGraph = function() {
-          // angular.copy needed to strip $$hashkey from the graph 
+          // angular.copy needed to strip $$hashkey from the graph
           $scope.$parent.$parent.submitAnswer(angular.copy($scope.graph), 'submit');
         };
         $scope.resetGraph = function() {
           updateGraphFromJSON($attrs.graphWithValue);
         };
-        
+
         $scope.init = function() {
           updateGraphFromJSON($attrs.graphWithValue);
           function stringToBool(str) {
             return (str === 'true');
           }
-          $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);          
+          $scope.canAddVertex = stringToBool($attrs.canAddVertexWithValue);
           $scope.canDeleteVertex = stringToBool($attrs.canDeleteVertexWithValue);
           $scope.canEditVertexLabel = stringToBool($attrs.canEditVertexLabelWithValue);
           $scope.canMoveVertex = stringToBool($attrs.canMoveVertexWithValue);
@@ -52,7 +52,7 @@ oppia.directive('oppiaInteractiveGraphInput', [
           $scope.canEditEdgeWeight = stringToBool($attrs.canEditEdgeWeightWithValue);
         };
         $scope.init();
-        
+
         // TODO(czxcjx): Write this function
         function checkValidGraph(graph) {
           return true;
@@ -93,16 +93,16 @@ oppia.factory('graphDetailService', [function() {
 
       var endX = dstVertex.x - 4 * dx;
       var endY = dstVertex.y - 4 * dy;
-      
+
       var ret = '';
-      ret += 
-        endX + ',' + 
+      ret +=
+        endX + ',' +
         endY + ' ';
-      ret += 
-        (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' + 
+      ret +=
+        (endX - ARROW_HEIGHT * dx + ARROW_WIDTH * dy) + ',' +
         (endY - ARROW_HEIGHT * dy - ARROW_WIDTH * dx) + ' ';
-      ret += 
-        (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' + 
+      ret +=
+        (endX - ARROW_HEIGHT * dx - ARROW_WIDTH * dy) + ',' +
         (endY - ARROW_HEIGHT * dy + ARROW_WIDTH * dx);
       return ret;
     },
@@ -194,7 +194,7 @@ oppia.directive('graphViz', function() {
         mouseDragStartX: 0,
         mouseDragStartY: 0,
       };
-      
+
       $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
       $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
 
@@ -203,7 +203,7 @@ oppia.directive('graphViz', function() {
       $scope.mousemoveGraphSVG = function(event) {
         $scope.state.mouseX = event.pageX - vizContainer.offset().left;
         $scope.state.mouseY = event.pageY - vizContainer.offset().top;
-        // vertexDragStartX/Y and mouseDragStartX/Y are to make mouse-dragging 
+        // vertexDragStartX/Y and mouseDragStartX/Y are to make mouse-dragging
         // by label more natural, by moving the vertex according to the difference
         // from the original position. Otherwise, mouse-dragging by label will make
         // the vertex awkwardly jump to the mouse.
@@ -232,9 +232,9 @@ oppia.directive('graphViz', function() {
       $scope.init = function() {
         initButtons();
         $scope.state.currentMode = $scope.buttons[0].mode;
-      }; 
+      };
       $scope.init();
-      
+
       function initButtons() {
         $scope.buttons = [];
         if ($scope.canMoveVertex) {
@@ -323,7 +323,7 @@ oppia.directive('graphViz', function() {
           }
         }
       };
-      
+
       $scope.onClickVertexLabel = function(index) {
         if ($scope.graph.isLabeled && $scope.canEditVertexLabel) {
           beginEditVertexLabel(index);
@@ -338,7 +338,7 @@ oppia.directive('graphViz', function() {
           }
         }
         if ($scope.state.currentMode !== _MODES.DELETE &&
-            $scope.graph.isWeighted && 
+            $scope.graph.isWeighted &&
             $scope.canEditEdgeWeight) {
           beginEditEdgeWeight(index);
         }
@@ -348,7 +348,7 @@ oppia.directive('graphViz', function() {
           beginEditEdgeWeight(index);
         }
       };
-     
+
       // Document event
       $scope.onMouseupDocument = function() {
         if ($scope.state.currentMode === _MODES.ADD_EDGE) {
@@ -440,7 +440,7 @@ oppia.directive('graphViz', function() {
         }
       }
       function deleteVertex(index) {
-        // Using jQuery's map instead of normal array.map because 
+        // Using jQuery's map instead of normal array.map because
         // it removes elements for which the callback returns null
         $scope.graph.edges = $.map($scope.graph.edges, function(edge) {
           if (edge.src === index || edge.dst === index) {
@@ -453,7 +453,7 @@ oppia.directive('graphViz', function() {
             edge.dst--;
           }
           return edge;
-        }); 
+        });
         $scope.graph.vertices.splice(index, 1);
         $scope.state.hoveredVertex = null;
       }
@@ -483,7 +483,7 @@ oppia.directive('graphViz', function() {
       var SELECT_COLOR = 'orange';
       var DEFAULT_COLOR = 'black';
       $scope.getEdgeColor = function(index) {
-        if ($scope.state.currentMode === _MODES.DELETE && 
+        if ($scope.state.currentMode === _MODES.DELETE &&
             index === $scope.state.hoveredEdge &&
             $scope.canDeleteEdge) {
           return DELETE_COLOR;
@@ -518,4 +518,4 @@ oppia.directive('graphViz', function() {
       };
     }]
   }
-}); 
+});

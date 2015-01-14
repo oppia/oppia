@@ -756,7 +756,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   position: absolute;
   right: 15px;
   /* This must be larger than the z-index in
-     .oppia-interactive-section-click-handler, so that the rule does not
+     .oppia-click-to-start-editing, so that the rule does not
      switch to edit mode when the destination link is clicked. */
   z-index: 200;
 }
@@ -806,7 +806,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   opacity: 1.0;
 }
 
-.oppia-interactive-section-click-handler {
+.oppia-click-to-start-editing {
   height: 100%;
   position: absolute;
   width: 100%;
@@ -890,7 +890,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-rule-dest-link {
   position: absolute;
   /* This must be larger than the z-index in
-     .oppia-interactive-section-click-handler, so that the rule does not
+     .oppia-click-to-start-editing, so that the rule does not
      switch to edit mode when the destination link is clicked. */
   z-index: 200;
 }

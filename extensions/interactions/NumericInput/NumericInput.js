@@ -25,7 +25,7 @@ oppia.directive('oppiaInteractiveNumericInput', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/NumericInput',
+      templateUrl: 'interaction/NumericInput',
       controller: ['$scope', '$attrs', function($scope, $attrs) {
         $scope.answer = 0;
 

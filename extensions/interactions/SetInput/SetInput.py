@@ -14,35 +14,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class SetInput(widget_domain.BaseWidget):
-    """Interaction for set input."""
+class SetInput(base.BaseInteraction):
+    """Interaction for input of an unordered set of strings."""
 
-    # The human-readable name of the interaction.
     name = 'Set'
-
-    # The category the interaction falls under in the repository.
     category = 'Basic Input'
+    description = 'Allows learners to enter an unordered set of strings.'
+    _dependency_ids = []
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'SetOfUnicodeString'}]
 
-    # A description of the interaction.
-    description = 'Allows learners to enter a set of strings.'
-
-    # Customization args and their descriptions, schemas and default
-    # values.
     # NB: There used to be a UnicodeString-typed parameter here called
     # 'element_type'. This has since been removed.
     _customization_arg_specs = []
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'SetOfUnicodeString'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = []

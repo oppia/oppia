@@ -24,7 +24,7 @@ oppia.directive('oppiaInteractiveCodeRepl', [
     return {
       restrict: 'E',
       scope: {},
-      templateUrl: 'interactiveWidget/CodeRepl',
+      templateUrl: 'interaction/CodeRepl',
       controller:  ['$scope', '$attrs', function($scope, $attrs) {
         $scope.language = oppiaHtmlEscaper.escapedJsonToObj($attrs.languageWithValue);
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);

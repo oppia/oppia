@@ -16,23 +16,19 @@
 
 __author__ = 'Zhan Xiong Chin'
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class GraphInput(widget_domain.BaseWidget):
+class GraphInput(base.BaseInteraction):
     """Interaction for evaluating graphs."""
 
-    # The human-readable name of the interaction.
     name = 'Graph'
-
-    # The category the interaction falls under in the repository.
     category = 'Custom'
-
-    # A description of the interaction.
     description = 'Allows learners to create and manipulate graphs.'
+    _dependency_ids = []
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'Graph'}]
 
-    # Customization parameters and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'graph',
         'description': 'The initial graph.',
@@ -117,15 +113,3 @@ class GraphInput(widget_domain.BaseWidget):
         },
         'default_value': False
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'Graph'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = []

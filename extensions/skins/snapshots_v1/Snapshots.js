@@ -47,7 +47,7 @@ oppia.directive('snapshotsSkin', [function() {
           }
 
           if (!isSticky) {
-            // The previous widget is not sticky and should be replaced.
+            // The previous interaction is not sticky and should be replaced.
             $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }

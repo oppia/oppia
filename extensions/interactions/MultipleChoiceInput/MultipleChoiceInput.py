@@ -14,24 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from core.domain import widget_domain
+from extensions.interactions import base
 
 
-class MultipleChoiceInput(widget_domain.BaseWidget):
+class MultipleChoiceInput(base.BaseInteraction):
     """Interaction for multiple choice input."""
 
-    # The human-readable name of the interaction.
     name = 'Multiple Choice'
-
-    # The category the interaction falls under in the repository.
     category = 'Basic Input'
-
-    # A description of the interaction.
     description = (
         'Allows learners to select one of a list of multiple-choice options.')
+    _dependency_ids = []
+    _handlers = [{
+        'name': 'submit', 'obj_type': 'NonnegativeInt'
+    }]
 
-    # Customization args and their descriptions, schemas and default
-    # values.
     _customization_arg_specs = [{
         'name': 'choices',
         'description': 'The options that the learner can select from.',
@@ -53,15 +50,3 @@ class MultipleChoiceInput(widget_domain.BaseWidget):
         },
         'default_value': ['Default choice'],
     }]
-
-    # Actions that the learner can perform on this interaction which trigger a
-    # feedback response, and the associated input types. Each interaction must
-    # have at least one of these. This attribute name MUST be prefixed by '_'.
-    _handlers = [{
-        'name': 'submit', 'obj_type': 'NonnegativeInt'
-    }]
-
-    # Additional JS library dependencies that should be loaded in pages
-    # containing this interaction. These should correspond to names of files in
-    # feconf.DEPENDENCIES_TEMPLATES_DIR.
-    _dependency_ids = []

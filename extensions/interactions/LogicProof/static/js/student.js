@@ -13,7 +13,7 @@
 // limitations under the License.
 
 /**
- * @fileoverview Components used by the LogicProof widget reader.
+ * @fileoverview Components used by the LogicProof interaction reader.
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
@@ -466,8 +466,8 @@ var logicProofStudent = (function() {
  /**
   * This function is run when the state is loaded, it is top-level.
   * @param questionData: The information from the teacher specifying the
-  *        question - this will be one of the keys of
-  *        widget_customization_args.
+  *        question - this will be one of the keys of the interaction's
+  *        customization_args.
   * @result A QuestionInstance object that will be used to build and check
   *         proofs from the student.
   */
@@ -1151,8 +1151,8 @@ var logicProofStudent = (function() {
   * This is the second top-level function for the student.
   * @param proof: a Proof object constructed by buildProof()
   * @param questionInstance: the object describing the problem built from the
-  *        QuestionData (an argument of widget_customization_args) by
-  *        buildInstance().
+  *        QuestionData (an argument of the interaction's customization_args)
+  *        by buildInstance().
   * @raises if a mistake from the mistake_table has been
   *          made in the proof, {
   *            message: a human-readable description of the first mistake
