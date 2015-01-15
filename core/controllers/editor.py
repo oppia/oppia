@@ -198,9 +198,9 @@ class ExplorationPage(EditorHandler):
 
     def get(self, exploration_id):
         """Handles GET requests."""
-        try:
-            exploration = exp_services.get_exploration_by_id(exploration_id)
-        except:
+        exploration = exp_services.get_exploration_by_id(
+            exploration_id, strict=False)
+        if exploration is None:
             raise self.PageNotFoundException
 
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):

@@ -24,7 +24,6 @@ import utils
 from google.appengine.datastore import datastore_query
 from google.appengine.ext import ndb
 
-import datetime
 
 class BaseModel(ndb.Model):
     """Base model for all persistent object storage classes."""
