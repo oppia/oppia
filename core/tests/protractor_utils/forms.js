@@ -19,7 +19,9 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
+var richTextComponents = require(
+  '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 
 var DictionaryEditor = function(elem) {
@@ -160,23 +162,25 @@ var RichTextEditor = function(elem) {
     appendHorizontalRule: function() {
       _clickContentMenuButton('insertHorizontalRule');
     },
-    // This adds and customizes RTE extensions.
+    // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant extension editor.
-    addExtension: function(extensionName) {
-      _clickContentMenuButton('custom-command-' + extensionName.toLowerCase());
+    // passed on to the relevant RTE component editor.
+    addRteComponent: function(componentName) {
+      _clickContentMenuButton('custom-command-' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
 
-      // Need to convert arguments to an actual array; we tell the extension
-      // which modal to act on but drop the extensionName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which modal to act on but drop the componentName.
       var args = [modal];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(extensionName).customizeWidget.apply(null, args);
-      modal.element(by.css('.protractor-test-close-extension-editor')).click();
+      richTextComponents.getComponent(componentName).customizeComponent.apply(
+        null, args);
+      modal.element(
+        by.css('.protractor-test-close-rich-text-component-editor')).click();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -265,7 +269,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 // should consist of:
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
-//   handler.readExtension('Math', ...);
+//   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
     // We remove all <span> elements since these are plain text that is
@@ -316,10 +320,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   // arrayPointer traverses both arrays simultaneously.
   var arrayPointer = 0;
   var textPointer = 0;
-  // Extensions insert line breaks above and below themselves and these are
+  // RTE components insert line breaks above and below themselves and these are
   // recorded in fullText but not arrayOfTexts so we need to track them
   // specially.
-  var justPassedExtension = false;
+  var justPassedRteComponent = false;
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
@@ -327,7 +331,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
-    justPassedExtension = false;
+    justPassedRteComponent = false;
   };
 
   return {
@@ -337,7 +341,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
       textPointer = textPointer + text.length;
-      justPassedExtension = false;
+      justPassedRteComponent = false;
     },
     readBoldText: function(text) {
       _readFormattedText(text, 'b');
@@ -348,27 +352,27 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     readUnderlineText: function(text) {
       _readFormattedText(text, 'u');
     },
-    // TODO (Jacob) add functions for other rich text components
+    // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant extension editor.
-    readExtension: function(extensionName) {
+    // passed on to the relevant RTE component editor.
+    readRteComponent: function(componentName) {
       var elem = arrayOfElems[arrayPointer];
       expect(elem.getTagName()).
-        toBe('oppia-noninteractive-' + extensionName.toLowerCase());
+        toBe('oppia-noninteractive-' + componentName.toLowerCase());
       expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
-      // Need to convert arguments to an actual array; we tell the extension
-      // which element to act on but drop the extensionName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which element to act on but drop the componentName.
       var args = [elem];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(extensionName).
-        expectWidgetDetailsToMatch.apply(null, args);
+      richTextComponents.getComponent(componentName).
+        expectComponentDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
-        (justPassedExtension ? 1 : 2);
+        (justPassedRteComponent ? 1 : 2);
       arrayPointer = arrayPointer + 1;
-      justPassedExtension = true;
+      justPassedRteComponent = true;
     },
     expectEnd: function() {
       expect(arrayPointer).toBe(arrayOfElems.length);

@@ -21,7 +21,7 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 var exitTutorialIfNecessary = function() {
@@ -69,12 +69,12 @@ var setContent = function(richTextInstructions) {
 // richTextInstructions will be supplied with a handler of the form
 // forms.RichTextChecker and can then perform checks such as
 //   handler.readBoldText('bold')
-//   handler.readExtension('Collapsible', 'outer', 'inner')
+//   handler.readRteComponent('Collapsible', 'outer', 'inner')
 // These would verify that the content consists of the word 'bold' in bold
-// followed by a Collapsible extension with the given arguments, and nothing else.
-// Note that this fails for collapsibles and tabs since it is not possible to
-// click on them to view their contents, as clicks instead open the rich text
-// editor.
+// followed by a Collapsible component with the given arguments, and nothing
+// else. Note that this fails for collapsibles and tabs since it is not
+// possible to click on them to view their contents, as clicks instead open the
+// rich text editor.
 var expectContentToMatch = function(richTextInstructions) {
   forms.expectRichText(
     element(by.css('.protractor-test-state-content-display'))
@@ -99,16 +99,12 @@ var setInteraction = function(interactionName) {
     element(by.css('.protractor-test-edit-interaction')).click();
 
     var elem = element(by.css('.protractor-test-interaction-editor'));
-
-    // Need to convert arguments to an actual array, discarding
-    // interactionName. We also send the interaction editor element, within
-    //  which the customizer should act.
     var args = [elem];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    widgets.getInteractive(interactionName).customizeInteraction.
-      apply(null, args);
+    interactions.getInteraction(interactionName).customizeInteraction.apply(
+      null, args);
 
     element(by.css('.protractor-test-save-interaction')).click();
   }
@@ -121,7 +117,7 @@ var expectInteractionToMatch = function(interactionName) {
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  widgets.getInteractive(interactionName).
+  interactions.getInteraction(interactionName).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
@@ -139,7 +135,7 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
   }
 
   var ruleDescription = rules.getDescription(
-    widgets.getInteractive(interactionName).answerObjectType, ruleName);
+    interactions.getInteraction(interactionName).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');

@@ -53,7 +53,7 @@ def get_state_rules_stats(exploration_id, state_name):
     state = exploration.states[state_name]
 
     rule_keys = []
-    for handler in state.widget.handlers:
+    for handler in state.interaction.handlers:
         for rule in handler.rule_specs:
             rule_keys.append((handler.name, str(rule)))
 
@@ -113,7 +113,8 @@ def get_state_improvements(exploration_id, exploration_version):
         eligible_flags = []
         state = exploration.states[state_name]
         if (default_count > threshold and
-                state.widget.handlers[0].default_rule_spec.dest == state_name):
+                state.interaction.handlers[0].default_rule_spec.dest
+                == state_name):
             eligible_flags.append({
                 'rank': default_count,
                 'improve_type': IMPROVE_TYPE_DEFAULT})

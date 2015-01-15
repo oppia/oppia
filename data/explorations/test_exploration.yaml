@@ -3,7 +3,7 @@ blurb: ''
 default_skin: conversation_v1
 init_state_name: Continue
 language_code: en
-objective: check all the widgets work
+objective: check all the interactions work
 param_changes: []
 param_specs:
   a:

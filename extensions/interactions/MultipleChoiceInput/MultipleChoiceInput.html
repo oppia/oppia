@@ -1,0 +1,15 @@
+<script type="text/ng-template" id="interaction/MultipleChoiceInput">
+  <div>
+    <form ng-submit="submitAnswer(answer)">
+      <div ng-repeat="choice in choices track by $index">
+        <button type="button" class="btn btn-default" ng-click="submitAnswer($index)" style="margin: 5px 0; text-align: left; white-space: normal; max-width: 350px;">
+          <span angular-html-bind="choice"></span>
+        </button>
+      </div>
+    </form>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/MultipleChoiceInput">
+  <span angular-html-bind="response"></span>
+</script>

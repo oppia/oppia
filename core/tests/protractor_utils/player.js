@@ -19,7 +19,7 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('./forms.js');
 
 var restartExploration = function() {
@@ -33,7 +33,7 @@ var expectExplorationNameToBe = function(name) {
 };
 
 // This verifies the question just asked, including formatting and
-// RTE extensions. To do so the richTextInstructions function will be
+// rich-text components. To do so the richTextInstructions function will be
 // sent a handler (as given in forms.RichTextChecker) to which calls such as
 //   handler.readItalicText('slanted');
 // can then be sent.
@@ -59,14 +59,14 @@ var expectInteractionToMatch = function(interactionName) {
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  widgets.getInteractive(interactionName).
+  interactions.getInteraction(interactionName).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
 // `answerData` is a variable that is passed to the corresponding interaction's
 // protractor utilities. Its definition and type are interaction-specific.
 var submitAnswer = function(interactionName, answerData) {
-  widgets.getInteractive(interactionName).submitAnswer(
+  interactions.getInteraction(interactionName).submitAnswer(
     element.all(by.css('.protractor-test-conversation-input')).last(),
     answerData);
 };

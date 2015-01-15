@@ -135,11 +135,11 @@ class ParameterDiscoveryJobManager(jobs.BaseMapReduceJobManager):
                     output += _get_nontrivial_expression_pairs(
                         'Param change, %s' % state_name, unicode(val))
 
-            for _, val in state.widget.customization_args.iteritems():
+            for _, val in state.interaction.customization_args.iteritems():
                 output += _get_nontrivial_expression_pairs(
-                    'Widget_cust_args, %s' % state_name, unicode(val))
+                    'Interaction_cust_args, %s' % state_name, unicode(val))
 
-            for handler in state.widget.handlers:
+            for handler in state.interaction.handlers:
                 for rule_spec in handler.rule_specs:
                     for feedback_item in rule_spec.feedback:
                         output += _get_nontrivial_expression_pairs(

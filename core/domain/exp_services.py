@@ -327,18 +327,24 @@ def apply_change_list(exploration_id, change_list):
                 exploration.delete_state(change.state_name)
             elif change.cmd == 'edit_state_property':
                 state = exploration.states[change.state_name]
-                if change.property_name == 'param_changes':
+                if (change.property_name ==
+                        exp_domain.STATE_PROPERTY_PARAM_CHANGES):
                     state.update_param_changes(change.new_value)
-                elif change.property_name == 'content':
+                elif change.property_name == exp_domain.STATE_PROPERTY_CONTENT:
                     state.update_content(change.new_value)
-                elif change.property_name == 'widget_id':
-                    state.update_widget_id(change.new_value)
-                elif change.property_name == 'widget_customization_args':
-                    state.update_widget_customization_args(change.new_value)
-                elif change.property_name == 'widget_sticky':
-                    state.update_widget_sticky(change.new_value)
-                elif change.property_name == 'widget_handlers':
-                    state.update_widget_handlers(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_ID):
+                    state.update_interaction_id(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS):
+                    state.update_interaction_customization_args(
+                        change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_STICKY):
+                    state.update_interaction_sticky(change.new_value)
+                elif (change.property_name ==
+                        exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
+                    state.update_interaction_handlers(change.new_value)
             elif change.cmd == 'edit_exploration_property':
                 if change.property_name == 'title':
                     exploration.update_title(change.new_value)

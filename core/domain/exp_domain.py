@@ -29,13 +29,23 @@ import string
 
 from core.domain import fs_domain
 from core.domain import html_cleaner
+from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rule_domain
 from core.domain import skins_services
-from core.domain import widget_registry
 import feconf
 import jinja_utils
 import utils
+
+
+# Do not modify the values of these constants. This is to preserve backwards
+# compatibility with previous change dicts.
+STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
+STATE_PROPERTY_CONTENT = 'content'
+STATE_PROPERTY_INTERACTION_ID = 'widget_id'
+STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
+STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
+STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 
 
 class ExplorationChange(object):
@@ -48,8 +58,12 @@ class ExplorationChange(object):
     """
 
     STATE_PROPERTIES = (
-        'param_changes', 'content', 'widget_id',
-        'widget_customization_args', 'widget_sticky', 'widget_handlers')
+        STATE_PROPERTY_PARAM_CHANGES,
+        STATE_PROPERTY_CONTENT,
+        STATE_PROPERTY_INTERACTION_ID,
+        STATE_PROPERTY_INTERACTION_CUST_ARGS,
+        STATE_PROPERTY_INTERACTION_STICKY,
+        STATE_PROPERTY_INTERACTION_HANDLERS)
 
     EXPLORATION_PROPERTIES = (
         'title', 'category', 'objective', 'language_code', 'skill_tags',
@@ -157,6 +171,7 @@ class Content(object):
 
     def validate(self):
         # TODO(sll): Add HTML sanitization checking.
+        # TODO(sll): Validate customization args for rich-text components.
         if not self.type == 'text':
             raise utils.ValidationError('Invalid content type: %s' % self.type)
         if not isinstance(self.value, basestring):
@@ -392,18 +407,21 @@ class AnswerHandlerInstance(object):
             rule_spec.validate()
 
 
-class WidgetInstance(object):
-    """Value object for a widget instance."""
+class InteractionInstance(object):
+    """Value object for an instance of an interaction."""
+
+    # The default interaction used for a new state.
+    _DEFAULT_INTERACTION_ID = 'TextInput'
 
     def _get_full_customization_args(self):
-        """Populates the customization_args dict of the widget with default
-        values, if any of the expected customization_args are missing.
+        """Populates the customization_args dict of the interaction with
+        default values, if any of the expected customization_args are missing.
         """
         full_customization_args_dict = copy.deepcopy(self.customization_args)
 
-        widget = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, self.widget_id)
-        for ca_spec in widget.customization_arg_specs:
+        interaction = interaction_registry.Registry.get_interaction_by_id(
+            self.id)
+        for ca_spec in interaction.customization_arg_specs:
             if ca_spec.name not in full_customization_args_dict:
                 full_customization_args_dict[ca_spec.name] = {
                     'value': ca_spec.default_value
@@ -412,32 +430,31 @@ class WidgetInstance(object):
 
     def to_dict(self):
         return {
-            'widget_id': self.widget_id,
+            'id': self.id,
             'customization_args': self._get_full_customization_args(),
             'handlers': [handler.to_dict() for handler in self.handlers],
             'sticky': self.sticky
         }
 
     @classmethod
-    def _get_obj_type(cls, widget_class_name):
-        return widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, widget_class_name
-        )._handlers[0]['obj_type']
+    def _get_obj_type(cls, interaction_id):
+        return interaction_registry.Registry.get_interaction_by_id(
+            interaction_id)._handlers[0]['obj_type']
 
     @classmethod
-    def from_dict(cls, widget_dict):
-        obj_type = cls._get_obj_type(widget_dict['widget_id'])
+    def from_dict(cls, interaction_dict):
+        obj_type = cls._get_obj_type(interaction_dict['id'])
         return cls(
-            widget_dict['widget_id'],
-            widget_dict['customization_args'],
+            interaction_dict['id'],
+            interaction_dict['customization_args'],
             [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)
-             for h in widget_dict['handlers']],
-            widget_dict['sticky'],
-        )
+             for h in interaction_dict['handlers']],
+            interaction_dict['sticky'])
 
-    def __init__(self, widget_id, customization_args, handlers, sticky=False):
-        self.widget_id = widget_id
-        # Customization args for the interactive widget view. Parts of these
+    def __init__(
+            self, interaction_id, customization_args, handlers, sticky=False):
+        self.id = interaction_id
+        # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
         # This is a dict: the keys are names of customization_args and the
         # values are dicts with a single key, 'value', whose corresponding
@@ -446,28 +463,27 @@ class WidgetInstance(object):
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
                          for h in handlers]
-        # If true, keep the widget instance from the previous state if both are
-        # of the same type.
+        # If true, keep the interaction instance from the previous state if
+        # both are of the same type.
         self.sticky = sticky
 
     def validate(self):
-        if not isinstance(self.widget_id, basestring):
+        if not isinstance(self.id, basestring):
             raise utils.ValidationError(
-                'Expected widget id to be a string, received %s'
-                % self.widget_id)
+                'Expected interaction id to be a string, received %s' %
+                self.id)
         try:
-            widget = widget_registry.Registry.get_widget_by_id(
-                feconf.INTERACTIVE_PREFIX, self.widget_id)
+            interaction = interaction_registry.Registry.get_interaction_by_id(
+                self.id)
         except KeyError:
-            raise utils.ValidationError(
-                'Invalid widget name: %s' % self.widget_id)
+            raise utils.ValidationError('Invalid interaction id: %s' % self.id)
 
-        widget_customization_arg_names = [
-            ca_spec.name for ca_spec in widget.customization_arg_specs]
+        customization_arg_names = [
+            ca_spec.name for ca_spec in interaction.customization_arg_specs]
 
         if not isinstance(self.customization_args, dict):
             raise utils.ValidationError(
-                'Expected widget customization args to be a dict, received %s'
+                'Expected customization args to be a dict, received %s'
                 % self.customization_args)
 
         # Validate and clean up the customization args.
@@ -475,17 +491,18 @@ class WidgetInstance(object):
         for (arg_name, arg_value) in self.customization_args.iteritems():
             if not isinstance(arg_name, basestring):
                 raise utils.ValidationError(
-                    'Invalid widget customization arg name: %s' % arg_name)
-            if arg_name not in widget_customization_arg_names:
+                    'Invalid customization arg name: %s' % arg_name)
+            if arg_name not in customization_arg_names:
                 extra_args.append(arg_name)
                 logging.warning(
-                    'Parameter %s for widget %s is invalid.'
-                    % (arg_name, self.widget_id))
+                    'Interaction %s does not support customization arg %s.'
+                    % (self.id, arg_name))
         for extra_arg in extra_args:
             del self.customization_args[extra_arg]
 
         try:
-            widget.validate_customization_arg_values(self.customization_args)
+            interaction.validate_customization_arg_values(
+                self.customization_args)
         except Exception:
             # TODO(sll): Raise an exception here if parameters are not
             # involved. (If they are, can we get sample values for the state
@@ -494,26 +511,26 @@ class WidgetInstance(object):
 
         if not isinstance(self.handlers, list):
             raise utils.ValidationError(
-                'Expected widget answer handlers to be a list, received %s'
+                'Expected answer handlers to be a list, received %s'
                 % self.handlers)
         if len(self.handlers) < 1:
             raise utils.ValidationError(
                 'At least one answer handler must be specified for each '
-                'state widget instance.')
+                'interaction instance.')
         for handler in self.handlers:
             handler.validate()
 
         if not isinstance(self.sticky, bool):
             raise utils.ValidationError(
-                'Expected widget sticky flag to be a boolean, received %s'
-                % self.sticky)
+                'Expected interaction \'sticky\' flag to be a boolean, '
+                'received %s' % self.sticky)
 
     @classmethod
-    def create_default_widget(cls, default_dest_state_name):
-        default_obj_type = WidgetInstance._get_obj_type(
-            feconf.DEFAULT_WIDGET_ID)
+    def create_default_interaction(cls, default_dest_state_name):
+        default_obj_type = InteractionInstance._get_obj_type(
+            cls._DEFAULT_INTERACTION_ID)
         return cls(
-            feconf.DEFAULT_WIDGET_ID,
+            cls._DEFAULT_INTERACTION_ID,
             {},
             [AnswerHandlerInstance.get_default_handler(
                 default_dest_state_name, default_obj_type)]
@@ -523,7 +540,7 @@ class WidgetInstance(object):
 class State(object):
     """Domain object for a state."""
 
-    def __init__(self, content, param_changes, widget):
+    def __init__(self, content, param_changes, interaction):
         # The content displayed to the reader in this state.
         self.content = [Content(item.type, item.value) for item in content]
         # Parameter changes associated with this state.
@@ -531,10 +548,10 @@ class State(object):
             param_change.name, param_change.generator.id,
             param_change.customization_args)
             for param_change in param_changes]
-        # The interactive widget instance associated with this state.
-        self.widget = WidgetInstance(
-            widget.widget_id, widget.customization_args, widget.handlers,
-            widget.sticky)
+        # The interaction instance associated with this state.
+        self.interaction = InteractionInstance(
+            interaction.id, interaction.customization_args,
+            interaction.handlers, interaction.sticky)
 
     def validate(self):
         if not isinstance(self.content, list):
@@ -554,10 +571,10 @@ class State(object):
         for param_change in self.param_changes:
             param_change.validate()
 
-        self.widget.validate()
+        self.interaction.validate()
 
     def update_content(self, content_list):
-        # TODO(sll): Must sanitize all content in noninteractive widget attrs.
+        # TODO(sll): Must sanitize all content in RTE component attrs.
         self.content = [Content.from_dict(content_list[0])]
 
     def update_param_changes(self, param_change_dicts):
@@ -565,31 +582,32 @@ class State(object):
             param_domain.ParamChange.from_dict(param_change_dict)
             for param_change_dict in param_change_dicts]
 
-    def update_widget_id(self, widget_id):
-        self.widget.widget_id = widget_id
-        # TODO(sll): This should also clear widget.handlers (except for the
-        # default rule).
+    def update_interaction_id(self, interaction_id):
+        self.interaction.id = interaction_id
+        # TODO(sll): This should also clear interaction.handlers (except for
+        # the default rule).
 
-    def update_widget_customization_args(self, widget_customization_args):
-        self.widget.customization_args = widget_customization_args
+    def update_interaction_customization_args(self, customization_args):
+        self.interaction.customization_args = customization_args
 
-    def update_widget_sticky(self, widget_sticky):
-        self.widget.sticky = widget_sticky
+    def update_interaction_sticky(self, interaction_is_sticky):
+        self.interaction.sticky = interaction_is_sticky
 
-    def update_widget_handlers(self, widget_handlers_dict):
-        if not isinstance(widget_handlers_dict, dict):
+    def update_interaction_handlers(self, handlers_dict):
+        if not isinstance(handlers_dict, dict):
             raise Exception(
-                'Expected widget_handlers to be a dictionary, received %s'
-                % widget_handlers_dict)
-        ruleset = widget_handlers_dict['submit']
+                'Expected interaction_handlers to be a dictionary, received %s'
+                % handlers_dict)
+        ruleset = handlers_dict[feconf.SUBMIT_HANDLER_NAME]
         if not isinstance(ruleset, list):
             raise Exception(
-                'Expected widget_handlers[submit] to be a list, received %s'
-                % ruleset)
+                'Expected interaction_handlers.submit to be a list, '
+                'received %s' % ruleset)
 
-        widget_handlers = [AnswerHandlerInstance('submit', [])]
-        generic_widget = widget_registry.Registry.get_widget_by_id(
-            'interactive', self.widget.widget_id)
+        interaction_handlers = [AnswerHandlerInstance('submit', [])]
+        generic_interaction = (
+            interaction_registry.Registry.get_interaction_by_id(
+                self.interaction.id))
 
         # TODO(yanamal): Do additional calculations here to get the
         # parameter changes, if necessary.
@@ -599,7 +617,7 @@ class State(object):
                                      for feedback in rule_dict['feedback']]
             if 'param_changes' not in rule_dict:
                 rule_dict['param_changes'] = []
-            obj_type = WidgetInstance._get_obj_type(self.widget.widget_id)
+            obj_type = InteractionInstance._get_obj_type(self.interaction.id)
             rule_spec = RuleSpec.from_dict_and_obj_type(rule_dict, obj_type)
             rule_type = rule_spec.definition['rule_type']
 
@@ -615,7 +633,7 @@ class State(object):
                         'last one should not be default rules.' % rule_dict)
 
                 # TODO(sll): Generalize this to Boolean combinations of rules.
-                matched_rule = generic_widget.get_rule_by_name(
+                matched_rule = generic_interaction.get_rule_by_name(
                     'submit', rule_spec.definition['name'])
 
                 # Normalize and store the rule params.
@@ -643,27 +661,45 @@ class State(object):
                                 (value, param_type.__name__))
                     rule_inputs[param_name] = normalized_param
 
-            widget_handlers[0].rule_specs.append(rule_spec)
-            self.widget.handlers = widget_handlers
+            interaction_handlers[0].rule_specs.append(rule_spec)
+            self.interaction.handlers = interaction_handlers
 
     def to_dict(self):
         return {
             'content': [item.to_dict() for item in self.content],
             'param_changes': [param_change.to_dict()
                               for param_change in self.param_changes],
-            'widget': self.widget.to_dict()
+            'interaction': self.interaction.to_dict()
         }
 
     @classmethod
+    def _get_current_state_dict(cls, state_dict):
+        """If the state dict still uses 'widget', change it to 'interaction'.
+
+        This corresponds to the v3 --> v4 migration in the YAML representation
+        of an exploration.
+        """
+        if 'widget' in state_dict:
+            # This is an old version of the state dict which still uses
+            # 'widget'.
+            state_dict['interaction'] = copy.deepcopy(state_dict['widget'])
+            state_dict['interaction']['id'] = copy.deepcopy(
+                state_dict['interaction']['widget_id'])
+            del state_dict['interaction']['widget_id']
+            del state_dict['widget']
+
+        return copy.deepcopy(state_dict)
+
+    @classmethod
     def from_dict(cls, state_dict):
-        widget = WidgetInstance.from_dict(state_dict['widget'])
+        current_state_dict = cls._get_current_state_dict(state_dict)
 
         return cls(
-            [Content.from_dict(item) for item in state_dict['content']],
+            [Content.from_dict(item)
+             for item in current_state_dict['content']],
             [param_domain.ParamChange.from_dict(param)
-             for param in state_dict['param_changes']],
-            widget
-        )
+             for param in current_state_dict['param_changes']],
+            InteractionInstance.from_dict(current_state_dict['interaction']))
 
     @classmethod
     def create_default_state(
@@ -672,7 +708,8 @@ class State(object):
             feconf.DEFAULT_INIT_STATE_CONTENT_STR if is_initial_state else '')
         return cls(
             [Content('text', text_str)], [],
-            WidgetInstance.create_default_widget(default_dest_state_name))
+            InteractionInstance.create_default_interaction(
+                default_dest_state_name))
 
 
 class Exploration(object):
@@ -928,7 +965,7 @@ class Exploration(object):
         # valid.
         all_state_names = self.states.keys() + [feconf.END_DEST]
         for state in self.states.values():
-            for handler in state.widget.handlers:
+            for handler in state.interaction.handlers:
                 for rule_spec in handler.rule_specs:
                     RuleSpec.validate_rule_definition(
                         rule_spec.definition, self.param_specs)
@@ -982,7 +1019,7 @@ class Exploration(object):
     def _verify_no_self_loops(self):
         """Verify that there are no feedback-less self-loops."""
         for (state_name, state) in self.states.iteritems():
-            for handler in state.widget.handlers:
+            for handler in state.interaction.handlers:
                 for rule in handler.rule_specs:
                     # Check that there are no feedback-less self-loops.
                     # NB: Sometimes it makes sense for a self-loop to not have
@@ -991,7 +1028,7 @@ class Exploration(object):
                     # frontend so that a valid dict with feedback for every
                     # self-loop is always saved to the backend.
                     if (rule.dest == state_name and not rule.feedback
-                            and not state.widget.sticky):
+                            and not state.interaction.sticky):
                         if rule.is_default:
                             error_msg = (
                                 'Please add feedback for the default rule in '
@@ -1022,7 +1059,7 @@ class Exploration(object):
 
             curr_state = self.states[curr_state_name]
 
-            for handler in curr_state.widget.handlers:
+            for handler in curr_state.interaction.handlers:
                 for rule in handler.rule_specs:
                     dest_state = rule.dest
                     if (dest_state not in curr_queue and
@@ -1056,7 +1093,7 @@ class Exploration(object):
             for (state_name, state) in self.states.iteritems():
                 if (state_name not in curr_queue
                         and state_name not in processed_queue):
-                    for handler in state.widget.handlers:
+                    for handler in state.interaction.handlers:
                         for rule_spec in handler.rule_specs:
                             if rule_spec.dest == curr_state_name:
                                 curr_queue.append(state_name)
@@ -1175,7 +1212,7 @@ class Exploration(object):
         # state, and change the name appropriately.
         for other_state_name in self.states:
             other_state = self.states[other_state_name]
-            for handler in other_state.widget.handlers:
+            for handler in other_state.interaction.handlers:
                 for rule in handler.rule_specs:
                     if rule.dest == old_state_name:
                         rule.dest = new_state_name
@@ -1193,7 +1230,7 @@ class Exploration(object):
         # state, and change them to loop back to their containing state.
         for other_state_name in self.states:
             other_state = self.states[other_state_name]
-            for handler in other_state.widget.handlers:
+            for handler in other_state.interaction.handlers:
                 for rule in handler.rule_specs:
                     if rule.dest == state_name:
                         rule.dest = other_state_name
@@ -1204,18 +1241,17 @@ class Exploration(object):
         """Gets a state dict with rule descriptions."""
         state_dict = self.states[state_name].to_dict()
 
-        for handler in state_dict['widget']['handlers']:
+        for handler in state_dict['interaction']['handlers']:
             for rule_spec in handler['rule_specs']:
 
-                widget = widget_registry.Registry.get_widget_by_id(
-                    feconf.INTERACTIVE_PREFIX,
-                    state_dict['widget']['widget_id']
-                )
+                interaction = (
+                    interaction_registry.Registry.get_interaction_by_id(
+                        state_dict['interaction']['id']))
 
                 rule_spec['description'] = rule_domain.get_rule_description(
                     rule_spec['definition'],
                     self.param_specs,
-                    widget.get_handler_by_name(handler['name']).obj_type
+                    interaction.get_handler_by_name(handler['name']).obj_type
                 )
 
         return state_dict
@@ -1224,7 +1260,7 @@ class Exploration(object):
     # incompatible changes are made to the exploration schema in the YAML
     # definitions, this version number must be changed and a migration process
     # put in place.
-    CURRENT_EXPLORATION_SCHEMA_VERSION = 3
+    CURRENT_EXPLORATION_SCHEMA_VERSION = 4
 
     @classmethod
     def _convert_v1_dict_to_v2_dict(cls, exploration_dict):
@@ -1255,6 +1291,20 @@ class Exploration(object):
         return exploration_dict
 
     @classmethod
+    def _convert_v3_dict_to_v4_dict(cls, exploration_dict):
+        """Converts a v3 exploration dict into a v4 exploration dict."""
+        exploration_dict['schema_version'] = 4
+
+        for _, state_defn in exploration_dict['states'].iteritems():
+            state_defn['interaction'] = copy.deepcopy(state_defn['widget'])
+            state_defn['interaction']['id'] = copy.deepcopy(
+                state_defn['interaction']['widget_id'])
+            del state_defn['interaction']['widget_id']
+            del state_defn['widget']
+
+        return exploration_dict
+
+    @classmethod
     def from_yaml(cls, exploration_id, title, category, yaml_content):
         """Creates and returns exploration from a YAML text string."""
         try:
@@ -1271,7 +1321,7 @@ class Exploration(object):
         if not (1 <= exploration_schema_version
                 <= cls.CURRENT_EXPLORATION_SCHEMA_VERSION):
             raise Exception(
-                'Sorry, we can only process v1, v2 and v3 YAML files at '
+                'Sorry, we can only process v1, v2, v3 and v4 YAML files at '
                 'present.')
         if exploration_schema_version == 1:
             exploration_dict = cls._convert_v1_dict_to_v2_dict(
@@ -1282,6 +1332,11 @@ class Exploration(object):
             exploration_dict = cls._convert_v2_dict_to_v3_dict(
                 exploration_dict)
             exploration_schema_version = 3
+
+        if exploration_schema_version == 3:
+            exploration_dict = cls._convert_v3_dict_to_v4_dict(
+                exploration_dict)
+            exploration_schema_version = 4
 
         exploration = cls.create_default_exploration(
             exploration_id, title, category,
@@ -1320,8 +1375,8 @@ class Exploration(object):
                                     'declared in the exploration param_specs.'
                                     % pc.name)
 
-            wdict = sdict['widget']
-            widget_handlers = [
+            idict = sdict['interaction']
+            interaction_handlers = [
                 AnswerHandlerInstance.from_dict_and_obj_type({
                     'name': handler['name'],
                     'rule_specs': [{
@@ -1331,12 +1386,12 @@ class Exploration(object):
                                      for feedback in rule_spec['feedback']],
                         'param_changes': rule_spec.get('param_changes', []),
                     } for rule_spec in handler['rule_specs']],
-                }, WidgetInstance._get_obj_type(wdict['widget_id']))
-                for handler in wdict['handlers']]
+                }, InteractionInstance._get_obj_type(idict['id']))
+                for handler in idict['handlers']]
 
-            state.widget = WidgetInstance(
-                wdict['widget_id'], wdict['customization_args'],
-                widget_handlers, wdict['sticky'])
+            state.interaction = InteractionInstance(
+                idict['id'], idict['customization_args'],
+                interaction_handlers, idict['sticky'])
 
             exploration.states[state_name] = state
 
@@ -1377,12 +1432,10 @@ class Exploration(object):
             'param_specs': self.param_specs_dict,
         }
 
-    def get_interactive_widget_ids(self):
-        """Get all interactive widget ids used in this exploration."""
-        result = set([])
-        for (state_name, state) in self.states.iteritems():
-            result.add(state.widget.widget_id)
-        return list(result)
+    def get_interaction_ids(self):
+        """Get all interaction ids used in this exploration."""
+        return list(set([
+            state.interaction.id for state in self.states.values()]))
 
 
 class ExplorationSummary(object):

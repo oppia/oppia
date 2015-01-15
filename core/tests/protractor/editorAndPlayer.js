@@ -25,7 +25,7 @@ var users = require('../protractor_utils/users.js');
 var workflow = require('../protractor_utils/workflow.js');
 var editor = require('../protractor_utils/editor.js');
 var player = require('../protractor_utils/player.js');
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 
 describe('State editor', function() {
   it('should display plain text content', function() {
@@ -234,30 +234,31 @@ describe('Full exploration editor', function() {
   });
 });
 
-describe('Rich-text editor extensions', function() {
+describe('rich-text components', function() {
   it('should display correctly', function() {
     users.createUser('user11@example.com', 'user11');
     users.login('user11@example.com')
 
-    workflow.createExploration('extensions', 'maths');
+    workflow.createExploration('RTE components', 'maths');
 
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendPlainText('plainly');
       richTextEditor.appendBoldText('bold');
-      richTextEditor.addExtension('Collapsible', 'title', forms.toRichText('inner'));
-      // TODO (Jacob) add image extension test
-      richTextEditor.addExtension('Link', 'http://google.com/', true);
-      richTextEditor.addExtension('Math', 'abc');
+      richTextEditor.addRteComponent(
+        'Collapsible', 'title', forms.toRichText('inner'));
+      // TODO (Jacob) add test for image RTE component
+      richTextEditor.addRteComponent('Link', 'http://google.com/', true);
+      richTextEditor.addRteComponent('Math', 'abc');
       richTextEditor.appendUnderlineText('underlined');
       richTextEditor.appendPlainText('extra');
-      richTextEditor.addExtension('Tabs', [{
+      richTextEditor.addRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-      richTextEditor.addExtension('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextEditor.addRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
     })
     editor.saveChanges();
 
@@ -265,36 +266,37 @@ describe('Rich-text editor extensions', function() {
     player.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readPlainText('plainly');
       richTextChecker.readBoldText('bold');
-      richTextChecker.readExtension('Collapsible', 'title', forms.toRichText('inner'));
-      richTextChecker.readExtension('Link', 'http://google.com/', true);
-      richTextChecker.readExtension('Math', 'abc');
+      richTextChecker.readRteComponent(
+        'Collapsible', 'title', forms.toRichText('inner'));
+      richTextChecker.readRteComponent('Link', 'http://google.com/', true);
+      richTextChecker.readRteComponent('Math', 'abc');
       richTextChecker.readUnderlineText('underlined');
       richTextChecker.readPlainText('extra');
-      richTextChecker.readExtension('Tabs', [{
+      richTextChecker.readRteComponent('Tabs', [{
         title: 'title 1',
         content: forms.toRichText('contents 1')
       }, {
         title: 'title 1',
         content: forms.toRichText('contents 2')
       }]);
-      richTextChecker.readExtension('Video', 'ANeHmk22a6Q', 10, 100, false);
+      richTextChecker.readRteComponent('Video', 'ANeHmk22a6Q', 10, 100, false);
     });
 
     users.logout();
   });
 
-  it('should allow nesting of RTE extensions inside one another', function() {
+  it('should allow nesting of RTE components inside one another', function() {
     users.createUser('user12@example.com', 'user12');
     users.login('user12@example.com')
 
-    workflow.createExploration('extensions', 'maths');
+    workflow.createExploration('RTE components', 'maths');
 
     editor.setContent(function(richTextEditor) {
       richTextEditor.appendItalicText('slanted');
-      richTextEditor.addExtension(
+      richTextEditor.addRteComponent(
           'Collapsible', 'heading', function(collapsibleEditor) {
-        // TODO (Jacob) add sub-extensions when issue 423 is fixed
-        collapsibleEditor.addExtension('Tabs', [{
+        // TODO (Jacob) add sub-components when issue 423 is fixed
+        collapsibleEditor.addRteComponent('Tabs', [{
           title: 'no1',
           content: function(tab1Editor) {
             tab1Editor.setPlainText('boring');
@@ -305,7 +307,7 @@ describe('Rich-text editor extensions', function() {
             tab2Editor.appendBoldText('fun!');
           }
         }]);
-        collapsibleEditor.addExtension('Math', 'xyz');
+        collapsibleEditor.addRteComponent('Math', 'xyz');
       });
     });
     editor.saveChanges();
@@ -313,9 +315,9 @@ describe('Rich-text editor extensions', function() {
     general.moveToPlayer();
     player.expectContentToMatch(function(richTextChecker) {
       richTextChecker.readItalicText('slanted');
-      richTextChecker.readExtension(
+      richTextChecker.readRteComponent(
           'Collapsible', 'heading', function(collapsibleChecker) {
-        collapsibleChecker.readExtension('Tabs', [{
+        collapsibleChecker.readRteComponent('Tabs', [{
           title: 'no1',
           content: function(tab1Checker) {
             tab1Checker.readPlainText('boring');
@@ -326,7 +328,7 @@ describe('Rich-text editor extensions', function() {
             tab2Checker.readBoldText('fun!');
           }
         }]);
-        collapsibleChecker.readExtension('Math', 'xyz');
+        collapsibleChecker.readRteComponent('Math', 'xyz');
       });
     });
 
@@ -358,13 +360,14 @@ describe('Interactions', function() {
     workflow.createExploration('interactions', 'history');
     editor.RuleEditor('default').setFeedback(0, forms.toRichText('no'));
 
-    for (var interactionName in widgets.INTERACTIVE_WIDGETS) {
-      var interaction = widgets.INTERACTIVE_WIDGETS[interactionName];
+    for (var interactionName in interactions.INTERACTIONS) {
+      var interaction = interactions.INTERACTIONS[interactionName];
       for (var i = 0; i < interaction.testSuite.length; i++) {
         var test = interaction.testSuite[i];
         editor.setInteraction.apply(
           null, [interactionName].concat(test.interactionArguments));
-        editor.addRule.apply(null, [interactionName].concat(test.ruleArguments));
+        editor.addRule.apply(
+          null, [interactionName].concat(test.ruleArguments));
         editor.RuleEditor(0).setFeedback(0, forms.toRichText('yes'));
 
         editor.enterPreviewMode();

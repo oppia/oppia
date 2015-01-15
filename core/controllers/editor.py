@@ -29,14 +29,15 @@ from core.domain import event_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import fs_domain
+from core.domain import interaction_registry
+from core.domain import obj_services
 from core.domain import param_domain
 from core.domain import rights_manager
-from core.domain import obj_services
+from core.domain import rte_component_registry
 from core.domain import skins_services
 from core.domain import stats_services
 from core.domain import user_services
 from core.domain import value_generators_domain
-from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -55,8 +56,11 @@ NEW_STATE_TEMPLATE = {
         'type': 'text',
         'value': ''
     }],
-    'param_changes': [],
-    'widget': {
+    'interaction': {
+        'customization_args': {
+            'rows': {'value': 1},
+            'placeholder': {'value': 'Type your answer here.'}
+        },
         'handlers': [{
             'name': 'submit',
             'rule_specs': [{
@@ -69,13 +73,10 @@ NEW_STATE_TEMPLATE = {
                 'description': 'Default',
             }],
         }],
-        'widget_id': 'TextInput',
-        'customization_args': {
-            'rows': {'value': 1},
-            'placeholder': {'value': 'Type your answer here.'}
-        },
+        'id': 'TextInput',
         'sticky': False
     },
+    'param_changes': [],
     'unresolved_answers': {},
 }
 
@@ -223,21 +224,20 @@ class ExplorationPage(EditorHandler):
         object_editors_js = OBJECT_EDITORS_JS.value
         value_generators_js = VALUE_GENERATORS_JS.value
 
-        all_interactive_widget_ids = (
-            widget_registry.Registry.get_widget_ids_of_type(
-                feconf.INTERACTIVE_PREFIX))
+        interaction_ids = (
+            interaction_registry.Registry.get_all_interaction_ids())
 
-        widget_dependency_ids = (
-            widget_registry.Registry.get_deduplicated_dependency_ids(
-                all_interactive_widget_ids))
+        interaction_dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
         dependencies_html, additional_angular_modules = (
             dependency_registry.Registry.get_deps_html_and_angular_modules(
-                widget_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
+                interaction_dependency_ids + self.EDITOR_PAGE_DEPENDENCY_IDS))
 
-        widget_templates = (
-            widget_registry.Registry.get_noninteractive_widget_html() +
-            widget_registry.Registry.get_interactive_widget_html(
-                all_interactive_widget_ids))
+        interaction_templates = (
+            rte_component_registry.Registry.get_html_for_all_components() +
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
 
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
@@ -262,11 +262,12 @@ class ExplorationPage(EditorHandler):
             'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
                 exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),
             'value_generators_js': jinja2.utils.Markup(value_generators_js),
-            'widget_templates': jinja2.utils.Markup(widget_templates),
             'skin_js_urls': [
                 skins_services.Registry.get_skin_js_url(skin_id)
                 for skin_id in skins_services.Registry.get_all_skin_ids()],
@@ -319,10 +320,10 @@ class ExplorationHandler(EditorHandler):
             'show_state_editor_tutorial_on_load': (
                 self.user_id and not
                 self.user_has_started_state_editor_tutorial),
-            'ALL_INTERACTIVE_WIDGETS': {
-                widget.id: widget.to_dict()
-                for widget in widget_registry.Registry.get_widgets_of_type(
-                    feconf.INTERACTIVE_PREFIX)
+            'ALL_INTERACTIONS': {
+                interaction.id: interaction.to_dict()
+                for interaction
+                in interaction_registry.Registry.get_all_interactions()
             },
         }
 

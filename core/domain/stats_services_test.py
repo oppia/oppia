@@ -206,7 +206,7 @@ class StateImprovementsUnitTests(test_utils.GenericTestBase):
         }, exp.init_state_name, [], [], 'NormalizedString')
         default_rule_spec = exp_domain.RuleSpec.get_default_rule_spec(
             feconf.END_DEST, 'NormalizedString')
-        exp.init_state.widget.handlers[0].rule_specs = [
+        exp.init_state.interaction.handlers[0].rule_specs = [
             not_default_rule_spec, default_rule_spec
         ]
         exp_services._save_exploration('fake@user.com', exp, '', [])
