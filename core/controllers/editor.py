@@ -56,8 +56,11 @@ NEW_STATE_TEMPLATE = {
         'type': 'text',
         'value': ''
     }],
-    'param_changes': [],
-    'widget': {
+    'interaction': {
+        'customization_args': {
+            'rows': {'value': 1},
+            'placeholder': {'value': 'Type your answer here.'}
+        },
         'handlers': [{
             'name': 'submit',
             'rule_specs': [{
@@ -70,13 +73,10 @@ NEW_STATE_TEMPLATE = {
                 'description': 'Default',
             }],
         }],
-        'widget_id': 'TextInput',
-        'customization_args': {
-            'rows': {'value': 1},
-            'placeholder': {'value': 'Type your answer here.'}
-        },
+        'id': 'TextInput',
         'sticky': False
     },
+    'param_changes': [],
     'unresolved_answers': {},
 }
 

@@ -64,14 +64,14 @@ class Registry(object):
         return cls._interactions.values()
 
     @classmethod
-    def get_interaction_by_id(cls, widget_id):
+    def get_interaction_by_id(cls, interaction_id):
         """Gets an interaction by its id.
 
         Refreshes once if the interaction is not found; subsequently, throws a
         KeyError."""
-        if widget_id not in cls._interactions:
+        if interaction_id not in cls._interactions:
             cls._refresh()
-        return cls._interactions[widget_id]
+        return cls._interactions[interaction_id]
 
     @classmethod
     def get_interaction_html(cls, interaction_ids):

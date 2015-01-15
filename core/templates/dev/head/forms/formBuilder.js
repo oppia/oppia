@@ -664,7 +664,7 @@ oppia.directive('richTextEditor', [
             if (!$scope.disallowOppiaRteComponents) {
               var componentIds = Object.keys(rteComponents);
               componentIds.sort().forEach(function(componentId) {
-                rteComponents[componentId].backendName = rteComponents[componentId].name;
+                rteComponents[componentId].backendName = rteComponents[componentId].backend_name;
                 rteComponents[componentId].name = rteComponents[componentId].frontend_name;
                 rteComponents[componentId].iconDataUrl = rteComponents[componentId].icon_data_url;
                 $scope._RICH_TEXT_COMPONENTS.push(rteComponents[componentId]);

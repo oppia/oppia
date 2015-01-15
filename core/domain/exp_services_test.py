@@ -384,7 +384,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 3
+schema_version: 4
 skill_tags: []
 states:
   %s:
@@ -393,8 +393,7 @@ states:
       value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
         to the learner playing your exploration.<br><br>If you need more help getting
         started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -408,14 +407,14 @@ states:
           dest: %s
           feedback: []
           param_changes: []
+      id: TextInput
       sticky: false
-      widget_id: TextInput
+    param_changes: []
   New state:
     content:
     - type: text
       value: ''
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -429,8 +428,9 @@ states:
           dest: New state
           feedback: []
           param_changes: []
+      id: TextInput
       sticky: false
-      widget_id: TextInput
+    param_changes: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME))
@@ -444,7 +444,7 @@ language_code: en
 objective: The objective
 param_changes: []
 param_specs: {}
-schema_version: 3
+schema_version: 4
 skill_tags: []
 states:
   %s:
@@ -453,8 +453,7 @@ states:
       value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
         to the learner playing your exploration.<br><br>If you need more help getting
         started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -468,14 +467,14 @@ states:
           dest: %s
           feedback: []
           param_changes: []
+      id: TextInput
       sticky: false
-      widget_id: TextInput
+    param_changes: []
   Renamed state:
     content:
     - type: text
       value: ''
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -489,8 +488,9 @@ states:
           dest: Renamed state
           feedback: []
           param_changes: []
+      id: TextInput
       sticky: false
-      widget_id: TextInput
+    param_changes: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME))
@@ -577,8 +577,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
     your exploration.<br><br>If you need more help getting
     started, check out the Help link in the navigation
     bar.
-param_changes: []
-widget:
+interaction:
   customization_args:
     placeholder:
       value: Type your answer here.
@@ -592,8 +591,9 @@ widget:
       dest: %s
       feedback: []
       param_changes: []
+  id: TextInput
   sticky: false
-  widget_id: TextInput
+param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
     SAMPLE_EXPORTED_DICT = {
@@ -601,8 +601,7 @@ widget:
         'New state': ("""content:
 - type: text
   value: ''
-param_changes: []
-widget:
+interaction:
   customization_args:
     placeholder:
       value: Type your answer here.
@@ -616,8 +615,9 @@ widget:
       dest: New state
       feedback: []
       param_changes: []
+  id: TextInput
   sticky: false
-  widget_id: TextInput
+param_changes: []
 """)
     }
 
@@ -626,8 +626,7 @@ widget:
         'Renamed state': ("""content:
 - type: text
   value: ''
-param_changes: []
-widget:
+interaction:
   customization_args:
     placeholder:
       value: Type your answer here.
@@ -641,8 +640,9 @@ widget:
       dest: Renamed state
       feedback: []
       param_changes: []
+  id: TextInput
   sticky: false
-  widget_id: TextInput
+param_changes: []
 """)
     }
 
@@ -718,7 +718,7 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             '$$hashKey': '018'
         }]
 
-        self.widget_handlers = {
+        self.interaction_handlers = {
             'submit': [{
                 'description': 'is equal to {{x|NonnegativeInt}}',
                 'definition': {
@@ -808,60 +808,66 @@ class UpdateStateTests(ExplorationServicesUnitTests):
                     self.init_state_name, 'param_changes', self.param_changes),
                 '')
 
-    def test_update_widget_id(self):
-        """Test updating of widget_id."""
+    def test_update_interaction_id(self):
+        """Test updating of interaction_id."""
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'widget_id', 'MultipleChoiceInput'), '')
+                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'MultipleChoiceInput'), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            exploration.init_state.widget.widget_id, 'MultipleChoiceInput')
+            exploration.init_state.interaction.id, 'MultipleChoiceInput')
 
-    def test_update_widget_customization_args(self):
-        """Test updating of widget_customization_args."""
+    def test_update_interaction_customization_args(self):
+        """Test updating of interaction customization_args."""
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID,
             _get_change_list(
-                self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'MultipleChoiceInput') +
             _get_change_list(
-                self.init_state_name, 'widget_customization_args', {
-                    'choices': {'value': ['Option A', 'Option B']}
-                }),
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_CUST_ARGS,
+                {'choices': {'value': ['Option A', 'Option B']}}),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
         self.assertEqual(
-            exploration.init_state.widget.customization_args[
+            exploration.init_state.interaction.customization_args[
                 'choices']['value'], ['Option A', 'Option B'])
 
-    def test_update_widget_sticky(self):
-        """Test updating of widget_sticky."""
+    def test_update_interaction_sticky(self):
+        """Test updating of interaction_sticky."""
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'widget_sticky', False), '')
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.init_state.widget.sticky, False)
+        self.assertEqual(exploration.init_state.interaction.sticky, False)
 
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'widget_sticky', True), '')
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True), '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.init_state.widget.sticky, True)
+        self.assertEqual(exploration.init_state.interaction.sticky, True)
 
-    def test_update_widget_sticky_type(self):
-        """Test for error if widget_sticky is made non-Boolean."""
+    def test_update_interaction_sticky_type(self):
+        """Test for error if interaction_sticky is made non-Boolean."""
         with self.assertRaisesRegexp(
                 utils.ValidationError,
-                'Expected widget sticky flag to be a boolean, received 3'):
+                'Expected interaction \'sticky\' flag to be a boolean, '
+                'received 3'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID, _get_change_list(
-                    self.init_state_name, 'widget_sticky', 3), '')
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_STICKY, 3), '')
 
-    def test_update_widget_handlers(self):
-        """Test updating of widget_handlers."""
+    def test_update_interaction_handlers(self):
+        """Test updating of interaction_handlers."""
 
         # We create a second state to use as a rule destination
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
@@ -869,17 +875,20 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         exp_services._save_exploration(self.OWNER_ID, exploration, '', [])
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.widget_handlers['submit'][1]['dest'] = 'State 2'
+        self.interaction_handlers['submit'][1]['dest'] = 'State 2'
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID,
             _get_change_list(
-                self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                self.init_state_name, exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                'MultipleChoiceInput') +
             _get_change_list(
-                self.init_state_name, 'widget_handlers', self.widget_handlers),
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+                self.interaction_handlers),
             '')
 
         exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        rule_specs = exploration.init_state.widget.handlers[0].rule_specs
+        rule_specs = exploration.init_state.interaction.handlers[0].rule_specs
         self.assertEqual(rule_specs[0].definition, {
             'rule_type': 'atomic',
             'name': 'Equals',
@@ -892,49 +901,57 @@ class UpdateStateTests(ExplorationServicesUnitTests):
 
     def test_update_state_invalid_state(self):
         """Test that rule destination states cannot be non-existant."""
-        self.widget_handlers['submit'][0]['dest'] = 'INVALID'
+        self.interaction_handlers['submit'][0]['dest'] = 'INVALID'
         with self.assertRaisesRegexp(
                 utils.ValidationError,
                 'The destination INVALID is not a valid state'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(
-                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'MultipleChoiceInput') +
                 _get_change_list(
-                    self.init_state_name, 'widget_handlers',
-                    self.widget_handlers),
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+                    self.interaction_handlers),
                 '')
 
     def test_update_state_missing_keys(self):
-        """Test that missing keys in widget_handlers produce an error."""
-        del self.widget_handlers['submit'][0]['definition']['inputs']
+        """Test that missing keys in interaction_handlers produce an error."""
+        del self.interaction_handlers['submit'][0]['definition']['inputs']
         with self.assertRaisesRegexp(KeyError, 'inputs'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(
-                    self.init_state_name, 'widget_id', 'NumericInput') +
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID, 'NumericInput') +
                 _get_change_list(
-                    self.init_state_name, 'widget_handlers',
-                    self.widget_handlers),
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+                    self.interaction_handlers),
                 '')
 
     def test_update_state_extra_keys(self):
         """Test that extra keys in rule definitions are detected."""
-        self.widget_handlers['submit'][0]['definition']['extra'] = 3
+        self.interaction_handlers['submit'][0]['definition']['extra'] = 3
         with self.assertRaisesRegexp(
                 utils.ValidationError, 'should conform to schema'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(
-                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'MultipleChoiceInput') +
                 _get_change_list(
-                    self.init_state_name, 'widget_handlers',
-                    self.widget_handlers),
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+                    self.interaction_handlers),
                 '')
 
     def test_update_state_extra_default_rule(self):
         """Test that rules other than the last cannot be default."""
-        self.widget_handlers['submit'][0]['definition']['rule_type'] = (
+        self.interaction_handlers['submit'][0]['definition']['rule_type'] = (
             rule_domain.DEFAULT_RULE_TYPE)
         with self.assertRaisesRegexp(
                 ValueError,
@@ -943,38 +960,49 @@ class UpdateStateTests(ExplorationServicesUnitTests):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(
-                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'MultipleChoiceInput') +
                 _get_change_list(
-                    self.init_state_name, 'widget_handlers',
-                    self.widget_handlers),
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+                    self.interaction_handlers),
                 '')
 
     def test_update_state_missing_default_rule(self):
         """Test that the last rule must be default."""
-        self.widget_handlers['submit'][1]['definition']['rule_type'] = 'atomic'
+        self.interaction_handlers['submit'][1]['definition']['rule_type'] = (
+            'atomic')
         with self.assertRaisesRegexp(
                 ValueError,
                 'Invalid ruleset .* the last rule should be a default rule'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(
-                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'MultipleChoiceInput') +
                 _get_change_list(
-                    self.init_state_name, 'widget_handlers',
-                    self.widget_handlers),
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+                    self.interaction_handlers),
                 '')
 
     def test_update_state_variable_types(self):
         """Test that parameters in rules must have the correct type."""
-        self.widget_handlers['submit'][0]['definition']['inputs']['x'] = 'abc'
+        self.interaction_handlers['submit'][0]['definition']['inputs']['x'] = (
+            'abc')
         with self.assertRaisesRegexp(Exception, 'invalid literal for int()'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID,
                 _get_change_list(
-                    self.init_state_name, 'widget_id', 'MultipleChoiceInput') +
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_ID,
+                    'MultipleChoiceInput') +
                 _get_change_list(
-                    self.init_state_name, 'widget_handlers',
-                    self.widget_handlers),
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS,
+                    self.interaction_handlers),
                 '')
 
     def test_update_content(self):
@@ -1020,7 +1048,9 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
 
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'widget_sticky', False), 'A message')
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_STICKY,
+                False), 'A message')
 
         self.assertEqual(
             exp_services.get_exploration_snapshots_metadata(
@@ -1036,22 +1066,29 @@ class CommitMessageHandlingTests(ExplorationServicesUnitTests):
                             'message but received none.'):
             exp_services.update_exploration(
                 self.OWNER_ID, self.EXP_ID, _get_change_list(
-                    self.init_state_name, 'widget_sticky', False), '')
+                    self.init_state_name,
+                    exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '')
 
     def test_unpublished_explorations_can_accept_commit_message(self):
         """Test unpublished explorations can accept optional commit messages"""
 
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'widget_sticky', False), 'A message')
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False
+            ), 'A message')
 
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'widget_sticky', True), '')
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True
+            ), '')
 
         exp_services.update_exploration(
             self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name, 'widget_sticky', True), None)
+                self.init_state_name,
+                exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True
+            ), None)
 
 
 class ExplorationSnapshotUnitTests(ExplorationServicesUnitTests):

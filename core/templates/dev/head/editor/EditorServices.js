@@ -171,6 +171,8 @@ oppia.factory('changeListService', [
   // undone change.
   var undoneChangeStack = [];
 
+  // All these constants should correspond to those in exp_domain.py.
+  // TODO(sll): Enforce this in code.
   var CMD_ADD_STATE = 'add_state';
   var CMD_RENAME_STATE = 'rename_state';
   var CMD_DELETE_STATE = 'delete_state';
@@ -629,7 +631,7 @@ oppia.factory('explorationStatesService', [
       }).result.then(function(deleteStateName) {
         delete _states[deleteStateName];
         for (var otherStateName in _states) {
-          var handlers = _states[otherStateName].widget.handlers;
+          var handlers = _states[otherStateName].interaction.handlers;
           for (var i = 0; i < handlers.length; i++) {
             for (var j = 0; j < handlers[i].rule_specs.length; j++) {
               if (handlers[i].rule_specs[j].dest === deleteStateName) {
@@ -667,7 +669,7 @@ oppia.factory('explorationStatesService', [
       delete _states[oldStateName];
 
       for (var otherStateName in _states) {
-        var handlers = _states[otherStateName].widget.handlers;
+        var handlers = _states[otherStateName].interaction.handlers;
         for (var i = 0; i < handlers.length; i++) {
           for (var j = 0; j < handlers[i].rule_specs.length; j++) {
             if (handlers[i].rule_specs[j].dest === oldStateName) {
@@ -697,7 +699,7 @@ oppia.factory('explorationStatesService', [
 oppia.factory('statePropertyService', [
     '$log', 'changeListService', 'warningsData', function($log, changeListService, warningsData) {
   // Public base API for data services corresponding to state properties
-  // (widget id, content, etc.)
+  // (interaction id, content, etc.)
   // WARNING: This should be initialized only in the context of the state editor, and
   // every time the state is loaded, so that proper behavior is maintained if e.g.
   // the state is renamed.
@@ -815,7 +817,7 @@ oppia.factory('newStateTemplateService', [function() {
     // NB: clients should ensure that the desired state name is valid.
     getNewStateTemplate: function(newStateName) {
       var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-      newStateTemplate.widget.handlers.forEach(function(handler) {
+      newStateTemplate.interaction.handlers.forEach(function(handler) {
         handler.rule_specs.forEach(function(ruleSpec) {
           ruleSpec.dest = newStateName;
         });
@@ -834,7 +836,7 @@ oppia.factory('computeGraphService', [function() {
     for (var stateName in states) {
       nodes[stateName] = stateName;
 
-      var handlers = states[stateName].widget.handlers;
+      var handlers = states[stateName].interaction.handlers;
       for (var h = 0; h < handlers.length; h++) {
         var ruleSpecs = handlers[h].rule_specs;
         for (i = 0; i < ruleSpecs.length; i++) {

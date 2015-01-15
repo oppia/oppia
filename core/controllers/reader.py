@@ -72,12 +72,12 @@ def classify(
         exp_id, exp_param_specs, state, handler_name, answer, params):
     """Normalize the answer and return the first rulespec that it satisfies."""
     interaction_instance = interaction_registry.Registry.get_interaction_by_id(
-        state.widget.widget_id)
+        state.interaction.id)
     normalized_answer = interaction_instance.normalize_answer(
         answer, handler_name)
 
     handler = next(
-        h for h in state.widget.handlers if h.name == handler_name)
+        h for h in state.interaction.handlers if h.name == handler_name)
     fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
     input_type = interaction_instance.get_handler_by_name(
         handler_name).obj_type
@@ -216,11 +216,11 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
         exp_param_specs = exploration.param_specs
-        old_interaction = exploration.states[old_state_name].widget
+        old_interaction = exploration.states[old_state_name].interaction
 
         old_interaction_instance = (
             interaction_registry.Registry.get_interaction_by_id(
-                old_interaction.widget_id))
+                old_interaction.id))
         normalized_answer = old_interaction_instance.normalize_answer(
             answer, handler_name)
         # TODO(sll): Should this also depend on `params`?
@@ -363,14 +363,14 @@ def submit_answer_in_tests(
 
     old_interaction_instance = (
         interaction_registry.Registry.get_interaction_by_id(
-            old_state.widget.widget_id))
+            old_state.interaction.id))
     normalized_answer = old_interaction_instance.normalize_answer(
         answer, handler_name)
     # TODO(sll): Should this also depend on `params`?
     event_services.AnswerSubmissionEventHandler.record(
         exploration_id, version, state_name, handler_name, rule_spec,
         old_interaction_instance.get_stats_log_html(
-            old_state.widget.customization_args, normalized_answer))
+            old_state.interaction.customization_args, normalized_answer))
 
     new_state = (
         None if rule_spec.dest == feconf.END_DEST

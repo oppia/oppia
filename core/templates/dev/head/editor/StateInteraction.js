@@ -145,13 +145,13 @@ oppia.controller('StateInteraction', [
       $scope.interactionRepository = interactionRepository;
 
       stateInteractionIdService.init(
-        $scope.stateName, stateData.widget.widget_id,
-        stateData.widget, 'widget_id');
+        $scope.stateName, stateData.interaction.id,
+        stateData.interaction, 'widget_id');
       stateCustomizationArgsService.init(
-        $scope.stateName, stateData.widget.customization_args,
-        stateData.widget, 'widget_customization_args');
+        $scope.stateName, stateData.interaction.customization_args,
+        stateData.interaction, 'widget_customization_args');
       stateInteractionStickyService.init(
-        $scope.stateName, stateData.widget.sticky, stateData.widget,
+        $scope.stateName, stateData.interaction.sticky, stateData.interaction,
         'widget_sticky');
 
       $scope.stateInteractionStickyService = stateInteractionStickyService;
@@ -164,12 +164,12 @@ oppia.controller('StateInteraction', [
       // - 'feedback' (list of feedback given for this rule)
       // - 'param_changes' (parameter changes associated with this rule)
       $scope.interactionHandlers = {};
-      for (var i = 0; i < stateData.widget.handlers.length; i++) {
-        $scope.interactionHandlers[stateData.widget.handlers[i].name] = (
-          stateData.widget.handlers[i].rule_specs);
+      for (var i = 0; i < stateData.interaction.handlers.length; i++) {
+        $scope.interactionHandlers[stateData.interaction.handlers[i].name] = (
+          stateData.interaction.handlers[i].rule_specs);
       }
 
-      $scope.resetInteractionCustomizer(stateData.widget);
+      $scope.resetInteractionCustomizer(stateData.interaction);
       $scope.hasLoaded = true;
     });
   });
@@ -313,11 +313,13 @@ oppia.controller('StateInteraction', [
     }
     $scope.interactionHandlersMemento = angular.copy($scope.interactionHandlers);
     $scope.interactionHandlers[handlerName].splice(index, 1);
-    $scope.saveInteractionHandlers($scope.interactionHandlers, $scope.interactionHandlersMemento);
+    $scope.saveInteractionHandlers(
+      $scope.interactionHandlers, $scope.interactionHandlersMemento);
   };
 
   $scope.saveRule = function() {
-    $scope.saveInteractionHandlers($scope.interactionHandlers, $scope.interactionHandlersMemento);
+    $scope.saveInteractionHandlers(
+      $scope.interactionHandlers, $scope.interactionHandlersMemento);
   };
 
   $scope.saveInteractionHandlers = function(newHandlers, oldHandlers) {
@@ -336,13 +338,16 @@ oppia.controller('StateInteraction', [
     var activeStateName = editorContextService.getActiveStateName();
     var _stateDict = explorationStatesService.getState(activeStateName);
 
-    _stateDict.widget.widget_id = angular.copy(stateInteractionIdService.savedMemento);
-    _stateDict.widget.customization_args = angular.copy(
+    _stateDict.interaction.id = angular.copy(
+      stateInteractionIdService.savedMemento);
+    _stateDict.interaction.customization_args = angular.copy(
       stateCustomizationArgsService.savedMemento);
-    _stateDict.widget.sticky = angular.copy(stateInteractionStickyService.savedMemento);
-    for (var i = 0; i < _stateDict.widget.handlers.length; i++) {
-      var handlerName = _stateDict.widget.handlers[i].name;
-      _stateDict.widget.handlers[i].rule_specs = $scope.interactionHandlers[handlerName];
+    _stateDict.interaction.sticky = angular.copy(
+      stateInteractionStickyService.savedMemento);
+    for (var i = 0; i < _stateDict.interaction.handlers.length; i++) {
+      var handlerName = _stateDict.interaction.handlers[i].name;
+      _stateDict.interaction.handlers[i].rule_specs = $scope.interactionHandlers[
+        handlerName];
     }
 
     explorationStatesService.setState(activeStateName, _stateDict);

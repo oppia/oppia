@@ -22,8 +22,8 @@ formatted as
 
     {ca_name: {value: ca_value}}
 
-On the other hand, widget.customization_args refers to a combination of
-the widget customization arg spec and the value used. It is a list of
+On the other hand, interaction.customization_args refers to a combination of
+the interaction customization arg spec and the value used. It is a list of
 dicts, each representing a customization arg -- viz.:
 
     [{
@@ -170,7 +170,7 @@ class BaseInteraction(object):
         provided.
         """
         result = {
-            'widget_id': self.id,
+            'id': self.id,
             'name': self.name,
             'category': self.category,
             'description': self.description,

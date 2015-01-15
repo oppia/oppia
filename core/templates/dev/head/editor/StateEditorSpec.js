@@ -59,7 +59,7 @@ describe('State Editor controller', function() {
 
       ess.setStates({
         'First State': {
-          widget: {
+          interaction: {
             handlers: [{
               rule_specs: [{
                 dest: null
@@ -69,7 +69,7 @@ describe('State Editor controller', function() {
           param_changes: []
         },
         'Second State': {
-          widget: {
+          interaction: {
             handlers: [{
               rule_specs: [{
                 dest: null
@@ -79,7 +79,7 @@ describe('State Editor controller', function() {
           param_changes: []
         },
         'Third State': {
-          widget: {
+          interaction: {
             handlers: [{
               rule_specs: [{
                 dest: null
@@ -285,8 +285,8 @@ describe('State Editor controller', function() {
       scope.cancelEdit();
       expect(scope.contentMemento).toBeNull();
       expect(scope.content).toEqual(contentBeforeEdit);
-    }); 
-      
+    });
+
     it('should save parameter edits correctly', function() {
       ecs.setActiveStateName('First State');
 

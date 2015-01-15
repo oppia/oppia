@@ -33,7 +33,7 @@ import utils
 IGNORED_FILE_SUFFIXES = ['.pyc', '.DS_Store']
 
 
-class WidgetDataUnitTests(test_utils.GenericTestBase):
+class RteComponentUnitTests(test_utils.GenericTestBase):
     """Tests that all the default RTE comopnents are valid."""
 
     def _is_camel_cased(self, name):

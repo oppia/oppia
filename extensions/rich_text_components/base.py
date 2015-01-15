@@ -91,10 +91,7 @@ class BaseRichTextComponent(object):
         customization args are provided.
         """
         return {
-            'widget_id': self.id,
-            'name': self.name,
-            'category': self.category,
-            'description': self.description,
+            'backend_name': self.name,
             'customization_args': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
@@ -102,6 +99,6 @@ class BaseRichTextComponent(object):
                 'schema': ca_spec.schema,
             } for ca_spec in self.customization_arg_specs],
             'frontend_name': self.frontend_name,
-            'tooltip': self.tooltip,
             'icon_data_url': self.icon_data_url,
+            'tooltip': self.tooltip,
         }

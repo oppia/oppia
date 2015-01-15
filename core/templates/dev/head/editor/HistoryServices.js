@@ -250,7 +250,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
       }
     }
     for (var stateName in states) {
-      var handlers = states[stateName].widget.handlers;
+      var handlers = states[stateName].interaction.handlers;
       for (var h = 0; h < handlers.length; h++) {
         ruleSpecs = handlers[h].rule_specs;
         for (var i = 0; i < ruleSpecs.length; i++) {

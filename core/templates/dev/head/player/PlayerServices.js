@@ -217,8 +217,8 @@ oppia.factory('oppiaPlayerService', [
     // happen in the same place. Perhaps in the non-sticky case we should call
     // a frontend method named appendFeedback() or similar.
     var isSticky = (
-      newStateName && newStateData.widget.sticky &&
-      newStateData.widget.widget_id === oldStateData.widget.widget_id);
+      newStateName && newStateData.interaction.sticky &&
+      newStateData.interaction.id === oldStateData.interaction.id);
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -244,12 +244,13 @@ oppia.factory('oppiaPlayerService', [
 
     // TODO(sll): Get rid of this special case for multiple choice.
     var oldInteractionChoices = null;
-    if (_exploration.states[oldStateName].widget.customization_args.choices) {
-      oldInteractionChoices = _exploration.states[oldStateName].widget.customization_args.choices.value;
+    if (_exploration.states[oldStateName].interaction.customization_args.choices) {
+      oldInteractionChoices = _exploration.states[oldStateName].interaction.customization_args.choices.value;
     }
 
     var readerResponseHtml = _getReaderResponseHtml(
-      _exploration.states[oldStateName].widget.widget_id, answer, isSticky, oldInteractionChoices);
+      _exploration.states[oldStateName].interaction.id, answer, isSticky,
+      oldInteractionChoices);
     if (newStateData) {
       learnerParamsService.init(newParams);
     }
@@ -359,8 +360,8 @@ oppia.factory('oppiaPlayerService', [
     },
     getInteractionHtml: function(stateName) {
       return _getInteractionHtml(
-        _exploration.states[stateName].widget.widget_id,
-        _exploration.states[stateName].widget.customization_args);
+        _exploration.states[stateName].interaction.id,
+        _exploration.states[stateName].interaction.customization_args);
     },
     getRandomSuffix: function() {
       // This is a bit of a hack. When a refresh to a $scope variable happens,
