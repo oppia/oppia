@@ -3,10 +3,10 @@
 {% block id %}rules{% endblock %}
 
 {% block row %}
-  <div class="col-lg-2 col-md-2 col-sm-2">
+  <div class="col-lg-1 col-md-1 col-sm-1">
   </div>
 
-  <div class="col-lg-10 col-md-10 col-sm-10 oppia-rules" id="tutorialStateRules">
+  <div class="col-lg-11 col-md-11 col-sm-11 oppia-rules" id="tutorialStateRules">
     <div ng-repeat="(handlerName, handler) in interactionHandlers">
       <div class="row" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
         <!-- An HTML element marked ui-sortable should contain only one element,
