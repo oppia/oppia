@@ -1,4 +1,5 @@
 <div ng-controller="ExplorationStatistics">
+  <h2>Statistics</h2>
   <div ng-if="!hasTabLoaded" class="oppia-align-center">
     Loading
     <span class="oppia-loading-dot-one">.</span>
@@ -6,7 +7,6 @@
     <span class="oppia-loading-dot-three">.</span>
   </div>
   <div ng-if="hasTabLoaded">
-    <br>
     <div ng-if="hasExplorationBeenVisited">
       <div>Show stats for version:
         <select class="oppia-select"

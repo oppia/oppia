@@ -384,6 +384,8 @@ var setFirstState = function(stateName) {
 // CONTROLS
 
 var saveChanges = function(commitMessage) {
+  general.scrollElementIntoView(
+    element(by.css('.protractor-test-save-changes')));
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
       element(by.css('.protractor-test-commit-message-input')).

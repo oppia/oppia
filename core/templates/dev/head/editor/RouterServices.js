@@ -24,22 +24,14 @@ oppia.factory('routerService', [
     function($rootScope, $location, $log, explorationInitStateNameService,
              editorContextService, explorationStatesService) {
 
+  var MAIN_TAB = 'main';
+  var STATS_TAB = 'stats';
+  var SETTINGS_TAB = 'settings';
+  var HISTORY_TAB = 'history';
+  var FEEDBACK_TAB = 'feedback';
+
   var _tabs = {
-    main: {
-      active: true
-    },
-    stats: {
-      active: false
-    },
-    settings: {
-      active: false
-    },
-    history: {
-      active: false
-    },
-    feedback: {
-      active: false
-    }
+    active: MAIN_TAB
   };
 
   // When the URL path changes, reroute to the appropriate tab in the
@@ -55,16 +47,19 @@ oppia.factory('routerService', [
     $rootScope.$broadcast('externalSave');
 
     if (newPath === '/stats') {
-      _tabs.stats.active = true;
+      _tabs.active = STATS_TAB;
+      $rootScope.$broadcast('refreshStatisticsTab');
     } else if (newPath === '/settings') {
-      _tabs.settings.active = true;
+      _tabs.active = SETTINGS_TAB;
       $rootScope.$broadcast('refreshSettingsTab');
     } else if (newPath === '/history') {
-      _tabs.history.active = true;
+      // TODO(sll): Do this on-hover rather than on-click.
+      $rootScope.$broadcast('refreshVersionHistory', {forceRefresh: false});
+      _tabs.active = HISTORY_TAB;
     } else if (newPath === '/feedback') {
-      _tabs.feedback.active = true;
+      _tabs.active = FEEDBACK_TAB;
     } else if (newPath.indexOf('/gui/') !== -1) {
-      _tabs.main.active = true;
+      _tabs.active = MAIN_TAB;
       var putativeStateName = newPath.substring('/gui/'.length);
       if (!explorationStatesService.getStates()) {
         return;

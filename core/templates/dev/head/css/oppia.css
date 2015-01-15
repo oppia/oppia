@@ -1120,7 +1120,12 @@ oppia-expression-error-tag:after {
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
+  position: fixed;
   z-index: 300;
+}
+.oppia-top-of-page-padding {
+  /* This ensures that content is not tucked behind the fixed navbar. */
+  padding-top: 50px;
 }
 .oppia-navbar-menu {
   margin-left: 10px;

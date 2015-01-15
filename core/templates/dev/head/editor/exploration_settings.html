@@ -2,8 +2,9 @@
   <div class="row">
     <div class="oppia-main-content">
       <div class="col-lg-8 col-md-8 col-sm-8">
+        <h2>Settings</h2>
 
-        <h4>General</h4>
+        <h3>General</h3>
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
             <div ng-if="editabilityService.isEditable()">
@@ -117,7 +118,7 @@
 
           <div class="row">
             <div class="col-lg-5 col-md-5 col-sm-5">
-              <h4>Roles</h4>
+              <h3>Roles</h3>
               <div ng-show="explorationRightsService.ownerNames.length > 0">
                 <strong>Managers</strong>
                 <ul>
@@ -183,7 +184,7 @@
             </div>
 
             <div class="col-lg-7 col-md-7 col-sm-7">
-              <h4>Permissions</h4>
+              <h3>Permissions</h3>
               <div class="pull-right">
                 <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
                   Toggle visibility
@@ -222,12 +223,44 @@
           </div>
         </div>
 
+        <div ng-if="explorationRightsService.ownerNames.length === 0 && !explorationRightsService.isCloned()">
+          <hr>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h3>Permissions</h3>
+              <div>
+                This exploration is <strong>public</strong> and <strong>community-editable</strong>.
+                <p ng-if="explorationRightsService.isPublic()">
+                  It is <strong>shown</strong> in the gallery.
+                </p>
+                <p ng-if="explorationRightsService.isPublicized()">
+                  It is <strong>featured</strong> in the gallery.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div ng-if="explorationRightsService.isCloned()">
+          <hr>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h3>Status</h3>
+              <div>
+                This exploration was <strong>cloned</strong> from another exploration.
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div ng-if="editabilityService.isEditable()">
           <hr>
 
           <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6">
-              <h4>Controls</h4>
+              <h3>Controls</h3>
 
               {% if can_release_ownership %}
                 <p ng-hide="explorationRightsService.isCommunityOwned()">
@@ -253,7 +286,7 @@
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
-              <h4>Admin Controls</h4>
+              <h3>Admin Controls</h3>
 
               {% if can_publicize %}
                 <p ng-show="explorationRightsService.isPublic()">
@@ -301,7 +334,7 @@
 
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <h4>Parameters</h4>
+            <h3>Parameters</h3>
           </div>
 
           <div class="col-lg-6 col-md-6 col-sm-6">
@@ -334,7 +367,7 @@
         {% if SHOW_SKIN_CHOOSER %}
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-              <h4>Skin chooser</h4>
+              <h3>Skin chooser</h3>
             </div>
           </div>
 
