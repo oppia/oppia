@@ -1207,3 +1207,11 @@ oppia-expression-error-tag:after {
   color: #555;
   padding: 5px;
 }
+
+.oppia-profile-img-lrg {
+  border: 1px solid black;
+  border-radius: 50px;
+  height: 100px;
+  margin: 10px;
+  width: 100px;
+}

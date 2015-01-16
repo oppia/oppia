@@ -9,14 +9,34 @@
     <div class="row">
       <div class="oppia-gallery-frame">
         <div>
-          <strong>Email address</strong>: {{user_email}}
+          <h1>Profile</h1>
+          <strong>Email address</strong> <input value="{{user_email}}" class="oppia-disabled-contenteditable" disabled/>
+          <em>Only moderators can see this</em>
           <br><br>
-          <strong>Username</strong>:
-          {% if username %}
-            {{username}}
+          <strong>Username</strong>
+          <input value="{% if username %} {{username}} {% else %} Not yet selected {% endif %}"
+            class="oppia-disabled-contenteditable" disabled/>
+          <br><br>
+          <strong>Bio</strong>
+          (optional)
+          <textarea></textarea>
+          <hr />
+          <strong>Language</strong>
+          <select2-dropdown choices="[English]" item="English"
+            allow-multiple-choices="true" new-choice-regex=".^" width="150"
+            placeholder="Filter languages..."
+            class="protractor-test-gallery-language-selector">
+          </select2-dropdown>
+
+          <br><br>
+          {% if profile_img_url %}
+            <img src="{{profile_img_url}}" class="oppia-profile-img-lrg"/>
+            <strong>Change photo</strong>
           {% else %}
-            <em>Not yet selected</em>
+            <strong>Upload photo</strong>
           {% endif %}
+          <input type="file" style="padding: 10px;"/>
+          <a class="btn btn-success">Finish</a>
         </div>
       </div>
     </div>
