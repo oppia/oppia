@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 import contextlib
+import datetime
 import os
 import re
 import unittest
@@ -147,6 +148,13 @@ class TestBase(unittest.TestCase):
     def get_expected_logout_url(self, slug):
         """Returns the expected logout URL."""
         return current_user_services.create_logout_url(slug)
+
+    def is_logged_out(self, response):
+        """Checks if the expiry date of the login cookie is in the past."""
+        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        return datetime.datetime.now() > datetime.datetime.strptime(
+            expiry_date[1], "%a, %d %b %Y %H:%M:%S GMT",)
+        
 
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
