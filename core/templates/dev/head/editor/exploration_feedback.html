@@ -1,6 +1,6 @@
 <div ng-controller="ExplorationFeedback">
   <div ng-if="threads === null">
-    <h4>Feedback Threads</h4>
+    <h2>Feedback Threads</h2>
     <div class="oppia-align-center">
       Loading
       <span class="oppia-loading-dot-one">.</span>
@@ -19,7 +19,7 @@
               Start new thread
             </button>
           {% endif %}
-          <h4>Feedback Threads</h4>
+          <h2>Feedback Threads</h2>
         </div>
       </div>
 
@@ -45,7 +45,7 @@
               <th class="col-lg-2 col-md-2 col-sm-2">
               </th>
             </tr>
-            <tr ng-repeat="t in threads|orderBy:'-last_updated'">
+            <tr ng-repeat="t in threads|orderBy:'-last_updated'" ng-click="setCurrentThread(t.thread_id)" class="oppia-feedback-tab-row">
               <td class="col-lg-1 col-md-1 col-sm-1">
                 <span ng-class="getLabelClass(t.status)"><[getHumanReadableStatus(t.status)]></span>
               </td>
@@ -60,7 +60,6 @@
                 <span><[getLocaleAbbreviatedDatetimeString(t.last_updated)]></span>
               </td>
               <td class="col-lg-2 col-md-2 col-sm-2">
-                <button class="btn btn-default btn-xs" ng-click="setCurrentThread(t.thread_id)">View</button>
               </td>
             </tr>
           </table>

@@ -19,7 +19,9 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
+var richTextComponents = require(
+  '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
 
 var DictionaryEditor = function(elem) {
@@ -160,23 +162,25 @@ var RichTextEditor = function(elem) {
     appendHorizontalRule: function() {
       _clickContentMenuButton('insertHorizontalRule');
     },
-    // This adds and customizes non-interactive widgets.
+    // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    addWidget: function(widgetName) {
-      _clickContentMenuButton('custom-command-' + widgetName.toLowerCase());
+    // passed on to the relevant RTE component editor.
+    addRteComponent: function(componentName) {
+      _clickContentMenuButton('custom-command-' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which modal to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which modal to act on but drop the componentName.
       var args = [modal];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).customizeWidget.apply(null, args);
-      modal.element(by.css('.protractor-test-close-widget-editor')).click();
+      richTextComponents.getComponent(componentName).customizeComponent.apply(
+        null, args);
+      modal.element(
+        by.css('.protractor-test-close-rich-text-component-editor')).click();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -197,15 +201,16 @@ var AutocompleteDropdownEditor = function(elem) {
   return {
     setValue: function(text) {
       elem.element(by.css('.select2-container')).click();
-      // NOTE: the input field is top-level in the DOM rather than below the
-      // container. The id is assigned when the dropdown is clicked.
+      // NOTE: the input field is top-level in the DOM, and is outside the
+      // context of 'elem'. The 'select2-drop' id is assigned to the input
+      // field when it is 'activated', i.e. when the dropdown is clicked.
       element(by.id('select2-drop')).element(by.css('.select2-input')).
         sendKeys(text + '\n');
     },
-    expectOptionsToBe: function (expectedOptions) {
+    expectOptionsToBe: function(expectedOptions) {
       elem.element(by.css('.select2-container')).click();
-      element(by.id('select2-drop')).all(by.tagName('li')).map(function(elem) {
-        return elem.getText();
+      element(by.id('select2-drop')).all(by.tagName('li')).map(function(optionElem) {
+        return optionElem.getText();
       }).then(function(actualOptions) {
         expect(actualOptions).toEqual(expectedOptions);
       });
@@ -216,7 +221,42 @@ var AutocompleteDropdownEditor = function(elem) {
   };
 };
 
-// This function is sent 'elem', which should be the element immediately 
+var AutocompleteMultiDropdownEditor = function(elem) {
+  return {
+    setValues: function(texts) {
+      // Clear all existing choices.
+      elem.element(by.css('.select2-choices'))
+          .all(by.tagName('li')).map(function(choiceElem) {
+        return choiceElem.element(by.css('.select2-search-choice-close'));
+      }).then(function(deleteButtons) {
+        // We iterate in descending order, because clicking on a delete button
+        // removes the element from the DOM. We also omit the last element
+        // because it is the field for new input.
+        for (var i = deleteButtons.length - 2; i >= 0; i--) {
+          deleteButtons[i].click();
+        }
+      });
+
+      for (var i = 0; i < texts.length; i++) {
+        elem.element(by.css('.select2-container')).click();
+        elem.element(by.css('.select2-input')).sendKeys(texts[i] + '\n');
+      }
+    },
+    expectCurrentSelectionToBe: function(expectedCurrentSelection) {
+      elem.element(by.css('.select2-choices'))
+          .all(by.tagName('li')).map(function(choiceElem) {
+        return choiceElem.getText();
+      }).then(function(actualSelection) {
+        // Remove the element corresponding to the last <li>, which actually
+        // corresponds to the field for new input.
+        actualSelection.pop();
+        expect(actualSelection).toEqual(expectedCurrentSelection);
+      });
+    }
+  };
+};
+
+// This function is sent 'elem', which should be the element immediately
 // containing the various elements of a rich text area, for example
 // <div>
 //   plain
@@ -229,15 +269,15 @@ var AutocompleteDropdownEditor = function(elem) {
 // should consist of:
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
-//   handler.readWidget('Math', ...);
+//   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
-    // We remove all <span> elements since these are plain text that is 
+    // We remove all <span> elements since these are plain text that is
     // sometimes represented just by text nodes.
     elem.all(by.xpath('./*[not(self::span)]')).map(function(entry) {
       // It is necessary to obtain the texts of the elements in advance since
       // applying .getText() while the RichTextChecker is running would be
-      // asynchronous and so not allow us to update the textPointer 
+      // asynchronous and so not allow us to update the textPointer
       // synchronously.
       return entry.getText(function(text) {
         return text;
@@ -266,12 +306,12 @@ var expectRichText = function(elem) {
 
 // This supplies functions to verify the contents of an area of the page that
 // was created using a rich-text editor, e.g. <div>text<b>bold</b></div>.
-// 'arrayOfElems': the array of promises of top-level element nodes in the 
+// 'arrayOfElems': the array of promises of top-level element nodes in the
 //   rich-text area, e.g [promise of <b>bold</b>].
-// 'arrayOfTexts': the array of visible texts of top-level element nodes in 
+// 'arrayOfTexts': the array of visible texts of top-level element nodes in
 //   the rich-text area, obtained from getText(), e.g. ['bold'].
-// 'fullText': a string consisting of all the visible text in the rich text 
-//   area (including both element and text nodes, so more than just the 
+// 'fullText': a string consisting of all the visible text in the rich text
+//   area (including both element and text nodes, so more than just the
 //   concatenation of arrayOfTexts), e.g. 'textbold'.
 var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   expect(arrayOfElems.length).toEqual(arrayOfTexts.length);
@@ -280,10 +320,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   // arrayPointer traverses both arrays simultaneously.
   var arrayPointer = 0;
   var textPointer = 0;
-  // Widgets insert line breaks above and below themselves and these are
-  // recorded in fullText but not arrayOfTexts so we need to track them 
+  // RTE components insert line breaks above and below themselves and these are
+  // recorded in fullText but not arrayOfTexts so we need to track them
   // specially.
-  var justPassedWidget = false;
+  var justPassedRteComponent = false;
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
@@ -291,7 +331,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
-    justPassedWidget = false;
+    justPassedRteComponent = false;
   };
 
   return {
@@ -301,7 +341,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
       textPointer = textPointer + text.length;
-      justPassedWidget = false;
+      justPassedRteComponent = false;
     },
     readBoldText: function(text) {
       _readFormattedText(text, 'b');
@@ -312,27 +352,27 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     readUnderlineText: function(text) {
       _readFormattedText(text, 'u');
     },
-    // TODO (Jacob) add functions for other rich text components
+    // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    readWidget: function(widgetName) {
+    // passed on to the relevant RTE component editor.
+    readRteComponent: function(componentName) {
       var elem = arrayOfElems[arrayPointer];
       expect(elem.getTagName()).
-        toBe('oppia-noninteractive-' + widgetName.toLowerCase());
+        toBe('oppia-noninteractive-' + componentName.toLowerCase());
       expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which element to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which element to act on but drop the componentName.
       var args = [elem];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).
-        expectWidgetDetailsToMatch.apply(null, args);
-      textPointer = textPointer + arrayOfTexts[arrayPointer].length + 
-        (justPassedWidget ? 1 : 2);
+      richTextComponents.getComponent(componentName).
+        expectComponentDetailsToMatch.apply(null, args);
+      textPointer = textPointer + arrayOfTexts[arrayPointer].length +
+        (justPassedRteComponent ? 1 : 2);
       arrayPointer = arrayPointer + 1;
-      justPassedWidget = true;
+      justPassedRteComponent = true;
     },
     expectEnd: function() {
       expect(arrayPointer).toBe(arrayOfElems.length);
@@ -341,14 +381,14 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
 };
 
 // This converts a string into a function that represents rich text, which can then
-// be sent to either editRichText() or expectRichText(). The string should not 
-// contain any html formatting. In the first case the function created will 
+// be sent to either editRichText() or expectRichText(). The string should not
+// contain any html formatting. In the first case the function created will
 // write the given text into the rich text editor (as plain text), and in
 // the second it will verify that the html created by a rich text editor
 // consists of the given text (without any formatting).
-//   This is necessary because the Protractor tests do not have an abstract 
-// representation of a 'rich text object'. This is because we are more 
-// interested in the process of interacting with the page than in the 
+//   This is necessary because the Protractor tests do not have an abstract
+// representation of a 'rich text object'. This is because we are more
+// interested in the process of interacting with the page than in the
 // information thereby conveyed.
 var toRichText = function(text) {
   // The 'handler' should be either a RichTextEditor or RichTextChecker
@@ -387,11 +427,11 @@ exports.ListEditor = ListEditor;
 exports.RealEditor = RealEditor;
 exports.RichTextEditor = RichTextEditor;
 exports.UnicodeEditor = UnicodeEditor;
+exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
+exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;
 exports.toRichText = toRichText;
-
-exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 
 exports.getEditor = getEditor;

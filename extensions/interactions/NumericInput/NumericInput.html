@@ -1,0 +1,21 @@
+<script type="text/ng-template" id="interaction/NumericInput">
+  <div class="row">
+    <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
+      <div class="col-lg-10 col-md-10 col-sm-10">
+        <ng-form name="numericInputForm">
+          <schema-based-editor schema="NUMERIC_INPUT_FORM_SCHEMA" local-value="answer">
+          </schema-based-editor>
+        </ng-form>
+      </div>
+      <div class="col-lg-2 col-md-2 col-sm-2">
+        <button type="submit" class="btn btn-default" ng-disabled="numericInputForm.$invalid">
+          Submit
+        </button>
+      </div>
+    </form>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/NumericInput">
+  <[answer]>
+</script>

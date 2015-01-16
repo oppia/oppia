@@ -20,7 +20,7 @@ __author__ = 'Sean Lip'
 
 from core.domain import dependency_registry
 from core.domain import exp_services
-from core.domain import widget_registry
+from core.domain import interaction_registry
 from core.tests import test_utils
 import feconf
 
@@ -58,10 +58,10 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
         # Verify that the exploration does not have a jsrepl dependency.
         exploration = exp_services.get_exploration_by_id('0')
-        interactive_widget_ids = exploration.get_interactive_widget_ids()
+        interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
-            widget_registry.Registry.get_deduplicated_dependency_ids(
-                interactive_widget_ids))
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
 
         self.assertNotIn('jsrepl', all_dependency_ids)
 
@@ -80,10 +80,10 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
         # Verify that exploration 0 does not have a jsrepl dependency.
         exploration = exp_services.get_exploration_by_id(EXP_ID)
-        interactive_widget_ids = exploration.get_interactive_widget_ids()
+        interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
-            widget_registry.Registry.get_deduplicated_dependency_ids(
-                interactive_widget_ids))
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
         self.assertNotIn('jsrepl', all_dependency_ids)
 
         # Thus, jsrepl is not loaded in the exploration reader.
@@ -98,10 +98,10 @@ class DependencyControllerTests(test_utils.GenericTestBase):
 
         # Verify that exploration 1 has a jsrepl dependency.
         exploration = exp_services.get_exploration_by_id(EXP_ID)
-        interactive_widget_ids = exploration.get_interactive_widget_ids()
+        interaction_ids = exploration.get_interaction_ids()
         all_dependency_ids = (
-            widget_registry.Registry.get_deduplicated_dependency_ids(
-                interactive_widget_ids))
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
         self.assertIn('jsrepl', all_dependency_ids)
 
         # Thus, jsrepl is loaded in the exploration reader.

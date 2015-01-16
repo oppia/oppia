@@ -2,8 +2,9 @@
   <div class="row">
     <div class="oppia-main-content">
       <div class="col-lg-8 col-md-8 col-sm-8">
+        <h2>Settings</h2>
 
-        <h4>General</h4>
+        <h3>General</h3>
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
             <div ng-if="editabilityService.isEditable()">
@@ -11,13 +12,13 @@
                 <div class="form-group" ng-class="{'has-error': !explorationTitleService.displayed}">
                   <label for="explorationTitle" class="col-lg-2 col-md-2 col-sm-2">Title</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <input id="explorationTitle" type="text" class="form-control" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
+                    <input id="explorationTitle" type="text" class="form-control protractor-test-exploration-title-input" ng-model="explorationTitleService.displayed" ng-blur="saveExplorationTitle()">
                   </div>
                 </div>
                 <div class="form-group" ng-class="{'has-error': !explorationObjectiveService.displayed}">
                   <label for="explorationObjective" class="col-lg-2 col-md-2 col-sm-2">Goal</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <input id="explorationObjective" type="text" class="form-control" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
+                    <input id="explorationObjective" type="text" class="form-control protractor-test-exploration-objective-input" ng-model="explorationObjectiveService.displayed" ng-blur="saveExplorationObjective()" placeholder="Learn how to ...">
                     <span class="help-block" style="font-size: smaller">
                       What does this exploration help people to do?
                     </span>
@@ -26,13 +27,13 @@
                 <div class="form-group" ng-class="{'has-error': !explorationCategoryService.displayed}">
                   <label for="explorationCategory" class="col-lg-2 col-md-2 col-sm-2">Category</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <input id="explorationCategory" type="text" class="form-control" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
+                    <input id="explorationCategory" type="text" class="form-control protractor-test-exploration-category-input" ng-model="explorationCategoryService.displayed" ng-blur="saveExplorationCategory()">
                   </div>
                 </div>
                 <div class="form-group">
                   <label for="explorationLanguageCode" class="col-lg-2 col-md-2 col-sm-2">Language</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <select id="explorationLanguageCode" class="form-control" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
+                    <select id="explorationLanguageCode" class="form-control protractor-test-exploration-language-select" ng-model="explorationLanguageCodeService.displayed" ng-change="saveExplorationLanguageCode()" ng-options="lc.code as lc.description for lc in explorationLanguageCodeService.getAllLanguageCodes()">
                     </select>
                     <span class="help-block" style="font-size: smaller">
                       <em>
@@ -44,7 +45,7 @@
                 <div class="form-group">
                   <label for="explorationInitStateName" class="col-lg-2 col-md-2 col-sm-2">First State</label>
                   <div class="col-lg-10 col-md-10 col-sm-10">
-                    <select id="explorationInitStateName" class="form-control" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames">
+                    <select id="explorationInitStateName" class="form-control protractor-test-initial-state-select" ng-model="explorationInitStateNameService.displayed" ng-change="saveExplorationInitStateName()" ng-options="name as name for name in stateNames">
                     </select>
                   </div>
                 </div>
@@ -117,7 +118,7 @@
 
           <div class="row">
             <div class="col-lg-5 col-md-5 col-sm-5">
-              <h4>Roles</h4>
+              <h3>Roles</h3>
               <div ng-show="explorationRightsService.ownerNames.length > 0">
                 <strong>Managers</strong>
                 <ul>
@@ -183,7 +184,7 @@
             </div>
 
             <div class="col-lg-7 col-md-7 col-sm-7">
-              <h4>Permissions</h4>
+              <h3>Permissions</h3>
               <div class="pull-right">
                 <button class="btn btn-default" ng-click="toggleViewabilityIfPrivate()" ng-if="explorationRightsService.isPrivate()">
                   Toggle visibility
@@ -222,12 +223,44 @@
           </div>
         </div>
 
+        <div ng-if="explorationRightsService.ownerNames.length === 0 && !explorationRightsService.isCloned()">
+          <hr>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h3>Permissions</h3>
+              <div>
+                This exploration is <strong>public</strong> and <strong>community-editable</strong>.
+                <p ng-if="explorationRightsService.isPublic()">
+                  It is <strong>shown</strong> in the gallery.
+                </p>
+                <p ng-if="explorationRightsService.isPublicized()">
+                  It is <strong>featured</strong> in the gallery.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div ng-if="explorationRightsService.isCloned()">
+          <hr>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <h3>Status</h3>
+              <div>
+                This exploration was <strong>cloned</strong> from another exploration.
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div ng-if="editabilityService.isEditable()">
           <hr>
 
           <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6">
-              <h4>Controls</h4>
+              <h3>Controls</h3>
 
               {% if can_release_ownership %}
                 <p ng-hide="explorationRightsService.isCommunityOwned()">
@@ -253,7 +286,7 @@
             </div>
 
             <div class="col-lg-6 col-md-6 col-sm-6" ng-if="currentUserIsAdmin || currentUserIsModerator">
-              <h4>Admin Controls</h4>
+              <h3>Admin Controls</h3>
 
               {% if can_publicize %}
                 <p ng-show="explorationRightsService.isPublic()">
@@ -301,7 +334,7 @@
 
         <div class="row">
           <div class="col-lg-12 col-md-12 col-sm-12">
-            <h4>Parameters</h4>
+            <h3>Parameters</h3>
           </div>
 
           <div class="col-lg-6 col-md-6 col-sm-6">
@@ -334,7 +367,7 @@
         {% if SHOW_SKIN_CHOOSER %}
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
-              <h4>Skin chooser</h4>
+              <h3>Skin chooser</h3>
             </div>
           </div>
 

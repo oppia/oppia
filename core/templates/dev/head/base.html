@@ -89,7 +89,7 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div>
-                    <div class="navbar-header" ng-if="!screenIsLarge">
+                    <div class="navbar-header protractor-test-navbar-header" ng-if="!screenIsLarge">
                       <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu">
                         <img src="/images/menu.png">
                       </a>
@@ -170,6 +170,9 @@
                   </div>
                 </div>
               </nav>
+
+              <div class="oppia-top-of-page-padding">
+              </div>
 
               {{ warnings_and_loader() }}
             </div>

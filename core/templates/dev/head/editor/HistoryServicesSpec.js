@@ -216,13 +216,13 @@ describe('Compare versions service', function() {
       };
       for (var stateName in statesDetails) {
         var newStateData = {
-          'widget': {'handlers': [{ 'rule_specs': []}]},
           'content': [{
             'type': 'text',
             'value': statesDetails[stateName].contentStr
-          }]
+          }],
+          'interaction': {'handlers': [{ 'rule_specs': []}]}
         };
-        newStateData.widget.handlers[0].rule_specs =
+        newStateData.interaction.handlers[0].rule_specs =
           statesDetails[stateName].ruleDests.map(function(ruleDestName) {
             return {'dest': ruleDestName};
           });

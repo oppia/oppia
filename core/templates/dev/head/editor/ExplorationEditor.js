@@ -28,7 +28,7 @@ oppia.controller('ExplorationEditor', [
   'editorContextService', 'changeListService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', 'widgetDefinitionsService', 'newStateTemplateService', 'oppiaPlayerService',
+  'oppiaDatetimeFormatter', 'interactionRepositoryService', 'newStateTemplateService', 'oppiaPlayerService',
   'explorationStatesService', 'routerService', 'graphDataService', 'focusService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService',
   function(
@@ -37,7 +37,7 @@ oppia.controller('ExplorationEditor', [
     editorContextService, changeListService, explorationTitleService,
     explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
     explorationRightsService, explorationInitStateNameService, validatorsService,
-    editabilityService, oppiaDatetimeFormatter, widgetDefinitionsService,
+    editabilityService, oppiaDatetimeFormatter, interactionRepositoryService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
     graphDataService, focusService, stateEditorTutorialFirstTimeService,
     explorationParamSpecsService) {
@@ -77,8 +77,9 @@ oppia.controller('ExplorationEditor', [
   var _pathnameArray = window.location.pathname.split('/');
   $scope.explorationId = _pathnameArray[_pathnameArray.length - 1];
   // The exploration id needs to be attached to the root scope in order for
-  // the file picker widget to work. (Note that an alternative approach might
-  // also be to replicate this URL-based calculation in the file picker widget.)
+  // the file picker RTE component to work. (Note that an alternative approach
+  // might also be to replicate this URL-based calculation in the file picker
+  // RTE component.)
   $rootScope.explorationId = $scope.explorationId;
   $scope.explorationUrl = '/create/' + $scope.explorationId;
   $scope.explorationDataUrl = '/createhandler/data/' + $scope.explorationId;
@@ -86,15 +87,6 @@ oppia.controller('ExplorationEditor', [
   $scope.revertExplorationUrl = '/createhandler/revert/' + $scope.explorationId;
 
   $scope.getTabStatuses = routerService.getTabStatuses;
-  $scope.selectMainTab = routerService.navigateToMainTab;
-  $scope.selectStatsTab = routerService.navigateToStatsTab;
-  $scope.selectSettingsTab = routerService.navigateToSettingsTab;
-  $scope.selectHistoryTab = function() {
-    // TODO(sll): Do this on-hover rather than on-click.
-    $scope.$broadcast('refreshVersionHistory', {forceRefresh: false});
-    routerService.navigateToHistoryTab();
-  };
-  $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 
   /**************************************************
   * Methods affecting the saving of explorations.
@@ -232,6 +224,8 @@ oppia.controller('ExplorationEditor', [
             $scope.deletedStates = deletedStates;
             $scope.commitMessageIsOptional = commitMessageIsOptional;
 
+            // For reasons of backwards compatibility, the following keys
+            // should not be changed.
             // TODO(sll): The keys for this dict already appear in
             // EditorServices.changeListService; consider deduplicating.
             $scope.EXPLORATION_BACKEND_NAMES_TO_HUMAN_NAMES = {
@@ -245,6 +239,8 @@ oppia.controller('ExplorationEditor', [
               'init_state_name': 'First state'
             };
 
+            // For reasons of backwards compatibility, the following keys
+            // should not be changed.
             var EXPLORATION_PROPERTIES_WHICH_ARE_SIMPLE_STRINGS = {
               'title': true,
               'category': true,
@@ -253,6 +249,8 @@ oppia.controller('ExplorationEditor', [
               'init_state_name': true
             };
 
+            // For reasons of backwards compatibility, the following keys
+            // should not be changed.
             $scope.STATE_BACKEND_NAMES_TO_HUMAN_NAMES = {
               'name': 'State name',
               'param_changes': 'Parameter changes',
@@ -265,6 +263,8 @@ oppia.controller('ExplorationEditor', [
 
             // An ordered list of state properties that determines the order in which
             // to show them in the save confirmation modal.
+            // For reasons of backwards compatibility, the following keys
+            // should not be changed.
             // TODO(sll): Implement this fully. Currently there is no sorting.
             $scope.ORDERED_STATE_PROPERTIES = [
               'name', 'param_changes', 'content', 'widget_id',
@@ -397,7 +397,7 @@ oppia.controller('ExplorationEditor', [
     var problematicStates = [];
     var _states = explorationStatesService.getStates();
     for (var stateName in _states) {
-      var handlers = _states[stateName].widget.handlers;
+      var handlers = _states[stateName].interaction.handlers;
       var isProblematic = handlers.some(function(handler) {
         return handler.rule_specs.some(function(ruleSpec) {
           return (
@@ -508,7 +508,7 @@ oppia.controller('ExplorationEditor', [
   // page load.
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
-      widgetDefinitionsService.setInteractiveDefinitions(data.ALL_INTERACTIVE_WIDGETS);
+      interactionRepositoryService.setInteractionRepository(data.ALL_INTERACTIONS);
       explorationStatesService.setStates(data.states);
 
       explorationTitleService.init(data.title);
@@ -558,12 +558,11 @@ oppia.controller('ExplorationEditor', [
       $rootScope.loadingMessage = '';
 
       $scope.$broadcast('refreshStatisticsTab');
+      $scope.$broadcast('refreshVersionHistory', {forceRefresh: true});
 
       if (explorationStatesService.getState(editorContextService.getActiveStateName())) {
         $scope.$broadcast('refreshStateEditor');
       }
-
-      $scope.refreshFeedbackTabHeader();
 
       if (successCallback) {
         successCallback();
@@ -604,24 +603,6 @@ oppia.controller('ExplorationEditor', [
           warningsData.clear();
         };
       }]
-    });
-  };
-
-  $scope.feedbackTabHeader = 'Feedback';
-  $scope.feedbackLastUpdatedUrl = (
-    '/feedback_last_updated/' + $scope.explorationId);
-  $scope.refreshFeedbackTabHeader = function() {
-    $scope.feedbackTabHeader = 'Feedback (loading...)';
-    $http.get($scope.feedbackLastUpdatedUrl).then(function(response) {
-      var data = response.data;
-      if (data.last_updated) {
-        $scope.feedbackTabHeader = (
-          'Feedback (updated ' +
-          oppiaDatetimeFormatter.getLocaleAbbreviatedDatetimeString(data.last_updated) +
-          ')');
-      } else {
-        $scope.feedbackTabHeader = 'Feedback';
-      }
     });
   };
 
@@ -750,8 +731,9 @@ oppia.controller('ExplorationEditor', [
 }]);
 
 
-oppia.controller('EditorHelpTab', [
-    '$scope', '$rootScope', '$timeout', function($scope, $rootScope, $timeout) {
+oppia.controller('EditorNavigation', [
+    '$scope', '$rootScope', '$timeout', 'routerService', 'explorationRightsService',
+    function($scope, $rootScope, $timeout, routerService, explorationRightsService) {
   $scope.postTutorialHelpPopoverIsShown = false;
 
   $scope.$on('openPostTutorialHelpPopover', function() {
@@ -769,6 +751,14 @@ oppia.controller('EditorHelpTab', [
   $scope.openEditorTutorial = function() {
     $rootScope.$broadcast('openEditorTutorial');
   };
+
+  $scope.explorationRightsService = explorationRightsService;
+  $scope.getTabStatuses = routerService.getTabStatuses;
+  $scope.selectMainTab = routerService.navigateToMainTab;
+  $scope.selectStatsTab = routerService.navigateToStatsTab;
+  $scope.selectSettingsTab = routerService.navigateToSettingsTab;
+  $scope.selectHistoryTab = routerService.navigateToHistoryTab;
+  $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 }]);
 
 

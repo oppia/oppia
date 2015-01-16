@@ -21,7 +21,7 @@
 
 var forms = require('./forms.js');
 var general = require('./general.js');
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
 var rules = require('../../../extensions/rules/protractor.js');
 
 var exitTutorialIfNecessary = function() {
@@ -36,16 +36,17 @@ var exitTutorialIfNecessary = function() {
 };
 
 var setStateName = function(name) {
-  var nameElement = element(by.css('.oppia-state-name-container'))
+  var nameElement = element(by.css('.protractor-test-state-name-container'))
   nameElement.click();
-  nameElement.element(by.tagName('input')).clear();
-  nameElement.element(by.tagName('input')).sendKeys(name);
-  nameElement.element(by.buttonText('Done')).click();
+  nameElement.element(by.css('.protractor-test-state-name-input')).clear();
+  nameElement.element(by.css('.protractor-test-state-name-input')).
+    sendKeys(name);
+  nameElement.element(by.css('.protractor-test-state-name-submit')).click();
 };
 
 var expectCurrentStateToBe = function(name) {
   expect(
-    element(by.css('.oppia-state-name-container')).getText()
+    element(by.css('.protractor-test-state-name-container')).getText()
   ).toMatch(name);
 };
 
@@ -55,13 +56,12 @@ var expectCurrentStateToBe = function(name) {
 // can then use to alter the state content, for example by calling
 // .appendBoldText(...).
 var setContent = function(richTextInstructions) {
-  element(by.css('.protractor-test-edit-content')).click();
+  element(by.css('.protractor-test-state-edit-content')).click();
   var richTextEditor = forms.RichTextEditor(
-    element(by.css('.oppia-state-content')));
+    element(by.css('.protractor-test-state-content-editor')));
   richTextEditor.clear();
   richTextInstructions(richTextEditor);
-  element(by.css('.oppia-state-content')).
-    element(by.buttonText('Save Content')).click();
+  element(by.css('.protractor-test-save-state-content')).click();
 };
 
 // This receives a function richTextInstructions used to verify the display of
@@ -69,60 +69,55 @@ var setContent = function(richTextInstructions) {
 // richTextInstructions will be supplied with a handler of the form
 // forms.RichTextChecker and can then perform checks such as
 //   handler.readBoldText('bold')
-//   handler.readWidget('Collapsible', 'outer', 'inner')
+//   handler.readRteComponent('Collapsible', 'outer', 'inner')
 // These would verify that the content consists of the word 'bold' in bold
-// followed by a Collapsible widget with the given arguments, and nothing else.
-// Note that this fails for collapsibles and tabs since it is not possible to
-// click on them to view their contents, as clicks instead open the rich text
-// editor.
+// followed by a Collapsible component with the given arguments, and nothing
+// else. Note that this fails for collapsibles and tabs since it is not
+// possible to click on them to view their contents, as clicks instead open the
+// rich text editor.
 var expectContentToMatch = function(richTextInstructions) {
-  // The .last() is necessary because we want the second of two <span>s; the
-  // first holds the placeholder text for the exploration content.
   forms.expectRichText(
-    element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
+    element(by.css('.protractor-test-state-content-display'))
   ).toMatch(richTextInstructions);
 };
 
 var expectContentTextToEqual = function(text) {
   forms.expectRichText(
-    element(by.css('.oppia-state-content-display')).all(by.xpath('./span')).last()
+    element(by.css('.protractor-test-state-content-display'))
   ).toEqual(text);
 };
 
-// INTERACTIVE WIDGETS
+// INTERACTIONS
 
 // Additional arguments may be sent to this function, and they will be
-// passed on to the relevant widget editor.
-var setInteraction = function(widgetName) {
+// passed on to the relevant interaction editor.
+var setInteraction = function(interactionName) {
   element(by.css('.protractor-test-select-interaction-id')).
-    element(by.css('option[value=' + widgetName + ']')).click();
+    element(by.css('option[value=' + interactionName + ']')).click();
 
   if (arguments.length > 1) {
     element(by.css('.protractor-test-edit-interaction')).click();
 
-    var elem = element(by.css('.oppia-interactive-widget-editor'));
-
-    // Need to convert arguments to an actual array, discarding widgetName. We
-    // also send the interaction editor element, within which the customizer
-    // should act.
+    var elem = element(by.css('.protractor-test-interaction-editor'));
     var args = [elem];
     for (var i = 1; i < arguments.length; i++) {
       args.push(arguments[i]);
     }
-    widgets.getInteractive(widgetName).customizeInteraction.apply(null, args);
+    interactions.getInteraction(interactionName).customizeInteraction.apply(
+      null, args);
 
     element(by.css('.protractor-test-save-interaction')).click();
   }
 };
 
 // Likewise this can receive additional arguments
-var expectInteractionToMatch = function(widgetName) {
+var expectInteractionToMatch = function(interactionName) {
   // Convert additional arguments to an array to send on.
   var args = [];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
-  widgets.getInteractive(widgetName).
+  interactions.getInteraction(interactionName).
     expectInteractionDetailsToMatch.apply(null, args);
 };
 
@@ -131,16 +126,16 @@ var expectInteractionToMatch = function(widgetName) {
 // This function selects a rule for the current interaction and enters the
 // entries of the parameterValues array as its parameters; the parameterValues
 // should be specified after the ruleName as additional arguments. For example
-// with widget 'NumericInput' and rule 'Equals' then there is a single
+// with interaction 'NumericInput' and rule 'Equals' then there is a single
 // parameter which the given answer is required to equal.
-var _selectRule = function(ruleElement, widgetName, ruleName) {
+var _selectRule = function(ruleElement, interactionName, ruleName) {
   var parameterValues = [];
   for (var i = 3; i < arguments.length; i++) {
     parameterValues.push(arguments[i]);
   }
 
   var ruleDescription = rules.getDescription(
-    widgets.getInteractive(widgetName).answerObjectType, ruleName);
+    interactions.getInteraction(interactionName).answerObjectType, ruleName);
 
   var parameterStart = (ruleDescription.indexOf('{{') === -1) ?
     undefined : ruleDescription.indexOf('{{');
@@ -178,12 +173,12 @@ var _selectRule = function(ruleElement, widgetName, ruleName) {
 
   // Now we enter the parameters
   for (var i = 0; i < parameterValues.length; i++) {
-    var parameterElement = ruleElement.element(
-      by.repeater('item in ruleDescriptionFragments track by $index'
-    ).row(i * 2 + 1));
+    var parameterElement = ruleElement.all(
+      by.css('.protractor-test-rule-description-fragment'
+    )).get(i * 2 + 1);
     var parameterEditor = forms.getEditor(parameterTypes[i])(parameterElement);
 
-    if (widgetName === 'MultipleChoiceInput') {
+    if (interactionName === 'MultipleChoiceInput') {
       // This is a special case as it uses a dropdown to set a NonnegativeInt
       parameterElement.element(
         by.cssContainingText('option', parameterValues[i])
@@ -197,8 +192,8 @@ var _selectRule = function(ruleElement, widgetName, ruleName) {
 // This clicks the "add new rule" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
-var addRule = function(widgetName, ruleName) {
-  element(by.css('.oppia-add-rule-button')).click();
+var addRule = function(interactionName, ruleName) {
+  element(by.css('.protractor-test-add-rule')).click();
   var ruleElement = element(by.css('.protractor-test-temporary-rule'))
   var args = [ruleElement];
   for (var i = 0; i < arguments.length; i++) {
@@ -212,7 +207,7 @@ var addRule = function(widgetName, ruleName) {
 var RuleEditor = function(ruleNum) {
   var elem = (ruleNum === 'default') ?
     element(by.css('.protractor-test-default-rule')):
-    element(by.repeater('rule in handler track by $index').row(ruleNum));
+    element.all(by.css('.protractor-test-rule-block')).get(ruleNum);
 
   // This button will not be shown if the rule editor is already open.
   elem.all(by.css('.protractor-test-edit-rule')).then(function(buttons) {
@@ -226,7 +221,7 @@ var RuleEditor = function(ruleNum) {
 
   return {
     // Any number of parameters may be specified after the ruleName
-    setDescription: function(widgetName, ruleName) {
+    setDescription: function(interactionName, ruleName) {
       var args = [elem];
       for (var i = 0; i < arguments.length; i++) {
         args.push(arguments[i]);
@@ -235,30 +230,33 @@ var RuleEditor = function(ruleNum) {
     },
     setFeedback: function(index, richTextInstructions) {
       var feedbackEditor = forms.ListEditor(
-        elem.element(by.css('.oppia-feedback-bubble'))
+        elem.element(by.css('.protractor-test-feedback-bubble'))
       ).editItem(index, 'RichText');
       feedbackEditor.clear();
       richTextInstructions(feedbackEditor);
     },
     addFeedback: function() {
-      forms.ListEditor(elem.element(by.css('.oppia-feedback-bubble'))).
-        addItem();
+      forms.ListEditor(
+        elem.element(by.css('.protractor-test-feedback-bubble'))
+      ).addItem();
     },
     deleteFeedback: function(index) {
-      forms.ListEditor(elem.element(by.css('.oppia-feedback-bubble'))).
-        deleteItem(index);
+      forms.ListEditor(
+        elem.element(by.css('.protractor-test-feedback-bubble'))
+      ).deleteItem(index);
     },
     // Enter 'END' for the end state.
     // This saves the rule after the destination is selected.
     setDestination: function(destinationName) {
-      var destinationElement = elem.element(by.css('.oppia-dest-bubble'));
+      var destinationElement =
+        elem.element(by.css('.protractor-test-dest-bubble'));
       forms.AutocompleteDropdownEditor(destinationElement).
         setValue(destinationName);
       elem.element(by.css('.protractor-test-save-rule')).click();
     },
     expectAvailableDestinationsToBe: function(stateNames) {
       forms.AutocompleteDropdownEditor(
-        elem.element(by.css('.oppia-dest-bubble'))
+        elem.element(by.css('.protractor-test-dest-bubble'))
       ).expectOptionsToBe(stateNames);
     },
     delete: function() {
@@ -271,21 +269,20 @@ var RuleEditor = function(ruleNum) {
 // STATE GRAPH
 
 var createState = function(newStateName) {
-  element(by.css('.oppia-add-state-container')).
-    element(by.tagName('input')).sendKeys(newStateName);
-  element(by.css('.oppia-add-state-container')).
-    element(by.tagName('button')).click();
+  element(by.css('.protractor-test-add-state-input')).sendKeys(newStateName);
+  element(by.css('.protractor-test-add-state-submit')).click();
 };
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
-  element.all(by.css('.node')).map(function(stateElement) {
-    return stateElement.element(by.tagName('text')).getText();
+  element.all(by.css('.protractor-test-node')).map(function(stateElement) {
+    return stateElement.element(by.css('.protractor-test-node-label')).
+      getText();
   }).then(function(listOfNames) {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === targetName) {
-        element.all(by.css('.node')).get(i).click();
+        element.all(by.css('.protractor-test-node')).get(i).click();
         matched = true;
       }
     }
@@ -296,13 +293,15 @@ var moveToState = function(targetName) {
 };
 
 var deleteState = function(stateName) {
-  element.all(by.css('.node')).map(function(stateElement) {
-    return stateElement.element(by.tagName('text')).getText();
+  element.all(by.css('.protractor-test-node')).map(function(stateElement) {
+    return stateElement.element(by.css('.protractor-test-node-label')).
+      getText();
   }).then(function(listOfNames) {
     var matched = false;
     for (var i = 0; i < listOfNames.length; i++) {
       if (listOfNames[i] === stateName) {
-        element.all(by.css('.node')).get(i).element(by.tagName('g')).click();
+        element.all(by.css('.protractor-test-node')).get(i).
+          element(by.css('.protractor-test-delete-node')).click();
         protractor.getInstance().waitForAngular();
         general.waitForSystem();
         element(by.css('.protractor-test-confirm-delete-state')).click();
@@ -316,8 +315,8 @@ var deleteState = function(stateName) {
 };
 
 var expectStateNamesToBe = function(names) {
-  element.all(by.css('.node')).map(function(stateNode) {
-    return stateNode.element(by.tagName('text')).getText();
+  element.all(by.css('.protractor-test-node')).map(function(stateNode) {
+    return stateNode.element(by.css('.protractor-test-node-label')).getText();
   }).then(function(stateNames) {
     expect(stateNames).toEqual(names);
   });
@@ -328,43 +327,45 @@ var expectStateNamesToBe = function(names) {
 // All functions involving the settings tab should be sent through this
 // wrapper.
 var runFromSettingsTab = function(callbackFunction) {
-  element(by.linkText('Settings')).click();
+  element(by.css('.protractor-test-settings-tab')).click();
   var result = callbackFunction();
-  element(by.linkText('Main')).click();
+  element(by.css('.protractor-test-main-tab')).click();
   return result;
 };
 
 var setTitle = function(title) {
   runFromSettingsTab(function() {
-    element(by.id('explorationTitle')).clear();
-    element(by.id('explorationTitle')).sendKeys(title);
+    element(by.css('protractor-test-exploration-title-input')).clear();
+    element(by.css('protractor-test-exploration-title-input')).sendKeys(title);
   });
 };
 
 var setCategory = function(category) {
   runFromSettingsTab(function() {
-    element(by.id('explorationCategory')).clear();
-    element(by.id('explorationCategory')).sendKeys(category);
+    element(by.css('.protractor-test-exploration-category-input')).clear();
+    element(by.css('.protractor-test-exploration-category-input')).
+      sendKeys(category);
   });
 };
 
 var setObjective = function(objective) {
   runFromSettingsTab(function() {
-    element(by.id('explorationObjective')).clear();
-    element(by.id('explorationObjective')).sendKeys(objective);
+    element(by.css('.protractor-test-exploration-objective-input')).clear();
+    element(by.css('.protractor-test-exploration-objective-input')).
+      sendKeys(objective);
   });
 };
 
 var setLanguage = function(language) {
   runFromSettingsTab(function() {
-    element(by.id('explorationLanguageCode')).
+    element(by.css('.protractor-test-exploration-language-select')).
       element(by.cssContainingText('option', language)).click();
   });
 };
 
 var expectAvailableFirstStatesToBe = function(names) {
   runFromSettingsTab(function() {
-    element(by.id('explorationInitStateName')).
+    element(by.css('.protractor-test-initial-state-select')).
         all(by.tagName('option')).map(function(elem) {
       return elem.getText();
     }).then(function(options) {
@@ -375,7 +376,7 @@ var expectAvailableFirstStatesToBe = function(names) {
 
 var setFirstState = function(stateName) {
   runFromSettingsTab(function() {
-    element(by.id('explorationInitStateName')).
+    element(by.css('.protractor-test-initial-state-select')).
       element(by.cssContainingText('option', stateName)).click();
   });
 };
@@ -383,9 +384,12 @@ var setFirstState = function(stateName) {
 // CONTROLS
 
 var saveChanges = function(commitMessage) {
+  general.scrollElementIntoView(
+    element(by.css('.protractor-test-save-changes')));
   element(by.css('.protractor-test-save-changes')).click().then(function() {
     if (commitMessage) {
-      element(by.model('commitMessage')).sendKeys(commitMessage);
+      element(by.css('.protractor-test-commit-message-input')).
+        sendKeys(commitMessage);
     }
     protractor.getInstance().waitForAngular();
     general.waitForSystem();
@@ -413,7 +417,8 @@ var exitPreviewMode = function() {
   // the username in the top right, which opens a dropdown menu that then
   // blocks the "Edit" button. To prevent this we move the cursor away.
   general.scrollElementIntoView(exitButton);
-  browser.actions().mouseMove(element(by.css('.navbar-header'))).perform();
+  browser.actions().
+    mouseMove(element(by.css('.protractor-test-navbar-header'))).perform();
   exitButton.click();
 };
 

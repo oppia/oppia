@@ -183,96 +183,6 @@ class ExplorationRightsModel(base_models.VersionedModel):
         super(ExplorationRightsModel, self).commit(
             committer_id, commit_message, commit_cmds)
 
-    @classmethod
-    def get_public(cls):
-        """Returns an iterable with public (beta) exp rights models."""
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLIC
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_publicized(cls):
-        """Returns an iterable with publicized exp rights models."""
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status == EXPLORATION_STATUS_PUBLICIZED
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_non_private(cls):
-        """Returns an iterable with non-private exp rights models."""
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_page_of_non_private(
-            cls, page_size=feconf.DEFAULT_QUERY_LIMIT,
-            urlsafe_start_cursor=None):
-        """Returns a page of non-private exp rights models."""
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status != EXPLORATION_STATUS_PRIVATE
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).order(
-            #these orders are because inequality filters require them.
-            #more info: http://stackoverflow.com/questions/12449197/badargumenterror-multiquery-with-cursors-requires-key-order-in-ndb
-            ExplorationRightsModel.status, ExplorationRightsModel._key
-        ).fetch_page(page_size=page_size, start_cursor=urlsafe_start_cursor)
-
-    @classmethod
-    def get_community_owned(cls):
-        """Returns an iterable with community-owned exp rights models."""
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.community_owned == True
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_private_at_least_viewable(cls, user_id):
-        """Returns an iterable with private exps that are at least viewable
-        by the given user.
-        """
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.status == EXPLORATION_STATUS_PRIVATE
-        ).filter(
-            ndb.OR(ExplorationRightsModel.owner_ids == user_id,
-                   ExplorationRightsModel.editor_ids == user_id,
-                   ExplorationRightsModel.viewer_ids == user_id)
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_at_least_editable(cls, user_id):
-        """Returns an iterable with all exps that are at least editable by the
-        given user.
-        """
-        return ExplorationRightsModel.query().filter(
-            ndb.OR(ExplorationRightsModel.owner_ids == user_id,
-                   ExplorationRightsModel.editor_ids == user_id)
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_viewable(cls, user_id):
-        """Returns an iterable with exp rights viewable by the given user.
-
-        All such explorations will have a status of 'private'.
-        """
-        return ExplorationRightsModel.query().filter(
-            ExplorationRightsModel.viewer_ids == user_id
-        ).filter(
-            ExplorationRightsModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
     def _trusted_commit(
             self, committer_id, commit_type, commit_message, commit_cmds):
         """Record the event to the commit log after the model commit.
@@ -434,37 +344,10 @@ class ExpSummaryModel(base_models.BaseModel):
     version = ndb.IntegerProperty()
 
     @classmethod
-    def get_public(cls):
-        """Returns an iterable with public (beta) exp summary models."""
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == EXPLORATION_STATUS_PUBLIC
-        ).filter(
-            ExpSummaryModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_publicized(cls):
-        """Returns an iterable with publicized exp summary models."""
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.status == EXPLORATION_STATUS_PUBLICIZED
-        ).filter(
-            ExpSummaryModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
     def get_non_private(cls):
         """Returns an iterable with non-private exp summary models."""
         return ExpSummaryModel.query().filter(
             ExpSummaryModel.status != EXPLORATION_STATUS_PRIVATE
-        ).filter(
-            ExpSummaryModel.deleted == False
-        ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-    @classmethod
-    def get_community_owned(cls):
-        """Returns an iterable with community-owned exp summary models."""
-        return ExpSummaryModel.query().filter(
-            ExpSummaryModel.community_owned == True
         ).filter(
             ExpSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)

@@ -171,6 +171,8 @@ oppia.factory('changeListService', [
   // undone change.
   var undoneChangeStack = [];
 
+  // All these constants should correspond to those in exp_domain.py.
+  // TODO(sll): Enforce this in code.
   var CMD_ADD_STATE = 'add_state';
   var CMD_RENAME_STATE = 'rename_state';
   var CMD_DELETE_STATE = 'delete_state';
@@ -629,7 +631,7 @@ oppia.factory('explorationStatesService', [
       }).result.then(function(deleteStateName) {
         delete _states[deleteStateName];
         for (var otherStateName in _states) {
-          var handlers = _states[otherStateName].widget.handlers;
+          var handlers = _states[otherStateName].interaction.handlers;
           for (var i = 0; i < handlers.length; i++) {
             for (var j = 0; j < handlers[i].rule_specs.length; j++) {
               if (handlers[i].rule_specs[j].dest === deleteStateName) {
@@ -667,7 +669,7 @@ oppia.factory('explorationStatesService', [
       delete _states[oldStateName];
 
       for (var otherStateName in _states) {
-        var handlers = _states[otherStateName].widget.handlers;
+        var handlers = _states[otherStateName].interaction.handlers;
         for (var i = 0; i < handlers.length; i++) {
           for (var j = 0; j < handlers[i].rule_specs.length; j++) {
             if (handlers[i].rule_specs[j].dest === oldStateName) {
@@ -697,7 +699,7 @@ oppia.factory('explorationStatesService', [
 oppia.factory('statePropertyService', [
     '$log', 'changeListService', 'warningsData', function($log, changeListService, warningsData) {
   // Public base API for data services corresponding to state properties
-  // (widget id, content, etc.)
+  // (interaction id, content, etc.)
   // WARNING: This should be initialized only in the context of the state editor, and
   // every time the state is loaded, so that proper behavior is maintained if e.g.
   // the state is renamed.
@@ -778,9 +780,9 @@ oppia.factory('statePropertyService', [
   };
 }]);
 
-// A data service that stores the current widget id.
+// A data service that stores the current interaction id.
 // TODO(sll): Add validation.
-oppia.factory('stateWidgetIdService', [
+oppia.factory('stateInteractionIdService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_id';
@@ -788,7 +790,7 @@ oppia.factory('stateWidgetIdService', [
 }]);
 
 // A data service that stores the current state customization args for the
-// widget. This is a dict mapping customization arg names to dicts of the
+// interaction. This is a dict mapping customization arg names to dicts of the
 // form {value: customization_arg_value}.
 // TODO(sll): Add validation.
 oppia.factory('stateCustomizationArgsService', [
@@ -798,9 +800,9 @@ oppia.factory('stateCustomizationArgsService', [
   return child;
 }]);
 
-// A data service that stores the current sticky status for the widget.
+// A data service that stores the current sticky status for the interaction.
 // TODO(sll): Add validation.
-oppia.factory('stateWidgetStickyService', [
+oppia.factory('stateInteractionStickyService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_sticky';
@@ -815,7 +817,7 @@ oppia.factory('newStateTemplateService', [function() {
     // NB: clients should ensure that the desired state name is valid.
     getNewStateTemplate: function(newStateName) {
       var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-      newStateTemplate.widget.handlers.forEach(function(handler) {
+      newStateTemplate.interaction.handlers.forEach(function(handler) {
         handler.rule_specs.forEach(function(ruleSpec) {
           ruleSpec.dest = newStateName;
         });
@@ -826,10 +828,48 @@ oppia.factory('newStateTemplateService', [function() {
 }]);
 
 
+oppia.factory('computeGraphService', [function() {
+
+  var _computeGraphData = function(initStateId, states) {
+    var nodes = {};
+    var links = [];
+    for (var stateName in states) {
+      nodes[stateName] = stateName;
+
+      var handlers = states[stateName].interaction.handlers;
+      for (var h = 0; h < handlers.length; h++) {
+        var ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          links.push({
+            source: stateName,
+            target: ruleSpecs[i].dest,
+          });
+        }
+      }
+    }
+    nodes[END_DEST] = END_DEST;
+
+    return {
+      nodes: nodes,
+      links: links,
+      initStateId: initStateId,
+      finalStateId: END_DEST
+    };
+  };
+
+  return {
+    compute: function(initStateId, states) {
+      return _computeGraphData(initStateId, states);
+    }
+  };
+}]);
+
+
 // Service for computing graph data.
 oppia.factory('graphDataService', [
     'explorationStatesService', 'explorationInitStateNameService',
-    function(explorationStatesService, explorationInitStateNameService) {
+    'computeGraphService', function(explorationStatesService,
+    explorationInitStateNameService, computeGraphService) {
 
   var _graphData = null;
 
@@ -848,31 +888,8 @@ oppia.factory('graphDataService', [
     }
 
     var states = explorationStatesService.getStates();
-
-    var nodes = {};
-    var links = [];
-    for (var stateName in states) {
-      nodes[stateName] = stateName;
-
-      var handlers = states[stateName].widget.handlers;
-      for (h = 0; h < handlers.length; h++) {
-        ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
-          links.push({
-            source: stateName,
-            target: ruleSpecs[i].dest,
-          });
-        }
-      }
-    }
-    nodes[END_DEST] = END_DEST;
-
-    _graphData = {
-      nodes: nodes,
-      links: links,
-      initStateId: explorationInitStateNameService.savedMemento,
-      finalStateId: END_DEST
-    };
+    var initStateId = explorationInitStateNameService.savedMemento;
+    _graphData = computeGraphService.compute(initStateId, states);
   };
 
   return {

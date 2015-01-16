@@ -25,13 +25,14 @@ var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
-  browser.get('/gallery');
+  browser.get(general.GALLERY_URL_SUFFIX);
   element(by.css('.protractor-test-create-exploration')).click();
   protractor.getInstance().waitForAngular();
-  element(by.model('newExplorationTitle')).sendKeys(name);
-  forms.AutocompleteDropdownEditor(element(by.tagName('select2-dropdown'))).
-    setValue(category);
-  element(by.buttonText('Create New Exploration')).click();
+  element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);
+  forms.AutocompleteDropdownEditor(
+    element(by.css('.protractor-test-new-exploration-category'))
+  ).setValue(category);
+  element(by.css('.protractor-test-submit-new-exploration')).click();
 
   // We now want to wait for the editor to fully load.
   protractor.getInstance().waitForAngular();

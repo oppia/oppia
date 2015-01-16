@@ -33,7 +33,6 @@ from core.controllers import reader
 from core.controllers import recent_commits
 from core.controllers import resources
 from core.controllers import services
-from core.controllers import widgets
 from core.platform import models
 transaction_services = models.Registry.import_transaction_services()
 
@@ -141,8 +140,6 @@ mapreduce_parameters.config.BASE_PATH = '/mapreduce/worker'
 urls = [
     get_redirect_route(r'/_ah/warmup', WarmupHandler, 'warmup_handler'),
 
-    webapp2.Route(
-        r'%s' % feconf.HOMEPAGE_URL, home.HomePage, 'home_page'),
     get_redirect_route(
         r'/dashboard', home.DashboardPage, 'dashboard_page'),
     get_redirect_route(
@@ -171,7 +168,16 @@ urls = [
     get_redirect_route(
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
+    get_redirect_route(
+        r'/interaction_repository/data',
+        resources.InteractionRepositoryHandler,
+        'interaction_repository_handler'),
+    get_redirect_route(
+        r'/rich_text_component_repository/data',
+        resources.RteComponentRepositoryHandler,
+        'rte_component_repository_handler'),
 
+    get_redirect_route(r'/', galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
         r'%s' % feconf.GALLERY_URL, galleries.GalleryPage, 'gallery_page'),
     get_redirect_route(
@@ -276,7 +282,10 @@ urls = [
         r'/createhandler/snapshots/<exploration_id>',
         editor.ExplorationSnapshotsHandler, 'exploration_snapshots_handler'),
     get_redirect_route(
-        r'/createhandler/statistics/<exploration_id>',
+        r'/createhandler/statisticsversion/<exploration_id>',
+        editor.ExplorationStatsVersionsHandler, 'exploration_stats_versions_handler'),
+    get_redirect_route(
+        r'/createhandler/statistics/<exploration_id>/<exploration_version>',
         editor.ExplorationStatisticsHandler, 'exploration_statistics_handler'),
     get_redirect_route(
         r'/createhandler/state_rules_stats/<exploration_id>/<escaped_state_name>',
@@ -302,10 +311,6 @@ urls = [
     get_redirect_route(
         r'%s/<exploration_id>/<thread_id>' % feconf.FEEDBACK_THREAD_URL_PREFIX,
         feedback.ThreadHandler, 'feedback_thread_handler'),
-
-    get_redirect_route(
-        r'/widgetrepository/data/<widget_type>',
-        widgets.WidgetRepositoryHandler, 'widget_repository_handler'),
 
     get_redirect_route(
         r'/notificationshandler', home.NotificationsHandler,

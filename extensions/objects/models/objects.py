@@ -516,3 +516,99 @@ class Graph(BaseObject):
             raise TypeError('Cannot convert to graph %s' % raw)
 
         return raw
+
+
+class NormalizedRectangle2D(BaseObject):
+    """Normalized Rectangle class."""
+    
+    description = 'A rectangle normalized so that the coordinates are within the range [0,1].'
+
+    SCHEMA = {
+        'type': 'list',
+        'len': 2,
+        'items': {
+            'type': 'list',
+            'len': 2,
+            'items': Real.SCHEMA
+        }
+    }
+    
+    @classmethod
+    def normalize(cls, raw):
+        # Moves cur_value to the nearest available value in the range [min_value, max_value]
+        def clamp(min_value, current_value, max_value):
+            return min(max_value, max(min_value, current_value))
+        try:
+            raw = schema_utils.normalize_against_schema(raw, cls.SCHEMA)
+            
+            raw[0][0] = clamp(0.0, raw[0][0], 1.0)
+            raw[0][1] = clamp(0.0, raw[0][1], 1.0)
+            raw[1][0] = clamp(0.0, raw[1][0], 1.0)
+            raw[1][1] = clamp(0.0, raw[1][1], 1.0)
+
+        except Exception:
+            raise TypeError('Cannot convert to Normalized Rectangle %s' % raw)
+
+        return raw
+
+
+class ImageRegion(BaseObject):
+    """Image Region class."""
+
+    description = 'A region of an image.'
+    
+    # Note: at the moment, only supports rectangular image regions
+    # Coordinates are [[top-left-x, top-left-y], [bottom-right-x, bottom-right-y]]
+    # origin is top-left, increasing x is to the right, increasing y is down
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'regionType',
+            'schema': UnicodeString.SCHEMA
+        }, {
+            'name': 'regionArea',
+            'schema': NormalizedRectangle2D.SCHEMA
+        }]
+    }
+
+
+class ImageWithRegions(BaseObject):
+    """Image With Regions class."""
+
+    description = 'An image overlaid with regions.'
+    edit_html_filename = 'image_with_regions_editor'
+    edit_js_filename = 'ImageWithRegionsEditor'
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'imagePath',
+            'schema': Filepath.SCHEMA
+        }, {
+            'name': 'imageRegions',
+            'schema': {
+                'type': 'list',
+                'items': {
+                    'type': 'dict',
+                    'properties': [{
+                        'name': 'label',
+                        'schema': UnicodeString.SCHEMA
+                    }, {
+                        'name': 'region',
+                        'schema': ImageRegion.SCHEMA 
+                    }]
+                }
+            }
+        }]
+    }
+
+
+class ListOfRegion(BaseObject):
+    """List of Region class."""
+
+    description = "A list of regions by index."
+
+    SCHEMA = {
+        'type': 'list',
+        'items': UnicodeString.SCHEMA
+    }

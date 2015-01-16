@@ -94,10 +94,10 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.logout()
 
-    def test_change_splash_page_config_property(self):
-        """Test that the correct variables show up on the splash page."""
-        # Navigate to the splash page. The site name is not set.
-        response = self.testapp.get('/')
+    def test_change_about_page_config_property(self):
+        """Test that the correct variables show up on the about page."""
+        # Navigate to the about page. The site name is not set.
+        response = self.testapp.get('/about')
         self.assertIn('SITE_NAME', response.body)
         self.assertNotIn(SITE_NAME, response.body)
 
@@ -113,7 +113,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         self.logout()
 
         # Navigate to the splash page. The site name is set.
-        response = self.testapp.get('/')
+        response = self.testapp.get('/about')
         self.assertNotIn('SITE_NAME', response.body)
         self.assertIn(SITE_NAME, response.body)
 
