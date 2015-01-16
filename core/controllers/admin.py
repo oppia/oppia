@@ -26,8 +26,8 @@ from core.controllers import editor
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import exp_services
+from core.domain import rte_component_registry
 from core.domain import user_services
-from core.domain import widget_registry
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 import feconf
@@ -122,20 +122,20 @@ class AdminPage(base.BaseHandler):
                         computation['last_finished_msec']))
 
         self.values.update({
-            'demo_explorations': demo_explorations,
-            'object_editors_js': jinja2.utils.Markup(
-                editor.OBJECT_EDITORS_JS.value),
-            'value_generators_js': jinja2.utils.Markup(
-                editor.VALUE_GENERATORS_JS.value),
-            'noninteractive_widget_html': jinja2.utils.Markup(
-                widget_registry.Registry.get_noninteractive_widget_html()),
-            'one_off_job_specs': one_off_job_specs,
-            'recent_job_data': recent_job_data,
-            'unfinished_job_data': unfinished_job_data,
             'continuous_computations_data': continuous_computations_data,
+            'demo_explorations': demo_explorations,
             'human_readable_current_time': (
                 utils.get_human_readable_time_string(
                     utils.get_current_time_in_millisecs())),
+            'object_editors_js': jinja2.utils.Markup(
+                editor.OBJECT_EDITORS_JS.value),
+            'one_off_job_specs': one_off_job_specs,
+            'recent_job_data': recent_job_data,
+            'rte_components_html': jinja2.utils.Markup(
+                rte_component_registry.Registry.get_html_for_all_components()),
+            'unfinished_job_data': unfinished_job_data,
+            'value_generators_js': jinja2.utils.Markup(
+                editor.VALUE_GENERATORS_JS.value),
         })
 
         self.render_template('admin/admin.html')

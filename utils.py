@@ -261,8 +261,7 @@ def verify_dict_keys_and_types(adict, dict_schema):
 def convert_png_to_data_url(filepath):
     """Converts the png file at filepath to a data URL.
 
-    This method is currently used only in tests for the non-interactive
-    widgets.
+    This method is currently used only in tests for RTE extensions.
     """
     file_contents = get_file_contents(filepath, raw_bytes=True, mode='rb')
     return 'data:image/png;base64,%s' % urllib.quote(

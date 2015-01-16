@@ -136,7 +136,7 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
         exploration.objective = 'An objective'
         # Link the start state to the END state in order to make the
         # exploration valid.
-        exploration.states[exploration.init_state_name].widget.handlers[
+        exploration.states[exploration.init_state_name].interaction.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
 
         exploration.validate(strict=True)
@@ -171,9 +171,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                 'type': 'text',
                 'value': u''
             }],
-            'param_changes': [],
-            'widget': {
-                'widget_id': u'TextInput',
+            'interaction': {
                 'customization_args': {
                     'placeholder': {
                         'value': 'Type your answer here.'
@@ -182,7 +180,6 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                         'value': 1
                     }
                 },
-                'sticky': False,
                 'handlers': [{
                     'name': u'submit',
                     'rule_specs': [{
@@ -194,8 +191,11 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                         'param_changes': [],
 
                     }]
-                }]
+                }],
+                'id': u'TextInput',
+                'sticky': False,
             },
+            'param_changes': [],
         }
         self.assertEqual(expected_dict, state_dict)
 
@@ -212,7 +212,7 @@ language_code: en
 objective: ''
 param_changes: []
 param_specs: {}
-schema_version: 3
+schema_version: 4
 skill_tags: []
 states:
   %s:
@@ -221,8 +221,7 @@ states:
       value: Welcome to the Oppia editor!<br><br>Anything you type here will be shown
         to the learner playing your exploration.<br><br>If you need more help getting
         started, check out the Help link in the navigation bar.
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -236,14 +235,14 @@ states:
           dest: %s
           feedback: []
           param_changes: []
+      id: TextInput
       sticky: false
-      widget_id: TextInput
+    param_changes: []
   New state:
     content:
     - type: text
       value: ''
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -257,8 +256,9 @@ states:
           dest: New state
           feedback: []
           param_changes: []
+      id: TextInput
       sticky: false
-      widget_id: TextInput
+    param_changes: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
     feconf.DEFAULT_INIT_STATE_NAME)
@@ -438,23 +438,87 @@ states:
       widget_id: TextInput
 """)
 
+    YAML_CONTENT_V4 = (
+"""author_notes: ''
+blurb: ''
+default_skin: conversation_v1
+init_state_name: (untitled state)
+language_code: en
+objective: ''
+param_changes: []
+param_specs: {}
+schema_version: 4
+skill_tags: []
+states:
+  (untitled state):
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: (untitled state)
+          feedback: []
+          param_changes: []
+      id: TextInput
+      sticky: false
+    param_changes: []
+  New state:
+    content:
+    - type: text
+      value: ''
+    interaction:
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 1
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: New state
+          feedback: []
+          param_changes: []
+      id: TextInput
+      sticky: false
+    param_changes: []
+""")
+
+    _LATEST_YAML_CONTENT = YAML_CONTENT_V4
+
     def test_load_from_v1(self):
         """Test direct loading from a v1 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V1)
-        self.assertEqual(exploration.to_yaml(), self.YAML_CONTENT_V3)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v2(self):
         """Test direct loading from a v2 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V2)
-        self.assertEqual(exploration.to_yaml(), self.YAML_CONTENT_V3)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
     def test_load_from_v3(self):
         """Test direct loading from a v3 yaml file."""
         exploration = exp_domain.Exploration.from_yaml(
             'eid', 'A title', 'A category', self.YAML_CONTENT_V3)
-        self.assertEqual(exploration.to_yaml(), self.YAML_CONTENT_V3)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
+
+    def test_load_from_v4(self):
+        """Test direct loading from a v4 yaml file."""
+        exploration = exp_domain.Exploration.from_yaml(
+            'eid', 'A title', 'A category', self.YAML_CONTENT_V4)
+        self.assertEqual(exploration.to_yaml(), self._LATEST_YAML_CONTENT)
 
 
 class ConversionUnitTests(test_utils.GenericTestBase):
@@ -474,8 +538,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                     'type': 'text',
                     'value': content_str,
                 }],
-                'param_changes': [],
-                'widget': {
+                'interaction': {
                     'customization_args': {
                         'placeholder': {
                             'value': 'Type your answer here.'
@@ -496,9 +559,10 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                             'param_changes': [],
                         }],
                     }],
+                    'id': 'TextInput',
                     'sticky': False,
-                    'widget_id': 'TextInput',
                 },
+                'param_changes': [],
             }
 
         self.assertEqual(exploration.to_player_dict(), {

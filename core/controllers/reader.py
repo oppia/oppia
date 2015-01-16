@@ -25,11 +25,12 @@ from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import feedback_services
 from core.domain import fs_domain
+from core.domain import interaction_registry
 from core.domain import param_domain
 from core.domain import rights_manager
+from core.domain import rte_component_registry
 from core.domain import rule_domain
 from core.domain import skins_services
-from core.domain import widget_registry
 import feconf
 import jinja_utils
 import utils
@@ -70,15 +71,16 @@ def _get_updated_param_dict(param_dict, param_changes, exp_param_specs):
 def classify(
         exp_id, exp_param_specs, state, handler_name, answer, params):
     """Normalize the answer and return the first rulespec that it satisfies."""
-    widget_instance = widget_registry.Registry.get_widget_by_id(
-        feconf.INTERACTIVE_PREFIX, state.widget.widget_id)
-    normalized_answer = widget_instance.normalize_answer(
+    interaction_instance = interaction_registry.Registry.get_interaction_by_id(
+        state.interaction.id)
+    normalized_answer = interaction_instance.normalize_answer(
         answer, handler_name)
 
     handler = next(
-        h for h in state.widget.handlers if h.name == handler_name)
+        h for h in state.interaction.handlers if h.name == handler_name)
     fs = fs_domain.AbstractFileSystem(fs_domain.ExplorationFileSystem(exp_id))
-    input_type = widget_instance.get_handler_by_name(handler_name).obj_type
+    input_type = interaction_instance.get_handler_by_name(
+        handler_name).obj_type
     for rule_spec in handler.rule_specs:
         if rule_domain.evaluate_rule(
                 rule_spec.definition, exp_param_specs, input_type, params,
@@ -112,30 +114,36 @@ class ExplorationPage(base.BaseHandler):
         except Exception as e:
             raise self.PageNotFoundException(e)
 
+        version = exploration.version
+
         if not rights_manager.Actor(self.user_id).can_view(exploration_id):
             raise self.PageNotFoundException
 
         is_iframed = (self.request.get('iframed') == 'true')
 
         # TODO(sll): Cache these computations.
-        interactive_widget_ids = exploration.get_interactive_widget_ids()
-        widget_dependency_ids = (
-            widget_registry.Registry.get_deduplicated_dependency_ids(
-                interactive_widget_ids))
-        widget_dependencies_html, additional_angular_modules = (
+        interaction_ids = exploration.get_interaction_ids()
+        dependency_ids = (
+            interaction_registry.Registry.get_deduplicated_dependency_ids(
+                interaction_ids))
+        dependencies_html, additional_angular_modules = (
             dependency_registry.Registry.get_deps_html_and_angular_modules(
-                widget_dependency_ids))
+                dependency_ids))
 
-        widget_templates = (
-            widget_registry.Registry.get_noninteractive_widget_html() +
-            widget_registry.Registry.get_interactive_widget_html(
-                interactive_widget_ids))
+        interaction_templates = (
+            rte_component_registry.Registry.get_html_for_all_components() +
+            interaction_registry.Registry.get_interaction_html(
+                interaction_ids))
 
         self.values.update({
             'additional_angular_modules': additional_angular_modules,
+            'dependencies_html': jinja2.utils.Markup(
+                dependencies_html),
             'exploration_title': exploration.title,
             'exploration_version': version,
             'iframed': is_iframed,
+            'interaction_templates': jinja2.utils.Markup(
+                interaction_templates),
             'is_private': rights_manager.is_exploration_private(
                 exploration_id),
             'nav_mode': feconf.NAV_MODE_EXPLORE,
@@ -148,9 +156,6 @@ class ExplorationPage(base.BaseHandler):
                 skins_services.Registry.get_skin_tag(exploration.default_skin)
             ),
             'title': exploration.title,
-            'widget_dependencies_html': jinja2.utils.Markup(
-                widget_dependencies_html),
-            'widget_templates': jinja2.utils.Markup(widget_templates),
         })
 
         if is_iframed:
@@ -211,17 +216,18 @@ class AnswerSubmittedEventHandler(base.BaseHandler):
         exploration = exp_services.get_exploration_by_id(
             exploration_id, version=version)
         exp_param_specs = exploration.param_specs
-        old_state_widget = exploration.states[old_state_name].widget
+        old_interaction = exploration.states[old_state_name].interaction
 
-        widget_instance = widget_registry.Registry.get_widget_by_id(
-            feconf.INTERACTIVE_PREFIX, old_state_widget.widget_id)
-        normalized_answer = widget_instance.normalize_answer(
+        old_interaction_instance = (
+            interaction_registry.Registry.get_interaction_by_id(
+                old_interaction.id))
+        normalized_answer = old_interaction_instance.normalize_answer(
             answer, handler_name)
         # TODO(sll): Should this also depend on `params`?
         event_services.AnswerSubmissionEventHandler.record(
             exploration_id, version, old_state_name, handler_name, rule_spec,
-            widget_instance.get_stats_log_html(
-                old_state_widget.customization_args, normalized_answer))
+            old_interaction_instance.get_stats_log_html(
+                old_interaction.customization_args, normalized_answer))
 
 
 class StateHitEventHandler(base.BaseHandler):
@@ -355,15 +361,16 @@ def submit_answer_in_tests(
         exploration_id, exp_param_specs, old_state, handler_name,
         answer, params)
 
-    widget_instance = widget_registry.Registry.get_widget_by_id(
-        feconf.INTERACTIVE_PREFIX, old_state.widget.widget_id)
-    normalized_answer = widget_instance.normalize_answer(
+    old_interaction_instance = (
+        interaction_registry.Registry.get_interaction_by_id(
+            old_state.interaction.id))
+    normalized_answer = old_interaction_instance.normalize_answer(
         answer, handler_name)
     # TODO(sll): Should this also depend on `params`?
     event_services.AnswerSubmissionEventHandler.record(
         exploration_id, version, state_name, handler_name, rule_spec,
-        widget_instance.get_stats_log_html(
-            old_state.widget.customization_args, normalized_answer))
+        old_interaction_instance.get_stats_log_html(
+            old_state.interaction.customization_args, normalized_answer))
 
     new_state = (
         None if rule_spec.dest == feconf.END_DEST

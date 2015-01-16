@@ -752,34 +752,32 @@ div.wysiwyg iframe.wysiwyg-content-large {
   -webkit-user-select: none;
 }
 
+.oppia-interaction-selector {
+  position: absolute;
+  right: 15px;
+  /* This must be larger than the z-index in
+     .oppia-click-to-start-editing, so that the rule does not
+     switch to edit mode when the destination link is clicked. */
+  z-index: 200;
+}
 @media (min-width: 768px) {
-  .oppia-widget-selector {
+  .oppia-interaction-selector {
     bottom: -24px;
-    position: absolute;
-    right: 15px;
   }
 }
 @media (max-width: 768px) {
-  .oppia-widget-selector {
-    position: absolute;
-    right: 15px;
+  .oppia-interaction-selector {
     top: -27px;
     width: 60%;
   }
 }
-.oppia-widget-selector {
-  /* This must be larger than the z-index in
-     .oppia-interactive-section-click-handler, so that the rule does not
-     switch to edit mode when the destination link is clicked. */
-  z-index: 200;
-}
 
-.oppia-interactive-widget-display {
+.oppia-interaction-display {
   margin: 0;
   padding: 0 10px;
 }
 
-.oppia-interactive-widget-editor {
+.oppia-interaction-editor {
   border: 1px solid #ccc;
   padding: 15px 15px 0px 15px;
 }
@@ -808,7 +806,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   opacity: 1.0;
 }
 
-.oppia-interactive-section-click-handler {
+.oppia-click-to-start-editing {
   height: 100%;
   position: absolute;
   width: 100%;
@@ -892,7 +890,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-rule-dest-link {
   position: absolute;
   /* This must be larger than the z-index in
-     .oppia-interactive-section-click-handler, so that the rule does not
+     .oppia-click-to-start-editing, so that the rule does not
      switch to edit mode when the destination link is clicked. */
   z-index: 200;
 }
@@ -1038,78 +1036,27 @@ oppia-parameter {
 
 /* Splash page. */
 
-.oppia-splash-image {
+.oppia-gallery-banner {
+  background-image: url("/images/banner.png");
+  background-repeat: no-repeat;
+  background-size: 100% auto;
+  min-height: 300px;
+  position: relative;
   width: 100%;
 }
-
-.oppia-splash-btn-row {
-  margin-top: 30px;
-}
-
-.oppia-splash-btn {
-  background-color: #18447E;
-  border-radius: 20px;
-  width: 200px;
-  margin: 3px 10px;
-  color: #fff;
-}
-.oppia-splash-btn:hover {
-  background-color: #2569C2;
-  color: #fff;
-}
-
-.oppia-splash-btn-section {
-  display: table;
-  width: 100%;
-  margin-left: 0;
-  margin-bottom: 60px;
-  margin-top: 50px;
-}
-
-.oppia-splash-section {
-  display: table;
-  width: 100%;
-  margin: 0;
-  padding: 12px 200px;
-  background-color: #fff;
-}
-.oppia-splash-section p {
-  font-size: 1.8rem;
-  max-width: 500px;
-}
-
-.oppia-splash-block {
-  margin: 200px auto;
-  padding: 0 0 10px 40px;
-}
-
-.oppia-splash-page-screenshot {
-  max-height: 250px;
-}
-
-.oppia-splash-hr {
-  border-color: #ccc;
-  width: 60%;
-}
-
-@media (min-width: 768px) {
-  .oppia-splash-block {
-    width: 600px;
-  }
-}
-
-@media (max-width: 992px) {
-  .oppia-splash-block {
-    text-align: center;
-  }
-
-  .oppia-splash-section {
-    padding: 0 10px;
-  }
-
-  .oppia-splash-section p {
-    max-width: 100%;
-  }
+.oppia-gallery-banner-content {
+  color: #05a69a;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 300;
+  left: 50%;
+  line-height: 1.5;
+  margin-left: auto;
+  margin-right: auto;
+  position: absolute;
+  text-align: center;
+  top: 60%;
+  transform: translate(-50%, -50%);
 }
 
 /* CSS3 Animations */
@@ -1173,7 +1120,12 @@ oppia-expression-error-tag:after {
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
+  position: fixed;
   z-index: 300;
+}
+.oppia-top-of-page-padding {
+  /* This ensures that content is not tucked behind the fixed navbar. */
+  padding-top: 50px;
 }
 .oppia-navbar-menu {
   margin-left: 10px;
@@ -1198,4 +1150,18 @@ oppia-expression-error-tag:after {
   height: 48px;
   margin-left: 6px;
   margin-top: 3px;
+}
+
+.oppia-select {
+  background: white;
+  border: #ddd solid 1px;
+  border-radius: 4px;
+  color: #555;
+  padding: 5px;
+}
+.oppia-feedback-tab-row {
+  cursor: pointer;
+}
+.oppia-feedback-tab-row:hover {
+  background: #eee;
 }

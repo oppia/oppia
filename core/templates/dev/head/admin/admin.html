@@ -29,7 +29,7 @@
             {{exploration[1]}}
           </span>
           <span class="col-lg-2 col-md-2 col-sm-2">
-            <button type="button" class="btn btn-default" ng-click="reloadExploration({{exploration[0]}})">
+            <button type="button" class="btn btn-default protractor-test-reload-exploration-button" ng-click="reloadExploration({{exploration[0]}})">
               Reload
             </button>
           </span>
@@ -156,9 +156,9 @@
 
     <div class="container" ng-if="isNonemptyObject(configProperties)" style="margin-left: 0;">
       <div ng-repeat="(configPropertyId, configPropertyData) in configProperties">
-        <div class="row" style="padding-bottom: 10px;">
+        <div class="row protractor-test-config-property" style="padding-bottom: 10px;">
           <span class="col-lg-2 col-md-2 col-sm-2">
-            <em><[configPropertyData.description]></em>
+            <em class="protractor-test-config-title"><[configPropertyData.description]></em>
           </span>
           <span class="col-lg-6 col-md-6 col-sm-6">
             <schema-based-editor schema="configPropertyData.schema" local-value="configPropertyData.value">
@@ -170,7 +170,7 @@
         </div>
       </div>
 
-      <button ng-click="saveConfigProperties()">Save</button>
+      <button ng-click="saveConfigProperties()" class="protractor-test-save-all-configs">Save</button>
       <button ng-click="reloadConfigProperties()">Undo changes</button>
     </div>
 
@@ -220,6 +220,6 @@
       {{ value_generators_js }}
     </script>
 
-    {{ noninteractive_widget_html }}
+    {{ rte_components_html }}
   </body>
 </html>
