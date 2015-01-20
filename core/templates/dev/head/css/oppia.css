@@ -1168,3 +1168,16 @@ oppia-expression-error-tag:after {
   background: rgb(255,255,255);
   max-width: 900px;
 }
+
+.oppia-show-rule-editors-ctrl {
+  background-color: #eee;
+  height: 50px;
+  margin-bottom: -13px;
+  margin-left: -3px;
+  margin-right: -3px;
+  padding-top: 15px;
+}
+.oppia-show-rule-editors-ctrl:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
