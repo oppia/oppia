@@ -151,7 +151,10 @@ class TestBase(unittest.TestCase):
 
     def is_logged_out(self, response):
         """Checks if the expiry date of the login cookie is in the past."""
-        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        login_cookie = 'Set-Cookie'
+        if login_cookie not in response.headers.keys():
+          return False
+        expiry_date = response.headers[login_cookie].rsplit('=', 1)
         return datetime.datetime.now() > datetime.datetime.strptime(
             expiry_date[1], "%a, %d %b %Y %H:%M:%S GMT",)
         

@@ -36,6 +36,7 @@ class LogoutTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 200)
 
         current_page = '/about'
+        self.assertFalse(self.is_logged_out(response))
         response = self.testapp.get(gae_current_user_services.create_logout_url(
             current_page))
         self.assertTrue(self.is_logged_out(response))

@@ -33,12 +33,10 @@ class LogoutPage(webapp.RequestHandler):
       # It seems that AppEngine is setting the ACSID cookie for http:// ,
       # and the SACSID cookie for https:// . We just unset both below.
       cookie = Cookie.SimpleCookie()
-      cookie['ACSID'] = ''
-      cookie['ACSID']['expires'] = self.ONE_DAY_AGO_IN_SECS # In the past, a day ago.
-      self.response.headers.add_header(*cookie.output().split(': ', 1))
-      cookie = Cookie.SimpleCookie()
-      cookie['SACSID'] = ''
-      cookie['SACSID']['expires'] = self.ONE_DAY_AGO_IN_SECS
-      self.response.headers.add_header(*cookie.output().split(': ', 1))
+      for cookie_name in ['ACSID', 'SACSID']:
+        cookie = Cookie.SimpleCookie()
+        cookie[cookie_name] = ''
+        cookie[cookie_name]['expires'] = self.ONE_DAY_AGO_IN_SECS # In the past, a day ago.
+        self.response.headers.add_header(*cookie.output().split(': ', 1)) 
       
       self.redirect(self.request.get('url') or '/') 
