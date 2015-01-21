@@ -51,10 +51,28 @@ oppia.controller('StateEditor', [
     // This should only be non-null when the content editor is open.
     $scope.contentMemento = null;
 
+    $scope.nextStateName = null;
+    $scope.nextStateContent = null;
+
+    for (var i = 0; i < stateData.interaction.handlers.length; i++) {
+      if ($scope.nextStateName) {
+        break;
+      }
+
+      var handler = stateData.interaction.handlers[i];
+      for (var j = 0; j < handler.rule_specs.length; j++) {
+        if (handler.rule_specs[j].dest !== 'END' && handler.rule_specs[j].dest !== $scope.stateName) {
+          $scope.nextStateName = handler.rule_specs[j].dest;
+          $scope.nextStateContent = explorationStatesService.getState(
+            $scope.nextStateName).content[0].value;
+          break;
+        }
+      }
+    }
+
     if ($scope.stateName && stateData) {
       $scope.$broadcast('stateEditorInitialized', stateData);
     }
-
   };
 
   $scope.openStateNameEditor = function() {
@@ -148,5 +166,10 @@ oppia.controller('StateEditor', [
       explorationStatesService.setState(
         editorContextService.getActiveStateName(), _stateData);
     }
+  };
+
+  $scope.navigateToState = function(stateName) {
+    routerService.navigateToMainTab(stateName);
+    $scope.initStateEditor();
   };
 }]);
