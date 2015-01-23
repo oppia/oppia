@@ -131,26 +131,26 @@ oppia.factory('editorContextService', ['$log', function($log) {
 // TODO(sll): Should this depend on a versioning service that keeps track of
 // the current active version? Previous versions should not be editable.
 oppia.factory('editabilityService', [function() {
-  var isEditable = false;
-  var inTutorialMode = false;
+  var _isEditable = false;
+  var _inTutorialMode = false;
   return {
     onStartTutorial: function() {
-      inTutorialMode = true;
+      _inTutorialMode = true;
     },
     onEndTutorial: function() {
-      inTutorialMode = false;
+      _inTutorialMode = false;
     },
     isEditableOutsideTutorialMode: function() {
-      return isEditable;
+      return _isEditable;
     },
     isEditable: function() {
-      return isEditable && !inTutorialMode;
+      return _isEditable && !_inTutorialMode;
     },
     markEditable: function() {
-      isEditable = true;
+      _isEditable = true;
     },
     markNotEditable: function() {
-      isEditable = false;
+      _isEditable = false;
     }
   };
 }]);
@@ -309,6 +309,9 @@ oppia.factory('changeListService', [
     },
     getChangeList: function() {
       return angular.copy(explorationChangeList);
+    },
+    isExplorationLockedForEditing: function() {
+      return explorationChangeList.length > 0;
     },
     undoLastChange: function() {
       if (explorationChangeList.length === 0) {
@@ -928,6 +931,153 @@ oppia.factory('stateEditorTutorialFirstTimeService', ['$http', '$rootScope', fun
       }
 
       _currentlyInFirstVisit = false;
+    }
+  };
+}]);
+
+
+// Service for the list of exploration warnings.
+oppia.factory('explorationWarningsService', [
+    'graphDataService', 'explorationStatesService', 'explorationObjectiveService',
+    function(graphDataService, explorationStatesService, explorationObjectiveService) {
+  var _warningsList = [];
+
+  // Given an initial node id, a object with keys node ids, and values node
+  // names, and a list of edges (each of which is an object with keys 'source'
+  // and 'target', and values equal to the respective node names), returns a
+  // list of names of all nodes which are unreachable from the initial node.
+  var _getUnreachableNodeNames = function(initNodeId, nodes, edges) {
+    var queue = [initNodeId];
+    var seen = {};
+    seen[initNodeId] = true;
+    while (queue.length > 0) {
+      var currNodeId = queue.shift();
+      edges.forEach(function(edge) {
+        if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
+          seen[edge.target] = true;
+          queue.push(edge.target);
+        }
+      });
+    }
+
+    var unreachableNodeNames = [];
+    for (var nodeId in nodes) {
+      if (!(seen.hasOwnProperty(nodes[nodeId]))) {
+        unreachableNodeNames.push(nodes[nodeId]);
+      }
+    }
+
+    return unreachableNodeNames;
+  };
+
+  // Given an array of objects with two keys 'source' and 'target', returns
+  // an array with the same objects but with the values of 'source' and 'target'
+  // switched. (The objects represent edges in a graph, and this operation
+  // amounts to reversing all the edges.)
+  var _getReversedLinks = function(links) {
+    return links.map(function(link) {
+      return {
+        source: link.target,
+        target: link.source
+      };
+    });
+  };
+
+  // Returns a list of states which have rules that have no feedback and that
+  // point back to the same state.
+  var _getStatesWithInsufficientFeedback = function() {
+    var problematicStates = [];
+    var _states = explorationStatesService.getStates();
+    for (var stateName in _states) {
+      var handlers = _states[stateName].interaction.handlers;
+      var isProblematic = handlers.some(function(handler) {
+        return handler.rule_specs.some(function(ruleSpec) {
+          return (
+            ruleSpec.dest === stateName &&
+            !ruleSpec.feedback.some(function(feedbackItem) {
+              return feedbackItem.length > 0;
+            })
+          );
+        });
+      });
+
+      if (isProblematic) {
+        problematicStates.push(stateName);
+      }
+    }
+    return problematicStates;
+  };
+
+  var _updateWarningsList = function() {
+    _warningsList = [];
+
+    graphDataService.recompute();
+    var _graphData = graphDataService.getGraphData();
+    if (_graphData) {
+      var unreachableStateNames = _getUnreachableNodeNames(
+        _graphData.initStateId, _graphData.nodes, _graphData.links);
+      if (unreachableStateNames.length) {
+        _warningsList.push(
+          'The following state(s) are unreachable: ' +
+          unreachableStateNames.join(', ') + '.');
+      } else {
+        // Only perform this check if all states are reachable.
+        var deadEndStates = _getUnreachableNodeNames(
+          _graphData.finalStateId, _graphData.nodes,
+          _getReversedLinks(_graphData.links));
+        if (deadEndStates.length) {
+          _warningsList.push(
+            'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
+        }
+      }
+    }
+
+    var statesWithInsufficientFeedback = _getStatesWithInsufficientFeedback();
+    if (statesWithInsufficientFeedback.length) {
+      _warningsList.push(
+        'The following states need more feedback: ' +
+        statesWithInsufficientFeedback.join(', ') + '.');
+    }
+
+    if (!explorationObjectiveService.displayed) {
+      _warningsList.push('Please specify an objective (in the Settings tab).');
+    }
+  };
+
+  return {
+    countWarnings: function() {
+      return _warningsList.length;
+    },
+    getWarnings: function() {
+      return angular.copy(_warningsList);
+    },
+    updateWarnings: function() {
+      _updateWarningsList();
+    }
+  };
+}]);
+
+
+// Service storing whether preview mode is active or not.
+oppia.factory('previewModeService', [function() {
+  var _data = {
+    isInPreviewMode: false
+  };
+
+  return {
+    // TODO(sll): Remove this when possible. This is needed currently for the
+    // editor/preview toggle to function.
+    data: function() {
+      return _data;
+    },
+    isInPreviewMode: function() {
+      return _data.isInPreviewMode;
+    },
+    turnOnPreviewMode: function() {
+      _data.isInPreviewMode = true;
+    },
+    turnOffPreviewMode: function() {
+      _data.isInPreviewMode = false;
     }
   };
 }]);

@@ -45,7 +45,7 @@ oppia.controller('StateEditor', [
     $scope.stateName = editorContextService.getActiveStateName();
 
     var stateData = explorationStatesService.getState($scope.stateName);
-    $scope.content = stateData.content || [];
+    $scope.content = stateData.content;
     $scope.stateParamChanges = stateData.param_changes || [];
 
     // This should only be non-null when the content editor is open.

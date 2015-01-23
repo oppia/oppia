@@ -285,7 +285,7 @@
               {% endif %}
 
               <span class="oppia-exploration-ctrl" ng-if="editabilityService.isEditable() && explorationRightsService.isPublic()">
-                <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationSaveable()" ng-class="{'btn-success': !isExplorationSaveable()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
+                <button type="button" class="btn btn-default" ng-click="showNominateExplorationModal()" ng-disabled="isExplorationLockedForEditing()" ng-class="{'btn-success': !isExplorationLockedForEditing()}" tooltip="Click this button to nominate this exploration for featured status in the gallery." tooltip-placement="bottom">
                   Nominate for Featured Status
                 </button>
               </span>

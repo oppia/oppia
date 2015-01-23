@@ -112,9 +112,10 @@ oppia.controller('ExplorationSettings', [
     }
   };
 
+  // TODO(sll): Modify this so that it works correctly when discarding changes
+  // to the default skin id.
   $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
-    if (oldValue !== undefined && !$scope.isDiscardInProgress
-        && !angular.equals(newValue, oldValue)) {
+    if (oldValue !== undefined && !angular.equals(newValue, oldValue)) {
       changeListService.editExplorationProperty(
         'default_skin_id', newValue, oldValue);
     }
@@ -220,5 +221,9 @@ oppia.controller('ExplorationSettings', [
 
   $scope.unpublishExploration = function() {
     explorationRightsService.saveChangeToBackend({is_public: false});
+  };
+
+  $scope.isExplorationLockedForEditing = function() {
+    return changeListService.isExplorationLockedForEditing();
   };
 }]);

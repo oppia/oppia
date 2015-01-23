@@ -59,37 +59,45 @@ describe('State Editor controller', function() {
 
       ess.setStates({
         'First State': {
+          content: [{
+            type: 'text',
+            value: 'First State Content'
+          }],
           interaction: {
             handlers: [{
               rule_specs: [{
-                dest: null
+                dest: 'Second State'
               }]
             }]
           },
           param_changes: []
         },
         'Second State': {
+          content: [{
+            type: 'text',
+            value: 'Second State Content'
+          }],
           interaction: {
             handlers: [{
               rule_specs: [{
-                dest: null
+                dest: 'Second State'
               }]
             }]
           },
           param_changes: []
         },
         'Third State': {
-          interaction: {
-            handlers: [{
-              rule_specs: [{
-                dest: null
-              }]
-            }]
-          },
           content: [{
             type: 'text',
             value: 'This is some content.'
           }],
+          interaction: {
+            handlers: [{
+              rule_specs: [{
+                dest: 'Second State'
+              }]
+            }]
+          },
           param_changes: [{
             name: 'comparison',
             generator_id: 'Copier',
@@ -211,7 +219,7 @@ describe('State Editor controller', function() {
       scope.saveStateName('#!% State');
       expect(ecs.getActiveStateName()).toEqual('Third State');
 
-      // Long states name will not save.
+      // Long state names will not save.
       scope.saveStateName(
         'This state name is too long to be saved. Try to be brief next time.'
       );
@@ -230,7 +238,7 @@ describe('State Editor controller', function() {
       ecs.setActiveStateName('First State');
       scope.initStateEditor();
       expect(scope.contentMemento).toBeNull();
-      expect(scope.content).toEqual([]);
+      expect(scope.content).toEqual(scope.getContent('First State Content'));
       scope.content = scope.getContent(
         'And now for something completely different.'
       );

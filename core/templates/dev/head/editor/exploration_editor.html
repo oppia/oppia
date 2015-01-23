@@ -50,7 +50,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation">
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main'}">
       <a href="#" title="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
@@ -105,6 +105,42 @@
         <div class="popover-content">If you need help in the future, click here!</div>
       </div>
     </li>
+  </ul>
+
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="ExplorationSaveAndPublishButtons">
+    <li ng-if="!isInPreviewMode()">
+      <div ng-if="isEditableOutsideTutorialMode()">
+        <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
+          <button id="tutorialSaveExplorationButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+            <span ng-if="!isSaveInProgress">
+              Save Changes
+              <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+            </span>
+            <span ng-if="isSaveInProgress">
+              Saving...
+            </span>
+          </button>
+          <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle" ng-disabled="!isExplorationSaveable()">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu" role="menu">
+            <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Changes</a></li>
+          </ul>
+        </div>
+      </div>
+    </li>
+
+    {% if can_publish %}
+      <li ng-if="!isInPreviewMode() && isExplorationPrivate()">
+        <!-- The 'display: inline-block' is needed for tooltips to display when the button is disabled. -->
+        <div style="display: inline-block; margin-right: 10px; margin-top: 8px;"
+             title="<[getPublishExplorationButtonTooltip()]>">
+          <button type="button" class="btn btn-default protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || countWarnings()">
+            Publish in Gallery
+          </button>
+        </div>
+      </li>
+    {% endif %}
   </ul>
 {% endblock local_top_nav_options %}
 
@@ -230,9 +266,6 @@
           <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
             <strong>Note:</strong> This is a private, unpublishable copy of a
             <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
-            You are very welcome to submit feedback to improve the original exploration: to do this,
-            click the previous link, then click the Feedback button on the top-right.
-            Thank you!
           </div>
         </div>
       </div>
@@ -245,40 +278,8 @@
           <div class="row">
             <div class="col-lg-12 col-md-12 col-sm-12">
               <span class="pull-right" style="margin-top: 10px;">
-                <span ng-show="!isInPreviewMode">
-
-                  {% if can_publish %}
-                    <!-- The 'display: inline-block' is needed for tooltips to display when the button is disabled. -->
-                    <div style="display: inline-block;" ng-if="explorationRightsService.isPrivate()" title="<[getPublishExplorationButtonTooltip()]>">
-                      <button type="button" class="btn btn-default protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !warningsList.length}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || warningsList.length">
-                        Publish in Gallery
-                      </button>
-                    </div>
-                  {% endif %}
-
-                  <span ng-if="editabilityService.isEditableOutsideTutorialMode()">
-                    <div class="btn-group" dropdown>
-                      <button id="tutorialSaveExplorationButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
-                        <span ng-if="!isSaveInProgress">
-                          Save Changes
-                          <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
-                        </span>
-                        <span ng-if="isSaveInProgress">
-                          Saving...
-                        </span>
-                      </button>
-                      <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle">
-                        <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" role="menu">
-                        <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Changes</a></li>
-                      </ul>
-                    </div>
-                  </span>
-                </span>
-
                 <div class="btn-group">
-                  <label class="btn btn-default protractor-test-exit-preview-mode" ng-model="isInPreviewMode" btn-radio="false" ng-click="exitPreviewMode()">
+                  <label class="btn btn-default protractor-test-exit-preview-mode" ng-model="previewModeData.isInPreviewMode" btn-radio="false" ng-click="exitPreviewMode()">
                     <span ng-if="!editabilityService.isEditable()">
                       <span class="glyphicon glyphicon-file"></span> Source
                     </span>
@@ -286,7 +287,7 @@
                       <span class="glyphicon glyphicon-pencil"></span> Edit
                     </span>
                   </label>
-                  <label id="tutorialPreviewExplorationButton" class="btn btn-default protractor-test-enter-preview-mode" ng-model="isInPreviewMode" btn-radio="true" ng-click="enterPreviewMode()"><span class="glyphicon glyphicon-play"></span> Preview</label>
+                  <label id="tutorialPreviewExplorationButton" class="btn btn-default protractor-test-enter-preview-mode" ng-model="previewModeData.isInPreviewMode" btn-radio="true" ng-click="enterPreviewMode()"><span class="glyphicon glyphicon-play"></span> Preview</label>
                 </div>
               </span>
             </div>
@@ -294,15 +295,15 @@
         </div>
       </div>
 
-      <div ng-if="!isInPreviewMode">
+      <div ng-if="!isInPreviewMode()">
         <div ng-show="getTabStatuses().active === 'main'">
           <div class="row">
             <div class="col-lg-9 col-md-9 col-sm-9">
               {% include 'editor/state_editor.html' %}
             </div>
             <div class="col-lg-3 col-md-3 col-sm-3">
-              <div class="row" ng-if="!isInPreviewMode">
-                <div ng-show="warningsList.length" ng-click="toggleExplorationWarningVisibility()" style="padding: 15px 0;">
+              <div class="row">
+                <div ng-show="countWarnings()" ng-click="toggleExplorationWarningVisibility()" style="padding: 15px 0;">
                   <div class="alert alert-warning oppia-exploration-warnings-box pull-right">
                     <div>
                       <span ng-if="!areExplorationWarningsVisible" style="color: black;">
@@ -310,13 +311,13 @@
                       <span ng-if="areExplorationWarningsVisible" style="color: black;">
                       </span>
                       <span class="glyphicon glyphicon-warning-sign"></span>
-                      <strong><[warningsList.length]></strong> warning<span ng-if="warningsList.length > 1">s</span>
+                      <strong><[countWarnings()]></strong> warning<span ng-if="countWarnings() > 1">s</span>
                       <span class="glyphicon glyphicon-chevron-right oppia-warning-chevron pull-right" ng-if="!areExplorationWarningsVisible"></span>
                       <span class="glyphicon glyphicon-chevron-down oppia-warning-chevron pull-right" ng-if="areExplorationWarningsVisible"></span>
                     </div>
                     <div collapse="!areExplorationWarningsVisible">
                       <ul>
-                        <li ng-repeat="warningText in warningsList track by $index">
+                        <li ng-repeat="warningText in getWarnings() track by $index">
                           <[warningText]>
                         </li>
                       </ul>
@@ -371,7 +372,7 @@
         </div>
       </div>
 
-      <div class="row" ng-if="!!isInPreviewMode" ng-controller="ExplorationPreview">
+      <div class="row" ng-if="!!isInPreviewMode()" ng-controller="ExplorationPreview">
         <hr>
         {% include 'editor/exploration_preview.html' %}
       </div>
