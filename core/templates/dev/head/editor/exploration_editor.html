@@ -107,40 +107,28 @@
     </li>
   </ul>
 
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="ExplorationSaveAndPublishButtons">
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="ExplorationPublishButton">
     <li ng-if="!isInPreviewMode()">
       <div ng-if="isEditableOutsideTutorialMode()">
         <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
           <button id="tutorialSaveExplorationButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
             <span ng-if="!isSaveInProgress">
-              Save Changes
+              Publish Draft
               <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
             </span>
             <span ng-if="isSaveInProgress">
-              Saving...
+              Publishing...
             </span>
           </button>
           <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle" ng-disabled="!isExplorationSaveable()">
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu" role="menu">
-            <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Changes</a></li>
+            <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
           </ul>
         </div>
       </div>
     </li>
-
-    {% if can_publish %}
-      <li ng-if="!isInPreviewMode() && isExplorationPrivate()">
-        <!-- The 'display: inline-block' is needed for tooltips to display when the button is disabled. -->
-        <div style="display: inline-block; margin-right: 10px; margin-top: 8px;"
-             title="<[getPublishExplorationButtonTooltip()]>">
-          <button type="button" class="btn btn-default protractor-test-publish-exploration" ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}" ng-click="showPublishExplorationModal()" ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-            Publish in Gallery
-          </button>
-        </div>
-      </li>
-    {% endif %}
   </ul>
 {% endblock local_top_nav_options %}
 

@@ -358,7 +358,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
 }]);
 
 
-oppia.controller('ExplorationSaveAndPublishButtons', [
+oppia.controller('ExplorationPublishButton', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal', 'warningsData',
     'changeListService', 'focusService', 'routerService', 'explorationData',
     'explorationRightsService', 'editabilityService', 'explorationWarningsService',
@@ -376,9 +376,6 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   // discard).
   $scope.lastSaveOrDiscardAction = null;
 
-  $scope.isExplorationPrivate = function() {
-    return explorationRightsService.isPrivate();
-  };
   $scope.isInPreviewMode = function() {
     return previewModeService.isInPreviewMode();
   };
@@ -624,33 +621,5 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
         });
       });
     });
-  };
-
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.publish = $modalInstance.close;
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
-  $scope.getPublishExplorationButtonTooltip = function() {
-    if (explorationWarningsService.countWarnings() > 0) {
-      return 'Please resolve the warnings before publishing.';
-    } else if ($scope.isExplorationLockedForEditing()) {
-      return 'Please save your changes before publishing.';
-    } else {
-      return 'Click this button to publish your exploration to the gallery.';
-    }
   };
 }]);
