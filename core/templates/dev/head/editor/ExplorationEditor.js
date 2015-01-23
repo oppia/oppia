@@ -459,34 +459,6 @@ oppia.controller('ExplorationEditor', [
 
   $scope.warningsList = [];
 
-  $scope.showEmbedExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/embedExploration',
-      backdrop: 'static',
-      resolve: {
-        explorationId: function() {
-          return $scope.explorationId;
-        },
-        explorationVersion: function() {
-          return $scope.currentVersion;
-        }
-      },
-      controller: ['$scope', '$modalInstance', 'explorationId', 'explorationVersion',
-        function($scope, $modalInstance, explorationId, explorationVersion) {
-          $scope.explorationId = explorationId;
-          $scope.serverName = window.location.protocol + '//' + window.location.host;
-          $scope.explorationVersion = explorationVersion;
-
-          $scope.close = function() {
-            $modalInstance.dismiss('close');
-            warningsData.clear();
-          };
-        }
-      ]
-    });
-  };
-
   $scope.initializeNewActiveInput = function(newActiveInput) {
     // TODO(sll): Rework this so that in general it saves the current active
     // input, if any, first. If it is bad input, display a warning and cancel
@@ -589,20 +561,6 @@ oppia.controller('ExplorationEditor', [
       }]
     }).result.then(function() {
       explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
-  $scope.showNominateExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/nominateExploration',
-      backdrop: 'static',
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.close = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
     });
   };
 

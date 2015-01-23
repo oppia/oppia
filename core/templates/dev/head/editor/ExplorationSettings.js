@@ -171,6 +171,20 @@ oppia.controller('ExplorationSettings', [
     });
   };
 
+  $scope.showNominateExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/nominateExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.close = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    });
+  };
+
   $scope.deleteExploration = function(role) {
     warningsData.clear();
 

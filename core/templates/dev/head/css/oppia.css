@@ -1166,6 +1166,7 @@ oppia-expression-error-tag:after {
 
 .oppia-state-card {
   background: rgb(255,255,255);
+  margin: 30px;
   max-width: 900px;
 }
 
