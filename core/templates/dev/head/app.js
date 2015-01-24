@@ -25,7 +25,7 @@
 var oppia = angular.module(
   'oppia', [
     'ngMaterial', 'ngAnimate', 'ngSanitize', 'ngResource', 'ui.bootstrap',
-    'ui.sortable'
+    'ui.sortable', 'infinite-scroll'
   ].concat(
     window.GLOBALS ? (window.GLOBALS.ADDITIONAL_ANGULAR_MODULES || [])
                    : []));

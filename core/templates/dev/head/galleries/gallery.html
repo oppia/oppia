@@ -130,7 +130,8 @@
                 {% endif %}
               </div>
 
-              <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
+            <div infinite-scroll="showMoreExplorations()" infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+              <div ng-repeat="exploration in shownExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
                 <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
                   <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
                     <!-- TODO(sll): Make the default image higher-res. -->
@@ -183,6 +184,7 @@
                   </a>
                 </md-card>
               </div>
+            </div>
             </div>
           </div>
         </div>

@@ -201,6 +201,14 @@ D3_URL = 'https://raw.github.com/mbostock/d3/v%s' % D3_REV
 D3_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'd3js-%s' % D3_REV)
 D3_FILES = ['d3.min.js']
 
+NG_INFINITE_SCROLL_REV = '1.0.0'
+NG_INFINITE_SCROLL_URL = (
+    'https://raw.github.com/BinaryMuse/ngInfiniteScroll/%s/build/' 
+    % NG_INFINITE_SCROLL_REV)
+NG_INFINITE_SCROLL_DST = os.path.join(
+    THIRD_PARTY_STATIC_DIR, 'nginfinitescroll-%s' % NG_INFINITE_SCROLL_REV)
+NG_INFINITE_SCROLL_FILES = ['ng-infinite-scroll.min.js']
+
 download_files(YUICOMPRESSOR_URL, YUICOMPRESSOR_DST, YUICOMPRESSOR_FILES)
 download_files(UI_BOOTSTRAP_URL, UI_BOOTSTRAP_DST, UI_BOOTSTRAP_FILES)
 download_files(JQUERY_URL, JQUERY_DST, JQUERY_FILES)
@@ -216,7 +224,10 @@ download_files(
     MATERIAL_DESIGN_ICONS_TOGGLE_URL, 
     MATERIAL_DESIGN_ICONS_DST, 
     MATERIAL_DESIGN_ICON_TOGGLE_FILES)
-
+download_files(
+    NG_INFINITE_SCROLL_URL, 
+    NG_INFINITE_SCROLL_DST, 
+    NG_INFINITE_SCROLL_FILES)
 
 # Download all the frontend library zip files.
 BOWER_MATERIAL_REV = '0.6.0-rc1'

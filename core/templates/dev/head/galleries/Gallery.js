@@ -59,7 +59,7 @@ oppia.directive('checkboxGroup', function() {
       model: '='
     },
     templateUrl: 'checkboxGroup/master',
-    controller: ['$scope', function($scope) {
+    controller: ['$scope', '$rootScope', function($scope, $rootScope) {
       var someCategoryUnchecked = false;
       for (var key in $scope.model) {
         if (!$scope.model[key]) {
@@ -110,6 +110,7 @@ oppia.directive('checkboxGroup', function() {
             $scope.allCategoriesSelected = true;
           }
         }
+        $rootScope.$broadcast('galleryQueryChanged', $scope.model);
       };
     }]
   };
@@ -123,6 +124,7 @@ oppia.controller('Gallery', [
   $scope.galleryDataUrl = '/galleryhandler/data';
   $scope.currentUserIsModerator = false;
   $scope.searchIsLoading = false;
+  $scope.pageLoaderIsBusy = false;
 
   // Default color.
   var _COLOR_TEAL = 'teal';
@@ -212,11 +214,11 @@ oppia.controller('Gallery', [
 
   $scope.onSearchQueryChangeExec = function() {
     if (!$scope.searchQuery) {
-      $http.get($scope.galleryDataUrl).success($scope.refreshGalleryData);
+      $http.get($scope.galleryDataUrl).success($scope.getGalleryData);
     } else {
       $scope.searchIsLoading = true;
       $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
-        $scope.refreshGalleryData);
+        $scope.getGalleryData);
     }
   };
 
@@ -234,7 +236,14 @@ oppia.controller('Gallery', [
   // This is a list.
   $scope.selectedLanguages = [_DEFAULT_LANGUAGE];
 
-  $scope.refreshGalleryData = function(data) {
+  var _INITIAL_NUM_ITEMS = 2;
+  var _INCREMENT_SIZE = 1;
+
+  $scope.numItemsShown = _INITIAL_NUM_ITEMS;
+  $scope.allExplorationsInOrder = [];
+
+  // Called only once.
+  $scope.getGalleryData = function(data) {
     $scope.searchIsLoading = false;
     $scope.featuredExplorations = data.featured;
     $scope.publicExplorations = data['public'];
@@ -248,7 +257,36 @@ oppia.controller('Gallery', [
       $scope.selectedCategories[expDict.category] = true;
     });
 
+    $scope.showGalleryData($scope.allExplorationsInOrder);
     $rootScope.loadingMessage = '';
+  };
+
+  // Called as needed to show more explorations.
+  $scope.showGalleryData = function(data) {
+    if (data.length > $scope.numItemsShown) {
+      $scope.finishedLoadingPage = false;
+      $scope.shownExplorationsInOrder = data.slice(0, $scope.numItemsShown);
+    } else {
+      $scope.finishedLoadingPage = true;
+      $scope.shownExplorationsInOrder = data;
+    }
+    $scope.pageLoaderIsBusy = false;
+  };
+
+  $scope.$on('galleryQueryChanged', function(event, selectedCategories) {
+    $scope.numItemsShown = _INITIAL_NUM_ITEMS;
+    $scope.shownExplorationsInOrder = $scope.allExplorationsInOrder.filter(function(expDict) {
+      return selectedCategories[expDict.category] === true;
+    }).slice(0, $scope.numItemsShown);
+
+    $scope.finishedLoadingPage = false;
+  });
+
+  $scope.showMoreExplorations = function(data) {
+    console.log("LOADING");
+    $scope.pageLoaderIsBusy = true;
+    $scope.numItemsShown += _INCREMENT_SIZE;
+    $scope.showGalleryData($scope.allExplorationsInOrder);
   };
 
   // Retrieves gallery data from the server.
@@ -257,7 +295,7 @@ oppia.controller('Gallery', [
       $scope.currentUserIsModerator = true;
     }
 
-    $scope.refreshGalleryData(data);
+    $scope.getGalleryData(data);
 
     if (data.username) {
       var urlParams = urlService.getUrlParams();
