@@ -51,10 +51,22 @@
 
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation" style="margin-left: 20px;">
-    <li ng-class="{'active': getTabStatuses().active === 'main'}">
+    <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
       <a href="#" title="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
+      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator">
+        <span class="oppia-exploration-warnings-count">
+          <[countWarnings()]>
+        </span>
+      </div>
+      <ul class="dropdown-menu oppia-exploration-warnings-box">
+        <span class="oppia-exploration-warnings-header">Warnings</span>
+        <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+          <hr class="oppia-exploration-warnings-separator">
+          <[warning]>
+        </li>
+      </ul>
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'preview'}" id="tutorialPreviewTab">
@@ -269,32 +281,6 @@
             {% include 'editor/state_editor.html' %}
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
-            <div class="row">
-              <div ng-show="countWarnings()" ng-click="toggleExplorationWarningVisibility()" style="padding: 15px 0;">
-                <div class="alert alert-warning oppia-exploration-warnings-box pull-right">
-                  <div>
-                    <span ng-if="!areExplorationWarningsVisible" style="color: black;">
-                    </span>
-                    <span ng-if="areExplorationWarningsVisible" style="color: black;">
-                    </span>
-                    <span class="glyphicon glyphicon-warning-sign"></span>
-                    <strong><[countWarnings()]></strong> warning<span ng-if="countWarnings() > 1">s</span>
-                    <span class="glyphicon glyphicon-chevron-right oppia-warning-chevron pull-right" ng-if="!areExplorationWarningsVisible"></span>
-                    <span class="glyphicon glyphicon-chevron-down oppia-warning-chevron pull-right" ng-if="areExplorationWarningsVisible"></span>
-                  </div>
-                  <div collapse="!areExplorationWarningsVisible">
-                    <ul>
-                      <li ng-repeat="warningText in getWarnings() track by $index">
-                        <[warningText]>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <br>
-
             <div class="oppia-state-editor-sidebar">
               <accordion close-others="true">
                 <accordion-group is-open="true">
@@ -305,18 +291,18 @@
                   <accordion-heading>Statistics<span class="caret"></span></accordion-heading>
                   {% include 'editor/state_statistics.html' %}
                 </accordion-group>
+                <accordion-group>
+                  <accordion-heading>License information<span class="caret"></span></accordion-heading>
+                    <div role="contentinfo">
+                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                        <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                      </a>
+                      <span style="font-size: 0.8em">
+                        <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
+                      </span>
+                    </div>
+                </accordion-group>
               </accordion>
-
-              <div role="contentinfo" style="margin-top: 100px;">
-                <span>
-                  <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
-                    <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                  </a>
-                  <span style="font-size: 0.8em">
-                    <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
-                  </span>
-                </span>
-              </div>
             </div>
           </div>
         </div>

@@ -857,16 +857,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   right: 15px;
 }
 
-.oppia-exploration-warnings-box {
-  cursor: pointer;
-  margin-bottom: 2px;
-  opacity: 1;
-  padding: 2px 5px;
-  position: absolute;
-  right: 15px;
-  z-index: 5;
-}
-
 .oppia-readonly-rule-container {
   margin-left: -30px;
 }
@@ -1189,6 +1179,40 @@ oppia-expression-error-tag:after {
 .oppia-state-editor-sidebar {
   position: fixed;
   right: 25px;
-  top: 110px;
+  top: 80px;
   width: 25%;
+}
+
+
+.oppia-exploration-warnings-indicator {
+  border-color: transparent transparent rgb(244,244,15) transparent;
+  border-style: inset;
+  border-width: 0 9px 14px 9px;
+  bottom: 10px;
+  color: #333;
+  font-size: 0.8em;
+  font-weight: bold;
+  height: 0;
+  position: absolute;
+  right: 5px;
+  width: 0;
+}
+.oppia-exploration-warnings-count {
+  margin-left: -3px;
+}
+.dropdown-menu.oppia-exploration-warnings-box {
+  background: #fcf8e3;
+}
+.oppia-exploration-warnings-header {
+  font-size: 0.8em;
+  font-weight: bold;
+  margin: 0 5px;
+}
+.oppia-exploration-warnings-text {
+  font-size: 0.9em;
+  padding: 2px 5px;
+  width: 250px;
+}
+.oppia-exploration-warnings-separator {
+  margin: 0;
 }

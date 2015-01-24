@@ -23,23 +23,22 @@
 var END_DEST = 'END';
 
 oppia.controller('ExplorationEditor', [
-  '$scope', '$http', '$modal', '$window', '$filter', '$rootScope',
-  '$log', '$timeout', 'explorationData', 'warningsData', 'activeInputData',
-  'editorContextService', 'changeListService', 'explorationTitleService',
-  'explorationCategoryService', 'explorationObjectiveService', 'explorationLanguageCodeService',
-  'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
-  'oppiaDatetimeFormatter', 'interactionRepositoryService', 'newStateTemplateService', 'oppiaPlayerService',
-  'explorationStatesService', 'routerService', 'graphDataService', 'focusService', 'stateEditorTutorialFirstTimeService',
+  '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
+  'explorationData', 'editorContextService', 'explorationTitleService',
+  'explorationCategoryService', 'explorationObjectiveService',
+  'explorationLanguageCodeService', 'explorationRightsService',
+  'explorationInitStateNameService', 'editabilityService',
+  'interactionRepositoryService', 'explorationStatesService', 'routerService',
+  'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationWarningsService',
   function(
-    $scope, $http, $modal, $window, $filter, $rootScope,
-    $log, $timeout, explorationData, warningsData, activeInputData,
-    editorContextService, changeListService, explorationTitleService,
-    explorationCategoryService, explorationObjectiveService, explorationLanguageCodeService,
-    explorationRightsService, explorationInitStateNameService, validatorsService,
-    editabilityService, oppiaDatetimeFormatter, interactionRepositoryService,
-    newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
-    graphDataService, focusService, stateEditorTutorialFirstTimeService,
+    $scope, $http, $window, $rootScope, $log, $timeout,
+    explorationData,  editorContextService, explorationTitleService,
+    explorationCategoryService, explorationObjectiveService,
+    explorationLanguageCodeService, explorationRightsService,
+    explorationInitStateNameService, editabilityService,
+    interactionRepositoryService, explorationStatesService, routerService,
+    graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationWarningsService) {
 
   $scope.editabilityService = editabilityService;
@@ -50,7 +49,7 @@ oppia.controller('ExplorationEditor', [
   $rootScope.loadingMessage = 'Loading';
 
   // The pathname should be: .../create/{exploration_id}
-  var _pathnameArray = window.location.pathname.split('/');
+  var _pathnameArray = $window.location.pathname.split('/');
   $scope.explorationId = _pathnameArray[_pathnameArray.length - 1];
   // The exploration id needs to be attached to the root scope in order for
   // the file picker RTE component to work. (Note that an alternative approach
@@ -76,22 +75,6 @@ oppia.controller('ExplorationEditor', [
     graphDataService.recompute();
     explorationWarningsService.updateWarnings();
   });
-
-  $scope.countWarnings = explorationWarningsService.countWarnings;
-  $scope.getWarnings = explorationWarningsService.getWarnings;
-
-  $scope.initializeNewActiveInput = function(newActiveInput) {
-    // TODO(sll): Rework this so that in general it saves the current active
-    // input, if any, first. If it is bad input, display a warning and cancel
-    // the effects of the old change. But, for now, each case is handled
-    // specially.
-    $log.info('Current Active Input: ' + activeInputData.name);
-
-    var inputArray = newActiveInput.split('.');
-
-    activeInputData.name = (newActiveInput || '');
-    // TODO(sll): Initialize the newly displayed field.
-  };
 
   $scope.getExplorationUrl = function(explorationId) {
     return explorationId ? ('/explore/' + explorationId) : '';
@@ -283,7 +266,10 @@ oppia.controller('ExplorationEditor', [
 
 oppia.controller('EditorNavigation', [
     '$scope', '$rootScope', '$timeout', 'routerService', 'explorationRightsService',
-    function($scope, $rootScope, $timeout, routerService, explorationRightsService) {
+    'explorationWarningsService',
+    function(
+      $scope, $rootScope, $timeout, routerService, explorationRightsService,
+      explorationWarningsService) {
   $scope.postTutorialHelpPopoverIsShown = false;
 
   $scope.$on('openPostTutorialHelpPopover', function() {
@@ -301,6 +287,9 @@ oppia.controller('EditorNavigation', [
   $scope.openEditorTutorial = function() {
     $rootScope.$broadcast('openEditorTutorial');
   };
+
+  $scope.countWarnings = explorationWarningsService.countWarnings;
+  $scope.getWarnings = explorationWarningsService.getWarnings;
 
   $scope.explorationRightsService = explorationRightsService;
   $scope.getTabStatuses = routerService.getTabStatuses;
