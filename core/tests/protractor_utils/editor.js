@@ -50,6 +50,20 @@ var expectCurrentStateToBe = function(name) {
   ).toMatch(name);
 };
 
+// NAVIGATION
+var navigateToMainTab = function() {
+  element(by.css('.protractor-test-main-tab')).click();
+};
+
+var navigateToPreviewTab = function() {
+  element(by.css('.protractor-test-preview-tab')).click();
+  general.waitForSystem();
+};
+
+var navigateToSettingsTab = function() {
+  element(by.css('.protractor-test-settings-tab')).click();
+};
+
 // CONTENT
 
 // 'richTextInstructions' is a function that is sent a RichTextEditor which it
@@ -110,10 +124,12 @@ var setInteraction = function(interactionName) {
   }
 };
 
-// Likewise this can receive additional arguments
+// Likewise this can receive additional arguments.
+// Note that this refers to the interaction displayed in the preview tab.
 var expectInteractionToMatch = function(interactionName) {
   // Convert additional arguments to an array to send on.
-  var args = [];
+  var elem = element(by.css('.protractor-test-interaction'));
+  var args = [elem];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
@@ -193,6 +209,13 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
 var addRule = function(interactionName, ruleName) {
+  // This button will not be shown if the rule editor section is already open.
+  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    }
+  });
+
   element(by.css('.protractor-test-add-rule')).click();
   var ruleElement = element(by.css('.protractor-test-temporary-rule'))
   var args = [ruleElement];
@@ -205,6 +228,13 @@ var addRule = function(interactionName, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
+  // This button will not be shown if the rule editor section is already open.
+  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    }
+  });
+
   var elem = (ruleNum === 'default') ?
     element(by.css('.protractor-test-default-rule')):
     element.all(by.css('.protractor-test-rule-block')).get(ruleNum);
@@ -327,9 +357,9 @@ var expectStateNamesToBe = function(names) {
 // All functions involving the settings tab should be sent through this
 // wrapper.
 var runFromSettingsTab = function(callbackFunction) {
-  element(by.css('.protractor-test-settings-tab')).click();
+  navigateToSettingsTab();
   var result = callbackFunction();
-  element(by.css('.protractor-test-main-tab')).click();
+  navigateToMainTab();
   return result;
 };
 
@@ -407,22 +437,11 @@ var discardChanges = function() {
   browser.driver.switchTo().alert().accept();
 };
 
-var enterPreviewMode = function() {
-  element(by.css('.protractor-test-enter-preview-mode')).click();
-};
-
-var exitPreviewMode = function() {
-  exitButton = element(by.css('.protractor-test-exit-preview-mode'));
-  // The process of scrolling to the exit button causes the cursor to rest over
-  // the username in the top right, which opens a dropdown menu that then
-  // blocks the "Edit" button. To prevent this we move the cursor away.
-  general.scrollElementIntoView(exitButton);
-  browser.actions().
-    mouseMove(element(by.css('.protractor-test-navbar-header'))).perform();
-  exitButton.click();
-};
-
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
+
+exports.navigateToMainTab = navigateToMainTab;
+exports.navigateToPreviewTab = navigateToPreviewTab;
+exports.navigateToSettingsTab = navigateToSettingsTab;
 
 exports.setStateName = setStateName;
 exports.expectCurrentStateToBe = expectCurrentStateToBe;
@@ -451,5 +470,3 @@ exports.setFirstState = setFirstState;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
-exports.enterPreviewMode = enterPreviewMode;
-exports.exitPreviewMode = exitPreviewMode;

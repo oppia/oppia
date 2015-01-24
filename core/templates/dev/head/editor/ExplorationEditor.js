@@ -30,7 +30,7 @@ oppia.controller('ExplorationEditor', [
   'explorationRightsService', 'explorationInitStateNameService', 'validatorsService', 'editabilityService',
   'oppiaDatetimeFormatter', 'interactionRepositoryService', 'newStateTemplateService', 'oppiaPlayerService',
   'explorationStatesService', 'routerService', 'graphDataService', 'focusService', 'stateEditorTutorialFirstTimeService',
-  'explorationParamSpecsService', 'explorationWarningsService', 'previewModeService',
+  'explorationParamSpecsService', 'explorationWarningsService',
   function(
     $scope, $http, $modal, $window, $filter, $rootScope,
     $log, $timeout, explorationData, warningsData, activeInputData,
@@ -40,42 +40,9 @@ oppia.controller('ExplorationEditor', [
     editabilityService, oppiaDatetimeFormatter, interactionRepositoryService,
     newStateTemplateService, oppiaPlayerService, explorationStatesService, routerService,
     graphDataService, focusService, stateEditorTutorialFirstTimeService,
-    explorationParamSpecsService, explorationWarningsService, previewModeService) {
+    explorationParamSpecsService, explorationWarningsService) {
 
   $scope.editabilityService = editabilityService;
-
-  $scope.isInPreviewMode = function() {
-    return previewModeService.isInPreviewMode();
-  };
-
-  $scope.enterPreviewMode = function() {
-    $rootScope.$broadcast('externalSave');
-    oppiaPlayerService.populateExploration({
-      states: explorationStatesService.getStates(),
-      init_state_name: explorationInitStateNameService.savedMemento,
-      param_specs: explorationParamSpecsService.savedMemento,
-      title: explorationTitleService.savedMemento,
-      // TODO(sll): are these actually editable?
-      param_changes: explorationData.data.param_changes
-    });
-    $timeout(function() {
-      previewModeService.turnOnPreviewMode();
-    });
-  };
-
-  $scope.exitPreviewMode = function() {
-    previewModeService.turnOffPreviewMode();
-    $timeout(function() {
-      routerService.navigateToMainTab(oppiaPlayerService.getCurrentStateName());
-      $scope.$broadcast('refreshStateEditor');
-    });
-  };
-
-  // TODO(sll): Remove this when possible. This is currently needed for the
-  // editor/preview mode to function, but it exposes what should be a private
-  // variable.
-  $scope.previewModeData = previewModeService.data;
-  $scope.previewModeData.isInPreviewMode = false;
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
@@ -261,10 +228,10 @@ oppia.controller('ExplorationEditor', [
         'You can navigate to individual states by clicking on them, and you can also click ' +
         'the top-right button to expand the graph.')
     }, {
-      element: '#tutorialPreviewExplorationButton',
+      element: '#tutorialPreviewTab',
       position: 'left',
       intro: (
-        'At any time, click the \'Preview\' button to preview an interactive version ' +
+        'At any time, click the \'Preview\' tab to preview an interactive version ' +
         'of your exploration, where you can interact with it as a student would! This ' +
         'is very useful for ensuring that the learning experience feels natural and ' +
         'enjoyable.')
@@ -302,11 +269,7 @@ oppia.controller('ExplorationEditor', [
   };
 
   $scope.startTutorial = function(firstTime) {
-    if (previewModeService.isInPreviewMode()) {
-      $scope.exitPreviewMode();
-    } else {
-      routerService.navigateToMainTab();
-    }
+    routerService.navigateToMainTab();
 
     // The $timeout wrapper is needed for all components on the page to load,
     // otherwise elements within ng-if's are not guaranteed to be present on
@@ -342,6 +305,7 @@ oppia.controller('EditorNavigation', [
   $scope.explorationRightsService = explorationRightsService;
   $scope.getTabStatuses = routerService.getTabStatuses;
   $scope.selectMainTab = routerService.navigateToMainTab;
+  $scope.selectPreviewTab = routerService.navigateToPreviewTab;
   $scope.selectStatsTab = routerService.navigateToStatsTab;
   $scope.selectSettingsTab = routerService.navigateToSettingsTab;
   $scope.selectHistoryTab = routerService.navigateToHistoryTab;
@@ -362,11 +326,10 @@ oppia.controller('ExplorationPublishButton', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal', 'warningsData',
     'changeListService', 'focusService', 'routerService', 'explorationData',
     'explorationRightsService', 'editabilityService', 'explorationWarningsService',
-    'previewModeService',
     function(
       $scope, $http, $rootScope, $window, $timeout, $modal, warningsData, changeListService,
       focusService, routerService, explorationData, explorationRightsService,
-      editabilityService, explorationWarningsService, previewModeService) {
+      editabilityService, explorationWarningsService) {
   // Whether or not a save action is currently in progress.
   $scope.isSaveInProgress = false;
   // Whether or not a discard action is currently in progress.
@@ -376,9 +339,6 @@ oppia.controller('ExplorationPublishButton', [
   // discard).
   $scope.lastSaveOrDiscardAction = null;
 
-  $scope.isInPreviewMode = function() {
-    return previewModeService.isInPreviewMode();
-  };
   $scope.isExplorationLockedForEditing = function() {
     return changeListService.isExplorationLockedForEditing();
   };

@@ -1056,28 +1056,3 @@ oppia.factory('explorationWarningsService', [
     }
   };
 }]);
-
-
-// Service storing whether preview mode is active or not.
-oppia.factory('previewModeService', [function() {
-  var _data = {
-    isInPreviewMode: false
-  };
-
-  return {
-    // TODO(sll): Remove this when possible. This is needed currently for the
-    // editor/preview toggle to function.
-    data: function() {
-      return _data;
-    },
-    isInPreviewMode: function() {
-      return _data.isInPreviewMode;
-    },
-    turnOnPreviewMode: function() {
-      _data.isInPreviewMode = true;
-    },
-    turnOffPreviewMode: function() {
-      _data.isInPreviewMode = false;
-    }
-  };
-}]);

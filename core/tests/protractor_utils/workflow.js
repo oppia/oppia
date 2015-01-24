@@ -43,10 +43,12 @@ var createExploration = function(name, category) {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
+  editor.navigateToSettingsTab();
   element(by.css('.protractor-test-publish-exploration')).click();
   protractor.getInstance().waitForAngular();
   general.waitForSystem();
   element(by.css('.protractor-test-confirm-publish')).click();
+  editor.navigateToMainTab();
 };
 
 // Creates and publishes a minimal exploration

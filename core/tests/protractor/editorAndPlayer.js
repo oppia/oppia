@@ -212,8 +212,8 @@ describe('Full exploration editor', function() {
       editor.addRule('NumericInput', 'IsGreaterThan', 2);
       editor.RuleEditor(0).delete();
 
-      // Check editor preview mode
-      editor.enterPreviewMode();
+      // Check editor preview tab
+      editor.navigateToPreviewTab();
       player.expectContentToMatch(function(richTextEditor) {
         richTextEditor.readItalicText('Welcome');
       });
@@ -222,7 +222,6 @@ describe('Full exploration editor', function() {
       // This checks the previously-deleted rule no longer applies.
       player.expectLatestFeedbackToMatch(forms.toRichText('Farewell'));
       player.expectExplorationToBeOver();
-      editor.exitPreviewMode();
 
       editor.discardChanges();
       users.logout();
@@ -370,8 +369,8 @@ describe('Interactions', function() {
           null, [interactionName].concat(test.ruleArguments));
         editor.RuleEditor(0).setFeedback(0, forms.toRichText('yes'));
 
-        editor.enterPreviewMode();
-        editor.expectInteractionToMatch.apply(
+        editor.navigateToPreviewTab();
+        player.expectInteractionToMatch.apply(
           null, [interactionName].concat(test.expectedInteractionDetails));
         for (var j = 0; j < test.wrongAnswers.length; j++) {
           player.submitAnswer(interactionName, test.wrongAnswers[j]);
@@ -381,7 +380,7 @@ describe('Interactions', function() {
           player.submitAnswer(interactionName, test.correctAnswers[j]);
           player.expectLatestFeedbackToMatch(forms.toRichText('yes'));
         }
-        editor.exitPreviewMode();
+        editor.navigateToMainTab();
       }
     }
 

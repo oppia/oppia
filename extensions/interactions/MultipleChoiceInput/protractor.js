@@ -34,8 +34,8 @@ var customizeInteraction = function(elem, richTextInstructionsArray) {
 
 // These members of richTextInstructionsArray each describe how to check one of
 // the options.
-var expectInteractionDetailsToMatch = function(richTextInstructionsArray) {
-  element.all(by.repeater('choice in choices track by $index')).
+var expectInteractionDetailsToMatch = function(elem, richTextInstructionsArray) {
+  elem.all(by.repeater('choice in choices track by $index')).
       then(function(optionElements) {
     expect(optionElements.length).toEqual(richTextInstructionsArray.length);
     for (var i = 0; i < optionElements.length; i++) {
