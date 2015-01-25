@@ -169,12 +169,14 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-content-container {
   height: 100%;
   left: 0;
-  overflow-y: scroll;
+  /*overflow-y: scroll;*/ 
   position: relative;
   transition: transform 0.5s;
   -webkit-transition: -webkit-transform 0.5s;
   z-index: 99;
 }
+
+
 .oppia-content-container::after {
   background: rgba(0,0,0,0.2);
   content: '';

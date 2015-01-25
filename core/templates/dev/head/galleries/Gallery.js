@@ -214,11 +214,11 @@ oppia.controller('Gallery', [
 
   $scope.onSearchQueryChangeExec = function() {
     if (!$scope.searchQuery) {
-      $http.get($scope.galleryDataUrl).success($scope.getGalleryData);
+      $http.get($scope.galleryDataUrl).success($scope.initGalleryData);
     } else {
       $scope.searchIsLoading = true;
       $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
-        $scope.getGalleryData);
+        $scope.initGalleryData);
     }
   };
 
@@ -243,7 +243,7 @@ oppia.controller('Gallery', [
   $scope.allExplorationsInOrder = [];
 
   // Called only once.
-  $scope.getGalleryData = function(data) {
+  $scope.initGalleryData = function(data) {
     $scope.searchIsLoading = false;
     $scope.featuredExplorations = data.featured;
     $scope.publicExplorations = data['public'];
@@ -275,15 +275,16 @@ oppia.controller('Gallery', [
 
   $scope.$on('galleryQueryChanged', function(event, selectedCategories) {
     $scope.numItemsShown = _INITIAL_NUM_ITEMS;
-    $scope.shownExplorationsInOrder = $scope.allExplorationsInOrder.filter(function(expDict) {
-      return selectedCategories[expDict.category] === true;
-    }).slice(0, $scope.numItemsShown);
 
-    $scope.finishedLoadingPage = false;
+    $scope.allInSelectedCategories = $scope.allExplorationsInOrder.filter(function(expDict) {
+      return selectedCategories[expDict.category] === true;
+    });
+    $scope.finishedLoadingPage = !($scope.allInSelectedCategories.length > $scope.numItemsShown);
+
+    $scope.shownExplorationsInOrder = $scope.allInSelectedCategories.slice(0, $scope.numItemsShown);
   });
 
   $scope.showMoreExplorations = function(data) {
-    console.log("LOADING");
     $scope.pageLoaderIsBusy = true;
     $scope.numItemsShown += _INCREMENT_SIZE;
     $scope.showGalleryData($scope.allExplorationsInOrder);
@@ -295,7 +296,7 @@ oppia.controller('Gallery', [
       $scope.currentUserIsModerator = true;
     }
 
-    $scope.getGalleryData(data);
+    $scope.initGalleryData(data);
 
     if (data.username) {
       var urlParams = urlService.getUrlParams();
