@@ -274,14 +274,14 @@ oppia.controller('Gallery', [
   };
 
   $scope.$on('galleryQueryChanged', function(event, selectedCategories) {
-    $scope.numItemsShown = _INITIAL_NUM_ITEMS;
-
-    $scope.allInSelectedCategories = $scope.allExplorationsInOrder.filter(function(expDict) {
+    $scope.filteredExplorations = $scope.allExplorationsInOrder.filter(function(expDict) {
       return selectedCategories[expDict.category] === true;
     });
-    $scope.finishedLoadingPage = !($scope.allInSelectedCategories.length > $scope.numItemsShown);
 
-    $scope.shownExplorationsInOrder = $scope.allInSelectedCategories.slice(0, $scope.numItemsShown);
+    $scope.numItemsShown = Math.min(_INITIAL_NUM_ITEMS, $scope.filteredExplorations.length);
+    $scope.finishedLoadingPage = ($scope.filteredExplorations.length <= $scope.numItemsShown);
+
+    $scope.shownExplorationsInOrder = $scope.filteredExplorations.slice(0, $scope.numItemsShown);
   });
 
   $scope.showMoreExplorations = function(data) {

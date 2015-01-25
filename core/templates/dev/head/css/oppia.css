@@ -166,16 +166,18 @@ div.wysiwyg iframe.wysiwyg-content-large {
   position: relative;
 }
 
+/* 
+  Note that adding "overflow-y: scroll;" will 
+  break infinite scrolling in the gallery page. 
+*/
 .oppia-content-container {
   height: 100%;
-  left: 0;
-  /*overflow-y: scroll;*/ 
+  left: 0; 
   position: relative;
   transition: transform 0.5s;
   -webkit-transition: -webkit-transform 0.5s;
   z-index: 99;
 }
-
 
 .oppia-content-container::after {
   background: rgba(0,0,0,0.2);
