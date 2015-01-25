@@ -281,10 +281,18 @@
             {% include 'editor/state_editor.html' %}
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
-            <div class="oppia-state-editor-sidebar">
+            <div class="oppia-editor-sidebar hidden-xs">
+              <div class="oppia-editor-sidebar-section-header">
+                Current State
+              </div>
+              <div class="oppia-editor-sidebar-section-body">
+                Name: <strong><[editorContextService.getActiveStateName()]></strong>
+              </div>
               <accordion close-others="true">
                 <accordion-group is-open="true">
-                  <accordion-heading>Map<span class="caret"></span></accordion-heading>
+                  <accordion-heading>
+                    Map<span class="caret"></span>
+                  </accordion-heading>
                   {% include 'editor/exploration_graph.html' %}
                 </accordion-group>
                 <accordion-group>
@@ -293,14 +301,14 @@
                 </accordion-group>
                 <accordion-group>
                   <accordion-heading>License information<span class="caret"></span></accordion-heading>
-                    <div role="contentinfo">
-                      <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
-                        <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                      </a>
-                      <span style="font-size: 0.8em">
-                        <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
-                      </span>
-                    </div>
+                  <div role="contentinfo">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                      <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                    </a>
+                    <span style="font-size: 0.8em">
+                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
+                    </span>
+                  </div>
                 </accordion-group>
               </accordion>
             </div>

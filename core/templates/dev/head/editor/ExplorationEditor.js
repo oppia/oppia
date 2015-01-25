@@ -42,6 +42,7 @@ oppia.controller('ExplorationEditor', [
     explorationParamSpecsService, explorationWarningsService) {
 
   $scope.editabilityService = editabilityService;
+  $scope.editorContextService = editorContextService;
 
   /**********************************************************
    * Called on initial load of the exploration editor page.
