@@ -19,14 +19,11 @@
  */
 
 oppia.controller('StateEditor', [
-  '$scope', '$filter', 'explorationData', 'warningsData',
-  'editorContextService', 'changeListService', 'validatorsService',
-  'explorationInitStateNameService', 'focusService', 'editabilityService',
-  'explorationStatesService', 'routerService', function(
-    $scope, $filter, explorationData, warningsData,
-    editorContextService, changeListService, validatorsService,
-    explorationInitStateNameService, focusService, editabilityService,
-    explorationStatesService, routerService) {
+  '$scope', '$rootScope', 'editorContextService', 'changeListService',
+  'editabilityService', 'explorationStatesService', 'routerService',
+  function(
+    $scope, $rootScope, editorContextService, changeListService,
+    editabilityService, explorationStatesService, routerService) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -35,13 +32,11 @@ oppia.controller('StateEditor', [
     }
   };
 
-  $scope.$on('refreshStateEditor', function(evt) {
+  $scope.$on('refreshStateEditor', function() {
     $scope.initStateEditor();
   });
 
   $scope.initStateEditor = function() {
-    $scope.stateNameEditorIsShown = false;
-
     $scope.stateName = editorContextService.getActiveStateName();
 
     var stateData = explorationStatesService.getState($scope.stateName);
@@ -71,51 +66,7 @@ oppia.controller('StateEditor', [
     }
 
     if ($scope.stateName && stateData) {
-      $scope.$broadcast('stateEditorInitialized', stateData);
-    }
-  };
-
-  $scope.openStateNameEditor = function() {
-    $scope.stateNameEditorIsShown = true;
-    $scope.tmpStateName = $scope.stateName;
-    $scope.stateNameMemento = $scope.stateName;
-    focusService.setFocus('stateNameEditorOpened');
-  };
-
-  $scope._getNormalizedStateName = function(newStateName) {
-    return $filter('normalizeWhitespace')(newStateName);
-  };
-
-  var _isNewStateNameValid = function(stateName) {
-    if (stateName === editorContextService.getActiveStateName()) {
-      return true;
-    }
-    return explorationStatesService.isNewStateNameValid(stateName, true);
-  };
-
-  $scope.saveStateNameAndRefresh = function(newStateName) {
-    var normalizedStateName = $scope._getNormalizedStateName(newStateName);
-    var valid = $scope.saveStateName(normalizedStateName);
-    if (valid) {
-      routerService.navigateToMainTab(normalizedStateName);
-    }
-  };
-
-  $scope.saveStateName = function(newStateName) {
-    newStateName = $scope._getNormalizedStateName(newStateName);
-    if (!_isNewStateNameValid(newStateName)) {
-      return false;
-    }
-
-    if ($scope.stateNameMemento === newStateName) {
-      $scope.stateNameEditorIsShown = false;
-      return false;
-    } else {
-      explorationStatesService.renameState(
-        editorContextService.getActiveStateName(), newStateName);
-      $scope.stateNameEditorIsShown = false;
-      $scope.initStateEditor();
-      return true;
+      $rootScope.$broadcast('stateEditorInitialized', stateData);
     }
   };
 
@@ -127,9 +78,6 @@ oppia.controller('StateEditor', [
 
   $scope.$on('externalSave', function() {
     $scope.saveTextContent();
-    if ($scope.stateNameEditorIsShown) {
-      $scope.saveStateName($scope.tmpStateName);
-    }
   });
 
   $scope.saveTextContent = function() {

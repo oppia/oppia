@@ -286,7 +286,7 @@
                 Current State
               </div>
               <div class="oppia-editor-sidebar-section-body">
-                Name: <strong><[editorContextService.getActiveStateName()]></strong>
+                {% include 'editor/sidebar_state_name.html' %}
               </div>
               <accordion close-others="true">
                 <accordion-group is-open="true">
@@ -391,6 +391,7 @@
     {{ include_js_file('editor/ExplorationHistory.js') }}
     {{ include_js_file('editor/HistoryServices.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
+    {{ include_js_file('editor/SidebarStateName.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
