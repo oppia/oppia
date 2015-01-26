@@ -115,9 +115,9 @@
                         </ul>
                       {% endif %}
 
-                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px;">
-                        <li class="dropdown">
-                          {% if user_email %}
+                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px; margin-right: 0;">
+                        {% if user_email %}
+                          <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown">
                               {% if username %}
                                 {{username}}
@@ -156,12 +156,21 @@
                                 <a href="{{logout_url}}">Logout</a>
                               </li>
                             </ul>
-                          {% else %}
-                            <a href="{{login_url}}">
-                              Sign in
+                          </li>
+                        {% else %}
+                          <li>
+                            <a href="{{login_url}}" style="font-size: 0.8em; margin-right: -20px;" class="oppia-no-hover-change">
+                              Log in
                             </a>
-                          {% endif %}
-                        </li>
+                          </li>
+                          <li>
+                            <a href="{{login_url}}" style="font-size: 0.8em;" class="oppia-no-hover-change">
+                              <span class="oppia-signup-button">
+                                Sign up
+                              </span>
+                            </a>
+                          </li>
+                        {% endif %}
                       </ul>
 
                       {% block local_top_nav_options %}
