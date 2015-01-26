@@ -35,22 +35,8 @@ var exitTutorialIfNecessary = function() {
   });
 };
 
-var setStateName = function(name) {
-  var nameElement = element(by.css('.protractor-test-state-name-container'))
-  nameElement.click();
-  nameElement.element(by.css('.protractor-test-state-name-input')).clear();
-  nameElement.element(by.css('.protractor-test-state-name-input')).
-    sendKeys(name);
-  nameElement.element(by.css('.protractor-test-state-name-submit')).click();
-};
-
-var expectCurrentStateToBe = function(name) {
-  expect(
-    element(by.css('.protractor-test-state-name-container')).getText()
-  ).toMatch(name);
-};
-
 // NAVIGATION
+
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
   // Click a neutral element in order to dismiss any warnings.
@@ -64,6 +50,23 @@ var navigateToPreviewTab = function() {
 
 var navigateToSettingsTab = function() {
   element(by.css('.protractor-test-settings-tab')).click();
+};
+
+// UTILITIES
+
+var setStateName = function(name) {
+  var nameElement = element(by.css('.protractor-test-state-name-container'))
+  nameElement.click();
+  nameElement.element(by.css('.protractor-test-state-name-input')).clear();
+  nameElement.element(by.css('.protractor-test-state-name-input')).
+    sendKeys(name);
+  nameElement.element(by.css('.protractor-test-state-name-submit')).click();
+};
+
+var expectCurrentStateToBe = function(name) {
+  expect(
+    element(by.css('.protractor-test-state-name-container')).getText()
+  ).toMatch(name);
 };
 
 // CONTENT
@@ -127,11 +130,12 @@ var setInteraction = function(interactionName) {
 };
 
 // Likewise this can receive additional arguments.
-// Note that this refers to the interaction displayed in the preview tab.
+// Note that this refers to the interaction displayed in the editor tab (as
+// opposed to the preview tab, which uses the corresponding function in
+// player.js).
 var expectInteractionToMatch = function(interactionName) {
   // Convert additional arguments to an array to send on.
-  var elem = element(by.css('.protractor-test-interaction'));
-  var args = [elem];
+  var args = [element(by.css('.protractor-test-interaction'))];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
