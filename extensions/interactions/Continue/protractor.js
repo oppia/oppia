@@ -31,7 +31,7 @@ var expectInteractionDetailsToMatch = function(buttonText) {
   expect(
     element(by.tagName('oppia-interactive-continue')).
       element(by.tagName('button')).getText()
-  ).toBe(buttonText);
+  ).toBe(buttonText.toUpperCase());
 };
 
 var submitAnswer = function(elem) {

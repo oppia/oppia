@@ -99,8 +99,9 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <input type="number" ng-model="$parent.localValue" class="form-control" ng-disabled="isDisabled()"
-             required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>">
+      <md-text-float type="number" ng-model="$parent.localValue" class="long" ng-disabled="isDisabled()"
+                     required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>">
+      </md-text-float>
     </span>
 
     <span ng-if="allowExpressions()">
@@ -124,9 +125,10 @@
   <span>
     <span class="input-group" ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <input type="text" name="floatValue" ng-model="$parent.localValue" class="form-control"
-               require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
-               focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)">
+        <md-text-float type="text" name="floatValue" ng-model="$parent.localValue" class="long" 
+                       require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
+                       focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)">
+        </md-text-float>
       </span>
 
       <span ng-if="allowExpressions()">
@@ -168,12 +170,14 @@
               class="form-control" focus-on="<[labelForFocusTarget()]>">
     </textarea>
 
-    <input ng-if="!getCodingMode() && !getRows()" type="text"
+    <md-text-float class="long" ng-if="!getCodingMode() && !getRows()" 
+           type="text"
            ng-model="$parent.$parent.localValue"
-           placeholder="<[getPlaceholder()]>"
+           label="<[getPlaceholder()]>"
            ng-disabled="isDisabled()"
            ng-keypress="onKeypress($event)"
-           class="form-control" focus-on="<[labelForFocusTarget()]>">
+           focus-on="<[labelForFocusTarget()]>">
+    </md-text-float>
 
     <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
       <div ui-codemirror

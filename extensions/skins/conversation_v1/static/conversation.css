@@ -27,30 +27,12 @@ html, body {
   All classes below should start with .conversation-skin  
  */
 .conversation-skin-exploration-intro-card {
-  background: rgb(255,255,255);
+  background-color: rgb(255,255,255);
   font-family: 'Roboto';
   text-align: center;
-  padding: 0 0 50px 0;
-}
-
-.conversation-skin-icons {
-  width: 24px;
-  height: 24px;
-}
-
-.conversation-skin-exploration-bookmark-rate {
-  margin-left: auto;
-  margin-right: auto;
-  min-width: 20%; 
-  max-width: 130px;
-}
-
-.conversation-skin-exploration-bookmark {
-  float: left;
-}
-
-.conversation-skin-exploration-rate {
-  float: right;
+  max-width: 560px;
+  max-height: 567px;
+  padding: 0 0 10px 0;
 }
 
 .conversation-skin-answer-feedback-pair {
@@ -80,7 +62,7 @@ html, body {
 
 .conversation-skin-exploration-header {
   text-align: center;
-  font-size: 36px;
+  font-size: 24px;
 }
 
 .conversation-skin-iframe-container {
@@ -95,6 +77,7 @@ html, body {
   background: rgb(255,255,255);
   margin-top: 30px;
   padding: 40px;
+  max-width: 560px;
   text-align: justify;
   font-family: 'Roboto';
 }
