@@ -53,6 +53,8 @@ var expectCurrentStateToBe = function(name) {
 // NAVIGATION
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
+  // Click a neutral element in order to dismiss any warnings.
+  element(by.css('.protractor-test-state-editor-oppia-avatar')).click();
 };
 
 var navigateToPreviewTab = function() {

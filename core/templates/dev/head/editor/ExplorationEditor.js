@@ -307,7 +307,11 @@ oppia.controller('EditorNavbarBreadcrumb', [
     '$scope', 'explorationTitleService', function($scope, explorationTitleService) {
   $scope.navbarTitle = null;
   $scope.$on('explorationPropertyChanged', function() {
+    var _MAX_TITLE_LENGTH = 20;
     $scope.navbarTitle = explorationTitleService.savedMemento;
+    if ($scope.navbarTitle.length > _MAX_TITLE_LENGTH) {
+      $scope.navbarTitle = $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...';
+    }
   });
 }]);
 
