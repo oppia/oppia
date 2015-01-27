@@ -730,10 +730,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-top: 0;
 }
 
-.oppia-exploration-editor-top-row {
-  margin-top: 5px;
-}
-
 .oppia-warning {
   background: #F9EDBE;
   width: 80%;
@@ -751,12 +747,14 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-state-name-container {
-  padding: 2px;
+  background: #eee;
+  border-bottom-left-radius: 5px;
+  margin: 2px 7px;
+  padding: 6px;
 }
 
 .oppia-state-editor-header {
-  margin-bottom: -20px;
-  text-align: center;
+  margin-top: -10px;
 }
 
 .oppia-state-editor-body {
@@ -766,8 +764,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-state-content {
   min-height: 20px;
-  padding: 5px 10px 15px 10px;
-  margin-top: -20px;
+  padding: 5px 0 15px 10px;
 }
 
 .oppia-state-content-display {
@@ -791,19 +788,19 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 @media (min-width: 768px) {
   .oppia-interaction-selector {
-    bottom: -24px;
+    bottom: -10px;
   }
 }
 @media (max-width: 768px) {
   .oppia-interaction-selector {
-    top: -27px;
+    top: -22px;
     width: 60%;
   }
 }
 
 .oppia-interaction-display {
   margin: 0;
-  padding: 0 10px;
+  padding: 0 0 0 10px;
 }
 
 .oppia-interaction-editor {
@@ -843,7 +840,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-rules {
-  padding: 0 10px 5px 10px;
+  padding: 0 10px 5px 25px;
 }
 
 /* Styles for the state graph vizualization. */
@@ -886,17 +883,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-top: 1px;
   padding: 9px 10px 6px 10px;
   position: absolute;
-  right: 15px;
-}
-
-.oppia-exploration-warnings-box {
-  cursor: pointer;
-  margin-bottom: 2px;
-  opacity: 1;
-  padding: 2px 5px;
-  position: absolute;
-  right: 15px;
-  z-index: 5;
+  right: 25px;
 }
 
 .oppia-readonly-rule-container {
@@ -972,10 +959,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding: 5px;
   vertical-align: middle;
   width: 160px;
-}
-
-.row {
-  margin-bottom: 10px;
 }
 
 .about-tabs {
@@ -1176,9 +1159,9 @@ oppia-expression-error-tag:after {
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 21px;
   font-weight: 300;
-  height: 48px;
+  height: 40px;
   margin-left: 6px;
-  margin-top: 3px;
+  margin-top: 6px;
 }
 
 .oppia-select {
@@ -1193,4 +1176,101 @@ oppia-expression-error-tag:after {
 }
 .oppia-feedback-tab-row:hover {
   background: #eee;
+}
+
+
+.oppia-state-card {
+  background: rgb(255,255,255);
+  margin: 30px;
+  max-width: 900px;
+}
+
+.oppia-show-rule-editors-ctrl {
+  background-color: #eee;
+  height: 50px;
+  margin-bottom: -13px;
+  margin-left: -3px;
+  margin-right: -3px;
+  padding-top: 15px;
+}
+.oppia-show-rule-editors-ctrl:hover {
+  background-color: #ccc;
+  cursor: pointer;
+}
+
+.oppia-state-next-card {
+  cursor: pointer;
+  margin-bottom: -100px;
+  margin-top: 40px;
+  opacity: 0.7;
+}
+
+.oppia-editor-sidebar {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  height: 100%;
+  max-width: 25%;
+  position: fixed;
+  right: 0;
+  top: 50px;
+  width: 400px;
+}
+.oppia-editor-sidebar accordion .panel {
+  border-radius: 0;
+}
+.oppia-editor-sidebar accordion .panel .panel-heading {
+  background-color: #ddd;
+  border-radius: 0;
+  padding: 3px 10px;
+}
+.oppia-editor-sidebar accordion .panel .panel-title {
+  font-weight: bold;
+}
+.oppia-editor-sidebar accordion .panel .panel-body {
+  border-radius: 0;
+  padding-right: 25px;
+}
+.oppia-editor-sidebar-section-header {
+  background-color: #ddd;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 3px 10px;
+}
+.oppia-editor-sidebar-section-body {
+  background-color: #fff;
+  margin-bottom: 5px;
+  padding-right: 25px;
+  padding: 0 10px;
+}
+
+.oppia-exploration-warnings-indicator {
+  border-color: transparent transparent rgb(244,244,15) transparent;
+  border-style: inset;
+  border-width: 0 9px 14px 9px;
+  bottom: 10px;
+  color: #333;
+  font-size: 0.8em;
+  font-weight: bold;
+  height: 0;
+  position: absolute;
+  right: 5px;
+  width: 0;
+}
+.oppia-exploration-warnings-count {
+  margin-left: -3px;
+}
+.dropdown-menu.oppia-exploration-warnings-box {
+  background: #fcf8e3;
+}
+.oppia-exploration-warnings-header {
+  font-size: 0.8em;
+  font-weight: bold;
+  margin: 0 5px;
+}
+.oppia-exploration-warnings-text {
+  font-size: 0.9em;
+  padding: 2px 5px;
+  width: 250px;
+}
+.oppia-exploration-warnings-separator {
+  margin: 0;
 }

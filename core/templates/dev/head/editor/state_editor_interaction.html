@@ -4,6 +4,10 @@
 
 {% block cls %}oppia-interaction-display{% endblock %}
 
+{% block left_margin %}
+  <img src="/images/user.png">
+{% endblock %}
+
 {% block center %}
   <div ng-if="!hasLoaded" class="oppia-align-center">
     Loading
@@ -12,7 +16,7 @@
     <span class="oppia-loading-dot-three">.</span>
   </div>
 
-  <div id="tutorialStateInteraction">
+  <div id="tutorialStateInteraction" class="protractor-test-interaction">
     <div ng-if="hasLoaded">
       <div ng-if="!interactionCustomizerIsShown"
            class="protractor-test-edit-interaction"
@@ -24,9 +28,8 @@
         <div class="oppia-click-to-start-editing" ng-click="showInteractionCustomizer()">
         </div>
 
-        <div class="row">
+        <div class="row" style="margin-bottom: 10px;">
           <div class="col-lg-8 col-md-8 col-sm-8">
-            <h3>Interaction <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-cog oppia-editor-edit-icon" title="Edit Interaction"></span></h3>
           </div>
           <div class="col-lg-4 col-md-4 col-sm-4">
             <select ng-show="editabilityService.isEditable()"
@@ -36,10 +39,9 @@
             </select>
           </div>
         </div>
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview well"></div>
-          </div>
+        <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-cog oppia-editor-edit-icon" title="Edit Interaction" style="position: absolute; right: 30px; top: 35px;">
+        </span>
+        <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview well">
         </div>
       </div>
     </div>

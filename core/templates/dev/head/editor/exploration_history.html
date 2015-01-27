@@ -23,51 +23,49 @@
   </div>
 
   <div class="row">
-    <div class="oppia-main-content">
-      <div class="col-lg-12 col-md-12 col-sm-12">
-        <h2>Version History</h2>
-        <div ng-repeat="versionNumber in snapshotOrderArray">
-          <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')">
-          <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')">
-          [<[versionNumber]>]
-          <strong><[explorationVersionMetadata[versionNumber].committerId]></strong>
-          <[explorationVersionMetadata[versionNumber].commitMessage]>
-          <span class="pull-right">
-            <em><[explorationVersionMetadata[versionNumber].createdOn]></em>
-            <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
-              | <a href="#" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
-            </span>
-            <span>
-              | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
-            </span>
+    <div class="col-lg-12 col-md-12 col-sm-12">
+      <h2>Version History</h2>
+      <div ng-repeat="versionNumber in snapshotOrderArray">
+        <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')">
+        <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')">
+        [<[versionNumber]>]
+        <strong><[explorationVersionMetadata[versionNumber].committerId]></strong>
+        <[explorationVersionMetadata[versionNumber].commitMessage]>
+        <span class="pull-right">
+          <em><[explorationVersionMetadata[versionNumber].createdOn]></em>
+          <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
+            | <a href="#" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
           </span>
-        </div>
+          <span>
+            | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
+          </span>
+        </span>
+      </div>
 
-        <br>
+      <br>
 
-        <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
-          <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
-        </div>
+      <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
+        <button class="btn" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+      </div>
 
-        <div ng-hide="hideHistoryGraph || !explorationVersionMetadata">
-          <hr>
-          <div class="container">
-            <div class="row">
-              <div class="col-lg-8 col-md-8 col-sm-8">
-                <h4>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h4>
-                <div ng-hide="diffGraphData" class="oppia-align-center">
-                  Loading
-                  <span class="oppia-loading-dot-one">.</span>
-                  <span class="oppia-loading-dot-two">.</span>
-                  <span class="oppia-loading-dot-three">.</span>
-                </div>
-                <div state-graph-viz graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
-                </div>
+      <div ng-hide="hideHistoryGraph || !explorationVersionMetadata">
+        <hr>
+        <div class="container">
+          <div class="row">
+            <div class="col-lg-8 col-md-8 col-sm-8">
+              <h4>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h4>
+              <div ng-hide="diffGraphData" class="oppia-align-center">
+                Loading
+                <span class="oppia-loading-dot-one">.</span>
+                <span class="oppia-loading-dot-two">.</span>
+                <span class="oppia-loading-dot-three">.</span>
               </div>
-              <div class="col-lg-4 col-md-4 col-sm-4">
-                <h4>Exploration Graph Legend</h4>
-                <div state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
+              <div state-graph-viz graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
               </div>
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">
+              <h4>Exploration Graph Legend</h4>
+              <div state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
             </div>
           </div>
         </div>

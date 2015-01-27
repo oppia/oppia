@@ -125,8 +125,9 @@ oppia.factory('oppiaPlayerService', [
       oppiaHtmlEscaper, answerClassificationService, stateTransitionService) {
   var _END_DEST = 'END';
 
-  var _editorPreviewMode = null;
+  // Note that both of these do not get set for the Karma unit tests.
   var _explorationId = null;
+  var _editorPreviewMode = null;
   // The pathname should be one of the following:
   //   -   /explore/{exploration_id}
   //   -   /create/{exploration_id}
@@ -141,13 +142,6 @@ oppia.factory('oppiaPlayerService', [
       _editorPreviewMode = true;
       break;
     }
-  }
-
-  if (_editorPreviewMode === null) {
-    throw 'No editor preview mode specified.';
-  }
-  if (_explorationId === null) {
-    throw 'No exploration id specified.';
   }
 
   // The following line is needed for image displaying to work, since the image
@@ -334,7 +328,9 @@ oppia.factory('oppiaPlayerService', [
       answerIsBeingProcessed = false;
 
       if (_editorPreviewMode) {
-        _loadInitialState(successCallback);
+        if (_exploration) {
+          _loadInitialState(successCallback);
+        }
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;

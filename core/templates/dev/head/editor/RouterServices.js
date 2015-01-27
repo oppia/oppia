@@ -20,11 +20,14 @@
 
 oppia.factory('routerService', [
     '$rootScope', '$location', '$log', 'explorationInitStateNameService',
-    'editorContextService', 'explorationStatesService',
+    'editorContextService', 'explorationStatesService', 'oppiaPlayerService',
+    'explorationParamSpecsService', 'explorationTitleService', 'explorationData',
     function($rootScope, $location, $log, explorationInitStateNameService,
-             editorContextService, explorationStatesService) {
+             editorContextService, explorationStatesService, oppiaPlayerService,
+             explorationParamSpecsService, explorationTitleService, explorationData) {
 
   var MAIN_TAB = 'main';
+  var PREVIEW_TAB = 'preview';
   var STATS_TAB = 'stats';
   var SETTINGS_TAB = 'settings';
   var HISTORY_TAB = 'history';
@@ -46,7 +49,9 @@ oppia.factory('routerService', [
 
     $rootScope.$broadcast('externalSave');
 
-    if (newPath === '/stats') {
+    if (newPath === '/preview') {
+      _tabs.active = PREVIEW_TAB;
+    } else if (newPath === '/stats') {
       _tabs.active = STATS_TAB;
       $rootScope.$broadcast('refreshStatisticsTab');
     } else if (newPath === '/settings') {
@@ -98,8 +103,9 @@ oppia.factory('routerService', [
     isLocationSetToNonStateEditorTab: function() {
       var currentPath = $location.path();
       return (
-        currentPath === '/stats' || currentPath === '/settings' ||
-        currentPath === '/history' || currentPath === '/feedback');
+        currentPath === '/preview' || currentPath === '/stats' ||
+        currentPath === '/settings' || currentPath === '/history' ||
+        currentPath === '/feedback');
     },
     getCurrentStateFromLocationPath: function() {
       if ($location.path().indexOf('/gui/') !== -1) {
@@ -114,6 +120,10 @@ oppia.factory('routerService', [
         editorContextService.setActiveStateName(stateName);
       }
       $location.path('/gui/' + editorContextService.getActiveStateName());
+    },
+    navigateToPreviewTab: function() {
+      _savePendingChanges();
+      $location.path('/preview');
     },
     navigateToStatsTab: function() {
       _savePendingChanges();

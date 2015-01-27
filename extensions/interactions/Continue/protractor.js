@@ -27,9 +27,9 @@ var customizeInteraction = function(elem, buttonText) {
   }
 };
 
-var expectInteractionDetailsToMatch = function(buttonText) {
+var expectInteractionDetailsToMatch = function(elem, buttonText) {
   expect(
-    element(by.tagName('oppia-interactive-continue')).
+    elem.element(by.tagName('oppia-interactive-continue')).
       element(by.tagName('button')).getText()
   ).toBe(buttonText.toUpperCase());
 };

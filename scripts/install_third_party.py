@@ -150,7 +150,7 @@ YUICOMPRESSOR_URL = (
 YUICOMPRESSOR_DST = os.path.join(TOOLS_DIR, YUICOMPRESSOR_FILENAME)
 YUICOMPRESSOR_FILES = ['%s.jar' % YUICOMPRESSOR_FILENAME]
 
-UI_BOOTSTRAP_REV = '0.10.0'
+UI_BOOTSTRAP_REV = '0.12.0'
 UI_BOOTSTRAP_URL = (
     'https://raw.githubusercontent.com/angular-ui/bootstrap/gh-pages')
 UI_BOOTSTRAP_DST = os.path.join(
@@ -161,10 +161,10 @@ UI_BOOTSTRAP_FILES = [
 
 MATERIAL_DESIGN_ICONS_REV = '1.0.1'
 MATERIAL_DESIGN_ICONS_ACTION_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/action/drawable-xxxhdpi' 
+    'https://raw.githubusercontent.com/google/material-design-icons/%s/action/drawable-xxxhdpi'
     % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_TOGGLE_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/toggle/drawable-xxxhdpi' 
+    'https://raw.githubusercontent.com/google/material-design-icons/%s/toggle/drawable-xxxhdpi'
     % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_DST = os.path.join(
     STATIC_IMAGES_DIR, 'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
@@ -217,12 +217,12 @@ download_files(ANGULAR_URL, ANGULAR_DST, ANGULAR_FILES)
 download_files(ANGULAR_TEST_URL, ANGULAR_DST, ANGULAR_TEST_FILES)
 download_files(D3_URL, D3_DST, D3_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_ACTION_URL, 
-    MATERIAL_DESIGN_ICONS_DST, 
+    MATERIAL_DESIGN_ICONS_ACTION_URL,
+    MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_ACTION_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_TOGGLE_URL, 
-    MATERIAL_DESIGN_ICONS_DST, 
+    MATERIAL_DESIGN_ICONS_TOGGLE_URL,
+    MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_TOGGLE_FILES)
 download_files(
     NG_INFINITE_SCROLL_URL, 

@@ -23,12 +23,12 @@ oppia.controller('ExplorationSettings', [
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
-    'warningsData', 'explorationStatesService', function(
+    'explorationWarningsService', 'warningsData', 'explorationStatesService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
-      warningsData, explorationStatesService) {
+      explorationWarningsService, warningsData, explorationStatesService) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
@@ -112,9 +112,10 @@ oppia.controller('ExplorationSettings', [
     }
   };
 
+  // TODO(sll): Modify this so that it works correctly when discarding changes
+  // to the default skin id.
   $scope.$watch('$parent.defaultSkinId', function(newValue, oldValue) {
-    if (oldValue !== undefined && !$scope.isDiscardInProgress
-        && !angular.equals(newValue, oldValue)) {
+    if (oldValue !== undefined && !angular.equals(newValue, oldValue)) {
       changeListService.editExplorationProperty(
         'default_skin_id', newValue, oldValue);
     }
@@ -171,6 +172,20 @@ oppia.controller('ExplorationSettings', [
     });
   };
 
+  $scope.showNominateExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/nominateExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.close = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    });
+  };
+
   $scope.deleteExploration = function(role) {
     warningsData.clear();
 
@@ -206,5 +221,41 @@ oppia.controller('ExplorationSettings', [
 
   $scope.unpublishExploration = function() {
     explorationRightsService.saveChangeToBackend({is_public: false});
+  };
+
+  $scope.isExplorationLockedForEditing = function() {
+    return changeListService.isExplorationLockedForEditing();
+  };
+
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: 'static',
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.publish = $modalInstance.close;
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    }).result.then(function() {
+      explorationRightsService.saveChangeToBackend({is_public: true});
+    });
+  };
+
+  $scope.getPublishExplorationButtonTooltip = function() {
+    if (explorationWarningsService.countWarnings() > 0) {
+      return 'Please resolve the warnings before publishing.';
+    } else if ($scope.isExplorationLockedForEditing()) {
+      return 'Please save your changes before publishing.';
+    } else {
+      return 'Click this button to publish your exploration to the gallery.';
+    }
+  };
+
+  $scope.countWarnings = function() {
+    return explorationWarningsService.countWarnings();
   };
 }]);
