@@ -52,7 +52,7 @@
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation" style="margin-left: 20px;">
     <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
-      <a href="#" title="Editor" ng-click="selectMainTab()" class="protractor-test-main-tab">
+      <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
       <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator">
@@ -70,37 +70,37 @@
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'preview'}" id="tutorialPreviewTab">
-      <a href="#" title="Preview" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
+      <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
         <span class="glyphicon glyphicon-play"></span>
       </a>
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'stats'}">
-      <a href="#" title="Statistics" ng-click="selectStatsTab()">
+      <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
         <span class="glyphicon glyphicon-stats"></span>
       </a>
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">
-      <a href="#" title="Settings" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
+      <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
         <span class="glyphicon glyphicon-cog"></span>
       </a>
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'history'}">
-      <a href="#" title="History" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
+      <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
         <span class="glyphicon glyphicon-time"></span>
       </a>
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
-      <a href="#" title="Feedback" ng-click="selectFeedbackTab()">
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom" tooltip-append-to-body="true" ng-click="selectFeedbackTab()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
 
     <li class="dropdown">
-      <a href="#" title="Help" class="dropdown-toggle" data-toggle="dropdown">
+      <a href="#" tooltip="Help" tooltip-placement="right" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-question-sign"></span>
       </a>
       <ul class="dropdown-menu">
@@ -138,7 +138,7 @@
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
-                ng-disabled="!isExplorationSaveable()">
+                ng-disabled="!isExplorationSaveable()" dropdown-toggle>
           <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" role="menu">

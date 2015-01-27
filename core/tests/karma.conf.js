@@ -11,7 +11,7 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.3.0-rc.5/angular-resource.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-sanitize.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-mocks.js',
-      'third_party/static/ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.js',
+      'third_party/static/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.js',
       'third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js',
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
