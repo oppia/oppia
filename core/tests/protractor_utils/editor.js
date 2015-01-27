@@ -275,6 +275,8 @@ var createState = function(newStateName) {
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
+  general.scrollElementIntoView(
+    element(by.css('.protractor-test-exploration-graph')));
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -426,65 +428,131 @@ var exitPreviewMode = function() {
 
 // Wrapper for functions involving the history tab
 var runFromHistoryTab = function(callbackFunction) {
-  element(by.linkText('History')).click();
+  element(by.css('.protractor-test-history-tab')).click();
   var result = callbackFunction();
-  element(by.linkText('Main')).click();
+  element(by.css('.protractor-test-main-tab')).click();
   return result;
 };
 
-var checkCompareVersions = function(v1, v2) {
-  runFromHistoryTab(function() {
-    var v1Position = null;
-    var v2Position = null;
-    element.all(by.name('compareVer1')).first().then(function(elem) {
-      elem.getAttribute('value').then(function(versionNumber) {
-        v1Position = versionNumber - v1;
-        v2Position = versionNumber - v2;
-        if (v1Position < 0 || v2Position < 0 ||
-            v1Position >= 30 || v2Position >= 30) {
-          throw new Error('Invalid versions for history comparison.');
-        }
-        element.all(by.name('compareVer1')).get(v2Position).click();
-        element.all(by.name('compareVer2')).get(v1Position).click();
-        protractor.getInstance().waitForAngular();
-      });
+// Selects the versions to compare on the history page.
+// This function should be run within the runFromHistoryTab wrapper, and
+// assumes that the 2 compared versions are found on the first page of
+// the exploration history.
+var historySelectComparedVersions = function(v1, v2) {
+  var v1Position = null;
+  var v2Position = null;
+  element.all(by.css('.protractor-test-history-v1-selector')).first()
+      .then(function(elem) {
+    elem.getAttribute('value').then(function(versionNumber) {
+      v1Position = versionNumber - v1;
+      v2Position = versionNumber - v2;
+      element.all(by.css('.protractor-test-history-v1-selector'))
+        .get(v1Position).click();
+      element.all(by.css('.protractor-test-history-v2-selector'))
+        .get(v2Position).click();
+      protractor.getInstance().waitForAngular();
     });
+  });
 
-    // Click button to show graph if necessary
-    element(by.css('.protractor-test-show-history-graph-button')).isDisplayed()
-        .then(function(isDisplayed) {
-      if (isDisplayed) {
-        element(by.css('.protractor-test-show-history-graph-button')).click();
-      }
-    });
-
-    // Click on all states in graph except 'END'
-    element.all(by.css('.protractor-test-history-graph .node'))
-        .map(function(stateElement) {
-      stateElement.element(by.tagName('text')).getText()
-          .then(function(stateLabel) {
-        if (stateLabel != 'END') {
-          stateElement.click();
-          element(by.css('.modal-footer')).element(by.tagName('button')).click();
-        }
-      });
-    });
+  // Click button to show graph if necessary
+  element(by.css('.protractor-test-show-history-graph')).isDisplayed()
+      .then(function(isDisplayed) {
+    if (isDisplayed) {
+      element(by.css('.protractor-test-show-history-graph')).click();
+    }
   });
 };
 
+// This function clicks on a state in the history graph, executes
+// callbackFunction, and exits the state comparison modal. It should be run
+// within the history page.
+var openStateHistoryModal = function(stateName, callbackFunction) {
+  element.all(by.css('.protractor-test-node')).map(function(stateElement) {
+    return stateElement.element(by.css('.protractor-test-node-label')).
+      getText();
+  }).then(function(listOfNames) {
+    var matched = false;
+    for (var i = 0; i < listOfNames.length; i++) {
+      if (listOfNames[i] === stateName) {
+        element.all(by.css('.protractor-test-node')).get(i).click();
+        matched = true;
+        var result = callbackFunction();
+        element(by.css('.protractor-test-close-history-state-modal')).click();
+        return result;
+      }
+    }
+    if (! matched) {
+      throw Error('State ' + stateName + ' not found by editor.openStateHistoryModal');
+    }
+  });
+};
+
+// This function compares the states in the history graph with a list of objects
+// with the following key-value pairs:
+//   - 'label': label of the node (Note: if the node has a secondary label,
+//              the secondary label should appear after a space. It may be
+//              truncated.)
+//   - 'color': color of the node
+var expectHistoryStatesToBe = function(expectedStates) {
+  element(by.css('.protractor-test-history-graph'))
+      .all(by.css('.protractor-test-node')).map(function(stateNode) {
+    return {
+      'label': stateNode.element(
+        by.css('.protractor-test-node-label')).getText(),
+      'color': stateNode.element(
+        by.css('.protractor-test-node-background')).getCssValue('fill')
+    };
+  }).then(function(states) {
+    // Note: we need to compare this way because the state graph is sometimes
+    // generated with states in different configurations.
+    expect(states.length).toEqual(expectedStates.length);
+    for (var i = 0; i < states.length; i++) {
+      expect(expectedStates).toContain(states[i]);
+    }
+  });
+};
+
+// Checks that the history graph contains totalLinks links altogether,
+// addedLinks green links and deletedLinks red links.
+var expectNumberOfLinksToBe = function(totalLinks, addedLinks, deletedLinks) {
+  var COLOR_ADDED = 'rgb(31, 125, 31)';
+  var COLOR_DELETED = 'rgb(178, 34, 34)';
+  var totalCount = 0;
+  var addedCount = 0;
+  var deletedCount = 0;
+  element(by.css('.protractor-test-history-graph'))
+      .all(by.css('.protractor-test-link')).map(function(link) {
+    link.getCssValue('stroke').then(function(linkColor) {
+      totalCount++;
+      if (linkColor == COLOR_ADDED) {
+        addedCount++;
+      } else if (linkColor == COLOR_DELETED) {
+        deletedCount++;
+      }
+    });
+  }).then(function() {
+    expect(totalCount).toBe(totalLinks);
+    expect(addedCount).toBe(addedLinks);
+    expect(deletedCount).toBe(deletedLinks);
+  });
+};
+
+// This function should be run within the runFromHistoryTab wrapper, and
+// assumes that the selected version is valid and found on the first page of
+// the exploration history.
 var revertToVersion = function(version) {
   runFromHistoryTab(function() {
     var versionPosition = null;
-    element.all(by.name('compareVer1')).first().then(function(elem) {
+    element.all(by.css('.protractor-test-history-v1-selector')).first()
+        .then(function(elem) {
       elem.getAttribute('value').then(function(versionNumber) {
-        versionPosition = versionNumber - version;
-        if (versionPosition < 0 || versionPosition >= 30) {
-          throw new Error('Invalid version for reversion.');
-        }
+        // Note: there is no 'revert' link next to the current version
+        versionPosition = versionNumber - version - 1;
+        element.all(by.css('.protractor-test-revert-version'))
+          .get(versionPosition).click();
+        element(by.css('.protractor-test-confirm-revert')).click();
       });
     });
-    element.all(by.linkText('Revert')).get(versionPosition).click();
-    element(by.css('.modal-footer')).element(by.buttonText('Revert')).click();
   });
 };
 
@@ -521,5 +589,8 @@ exports.enterPreviewMode = enterPreviewMode;
 exports.exitPreviewMode = exitPreviewMode;
 
 exports.runFromHistoryTab = runFromHistoryTab;
-exports.checkCompareVersions = checkCompareVersions;
+exports.historySelectComparedVersions = historySelectComparedVersions;
+exports.openStateHistoryModal = openStateHistoryModal;
+exports.expectHistoryStatesToBe = expectHistoryStatesToBe;
+exports.expectNumberOfLinksToBe = expectNumberOfLinksToBe;
 exports.revertToVersion = revertToVersion;

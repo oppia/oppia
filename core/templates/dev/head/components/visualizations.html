@@ -90,7 +90,7 @@
           <g>
             <g class="pannable-child" ng-attr-transform="<[innerTransformStr]>">
               <g ng-repeat="link in augmentedLinks">
-                <path class="link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
+                <path class="link protractor-test-link" ng-if="link.d" ng-attr-d="<[link.d]>" marker-end="url(#arrowhead)" ng-attr-style="<[link.style]>">
                 </path>
               </g>
 
@@ -99,7 +99,7 @@
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
                       ng-class="{clickable: canNavigateToNode(node.id), 'init-node': node.isInitNode, 'end-node': node.isEndNode, 'bad-node': node.isBadNode, 'normal-node': node.isNormalNode}"
                       ng-attr-style="<[node.style]>"
-                      ng-click="onClickFunction(node.id)">
+                      ng-click="onClickFunction(node.id)" class="protractor-test-node-background">
                 </rect>
                 <title><[getNodeTitle(node)]></title>
                 <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">

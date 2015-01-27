@@ -64,7 +64,7 @@
     </li>
 
     <li ng-class="{'active': getTabStatuses().active === 'history'}">
-      <a href="#" title="History" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
+      <a href="#" title="History" ng-click="selectHistoryTab()" class="protractor-test-history-tab" disabled="explorationRightsService.isCloned()">
         <span class="glyphicon glyphicon-time"></span>
       </a>
     </li>

@@ -27,15 +27,15 @@
       <div class="col-lg-12 col-md-12 col-sm-12">
         <h2>Version History</h2>
         <div ng-repeat="versionNumber in snapshotOrderArray">
-          <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')">
-          <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')">
+          <input type="radio" name="compareVer1" ng-model="compareVersions.selectedVersion1" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion1')" class='protractor-test-history-v1-selector'>
+          <input type="radio" name="compareVer2" ng-model="compareVersions.selectedVersion2" ng-value="versionNumber" ng-change="changeCompareVersion(versionNumber, 'selectedVersion2')" class='protractor-test-history-v2-selector'>
           [<[versionNumber]>]
           <strong><[explorationVersionMetadata[versionNumber].committerId]></strong>
           <[explorationVersionMetadata[versionNumber].commitMessage]>
           <span class="pull-right">
             <em><[explorationVersionMetadata[versionNumber].createdOn]></em>
             <span ng-if="versionNumber !== currentVersion && editabilityService.isEditable()">
-              | <a href="#" ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
+              | <a href="#" class='protractor-test-revert-version' ng-click="showRevertExplorationModal(versionNumber)">Revert</a>
             </span>
             <span>
               | <a href="#" ng-click="downloadExplorationWithVersion(versionNumber)" title="Download exploration as a zip file.">Download</a>
@@ -46,7 +46,7 @@
         <br>
 
         <div ng-hide="!explorationVersionMetadata || hideCompareVersionsButton">
-          <button class="btn protractor-test-show-history-graph-button" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
+          <button class="btn protractor-test-show-history-graph" ng-class="{'btn-success': areCompareVersionsSelected(), 'btn-default': !areCompareVersionsSelected()}" ng-click="showHistoryGraph()" ng-disabled="!areCompareVersionsSelected()">Compare selected revisions</button>
         </div>
 
         <div ng-hide="hideHistoryGraph || !explorationVersionMetadata">
@@ -111,7 +111,7 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-default" ng-click="cancel()">Done</button>
+      <button class="btn btn-default protractor-test-close-history-state-modal" ng-click="cancel()">Done</button>
     </div>
   </script>
 
@@ -133,7 +133,7 @@
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-default" ng-click="revert()">Revert</button>
+      <button class="btn btn-default protractor-test-confirm-revert" ng-click="revert()">Revert</button>
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
     </div>
   </script>
