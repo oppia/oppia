@@ -408,14 +408,10 @@ describe('Exploration history', function() {
     var COLOR_RENAMED_UNCHANGED = 'rgb(255, 215, 0)';
 
     // Compare a version to itself
-    editor.runFromHistoryTab(function() {
-      editor.historySelectComparedVersions(1, 1);
-      editor.expectHistoryStatesToBe([
-        {'label': 'First State', 'color': COLOR_UNCHANGED},
-        {'label': 'END', 'color': COLOR_UNCHANGED}
-      ]);
-      editor.expectNumberOfLinksToBe(0, 0, 0);
-    });
+    editor.expectGraphComparisonOf(1, 1).toBe([
+      {'label': 'First State', 'color': COLOR_UNCHANGED},
+      {'label': 'END', 'color': COLOR_UNCHANGED}
+    ], [0, 0, 0]);
 
     // Check adding state, renaming state, editing text and interactions
     editor.createState('second');
@@ -430,62 +426,62 @@ describe('Exploration history', function() {
     editor.RuleEditor(0).setDestination('second');
     editor.saveChanges();
 
-    var state_first_v1_contents = {
-      '1': {'text': 'content:', 'highlighted': false},
-      '2': {'text': '- type: text', 'highlighted': false},
-      '3': {'text': '  value: enter 6 to continue', 'highlighted': true},
-      '4': {'text': 'interaction:', 'highlighted': true},
-      '5': {'text': '  customization_args: {}', 'highlighted': true},
-      '6': {'text': '  handlers:', 'highlighted': true},
-      '7': {'text': '  - name: submit', 'highlighted': true},
-      '8': {'text': '    rule_specs:', 'highlighted': true},
-      '9': {'text': '    - definition:', 'highlighted': true},
-      '10': {'text': '        inputs:', 'highlighted': true},
-      '11': {'text': '          x: 6.0', 'highlighted': true},
-      '12': {'text': '        name: Equals', 'highlighted': true},
-      '13': {'text': '        rule_type: atomic', 'highlighted': true},
-      '14': {'text': '        subject: answer', 'highlighted': true},
-      '15': {'text': '      dest: second', 'highlighted': true},
-      '16': {'text': '      feedback: []', 'highlighted': true},
-      '17': {'text': '      param_changes: []', 'highlighted': true},
-      '18': {'text': '    - definition:', 'highlighted': false},
-      '19': {'text': '        rule_type: default', 'highlighted': false},
-      '20': {'text': '      dest: first', 'highlighted': true},
-      '21': {'text': '      feedback: []', 'highlighted': false},
-      '22': {'text': '      param_changes: []', 'highlighted': false},
-      '23': {'text': '  id: NumericInput', 'highlighted': true},
-      '24': {'text': '  sticky: false', 'highlighted': false},
-      '25': {'text': 'param_changes: []', 'highlighted': false},
-      '26': {'text': ' ', 'highlighted': false}
+    var VERSION_1_STATE_1_CONTENTS = {
+      1: {text: 'content:', highlighted: false},
+      2: {text: '- type: text', highlighted: false},
+      3: {text: '  value: enter 6 to continue', highlighted: true},
+      4: {text: 'interaction:', highlighted: true},
+      5: {text: '  customization_args: {}', highlighted: true},
+      6: {text: '  handlers:', highlighted: true},
+      7: {text: '  - name: submit', highlighted: true},
+      8: {text: '    rule_specs:', highlighted: true},
+      9: {text: '    - definition:', highlighted: true},
+      10: {text: '        inputs:', highlighted: true},
+      11: {text: '          x: 6.0', highlighted: true},
+      12: {text: '        name: Equals', highlighted: true},
+      13: {text: '        rule_type: atomic', highlighted: true},
+      14: {text: '        subject: answer', highlighted: true},
+      15: {text: '      dest: second', highlighted: true},
+      16: {text: '      feedback: []', highlighted: true},
+      17: {text: '      param_changes: []', highlighted: true},
+      18: {text: '    - definition:', highlighted: false},
+      19: {text: '        rule_type: default', highlighted: false},
+      20: {text: '      dest: first', highlighted: true},
+      21: {text: '      feedback: []', highlighted: false},
+      22: {text: '      param_changes: []', highlighted: false},
+      23: {text: '  id: NumericInput', highlighted: true},
+      24: {text: '  sticky: false', highlighted: false},
+      25: {text: 'param_changes: []', highlighted: false},
+      26: {text: ' ', highlighted: false}
     };
-    var state_first_v2_contents = {
-      '1': {'text': 'content:', 'highlighted': false},
-      '2': {'text': '- type: text', 'highlighted': false},
-      '3': {'text': '  value: Welcome to the Oppia editor!<br><br>Anything', 'highlighted': true},
-      '4': {'text': '    you type here will be shown to the learner playing', 'highlighted': true},
-      '5': {'text': '    your exploration.<br><br>If you need more help getting', 'highlighted': true},
-      '6': {'text': '    started, check out the Help link in the navigation', 'highlighted': true},
-      '7': {'text': '    bar.', 'highlighted': true},
-      '8': {'text': 'interaction:', 'highlighted': true},
-      '9': {'text': '  customization_args:', 'highlighted': true},
-      '10': {'text': '    placeholder:', 'highlighted': true},
-      '11': {'text': '      value: Type your answer here.', 'highlighted': true},
-      '12': {'text': '    rows:', 'highlighted': true},
-      '13': {'text': '      value: 1', 'highlighted': true},
-      '14': {'text': '  handlers:', 'highlighted': true},
-      '15': {'text': '  - name: submit', 'highlighted': true},
-      '16': {'text': '    rule_specs:', 'highlighted': true},
-      '17': {'text': '    - definition:', 'highlighted': false},
-      '18': {'text': '        rule_type: default', 'highlighted': false},
-      '19': {'text': '      dest: First State', 'highlighted': true},
-      '20': {'text': '      feedback: []', 'highlighted': false},
-      '21': {'text': '      param_changes: []', 'highlighted': false},
-      '22': {'text': '  id: TextInput', 'highlighted': true},
-      '23': {'text': '  sticky: false', 'highlighted': false},
-      '24': {'text': 'param_changes: []', 'highlighted': false},
-      '25': {'text': ' ', 'highlighted': false}
+    var VERSION_2_STATE_1_CONTENTS = {
+      1: {text: 'content:', highlighted: false},
+      2: {text: '- type: text', highlighted: false},
+      3: {text: '  value: Welcome to the Oppia editor!<br><br>Anything', highlighted: true},
+      4: {text: '    you type here will be shown to the learner playing', highlighted: true},
+      5: {text: '    your exploration.<br><br>If you need more help getting', highlighted: true},
+      6: {text: '    started, check out the Help link in the navigation', highlighted: true},
+      7: {text: '    bar.', highlighted: true},
+      8: {text: 'interaction:', highlighted: true},
+      9: {text: '  customization_args:', highlighted: true},
+      10: {text: '    placeholder:', highlighted: true},
+      11: {text: '      value: Type your answer here.', highlighted: true},
+      12: {text: '    rows:', highlighted: true},
+      13: {text: '      value: 1', highlighted: true},
+      14: {text: '  handlers:', highlighted: true},
+      15: {text: '  - name: submit', highlighted: true},
+      16: {text: '    rule_specs:', highlighted: true},
+      17: {text: '    - definition:', highlighted: false},
+      18: {text: '        rule_type: default', highlighted: false},
+      19: {text: '      dest: First State', highlighted: true},
+      20: {text: '      feedback: []', highlighted: false},
+      21: {text: '      param_changes: []', highlighted: false},
+      22: {text: '  id: TextInput', highlighted: true},
+      23: {text: '  sticky: false', highlighted: false},
+      24: {text: 'param_changes: []', highlighted: false},
+      25: {text: ' ', highlighted: false}
     };
-    var state_second_contents =
+    var STATE_2_STRING =
       'content:\n' +
       '- type: text\n' +
       '  value: this is state 2\n' +
@@ -505,36 +501,22 @@ describe('Exploration history', function() {
       '  sticky: false\n' +
       'param_changes: []\n ';
 
-    editor.runFromHistoryTab(function() {
-      editor.historySelectComparedVersions(1, 2);
-      editor.expectHistoryStatesToBe([
-        {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
-        {'label': 'second', 'color': COLOR_ADDED},
-        {'label': 'END', 'color': COLOR_UNCHANGED}
-      ]);
-      editor.expectNumberOfLinksToBe(2, 2, 0);
-      editor.openStateHistoryModal('first (was: First ...', function() {
-        forms.expectCodeMirrorText(element.all(by.css('.CodeMirror-code')).first())
-          .toEqualWithHighlighting(state_first_v1_contents);
-        forms.expectCodeMirrorText(element.all(by.css('.CodeMirror-code')).get(1))
-          .toEqualWithHighlighting(state_first_v2_contents);
-      });
-      editor.openStateHistoryModal('second', function() {
-        forms.expectCodeMirrorText(element.all(by.css('.CodeMirror-code')).first())
-          .toEqual(state_second_contents);
-        forms.expectCodeMirrorText(element.all(by.css('.CodeMirror-code')).get(1))
-          .toEqual(' ');
-      });
+    editor.expectGraphComparisonOf(1, 2).toBe([
+      {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
+      {'label': 'second', 'color': COLOR_ADDED},
+      {'label': 'END', 'color': COLOR_UNCHANGED}
+    ], [2, 2, 0]);
+    editor.expectTextComparisonOf(1, 2, 'first (was: First ...')
+      .toBeWithHighlighting(VERSION_1_STATE_1_CONTENTS, VERSION_2_STATE_1_CONTENTS);
+    editor.expectTextComparisonOf(1, 2, 'second')
+      .toBe(STATE_2_STRING, ' ');
 
-      // Switching the 2 compared versions should give the same result.
-      editor.historySelectComparedVersions(2, 1);
-      editor.expectHistoryStatesToBe([
-        {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
-        {'label': 'second', 'color': COLOR_ADDED},
-        {'label': 'END', 'color': COLOR_UNCHANGED}
-      ]);
-      editor.expectNumberOfLinksToBe(2, 2, 0);
-    });
+    // Switching the 2 compared versions should give the same result.
+    editor.expectGraphComparisonOf(2, 1).toBe([
+      {'label': 'first (was: First ...', 'color': COLOR_CHANGED},
+      {'label': 'second', 'color': COLOR_ADDED},
+      {'label': 'END', 'color': COLOR_UNCHANGED}
+    ], [2, 2, 0]);
 
     // Check deleting a state
     editor.deleteState('second');
@@ -542,33 +524,21 @@ describe('Exploration history', function() {
     editor.RuleEditor(0).setDestination('END');
     editor.saveChanges();
 
-    editor.runFromHistoryTab(function() {
-      editor.historySelectComparedVersions(2, 3);
-      editor.expectHistoryStatesToBe([
-        {'label': 'first', 'color': COLOR_CHANGED},
-        {'label': 'second', 'color': COLOR_DELETED},
-        {'label': 'END', 'color': COLOR_UNCHANGED}
-      ]);
-      editor.expectNumberOfLinksToBe(3, 1, 2);
-      editor.openStateHistoryModal('second', function() {
-        forms.expectCodeMirrorText(element.all(by.css('.CodeMirror-code')).first())
-          .toEqual(' ');
-        forms.expectCodeMirrorText(element.all(by.css('.CodeMirror-code')).get(1))
-          .toEqual(state_second_contents);
-      });
-    });
+    editor.expectGraphComparisonOf(2, 3).toBe([
+      {'label': 'first', 'color': COLOR_CHANGED},
+      {'label': 'second', 'color': COLOR_DELETED},
+      {'label': 'END', 'color': COLOR_UNCHANGED}
+    ], [3, 1, 2]);
+    editor.expectTextComparisonOf(2, 3, 'second')
+      .toBe(' ', STATE_2_STRING);
 
     // Check renaming a state
     editor.setStateName('third');
     editor.saveChanges();
-    editor.runFromHistoryTab(function() {
-      editor.historySelectComparedVersions(3, 4);
-      editor.expectHistoryStatesToBe([
-        {'label': 'third (was: first)', 'color': COLOR_RENAMED_UNCHANGED},
-        {'label': 'END', 'color': COLOR_UNCHANGED}
-      ]);
-      editor.expectNumberOfLinksToBe(1, 0, 0);
-    });
+    editor.expectGraphComparisonOf(3, 4).toBe([
+      {'label': 'third (was: first)', 'color': COLOR_RENAMED_UNCHANGED},
+      {'label': 'END', 'color': COLOR_UNCHANGED}
+    ], [1, 0, 0]);
 
     // Check re-inserting a deleted state
     editor.createState('second');
@@ -579,16 +549,11 @@ describe('Exploration history', function() {
     editor.RuleEditor(0).setDestination('second');
     editor.saveChanges();
 
-    editor.runFromHistoryTab(function() {
-      editor.historySelectComparedVersions(2, 5);
-      editor.expectHistoryStatesToBe([
-        {'label': 'third (was: first)', 'color': COLOR_CHANGED},
-        {'label': 'second', 'color': COLOR_UNCHANGED},
-        {'label': 'END', 'color': COLOR_UNCHANGED}
-      ]);
-      editor.expectNumberOfLinksToBe(2, 0, 0);
-
-    });
+    editor.expectGraphComparisonOf(2, 5).toBe([
+      {'label': 'third (was: first)', 'color': COLOR_CHANGED},
+      {'label': 'second', 'color': COLOR_UNCHANGED},
+      {'label': 'END', 'color': COLOR_UNCHANGED}
+    ], [2, 0, 0]);
 
     // Check that reverting works
     editor.revertToVersion(2);
@@ -602,15 +567,11 @@ describe('Exploration history', function() {
     player.expectExplorationToBeOver();
 
     general.moveToEditor();
-    editor.runFromHistoryTab(function() {
-      editor.historySelectComparedVersions(4, 6);
-      editor.expectHistoryStatesToBe([
-        {'label': 'first (was: third)', 'color': COLOR_CHANGED},
-        {'label': 'second', 'color': COLOR_ADDED},
-        {'label': 'END', 'color': COLOR_UNCHANGED}
-      ]);
-      editor.expectNumberOfLinksToBe(3, 2, 1);
-    });
+    editor.expectGraphComparisonOf(4, 6).toBe([
+      {'label': 'first (was: third)', 'color': COLOR_CHANGED},
+      {'label': 'second', 'color': COLOR_ADDED},
+      {'label': 'END', 'color': COLOR_UNCHANGED}
+    ], [3, 2, 1]);
 
     users.logout();
   });

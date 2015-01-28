@@ -410,9 +410,14 @@ var toRichText = function(text) {
  * CodeMirror loads a part of the text at once, and scrolling in the element
  * loads more divs.
  */
-var expectCodeMirrorText = function(elem) {
+var CodeMirrorChecker = function(elem) {
+  // The number of pixels to scroll between reading different sections of
+  // CodeMirror's text. 400 pixels is about 15 lines, which will work if
+  // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
+  var CODEMIRROR_SCROLL_AMOUNT = 400;
+
   /**
-   * This function is used by the toEqualWithHighlighting() function.
+   * This recursive function is used by expectTextWithHighlightingToBe().
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
@@ -439,7 +444,7 @@ var expectCodeMirrorText = function(elem) {
           return lineNumber;
         }
         if (!compareDict.hasOwnProperty(lineNumber)) {
-          throw Error('Line ' + lineNumber + ' not found');
+          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
         }
         expect(lineElement.element(by.xpath('./pre')).getText())
           .toEqual(compareDict[lineNumber].text);
@@ -452,21 +457,20 @@ var expectCodeMirrorText = function(elem) {
     }).then(function(lineNumbers) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
       if (largestLineNumber != currentLineNumber) {
-        // 'scrollTo + 400' will cause the next iteration to scroll down an
-        // additional 400 pixels, which is about 15 lines. This will work if
-        // codemirror's buffer (viewportMargin) is set to at least 10 (the
-        // default).
         _compareTextAndHighlightingFromLine(
-          largestLineNumber, scrollTo + 400, compareDict);
+          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT, compareDict);
       } else {
         for (var lineNumber in compareDict) {
-          expect(compareDict[lineNumber].checked).toBe(true);
+          if (compareDict[lineNumber].checked !== true) {
+            throw Error('Expected ' + lineNumber + ' to be found in CodeMirror');
+          }
         }
       }
     });
   }
   /**
-   * This function is used by the toEqual() function.
+   * This recursive function is used by expectTextToBe(). The previous function
+   * is not used because it is very slow.
    * currentLineNumber is the current largest line number processed,
    * scrollTo is the number of pixels from the top of the text that
    * codemirror should scroll to,
@@ -486,15 +490,21 @@ var expectCodeMirrorText = function(elem) {
       for (var i = 0; i < textArray.length; i += 2) {
         var lineNumber = textArray[i];
         var lineText = textArray[i + 1];
+        if (!compareDict.hasOwnProperty(lineNumber)) {
+          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+        }
         expect(lineText).toEqual(compareDict[lineNumber].text);
         compareDict[lineNumber].checked = true;
       }
       var largestLineNumber = textArray[textArray.length - 2];
       if (largestLineNumber !== currentLineNumber) {
-        _compareTextFromLine(largestLineNumber, scrollTo + 400, compareDict);
+        _compareTextFromLine(
+          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT, compareDict);
       } else {
         for (var lineNumber in compareDict) {
-          expect(compareDict[lineNumber].checked).toBe(true);
+          if (compareDict[lineNumber].checked !== true) {
+            throw Error('Expected ' + lineNumber + ' to be found in CodeMirror');
+          }
         }
       }
     });
@@ -507,9 +517,9 @@ var expectCodeMirrorText = function(elem) {
      *  - text: the exact string of text expected on that line
      *  - highlighted: true or false
      * This runs much slower than checking without highlighting, so the
-     * toEqual() function should be used when possible.
+     * expectTextToBe() function should be used when possible.
      */
-    toEqualWithHighlighting: function(expectedTextDict) {
+    expectTextWithHighlightingToBe: function(expectedTextDict) {
       for (var lineNumber in expectedTextDict) {
         expectedTextDict[lineNumber]['checked'] = false;
       }
@@ -519,7 +529,7 @@ var expectCodeMirrorText = function(elem) {
      * Compares text with codemirror. The input should be a string (with
      * line breaks) of the expected display on codemirror.
      */
-    toEqual: function(expectedTextString) {
+    expectTextToBe: function(expectedTextString) {
       var expectedTextArray = expectedTextString.split('\n');
       var expectedDict = {};
       for (var lineNumber = 1; lineNumber <= expectedTextArray.length; lineNumber++) {
@@ -565,6 +575,6 @@ exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;
 exports.toRichText = toRichText;
-exports.expectCodeMirrorText = expectCodeMirrorText;
+exports.CodeMirrorChecker = CodeMirrorChecker;
 
 exports.getEditor = getEditor;

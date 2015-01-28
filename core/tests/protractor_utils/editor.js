@@ -427,7 +427,7 @@ var exitPreviewMode = function() {
 // HISTORY
 
 // Wrapper for functions involving the history tab
-var runFromHistoryTab = function(callbackFunction) {
+var _runFromHistoryTab = function(callbackFunction) {
   element(by.css('.protractor-test-history-tab')).click();
   var result = callbackFunction();
   element(by.css('.protractor-test-main-tab')).click();
@@ -438,20 +438,18 @@ var runFromHistoryTab = function(callbackFunction) {
 // This function should be run within the runFromHistoryTab wrapper, and
 // assumes that the 2 compared versions are found on the first page of
 // the exploration history.
-var historySelectComparedVersions = function(v1, v2) {
+var _selectComparedVersions = function(v1, v2) {
   var v1Position = null;
   var v2Position = null;
   element.all(by.css('.protractor-test-history-v1-selector')).first()
-      .then(function(elem) {
-    elem.getAttribute('value').then(function(versionNumber) {
-      v1Position = versionNumber - v1;
-      v2Position = versionNumber - v2;
-      element.all(by.css('.protractor-test-history-v1-selector'))
-        .get(v1Position).click();
-      element.all(by.css('.protractor-test-history-v2-selector'))
-        .get(v2Position).click();
-      protractor.getInstance().waitForAngular();
-    });
+      .getAttribute('value').then(function(versionNumber) {
+    v1Position = versionNumber - v1;
+    v2Position = versionNumber - v2;
+    element.all(by.css('.protractor-test-history-v1-selector'))
+      .get(v1Position).click();
+    element.all(by.css('.protractor-test-history-v2-selector'))
+      .get(v2Position).click();
+    protractor.getInstance().waitForAngular();
   });
 
   // Click button to show graph if necessary
@@ -463,85 +461,155 @@ var historySelectComparedVersions = function(v1, v2) {
   });
 };
 
-// This function clicks on a state in the history graph, executes
-// callbackFunction, and exits the state comparison modal. It should be run
-// within the history page.
-var openStateHistoryModal = function(stateName, callbackFunction) {
-  element.all(by.css('.protractor-test-node')).map(function(stateElement) {
-    return stateElement.element(by.css('.protractor-test-node-label')).
-      getText();
-  }).then(function(listOfNames) {
-    var matched = false;
-    for (var i = 0; i < listOfNames.length; i++) {
-      if (listOfNames[i] === stateName) {
-        element.all(by.css('.protractor-test-node')).get(i).click();
-        matched = true;
-        var result = callbackFunction();
-        element(by.css('.protractor-test-close-history-state-modal')).click();
-        return result;
-      }
-    }
-    if (! matched) {
-      throw Error('State ' + stateName + ' not found by editor.openStateHistoryModal');
-    }
-  });
-};
-
-// This function compares the states in the history graph with a list of objects
-// with the following key-value pairs:
-//   - 'label': label of the node (Note: if the node has a secondary label,
-//              the secondary label should appear after a space. It may be
-//              truncated.)
-//   - 'color': color of the node
-var expectHistoryStatesToBe = function(expectedStates) {
-  element(by.css('.protractor-test-history-graph'))
-      .all(by.css('.protractor-test-node')).map(function(stateNode) {
-    return {
-      'label': stateNode.element(
-        by.css('.protractor-test-node-label')).getText(),
-      'color': stateNode.element(
-        by.css('.protractor-test-node-background')).getCssValue('fill')
-    };
-  }).then(function(states) {
-    // Note: we need to compare this way because the state graph is sometimes
-    // generated with states in different configurations.
-    expect(states.length).toEqual(expectedStates.length);
-    for (var i = 0; i < states.length; i++) {
-      expect(expectedStates).toContain(states[i]);
-    }
-  });
-};
-
-// Checks that the history graph contains totalLinks links altogether,
-// addedLinks green links and deletedLinks red links.
-var expectNumberOfLinksToBe = function(totalLinks, addedLinks, deletedLinks) {
-  var COLOR_ADDED = 'rgb(31, 125, 31)';
-  var COLOR_DELETED = 'rgb(178, 34, 34)';
-  var totalCount = 0;
-  var addedCount = 0;
-  var deletedCount = 0;
-  element(by.css('.protractor-test-history-graph'))
-      .all(by.css('.protractor-test-link')).map(function(link) {
-    link.getCssValue('stroke').then(function(linkColor) {
-      totalCount++;
-      if (linkColor == COLOR_ADDED) {
-        addedCount++;
-      } else if (linkColor == COLOR_DELETED) {
-        deletedCount++;
+var expectGraphComparisonOf = function(v1, v2) {
+  // This function compares the states in the history graph with a list of objects
+  // with the following key-value pairs:
+  //   - 'label': label of the node (Note: if the node has a secondary label,
+  //              the secondary label should appear after a space. It may be
+  //              truncated.)
+  //   - 'color': color of the node
+  var _expectHistoryStatesToBe = function(expectedStates) {
+    element(by.css('.protractor-test-history-graph'))
+        .all(by.css('.protractor-test-node')).map(function(stateNode) {
+      return {
+        'label': stateNode.element(
+          by.css('.protractor-test-node-label')).getText(),
+        'color': stateNode.element(
+          by.css('.protractor-test-node-background')).getCssValue('fill')
+      };
+    }).then(function(states) {
+      // Note: we need to compare this way because the state graph is sometimes
+      // generated with states in different configurations.
+      expect(states.length).toEqual(expectedStates.length);
+      for (var i = 0; i < states.length; i++) {
+        expect(expectedStates).toContain(states[i]);
       }
     });
-  }).then(function() {
-    expect(totalCount).toBe(totalLinks);
-    expect(addedCount).toBe(addedLinks);
-    expect(deletedCount).toBe(deletedLinks);
-  });
+  };
+
+  // Checks that the history graph contains totalLinks links altogether,
+  // addedLinks green links and deletedLinks red links.
+  var _expectNumberOfLinksToBe = function(totalLinks, addedLinks, deletedLinks) {
+    var COLOR_ADDED = 'rgb(31, 125, 31)';
+    var COLOR_DELETED = 'rgb(178, 34, 34)';
+    var totalCount = 0;
+    var addedCount = 0;
+    var deletedCount = 0;
+    element(by.css('.protractor-test-history-graph'))
+        .all(by.css('.protractor-test-link')).map(function(link) {
+      link.getCssValue('stroke').then(function(linkColor) {
+        totalCount++;
+        if (linkColor == COLOR_ADDED) {
+          addedCount++;
+        } else if (linkColor == COLOR_DELETED) {
+          deletedCount++;
+        }
+      });
+    }).then(function() {
+      if (totalCount != totalLinks) {
+        throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+          'expected to find ' + totalLinks + ' links in total, ' +
+          'but found ' + totalCount);
+      }
+      if (addedCount != addedLinks) {
+        throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+          'expected to find ' + addedLinks + ' added links, ' + 'but found ' +
+          addedCount);
+      }
+      if (deletedCount != deletedLinks) {
+        throw Error('In editor.expectGraphComparisonOf(' + v1 + ', ' + v2 + '), ' +
+          'expected to find ' + deletedLinks + ' deleted links, ' + 'but found ' +
+          deletedCount);
+      }
+    });
+  };
+
+  return {
+    // Checks the nodes in the state graph and the number of links.
+    // expectedStates should be a list of objects with the following key-value
+    // pairs:
+    //   - 'label': label of the node (Note: if the node has a secondary label,
+    //              the secondary label should appear after a space. It may be
+    //              truncated.)
+    //   - 'color': color of the node
+    // linksCount should be a list where the first element is the total number
+    // of expected links, the second element is the number of added links, the
+    // third element is the number of deleted links.
+    toBe: function(expectedStates, linksCount) {
+      _runFromHistoryTab(function() {
+        _selectComparedVersions(v1, v2);
+        _expectHistoryStatesToBe(expectedStates);
+        _expectNumberOfLinksToBe(linksCount[0], linksCount[1], linksCount[2]);
+      });
+    }
+  };
 };
 
-// This function should be run within the runFromHistoryTab wrapper, and
-// assumes that the selected version is valid and found on the first page of
-// the exploration history.
+// This function compares the contents of stateName between v1 and v2.
+var expectTextComparisonOf = function(v1, v2, stateName) {
+  // This function clicks on a state in the history graph, executes
+  // callbackFunction, and exits the state comparison modal.
+  var _openStateHistoryModal = function(callbackFunction) {
+    element.all(by.css('.protractor-test-node')).map(function(stateElement) {
+      return stateElement.element(by.css('.protractor-test-node-label')).
+        getText();
+    }).then(function(listOfNames) {
+      var matched = false;
+      for (var i = 0; i < listOfNames.length; i++) {
+        if (listOfNames[i] === stateName) {
+          element.all(by.css('.protractor-test-node')).get(i).click();
+          matched = true;
+          var result = callbackFunction();
+          element(by.css('.protractor-test-close-history-state-modal')).click();
+          return result;
+        }
+      }
+      if (! matched) {
+        throw Error('State ' + stateName + ' not found by editor.openStateHistoryModal');
+      }
+    });
+  };
+
+  return {
+    // This function checks the text contents of stateName. v1StateContents
+    // should contain an object representing the newer state and v2StateContents
+    // should contain an object representing the older state.
+    // The state representations should be an object whose keys are line numbers
+    // and whose values should be an object with the following key-value pairs:
+    //  - text: the exact string of text expected on that line
+    //  - highlighted: true or false
+    toBeWithHighlighting: function(v1StateContents, v2StateContents) {
+      _runFromHistoryTab(function() {
+        _selectComparedVersions(v1, v2);
+        _openStateHistoryModal(function() {
+          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).first())
+            .expectTextWithHighlightingToBe(v1StateContents);
+          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).last())
+            .expectTextWithHighlightingToBe(v2StateContents);
+        });
+      });
+    },
+    // This function checks the text contents of stateName. v1StateContents
+    // should contain a string representing the newer state and v2StateContents
+    // should contain a string representation of the older state.
+    toBe: function(v1StateContents, v2StateContents) {
+      _runFromHistoryTab(function() {
+        _selectComparedVersions(v1, v2);
+        _openStateHistoryModal(function() {
+          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).first())
+            .expectTextToBe(v1StateContents);
+          forms.CodeMirrorChecker(element.all(by.css('.CodeMirror-code')).last())
+            .expectTextToBe(v2StateContents);
+        });
+      });
+    }
+  };
+};
+
+// This function assumes that the selected version is valid and found on the
+// first page of the exploration history.
 var revertToVersion = function(version) {
-  runFromHistoryTab(function() {
+  _runFromHistoryTab(function() {
     var versionPosition = null;
     element.all(by.css('.protractor-test-history-v1-selector')).first()
         .then(function(elem) {
@@ -588,9 +656,6 @@ exports.discardChanges = discardChanges;
 exports.enterPreviewMode = enterPreviewMode;
 exports.exitPreviewMode = exitPreviewMode;
 
-exports.runFromHistoryTab = runFromHistoryTab;
-exports.historySelectComparedVersions = historySelectComparedVersions;
-exports.openStateHistoryModal = openStateHistoryModal;
-exports.expectHistoryStatesToBe = expectHistoryStatesToBe;
-exports.expectNumberOfLinksToBe = expectNumberOfLinksToBe;
+exports.expectGraphComparisonOf = expectGraphComparisonOf;
+exports.expectTextComparisonOf = expectTextComparisonOf;
 exports.revertToVersion = revertToVersion;
