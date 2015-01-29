@@ -393,8 +393,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   background: #fff;
 }
 
-.navbar-default .navbar-nav > .open > a,
-.navbar-default .navbar-nav > .open > a:focus,
+.navbar-default .navbar-nav > li.dropdown.open,
+.navbar-default .navbar-nav > li.dropdown.open > a {
+  background: #fff;
+  color: #05a69a;
+}
+
 .navbar-default .navbar-nav > .active > a,
 .navbar-default .navbar-nav > .active > a:hover,
 .navbar-default .navbar-nav > .active > a:focus {
