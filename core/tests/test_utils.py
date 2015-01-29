@@ -149,16 +149,6 @@ class TestBase(unittest.TestCase):
         """Returns the expected logout URL."""
         return current_user_services.create_logout_url(slug)
 
-    def is_logged_out(self, response):
-        """Checks if the expiry date of the login cookie is in the past."""
-        login_cookie = 'Set-Cookie'
-        if login_cookie not in response.headers.keys():
-          return False
-        expiry_date = response.headers[login_cookie].rsplit('=', 1)
-        return datetime.datetime.now() > datetime.datetime.strptime(
-            expiry_date[1], "%a, %d %b %Y %H:%M:%S GMT",)
-        
-
     def _parse_json_response(self, json_response, expect_errors=False):
         """Convert a JSON server response to an object (such as a dict)."""
         if not expect_errors:
