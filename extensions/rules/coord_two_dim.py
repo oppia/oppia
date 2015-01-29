@@ -19,20 +19,26 @@
 __author__ = 'Sean Lip'
 
 from extensions.rules import base
+import math
 
 
 class Within(base.CoordTwoDimRule):
-    description = 'is within {{d|Real}} of {{p|CoordTwoDim}}'
+    description = 'is within {{d|Real}} km of {{p|CoordTwoDim}}'
     is_generic = False
 
     def _evaluate(self, subject):
-        dx = subject[0] - self.p[0]
-        dy = subject[1] - self.p[1]
-        return dx * dx + dy * dy < self.d * self.d
+        lat1 = math.radians(self.p[0])
+        lat2 = math.radians(subject[0])
+        lat_diff = math.radians(subject[0]-self.p[0])
+        lon_diff = math.radians(subject[1]-self.p[1])
+        # Haversine formula
+        a = math.sin(lat_diff/2) * math.sin(lat_diff/2) + math.cos(lat1) * math.cos(lat2) * math.sin(lon_diff/2) * math.sin(lon_diff/2);
+        d = 6371 * 2 * math.asin(math.sqrt(a))
+        return d < self.d
 
 
 class NotWithin(base.CoordTwoDimRule):
-    description = 'is not within {{d|Real}} of {{p|CoordTwoDim}}'
+    description = 'is not within {{d|Real}} km of {{p|CoordTwoDim}}'
     is_generic = True
 
     def _evaluate(self, subject):
