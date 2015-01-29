@@ -190,6 +190,7 @@ oppia.controller('StateInteraction', [
       }
 
       $scope.resetInteractionCustomizer(stateData.interaction);
+      $scope.ruleEditorsAreShown = false;
       $scope.hasLoaded = true;
     });
   });
@@ -371,5 +372,9 @@ oppia.controller('StateInteraction', [
     }
 
     explorationStatesService.setState(activeStateName, _stateDict);
+  };
+
+  $scope.showRuleEditors = function() {
+    $scope.ruleEditorsAreShown = true;
   };
 }]);

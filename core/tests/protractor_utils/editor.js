@@ -35,6 +35,25 @@ var exitTutorialIfNecessary = function() {
   });
 };
 
+// NAVIGATION
+
+var navigateToMainTab = function() {
+  element(by.css('.protractor-test-main-tab')).click();
+  // Click a neutral element in order to dismiss any warnings.
+  element(by.css('.protractor-test-state-editor-oppia-avatar')).click();
+};
+
+var navigateToPreviewTab = function() {
+  element(by.css('.protractor-test-preview-tab')).click();
+  general.waitForSystem();
+};
+
+var navigateToSettingsTab = function() {
+  element(by.css('.protractor-test-settings-tab')).click();
+};
+
+// UTILITIES
+
 var setStateName = function(name) {
   var nameElement = element(by.css('.protractor-test-state-name-container'))
   nameElement.click();
@@ -110,10 +129,13 @@ var setInteraction = function(interactionName) {
   }
 };
 
-// Likewise this can receive additional arguments
+// Likewise this can receive additional arguments.
+// Note that this refers to the interaction displayed in the editor tab (as
+// opposed to the preview tab, which uses the corresponding function in
+// player.js).
 var expectInteractionToMatch = function(interactionName) {
   // Convert additional arguments to an array to send on.
-  var args = [];
+  var args = [element(by.css('.protractor-test-interaction'))];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
@@ -193,6 +215,13 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
 var addRule = function(interactionName, ruleName) {
+  // This button will not be shown if the rule editor section is already open.
+  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    }
+  });
+
   element(by.css('.protractor-test-add-rule')).click();
   var ruleElement = element(by.css('.protractor-test-temporary-rule'))
   var args = [ruleElement];
@@ -205,6 +234,13 @@ var addRule = function(interactionName, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
+  // This button will not be shown if the rule editor section is already open.
+  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
+    if (buttons.length === 1) {
+      buttons[0].click();
+    }
+  });
+
   var elem = (ruleNum === 'default') ?
     element(by.css('.protractor-test-default-rule')):
     element.all(by.css('.protractor-test-rule-block')).get(ruleNum);
@@ -329,9 +365,9 @@ var expectStateNamesToBe = function(names) {
 // All functions involving the settings tab should be sent through this
 // wrapper.
 var runFromSettingsTab = function(callbackFunction) {
-  element(by.css('.protractor-test-settings-tab')).click();
+  navigateToSettingsTab();
   var result = callbackFunction();
-  element(by.css('.protractor-test-main-tab')).click();
+  navigateToMainTab();
   return result;
 };
 
@@ -407,21 +443,6 @@ var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
   browser.driver.switchTo().alert().accept();
-};
-
-var enterPreviewMode = function() {
-  element(by.css('.protractor-test-enter-preview-mode')).click();
-};
-
-var exitPreviewMode = function() {
-  exitButton = element(by.css('.protractor-test-exit-preview-mode'));
-  // The process of scrolling to the exit button causes the cursor to rest over
-  // the username in the top right, which opens a dropdown menu that then
-  // blocks the "Edit" button. To prevent this we move the cursor away.
-  general.scrollElementIntoView(exitButton);
-  browser.actions().
-    mouseMove(element(by.css('.protractor-test-navbar-header'))).perform();
-  exitButton.click();
 };
 
 // HISTORY
@@ -626,6 +647,10 @@ var revertToVersion = function(version) {
 
 exports.exitTutorialIfNecessary = exitTutorialIfNecessary;
 
+exports.navigateToMainTab = navigateToMainTab;
+exports.navigateToPreviewTab = navigateToPreviewTab;
+exports.navigateToSettingsTab = navigateToSettingsTab;
+
 exports.setStateName = setStateName;
 exports.expectCurrentStateToBe = expectCurrentStateToBe;
 
@@ -653,8 +678,6 @@ exports.setFirstState = setFirstState;
 
 exports.saveChanges = saveChanges;
 exports.discardChanges = discardChanges;
-exports.enterPreviewMode = enterPreviewMode;
-exports.exitPreviewMode = exitPreviewMode;
 
 exports.expectGraphComparisonOf = expectGraphComparisonOf;
 exports.expectTextComparisonOf = expectTextComparisonOf;

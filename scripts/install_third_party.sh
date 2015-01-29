@@ -54,7 +54,7 @@ if [ ! -d "$NODE_PATH" ]; then
     fi
   fi
 
-  wget http://nodejs.org/dist/v0.10.33/$NODE_FILE_NAME.tar.gz -O node-download.tgz
+  curl --silent http://nodejs.org/dist/v0.10.33/$NODE_FILE_NAME.tar.gz -o node-download.tgz
   tar xzf node-download.tgz --directory $TOOLS_DIR
   mv $TOOLS_DIR/$NODE_FILE_NAME $NODE_PATH
   rm node-download.tgz

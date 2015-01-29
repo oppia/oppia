@@ -17,11 +17,7 @@
     <div class="oppia-gallery-banner">
       <div class="oppia-gallery-banner-content">
         <div style="font-size: 2em;">
-          Welcome to Oppia.
-        </div>
-
-        <div>
-          Learning explorations, by anyone and for everyone.
+          Hi, I'm Oppia.
         </div>
 
         <form role="search" style="margin-top: 30px; margin-bottom: 30px;">
@@ -34,16 +30,10 @@
                                   'oppia-animate-spin': searchIsLoading}">
                  </span>
               </div>
-              <input type="text" class="form-control" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+              <input type="text" class="form-control" placeholder="   What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
             </div>
           </div>
         </form>
-
-        <div>
-          <a href="/about" style="font-size: 0.7em;">
-            Learn more about Oppia...
-          </a>
-        </div>
       </div>
     </div>
 
@@ -130,7 +120,8 @@
                 {% endif %}
               </div>
 
-              <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
+            <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1" infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+              <div ng-repeat="exploration in shownExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
                 <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
                   <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
                     <!-- TODO(sll): Make the default image higher-res. -->
@@ -183,6 +174,7 @@
                   </a>
                 </md-card>
               </div>
+            </div>
             </div>
           </div>
         </div>

@@ -1,6 +1,8 @@
-<div>
+<div ng-controller="ExplorationPreview">
   <!-- TODO(sll): Extend this to allow other skins. -->
-  <conversation-skin></conversation-skin>
+  <div ng-if="isExplorationPopulated">
+    <conversation-skin></conversation-skin>
+  </div>
 
   <!-- Developers: set ng-show="true" to see a parameter debug log. -->
   <div ng-show="false">

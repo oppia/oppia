@@ -1,15 +1,14 @@
 <div class="row" id="{% block id %}{% endblock %}" style="margin-bottom: 0;">
   {% block row %}
-    <div class="col-lg-2 col-md-2 col-sm-2">
+    <div class="col-lg-1 col-md-1 col-sm-1">
+      {% block left_margin %}{% endblock %}
     </div>
-    <div class="col-lg-10 col-md-10 col-sm-10">
+    <div class="col-lg-11 col-md-11 col-sm-11">
       {% block center_right %}
         <div>
           {% block line1 %}
-            <div class="row">
-              <div class="col-lg-12 col-md-12 col-sm-12 {% block cls %}{% endblock %}">
-                {% block center %}{% endblock %}
-              </div>
+            <div class="{% block cls %}{% endblock %}">
+              {% block center %}{% endblock %}
             </div>
           {% endblock %}
           {% block line2 %}{% endblock %}

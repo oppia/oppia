@@ -6,26 +6,23 @@
 
 {% block cls %}oppia-state-content{% endblock %}
 
+{% block left_margin %}
+  <img src="/images/oppia_favicon_mint.png" class="protractor-test-state-editor-oppia-avatar">
+{% endblock %}
+
 {% block center %}
   <div id="tutorialStateContent">
     <div ng-if="!contentMemento" class="protractor-test-edit-content"
          ng-click="openStateContentEditor()"
          ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <h3>Content <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit State Content"></span></h3>
-        </div>
-      </div>
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12">
-          <div class="oppia-state-content-display well protractor-test-state-edit-content" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}">
-            <span ng-show="content[0].value == ''" class="oppia-placeholder">
-              You can give context to the learner here, and ask a question -- then,
-              in the space below, choose a suitable way for the learner to respond.
-            </span>
-            <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
-          </div>
-        </div>
+      <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit State Content" style="position: absolute; right: 20px; top: 10px;">
+      </span>
+      <div class="oppia-state-content-display well protractor-test-state-edit-content" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="State Content">
+        <span ng-show="content[0].value == ''" class="oppia-placeholder">
+          You can give context to the learner here, and ask a question -- then,
+          in the space below, choose a suitable way for the learner to respond.
+        </span>
+        <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
       </div>
     </div>
   </div>
