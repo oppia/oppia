@@ -313,10 +313,10 @@ oppia.controller('ExplorationHistory', [
         }
       },
       controller: [
-        '$scope', '$modalInstance', 'stateName', 'oldStateName',
+        '$scope', '$modalInstance', '$timeout', 'stateName', 'oldStateName',
           'compareVersionMetadata', 'explorationId', 'stateProperty',
           function(
-          $scope, $modalInstance, stateName, oldStateName,
+          $scope, $modalInstance, $timeout, stateName, oldStateName,
           compareVersionMetadata, explorationId, stateProperty) {
         var stateDownloadUrl = '/createhandler/download_state/' + explorationId;
         $scope.stateName = stateName;
@@ -338,7 +338,11 @@ oppia.controller('ExplorationHistory', [
             $scope.yamlStrs['leftPane'] = response.data;
           });
         } else {
-          $scope.yamlStrs['leftPane'] = '';
+          // Note: the timeout is needed or the string will be sent before
+          // codemirror has fully loaded and will not be displayed.
+          $timeout(function() {
+            $scope.yamlStrs['leftPane'] = '';
+          }, 200);
         }
 
         if (stateProperty != STATE_PROPERTY_ADDED) {
@@ -349,7 +353,11 @@ oppia.controller('ExplorationHistory', [
             $scope.yamlStrs['rightPane'] = response.data;
           });
         } else {
-          $scope.yamlStrs['rightPane'] = '';
+          // Note: the timeout is needed or the string will be sent before
+          // codemirror has fully loaded and will not be displayed.
+          $timeout(function() {
+            $scope.yamlStrs['rightPane'] = '';
+          }, 200);
         }
 
         $scope.cancel = function() {
