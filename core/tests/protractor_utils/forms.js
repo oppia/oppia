@@ -414,7 +414,7 @@ var CodeMirrorChecker = function(elem) {
   // The number of pixels to scroll between reading different sections of
   // CodeMirror's text. 400 pixels is about 15 lines, which will work if
   // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
-  var CODEMIRROR_SCROLL_AMOUNT = 400;
+  var CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS = 400;
 
   /**
    * This recursive function is used by expectTextWithHighlightingToBe().
@@ -458,11 +458,12 @@ var CodeMirrorChecker = function(elem) {
       var largestLineNumber = lineNumbers[lineNumbers.length - 1];
       if (largestLineNumber != currentLineNumber) {
         _compareTextAndHighlightingFromLine(
-          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT, compareDict);
+          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS, compareDict);
       } else {
         for (var lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
-            throw Error('Expected ' + lineNumber + ' to be found in CodeMirror');
+            throw Error('Expected line ' + lineNumber + ': \'' +
+              compareDict[lineNumber].text + '\' to be found in CodeMirror');
           }
         }
       }
@@ -499,11 +500,12 @@ var CodeMirrorChecker = function(elem) {
       var largestLineNumber = textArray[textArray.length - 2];
       if (largestLineNumber !== currentLineNumber) {
         _compareTextFromLine(
-          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT, compareDict);
+          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS, compareDict);
       } else {
         for (var lineNumber in compareDict) {
           if (compareDict[lineNumber].checked !== true) {
-            throw Error('Expected ' + lineNumber + ' to be found in CodeMirror');
+            throw Error('Expected line ' + lineNumber + ': \'' +
+              compareDict[lineNumber].text + '\' to be found in CodeMirror');
           }
         }
       }
