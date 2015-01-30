@@ -703,16 +703,11 @@ div.wysiwyg iframe.wysiwyg-content-large {
   height: 100%;
   margin: 0 auto -4em;
   min-height: 100%;
-  padding-bottom: 3em;
 }
 
-.oppia-footer {
-  border-top: 1pt solid #eee;
-  bottom: 5px;
-  height: 3em;
-  max-height: 3em;
-  position: absolute;
-  width: 100%;
+.oppia-cc-icon {
+  position:absolute;
+  right: 20px;
 }
 
 .oppia-wide-panel {
