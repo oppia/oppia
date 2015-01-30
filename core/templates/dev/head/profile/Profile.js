@@ -26,5 +26,14 @@ oppia.controller('Profile', ['$scope', '$http', '$rootScope', function(
   // Retrieves profile data from the server.
   $http.get($scope.profileDataUrl).success(function(data) {
     $rootScope.loadingMessage = '';
+    $scope.userBio = data.user_bio;
   });
+
+  $scope.submitUserProfileForm = function(userBio) {
+    var requestParams = {
+      user_bio: userBio
+    };
+    $http.post($scope.profileDataUrl, requestParams).success(function(data) {
+    });
+  }
 }]);

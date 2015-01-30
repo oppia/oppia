@@ -17,26 +17,28 @@
           <input value="{% if username %} {{username}} {% else %} Not yet selected {% endif %}"
             class="oppia-disabled-contenteditable" disabled/>
           <br><br>
-          <strong>Bio</strong>
-          (optional)
-          <textarea></textarea>
-          <hr />
-          <strong>Language</strong>
-          <select2-dropdown choices="[English]" item="English"
-            allow-multiple-choices="true" new-choice-regex=".^" width="150"
-            placeholder="Filter languages..."
-            class="protractor-test-gallery-language-selector">
-          </select2-dropdown>
+          <form ng-submit="submitUserProfileForm(userBio)">
+            <strong>Bio</strong>
+            (optional)
+            <textarea ng-model="userBio" text="some text"></textarea>
+            <hr />
+            <strong>Language</strong>
+            <select2-dropdown choices="[English]" item="English"
+              allow-multiple-choices="true" new-choice-regex=".^" width="150"
+              placeholder="Filter languages..."
+              class="protractor-test-gallery-language-selector">
+            </select2-dropdown>
 
-          <br><br>
-          {% if profile_img_url %}
-            <img src="{{profile_img_url}}" class="oppia-profile-img-lrg"/>
-            <strong>Change photo</strong>
-          {% else %}
-            <strong>Upload photo</strong>
-          {% endif %}
-          <input type="file" style="padding: 10px;"/>
-          <a class="btn btn-success">Finish</a>
+            <br><br>
+            {% if profile_img_url %}
+              <img src="{{profile_img_url}}" class="oppia-profile-img-lrg"/>
+              <strong>Change photo</strong>
+            {% else %}
+              <strong>Upload photo</strong>
+            {% endif %}
+            <input type="file" style="padding: 10px;"/>
+            <button type="submit" class="btn btn-success">Save</button>
+          </form>
         </div>
       </div>
     </div>

@@ -40,6 +40,8 @@ class UserSettingsModel(base_models.BaseModel):
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
     last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    # User specified bio from the profile page.
+    user_bio = ndb.TextProperty(indexed=False)
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):

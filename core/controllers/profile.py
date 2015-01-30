@@ -48,10 +48,22 @@ class ProfilePage(base.BaseHandler):
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
+    PAGE_NAME_FOR_CSRF = 'profile'
+
     @base.require_user
     def get(self):
         """Handles GET requests."""
+        user_settings = user_services.get_user_settings(self.user_id)
+        self.values.update({
+            'user_bio': user_settings.user_bio,
+        })
         self.render_json(self.values)
+
+    @base.require_user
+    def post(self):
+        """Handles POST requests."""
+        user_bio = self.payload.get('user_bio')
+        user_services.update_user_bio(self.user_id, user_bio)
 
 
 class EditorPrerequisitesPage(base.BaseHandler):

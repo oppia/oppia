@@ -35,13 +35,14 @@ class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
-            last_started_state_editor_tutorial=None):
+            last_started_state_editor_tutorial=None, user_bio=""):
         self.user_id = user_id
         self.email = email
         self.username = username
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (
             last_started_state_editor_tutorial)
+        self.user_bio = user_bio
 
     def validate(self):
         if not isinstance(self.user_id, basestring):
@@ -155,6 +156,7 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
+                user_bio=model.user_bio,
             ))
         else:
             result.append(None)
@@ -180,7 +182,8 @@ def _save_user_settings(user_settings):
         normalized_username=user_settings.normalized_username,
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
-            user_settings.last_started_state_editor_tutorial)
+            user_settings.last_started_state_editor_tutorial),
+        user_bio=user_settings.user_bio
     ).put()
 
 
@@ -238,6 +241,12 @@ def record_agreement_to_terms(user_id):
     """Records that the user has agreed to the license terms."""
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
+    _save_user_settings(user_settings)
+
+
+def update_user_bio(user_id, user_bio):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.user_bio = user_bio
     _save_user_settings(user_settings)
 
 
