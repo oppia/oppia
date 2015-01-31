@@ -1046,24 +1046,38 @@ oppia-parameter {
 .oppia-gallery-banner {
   background-image: url("/images/banner.png");
   background-repeat: no-repeat;
-  background-size: 100% auto;
-  min-height: 300px;
-  position: relative;
+  background-size: cover;
+  height: 500px;
   width: 100%;
 }
 .oppia-gallery-banner-content {
-  color: #05a69a;
+  color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 18px;
-  font-weight: 300;
-  left: 50%;
-  line-height: 1.5;
+  font-size: 56px;
+  font-weight: bolder;
   margin-left: auto;
   margin-right: auto;
-  position: absolute;
+  padding-top: 140px;
   text-align: center;
-  top: 60%;
-  transform: translate(-50%, -50%);
+  width: 450px;
+}
+
+.oppia-splash-search {
+  border-left: none;
+  border-radius: 28px;
+  font-size: 23px;
+  height: 62px;
+}
+
+.oppia-splash-search-icon {
+  background-color: #fff;
+  border-radius: 28px;
+}
+
+.oppia-splash-search-icon .glyphicon {
+  font-size: 20px;
+  margin-left: 7px;
+  margin-right: 3px;
 }
 
 /* CSS3 Animations */
