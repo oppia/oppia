@@ -180,6 +180,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                     exploration.objective,
                     exploration.language_code,
                     exploration.skill_tags,
+                    {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
                     spec['status'],
                     exp_rights_model.community_owned,
                     exp_rights_model.owner_ids,
@@ -222,7 +223,7 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
             self.assertEqual(actual_job_output.keys(),
                              expected_job_output.keys())
             simple_props = ['id', 'title', 'category', 'objective',
-                            'language_code', 'skill_tags', 'status',
+                            'language_code', 'skill_tags', 'ratings', 'status',
                             'community_owned', 'owner_ids',
                             'editor_ids', 'viewer_ids', 'version',
                             'exploration_model_created_on',

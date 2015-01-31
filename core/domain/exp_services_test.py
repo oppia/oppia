@@ -1913,6 +1913,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
+                {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -1923,7 +1924,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'skill_tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1940,6 +1941,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
+                {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
@@ -1948,6 +1950,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
+                {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -1959,7 +1962,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'skill_tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -1980,6 +1983,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_1: exp_domain.ExplorationSummary(
                 self.EXP_ID_1, 'Exploration 1 title',
                 'A category', 'An objective', 'en', [],
+                {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
                 rights_manager.EXPLORATION_STATUS_PRIVATE,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_1,
                 actual_summaries[self.EXP_ID_1].exploration_model_created_on,
@@ -1990,7 +1994,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'skill_tags', 'ratings', 'status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',
@@ -2022,6 +2026,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             self.EXP_ID_2: exp_domain.ExplorationSummary(
                 self.EXP_ID_2, 'Exploration 2 Albert title',
                 'A category', 'An objective', 'en', [],
+                {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0},
                 rights_manager.EXPLORATION_STATUS_PUBLIC,
                 False, [self.ALBERT_ID], [], [], self.EXPECTED_VERSION_2,
                 actual_summaries[self.EXP_ID_2].exploration_model_created_on,
@@ -2032,7 +2037,7 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
         self.assertEqual(actual_summaries.keys(),
                          expected_summaries.keys())
         simple_props = ['id', 'title', 'category', 'objective',
-                        'language_code', 'skill_tags', 'status',
+                        'language_code', 'skill_tags', 'ratings','status',
                         'community_owned', 'owner_ids',
                         'editor_ids', 'viewer_ids', 'version',
                         'exploration_model_created_on',

@@ -31,6 +31,7 @@ from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
 from core.domain import skins_services
+from core.domain import rating_services
 import feconf
 import jinja_utils
 import utils
@@ -390,3 +391,26 @@ def submit_answer_in_tests(
             if not finished else ''),
         'state_name': rule_spec.dest if not finished else None,
     }
+
+
+class RatingHandler(base.BaseHandler):
+    """Records the rating of an exploration submitted by a user."""
+
+    REQUIRE_PAYLOAD_CSRF_CHECK = False
+
+    @base.require_user
+    def put(self, exploration_id):
+        """Handles PUT requests."""
+        rating_services.assign_rating(
+            self.user_id, exploration_id, self.payload.get('rating'))
+        self.render_json({})
+
+    @require_playable
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        self.values.update({
+            'user': rating_services.get_user_specific_rating(
+                self.user_id, exploration_id) if self.user_id else None,
+            'overall': rating_services.get_overall_ratings(exploration_id)
+        })
+        self.render_json(self.values)

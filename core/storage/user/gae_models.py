@@ -78,3 +78,36 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     # The time, in milliseconds since the epoch, when the job that computed
     # this batch model was queued.
     job_queued_msec = ndb.FloatProperty(indexed=False)
+
+
+class ExpUserDataModel(base_models.BaseModel):
+    """User-specific data about explorations.
+
+    Instances of this class are keyed by user and exploration id combined.
+    """
+
+    # Concatenation of user id, '.', then exploration id
+    user_and_exploration_ids = ndb.StringProperty(indexed=True)
+    # The user id
+    user_id = ndb.StringProperty(indexed=False)
+    # The exploration id
+    exploration_id = ndb.StringProperty(indexed=False)
+
+    # The rating (1-5) the user assigned to the exploration
+    rating = ndb.IntegerProperty(default=None, indexed=False)
+
+    @classmethod
+    def _generate_id(cls, user_id, exploration_id):
+        return user_id + '.' + exploration_id
+
+    @classmethod
+    def create(cls, user_id, exploration_id):
+        """Creates a new ExpUserDataModel entry"""
+        combined_id = cls._generate_id(user_id, exploration_id)
+        return cls(id=combined_id)
+
+    @classmethod
+    def get(cls, user_id, exploration_id):
+        """Gets the ExpUserDataModel for the given ids"""
+        combined_id = cls._generate_id(user_id, exploration_id)
+        return super(ExpUserDataModel, cls).get(combined_id, strict=False)

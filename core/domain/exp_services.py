@@ -73,14 +73,24 @@ def get_exploration_from_model(exploration_model):
 
 def get_exploration_summary_from_model(exp_summary_model):
     return exp_domain.ExplorationSummary(
-        exp_summary_model.id, exp_summary_model.title,
-        exp_summary_model.category, exp_summary_model.objective,
-        exp_summary_model.language_code, exp_summary_model.skill_tags,
-        exp_summary_model.status, exp_summary_model.community_owned,
-        exp_summary_model.owner_ids, exp_summary_model.editor_ids,
-        exp_summary_model.viewer_ids, exp_summary_model.version,
-        exp_summary_model.exploration_model_created_on,
-        exp_summary_model.exploration_model_last_updated)
+        exploration_id=exp_summary_model.id,
+        title=exp_summary_model.title,
+        category=exp_summary_model.category,
+        objective=exp_summary_model.objective,
+        language_code=exp_summary_model.language_code,
+        skill_tags=exp_summary_model.skill_tags,
+        ratings=exp_summary_model.ratings,
+        status=exp_summary_model.status,
+        community_owned=exp_summary_model.community_owned,
+        owner_ids=exp_summary_model.owner_ids,
+        editor_ids=exp_summary_model.editor_ids,
+        viewer_ids=exp_summary_model.viewer_ids,
+        version=exp_summary_model.version,
+        exploration_model_created_on=(
+            exp_summary_model.exploration_model_created_on),
+        exploration_model_last_updated=(
+            exp_summary_model.exploration_model_last_updated)
+    )
 
 
 def get_exploration_by_id(exploration_id, strict=True, version=None):
@@ -748,14 +758,14 @@ def create_exploration_summary(exploration_id):
     """Create summary of an exploration and store in datastore."""
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = get_summary_of_exploration(exploration)
-    _save_exploration_summary(exp_summary)
+    save_exploration_summary(exp_summary)
 
 
 def update_exploration_summary(exploration_id):
     """Update the summary of an exploration."""
     exploration = get_exploration_by_id(exploration_id)
     exp_summary = get_summary_of_exploration(exploration)
-    _save_exploration_summary(exp_summary)
+    save_exploration_summary(exp_summary)
 
 
 def get_summary_of_exploration(exploration):
@@ -763,31 +773,38 @@ def get_summary_of_exploration(exploration):
     domain object and return it.
     """
     exp_rights = exp_models.ExplorationRightsModel.get_by_id(exploration.id)
+    exp_summary_model = exp_models.ExpSummaryModel.get_by_id(exploration.id)
+    if exp_summary_model:
+        old_exp_summary = get_exploration_summary_from_model(exp_summary_model)
+        ratings = old_exp_summary.ratings
+    else:
+        ratings = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
 
     exploration_model_last_updated = exploration.last_updated
     exploration_model_created_on = exploration.created_on
 
     exp_summary = exp_domain.ExplorationSummary(
-        exploration.id,
-        exploration.title,
-        exploration.category,
-        exploration.objective,
-        exploration.language_code,
-        exploration.skill_tags,
-        exp_rights.status,
-        exp_rights.community_owned,
-        exp_rights.owner_ids,
-        exp_rights.editor_ids,
-        exp_rights.viewer_ids,
-        exploration.version,
-        exploration_model_created_on,
-        exploration_model_last_updated
+        exploration_id=exploration.id,
+        title=exploration.title,
+        category=exploration.category,
+        objective=exploration.objective,
+        language_code=exploration.language_code,
+        skill_tags=exploration.skill_tags,
+        ratings=ratings,
+        status=exp_rights.status,
+        community_owned=exp_rights.community_owned,
+        owner_ids=exp_rights.owner_ids,
+        editor_ids=exp_rights.editor_ids,
+        viewer_ids=exp_rights.viewer_ids,
+        version=exploration.version,
+        exploration_model_created_on=exploration_model_created_on,
+        exploration_model_last_updated=exploration_model_last_updated
     )
 
     return exp_summary
 
 
-def _save_exploration_summary(exp_summary):
+def save_exploration_summary(exp_summary):
     """Save exploration summary domain object as ExpSummaryModel
     entity in datastore."""
 
@@ -798,6 +815,7 @@ def _save_exploration_summary(exp_summary):
         objective=exp_summary.objective,
         language_code=exp_summary.language_code,
         skill_tags=exp_summary.skill_tags,
+        ratings = exp_summary.ratings,
         status=exp_summary.status,
         community_owned=exp_summary.community_owned,
         owner_ids=exp_summary.owner_ids,

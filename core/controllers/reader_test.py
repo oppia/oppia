@@ -290,3 +290,63 @@ class ExplorationParametersUnitTests(test_utils.GenericTestBase):
             old_params, [dependent_pc], exp_param_specs)
         self.assertEqual(new_params, {'b': ''})
         self.assertEqual(old_params, {})
+
+
+class RatingsIntegrationTests(test_utils.GenericTestBase):
+    """Integration tests of ratings recording and display."""
+
+    def test_assign_and_read_ratings(self):
+        """Test the PUT and GET methods for ratings."""
+
+        # Load demo exploration
+        EXP_ID = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login('user@example.com')
+
+        # User checks rating
+        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        self.assertEqual(ratings['user'], None)
+        self.assertEqual(
+            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0})
+
+        # User rates and checks rating
+        self.put_json(
+            '/explorehandler/rating/%s' % EXP_ID,
+            {
+                'rating': 2
+            }
+        )
+        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        self.assertEqual(ratings['user'], 2)
+        self.assertEqual(
+            ratings['overall'], {'1': 0, '2': 1, '3': 0, '4': 0, '5': 0})
+
+        # User re-rates and checks rating
+        self.login('user@example.com')
+        self.put_json(
+            '/explorehandler/rating/%s' % EXP_ID,
+            {
+                'rating': 5
+            }
+        )
+        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        self.assertEqual(ratings['user'], 5)
+        self.assertEqual(
+            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
+
+        self.logout()
+
+        # Non-logged in users can view ratings but cannot submit them
+        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        self.assertEqual(ratings['user'], None)
+        self.assertEqual(
+            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
+        with self.assertRaisesRegexp(Exception, '302 != 200'):
+            self.put_json(
+                '/explorehandler/rating/%s' % EXP_ID,
+                {
+                    'rating': 1
+                }
+            )
