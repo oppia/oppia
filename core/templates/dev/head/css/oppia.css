@@ -1068,8 +1068,8 @@ oppia-parameter {
 }
 
 .oppia-splash-search {
-  border-radius: 28px;
   border-left: none;
+  border-radius: 28px;
   font-size: 23px;
   height: 62px;
 }
