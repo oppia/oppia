@@ -26,22 +26,23 @@ html, body {
   Additional CSS for the conversation_v1 skin. 
   All classes below should start with .conversation-skin  
  */
+
 .conversation-skin-exploration-intro-card {
   background-color: rgb(255,255,255);
   font-family: 'Roboto';
   text-align: center;
   max-width: 560px;
   max-height: 567px;
-  padding: 0 0 10px 0;
-}
-
-.conversation-skin-answer-feedback-pair {
-  padding-top: 20px;
+  padding: 0 0 5px 0;
+  margin-top: 20px !important;
 }
 
 .conversation-skin-card-row-container {
   width: 100%;
-  margin-top: 10px;
+}
+
+.response {
+  margin-top: 17px;
 }
 
 .conversation-skin-card-row {
@@ -75,8 +76,11 @@ html, body {
 
 .conversation-skin-card {
   background: rgb(255,255,255);
-  margin-top: 30px;
-  padding: 40px;
+  margin-top: 20px;
+  padding-top: 40px;
+  padding-left: 22px;
+  padding-bottom: 40px;
+  padding-right: 60px;
   max-width: 560px;
   text-align: justify;
   font-family: 'Roboto';
