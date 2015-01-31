@@ -30,40 +30,37 @@ html, body {
 .conversation-skin-exploration-intro-card {
   background-color: rgb(255,255,255);
   font-family: 'Roboto';
-  text-align: center;
+  margin-top: 20px;
   max-width: 560px;
   max-height: 567px;
   padding: 0 0 5px 0;
-  margin-top: 20px !important;
+  text-align: center;
 }
 
 .conversation-skin-card-row-container {
+  margin-bottom: 17px;
   width: 100%;
-}
-
-.response {
-  margin-top: 17px;
 }
 
 .conversation-skin-card-row {
-  width: 100%;
-  margin-top: 20px;
   margin-bottom: 20px;
+  margin-top: 20px;
+  width: 100%;
 }
 
 .conversation-skin-row-avatar {
-  width: 30px;
   padding-right: 10px;
+  width: 30px;
 }
 
 .conversation-skin-row-avatar-img {
-  max-width: 30px;
   height: 30px;
+  max-width: 30px;
 }
 
 .conversation-skin-exploration-header {
-  text-align: center;
   font-size: 24px;
+  text-align: center;
 }
 
 .conversation-skin-iframe-container {
@@ -76,14 +73,11 @@ html, body {
 
 .conversation-skin-card {
   background: rgb(255,255,255);
-  margin-top: 20px;
-  padding-top: 40px;
-  padding-left: 22px;
-  padding-bottom: 40px;
-  padding-right: 60px;
-  max-width: 560px;
-  text-align: justify;
   font-family: 'Roboto';
+  margin-top: 20px;
+  max-width: 560px;
+  padding: 40px 60px 27px 22px;
+  text-align: justify;
 }
 
 .conversation-skin-learner-answer {

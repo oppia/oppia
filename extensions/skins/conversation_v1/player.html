@@ -19,7 +19,7 @@
                 <td class="conversation-skin-row-avatar" valign="top">
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                 </td>
-                <td style="padding-top:5px;">
+                <td style="padding-top: 5px;">
                   <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
                        angular-html-bind="state.content"></div>
                   <div ng-show="$last && finished" class="protractor-test-conversation-finished">
@@ -30,7 +30,7 @@
             </table>
 
             <div ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
-              <table class="conversation-skin-card-row-container response">
+              <table class="conversation-skin-card-row-container">
                 <tr ng-show="responsePair.learnerAnswer" class="conversation-skin-card-row">
                   <td class="conversation-skin-row-avatar" valign="top">
                     <img class="conversation-skin-row-avatar-img" src="/images/user.png">
@@ -38,7 +38,7 @@
                   <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
                 </tr>
               </table>
-              <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container response">
+              <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">
                 <tr class="conversation-skin-card-row">
                   <td class="conversation-skin-row-avatar" valign="top">
                     <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
