@@ -39,11 +39,6 @@ md-input-group.long > input
   width: 100%; 
 }
 
-md-input-group.md-default-theme label
-{
-  margin-bottom:0px;
-}
-
 .md-button-success {
   color: #009688;
 }
@@ -806,14 +801,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-interaction-editor {
   border: 1px solid #ccc;
   padding: 15px 15px 0px 15px;
-}
-
-.oppia-interaction-text-input-container {
-  margin-top: -30px;
-}
-
-.oppia-interaction-numeric-input-container {
-  margin-top: -11px;
 }
 
 .oppia-state-item-editor-div {

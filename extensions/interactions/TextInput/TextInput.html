@@ -1,6 +1,17 @@
+<style>
+.text-input-container {
+  margin-top: -30px;
+}
+
+.text-input-container md-input-group.md-default-theme label
+{
+  margin-bottom: 0px;
+}
+</style>
+
 <script type="text/ng-template" id="interaction/TextInput">
   <!-- This outer div is needed, otherwise the textarea will overlap the footer of the page. -->
-  <div class="row oppia-interaction-text-input-container">
+  <div class="row text-input-container">
     <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
       <div ng-class="rows > 1 ? 'col-lg-10 col-md-10 col-sm-10' : 'col-lg-12 col-md-12 col-sm-12' ">
         <schema-based-editor schema="schema" local-value="answer">
