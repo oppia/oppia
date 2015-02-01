@@ -19,9 +19,28 @@
  */
 
 oppia.controller('ExplorationPreview', [
-	'$scope', 'learnerParamsService', function($scope, learnerParamsService) {
-  $scope.allParams = {};
+    '$scope', 'learnerParamsService', 'explorationData',
+    'explorationStatesService', 'explorationInitStateNameService',
+    'explorationParamSpecsService', 'explorationTitleService',
+    'oppiaPlayerService',
+    function($scope, learnerParamsService, explorationData,
+             explorationStatesService, explorationInitStateNameService,
+             explorationParamSpecsService, explorationTitleService,
+             oppiaPlayerService) {
+  $scope.isExplorationPopulated = false;
+  explorationData.getData().then(function() {
+    oppiaPlayerService.populateExploration({
+      init_state_name: explorationInitStateNameService.savedMemento,
+      // TODO(sll): are these actually editable?
+      param_changes: explorationData.data.param_changes,
+      param_specs: explorationParamSpecsService.savedMemento,
+      states: explorationStatesService.getStates(),
+      title: explorationTitleService.savedMemento
+    });
+    $scope.isExplorationPopulated = true;
+  });
 
+  $scope.allParams = {};
   $scope.$on('playerStateChange', function() {
     $scope.allParams = learnerParamsService.getAllParams();
   });

@@ -55,7 +55,7 @@ var expectLatestFeedbackToMatch = function(richTextInstructions) {
 // passed on to the relevant interaction's detail checker.
 var expectInteractionToMatch = function(interactionName) {
   // Convert additional arguments to an array to send on.
-  var args = [];
+  var args = [element(by.css('.protractor-test-conversation-input'))];
   for (var i = 1; i < arguments.length; i++) {
     args.push(arguments[i]);
   }

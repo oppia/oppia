@@ -3,44 +3,55 @@
 {% block id %}rules{% endblock %}
 
 {% block row %}
-  <div class="col-lg-2 col-md-2 col-sm-2">
+  <div ng-if="!ruleEditorsAreShown" class="oppia-show-rule-editors-ctrl" ng-click="showRuleEditors()">
+    <div class="col-lg-1 col-md-1 col-sm-1">
+    </div>
+    <div class="col-lg-11 col-md-11 col-sm-11 protractor-test-show-rules" style="text-align: center;">
+      More...
+      <span class="caret"></span>
+    </div>
   </div>
 
-  <div class="col-lg-10 col-md-10 col-sm-10 oppia-rules" id="tutorialStateRules">
-    <div ng-repeat="(handlerName, handler) in interactionHandlers">
-      <div class="row" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
-        <!-- An HTML element marked ui-sortable should contain only one element,
-        and this element should have an ng-repeat defined on it. See the
-        ui-sortable documentation for more details. -->
-        <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-sortable-rule-block protractor-test-rule-block">
-          <rule-editor rule="rule" heading="Rule #<[$index + 1]>" num-rules="handler.length" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
-          </rule-editor>
-        </div>
-      </div>
+  <div ng-if="ruleEditorsAreShown">
+    <div class="col-lg-1 col-md-1 col-sm-1">
+    </div>
 
-      <div class="row" ng-if="getCurrentInteractionId() != 'Continue' && editabilityService.isEditable()">
-        <div ng-if="!tmpRule">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-rule" ng-click="createTmpRule()">
-              Add new rule
-            </button>
-          </div>
-        </div>
-        <div ng-if="tmpRule" class="protractor-test-temporary-rule">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <rule-editor rule="tmpRule" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" is-tmp-rule="true" save-rule="saveTmpRule" cancel-edit="cancelTmpRule()" is-editable="editabilityService.isEditable()">
+    <div class="col-lg-11 col-md-11 col-sm-11 oppia-rules" id="tutorialStateRules">
+      <div ng-repeat="(handlerName, handler) in interactionHandlers">
+        <div class="row" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
+          <!-- An HTML element marked ui-sortable should contain only one element,
+          and this element should have an ng-repeat defined on it. See the
+          ui-sortable documentation for more details. -->
+          <div ng-repeat="rule in handler track by $index" ng-hide="$last" class="col-lg-12 col-md-12 col-sm-12 oppia-sortable-rule-block protractor-test-rule-block">
+            <rule-editor rule="rule" heading="Rule #<[$index + 1]>" num-rules="handler.length" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
             </rule-editor>
           </div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="col-lg-12 col-md-12 col-sm-12 protractor-test-default-rule">
-          <rule-editor rule="handler[handler.length - 1]" heading="Default Rule" answer-choices="answerChoices" all-rule-types="allRuleTypes" interaction-handler-specs="interactionHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
-          </rule-editor>
+        <div class="row" ng-if="getCurrentInteractionId() != 'Continue' && editabilityService.isEditable()">
+          <div ng-if="!tmpRule">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-rule" ng-click="createTmpRule()">
+                Add new rule
+              </button>
+            </div>
+          </div>
+          <div ng-if="tmpRule" class="protractor-test-temporary-rule">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <rule-editor rule="tmpRule" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" is-tmp-rule="true" save-rule="saveTmpRule" cancel-edit="cancelTmpRule()" is-editable="editabilityService.isEditable()">
+              </rule-editor>
+            </div>
+          </div>
         </div>
-      </div>
 
+        <div class="row">
+          <div class="col-lg-12 col-md-12 col-sm-12 protractor-test-default-rule">
+            <rule-editor rule="handler[handler.length - 1]" heading="Default Rule" answer-choices="answerChoices" all-rule-types="allRuleTypes" interaction-handler-specs="interactionHandlerSpecs" is-tmp-rule="false" save-rule="saveRule" is-editable="editabilityService.isEditable()">
+            </rule-editor>
+          </div>
+        </div>
+
+      </div>
     </div>
   </div>
 {% endblock %}

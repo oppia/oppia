@@ -8,18 +8,6 @@
         <!-- TODO(mgowano): Remove eclipse image once backend has image info for exploration. -->
         <img src="/images/eclipse.jpg">
         <h3 role="heading" class="conversation-skin-exploration-header protractor-test-exploration-header"><[explorationTitle]></h3>
-        <div class="conversation-skin-exploration-bookmark-rate">
-          <div class="conversation-skin-exploration-bookmark">
-            <img class="conversation-skin-icons" src="/images/material-design-icons-1.0.1/ic_bookmark_outline_black_48dp.png">
-            <br>
-            Bookmark
-          </div>
-          <div class="conversation-skin-exploration-rate">
-            <img class="conversation-skin-icons" src="/images/material-design-icons-1.0.1/ic_star_outline_black_48dp.png">
-            <br>
-            Rate
-          </div>
-        </div>
       </md-card>
 
       <div class="conversation-skin-iframe-container">
@@ -31,7 +19,7 @@
                 <td class="conversation-skin-row-avatar" valign="top">
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                 </td>
-                <td>
+                <td style="padding-top: 5px;">
                   <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
                        angular-html-bind="state.content"></div>
                   <div ng-show="$last && finished" class="protractor-test-conversation-finished">
@@ -41,7 +29,7 @@
               </tr>
             </table>
 
-            <div class="conversation-skin-answer-feedback-pair" ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
+            <div ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
               <table class="conversation-skin-card-row-container">
                 <tr ng-show="responsePair.learnerAnswer" class="conversation-skin-card-row">
                   <td class="conversation-skin-row-avatar" valign="top">
