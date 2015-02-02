@@ -114,6 +114,14 @@ oppia.controller('Base', [
     $scope.$apply();
   });
 
+  $scope.onMouseoverDropdownMenu = function(evt) {
+    angular.element(evt.currentTarget).parent().addClass('open');
+  };
+
+  $scope.onMouseoutDropdownMenu = function(evt) {
+    angular.element(evt.currentTarget).parent().removeClass('open');
+  };
+
   $scope.pageHasLoaded = false;
   $scope.pendingSidebarClick = false;
   $scope.sidebarIsShown = false;
