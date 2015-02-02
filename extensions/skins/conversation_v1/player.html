@@ -47,7 +47,7 @@
             </table>
           </div>
 
-          <div ng-show="!finished && $last && !nextCardContent && interactionIsInline">
+          <div ng-if="!finished && $last && !nextCardContent && interactionIsInline">
             <div ng-hide="isAnswerBeingProcessed()">
               <table class="conversation-skin-card-row-container">
                 <tr class="conversation-skin-card-row">
