@@ -124,6 +124,7 @@ oppia.factory('oppiaPlayerService', [
       stopwatchProviderService, learnerParamsService, warningsData,
       oppiaHtmlEscaper, answerClassificationService, stateTransitionService) {
   var _END_DEST = 'END';
+  var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
 
   // Note that both of these do not get set for the Karma unit tests.
   var _explorationId = null;
@@ -358,6 +359,11 @@ oppia.factory('oppiaPlayerService', [
       return _getInteractionHtml(
         _exploration.states[stateName].interaction.id,
         _exploration.states[stateName].interaction.customization_args);
+    },
+    isInteractionInline: function(stateName) {
+      return GLOBALS.interactionDisplayModes[
+        _exploration.states[stateName].interaction.id
+      ] === _INTERACTION_DISPLAY_MODE_INLINE;
     },
     getRandomSuffix: function() {
       // This is a bit of a hack. When a refresh to a $scope variable happens,

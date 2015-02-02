@@ -46,6 +46,15 @@ import jinja_utils
 import schema_utils
 import utils
 
+# Indicates that the learner view of the interaction should be displayed in the
+# context of the conversation.
+DISPLAY_MODE_INLINE = 'inline'
+# Indicates that the learner view of the interaction should be displayed as a
+# separate object from the conversation.
+DISPLAY_MODE_SUPPLEMENTAL = 'supplemental'
+
+ALLOWED_DISPLAY_MODES = [DISPLAY_MODE_SUPPLEMENTAL, DISPLAY_MODE_INLINE]
+
 
 class AnswerHandler(object):
     """Value object for an answer event stream (e.g. submit, click, drag)."""
@@ -91,6 +100,9 @@ class BaseInteraction(object):
     category = ''
     # A description of the interaction. Overridden in subclasses.
     description = ''
+    # Describes how the interaction should be displayed (either within the
+    # conversation, or as a separate object).
+    display_mode = ''
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -174,6 +186,7 @@ class BaseInteraction(object):
             'name': self.name,
             'category': self.category,
             'description': self.description,
+            'display_mode': self.display_mode,
             'customization_args': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,

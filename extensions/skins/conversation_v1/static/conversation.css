@@ -22,9 +22,9 @@ html, body {
   background-color: #eeedee;
 }
 
-/* 
-  Additional CSS for the conversation_v1 skin. 
-  All classes below should start with .conversation-skin  
+/*
+  Additional CSS for the conversation_v1 skin.
+  All classes below should start with .conversation-skin
  */
 
 .conversation-skin-exploration-intro-card {
@@ -84,7 +84,6 @@ html, body {
   color: #579287;
 }
 
-.affix {
-  position: fixed;
-  top: 20px;
+.conversation-skin-supplemental-interaction {
+  max-width: 600px;
 }

@@ -2,78 +2,82 @@
   <link rel="stylesheet" type="text/css"
         href="/extensions/skins/conversation_v1/static/conversation.css">
 
-  <div>
-    <div class="oppia-content" role="main">
-      <md-card class="conversation-skin-exploration-intro-card">
-        <!-- TODO(mgowano): Remove eclipse image once backend has image info for exploration. -->
-        <img src="/images/eclipse.jpg">
-        <h3 role="heading" class="conversation-skin-exploration-header protractor-test-exploration-header"><[explorationTitle]></h3>
-      </md-card>
+  <div class="oppia-content" role="main">
+    <md-card class="conversation-skin-exploration-intro-card">
+      <!-- TODO(mgowano): Remove eclipse image once backend has image info for exploration. -->
+      <img src="/images/eclipse.jpg">
+      <h3 role="heading" class="conversation-skin-exploration-header protractor-test-exploration-header"><[explorationTitle]></h3>
+    </md-card>
 
-      <div class="conversation-skin-iframe-container">
-        <div ng-repeat="state in allResponseStates track by $index"
-             ng-class="{'conversation-skin-last-log-entry': $last, 'conversation-skin-old-content': !$last}">
-          <md-card class="conversation-skin-card">
+    <div class="conversation-skin-iframe-container">
+      <div ng-repeat="state in allResponseStates track by $index"
+           ng-class="{'conversation-skin-last-log-entry': $last, 'conversation-skin-old-content': !$last}">
+        <md-card class="conversation-skin-card">
+          <table class="conversation-skin-card-row-container">
+            <tr class="conversation-skin-card-row">
+              <td class="conversation-skin-row-avatar" valign="top">
+                <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
+              </td>
+              <td style="padding-top: 5px;">
+                <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
+                     angular-html-bind="state.content"></div>
+                <div ng-show="$last && finished" class="protractor-test-conversation-finished">
+                  Congratulations, you have finished this exploration!
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <div ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
             <table class="conversation-skin-card-row-container">
+              <tr ng-show="responsePair.learnerAnswer" class="conversation-skin-card-row">
+                <td class="conversation-skin-row-avatar" valign="top">
+                  <img class="conversation-skin-row-avatar-img" src="/images/user.png">
+                </td>
+                <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
+              </tr>
+            </table>
+            <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">
               <tr class="conversation-skin-card-row">
                 <td class="conversation-skin-row-avatar" valign="top">
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
                 </td>
-                <td style="padding-top: 5px;">
-                  <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
-                       angular-html-bind="state.content"></div>
-                  <div ng-show="$last && finished" class="protractor-test-conversation-finished">
-                    Congratulations, you have finished this exploration!
-                  </div>
-                </td>
+                <td class="protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
               </tr>
             </table>
+          </div>
 
-            <div ng-repeat="responsePair in state.answerFeedbackPairs track by $index">
+          <div ng-show="!finished && $last && !nextCardContent && interactionIsInline">
+            <div ng-hide="isAnswerBeingProcessed()">
               <table class="conversation-skin-card-row-container">
-                <tr ng-show="responsePair.learnerAnswer" class="conversation-skin-card-row">
-                  <td class="conversation-skin-row-avatar" valign="top">
-                    <img class="conversation-skin-row-avatar-img" src="/images/user.png">
-                  </td>
-                  <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
-                </tr>
-              </table>
-              <table ng-show="responsePair.oppiaFeedback" class="conversation-skin-card-row-container">
                 <tr class="conversation-skin-card-row">
                   <td class="conversation-skin-row-avatar" valign="top">
-                    <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_mint.png">
+                    <!-- No avatar on user input, hence this is empty. -->
                   </td>
-                  <td class="protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
+                  <td class="protractor-test-conversation-input"
+                      angular-html-bind="inputTemplate">
+                  </td>
                 </tr>
               </table>
             </div>
-
-            <div ng-show="!finished && $last && !nextCardContent">
-              <!-- This iframe must always be contained within a div in
-              which it is the only element. For more information, please
-              see the ReaderExploration.js file. -->
-              <div ng-hide="isAnswerBeingProcessed()">
-                <table class="conversation-skin-card-row-container">
-                  <tr class="conversation-skin-card-row">
-                    <td class="conversation-skin-row-avatar" valign="top">
-                      <!-- No avatar on user input, hence this is empty. -->
-                    </td>
-                    <td class="protractor-test-conversation-input"
-                        angular-html-bind="inputTemplate"></td>
-                  </tr>
-                </table>
-              </div>
-              <div ng-show="isAnswerBeingProcessed()">
-                <center style="font-size: 8em;">
-                  <span class="oppia-loading-dot-one">.</span>
-                  <span class="oppia-loading-dot-two">.</span>
-                  <span class="oppia-loading-dot-three">.</span>
-                </center>
-              </div>
+            <div ng-show="isAnswerBeingProcessed()">
+              <center style="font-size: 8em;">
+                <span class="oppia-loading-dot-one">.</span>
+                <span class="oppia-loading-dot-two">.</span>
+                <span class="oppia-loading-dot-three">.</span>
+              </center>
             </div>
-          </md-card>
+          </div>
+        </md-card>
+      </div>
+    </div>
+
+    <div class="conversation-skin-supplemental-interaction">
+      <div ng-if="!finished && !nextCardContent && !interactionIsInline">
+        <div class="protractor-test-conversation-input" angular-html-bind="inputTemplate">
         </div>
       </div>
     </div>
+
   </div>
 </script>

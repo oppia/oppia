@@ -23,6 +23,7 @@ class InteractiveMap(base.BaseInteraction):
     name = 'World Map'
     category = 'Custom'
     description = 'Allows learners to specify a position on a world map.'
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['google_maps']
     _handlers = [{
         'name': 'submit', 'obj_type': 'CoordTwoDim'}]
