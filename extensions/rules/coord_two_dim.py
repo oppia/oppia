@@ -18,9 +18,11 @@
 
 __author__ = 'Sean Lip'
 
-from extensions.rules import base
 import math
 
+from extensions.rules import base
+
+_RADIUS_OF_EARTH = 6371.0
 
 class Within(base.CoordTwoDimRule):
     description = 'is within {{d|Real}} km of {{p|CoordTwoDim}}'
@@ -29,12 +31,12 @@ class Within(base.CoordTwoDimRule):
     def _evaluate(self, subject):
         lat1 = math.radians(self.p[0])
         lat2 = math.radians(subject[0])
-        lat_diff = math.radians(subject[0]-self.p[0])
-        lon_diff = math.radians(subject[1]-self.p[1])
+        lat_diff = math.radians(subject[0] - self.p[0])
+        lon_diff = math.radians(subject[1] - self.p[1])
         # Haversine formula
-        a = math.sin(lat_diff/2) * math.sin(lat_diff/2) + math.cos(lat1) * math.cos(lat2) * math.sin(lon_diff/2) * math.sin(lon_diff/2);
-        d = 6371 * 2 * math.asin(math.sqrt(a))
-        return d < self.d
+        haversine_of_central_angle = math.sin(lat_diff / 2) * math.sin(lat_diff / 2) + math.cos(lat1) * math.cos(lat2) * math.sin(lon_diff / 2) * math.sin(lon_diff / 2)
+        actual_distance = _RADIUS_OF_EARTH * 2 * math.asin(math.sqrt(haversine_of_central_angle))
+        return actual_distance < self.d
 
 
 class NotWithin(base.CoordTwoDimRule):
