@@ -25,6 +25,7 @@ class MusicNotesInput(base.BaseInteraction):
     description = (
         'Allows learners to drag and drop notes onto the lines of a music '
         'staff.')
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['midijs']
     _handlers = [{
         'name': 'submit', 'obj_type': 'MusicPhrase'}]

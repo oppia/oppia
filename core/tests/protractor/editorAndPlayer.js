@@ -561,7 +561,7 @@ describe('Exploration history', function() {
     player.submitAnswer('NumericInput', 6);
     player.expectExplorationToNotBeOver();
     player.expectContentToMatch(forms.toRichText('this is state 2'));
-    player.expectInteractionToMatch('Continue', '');
+    player.expectInteractionToMatch('Continue', 'CONTINUE');
     player.submitAnswer('Continue', null);
     player.expectExplorationToBeOver();
 
