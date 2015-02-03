@@ -30,8 +30,9 @@ class LogoutPage(webapp.RequestHandler):
   ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 
   def get(self):
-      # It seems that AppEngine is setting the ACSID cookie for http:// ,
-      # and the SACSID cookie for https:// . We just unset both below.
+      """Logs the user out and returns them to the current page."""
+      # AppEngine sets the ACSID cookie for http:// and the SACSID cookie for
+      # https:// . We just unset both below.
       cookie = Cookie.SimpleCookie()
       for cookie_name in ['ACSID', 'SACSID']:
           cookie = Cookie.SimpleCookie()
