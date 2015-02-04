@@ -21,6 +21,15 @@ __author__ = 'Zhan Xiong Chin'
 from extensions.rules import base
 import itertools
 
+def construct_adjacency_lists(graph):
+    ret = [[] for v in graph['vertices']]
+    for edge in graph['edges']:
+        ret[edge['src']].append(edge['dst'])
+        if not graph['isDirected']:
+            ret[edge['dst']].append(edge['src'])
+    return ret
+
+
 # TODO(czx): Speed up the isomorphism checker?
 class IsIsomorphicTo(base.GraphRule):
     description = 'is isomorphic to {{g|Graph}}, including matching labels'
@@ -65,3 +74,63 @@ class IsIsomorphicTo(base.GraphRule):
             if found_isomorphism:
                 return True
         return False
+
+# TODO(czx): Handle the directed case?
+class IsConnected(base.GraphRule):
+    description = 'is a connected graph'
+    is_generic = False
+
+    def _evaluate(self, subject):
+        if len(subject['vertices']) == 0:
+            return True
+        def dfs(x, adj, visited):
+            visited[x] = True
+            for y in adj[x]:
+                if not visited[y]:
+                    dfs(y, adj, visited)
+        
+        visited = [False for v in subject['vertices']]
+        adj = construct_adjacency_lists(subject)
+        dfs(0, adj, visited)
+        return not (False in visited)
+
+
+class IsAcyclic(base.GraphRule):
+    description = 'is an acyclic graph'
+    is_generic = False
+
+    def _evaluate(self, subject):
+        # Checks if vertex is in parent set
+        def dfs(x, p, adj, visited):
+            visited[x] = 1
+            for y in adj[x]:
+                if y == p and subject['isDirected'] == False:
+                    continue
+                if visited[y] == 1:
+                    return False
+                elif visited[y] == 2:
+                    continue
+                else:
+                    if not dfs(y, x, adj, visited):
+                        return False
+            visited[x] = 2
+            return True
+
+        visited = [0 for v in subject['vertices']]
+        adj = construct_adjacency_lists(subject)
+        for i in xrange(len(visited)):
+            if not visited[i]:
+                if not dfs(i, -1, adj, visited):
+                    return False
+        return True
+
+# TODO(czx): Handle the directed case?
+class IsRegular(base.GraphRule):
+    description = 'is a regular graph'
+    is_generic = False
+
+    def _evaluate(self, subject):
+        adj = construct_adjacency_lists(subject)
+        same_length = [len(l) == len(adj[0]) for l in adj]
+        return not (False in same_length)
+

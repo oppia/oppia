@@ -234,3 +234,125 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isWeighted': True,
             'isLabeled': True
         }))
+
+    def test_isconnected_rule(self):
+        self.assertTrue(graph.IsConnected().eval(_emptyGraph()))
+        self.assertTrue(graph.IsConnected().eval(_cycleGraph(5)))
+        self.assertTrue(graph.IsConnected().eval(_completeGraph(10)))
+        self.assertTrue(graph.IsConnected().eval({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
+                {'label': 'c', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2},
+                {'src': 2, 'dst': 1, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
+        self.assertFalse(graph.IsConnected().eval(_nullGraph(2)))
+        self.assertFalse(graph.IsConnected().eval({
+            'vertices': [
+                {'label': 'a', 'x': 1.0, 'y': 1.0},
+                {'label': 'b', 'x': 2.0, 'y': 2.0},
+                {'label': 'c', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 2}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
+
+    def test_isacyclic_rule(self):
+        self.assertTrue(graph.IsAcyclic().eval(_emptyGraph()))
+        self.assertTrue(graph.IsAcyclic().eval(_completeGraph(2)))
+        self.assertTrue(graph.IsAcyclic().eval({
+            'vertices': [
+                {'label': 'a', 'x': 0.0, 'y': 0.0},
+                {'label': 'b', 'x': 0.0, 'y': 0.0},
+                {'label': 'c', 'x': 0.0, 'y': 0.0},
+                {'label': 'd', 'x': 0.0, 'y': 0.0},
+            ],
+            'edges': [
+                {'src': 0, 'dst': 2, 'weight': 2},
+                {'src': 2, 'dst': 3, 'weight': 4},
+                {'src': 1, 'dst': 3, 'weight': 123}
+            ],
+            'isDirected': False,
+            'isWeighted': True,
+            'isLabeled': True
+        }))
+        self.assertTrue(graph.IsAcyclic().eval({
+            'vertices': [
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 0, 'dst': 2, 'weight': 1},
+                {'src': 1, 'dst': 2, 'weight': 1}
+            ],
+            'isDirected': True,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+        self.assertFalse(graph.IsAcyclic().eval(_cycleGraph(5)))
+        self.assertFalse(graph.IsAcyclic().eval(_completeGraph(4)))
+        self.assertFalse(graph.IsAcyclic().eval({
+            'vertices': [
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 2, 'dst': 0, 'weight': 1},
+                {'src': 1, 'dst': 2, 'weight': 1}
+            ],
+            'isDirected': True,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+
+    def test_isregular_rule(self):
+        self.assertTrue(graph.IsRegular().eval(_emptyGraph()))
+        self.assertTrue(graph.IsRegular().eval(_nullGraph(9)))
+        self.assertTrue(graph.IsRegular().eval(_completeGraph(8)))
+        self.assertTrue(graph.IsRegular().eval(_cycleGraph(3)))
+        self.assertFalse(graph.IsRegular().eval({
+            'vertices': [
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+        self.assertFalse(graph.IsRegular().eval({
+            'vertices': [
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 2, 'dst': 1, 'weight': 1},
+                {'src': 3, 'dst': 1, 'weight': 1}
+            ],
+            'isDirected': False,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+
+
