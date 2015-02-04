@@ -31,15 +31,12 @@ class RatingServicesTests(test_utils.GenericTestBase):
     USER_ID_1 = 'user_1'
     USER_ID_2 = 'user_2'
 
-    def setUp(self):
-        super(RatingServicesTests, self).setUp()
+    def test_rating_assignation(self):
+        """Check ratings are correctly assigned to an exploration"""
 
         self.exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, 'A title', 'A category')
         exp_services.save_new_exploration(self.EXP_ID, self.exploration)
-
-    def test_rating_assignation(self):
-        """Check ratings are correctly assigned"""
 
         self.assertEqual(
             rating_services.get_overall_ratings(self.EXP_ID),
@@ -59,22 +56,69 @@ class RatingServicesTests(test_utils.GenericTestBase):
         self.assertEqual(
             rating_services.get_user_specific_rating(
                 self.USER_ID_2, self.EXP_ID), 4)
-
         self.assertEqual(
             rating_services.get_overall_ratings(self.EXP_ID),
             {'1': 0, '2': 0, '3': 1, '4': 1, '5': 0})
 
+        rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 4)
+
+        self.assertEqual(
+            rating_services.get_overall_ratings(self.EXP_ID),
+            {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
+
+    def test_rating_assignations_do_not_conflict(self):
+        """Check that ratings of different explorations are independant."""
+
+        EXP_ID_A = 'exp_id_A'
+        EXP_ID_B = 'exp_id_B'
+
+        self.exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID_A, 'A title', 'A category')
+        exp_services.save_new_exploration(EXP_ID_A, self.exploration)
+        self.exploration = exp_domain.Exploration.create_default_exploration(
+            EXP_ID_B, 'A title', 'A category')
+        exp_services.save_new_exploration(EXP_ID_B, self.exploration)
+
+        rating_services.assign_rating(self.USER_ID_1, EXP_ID_A, 1)
+        rating_services.assign_rating(self.USER_ID_1, EXP_ID_B, 3)
+        rating_services.assign_rating(self.USER_ID_2, EXP_ID_A, 2)
+        rating_services.assign_rating(self.USER_ID_2, EXP_ID_B, 5)
+
+        self.assertEqual(
+            rating_services.get_user_specific_rating(
+                self.USER_ID_1, EXP_ID_A), 1)
+        self.assertEqual(
+            rating_services.get_user_specific_rating(
+                self.USER_ID_1, EXP_ID_B), 3)
+        self.assertEqual(
+            rating_services.get_user_specific_rating(
+                self.USER_ID_2, EXP_ID_A), 2)
+        self.assertEqual(
+            rating_services.get_user_specific_rating(
+                self.USER_ID_2, EXP_ID_B), 5)
+
+        self.assertEqual(
+            rating_services.get_overall_ratings(EXP_ID_A),
+            {'1': 1, '2': 1, '3': 0, '4': 0, '5': 0})
+        self.assertEqual(
+            rating_services.get_overall_ratings(EXP_ID_B),
+            {'1': 0, '2': 0, '3': 1, '4': 0, '5': 1})
+
     def forbid_invalid_ratings(self):
         with self.assertRaisesRegexp(
-                ValueError, 'Rating of 0 is not acceptable.'):
+                ValueError, 'Expected a rating 1-5, received: 0'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 0)
 
         with self.assertRaisesRegexp(
-                ValueError, 'Rating of 7 is not acceptable.'):
+                ValueError, 'Expected a rating 1-5, received: 7'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 7)
 
         with self.assertRaisesRegexp(
-                ValueError, 'Rating of aaa is not acceptable.'):
+                ValueError, 'Expected a rating 1-5, received: 2'):
+            rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, '2')
+
+        with self.assertRaisesRegexp(
+                ValueError, 'Expected a rating 1-5, received: aaa'):
             rating_services.assign_rating(self.USER_ID_1, self.EXP_ID, 'aaa')
 
     def forbid_invalid_exploration_ids(self):

@@ -312,8 +312,7 @@ class ExpSummaryModel(base_models.BaseModel):
     skill_tags = ndb.StringProperty(repeated=True, indexed=True)
 
     # Aggregate user-assigned ratings of the exploration
-    ratings = ndb.JsonProperty(
-        default={'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}, indexed=False)
+    ratings = ndb.JsonProperty(default=None, required=True, indexed=False)
 
     # Time when the exploration model was last updated (not to be
     # confused with last_updated, which is the time when the
@@ -382,5 +381,3 @@ class ExpSummaryModel(base_models.BaseModel):
         ).filter(
             ExpSummaryModel.deleted == False
         ).fetch(feconf.DEFAULT_QUERY_LIMIT)
-
-

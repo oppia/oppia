@@ -19,17 +19,31 @@
 __author__ = 'Jacob Davis'
 
 
-from core.platform import models
-(user_models,) = models.Registry.import_models([models.NAMES.user])
-(exp_models,) = models.Registry.import_models([models.NAMES.exploration])
+import copy
+
 from core.domain import exp_services
+from core.platform import models
+(exp_models, user_models,) = models.Registry.import_models([
+    models.NAMES.exploration, models.NAMES.user])
 transaction_services = models.Registry.import_transaction_services()
 
 
-# This validates the exploration id but not the user id.
+_EMPTY_RATINGS = {'1': 0, '2': 0, '3': 0, '4': 0, '5': 0}
+
+def get_empty_ratings():
+    return copy.deepcopy(_EMPTY_RATINGS)
+
+
 def assign_rating(user_id, exploration_id, new_rating):
-    if new_rating not in [1, 2, 3, 4, 5]:
-        raise ValueError('Rating of %s is not acceptable.' % rating)
+    """Records the rating awarded by the user to the exploration in both the
+    user-specific data and exploration summary.
+
+    It validates the exploration id but not the user id.
+    """
+
+    ALLOWED_RATINGS = [1, 2, 3, 4, 5]
+    if new_rating not in ALLOWED_RATINGS:
+        raise ValueError('Expected a rating 1-5, received: %s.' % rating)
 
     try:
         exploration = exp_services.get_exploration_by_id(exploration_id)
@@ -37,33 +51,39 @@ def assign_rating(user_id, exploration_id, new_rating):
         raise Exception('Invalid exploration id %s' % exploration_id)
 
     def _update_user_rating():
-        user_specific_entry = user_models.ExpUserDataModel.get(
+        user_specific_model = user_models.ExplorationUserDataModel.get(
             user_id, exploration_id)
-        if user_specific_entry:
-            old_rating = user_specific_entry.rating
+        if user_specific_model:
+            old_rating = user_specific_model.rating
         else:
             old_rating = None
-            user_specific_entry = user_models.ExpUserDataModel.create(
+            user_specific_model = user_models.ExplorationUserDataModel.create(
                 user_id, exploration_id)
-        user_specific_entry.rating = new_rating
-        user_specific_entry.put()
+        user_specific_model.rating = new_rating
+        user_specific_model.put()
         return old_rating
     old_rating = transaction_services.run_in_transaction(_update_user_rating)
 
     exploration_summary = exp_services.get_exploration_summary_by_id(
         exploration_id)
-    exploration_summary.ratings[str(new_rating)] = (
-        exploration_summary.ratings[str(new_rating)] + 1)
+    if not exploration_summary.ratings:
+        exploration_summary.ratings = get_empty_ratings()
+    exploration_summary.ratings[str(new_rating)] += 1
     if old_rating:
-        exploration_summary.ratings[str(old_rating)] = (
-            exploration_summary.ratings[str(old_rating)] - 1)
+        exploration_summary.ratings[str(old_rating)] -= 1
     exp_services.save_exploration_summary(exploration_summary)
 
-# This returns either an integer 1-5 or None if there is no such rating
+
 def get_user_specific_rating(user_id, exploration_id):
-    user_specific_entry = user_models.ExpUserDataModel.get(
+    """
+    Returns:
+        An integer 1-5, or None if there is no rating of this exploration by
+        this user.
+    """
+    exp_user_data_model = user_models.ExplorationUserDataModel.get(
         user_id, exploration_id)
-    return user_specific_entry.rating if user_specific_entry else None
+    return exp_user_data_model.rating if exp_user_data_model else None
+
 
 def get_overall_ratings(exploration_id):
     exp_summary = exp_services.get_exploration_summary_by_id(exploration_id)

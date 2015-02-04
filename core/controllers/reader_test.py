@@ -304,6 +304,8 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         self.login('user@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % EXP_ID))
 
         # User checks rating
         ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
@@ -313,10 +315,9 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
 
         # User rates and checks rating
         self.put_json(
-            '/explorehandler/rating/%s' % EXP_ID,
-            {
+            '/explorehandler/rating/%s' % EXP_ID, {
                 'rating': 2
-            }
+            }, csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
         self.assertEqual(ratings['user'], 2)
@@ -326,10 +327,9 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         # User re-rates and checks rating
         self.login('user@example.com')
         self.put_json(
-            '/explorehandler/rating/%s' % EXP_ID,
-            {
+            '/explorehandler/rating/%s' % EXP_ID, {
                 'rating': 5
-            }
+            }, csrf_token
         )
         ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
         self.assertEqual(ratings['user'], 5)
@@ -343,10 +343,43 @@ class RatingsIntegrationTests(test_utils.GenericTestBase):
         self.assertEqual(ratings['user'], None)
         self.assertEqual(
             ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 0, '5': 1})
-        with self.assertRaisesRegexp(Exception, '302 != 200'):
+        with self.assertRaisesRegexp(Exception, 'Bad response: 401'):
             self.put_json(
-                '/explorehandler/rating/%s' % EXP_ID,
-                {
+                '/explorehandler/rating/%s' % EXP_ID, {
                     'rating': 1
-                }
+                }, csrf_token
             )
+
+    def test_ratings_by_different_users(self):
+        """Check that ratings by different users do not interfere."""
+
+        # Load demo exploration
+        EXP_ID = '0'
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        self.login('a@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % EXP_ID))
+        self.put_json(
+            '/explorehandler/rating/%s' % EXP_ID, {
+                'rating': 4
+            }, csrf_token
+        )
+        self.logout()
+
+        self.login('b@example.com')
+        csrf_token = self.get_csrf_token_from_response(
+            self.testapp.get('/explore/%s' % EXP_ID))
+        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        self.assertEqual(ratings['user'], None)
+        self.put_json(
+            '/explorehandler/rating/%s' % EXP_ID, {
+                'rating': 4
+            }, csrf_token
+        )
+        ratings = self.get_json('/explorehandler/rating/%s' % EXP_ID)
+        self.assertEqual(ratings['user'], 4)
+        self.assertEqual(
+            ratings['overall'], {'1': 0, '2': 0, '3': 0, '4': 2, '5': 0})
+        self.logout()

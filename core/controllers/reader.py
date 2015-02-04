@@ -27,11 +27,11 @@ from core.domain import feedback_services
 from core.domain import fs_domain
 from core.domain import interaction_registry
 from core.domain import param_domain
+from core.domain import rating_services
 from core.domain import rights_manager
 from core.domain import rte_component_registry
 from core.domain import rule_domain
 from core.domain import skins_services
-from core.domain import rating_services
 import feconf
 import jinja_utils
 import utils
@@ -98,6 +98,8 @@ def classify(
 
 class ExplorationPage(base.BaseHandler):
     """Page describing a single exploration."""
+
+    PAGE_NAME_FOR_CSRF = 'player'
 
     @require_playable
     def get(self, exploration_id):
@@ -396,7 +398,17 @@ def submit_answer_in_tests(
 class RatingHandler(base.BaseHandler):
     """Records the rating of an exploration submitted by a user."""
 
-    REQUIRE_PAYLOAD_CSRF_CHECK = False
+    PAGE_NAME_FOR_CSRF = 'player'
+
+    @require_playable
+    def get(self, exploration_id):
+        """Handles GET requests."""
+        self.values.update({
+            'overall': rating_services.get_overall_ratings(exploration_id),
+            'user': rating_services.get_user_specific_rating(
+                self.user_id, exploration_id) if self.user_id else None
+        })
+        self.render_json(self.values)
 
     @base.require_user
     def put(self, exploration_id):
@@ -405,12 +417,3 @@ class RatingHandler(base.BaseHandler):
             self.user_id, exploration_id, self.payload.get('rating'))
         self.render_json({})
 
-    @require_playable
-    def get(self, exploration_id):
-        """Handles GET requests."""
-        self.values.update({
-            'user': rating_services.get_user_specific_rating(
-                self.user_id, exploration_id) if self.user_id else None,
-            'overall': rating_services.get_overall_ratings(exploration_id)
-        })
-        self.render_json(self.values)

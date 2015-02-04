@@ -80,18 +80,17 @@ class UserRecentChangesBatchModel(base_models.BaseMapReduceBatchResultsModel):
     job_queued_msec = ndb.FloatProperty(indexed=False)
 
 
-class ExpUserDataModel(base_models.BaseModel):
-    """User-specific data about explorations.
+class ExplorationUserDataModel(base_models.BaseModel):
+    """User-specific data pertaining to a specific exploration.
 
-    Instances of this class are keyed by user and exploration id combined.
+    Instances of this class have keys of the form
+    [user id].[exploration id]
     """
 
-    # Concatenation of user id, '.', then exploration id
-    user_and_exploration_ids = ndb.StringProperty(indexed=True)
     # The user id
-    user_id = ndb.StringProperty(indexed=False)
+    user_id = ndb.StringProperty(indexed=True)
     # The exploration id
-    exploration_id = ndb.StringProperty(indexed=False)
+    exploration_id = ndb.StringProperty(indexed=True)
 
     # The rating (1-5) the user assigned to the exploration
     rating = ndb.IntegerProperty(default=None, indexed=False)
@@ -102,12 +101,13 @@ class ExpUserDataModel(base_models.BaseModel):
 
     @classmethod
     def create(cls, user_id, exploration_id):
-        """Creates a new ExpUserDataModel entry"""
-        combined_id = cls._generate_id(user_id, exploration_id)
-        return cls(id=combined_id)
+        """Creates a new ExplorationUserDataModel entry and returns it"""
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return cls(id=instance_id)
 
     @classmethod
     def get(cls, user_id, exploration_id):
-        """Gets the ExpUserDataModel for the given ids"""
-        combined_id = cls._generate_id(user_id, exploration_id)
-        return super(ExpUserDataModel, cls).get(combined_id, strict=False)
+        """Gets the ExplorationUserDataModel for the given ids"""
+        instance_id = cls._generate_id(user_id, exploration_id)
+        return super(ExplorationUserDataModel, cls).get(
+            instance_id, strict=False)
