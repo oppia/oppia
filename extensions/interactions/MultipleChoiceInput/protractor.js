@@ -40,7 +40,7 @@ var expectInteractionDetailsToMatch = function(elem, richTextInstructionsArray) 
     expect(optionElements.length).toEqual(richTextInstructionsArray.length);
     for (var i = 0; i < optionElements.length; i++) {
       forms.expectRichText(
-        optionElements[i].element(by.xpath('./button/span'))
+        optionElements[i].element(by.xpath('./a/span'))
       ).toMatch(richTextInstructionsArray[i]);
     }
   });
@@ -50,7 +50,7 @@ var expectInteractionDetailsToMatch = function(elem, richTextInstructionsArray) 
 // 'answer' {String} is the text on the multiple-choice item to select.
 var submitAnswer = function(elem, answer) {
   elem.element(by.tagName('oppia-interactive-multiple-choice-input')).
-    element(by.buttonText(answer)).click();
+    element(by.linkText(answer)).click();
 };
 
 var answerObjectType = 'NonnegativeInt';

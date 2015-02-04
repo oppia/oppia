@@ -39,6 +39,13 @@ md-input-group.long > input
   width: 100%; 
 }
 
+md-input-group.md-default-theme label
+{
+  font-size: 16px;
+  font-weight: 200;
+  margin-bottom:0px;
+}
+
 .md-button-success {
   color: #009688;
 }
