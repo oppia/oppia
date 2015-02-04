@@ -23,6 +23,7 @@ class TextInput(base.BaseInteraction):
     name = 'Text'
     category = 'Basic Input'
     description = 'Allows learners to enter arbitrary text strings.'
+    display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []
     _handlers = [{
         'name': 'submit', 'obj_type': 'NormalizedString'}]

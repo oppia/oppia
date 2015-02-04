@@ -26,6 +26,7 @@ class LogicProof(base.BaseInteraction):
     category = 'Custom'
     description = (
         'Allows learners to write proofs for simple logical statements.')
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['logic_proof', 'codemirror']
     _handlers = [{
         'name': 'submit', 'obj_type': 'CheckedProof'}]

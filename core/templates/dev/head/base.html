@@ -132,7 +132,7 @@
                               {% endif %}
                               <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu" role="menu">
+                            <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
                                 <a href="/dashboard">Dashboard</a>
                               </li>

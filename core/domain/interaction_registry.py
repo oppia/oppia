@@ -92,3 +92,11 @@ class Registry(object):
             interaction = cls.get_interaction_by_id(interaction_id)
             result.update(interaction.dependency_ids)
         return list(result)
+
+    @classmethod
+    def get_all_display_modes(cls):
+        """Returns a dict mapping interaction ids to their display modes."""
+        return {
+            interaction.id: interaction.display_mode
+            for interaction in cls.get_all_interactions()
+        }

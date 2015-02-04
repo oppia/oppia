@@ -21,6 +21,7 @@ execute:
 """
 
 import argparse
+import copy
 import datetime
 import os
 import re
@@ -159,21 +160,35 @@ def _check_all_tasks(tasks):
         log('Tasks still running:')
         for task_details in running_tasks_data:
             log(task_details)
-        log('----------------------------------------')
 
 
-def _execute_tasks(tasks):
-    """Starts all tasks and checks the results."""
-    # Start all tasks.
-    for task in tasks:
-        task.start()
-        task.start_time = time.time()
+def _execute_tasks(tasks, batch_size=24):
+    """Starts all tasks and checks the results.
 
-    # Note that the main thread (i.e. the original process that runs this
-    # script) is also counted in threading.active_count().
-    while threading.active_count() > 1:
+    Runs no more than 'batch_size' tasks at a time.
+    """
+    remaining_tasks = [] + tasks
+    currently_running_tasks = set([])
+
+    while remaining_tasks or currently_running_tasks:
+        if currently_running_tasks:
+            for task in list(currently_running_tasks):
+                task.join(1)
+                if not task.isAlive():
+                    currently_running_tasks.remove(task)
+
+        while remaining_tasks and len(currently_running_tasks) < batch_size:
+            task = remaining_tasks.pop()
+            currently_running_tasks.add(task)
+            task.start()
+            task.start_time = time.time()
+
         time.sleep(5)
+        if remaining_tasks:
+            log('----------------------------------------')
+            log('Number of unstarted tasks: %s' % len(remaining_tasks))
         _check_all_tasks(tasks)
+        log('----------------------------------------')
 
 
 def _get_all_test_targets(test_path=None):
