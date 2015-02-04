@@ -53,7 +53,6 @@ oppia.controller('ExplorationFeedback', [
     }).success(function() {
       $scope._getThreadList();
       $scope.setCurrentThread(null);
-      $scope.$parent.refreshFeedbackTabHeader();
     });
   };
 
@@ -139,7 +138,6 @@ oppia.controller('ExplorationFeedback', [
       $scope.setCurrentThread(threadId);
       $scope.messageSendingInProgress = false;
       $scope.newMessageText = '';
-      $scope.$parent.refreshFeedbackTabHeader();
     }).error(function(data) {
       $scope.messageSendingInProgress = false;
     });

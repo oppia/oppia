@@ -89,7 +89,7 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div>
-                    <div class="navbar-header" ng-if="!screenIsLarge">
+                    <div class="navbar-header protractor-test-navbar-header" ng-if="!screenIsLarge">
                       <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu">
                         <img src="/images/menu.png">
                       </a>
@@ -115,9 +115,9 @@
                         </ul>
                       {% endif %}
 
-                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px;">
-                        <li class="dropdown">
-                          {% if user_email %}
+                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px; margin-right: 0;">
+                        {% if user_email %}
+                          <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown">
                               {% if username %}
                                 {{username}}
@@ -132,7 +132,7 @@
                               {% endif %}
                               <span class="caret"></span>
                             </a>
-                            <ul class="dropdown-menu" role="menu">
+                            <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
                                 <a href="/dashboard">Dashboard</a>
                               </li>
@@ -156,12 +156,21 @@
                                 <a href="{{logout_url}}">Logout</a>
                               </li>
                             </ul>
-                          {% else %}
-                            <a href="{{login_url}}">
-                              Sign in
+                          </li>
+                        {% else %}
+                          <li>
+                            <a href="{{login_url}}" style="font-size: 0.8em; margin-right: -20px;" class="oppia-no-hover-change">
+                              Log in
                             </a>
-                          {% endif %}
-                        </li>
+                          </li>
+                          <li>
+                            <a href="{{login_url}}" style="font-size: 0.8em;" class="oppia-no-hover-change">
+                              <span class="oppia-signup-button">
+                                Sign up
+                              </span>
+                            </a>
+                          </li>
+                        {% endif %}
                       </ul>
 
                       {% block local_top_nav_options %}
@@ -171,27 +180,23 @@
                 </div>
               </nav>
 
+              <div class="oppia-top-of-page-padding">
+              </div>
+
               {{ warnings_and_loader() }}
             </div>
 
             {% include 'side_nav.html' %}
 
-            {% if nav_mode in ['explore', 'create'] %}
-              <div class="oppia-footer" role="contentinfo">
-                <div class="container">
-                  <div class="oppia-footer-nav col-lg-8 col-md-8 col-sm-8">
-                  </div>
-                  <span class="col-lg-4 col-md-4 col-sm-4" style="margin-top: 10px;">
-                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
-                      <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                    </a>
-                    <span style="font-size: 0.8em">
-                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
-                    </span>
-                  </span>
-                </div>
-              </div>
+            {% if nav_mode in ['explore'] %}
+              <span class="oppia-cc-icon">
+                <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
+                  <img alt="Creative Commons Licence" style="border-width: 0; height: 24px;" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                </a><br />
+                <a href="/about#license" target="_blank" style="font-size: 9px;">Attribution Guide</a>
+              </span>
             {% endif %}
+
           </div>
         </div>
       </div>

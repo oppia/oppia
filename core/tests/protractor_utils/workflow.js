@@ -25,14 +25,14 @@ var general = require('./general.js');
 
 // Creates an exploration and opens its editor.
 var createExploration = function(name, category) {
-  browser.get('/gallery');
+  browser.get(general.GALLERY_URL_SUFFIX);
   element(by.css('.protractor-test-create-exploration')).click();
   protractor.getInstance().waitForAngular();
-  element(by.model('newExplorationTitle')).sendKeys(name);
+  element(by.css('.protractor-test-new-exploration-title')).sendKeys(name);
   forms.AutocompleteDropdownEditor(
     element(by.css('.protractor-test-new-exploration-category'))
   ).setValue(category);
-  element(by.buttonText('Create New Exploration')).click();
+  element(by.css('.protractor-test-submit-new-exploration')).click();
 
   // We now want to wait for the editor to fully load.
   protractor.getInstance().waitForAngular();
@@ -43,10 +43,12 @@ var createExploration = function(name, category) {
 // This will only work if all changes have been saved and there are no
 // outstanding warnings; run from the editor.
 var publishExploration = function() {
-  element(by.css('.protractor-test-publish-exploration')).click();
-  protractor.getInstance().waitForAngular();
-  general.waitForSystem();
-  element(by.css('.protractor-test-confirm-publish')).click();
+  editor.runFromSettingsTab(function() {
+    element(by.css('.protractor-test-publish-exploration')).click();
+    protractor.getInstance().waitForAngular();
+    general.waitForSystem();
+    element(by.css('.protractor-test-confirm-publish')).click();
+  });
 };
 
 // Creates and publishes a minimal exploration

@@ -35,11 +35,9 @@ else:
 
 TESTS_DATA_DIR = os.path.join('core', 'tests', 'data')
 SAMPLE_EXPLORATIONS_DIR = os.path.join('data', 'explorations')
-WIDGETS_DIR = os.path.join('extensions', 'widgets')
+INTERACTIONS_DIR = os.path.join('extensions', 'interactions')
+RTE_EXTENSIONS_DIR = os.path.join('extensions', 'rich_text_components')
 RULES_DIR = os.path.join('extensions', 'rules')
-INTERACTIVE_WIDGETS_DIR = os.path.join('extensions', 'widgets', 'interactive')
-NONINTERACTIVE_WIDGETS_DIR = os.path.join(
-    'extensions', 'widgets', 'noninteractive')
 
 OBJECT_TEMPLATES_DIR = os.path.join('extensions', 'objects', 'templates')
 OBJECTS_DIR = os.path.join('extensions', 'objects')
@@ -58,9 +56,6 @@ END_DEST = 'END'
 
 # The default number of items to show on a page in a paged view.
 DEFAULT_PAGE_SIZE = 50
-
-# The default widget used for a new state.
-DEFAULT_WIDGET_ID = 'TextInput'
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First State'
@@ -84,16 +79,6 @@ ACCEPTED_IMAGE_FORMATS_AND_EXTENSIONS = {
     'gif': ['gif']
 }
 
-# Prefixes for widget ids in the datastore.
-INTERACTIVE_PREFIX = 'interactive'
-NONINTERACTIVE_PREFIX = 'noninteractive'
-
-# The total number of non-interactive widgets. Used as a sanity check.
-NONINTERACTIVE_WIDGET_COUNT = 4
-# The total number of interactive widgets. Used as a sanity check.
-INTERACTIVE_WIDGET_COUNT = 12
-
-
 DEFAULT_EDITOR_PREREQUISITES_AGREEMENT = """
 I understand and agree that any contributions I make to this site will be
 licensed under CC-BY-SA v4.0, with a waiver of the attribution requirement. I
@@ -104,7 +89,8 @@ part of an exploration) whose licensing is not compatible with CC-BY-SA v4.0.
 # Static file url to path mapping
 PATH_MAP = {
     '/css': os.path.join('core', 'templates', 'dev', 'head', 'css'),
-    '/extensions/widgets': os.path.join('extensions', 'widgets'),
+    '/extensions/interactions': INTERACTIONS_DIR,
+    '/extensions/rich_text_components': RTE_EXTENSIONS_DIR,
     '/favicon.ico': os.path.join('static', 'images', 'favicon.ico'),
     '/images': os.path.join('static', 'images'),
     '/lib/static': os.path.join('lib', 'static'),
@@ -149,60 +135,61 @@ DEFAULT_LANGUAGE_CODE = 'en'
 # Whether to include a page with the Oppia discussion forum.
 SHOW_FORUM_PAGE = True
 
-# Ids and locations of the permitted widgets.
-ALLOWED_WIDGETS = {
-    NONINTERACTIVE_PREFIX: {
-        'Collapsible': {
-            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Collapsible')
-        },
-        'Image': {
-            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Image')
-        },
-        'Link': {
-            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Link')
-        },
-        'Math': {
-            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Math')
-        },
-        'Tabs': {
-            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Tabs')
-        },
-        'Video': {
-            'dir': os.path.join(NONINTERACTIVE_WIDGETS_DIR, 'Video')
-        },
+# Ids and locations of the permitted extensions.
+ALLOWED_RTE_EXTENSIONS = {
+    'Collapsible': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Collapsible')
     },
-    INTERACTIVE_PREFIX: {
-        'Continue': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'Continue')
-        },
-        'MultipleChoiceInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MultipleChoiceInput')
-        },
-        'NumericInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'NumericInput')
-        },
-        'TextInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'TextInput')
-        },
-        'InteractiveMap': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'InteractiveMap')
-        },
-        'SetInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'SetInput')
-        },
-        'CodeRepl': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'CodeRepl')
-        },
-        'LogicProof': {
-            'dir': 'extensions/widgets/interactive/LogicProof'
-        },
-        'MusicNotesInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'MusicNotesInput')
-        },
-        'GraphInput': {
-            'dir': os.path.join(INTERACTIVE_WIDGETS_DIR, 'GraphInput')
-        },
-    }
+    'Image': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Image')
+    },
+    'Link': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Link')
+    },
+    'Math': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Math')
+    },
+    'Tabs': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Tabs')
+    },
+    'Video': {
+        'dir': os.path.join(RTE_EXTENSIONS_DIR, 'Video')
+    },
+}
+ALLOWED_INTERACTIONS = {
+    'CodeRepl': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'CodeRepl')
+    },
+    'Continue': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'Continue')
+    },
+    'GraphInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'GraphInput')
+    },
+    'ImageClickInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'ImageClickInput')
+    },
+    'InteractiveMap': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'InteractiveMap')
+    },
+    'LogicProof': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'LogicProof')
+    },
+    'MultipleChoiceInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'MultipleChoiceInput')
+    },
+    'MusicNotesInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'MusicNotesInput')
+    },
+    'NumericInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'NumericInput')
+    },
+    'SetInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'SetInput')
+    },
+    'TextInput': {
+        'dir': os.path.join(INTERACTIONS_DIR, 'TextInput')
+    },
 }
 
 # Demo explorations to load on startup. The id assigned to each exploration
@@ -227,7 +214,7 @@ DEMO_EXPLORATIONS = [
     # fiction engine!
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
-    ('test_exploration.yaml', 'Test of expressions and widgets', 'Test'),
+    ('test_exploration.yaml', 'Test of expressions and interactions', 'Test'),
     ('modeling_graphs', 'Graph Modeling', 'Mathematics')
 ]
 
@@ -249,7 +236,6 @@ GALLERY_URL = '/gallery'
 GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
 GALLERY_LOGIN_REDIRECT_URL = '/gallery_login_redirect'
-HOMEPAGE_URL = '/'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -297,7 +283,7 @@ OUTPUT_FORMAT_ZIP = 'zip'
 UPDATE_TYPE_EXPLORATION_COMMIT = 'exploration_commit'
 UPDATE_TYPE_FEEDBACK_MESSAGE = 'feedback_thread'
 
-# The name for the default handler of a widget.
+# The name for the default handler of an interaction.
 SUBMIT_HANDLER_NAME = 'submit'
 
 # List of supported language codes. Each description has a

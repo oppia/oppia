@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 import contextlib
+import datetime
 import os
 import re
 import unittest
@@ -279,7 +280,7 @@ class TestBase(unittest.TestCase):
         """
         exploration = exp_domain.Exploration.create_default_exploration(
             exploration_id, title, category)
-        exploration.states[exploration.init_state_name].widget.handlers[
+        exploration.states[exploration.init_state_name].interaction.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
         exploration.objective = objective
         exp_services.save_new_exploration(owner_id, exploration)

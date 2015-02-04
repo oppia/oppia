@@ -47,7 +47,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
 
       if (!$scope.explorationId) {
         warningsData.addWarning(
-          'Error: File picker widget called without being given an exploration.');
+          'The file picker can only be used in the context of an exploration.');
         return;
       }
 

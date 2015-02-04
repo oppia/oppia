@@ -35,17 +35,3 @@ TESTING THE INSTALLATION
 ************************************
 
 Run `bash scripts/test.sh' and `bash scripts/run_js_tests.sh' from the oppia/ folder.
-
-
-************************************
-TROUBLESHOOTING
-************************************
-
-Q: What should I do if I get a error like this when running start.sh?
-
-ERROR: cannot verify github.com's certificate, issued by `/C=US/O=DigiCert Inc/OU=www.digicert.com/CN=DigiCert High Assurance EV CA-1':
-  Unable to locally verify the issuer's authority.
-To connect to github.com insecurely, use `--no-check-certificate'.
-
-A: Open scripts/install_third_party.sh with your favorite text editor and replace
-`wget' by `wget --no-check-certificate' everywhere. Then run `bash scripts/start.sh' again.

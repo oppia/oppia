@@ -332,8 +332,11 @@ describe('New state template service', function() {
       GLOBALS = {
         NEW_STATE_TEMPLATE: {
           content: [{type: 'text', value: ''}],
-          param_changes: [],
-          widget: {
+          interaction: {
+            customization_args: {
+              rows: {value: 1},
+              placeholder: {value: 'Type your answer here.'}
+            },
             handlers: [{
               name: 'submit',
               rule_specs: [{
@@ -344,13 +347,10 @@ describe('New state template service', function() {
                 description: 'Default',
               }],
             }],
-            widget_id: 'TextInput',
-            customization_args: {
-              rows: {value: 1},
-              placeholder: {value: 'Type your answer here.'}
-            },
+            id: 'TextInput',
             sticky: false
           },
+          param_changes: [],
           unresolved_answers: {},
         }
       };
@@ -360,8 +360,11 @@ describe('New state template service', function() {
     it('should correctly make a new state template given a state name', function() {
       expect(nsts.getNewStateTemplate(NEW_STATE_NAME)).toEqual({
         content: [{type: 'text', value: ''}],
-        param_changes: [],
-        widget: {
+        interaction: {
+          customization_args: {
+            rows: {value: 1},
+            placeholder: {value: 'Type your answer here.'}
+          },
           handlers: [{
             name: 'submit',
             rule_specs: [{
@@ -372,13 +375,10 @@ describe('New state template service', function() {
               description: 'Default'
             }]
           }],
-          widget_id: 'TextInput',
-          customization_args: {
-            rows: {value: 1},
-            placeholder: {value: 'Type your answer here.'}
-          },
+          id: 'TextInput',
           sticky: false
         },
+        param_changes: [],
         unresolved_answers: {}
       });
     });

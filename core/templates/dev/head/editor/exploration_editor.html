@@ -15,6 +15,7 @@
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
+    GLOBALS.interactionDisplayModes = JSON.parse('{{interaction_display_modes|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -25,6 +26,12 @@
       throw 'error: Could not load google visualization library. Are you offline?';
     }
   </script>
+
+  <style>
+    html, body {
+      background-color: #eeedee;
+    }
+  </style>
 
   {{dependencies_html}}
 {% endblock header_js %}
@@ -44,12 +51,60 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
-    <li class="dropdown" ng-controller="EditorHelpTab">
-      <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="EditorNavigation" style="margin-left: 20px;">
+    <li ng-class="{'active': getTabStatuses().active === 'main', 'dropdown': countWarnings()}">
+      <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
+        <span class="glyphicon glyphicon-pencil"></span>
+      </a>
+      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator">
+        <span class="oppia-exploration-warnings-count">
+          <[countWarnings()]>
+        </span>
+      </div>
+      <ul class="dropdown-menu oppia-exploration-warnings-box">
+        <span class="oppia-exploration-warnings-header">Warnings</span>
+        <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
+          <hr class="oppia-exploration-warnings-separator">
+          <[warning]>
+        </li>
+      </ul>
+    </li>
+
+    <li ng-class="{'active': getTabStatuses().active === 'preview'}" id="tutorialPreviewTab">
+      <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
+        <span class="glyphicon glyphicon-play"></span>
+      </a>
+    </li>
+
+    <li ng-class="{'active': getTabStatuses().active === 'stats'}">
+      <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
+        <span class="glyphicon glyphicon-stats"></span>
+      </a>
+    </li>
+
+    <li ng-class="{'active': getTabStatuses().active === 'settings'}">
+      <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
+        <span class="glyphicon glyphicon-cog"></span>
+      </a>
+    </li>
+
+    <li ng-class="{'active': getTabStatuses().active === 'history'}">
+      <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()" class="protractor-test-history-tab">
+        <span class="glyphicon glyphicon-time"></span>
+      </a>
+    </li>
+
+    <li ng-class="{'active': getTabStatuses().active === 'feedback'}">
+      <a href="#" tooltip="Feedback" tooltip-placement="bottom" tooltip-append-to-body="true" ng-click="selectFeedbackTab()">
+        <span class="glyphicon glyphicon-comment"></span>
+      </a>
+    </li>
+
+    <li class="dropdown">
+      <a href="#" tooltip="Help" tooltip-placement="right" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-question-sign"></span>
       </a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
         <li class="dropdown">
           <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
         </li>
@@ -67,6 +122,29 @@
       <div ng-if="postTutorialHelpPopoverIsShown" class="popover left oppia-post-tutorial-popover">
         <div class="arrow"></div>
         <div class="popover-content">If you need help in the future, click here!</div>
+      </div>
+    </li>
+  </ul>
+
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="ExplorationPublishButton">
+    <li ng-if="isEditableOutsideTutorialMode()">
+      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
+        <button id="tutorialSaveExplorationButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+          <span ng-if="!isSaveInProgress">
+            Publish Draft
+            <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
+          </span>
+          <span ng-if="isSaveInProgress">
+            Publishing...
+          </span>
+        </button>
+        <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"
+                ng-disabled="!isExplorationSaveable()" dropdown-toggle>
+          <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+          <li><a ng-click="discardChanges()" ng-class="{'oppia-disabled-link': !isExplorationSaveable()}" class="protractor-test-discard-changes" title="Discard all pending changes.">Discard Draft</a></li>
+        </ul>
       </div>
     </li>
   </ul>
@@ -117,39 +195,6 @@
       </div>
     </script>
 
-    <script type="text/ng-template" id="modals/nominateExploration">
-      <div class="modal-header">
-        <h3>Nominate for featured status</h3>
-      </div>
-
-      <div class="modal-body">
-        <p>
-          Congratulations, you are about to nominate this exploration for featured status in the gallery!
-        </p>
-
-        <p>
-          Currently, the decision to feature an exploration is based on moderator review.
-          When you submit an exploration for review, a moderator will play through
-          it, look at its structure, and decide whether it fits the
-          <a href="/site_guidelines#/publication-criteria">criteria for featured status</a>.
-          If not, the moderator will make a series of specific suggestions on how
-          to make the exploration satisfy the criteria, and work with the editor(s)
-          to get it featured.
-        </p>
-
-        <p>
-          <strong>To kick off the review process</strong>, please make a post to the
-          <a href="{{moderator_request_forum_url}}" target="_blank">request forum</a>, and
-          include a link to the exploration.
-        </p>
-      </div>
-
-      <div class="modal-footer">
-        <button class="btn btn-default" ng-click="close()">Close</button>
-        <a class="btn btn-success" href="{{moderator_request_forum_url}}" target="_blank">Post in the request forum</a>
-      </div>
-    </script>
-
     <script type="text/ng-template" id="modals/deleteExploration">
       <div class="modal-header">
         <h3>Delete Exploration</h3>
@@ -175,7 +220,7 @@
         <p>
           <span ng-if="commitMessageIsOptional">(Optional)</span>
           Please enter a brief description of what you have changed:
-          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened"></textarea>
+          <textarea rows="3" cols="50" ng-model="commitMessage" focus-on="saveChangesModalOpened" class="protractor-test-commit-message-input"></textarea>
         </p>
 
         <div ng-if="explorationChangesExist">
@@ -227,13 +272,11 @@
           <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">
             <strong>Note:</strong> This is a private, unpublishable copy of a
             <a ng-href="<[getExplorationUrl(explorationRightsService.clonedFrom())]>" target="_blank">public exploration</a>.
-            You are very welcome to submit feedback to improve the original exploration: to do this,
-            click the previous link, then click the Feedback button on the top-right.
-            Thank you!
           </div>
         </div>
       </div>
 
+<<<<<<< HEAD
       <div class="row oppia-exploration-editor-top-row">
         <div class="col-lg-4 col-md-4 col-sm-4">
           <div ng-if="!isInPreviewMode">
@@ -318,73 +361,68 @@
                 </div>
               </span>
             </div>
+=======
+      <div ng-show="getTabStatuses().active === 'main'">
+        <div class="row">
+          <div class="col-lg-9 col-md-9 col-sm-9">
+            {% include 'editor/state_editor.html' %}
+>>>>>>> develop
           </div>
-
-          <div class="row" ng-if="!isInPreviewMode">
-            <div class="col-lg-6 col-md-6 col-sm-6">
-            </div>
-            <div class="col-lg-6 col-md-6 col-sm-6">
-              <div ng-show="warningsList.length" ng-click="toggleExplorationWarningVisibility()">
-                <div class="alert alert-warning oppia-exploration-warnings-box pull-right">
-                  <div>
-                    <span ng-if="!areExplorationWarningsVisible" style="color: black;">
-                    </span>
-                    <span ng-if="areExplorationWarningsVisible" style="color: black;">
-                    </span>
-                    <span class="glyphicon glyphicon-warning-sign"></span>
-                    <strong><[warningsList.length]></strong> warning<span ng-if="warningsList.length > 1">s</span>
-                    <span class="glyphicon glyphicon-chevron-right oppia-warning-chevron pull-right" ng-if="!areExplorationWarningsVisible"></span>
-                    <span class="glyphicon glyphicon-chevron-down oppia-warning-chevron pull-right" ng-if="areExplorationWarningsVisible"></span>
-                  </div>
-                  <div collapse="!areExplorationWarningsVisible">
-                    <ul>
-                      <li ng-repeat="warningText in warningsList track by $index">
-                        <[warningText]>
-                      </li>
-                    </ul>
-                  </div>
-                </div>
+          <div class="col-lg-3 col-md-3 col-sm-3">
+            <div class="oppia-editor-sidebar hidden-xs">
+              <div class="oppia-editor-sidebar-section-header">
+                Current State
               </div>
+              <div class="oppia-editor-sidebar-section-body">
+                {% include 'editor/sidebar_state_name.html' %}
+              </div>
+              <accordion close-others="true">
+                <accordion-group is-open="true">
+                  <accordion-heading>
+                    Map<span class="caret"></span>
+                  </accordion-heading>
+                  {% include 'editor/exploration_graph.html' %}
+                </accordion-group>
+                <accordion-group>
+                  <accordion-heading>Statistics<span class="caret"></span></accordion-heading>
+                  {% include 'editor/state_statistics.html' %}
+                </accordion-group>
+                <accordion-group>
+                  <accordion-heading>License information<span class="caret"></span></accordion-heading>
+                  <div role="contentinfo">
+                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                      <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
+                    </a>
+                    <span style="font-size: 0.8em">
+                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
+                    </span>
+                  </div>
+                </accordion-group>
+              </accordion>
             </div>
           </div>
         </div>
       </div>
 
-      <div ng-if="!isInPreviewMode">
-        <tabset>
-          <tab heading="Main" active="getTabStatuses().main.active" select="selectMainTab()">
-            <div class="row">
-              <div class="col-lg-9 col-md-9 col-sm-9">
-                {% include 'editor/state_editor.html' %}
-              </div>
-              <div class="col-lg-3 col-md-3 col-sm-3">
-                {% include 'editor/exploration_graph.html' %}
-                {% include 'editor/state_statistics.html' %}
-              </div>
-            </div>
-          </tab>
-
-          <tab heading="Statistics" active="getTabStatuses().stats.active" select="selectStatsTab()">
-            {% include 'editor/exploration_statistics.html' %}
-          </tab>
-
-          <tab heading="Settings" active="getTabStatuses().settings.active" select="selectSettingsTab()">
-            {% include 'editor/exploration_settings.html' %}
-          </tab>
-
-          <tab heading="History" active="getTabStatuses().history.active" select="selectHistoryTab()" disabled="explorationRightsService.isCloned()">
-            {% include 'editor/exploration_history.html' %}
-          </tab>
-
-          <tab heading="<[feedbackTabHeader]>" active="getTabStatuses().feedback.active" select="selectFeedbackTab()">
-            {% include 'editor/exploration_feedback.html' %}
-          </tab>
-        </tabset>
+      <!-- This is an ng-if, so that the preview loads the latest version of the exploration each time the tab is accessed. -->
+      <div ng-if="getTabStatuses().active === 'preview'">
+        {% include 'editor/exploration_preview.html' %}
       </div>
 
-      <div class="row" ng-if="!!isInPreviewMode" ng-controller="ExplorationPreview">
-        <hr>
-        {% include 'editor/exploration_preview.html' %}
+      <div ng-show="getTabStatuses().active === 'stats'">
+        {% include 'editor/exploration_statistics.html' %}
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'settings'">
+        {% include 'editor/exploration_settings.html' %}
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'history'">
+        {% include 'editor/exploration_history.html' %}
+      </div>
+
+      <div ng-show="getTabStatuses().active === 'feedback'">
+        {% include 'editor/exploration_feedback.html' %}
       </div>
     </div>
   </div>
@@ -443,6 +481,7 @@
     {{ include_js_file('editor/ExplorationHistory.js') }}
     {{ include_js_file('editor/HistoryServices.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
+    {{ include_js_file('editor/SidebarStateName.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
@@ -457,5 +496,5 @@
   </script>
 
   {{ skin_templates }}
-  {{ widget_templates }}
+  {{ interaction_templates }}
 {% endblock footer_js %}

@@ -19,8 +19,11 @@
  * @author Jacob Davis (jacobdavis11@gmail.com)
  */
 
-var widgets = require('../../../extensions/widgets/protractor.js');
+var interactions = require('../../../extensions/interactions/protractor.js');
+var richTextComponents = require(
+  '../../../extensions/rich_text_components/protractor.js');
 var objects = require('../../../extensions/objects/protractor.js');
+var general = require('./general.js');
 
 var DictionaryEditor = function(elem) {
   return {
@@ -160,23 +163,25 @@ var RichTextEditor = function(elem) {
     appendHorizontalRule: function() {
       _clickContentMenuButton('insertHorizontalRule');
     },
-    // This adds and customizes non-interactive widgets.
+    // This adds and customizes RTE components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    addWidget: function(widgetName) {
-      _clickContentMenuButton('custom-command-' + widgetName.toLowerCase());
+    // passed on to the relevant RTE component editor.
+    addRteComponent: function(componentName) {
+      _clickContentMenuButton('custom-command-' + componentName.toLowerCase());
 
       // The currently active modal is the last in the DOM
       var modal = element.all(by.css('.modal-dialog')).last();
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which modal to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which modal to act on but drop the componentName.
       var args = [modal];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).customizeWidget.apply(null, args);
-      modal.element(by.css('.protractor-test-close-widget-editor')).click();
+      richTextComponents.getComponent(componentName).customizeComponent.apply(
+        null, args);
+      modal.element(
+        by.css('.protractor-test-close-rich-text-component-editor')).click();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -265,7 +270,7 @@ var AutocompleteMultiDropdownEditor = function(elem) {
 // should consist of:
 //   handler.readPlainText('plain');
 //   handler.readBoldText('bold');
-//   handler.readWidget('Math', ...);
+//   handler.readRteComponent('Math', ...);
 var expectRichText = function(elem) {
   var toMatch = function(richTextInstructions) {
     // We remove all <span> elements since these are plain text that is
@@ -316,10 +321,10 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
   // arrayPointer traverses both arrays simultaneously.
   var arrayPointer = 0;
   var textPointer = 0;
-  // Widgets insert line breaks above and below themselves and these are
+  // RTE components insert line breaks above and below themselves and these are
   // recorded in fullText but not arrayOfTexts so we need to track them
   // specially.
-  var justPassedWidget = false;
+  var justPassedRteComponent = false;
 
   var _readFormattedText = function(text, tagName) {
     expect(arrayOfElems[arrayPointer].getTagName()).toBe(tagName);
@@ -327,7 +332,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     expect(arrayOfTexts[arrayPointer]).toEqual(text);
     arrayPointer = arrayPointer + 1;
     textPointer = textPointer + text.length;
-    justPassedWidget = false;
+    justPassedRteComponent = false;
   };
 
   return {
@@ -337,7 +342,7 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
         fullText.substring(textPointer, textPointer + text.length)
       ).toEqual(text);
       textPointer = textPointer + text.length;
-      justPassedWidget = false;
+      justPassedRteComponent = false;
     },
     readBoldText: function(text) {
       _readFormattedText(text, 'b');
@@ -348,27 +353,27 @@ var RichTextChecker = function(arrayOfElems, arrayOfTexts, fullText) {
     readUnderlineText: function(text) {
       _readFormattedText(text, 'u');
     },
-    // TODO (Jacob) add functions for other rich text components
+    // TODO(Jacob): add functions for other rich text components.
     // Additional arguments may be sent to this function, and they will be
-    // passed on to the relevant widget editor.
-    readWidget: function(widgetName) {
+    // passed on to the relevant RTE component editor.
+    readRteComponent: function(componentName) {
       var elem = arrayOfElems[arrayPointer];
       expect(elem.getTagName()).
-        toBe('oppia-noninteractive-' + widgetName.toLowerCase());
+        toBe('oppia-noninteractive-' + componentName.toLowerCase());
       expect(elem.getText()).toBe(arrayOfTexts[arrayPointer]);
 
-      // Need to convert arguments to an actual array; we tell the widget
-      // which element to act on but drop the widgetName.
+      // Need to convert arguments to an actual array; we tell the component
+      // which element to act on but drop the componentName.
       var args = [elem];
       for (var i = 1; i < arguments.length; i++) {
         args.push(arguments[i]);
       }
-      widgets.getNoninteractive(widgetName).
-        expectWidgetDetailsToMatch.apply(null, args);
+      richTextComponents.getComponent(componentName).
+        expectComponentDetailsToMatch.apply(null, args);
       textPointer = textPointer + arrayOfTexts[arrayPointer].length +
-        (justPassedWidget ? 1 : 2);
+        (justPassedRteComponent ? 1 : 2);
       arrayPointer = arrayPointer + 1;
-      justPassedWidget = true;
+      justPassedRteComponent = true;
     },
     expectEnd: function() {
       expect(arrayPointer).toBe(arrayOfElems.length);
@@ -393,6 +398,149 @@ var toRichText = function(text) {
       handler.setPlainText(text);
     } else {
       handler.readPlainText(text);
+    }
+  };
+};
+
+/**
+ * This function is used to read and check CodeMirror.
+ * The input 'elem' is the div with the 'CodeMirror-code' class.
+ * This assumes that line numbers are enabled, as line numbers are used to
+ * identify lines.
+ * CodeMirror loads a part of the text at once, and scrolling in the element
+ * loads more divs.
+ */
+var CodeMirrorChecker = function(elem) {
+  // The number of pixels to scroll between reading different sections of
+  // CodeMirror's text. 400 pixels is about 15 lines, which will work if
+  // codemirror's buffer (viewportMargin) is set to at least 10 (the default).
+  var CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS = 400;
+
+  /**
+   * This recursive function is used by expectTextWithHighlightingToBe().
+   * currentLineNumber is the current largest line number processed,
+   * scrollTo is the number of pixels from the top of the text that
+   * codemirror should scroll to,
+   * compareDict is an object whose keys are line numbers and whose values are
+   * objects corresponding to that line with the following key-value pairs:
+   *  - 'text': the exact string of text expected on that line
+   *  - 'highlighted': true or false, whether the line is highlighted
+   *  - 'checked': true or false, whether the line has been checked
+   */
+  function _compareTextAndHighlightingFromLine(
+      currentLineNumber, scrollTo, compareDict) {
+    // The general.scrollElementIntoView() function sometimes does not make
+    // codemirror load additional divs, so this is used to scroll the text in
+    // codemirror to a point scrollTo pixels from the top of the text or the
+    // bottom of the text if scrollTo is too large.
+    browser.executeScript(
+      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) + ");");
+    elem.all(by.xpath('./div')).map(function(lineElement) {
+      return lineElement.element(by.css('.CodeMirror-linenumber')).getText()
+          .then(function(lineNumber) {
+        // Note: the last line in codemirror will have an empty string for line
+        // number and for text. This is to skip that line.
+        if (lineNumber == '') {
+          return lineNumber;
+        }
+        if (!compareDict.hasOwnProperty(lineNumber)) {
+          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+        }
+        expect(lineElement.element(by.xpath('./pre')).getText())
+          .toEqual(compareDict[lineNumber].text);
+        expect(
+          lineElement.element(by.css('.CodeMirror-linebackground')).isPresent())
+          .toEqual(compareDict[lineNumber].highlighted);
+        compareDict[lineNumber].checked = true;
+        return lineNumber;
+      });
+    }).then(function(lineNumbers) {
+      var largestLineNumber = lineNumbers[lineNumbers.length - 1];
+      if (largestLineNumber != currentLineNumber) {
+        _compareTextAndHighlightingFromLine(
+          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS, compareDict);
+      } else {
+        for (var lineNumber in compareDict) {
+          if (compareDict[lineNumber].checked !== true) {
+            throw Error('Expected line ' + lineNumber + ': \'' +
+              compareDict[lineNumber].text + '\' to be found in CodeMirror');
+          }
+        }
+      }
+    });
+  }
+  /**
+   * This recursive function is used by expectTextToBe(). The previous function
+   * is not used because it is very slow.
+   * currentLineNumber is the current largest line number processed,
+   * scrollTo is the number of pixels from the top of the text that
+   * codemirror should scroll to,
+   * compareDict is an object whose keys are line numbers and whose values are
+   * objects corresponding to that line with the following key-value pairs:
+   *  - 'text': the exact string of text expected on that line
+   *  - 'checked': true or false, whether the line has been checked
+   */
+  function _compareTextFromLine(currentLineNumber, scrollTo, compareDict) {
+    browser.executeScript(
+      "$('.CodeMirror-vscrollbar').first().scrollTop(" + String(scrollTo) + ");");
+    elem.getText().then(function(text) {
+      // text is a string 2n lines long representing n lines of text codemirror
+      // has loaded. The (2i)th line contains a line number and the (2i+1)th
+      // line contains the text on that line.
+      var textArray = text.split('\n');
+      for (var i = 0; i < textArray.length; i += 2) {
+        var lineNumber = textArray[i];
+        var lineText = textArray[i + 1];
+        if (!compareDict.hasOwnProperty(lineNumber)) {
+          throw Error('Line ' + lineNumber + ' not found in CodeMirror');
+        }
+        expect(lineText).toEqual(compareDict[lineNumber].text);
+        compareDict[lineNumber].checked = true;
+      }
+      var largestLineNumber = textArray[textArray.length - 2];
+      if (largestLineNumber !== currentLineNumber) {
+        _compareTextFromLine(
+          largestLineNumber, scrollTo + CODEMIRROR_SCROLL_AMOUNT_IN_PIXELS, compareDict);
+      } else {
+        for (var lineNumber in compareDict) {
+          if (compareDict[lineNumber].checked !== true) {
+            throw Error('Expected line ' + lineNumber + ': \'' +
+              compareDict[lineNumber].text + '\' to be found in CodeMirror');
+          }
+        }
+      }
+    });
+  }
+  return {
+    /**
+     * Compares text and highlighting with codemirror-mergeview. The input
+     * should be an object whose keys are line numbers and whose values should
+     * be an object with the following key-value pairs:
+     *  - text: the exact string of text expected on that line
+     *  - highlighted: true or false
+     * This runs much slower than checking without highlighting, so the
+     * expectTextToBe() function should be used when possible.
+     */
+    expectTextWithHighlightingToBe: function(expectedTextDict) {
+      for (var lineNumber in expectedTextDict) {
+        expectedTextDict[lineNumber]['checked'] = false;
+      }
+      _compareTextAndHighlightingFromLine(1, 0, expectedTextDict);
+    },
+    /**
+     * Compares text with codemirror. The input should be a string (with
+     * line breaks) of the expected display on codemirror.
+     */
+    expectTextToBe: function(expectedTextString) {
+      var expectedTextArray = expectedTextString.split('\n');
+      var expectedDict = {};
+      for (var lineNumber = 1; lineNumber <= expectedTextArray.length; lineNumber++) {
+        expectedDict[lineNumber] = {
+          'text': expectedTextArray[lineNumber - 1],
+          'checked': false
+        };
+      }
+      _compareTextFromLine(1, 0, expectedDict);
     }
   };
 };
@@ -429,5 +577,6 @@ exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;
 exports.toRichText = toRichText;
+exports.CodeMirrorChecker = CodeMirrorChecker;
 
 exports.getEditor = getEditor;

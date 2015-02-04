@@ -96,6 +96,7 @@ oppia.directive('conversationSkin', [function() {
       $scope.initializePage = function() {
         $scope.allResponseStates = [];
         $scope.inputTemplate = '';
+        $scope.interactionIsInline = false;
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
@@ -104,8 +105,8 @@ oppia.directive('conversationSkin', [function() {
           $scope.hasEditingRights = hasEditingRights;
 
           $scope.stateName = stateName;
-          $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
-            $scope.stateName);
+          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName);
+          $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(stateName);
           _addNewCard(initHtml);
           $scope.mostRecentQuestionIndex = 0;
 
@@ -139,9 +140,11 @@ oppia.directive('conversationSkin', [function() {
           $scope.finished = !Boolean(newStateName);
 
           if (!$scope.finished && !isSticky) {
-            // The previous widget is not sticky and should be replaced.
-            $scope.inputTemplate = oppiaPlayerService.getInteractiveWidgetHtml(
+            // The previous interaction is not sticky and should be replaced.
+            $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
               newStateName) + oppiaPlayerService.getRandomSuffix();
+            $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(
+              newStateName);
           }
 
           $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs.push({

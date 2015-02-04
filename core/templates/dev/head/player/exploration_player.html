@@ -9,10 +9,11 @@
   {% if exploration_version %}
     <script type="text/javascript">
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
+      GLOBALS.interactionDisplayModes = JSON.parse('{{interaction_display_modes|js_string}}');
     </script>
   {% endif %}
 
-  {{widget_dependencies_html}}
+  {{dependencies_html}}
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
@@ -148,5 +149,5 @@
   </script>
 
   {{ skin_templates }}
-  {{ widget_templates }}
+  {{ interaction_templates }}
 {% endblock footer_js %}

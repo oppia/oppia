@@ -53,7 +53,7 @@ describe('Gallery view', function() {
     users.logout();
 
     users.login('varda@example.com');
-    browser.get('/gallery');
+    browser.get(general.GALLERY_URL_SUFFIX);
     gallery.editExploration(EXPLORATION_VINGILOT);
     // Moderators can edit explorations and mark them as featured.
     editor.setLanguage(LANGUAGE_FRANCAIS);

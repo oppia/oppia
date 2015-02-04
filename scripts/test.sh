@@ -73,7 +73,7 @@ for arg in "$@"; do
     if [ ! -d "$TOOLS_DIR/coverage-3.6" ]; then
       echo Installing coverage
       rm -rf $TOOLS_DIR/coverage
-      wget --no-check-certificate http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -O coverage.tar.gz
+      curl --silent http://pypi.python.org/packages/source/c/coverage/coverage-3.6.tar.gz#md5=67d4e393f4c6a5ffc18605409d2aa1ac -o coverage.tar.gz
       tar xvzf coverage.tar.gz -C $TOOLS_DIR
       rm coverage.tar.gz
     fi

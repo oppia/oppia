@@ -131,26 +131,26 @@ oppia.factory('editorContextService', ['$log', function($log) {
 // TODO(sll): Should this depend on a versioning service that keeps track of
 // the current active version? Previous versions should not be editable.
 oppia.factory('editabilityService', [function() {
-  var isEditable = false;
-  var inTutorialMode = false;
+  var _isEditable = false;
+  var _inTutorialMode = false;
   return {
     onStartTutorial: function() {
-      inTutorialMode = true;
+      _inTutorialMode = true;
     },
     onEndTutorial: function() {
-      inTutorialMode = false;
+      _inTutorialMode = false;
     },
     isEditableOutsideTutorialMode: function() {
-      return isEditable;
+      return _isEditable;
     },
     isEditable: function() {
-      return isEditable && !inTutorialMode;
+      return _isEditable && !_inTutorialMode;
     },
     markEditable: function() {
-      isEditable = true;
+      _isEditable = true;
     },
     markNotEditable: function() {
-      isEditable = false;
+      _isEditable = false;
     }
   };
 }]);
@@ -171,6 +171,8 @@ oppia.factory('changeListService', [
   // undone change.
   var undoneChangeStack = [];
 
+  // All these constants should correspond to those in exp_domain.py.
+  // TODO(sll): Enforce this in code.
   var CMD_ADD_STATE = 'add_state';
   var CMD_RENAME_STATE = 'rename_state';
   var CMD_DELETE_STATE = 'delete_state';
@@ -307,6 +309,9 @@ oppia.factory('changeListService', [
     },
     getChangeList: function() {
       return angular.copy(explorationChangeList);
+    },
+    isExplorationLockedForEditing: function() {
+      return explorationChangeList.length > 0;
     },
     undoLastChange: function() {
       if (explorationChangeList.length === 0) {
@@ -629,7 +634,7 @@ oppia.factory('explorationStatesService', [
       }).result.then(function(deleteStateName) {
         delete _states[deleteStateName];
         for (var otherStateName in _states) {
-          var handlers = _states[otherStateName].widget.handlers;
+          var handlers = _states[otherStateName].interaction.handlers;
           for (var i = 0; i < handlers.length; i++) {
             for (var j = 0; j < handlers[i].rule_specs.length; j++) {
               if (handlers[i].rule_specs[j].dest === deleteStateName) {
@@ -667,7 +672,7 @@ oppia.factory('explorationStatesService', [
       delete _states[oldStateName];
 
       for (var otherStateName in _states) {
-        var handlers = _states[otherStateName].widget.handlers;
+        var handlers = _states[otherStateName].interaction.handlers;
         for (var i = 0; i < handlers.length; i++) {
           for (var j = 0; j < handlers[i].rule_specs.length; j++) {
             if (handlers[i].rule_specs[j].dest === oldStateName) {
@@ -697,7 +702,7 @@ oppia.factory('explorationStatesService', [
 oppia.factory('statePropertyService', [
     '$log', 'changeListService', 'warningsData', function($log, changeListService, warningsData) {
   // Public base API for data services corresponding to state properties
-  // (widget id, content, etc.)
+  // (interaction id, content, etc.)
   // WARNING: This should be initialized only in the context of the state editor, and
   // every time the state is loaded, so that proper behavior is maintained if e.g.
   // the state is renamed.
@@ -778,9 +783,9 @@ oppia.factory('statePropertyService', [
   };
 }]);
 
-// A data service that stores the current widget id.
+// A data service that stores the current interaction id.
 // TODO(sll): Add validation.
-oppia.factory('stateWidgetIdService', [
+oppia.factory('stateInteractionIdService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_id';
@@ -788,7 +793,7 @@ oppia.factory('stateWidgetIdService', [
 }]);
 
 // A data service that stores the current state customization args for the
-// widget. This is a dict mapping customization arg names to dicts of the
+// interaction. This is a dict mapping customization arg names to dicts of the
 // form {value: customization_arg_value}.
 // TODO(sll): Add validation.
 oppia.factory('stateCustomizationArgsService', [
@@ -798,9 +803,9 @@ oppia.factory('stateCustomizationArgsService', [
   return child;
 }]);
 
-// A data service that stores the current sticky status for the widget.
+// A data service that stores the current sticky status for the interaction.
 // TODO(sll): Add validation.
-oppia.factory('stateWidgetStickyService', [
+oppia.factory('stateInteractionStickyService', [
     'statePropertyService', function(statePropertyService) {
   var child = Object.create(statePropertyService);
   child.propertyName = 'widget_sticky';
@@ -815,7 +820,7 @@ oppia.factory('newStateTemplateService', [function() {
     // NB: clients should ensure that the desired state name is valid.
     getNewStateTemplate: function(newStateName) {
       var newStateTemplate = angular.copy(GLOBALS.NEW_STATE_TEMPLATE);
-      newStateTemplate.widget.handlers.forEach(function(handler) {
+      newStateTemplate.interaction.handlers.forEach(function(handler) {
         handler.rule_specs.forEach(function(ruleSpec) {
           ruleSpec.dest = newStateName;
         });
@@ -826,10 +831,48 @@ oppia.factory('newStateTemplateService', [function() {
 }]);
 
 
+oppia.factory('computeGraphService', [function() {
+
+  var _computeGraphData = function(initStateId, states) {
+    var nodes = {};
+    var links = [];
+    for (var stateName in states) {
+      nodes[stateName] = stateName;
+
+      var handlers = states[stateName].interaction.handlers;
+      for (var h = 0; h < handlers.length; h++) {
+        var ruleSpecs = handlers[h].rule_specs;
+        for (i = 0; i < ruleSpecs.length; i++) {
+          links.push({
+            source: stateName,
+            target: ruleSpecs[i].dest,
+          });
+        }
+      }
+    }
+    nodes[END_DEST] = END_DEST;
+
+    return {
+      nodes: nodes,
+      links: links,
+      initStateId: initStateId,
+      finalStateId: END_DEST
+    };
+  };
+
+  return {
+    compute: function(initStateId, states) {
+      return _computeGraphData(initStateId, states);
+    }
+  };
+}]);
+
+
 // Service for computing graph data.
 oppia.factory('graphDataService', [
     'explorationStatesService', 'explorationInitStateNameService',
-    function(explorationStatesService, explorationInitStateNameService) {
+    'computeGraphService', function(explorationStatesService,
+    explorationInitStateNameService, computeGraphService) {
 
   var _graphData = null;
 
@@ -848,31 +891,8 @@ oppia.factory('graphDataService', [
     }
 
     var states = explorationStatesService.getStates();
-
-    var nodes = {};
-    var links = [];
-    for (var stateName in states) {
-      nodes[stateName] = stateName;
-
-      var handlers = states[stateName].widget.handlers;
-      for (h = 0; h < handlers.length; h++) {
-        ruleSpecs = handlers[h].rule_specs;
-        for (i = 0; i < ruleSpecs.length; i++) {
-          links.push({
-            source: stateName,
-            target: ruleSpecs[i].dest,
-          });
-        }
-      }
-    }
-    nodes[END_DEST] = END_DEST;
-
-    _graphData = {
-      nodes: nodes,
-      links: links,
-      initStateId: explorationInitStateNameService.savedMemento,
-      finalStateId: END_DEST
-    };
+    var initStateId = explorationInitStateNameService.savedMemento;
+    _graphData = computeGraphService.compute(initStateId, states);
   };
 
   return {
@@ -911,6 +931,128 @@ oppia.factory('stateEditorTutorialFirstTimeService', ['$http', '$rootScope', fun
       }
 
       _currentlyInFirstVisit = false;
+    }
+  };
+}]);
+
+
+// Service for the list of exploration warnings.
+oppia.factory('explorationWarningsService', [
+    'graphDataService', 'explorationStatesService', 'explorationObjectiveService',
+    function(graphDataService, explorationStatesService, explorationObjectiveService) {
+  var _warningsList = [];
+
+  // Given an initial node id, a object with keys node ids, and values node
+  // names, and a list of edges (each of which is an object with keys 'source'
+  // and 'target', and values equal to the respective node names), returns a
+  // list of names of all nodes which are unreachable from the initial node.
+  var _getUnreachableNodeNames = function(initNodeId, nodes, edges) {
+    var queue = [initNodeId];
+    var seen = {};
+    seen[initNodeId] = true;
+    while (queue.length > 0) {
+      var currNodeId = queue.shift();
+      edges.forEach(function(edge) {
+        if (edge.source === currNodeId && !seen.hasOwnProperty(edge.target)) {
+          seen[edge.target] = true;
+          queue.push(edge.target);
+        }
+      });
+    }
+
+    var unreachableNodeNames = [];
+    for (var nodeId in nodes) {
+      if (!(seen.hasOwnProperty(nodes[nodeId]))) {
+        unreachableNodeNames.push(nodes[nodeId]);
+      }
+    }
+
+    return unreachableNodeNames;
+  };
+
+  // Given an array of objects with two keys 'source' and 'target', returns
+  // an array with the same objects but with the values of 'source' and 'target'
+  // switched. (The objects represent edges in a graph, and this operation
+  // amounts to reversing all the edges.)
+  var _getReversedLinks = function(links) {
+    return links.map(function(link) {
+      return {
+        source: link.target,
+        target: link.source
+      };
+    });
+  };
+
+  // Returns a list of states which have rules that have no feedback and that
+  // point back to the same state.
+  var _getStatesWithInsufficientFeedback = function() {
+    var problematicStates = [];
+    var _states = explorationStatesService.getStates();
+    for (var stateName in _states) {
+      var handlers = _states[stateName].interaction.handlers;
+      var isProblematic = handlers.some(function(handler) {
+        return handler.rule_specs.some(function(ruleSpec) {
+          return (
+            ruleSpec.dest === stateName &&
+            !ruleSpec.feedback.some(function(feedbackItem) {
+              return feedbackItem.length > 0;
+            })
+          );
+        });
+      });
+
+      if (isProblematic) {
+        problematicStates.push(stateName);
+      }
+    }
+    return problematicStates;
+  };
+
+  var _updateWarningsList = function() {
+    _warningsList = [];
+
+    graphDataService.recompute();
+    var _graphData = graphDataService.getGraphData();
+    if (_graphData) {
+      var unreachableStateNames = _getUnreachableNodeNames(
+        _graphData.initStateId, _graphData.nodes, _graphData.links);
+      if (unreachableStateNames.length) {
+        _warningsList.push(
+          'The following state(s) are unreachable: ' +
+          unreachableStateNames.join(', ') + '.');
+      } else {
+        // Only perform this check if all states are reachable.
+        var deadEndStates = _getUnreachableNodeNames(
+          _graphData.finalStateId, _graphData.nodes,
+          _getReversedLinks(_graphData.links));
+        if (deadEndStates.length) {
+          _warningsList.push(
+            'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
+        }
+      }
+    }
+
+    var statesWithInsufficientFeedback = _getStatesWithInsufficientFeedback();
+    if (statesWithInsufficientFeedback.length) {
+      _warningsList.push(
+        'The following states need more feedback: ' +
+        statesWithInsufficientFeedback.join(', ') + '.');
+    }
+
+    if (!explorationObjectiveService.displayed) {
+      _warningsList.push('Please specify an objective (in the Settings tab).');
+    }
+  };
+
+  return {
+    countWarnings: function() {
+      return _warningsList.length;
+    },
+    getWarnings: function() {
+      return angular.copy(_warningsList);
+    },
+    updateWarnings: function() {
+      _updateWarningsList();
     }
   };
 }]);

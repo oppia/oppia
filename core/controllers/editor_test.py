@@ -244,6 +244,20 @@ class EditorTest(BaseEditorControllerTest):
         self.logout()
 
 
+class StatsIntegrationTest(BaseEditorControllerTest):
+    """Test statistics recording using the default exploration."""
+
+    def test_state_stats_for_default_exploration(self):
+        exp_services.delete_demo('0')
+        exp_services.load_demo('0')
+
+        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0/1'
+
+        # Check, from the editor perspective, that no stats have been recorded.
+        self.register_editor(self.EDITOR_EMAIL)
+        self.login(self.EDITOR_EMAIL)
+
+
 class DownloadIntegrationTest(BaseEditorControllerTest):
     """Test handler for exploration and state download."""
 
@@ -251,8 +265,7 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
         "State A": ("""content:
 - type: text
   value: ''
-param_changes: []
-widget:
+interaction:
   customization_args:
     placeholder:
       value: Type your answer here.
@@ -266,14 +279,14 @@ widget:
       dest: State A
       feedback: []
       param_changes: []
+  id: TextInput
   sticky: false
-  widget_id: TextInput
+param_changes: []
 """),
         "State B": ("""content:
 - type: text
   value: ''
-param_changes: []
-widget:
+interaction:
   customization_args:
     placeholder:
       value: Type your answer here.
@@ -287,8 +300,9 @@ widget:
       dest: State B
       feedback: []
       param_changes: []
+  id: TextInput
   sticky: false
-  widget_id: TextInput
+param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""content:
 - type: text
@@ -297,8 +311,7 @@ widget:
     your exploration.<br><br>If you need more help getting
     started, check out the Help link in the navigation
     bar.
-param_changes: []
-widget:
+interaction:
   customization_args:
     placeholder:
       value: Type your answer here.
@@ -312,8 +325,9 @@ widget:
       dest: %s
       feedback: []
       param_changes: []
+  id: TextInput
   sticky: false
-  widget_id: TextInput
+param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
 
@@ -321,8 +335,7 @@ widget:
 """content:
 - type: text
   value: ''
-param_changes: []
-widget:
+interaction:
   customization_args:
     placeholder:
       value: Type your answer here.
@@ -336,8 +349,9 @@ widget:
       dest: State A
       feedback: []
       param_changes: []
+  id: TextInput
   sticky: false
-  widget_id: TextInput
+param_changes: []
 """)
 
     def test_exploration_download_handler_for_default_exploration(self):

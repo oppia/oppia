@@ -69,7 +69,6 @@ describe('Embedding', function() {
     editor.saveChanges('demonstration edit');
 
     for (var i = 0; i < TEST_PAGES.length; i++) {
-
       // This is necessary as the pages are non-angular; we need xpaths below
       // for the same reason.
       var driver = protractor.getInstance().driver;
@@ -84,6 +83,11 @@ describe('Embedding', function() {
       browser.switchTo().defaultContent();
 
       // Test of deferred loading (old version)
+      var deferredElement = driver.findElement(by.xpath(
+        "//div[@class='protractor-test-deferred']"));
+      // Without the following line, protractor does not scroll down to the
+      // element in question.
+      general.scrollElementIntoView(deferredElement);
       driver.findElement(
         by.xpath(
           "//div[@class='protractor-test-deferred']/oppia/div/button")).click();

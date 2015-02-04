@@ -143,9 +143,9 @@ describe('RTE directive', function() {
   beforeEach(module('oppia'));
   beforeEach(inject(function($rootScope, $compile, _$httpBackend_) {
     $httpBackend = _$httpBackend_;
-    $httpBackend.expectGET('/widgetrepository/data/noninteractive').respond({
+    $httpBackend.expectGET('/rich_text_component_repository/data').respond({
       data: {
-        widgetRepository: {
+        repository: {
           'Image': [{
             frontend_name: 'image',
             name: 'Image',
@@ -176,7 +176,7 @@ describe('RTE directive', function() {
     var rteControllerScope = elm.isolateScope();
 
     // TODO(sll): Why isn't this being auto-populated?
-    rteControllerScope._NONINTERACTIVE_WIDGETS = [{
+    rteControllerScope._RICH_TEXT_COMPONENTS = [{
       name: 'image',
       backendName: 'Image',
       tooltip: 'Insert image',

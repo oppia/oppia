@@ -62,9 +62,15 @@ handlers:
   http_headers:
     Cache-Control: 'public, max-age=2592000'
     Vary: Accept-Encoding
-- url: /extensions/widgets/(.*)/(.*)/static/(.*)
-  static_files: extensions/widgets/\1/\2/static/\3
-  upload: extensions/widgets/(.*)/(.*)/static/(.*)
+- url: /extensions/interactions/(.*)/static/(.*)
+  static_files: extensions/interactions/\1/static/\2
+  upload: extensions/interactions/(.*)/static/(.*)
+  secure: always
+  http_headers:
+    Cache-Control: 'no-cache'
+- url: /extensions/rich_text_components/(.*)/static/(.*)
+  static_files: extensions/rich_text_components/\1/static/\2
+  upload: extensions/rich_text_components/(.*)/static/(.*)
   secure: always
   http_headers:
     Cache-Control: 'no-cache'

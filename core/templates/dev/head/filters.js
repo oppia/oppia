@@ -88,7 +88,7 @@ oppia.filter('truncateAtFirstInput', [function() {
 
 // Filter that changes {{...}} tags into the corresponding parameter input values.
 // Note that this returns an HTML string to accommodate the case of multiple-choice
-// input.
+// input and image-click input.
 oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
   return function(input, choices) {
     if (!input || !(input.description)) {
@@ -117,13 +117,17 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
         varType = varType.substring(1);
       }
 
-      var replacementText = inputs[varName];
+      var replacementText;
+      // Special case for MultipleChoiceInput and ImageClickInput
       if (choices) {
-        replacementText = '\'' + choices[inputs[varName]] + '\'';
-      }
+        for (var i = 0; i < choices.length; i++) {
+          if (choices[i].val === inputs[varName]) {
+            replacementText = '\'' + choices[i].label + '\'';
+          }
+        }
       // TODO(sll): Generalize this to use the inline string representation of
       // an object type.
-      if (varType === 'MusicPhrase') {
+      } else if (varType === 'MusicPhrase') {
         replacementText = '[';
         for (var i = 0; i < inputs[varName].length; i++) {
           if (i !== 0) {
@@ -133,9 +137,11 @@ oppia.filter('parameterizeRuleDescription', ['$filter', function($filter) {
         }
         replacementText += ']';
       } else if (varType === 'NormalizedString') {
-        replacementText = '"' + replacementText + '"';
+        replacementText = '"' + inputs[varName] + '"';
       } else if (varType === 'Graph') {
         replacementText = '[reference graph]';
+      } else {
+        replacementText = inputs[varName];
       }
 
       description = description.replace(pattern, ' ');

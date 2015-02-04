@@ -25,7 +25,6 @@ from core.domain import exp_jobs
 from core.domain import exp_services
 from core.domain import rights_manager
 from core.domain import user_services
-from core.domain import widget_registry
 from core.platform import models
 (base_models, exp_models,) = models.Registry.import_models([
     models.NAMES.base_model, models.NAMES.exploration])
@@ -48,6 +47,10 @@ CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
     'An announcement to display on top of the contribute gallery page.',
     default_value='')
 
+BANNER_ALT_TEXT = config_domain.ConfigProperty(
+    'banner_alt_text', 'UnicodeString',
+    'The alt text for the site banner image', default_value='')
+
 
 def _get_short_language_description(full_language_description):
     if ' (' not in full_language_description:
@@ -64,15 +67,9 @@ class GalleryPage(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-
-        noninteractive_widget_html = (
-            widget_registry.Registry.get_noninteractive_widget_html())
-
         self.values.update({
             'nav_mode': feconf.NAV_MODE_GALLERY,
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
-            'noninteractive_widget_html': jinja2.utils.Markup(
-                noninteractive_widget_html),
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
                     feconf.GALLERY_LOGIN_REDIRECT_URL)),
@@ -81,7 +78,8 @@ class GalleryPage(base.BaseHandler):
                 'return_url', feconf.GALLERY_CREATE_MODE_URL),
             'ALL_LANGUAGE_NAMES': [
                 _get_short_language_description(lc['description'])
-                for lc in feconf.ALL_LANGUAGE_CODES]
+                for lc in feconf.ALL_LANGUAGE_CODES],
+            'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
         })
         self.render_template('galleries/gallery.html')
 

@@ -11,20 +11,21 @@ module.exports = function(config) {
       'third_party/static/angularjs-1.3.0-rc.5/angular-resource.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-sanitize.min.js',
       'third_party/static/angularjs-1.3.0-rc.5/angular-mocks.js',
-      'third_party/static/ui-bootstrap-0.10.0/ui-bootstrap-tpls-0.10.0.js',
+      'third_party/static/ui-bootstrap-0.12.0/ui-bootstrap-tpls-0.12.0.js',
       'third_party/static/ui-codemirror-0.1.2/src/ui-codemirror.js',
       'third_party/static/ui-utils-0.1.1/ui-utils.js',
       'third_party/static/ui-map-0.5.0/ui-map.js',
       'third_party/static/ui-sortable-0.12.6/src/sortable.js',
       'third_party/static/bower-material-0.6.0-rc1/angular-material.js',
       'third_party/static/hammer-js-2.0.4/hammer.js',
+      'third_party/static/nginfinitescroll-1.0.0/ng-infinite-scroll.min.js',
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
       // and extensions/... are switched. The test framework may be flaky.
       'core/templates/dev/head/**/*.js',
       'extensions/**/*.js',
-      'extensions/widgets/interactive/**/*.html'
+      'extensions/interactions/**/*.html'
     ],
     exclude: [
       'core/templates/dev/head/**/*-e2e.js',
@@ -59,7 +60,7 @@ module.exports = function(config) {
       'core/templates/dev/head/tests/!(*Spec).js': ['coverage'],
       'extensions/**/!(*Spec).js': ['coverage'],
       'core/templates/dev/head/**/*.html': ['ng-html2js'],
-      'extensions/widgets/interactive/**/*.html': ['ng-html2js']
+      'extensions/interactions/**/*.html': ['ng-html2js']
     },
     reporters: ['progress', 'coverage'],
     coverageReporter: {

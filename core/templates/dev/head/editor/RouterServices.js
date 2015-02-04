@@ -20,26 +20,21 @@
 
 oppia.factory('routerService', [
     '$rootScope', '$location', '$log', 'explorationInitStateNameService',
-    'editorContextService', 'explorationStatesService',
+    'editorContextService', 'explorationStatesService', 'oppiaPlayerService',
+    'explorationParamSpecsService', 'explorationTitleService', 'explorationData',
     function($rootScope, $location, $log, explorationInitStateNameService,
-             editorContextService, explorationStatesService) {
+             editorContextService, explorationStatesService, oppiaPlayerService,
+             explorationParamSpecsService, explorationTitleService, explorationData) {
+
+  var MAIN_TAB = 'main';
+  var PREVIEW_TAB = 'preview';
+  var STATS_TAB = 'stats';
+  var SETTINGS_TAB = 'settings';
+  var HISTORY_TAB = 'history';
+  var FEEDBACK_TAB = 'feedback';
 
   var _tabs = {
-    main: {
-      active: true
-    },
-    stats: {
-      active: false
-    },
-    settings: {
-      active: false
-    },
-    history: {
-      active: false
-    },
-    feedback: {
-      active: false
-    }
+    active: MAIN_TAB
   };
 
   // When the URL path changes, reroute to the appropriate tab in the
@@ -54,17 +49,22 @@ oppia.factory('routerService', [
 
     $rootScope.$broadcast('externalSave');
 
-    if (newPath === '/stats') {
-      _tabs.stats.active = true;
+    if (newPath === '/preview') {
+      _tabs.active = PREVIEW_TAB;
+    } else if (newPath === '/stats') {
+      _tabs.active = STATS_TAB;
+      $rootScope.$broadcast('refreshStatisticsTab');
     } else if (newPath === '/settings') {
-      _tabs.settings.active = true;
+      _tabs.active = SETTINGS_TAB;
       $rootScope.$broadcast('refreshSettingsTab');
     } else if (newPath === '/history') {
-      _tabs.history.active = true;
+      // TODO(sll): Do this on-hover rather than on-click.
+      $rootScope.$broadcast('refreshVersionHistory', {forceRefresh: false});
+      _tabs.active = HISTORY_TAB;
     } else if (newPath === '/feedback') {
-      _tabs.feedback.active = true;
+      _tabs.active = FEEDBACK_TAB;
     } else if (newPath.indexOf('/gui/') !== -1) {
-      _tabs.main.active = true;
+      _tabs.active = MAIN_TAB;
       var putativeStateName = newPath.substring('/gui/'.length);
       if (!explorationStatesService.getStates()) {
         return;
@@ -103,8 +103,9 @@ oppia.factory('routerService', [
     isLocationSetToNonStateEditorTab: function() {
       var currentPath = $location.path();
       return (
-        currentPath === '/stats' || currentPath === '/settings' ||
-        currentPath === '/history' || currentPath === '/feedback');
+        currentPath === '/preview' || currentPath === '/stats' ||
+        currentPath === '/settings' || currentPath === '/history' ||
+        currentPath === '/feedback');
     },
     getCurrentStateFromLocationPath: function() {
       if ($location.path().indexOf('/gui/') !== -1) {
@@ -119,6 +120,10 @@ oppia.factory('routerService', [
         editorContextService.setActiveStateName(stateName);
       }
       $location.path('/gui/' + editorContextService.getActiveStateName());
+    },
+    navigateToPreviewTab: function() {
+      _savePendingChanges();
+      $location.path('/preview');
     },
     navigateToStatsTab: function() {
       _savePendingChanges();

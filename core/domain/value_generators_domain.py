@@ -94,7 +94,8 @@ class Registry(object):
                 if issubclass(clazz, BaseValueGenerator):
                     if clazz.__name__ in cls.value_generators_dict:
                         raise Exception(
-                            'Duplicate widget name %s' % clazz.__name__)
+                            'Duplicate value generator name %s'
+                            % clazz.__name__)
 
                     cls.value_generators_dict[clazz.__name__] = clazz
 

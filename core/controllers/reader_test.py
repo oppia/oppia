@@ -39,7 +39,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
-        exploration.states[exploration.init_state_name].widget.handlers[
+        exploration.states[exploration.init_state_name].interaction.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
         exp_services.save_new_exploration(self.editor_id, exploration)
 
@@ -132,7 +132,7 @@ class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
         init_state_data = (
             reader_dict['exploration']['states'][self.last_state_name])
         init_content = init_state_data['content'][0]['value']
-       
+
         self.assertRegexpMatches(init_content, expected_response)
         self.assertEqual(reader_dict['exploration']['title'], expected_title)
 

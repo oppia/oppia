@@ -17,7 +17,6 @@
 __author__ = 'sll@google.com (Sean Lip)'
 
 from core.controllers import base
-from core.controllers import pages
 from core.domain import config_domain
 from core.domain import exp_services
 from core.domain import subscription_services
@@ -27,9 +26,6 @@ import feconf
 import utils
 
 
-BANNER_ALT_TEXT = config_domain.ConfigProperty(
-    'banner_alt_text', 'UnicodeString',
-    'The alt text for the site banner image', default_value='')
 SPLASH_PAGE_EXPLORATION_ID = config_domain.ConfigProperty(
     'splash_page_exploration_id', 'UnicodeString',
     ('The id for the exploration on the splash page '
@@ -40,31 +36,6 @@ SPLASH_PAGE_EXPLORATION_VERSION = config_domain.ConfigProperty(
     ('The version number for the exploration on the splash page '
      '(a blank value indicates that the latest version should be used)'),
     default_value='')
-
-
-class HomePage(base.BaseHandler):
-    """Visited when user visits /. Shows the generic splash page."""
-    # We use 'gallery' because the createExploration() modal makes a call
-    # there.
-    PAGE_NAME_FOR_CSRF = 'gallery'
-
-    def get(self):
-        if SPLASH_PAGE_EXPLORATION_ID.value:
-            splash_exp_id = SPLASH_PAGE_EXPLORATION_ID.value
-            if not exp_services.get_exploration_by_id(
-                    splash_exp_id, strict=False):
-                exp_services.delete_demo(splash_exp_id)
-                exp_services.load_demo(splash_exp_id)
-
-        self.values.update({
-            'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
-            'SITE_FORUM_URL': pages.SITE_FORUM_URL.value,
-            'SITE_NAME': pages.SITE_NAME.value,
-            'SPLASH_PAGE_EXPLORATION_ID': SPLASH_PAGE_EXPLORATION_ID.value,
-            'SPLASH_PAGE_EXPLORATION_VERSION': (
-                SPLASH_PAGE_EXPLORATION_VERSION.value),
-        })
-        self.render_template('pages/splash.html')
 
 
 class DashboardPage(base.BaseHandler):
@@ -81,7 +52,7 @@ class DashboardPage(base.BaseHandler):
         elif user_services.has_user_registered_as_editor(self.user_id):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
-            })                    
+            })
             self.render_template('dashboard/dashboard.html')
         else:
             self.redirect(utils.set_url_query_parameter(
@@ -124,9 +95,24 @@ class DashboardHandler(base.BaseHandler):
         subscription_services.record_user_has_seen_notifications(
             self.user_id, job_queued_msec if job_queued_msec else 0.0)
 
+        editable_exp_summaries = (
+            exp_services.get_at_least_editable_exploration_summaries(
+                self.user_id))
+
         self.values.update({
-            'explorations': exp_services.get_at_least_editable_summary_dict(
-                self.user_id),
+            'explorations': {
+                exp_summary.id: {
+                    'title': exp_summary.title,
+                    'category': exp_summary.category,
+                    'objective': exp_summary.objective,
+                    'language_code': exp_summary.language_code,
+                    'last_updated': utils.get_time_in_millisecs(
+                        exp_summary.exploration_model_last_updated),
+                    'status': exp_summary.status,
+                    'community_owned': exp_summary.community_owned,
+                    'is_editable': True,
+                } for exp_summary in editable_exp_summaries.values()
+            },
             # This may be None if no job has ever run for this user.
             'job_queued_msec': job_queued_msec,
             # This may be None if this is the first time the user has seen
