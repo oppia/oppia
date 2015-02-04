@@ -383,12 +383,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: #fff;
 }
 
-.oppia-share-dropdown {
+.oppia-share-dropdown-menu {
   min-width: 30px;
   width: 47px;
 }
 
-.oppia-share-items li > a {
+.oppia-share-dropdown-menu li > a {
   padding: 0 13%;
   font-size: 20px;
   font-weight: bolder;

@@ -6,13 +6,15 @@
     <div class="oppia-content" role="main">
       <md-card class="conversation-skin-exploration-intro-card">
         <!-- TODO(mgowano): Remove eclipse image once backend has image info for exploration. -->
-        <img src="/images/eclipse.jpg">
-        <h3 role="heading" class="conversation-skin-exploration-header protractor-test-exploration-header"><[explorationTitle]></h3>
+        <img itemprop="image" src="/images/eclipse.jpg">
+        <h3 itemprop="name" role="heading" class="conversation-skin-exploration-header protractor-test-exploration-header"><[explorationTitle]></h3>
         <div class="conversation-skin-exploration-bookmark-rate">
           <div class="conversation-skin-exploration-bookmark">
             <img class="conversation-skin-icons" src="/images/material-design-icons-1.0.1/ic_bookmark_outline_black_48dp.png">
             <br>
-            Bookmark
+            <span itemprop="description">
+              Bookmark
+            </span>
           </div>
           <div class="conversation-skin-exploration-rate">
             <img class="conversation-skin-icons" src="/images/material-design-icons-1.0.1/ic_star_outline_black_48dp.png">

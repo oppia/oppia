@@ -44,7 +44,8 @@ oppia.controller('ExplorationEditor', [
 
   $scope.isInPreviewMode = false;
   $scope.editabilityService = editabilityService;
-  $scope.embedExplorationButtonService = embedExplorationButtonService;
+  $scope.explorationId = oppiaPlayerService.getExplorationId();
+  $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
   $scope.enterPreviewMode = function() {
     $rootScope.$broadcast('externalSave');

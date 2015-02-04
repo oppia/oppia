@@ -31,9 +31,9 @@
       <a href="#" title="Share" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-share"></span>
       </a>
-      <ul class="dropdown-menu oppia-share-dropdown oppia-share-items" role="menu">
+      <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu">
         <li>
-          <a href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
+          <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
              onclick="javascript:window.open(this.href,
                       '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
             <img src="https://www.gstatic.com/images/icons/gplus-64.png"
@@ -41,7 +41,7 @@
           </a>
         </li>
         <li>
-          <a href="#" ng-click="showEmbedModal(explorationId)">
+          <a href="#" ng-click="showEmbedExplorationModal(explorationId)">
             <span>&lt;&gt</span>
           </a>
         </li>

@@ -456,7 +456,7 @@ oppia.controller('LearnerLocalNav', [
 
   $scope.explorationId = oppiaPlayerService.getExplorationId();
   $scope.serverName = window.location.protocol + '//' + window.location.host;
-  $scope.showEmbedModal = embedExplorationButtonService.showModal;
+  $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
   $scope.showFeedbackModal = function() {
     $modal.open({

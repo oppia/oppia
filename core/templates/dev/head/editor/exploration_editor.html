@@ -264,7 +264,7 @@
                 <span ng-show="!isInPreviewMode">
 
                   <span class="oppia-exploration-ctrl" ng-if="!explorationRightsService.isPrivate()">
-                    <button class="btn btn-default" title="Embed this exploration in another webpage." ng-click="showEmbedExplorationModal()" ng-disabled="isExplorationSaveable()">
+                    <button class="btn btn-default" title="Embed this exploration in another webpage." ng-click="showEmbedExplorationModal(explorationId)" ng-disabled="isExplorationSaveable()">
                       <span class="glyphicon glyphicon-share"></span>
                     </button>
                   </span>
