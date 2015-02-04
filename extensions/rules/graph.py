@@ -81,6 +81,7 @@ class IsConnected(base.GraphRule):
     is_generic = False
 
     def _evaluate(self, subject):
+        # Uses dfs to ensure that we can visit all vertices in one pass
         if len(subject['vertices']) == 0:
             return True
         def dfs(x, adj, visited):
@@ -100,7 +101,7 @@ class IsAcyclic(base.GraphRule):
     is_generic = False
 
     def _evaluate(self, subject):
-        # Checks if vertex is in parent set
+        # Uses dfs to ensure that we never have an edge to an ancestor in the dfs tree
         def dfs(x, p, adj, visited):
             visited[x] = 1
             for y in adj[x]:
@@ -130,7 +131,7 @@ class IsRegular(base.GraphRule):
     is_generic = False
 
     def _evaluate(self, subject):
+        # Checks that every vertex has degree equal to the first
         adj = construct_adjacency_lists(subject)
-        same_length = [len(l) == len(adj[0]) for l in adj]
-        return not (False in same_length)
+        return any(len(l) != len(adj[0]) for l in adj)
 
