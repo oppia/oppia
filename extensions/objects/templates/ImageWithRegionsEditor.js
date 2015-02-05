@@ -45,11 +45,27 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.rectWidth = $scope.rectHeight = 0;
         // Is user currently dragging?
         $scope.userIsCurrentlyDragging = false;
-        // Dimensions of image
+        // Dimensions of original image
+        $scope.originalImageWidth = $scope.originalImageHeight = 0;
+        // Dimensions of displayed image
         $scope.imageWidth = $scope.imageHeight = 0;
 
+        
         // Temporary label list
         var labelList = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
+        
+        // Calculates the dimensions of the image, assuming that the width
+        // of the image is scaled down to fit the svg element if necessary
+        $scope.calculateImageDimensions = function() {
+          var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
+          $scope.imageWidth = Math.min(svgElement.width(), $scope.originalImageWidth);
+          var scalingRatio = svgElement.width() / $scope.originalImageWidth;
+          $scope.imageHeight = $scope.originalImageHeight * scalingRatio;
+          return {
+            width: $scope.imageWidth,
+            height: $scope.imageHeight 
+          };
+        };
 
         $scope.getPreviewUrl = function(imageUrl) {
           return $sce.trustAsResourceUrl(
@@ -66,8 +82,8 @@ oppia.directive('imageWithRegionsEditor', [
           // width and height
           $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
             function() {
-              $scope.imageWidth = this.width;
-              $scope.imageHeight = this.height;
+              $scope.originalImageWidth = this.width;
+              $scope.originalImageHeight = this.height;
               $scope.$apply();
             }
           );

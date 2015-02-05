@@ -7,16 +7,16 @@
 <div ng-if="$parent.value.imagePath !== ''">
   <div>
     <svg class="oppia-image-with-regions-editor-svg"
-      ng-attr-width="<[imageWidth]>" 
-      ng-attr-height="<[imageHeight]>"
+      width="100%"
+      ng-attr-height="<[calculateImageDimensions().height]>"
       ng-mousedown="onSvgMouseDown($event)"
       ng-mousemove="onSvgMouseMove($event)"
       ng-mouseup="onSvgMouseUp($event)">
       <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
         x="0"
         y="0"
-        height="100%"
-        width="100%">
+        ng-attr-height="<[calculateImageDimensions().height]>"
+        ng-attr-width="<[calculateImageDimensions().width]>">
       </image>
       <rect ng-if="userIsCurrentlyDragging"
         ng-attr-x="<[rectX]>"
