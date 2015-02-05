@@ -34,9 +34,9 @@
 }
 
 /* Angular material overrides. */
-md-input-group.long > input 
+md-input-group.long > input
 {
-  width: 100%; 
+  width: 100%;
 }
 
 .md-button-success {
@@ -175,13 +175,13 @@ div.wysiwyg iframe.wysiwyg-content-large {
   position: relative;
 }
 
-/* 
-  Note that adding "overflow-y: scroll;" will 
-  break infinite scrolling in the gallery page. 
+/*
+  Note that adding "overflow-y: scroll;" will
+  break infinite scrolling in the gallery page.
 */
 .oppia-content-container {
   height: 100%;
-  left: 0; 
+  left: 0;
   position: relative;
   transition: transform 0.5s;
   -webkit-transition: -webkit-transform 0.5s;
@@ -797,11 +797,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   }
 }
 
-.oppia-interaction-display {
-  margin: 0;
-  padding: 0 0 0 10px;
-}
-
 .oppia-interaction-editor {
   border: 1px solid #ccc;
   padding: 15px 15px 0px 15px;
@@ -816,6 +811,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-editable-section {
   cursor: pointer;
+  position: relative;
 }
 .oppia-editable-section:hover .oppia-state-content-display,
 .oppia-editable-section:hover .oppia-interaction-preview,
@@ -840,6 +836,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-rules {
   padding: 0 10px 5px 25px;
+}
+
+.oppia-rule-block {
+  padding-bottom: 10px;
 }
 
 /* Styles for the state graph vizualization. */
@@ -868,8 +868,8 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-add-rule-button {
-  margin-top: -10px;
   margin-bottom: 10px;
+  margin-top: 10px;
   padding: 5px 40px;
 }
 
@@ -1194,21 +1194,8 @@ oppia-expression-error-tag:after {
 
 .oppia-state-card {
   background: rgb(255,255,255);
-  margin: 30px;
-  max-width: 900px;
-}
-
-.oppia-show-rule-editors-ctrl {
-  background-color: #eee;
-  height: 50px;
-  margin-bottom: -13px;
-  margin-left: -3px;
-  margin-right: -3px;
-  padding-top: 15px;
-}
-.oppia-show-rule-editors-ctrl:hover {
-  background-color: #ccc;
-  cursor: pointer;
+  margin: 20px auto;
+  max-width: 700px;
 }
 
 .oppia-state-next-card {

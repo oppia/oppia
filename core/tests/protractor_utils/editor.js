@@ -215,13 +215,6 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
 var addRule = function(interactionName, ruleName) {
-  // This button will not be shown if the rule editor section is already open.
-  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
-    if (buttons.length === 1) {
-      buttons[0].click();
-    }
-  });
-
   element(by.css('.protractor-test-add-rule')).click();
   var ruleElement = element(by.css('.protractor-test-temporary-rule'))
   var args = [ruleElement];
@@ -234,13 +227,6 @@ var addRule = function(interactionName, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
-  // This button will not be shown if the rule editor section is already open.
-  element.all(by.css('.protractor-test-show-rules')).then(function(buttons) {
-    if (buttons.length === 1) {
-      buttons[0].click();
-    }
-  });
-
   var elem = (ruleNum === 'default') ?
     element(by.css('.protractor-test-default-rule')):
     element.all(by.css('.protractor-test-rule-block')).get(ruleNum);
