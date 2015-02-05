@@ -41,60 +41,24 @@ def construct_adjacency_matrix(graph):
     return adjacency_matrix
 
 
-# TODO(czx): Speed up the isomorphism checker?
-class IsIsomorphicTo(base.GraphRule):
-    description = 'is isomorphic to {{g|Graph}}, including matching labels'
-    is_generic = False
-
-    def _evaluate(self, subject):
-        if len(subject['vertices']) != len(self.g['vertices']):
-            return False
-
-        adjacency_matrix_1 = construct_adjacency_matrix(subject)
-        adjacency_matrix_2 = construct_adjacency_matrix(self.g)
-
-        # Check against every permutation of vertices. 
-        # The new index of vertex i in self.g is perm[i].
-        num_vertices = len(self.g['vertices'])
-        for perm in itertools.permutations(range(num_vertices)):
-            # Test matching labels
-            if subject['isLabeled'] and any([
-                    self.g['vertices'][i]['label'] !=
-                    subject['vertices'][perm[i]]['label']
-                    for i in xrange(num_vertices)]):
-                continue
-
-            # Test isomorphism
-            found_isomorphism = True
-            for i in xrange(num_vertices):
-                for j in xrange(num_vertices):
-                    if adjacency_matrix_1[perm[i]][perm[j]] != adjacency_matrix_2[i][j]:
-                        found_isomorphism = False
-                        break
-                if not found_isomorphism:
-                    break
-            if found_isomorphism:
-                return True
-        return False
-
 # TODO(czx): Handle the directed case?
 class IsConnected(base.GraphRule):
     description = 'is a connected graph'
     is_generic = False
 
     def _evaluate(self, subject):
-        # Uses dfs to ensure that we can visit all vertices in one pass
+        # Uses depth first search to ensure that we can visit all vertices in one pass
         if len(subject['vertices']) == 0:
             return True
-        def dfs(current_vertex, adjacency_lists, is_visited):
+        def search_component(current_vertex, adjacency_lists, is_visited):
             is_visited[current_vertex] = True
             for next_vertex in adjacency_lists[current_vertex]:
                 if not is_visited[next_vertex]:
-                    dfs(next_vertex, adjacency_lists, is_visited)
+                    search_component(next_vertex, adjacency_lists, is_visited)
         
         is_visited = [False for v in subject['vertices']]
         adjacency_lists = construct_adjacency_lists(subject)
-        dfs(0, adjacency_lists, is_visited)
+        search_component(0, adjacency_lists, is_visited)
         return not (False in is_visited)
 
 
@@ -106,8 +70,8 @@ class IsAcyclic(base.GraphRule):
         NOT_VISITED = 0
         STILL_VISITING = 1
         IS_VISITED = 2
-        # Uses dfs to ensure that we never have an edge to an ancestor in the dfs tree
-        def dfs(current_vertex, previous_vertex, adjacency_lists, is_visited):
+        # Uses depth first search to ensure that we never have an edge to an ancestor in the search tree
+        def find_cycle(current_vertex, previous_vertex, adjacency_lists, is_visited):
             is_visited[current_vertex] = STILL_VISITING
             for next_vertex in adjacency_lists[current_vertex]:
                 if next_vertex == previous_vertex and subject['isDirected'] == False:
@@ -117,7 +81,7 @@ class IsAcyclic(base.GraphRule):
                 elif is_visited[next_vertex] == IS_VISITED:
                     continue
                 else:
-                    if not dfs(next_vertex, current_vertex, adjacency_lists, is_visited):
+                    if not find_cycle(next_vertex, current_vertex, adjacency_lists, is_visited):
                         return False
             is_visited[current_vertex] = IS_VISITED
             return True
@@ -126,7 +90,7 @@ class IsAcyclic(base.GraphRule):
         adjacency_lists = construct_adjacency_lists(subject)
         for start_vertex in xrange(len(subject['vertices'])):
             if not is_visited[start_vertex]:
-                if not dfs(start_vertex, -1, adjacency_lists, is_visited):
+                if not find_cycle(start_vertex, -1, adjacency_lists, is_visited):
                     return False
         return True
 
