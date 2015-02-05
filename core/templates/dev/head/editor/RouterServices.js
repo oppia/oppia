@@ -19,10 +19,10 @@
  */
 
 oppia.factory('routerService', [
-    '$rootScope', '$location', '$log', 'explorationInitStateNameService',
+    '$rootScope', '$location', '$interval', '$log', 'explorationInitStateNameService',
     'editorContextService', 'explorationStatesService', 'oppiaPlayerService',
     'explorationParamSpecsService', 'explorationTitleService', 'explorationData',
-    function($rootScope, $location, $log, explorationInitStateNameService,
+    function($rootScope, $location, $interval, $log, explorationInitStateNameService,
              editorContextService, explorationStatesService, oppiaPlayerService,
              explorationParamSpecsService, explorationTitleService, explorationData) {
 
@@ -66,14 +66,20 @@ oppia.factory('routerService', [
     } else if (newPath.indexOf('/gui/') !== -1) {
       _tabs.active = MAIN_TAB;
       var putativeStateName = newPath.substring('/gui/'.length);
-      if (!explorationStatesService.getStates()) {
-        return;
-      } else if (explorationStatesService.getState(putativeStateName)) {
-        editorContextService.setActiveStateName(putativeStateName);
-      } else {
-        $location.path('/gui/' + explorationInitStateNameService.savedMemento);
-      }
-      $rootScope.$broadcast('refreshStateEditor');
+
+      var waitForStatesToLoad = $interval(function() {
+        var allStates = explorationStatesService.getStates();
+        if (allStates) {
+          $interval.cancel(waitForStatesToLoad);
+
+          if (allStates.hasOwnProperty(putativeStateName)) {
+            editorContextService.setActiveStateName(putativeStateName);
+            $rootScope.$broadcast('refreshStateEditor');
+          } else {
+            $location.path('/gui/' + explorationInitStateNameService.savedMemento);
+          }
+        }
+      }, 300);
     } else {
       if (explorationInitStateNameService.savedMemento) {
         $location.path('/gui/' + explorationInitStateNameService.savedMemento);
