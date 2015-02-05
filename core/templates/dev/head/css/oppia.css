@@ -839,10 +839,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   z-index: 50;
 }
 
-.oppia-rules {
-  padding: 0 10px 5px 25px;
-}
-
 .oppia-rule-block {
   padding-bottom: 10px;
 }
@@ -875,7 +871,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-add-rule-button {
   margin-bottom: 10px;
   margin-top: 10px;
-  padding: 5px 40px;
+  padding: 5px 10px;
 }
 
 .oppia-small-delete-button {
@@ -890,9 +886,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   right: 25px;
 }
 
-.oppia-readonly-rule-container {
-  margin-left: -30px;
-}
 .oppia-readonly-rule-tile {
   background: #f5f5f5;
   border-radius: 4px;
@@ -907,33 +900,25 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding-bottom: 20px;
 }
 
-.oppia-rule-dest-link {
-  position: absolute;
-  /* This must be larger than the z-index in
-     .oppia-click-to-start-editing, so that the rule does not
-     switch to edit mode when the destination link is clicked. */
-  z-index: 200;
-}
-
 .oppia-rule-save-cancel-buttons {
   margin-bottom: 5px;
   margin-top: 2px;
 }
 
 .oppia-rule-sort-handle {
-  background: #ccc;
+  background: #ddd;
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
   float: left;
-  margin-left: -10px;
+  margin-left: -25px;
   width: 25px;
 }
 .oppia-rule-sort-arrows {
   cursor: move;
-  font-size: 14px;
-  margin-left: 5px;
-  padding-top: 3px;
-  padding-bottom: 6px;
+  font-size: 18px;
+  margin-left: 3px;
+  padding-top: 11px;
+  padding-bottom: 11px;
 }
 
 .oppia-rule-bubble {

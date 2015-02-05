@@ -47,6 +47,11 @@ oppia.factory('routerService', [
       return;
     }
 
+    if (!oldPath) {
+      // This can happen when clicking on links whose href is "#".
+      return;
+    }
+
     $rootScope.$broadcast('externalSave');
 
     if (newPath === '/preview') {

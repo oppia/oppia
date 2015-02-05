@@ -45,15 +45,19 @@ oppia.factory('interactionHandlersCache', [function() {
 
 
 oppia.controller('StateRules', [
-    '$scope', '$log', 'changeListService', 'interactionRepositoryService',
+    '$scope', '$log', '$modal', 'changeListService', 'interactionRepositoryService',
     'interactionHandlersCache', 'stateInteractionIdService', 'editorContextService',
-    'explorationStatesService', 'graphDataService',
+    'explorationStatesService', 'graphDataService', 'warningsData',
     function(
-      $scope, $log, changeListService, interactionRepositoryService,
+      $scope, $log, $modal, changeListService, interactionRepositoryService,
       interactionHandlersCache, stateInteractionIdService, editorContextService,
-      explorationStatesService, graphDataService) {
+      explorationStatesService, graphDataService, warningsData) {
 
   var _interactionHandlersMemento = null;
+
+  $scope.changeActiveRuleIndex = function(newIndex) {
+    $scope.activeRuleIndex = newIndex;
+  };
 
   $scope.getCurrentInteractionId = function() {
     return stateInteractionIdService.savedMemento;
@@ -89,6 +93,7 @@ oppia.controller('StateRules', [
 
     _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
     $scope.tmpRule = null;
+    $scope.activeRuleIndex = 0;
   });
 
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
@@ -111,8 +116,10 @@ oppia.controller('StateRules', [
 
     _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
     $scope.tmpRule = null;
+    $scope.activeRuleIndex = 0;
   });
 
+  // TODO(sll): Make this do the correct thing and open a modal instead.
   $scope.createTmpRule = function() {
     // A rule name of 'null' triggers the opening of the rule description
     // editor.
@@ -166,6 +173,10 @@ oppia.controller('StateRules', [
   };
 
   $scope.deleteRule = function(handlerName, index) {
+    if (index === $scope.interactionHandlers.length - 1) {
+      warningsData.addWarning('Cannot delete default rule.');
+      return;
+    }
     if (!window.confirm('Are you sure you want to delete this rule?')) {
       return;
     }
