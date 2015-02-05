@@ -21,13 +21,24 @@ __author__ = 'Zhan Xiong Chin'
 from extensions.rules import base
 import itertools
 
+# Constructs adjacency lists from a Graph object
 def construct_adjacency_lists(graph):
-    ret = [[] for v in graph['vertices']]
+    adjacency_lists = [[] for v in graph['vertices']]
     for edge in graph['edges']:
-        ret[edge['src']].append(edge['dst'])
+        adjacency_lists[edge['src']].append(edge['dst'])
         if not graph['isDirected']:
-            ret[edge['dst']].append(edge['src'])
-    return ret
+            adjacency_lists[edge['dst']].append(edge['src'])
+    return adjacency_lists
+
+# Constructs adjacency matrices from a Graph object
+def construct_adjacency_matrix(graph):
+    adjacency_matrix = [[None for v in graph['vertices']] for v in graph['vertices']]
+    for edge in graph['edges']:
+        weight = edge['weight'] if graph['isWeighted'] else 1
+        adjacency_matrix[edge['src']][edge['dst']] = weight
+        if not graph['isDirected']:
+            adjacency_matrix[edge['dst']][edge['src']] = weight
+    return adjacency_matrix
 
 
 # TODO(czx): Speed up the isomorphism checker?
@@ -39,17 +50,8 @@ class IsIsomorphicTo(base.GraphRule):
         if len(subject['vertices']) != len(self.g['vertices']):
             return False
 
-        # Construct adjacency matrices
-        def construct_adjacency_matrix(graph):
-            ret = [[None for v in graph['vertices']] for v in graph['vertices']]
-            for edge in graph['edges']:
-                weight = edge['weight'] if graph['isWeighted'] else 1
-                ret[edge['src']][edge['dst']] = weight
-                if not graph['isDirected']:
-                    ret[edge['dst']][edge['src']] = weight
-            return ret
-        adj = construct_adjacency_matrix(subject)
-        adj2 = construct_adjacency_matrix(self.g)
+        adjacency_matrix_1 = construct_adjacency_matrix(subject)
+        adjacency_matrix_2 = construct_adjacency_matrix(self.g)
 
         # Check against every permutation of vertices. 
         # The new index of vertex i in self.g is perm[i].
@@ -66,7 +68,7 @@ class IsIsomorphicTo(base.GraphRule):
             found_isomorphism = True
             for i in xrange(num_vertices):
                 for j in xrange(num_vertices):
-                    if adj[perm[i]][perm[j]] != adj2[i][j]:
+                    if adjacency_matrix_1[perm[i]][perm[j]] != adjacency_matrix_2[i][j]:
                         found_isomorphism = False
                         break
                 if not found_isomorphism:
@@ -84,16 +86,16 @@ class IsConnected(base.GraphRule):
         # Uses dfs to ensure that we can visit all vertices in one pass
         if len(subject['vertices']) == 0:
             return True
-        def dfs(x, adj, visited):
-            visited[x] = True
-            for y in adj[x]:
-                if not visited[y]:
-                    dfs(y, adj, visited)
+        def dfs(current_vertex, adjacency_lists, is_visited):
+            is_visited[current_vertex] = True
+            for next_vertex in adjacency_lists[current_vertex]:
+                if not is_visited[next_vertex]:
+                    dfs(next_vertex, adjacency_lists, is_visited)
         
-        visited = [False for v in subject['vertices']]
-        adj = construct_adjacency_lists(subject)
-        dfs(0, adj, visited)
-        return not (False in visited)
+        is_visited = [False for v in subject['vertices']]
+        adjacency_lists = construct_adjacency_lists(subject)
+        dfs(0, adjacency_lists, is_visited)
+        return not (False in is_visited)
 
 
 class IsAcyclic(base.GraphRule):
@@ -101,27 +103,30 @@ class IsAcyclic(base.GraphRule):
     is_generic = False
 
     def _evaluate(self, subject):
+        NOT_VISITED = 0
+        STILL_VISITING = 1
+        IS_VISITED = 2
         # Uses dfs to ensure that we never have an edge to an ancestor in the dfs tree
-        def dfs(x, p, adj, visited):
-            visited[x] = 1
-            for y in adj[x]:
-                if y == p and subject['isDirected'] == False:
+        def dfs(current_vertex, previous_vertex, adjacency_lists, is_visited):
+            is_visited[current_vertex] = STILL_VISITING
+            for next_vertex in adjacency_lists[current_vertex]:
+                if next_vertex == previous_vertex and subject['isDirected'] == False:
                     continue
-                if visited[y] == 1:
+                if is_visited[next_vertex] == STILL_VISITING:
                     return False
-                elif visited[y] == 2:
+                elif is_visited[next_vertex] == IS_VISITED:
                     continue
                 else:
-                    if not dfs(y, x, adj, visited):
+                    if not dfs(next_vertex, current_vertex, adjacency_lists, is_visited):
                         return False
-            visited[x] = 2
+            is_visited[current_vertex] = IS_VISITED
             return True
 
-        visited = [0 for v in subject['vertices']]
-        adj = construct_adjacency_lists(subject)
-        for i in xrange(len(visited)):
-            if not visited[i]:
-                if not dfs(i, -1, adj, visited):
+        is_visited = [NOT_VISITED for v in subject['vertices']]
+        adjacency_lists = construct_adjacency_lists(subject)
+        for start_vertex in xrange(len(subject['vertices'])):
+            if not is_visited[start_vertex]:
+                if not dfs(start_vertex, -1, adjacency_lists, is_visited):
                     return False
         return True
 
@@ -131,7 +136,9 @@ class IsRegular(base.GraphRule):
     is_generic = False
 
     def _evaluate(self, subject):
+        if len(subject['vertices']) == 0:
+            return True
         # Checks that every vertex has degree equal to the first
-        adj = construct_adjacency_lists(subject)
-        return any(len(l) != len(adj[0]) for l in adj)
+        adjacency_lists = construct_adjacency_lists(subject)
+        return all(len(l) == len(adjacency_lists[0]) for l in adjacency_lists)
 

@@ -67,7 +67,7 @@ def _completeGraph(n):
 class GraphRuleUnitTests(test_utils.GenericTestBase):
     """Tests for rules operating on Graph objects."""
     
-    def test_isisomorphic_rule(self):
+    def test_is_isomorphic_rule(self):
         self.assertTrue(graph.IsIsomorphicTo(_emptyGraph()).eval(_emptyGraph()))
         self.assertTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval(_cycleGraph(5)))
         self.assertTrue(graph.IsIsomorphicTo(_cycleGraph(5)).eval({
@@ -235,7 +235,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isLabeled': True
         }))
 
-    def test_isconnected_rule(self):
+    def test_is_connected_rule(self):
         self.assertTrue(graph.IsConnected().eval(_emptyGraph()))
         self.assertTrue(graph.IsConnected().eval(_cycleGraph(5)))
         self.assertTrue(graph.IsConnected().eval(_completeGraph(10)))
@@ -268,7 +268,7 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isLabeled': True
         }))
 
-    def test_isacyclic_rule(self):
+    def test_is_acyclic_rule(self):
         self.assertTrue(graph.IsAcyclic().eval(_emptyGraph()))
         self.assertTrue(graph.IsAcyclic().eval(_completeGraph(2)))
         self.assertTrue(graph.IsAcyclic().eval({
@@ -320,11 +320,12 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
             'isLabeled': False
         }))
 
-    def test_isregular_rule(self):
+    def test_is_regular_rule(self):
         self.assertTrue(graph.IsRegular().eval(_emptyGraph()))
         self.assertTrue(graph.IsRegular().eval(_nullGraph(9)))
         self.assertTrue(graph.IsRegular().eval(_completeGraph(8)))
         self.assertTrue(graph.IsRegular().eval(_cycleGraph(3)))
+        self.assertTrue(graph.IsRegular().eval(_cycleGraph(4)))
         self.assertFalse(graph.IsRegular().eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
