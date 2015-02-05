@@ -675,10 +675,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 100%;
 }
 
-.oppia-lightly-grayed {
-  color: #888;
-}
-
 .oppia-grayed {
   color: gray;
   opacity: 0.5;
@@ -910,7 +906,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
   float: left;
-  margin-left: -25px;
+  margin-left: -33px;
   width: 25px;
 }
 .oppia-rule-sort-arrows {

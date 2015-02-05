@@ -47,18 +47,16 @@ oppia.factory('interactionDetailsCache', [function() {
 
 
 oppia.controller('StateInteraction', [
-    '$scope', '$http', '$rootScope', '$filter', '$modal', '$window',
-    'warningsData', 'editorContextService', 'changeListService',
-    'oppiaHtmlEscaper', 'interactionRepositoryService',
+    '$scope', '$http', '$rootScope', '$filter', 'warningsData',
+    'editorContextService', 'oppiaHtmlEscaper', 'interactionRepositoryService',
     'stateInteractionIdService', 'stateCustomizationArgsService',
     'stateInteractionStickyService', 'editabilityService',
     'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
-    function($scope, $http, $rootScope, $filter, $modal, $window, warningsData,
-      editorContextService, changeListService, oppiaHtmlEscaper,
-      interactionRepositoryService, stateInteractionIdService,
-      stateCustomizationArgsService, stateInteractionStickyService,
-      editabilityService, explorationStatesService, graphDataService,
-      interactionDetailsCache) {
+    function($scope, $http, $rootScope, $filter, warningsData,
+      editorContextService, oppiaHtmlEscaper, interactionRepositoryService,
+      stateInteractionIdService, stateCustomizationArgsService,
+      stateInteractionStickyService, editabilityService,
+      explorationStatesService, graphDataService, interactionDetailsCache) {
 
   $scope.form = {};
 

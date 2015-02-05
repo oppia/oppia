@@ -54,6 +54,7 @@ oppia.controller('StateRules', [
       explorationStatesService, graphDataService, warningsData) {
 
   var _interactionHandlersMemento = null;
+  $scope.answerChoices = null;
 
   $scope.changeActiveRuleIndex = function(newIndex) {
     $scope.activeRuleIndex = newIndex;
@@ -93,7 +94,6 @@ oppia.controller('StateRules', [
       stateInteractionIdService.savedMemento, $scope.interactionHandlers);
 
     _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
-    $scope.tmpRule = null;
     $scope.activeRuleIndex = 0;
   });
 
@@ -124,42 +124,67 @@ oppia.controller('StateRules', [
       stateInteractionIdService.savedMemento, $scope.interactionHandlers);
 
     _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
-    $scope.tmpRule = null;
     $scope.activeRuleIndex = 0;
   });
 
-  // TODO(sll): Make this do the correct thing and open a modal instead.
-  $scope.createTmpRule = function() {
-    // A rule name of 'null' triggers the opening of the rule description
-    // editor.
-    $scope.tmpRule = {
-      description: null,
-      definition: {
-        rule_type: 'atomic',
-        name: null,
-        inputs: {},
-        subject: 'answer'
+  $scope.openAddRuleModal = function() {
+    warningsData.clear();
+
+    $modal.open({
+      templateUrl: 'modals/addRule',
+      backdrop: 'static',
+      resolve: {
+        interactionHandlerSpecs: function() {
+          return $scope.interactionHandlerSpecs;
+        },
+        answerChoices: function() {
+          return $scope.answerChoices;
+        }
       },
-      dest: editorContextService.getActiveStateName(),
-      feedback: [],
-      param_changes: []
-    };
-  };
+      controller: [
+          '$scope', '$modalInstance', 'interactionHandlerSpecs', 'answerChoices',
+          function($scope, $modalInstance, interactionHandlerSpecs, answerChoices) {
+        $scope.currentRuleDescription = null;
+        $scope.currentRuleDefinition = {
+          rule_type: 'atomic',
+          name: null,
+          inputs: {},
+          subject: 'answer'
+        };
 
-  $scope.saveTmpRule = function() {
-    _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
+        $scope.interactionHandlerSpecs = interactionHandlerSpecs;
+        $scope.answerChoices = answerChoices;
 
-    // Move the tmp rule into the list of 'real' rules.
-    var rules = $scope.interactionHandlers['submit'];
-    rules.splice(rules.length - 1, 0, angular.copy($scope.tmpRule));
+        $scope.addNewRule = function() {
+          $modalInstance.close({
+            description: $scope.currentRuleDescription,
+            definition: $scope.currentRuleDefinition
+          });
+        };
 
-    $scope.saveInteractionHandlers(
-      $scope.interactionHandlers, _interactionHandlersMemento);
-    $scope.tmpRule = null;
-  }
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    }).result.then(function(tmpRule) {
+      _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
 
-  $scope.cancelTmpRule = function() {
-    $scope.tmpRule = null;
+      // Move the tmp rule into the list of 'real' rules.
+      var numRules = $scope.interactionHandlers['submit'].length;
+      $scope.interactionHandlers['submit'].splice(numRules - 1, 0, {
+        description: tmpRule.description,
+        definition: tmpRule.definition,
+        dest: editorContextService.getActiveStateName(),
+        feedback: [],
+        param_changes: []
+      });
+
+      $scope.saveInteractionHandlers(
+        $scope.interactionHandlers, _interactionHandlersMemento);
+
+      $scope.activeRuleIndex = $scope.interactionHandlers['submit'].length - 2;
+    });
   };
 
   $scope.RULE_LIST_SORTABLE_OPTIONS = {

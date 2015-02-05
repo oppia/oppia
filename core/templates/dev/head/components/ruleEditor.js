@@ -80,9 +80,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       rule: '=',
       answerChoices: '=',
       interactionHandlerSpecs: '=',
-      isTmpRule: '&',
       saveRule: '=',
-      cancelEdit: '&',
       deleteRule: '&',
       isEditable: '=',
       numRules: '&'
@@ -163,7 +161,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDefinitionMemento = null;
           $scope.ruleFeedbackMemento = null;
           $scope.ruleDestMemento = null;
-          $scope.cancelEdit();
         };
         $scope.deleteThisRule = function() {
           $scope.cancelThisEdit();
@@ -237,10 +234,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.navigateToRuleDest = function() {
           routerService.navigateToMainTab($scope.rule.dest);
         };
-
-        if ($scope.isTmpRule()) {
-          $scope.openRuleEditor();
-        }
       }
     ]
   };
@@ -251,7 +244,6 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
   return {
     restrict: 'E',
     scope: {
-      allRuleTypes: '=',
       answerChoices: '=',
       currentRuleDescription: '=',
       currentRuleDefinition: '=',

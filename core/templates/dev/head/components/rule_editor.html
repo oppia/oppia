@@ -79,7 +79,7 @@
   <div ng-if="isEditable && ruleEditorIsOpen" class="oppia-rule-editable-view">
     <div class="oppia-rule-bubble">
       <span ng-if="rule.description !== 'Default'">
-        <rule-description-editor all-rule-types="allRuleTypes" current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition" interaction-handler-specs="interactionHandlerSpecs" answer-choices="answerChoices"></rule-description-editor>
+        <rule-description-editor current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition" interaction-handler-specs="interactionHandlerSpecs" answer-choices="answerChoices"></rule-description-editor>
       </span>
 
       <span ng-if="rule.description === 'Default'">
@@ -87,7 +87,7 @@
       </span>
     </div>
 
-    <div class="oppia-feedback-and-dest" ng-class="{'oppia-lightly-grayed': isTmpRule()}">
+    <div class="oppia-feedback-and-dest">
       <div class="oppia-feedback-bubble protractor-test-feedback-bubble">
         <span ng-if="rule.feedback.length > 0">
           Feedback
@@ -116,7 +116,7 @@
     <div class="oppia-rule-save-cancel-buttons">
       <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
       <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-      <button type="button" class="btn btn-danger pull-right protractor-test-delete-rule" ng-if="!isDefaultRule() && !isTmpRule()" ng-click="deleteThisRule()">Delete Rule</button>
+      <button type="button" class="btn btn-danger pull-right protractor-test-delete-rule" ng-if="!isDefaultRule()" ng-click="deleteThisRule()">Delete Rule</button>
     </div>
   </div>
 </div>
