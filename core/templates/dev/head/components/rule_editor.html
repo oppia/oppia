@@ -79,25 +79,7 @@
   <div ng-if="isEditable && ruleEditorIsOpen" class="oppia-rule-editable-view">
     <div class="oppia-rule-bubble">
       <span ng-if="rule.description !== 'Default'">
-        <form class="form-inline" role="form">
-          Answer
-          <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="$parent.$parent.currentRuleDescription" on-selection-change="onSelectNewRuleType()">
-          </rule-type-selector>
-
-          <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment">
-            <span ng-if="item.type == 'select'" style="color: black;">
-              <select class="form-control" ng-model="rule.definition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices">
-              </select>
-            </span>
-
-            <span ng-if="item.type != 'select' && item.type != 'noneditable'">
-              <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="rule.definition.inputs[item.varName]" style="color: black;"></object-editor>
-            </span>
-            <span ng-if="item.type == 'noneditable'">
-              <[item.text]>
-            </span>
-          </span>
-        </form>
+        <rule-description-editor all-rule-types="allRuleTypes" current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition" interaction-handler-specs="interactionHandlerSpecs" answer-choices="answerChoices"></rule-description-editor>
       </span>
 
       <span ng-if="rule.description === 'Default'">
@@ -138,3 +120,26 @@
     </div>
   </div>
 </div>
+
+
+<script type="text/ng-template" id="rules/ruleDescriptionEditor">
+  <form class="form-inline" role="form">
+    Answer
+    <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="currentRuleDescription" on-selection-change="onSelectNewRuleType()">
+    </rule-type-selector>
+
+    <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment">
+      <span ng-if="item.type == 'select'" style="color: black;">
+        <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices">
+        </select>
+      </span>
+
+      <span ng-if="item.type != 'select' && item.type != 'noneditable'">
+        <object-editor obj-type="<[item.type]>" is-editable="isEditable" always-editable="true" value="currentRuleDefinition.inputs[item.varName]" style="color: black;"></object-editor>
+      </span>
+      <span ng-if="item.type == 'noneditable'">
+        <[item.text]>
+      </span>
+    </span>
+  </form>
+</script>

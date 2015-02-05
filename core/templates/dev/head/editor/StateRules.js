@@ -75,6 +75,7 @@ oppia.controller('StateRules', [
   };
 
   $scope.$on('initializeHandlers', function(evt, data) {
+    interactionHandlersCache.reset();
     _refreshHandlerSpecs();
 
     // Stores rules as key-value pairs. For each pair, the key is the
@@ -94,6 +95,14 @@ oppia.controller('StateRules', [
     _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
     $scope.tmpRule = null;
     $scope.activeRuleIndex = 0;
+  });
+
+  // Updates answer choices when the interaction requires it -- for example,
+  // the rules for multiple choice need to refer to the multiple choice
+  // interaction's customization arguments.
+  // TODO(sll): Remove the need for this watcher, or make it less ad hoc.
+  $scope.$on('updateAnswerChoices', function(evt, newAnswerChoices) {
+    $scope.answerChoices = newAnswerChoices;
   });
 
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
