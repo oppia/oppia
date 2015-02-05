@@ -94,7 +94,7 @@ class IsAcyclic(base.GraphRule):
                     return False
         return True
 
-# TODO(czx): Handle the directed case?
+
 class IsRegular(base.GraphRule):
     description = 'is a regular graph'
     is_generic = False
@@ -102,7 +102,15 @@ class IsRegular(base.GraphRule):
     def _evaluate(self, subject):
         if len(subject['vertices']) == 0:
             return True
-        # Checks that every vertex has degree equal to the first
+        # Checks that every vertex has outdegree and indegree equal to the first
         adjacency_lists = construct_adjacency_lists(subject)
-        return all(len(l) == len(adjacency_lists[0]) for l in adjacency_lists)
+        outdegree_counts = [len(l) for l in adjacency_lists]
+        indegree_counts = [0 for l in adjacency_lists]
+        for l in adjacency_lists:
+            for destination_vertex in l:
+                indegree_counts[destination_vertex] += 1
+        return (
+            all(indegree == indegree_counts[0] for indegree in indegree_counts) and 
+            all(outdegree == outdegree_counts[0] for outdegree in outdegree_counts)
+        )
 

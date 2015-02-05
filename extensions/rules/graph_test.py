@@ -158,6 +158,36 @@ class GraphRuleUnitTests(test_utils.GenericTestBase):
         self.assertTrue(graph.IsRegular().eval(_completeGraph(8)))
         self.assertTrue(graph.IsRegular().eval(_cycleGraph(3)))
         self.assertTrue(graph.IsRegular().eval(_cycleGraph(4)))
+        self.assertTrue(graph.IsRegular().eval({
+            'vertices': [
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 2, 'weight': 1},
+                {'src': 2, 'dst': 0, 'weight': 1}
+            ],
+            'isDirected': True,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
+        self.assertFalse(graph.IsRegular().eval({
+            'vertices': [
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0},
+                {'label': '', 'x': 0.0, 'y': 0.0}
+            ],
+            'edges': [
+                {'src': 0, 'dst': 1, 'weight': 1},
+                {'src': 1, 'dst': 2, 'weight': 1},
+                {'src': 0, 'dst': 2, 'weight': 1}
+            ],
+            'isDirected': True,
+            'isWeighted': False,
+            'isLabeled': False
+        }))
         self.assertFalse(graph.IsRegular().eval({
             'vertices': [
                 {'label': '', 'x': 0.0, 'y': 0.0},
