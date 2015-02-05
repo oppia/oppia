@@ -96,20 +96,6 @@ input.ng-dirty.ng-invalid {
   color: red;
 }
 
-.oppia-editor h3 {
-  font-size: 18px;
-  margin: 0;
-}
-
-.oppia-editor h4 {
-  font-size: 14px;
-  margin: 0;
-}
-
-.oppia-editor form {
-  margin: 0;
-}
-
 .oppia-disabled-contenteditable {
   background-color: #eee;
   cursor: not-allowed;
@@ -752,13 +738,32 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding: 6px;
 }
 
-.oppia-state-editor-header {
-  margin-top: -10px;
+.oppia-editor-cards-container {
+  margin: 20px auto;
+  max-width: 700px;
+}
+.oppia-editor-card {
+  background: rgb(255,255,255);
 }
 
-.oppia-state-editor-body {
+.oppia-editor-card-body {
   padding: 5px 10px;
   position: relative;
+}
+.oppia-editor-card-body h3 {
+  font-size: 18px;
+  margin: 0;
+}
+.oppia-editor-card-body h4 {
+  font-size: 14px;
+  margin: 0;
+}
+.oppia-editor-card-body form {
+  margin: 0;
+}
+
+.oppia-editor-rules-card {
+  margin: -8px 15px 8px 15px;
 }
 
 .oppia-state-content {
@@ -1191,19 +1196,6 @@ oppia-expression-error-tag:after {
   background: #eee;
 }
 
-
-.oppia-state-card {
-  background: rgb(255,255,255);
-  margin: 20px auto;
-  max-width: 700px;
-}
-
-.oppia-state-next-card {
-  cursor: pointer;
-  margin-bottom: -100px;
-  margin-top: 40px;
-  opacity: 0.7;
-}
 
 .oppia-editor-sidebar {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);

@@ -37,7 +37,7 @@
 {% endblock header_js %}
 
 {% block navbar_breadcrumb %}
-  <ul class="nav navbar-nav oppia-navbar-breadcrumb" ng-controller="EditorNavbarBreadcrumb">
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb ng-cloak" ng-controller="EditorNavbarBreadcrumb">
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span ng-if="navbarTitle">
@@ -394,6 +394,7 @@
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/SidebarStateName.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
+    {{ include_js_file('editor/StateRules.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
     /* These should come after the valueGeneratorEditor scripts. */
     {{ include_js_file('editor/StateInteraction.js') }}
