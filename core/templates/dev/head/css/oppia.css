@@ -762,6 +762,16 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin: -8px 15px 8px 115px;
 }
 
+.oppia-state-navigation-bar {
+  background: white;
+  bottom: 0;
+  height: 30px;
+  left: 0;
+  position: fixed;
+  text-align: center;
+  width: 75%;
+}
+
 .oppia-state-content {
   min-height: 20px;
   padding: 5px 0 15px 10px;
@@ -899,6 +909,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-bottom: 1px solid #ddd;
   border-right: 1px solid #ddd;
   border-top: 1px solid #ddd;
+  width: 110px;
 }
 .oppia-rule-tab.active {
   border-right: 0;

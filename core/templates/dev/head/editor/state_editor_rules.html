@@ -35,6 +35,11 @@
   </div>
 </div>
 
+<a class="oppia-state-navigation-bar" ng-if="nextStateName !== editorContextService.getActiveStateName() && nextStateName !== 'END'" ng-click="navigateToState(nextStateName)">
+  <span class="glyphicon glyphicon-chevron-down" style="margin-top: 7px;">
+  </span>
+</a>
+
 <script type="text/ng-template" id="modals/addRule">
   <div class="modal-header">
     <h3>Add Rule</h3>
