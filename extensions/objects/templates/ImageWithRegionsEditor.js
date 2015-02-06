@@ -32,8 +32,10 @@ oppia.directive('imageWithRegionsEditor', [
       controller: function($scope, $element, $attrs) {
         $scope.alwaysEditable = true;
 
-        $scope.REGION_LABEL_OFFSET_X = 3;
-        $scope.REGION_LABEL_OFFSET_Y = 12;
+        $scope.REGION_LABEL_OFFSET_X = 6;
+        $scope.REGION_LABEL_OFFSET_Y = 18;
+        $scope.REGION_STYLE = 'fill: blue; opacity: 0.5;';
+        $scope.REGION_LABEL_STYLE = 'fill: white; font-size: large;';
 
         //All coordinates have origin at top-left, increasing in x to the right and increasing in y down
         // Current mouse position in SVG coordinates
