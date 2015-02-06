@@ -759,7 +759,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-editor-rules-card {
-  margin: -8px 15px 8px 15px;
+  margin: -8px 15px 8px 115px;
 }
 
 .oppia-state-content {
@@ -835,10 +835,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   z-index: 50;
 }
 
-.oppia-rule-block {
-  padding-bottom: 10px;
-}
-
 /* Styles for the state graph vizualization. */
 
 .oppia-graph-viz-container {
@@ -866,8 +862,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-add-rule-button {
   margin-bottom: 10px;
+  margin-left: 10px;
   margin-top: 10px;
-  padding: 5px 10px;
+  padding: 5px;
 }
 
 .oppia-small-delete-button {
@@ -880,6 +877,39 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding: 9px 10px 6px 10px;
   position: absolute;
   right: 25px;
+}
+
+.oppia-rules-container {
+  display: table;
+  height: 100%;
+  margin-left: -115px;
+}
+
+.oppia-rule-tabs-container {
+  display: table-cell;
+  float: none;
+  padding-left: 0;
+  padding-right: 0;
+  vertical-align: top;
+  width: 100px;
+}
+.oppia-rule-tab {
+  background: #eeedee;
+  border-radius: 0;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+}
+.oppia-rule-tab.active {
+  border-right: 0;
+}
+
+.oppia-rule-bodies-container {
+  display: table-cell;
+  float: none;
+  padding-left: 15px;
+  padding-right: 15px;
+  width: 100%;
 }
 
 .oppia-readonly-rule-tile {
@@ -906,7 +936,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
   float: left;
-  margin-left: -33px;
+  margin-left: -25px;
   width: 25px;
 }
 .oppia-rule-sort-arrows {

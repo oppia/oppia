@@ -1,19 +1,21 @@
 <div id="tutorialStateRules">
-  <div class="row" ng-repeat="(handlerName, handler) in interactionHandlers">
-    <div class="col-lg-2 col-md-2 col-sm-2">
-      <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
+  <div class="row oppia-rules-container" ng-repeat="(handlerName, handler) in interactionHandlers">
+    <div class="oppia-rule-tabs-container">
+      <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler" style="margin-right: -15px;">
         <!-- An HTML element marked ui-sortable should contain only one element,
         and this element should have an ng-repeat defined on it. See the
         ui-sortable documentation for more details. -->
-        <li ng-repeat="rule in handler track by $index" ng-class="{'active': activeRuleIndex == $index}" class="oppia-rule-block oppia-sortable-rule-block" ng-hide="$last">
+        <!-- Note that adding "track by $index" here seems to mess up the final
+        index in the stop() event handler. -->
+        <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex == $index}" class="oppia-sortable-rule-block" ng-hide="$last" style="margin-top: 0;">
           <span class="oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
             <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
           </span>
-          <a ng-click="changeActiveRuleIndex($index)" href="#">Rule #<[$index + 1]></a>
+          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Rule #<[$index + 1]></a>
         </li>
 
-        <li ng-class="{'active': activeRuleIndex === handler.length - 1}" class="oppia-rule-block">
-          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#">Default</a>
+        <li ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
+          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Default</a>
         </li>
       </ul>
 
@@ -24,8 +26,8 @@
       </div>
     </div>
 
-    <div class="col-lg-10 col-md-10 col-sm-10">
-      <div ng-repeat="rule in handler track by $index" class="tab-pane" ng-show="activeRuleIndex == $index">
+    <div class="oppia-rule-bodies-container">
+      <div ng-repeat="rule in handler track by $index" class="tab-pane" ng-show="activeRuleIndex == $index" style="height: 100%;">
         <rule-editor rule="rule" num-rules="handler.length" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
         </rule-editor>
       </div>

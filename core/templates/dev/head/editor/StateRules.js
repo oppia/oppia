@@ -203,6 +203,7 @@ oppia.controller('StateRules', [
       $scope.$apply();
       $scope.saveInteractionHandlers(
         $scope.interactionHandlers, _interactionHandlersMemento);
+      $scope.activeRuleIndex = ui.item.index();
     }
   };
 

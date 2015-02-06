@@ -132,6 +132,8 @@ oppia.controller('StateInteraction', [
           break;
         }
       }
+    } else {
+      $rootScope.$broadcast('updateAnswerChoices', null);
     }
 
     stateInteractionStickyService.restoreFromMemento();
