@@ -1,7 +1,24 @@
 <script type="text/ng-template" id="interaction/ImageClickInput">
-  <img ng-src="<[imageUrl]>"
-    class="oppia-image-click-img"
-    ng-click="onClickImage($event)">
+  <div style="position: relative;">
+    <img 
+      ng-src="<[imageUrl]>"
+      class="oppia-image-click-img"
+      ng-click="onClickImage($event)"
+      ng-mousemove="onMousemoveImage($event)">
+    <div ng-repeat="region in allRegions"
+      style="
+        height: <[getRegionDimensions($index).height]>px; 
+        width: <[getRegionDimensions($index).width]>px; 
+        left: <[getRegionDimensions($index).left]>px; 
+        top: <[getRegionDimensions($index).top]>px; 
+        pointer-events: none; 
+        position: absolute; 
+        display: <[getRegionDisplay(region.label)]>;
+        background: rgba(0,0,255,0.5); 
+        z-index: 999;
+      ">
+    </div>
+  </div>
 </script>
 
 <script type="text/ng-template" id="response/ImageClickInput">

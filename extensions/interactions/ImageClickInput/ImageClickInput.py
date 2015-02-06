@@ -42,4 +42,11 @@ class ImageClickInput(base.BaseInteraction):
             'imagePath': '',
             'imageRegions': []
         },
+    }, {
+        'name': 'highlightRegionsOnHover',
+        'description': 'Highlights the regions the learner is hovering over.',
+        'schema': {
+            'type': 'bool',
+        },
+        'default_value': False
     }]

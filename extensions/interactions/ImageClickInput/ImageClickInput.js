@@ -33,21 +33,44 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           '/imagehandler/' + $rootScope.explorationId + '/' +
           encodeURIComponent($scope.filepath)
         );
-        $scope.onClickImage = function(event) {
+        $scope.currentlyHoveredRegions = [];
+        $scope.allRegions = imageAndRegions.imageRegions;
+        $scope.getRegionDimensions = function(index) {
+          var image = $($element).find('.oppia-image-click-img');
+          var region = imageAndRegions.imageRegions[index];
+          var regionArea = region.region.regionArea;
+          return {
+            left: regionArea[0][0] * image.width(),
+            top: regionArea[0][1] * image.height(),
+            width: (regionArea[1][0] - regionArea[0][0]) * image.width(),
+            height: (regionArea[1][1] - regionArea[0][1]) * image.height(),
+          };
+        };
+        $scope.getRegionDisplay = function(label) {
+          if ($scope.currentlyHoveredRegions.indexOf(label) === -1) {
+            return "none";
+          } else {
+            return "inline";
+          }
+        };
+        $scope.onMousemoveImage = function(event) {
           var image = $($element).find('.oppia-image-click-img');
           var mouseX = (event.pageX - image.offset().left) / image.width();
           var mouseY = (event.pageY - image.offset().top) / image.height();
-          var answer = [];
+          $scope.currentlyHoveredRegions = [];
           for (var i = 0; i < imageAndRegions.imageRegions.length; i++) {
             var region = imageAndRegions.imageRegions[i];
             var regionArea = region.region.regionArea;
             if (regionArea[0][0] <= mouseX && mouseX <= regionArea[1][0] &&
                 regionArea[0][1] <= mouseY && mouseY <= regionArea[1][1]) {
-              answer.push(region.label);
+              $scope.currentlyHoveredRegions.push(region.label);
             }
           }
-          $scope.$parent.$parent.submitAnswer(answer, 'submit');
-        }
+          console.log($scope.currentlyHoveredRegions);
+        };
+        $scope.onClickImage = function(event) {
+          $scope.$parent.$parent.submitAnswer($scope.currentlyHoveredRegions, 'submit');
+        };
       }]
     };
   }
