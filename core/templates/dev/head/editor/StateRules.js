@@ -60,6 +60,7 @@ oppia.controller('StateRules', [
   $scope.editorContextService = editorContextService;
 
   $scope.changeActiveRuleIndex = function(newIndex) {
+    $scope.$broadcast('externalSave');
     $scope.activeRuleIndex = newIndex;
     $scope.nextStateName = $scope.interactionHandlers['submit'][$scope.activeRuleIndex].dest;
   };

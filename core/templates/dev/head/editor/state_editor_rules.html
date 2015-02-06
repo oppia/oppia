@@ -11,16 +11,16 @@
           <span class="oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
             <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
           </span>
-          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Rule #<[$index + 1]></a>
+          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Rule #<[$index + 1]></a>
         </li>
 
         <li ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
-          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Default</a>
+          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab protractor-test-default-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Default</a>
         </li>
       </ul>
 
       <div ng-if="getCurrentInteractionId() !== 'Continue' && editabilityService.isEditable()">
-        <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-add-rule" ng-click="openAddRuleModal()">
+        <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-open-add-rule-modal" ng-click="openAddRuleModal()">
           Add Rule
         </button>
       </div>
@@ -28,7 +28,7 @@
 
     <div class="oppia-rule-bodies-container">
       <div ng-repeat="rule in handler track by $index" class="tab-pane" ng-show="activeRuleIndex == $index" style="height: 100%;">
-        <rule-editor rule="rule" num-rules="handler.length" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()">
+        <rule-editor rule="rule" num-rules="handler.length" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()" ng-class="{'protractor-test-rule-body': !$last, 'protractor-test-default-rule-body': $last}">
         </rule-editor>
       </div>
     </div>
@@ -51,6 +51,6 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success" ng-click="addNewRule()">Add New Rule</button>
+    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewRule()">Add New Rule</button>
   </div>
 </script>
