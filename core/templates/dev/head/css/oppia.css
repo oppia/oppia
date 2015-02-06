@@ -735,7 +735,8 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-editor-cards-container {
-  margin: 20px auto;
+  margin-top: 20px;
+  margin-left: 100px;
   max-width: 700px;
 }
 .oppia-editor-card {
@@ -759,7 +760,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-editor-rules-card {
-  margin: -8px 15px 8px 115px;
+  margin: -8px 15px 8px 15px;
 }
 
 .oppia-state-navigation-bar {
@@ -943,6 +944,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-rule-sort-handle {
+  cursor: move;
+}
+.oppia-rule-sort-arrows-container {
   background: #ddd;
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
@@ -951,7 +955,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   width: 25px;
 }
 .oppia-rule-sort-arrows {
-  cursor: move;
   font-size: 18px;
   margin-left: 3px;
   padding-top: 11px;
