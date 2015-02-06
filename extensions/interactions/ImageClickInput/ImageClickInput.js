@@ -28,6 +28,7 @@ oppia.directive('oppiaInteractiveImageClickInput', [
       templateUrl: 'interaction/ImageClickInput',
       controller: ['$scope', '$element', '$attrs', function($scope, $element, $attrs) {
         var imageAndRegions = oppiaHtmlEscaper.escapedJsonToObj($attrs.imageAndRegionsWithValue);
+        $scope.highlightRegionsOnHover = ($attrs.highlightRegionsOnHoverWithValue === 'true')?true:false;
         $scope.filepath = imageAndRegions.imagePath;
         $scope.imageUrl = $sce.trustAsResourceUrl(
           '/imagehandler/' + $rootScope.explorationId + '/' +
@@ -66,7 +67,6 @@ oppia.directive('oppiaInteractiveImageClickInput', [
               $scope.currentlyHoveredRegions.push(region.label);
             }
           }
-          console.log($scope.currentlyHoveredRegions);
         };
         $scope.onClickImage = function(event) {
           $scope.$parent.$parent.submitAnswer($scope.currentlyHoveredRegions, 'submit');
