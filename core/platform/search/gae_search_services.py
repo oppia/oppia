@@ -246,7 +246,15 @@ def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
         cursor=gae_cursor,
         ids_only=ids_only,
         sort_options=sort_options)
-    query = gae_search.Query(query_string, options=options)
+
+    try:
+        query = gae_search.Query(query_string, options=options)
+    except gae_search.QueryError as e:
+        # This can happen for query strings like "NOT" or a string that
+        # contains backslashes.
+        logging.exception('Could not parse query string %s' % query_string)
+        return [], None
+
     index = gae_search.Index(index)
 
     try:
