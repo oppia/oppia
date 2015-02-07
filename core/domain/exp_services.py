@@ -565,7 +565,7 @@ def _save_exploration(
         committer_id, commit_message, change_list)
     memcache_services.delete(_get_exploration_memcache_key(exploration.id))
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
-    _handle_exp_change_event(exploration.id)
+    index_explorations_given_ids([exploration.id])
 
     exploration.version += 1
 
@@ -600,10 +600,7 @@ def _create_exploration(
     )
     model.commit(committer_id, commit_message, commit_cmds)
     event_services.ExplorationContentChangeEventHandler.record(exploration.id)
-    _handle_exp_change_event(exploration.id)
     exploration.version += 1
-
-    # create summary of exploration
     create_exploration_summary(exploration.id)
 
 
@@ -946,6 +943,8 @@ def load_demo(exploration_id):
     rights_manager.release_ownership(
         feconf.ADMIN_COMMITTER_ID, exploration_id)
 
+    index_explorations_given_ids([exploration_id])
+
     logging.info('Exploration with id %s was loaded.' % exploration_id)
 
 
@@ -1029,16 +1028,13 @@ def _exp_to_search_dict(exp):
     return doc
 
 
-def index_explorations_given_domain_objects(exp_objects):
-    search_docs = [_exp_to_search_dict(exp) for exp in exp_objects
-                   if _should_index(exp)]
-    search_services.add_documents_to_index(search_docs, SEARCH_INDEX_EXPLORATIONS)
-
-
 def index_explorations_given_ids(exp_ids):
     # We pass 'strict=False' so as not to index deleted explorations.
     exploration_models = get_multiple_explorations_by_id(exp_ids, strict=False)
-    index_explorations_given_domain_objects(exploration_models.values())
+    search_services.add_documents_to_index([
+        _exp_to_search_dict(exp) for exp in exploration_models.values()
+        if _should_index(exp)
+    ], SEARCH_INDEX_EXPLORATIONS)
 
 
 def patch_exploration_search_document(exp_id, update):
@@ -1063,7 +1059,7 @@ def update_exploration_status_in_search(exp_id):
 
 def search_explorations(
     query, sort=None, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
-    """Searcher through the exploration
+    """Searches through the available explorations.
 
     args:
       - query_string: the query string to search for.
@@ -1086,9 +1082,3 @@ def search_explorations(
     """
     return search_services.search(
         query, SEARCH_INDEX_EXPLORATIONS, cursor, limit, sort, ids_only=True)
-
-# Temporary event handlers
-
-def _handle_exp_change_event(exp_id):
-    """Indexes the changed exploration."""
-    index_explorations_given_ids([exp_id])

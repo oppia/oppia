@@ -303,11 +303,11 @@
                 <accordion-group>
                   <accordion-heading>License information<span class="caret"></span></accordion-heading>
                   <div role="contentinfo">
-                    <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">
+                    <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
                       <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
                     </a>
                     <span style="font-size: 0.8em">
-                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="http://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
+                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="https://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
                     </span>
                   </div>
                 </accordion-group>
@@ -370,6 +370,7 @@
     {% include 'components/rule_editor.html' %}
   </script>
 
+  {% include 'components/exploration_embed_button.html' %}
   {% include 'components/visualizations.html' %}
 
 {% endblock content %}
@@ -382,6 +383,7 @@
     {{ include_js_file('editor/ExplorationEditor.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
+    {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('components/valueGeneratorEditor.js') }}
     {{ value_generators_js }}
     {{ include_js_file('components/objectEditor.js') }}

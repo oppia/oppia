@@ -17,6 +17,7 @@
 """Common utilities for test classes."""
 
 import contextlib
+import datetime
 import os
 import re
 import unittest
@@ -462,7 +463,7 @@ class FunctionWrapper(object):
     def __get__(self, instance, owner):
         # We have to implement __get__ because otherwise, we don't have a chance
         # to bind to the instance self._f was bound to. See the following SO answer:
-        # http://stackoverflow.com/a/22555978/675311
+        # https://stackoverflow.com/a/22555978/675311
         self._instance = instance
         return self
 

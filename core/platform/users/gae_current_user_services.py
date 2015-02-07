@@ -18,8 +18,7 @@
 
 __author__ = 'Sean Lip'
 
-
-import utils
+import urlparse
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -32,7 +31,10 @@ def create_login_url(slug):
 
 def create_logout_url(slug):
     """Creates a logout url."""
-    return users.create_logout_url(slug)
+    # Extract the relative path from slug.
+    # Example: slug="http://www.example.com/gallery" path="/gallery".
+    path = list(urlparse.urlparse(slug))[2]
+    return '/logout?url=%s' % path
 
 
 def get_current_user(request):

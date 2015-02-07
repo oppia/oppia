@@ -413,6 +413,18 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: #fff;
 }
 
+.oppia-share-dropdown-menu {
+  min-width: 30px;
+  width: 47px;
+}
+
+.oppia-share-dropdown-menu li > a {
+  padding: 0 13%;
+  font-size: 20px;
+  font-weight: bolder;
+  text-align: center;
+}
+
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {

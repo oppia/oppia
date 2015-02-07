@@ -28,11 +28,26 @@
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
       ng-controller="LearnerLocalNav">
-    <!-- TODO(sll): Implement this, and change the title and color accordingly after doing so. -->
     <li class="dropdown">
-      <a href="#" title="Share (not yet implemented)" class="dropdown-toggle" data-toggle="dropdown"> 
-        <span class="glyphicon glyphicon-share" style="color: #666"></span>
+      <a href="#" title="Share" class="dropdown-toggle" data-toggle="dropdown">
+        <span class="glyphicon glyphicon-share"></span>
       </a>
+      <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu">
+        <li>
+          <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
+          <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
+             onclick="javascript:window.open(this.href,
+                      '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+            <img src="https://www.gstatic.com/images/icons/gplus-64.png"
+                 alt="Share on Google+"/>
+          </a>
+        </li>
+        <li>
+          <a href="#" ng-click="showEmbedExplorationModal(explorationId)">
+            <span>&lt;&gt</span>
+          </a>
+        </li>
+      </ul>
     </li>
     <li>
       <a href="#" title="Give feedback" ng-click="showFeedbackModal()">
@@ -121,11 +136,14 @@
       <button class="btn btn-default" ng-click="cancel()">Close</button>
     </div>
   </script>
+
+  {% include 'components/exploration_embed_button.html' %}
 {% endblock %}
 
 {% block footer_js %}
   {{ super() }}
   <script>
+    {{ include_js_file('components/explorationEmbedButton.js') }}
     {{ include_js_file('player/PlayerServices.js') }}
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_skins_js_file(skin_js_url) }}
