@@ -71,6 +71,11 @@ oppia.directive('oppiaInteractiveImageClickInput', [
         $scope.onClickImage = function(event) {
           $scope.$parent.$parent.submitAnswer($scope.currentlyHoveredRegions, 'submit');
         };
+        // TODO(czx): Maybe this can be put in an angular directive?
+        $('.oppia-image-click-img').error(function(){
+          $(this).parent().text('[Select an image to display]');
+          $(this).hide();
+        });
       }]
     };
   }
