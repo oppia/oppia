@@ -4,30 +4,44 @@
   Profile
 {% endblock subtitle %}
 
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.ALL_LANGUAGE_NAMES = JSON.parse(
+      '{{ALL_LANGUAGE_NAMES|js_string}}');
+  </script>
+{% endblock header_js %}
+
 {% block content %}
   <div class="container" ng-controller="Profile">
     <div class="row">
       <div class="oppia-gallery-frame">
         <div>
           <h1>Profile</h1>
-          <strong>Email address</strong> <input value="{{user_email}}" class="oppia-disabled-contenteditable" disabled/>
+          <strong>Email address</strong>
+          <input value="{{user_email}}" class="oppia-disabled-contenteditable" disabled/>
           <em>Only moderators can see this</em>
           <br><br>
           <strong>Username</strong>
-          <input value="{% if username %} {{username}} {% else %} Not yet selected {% endif %}"
+          <input value="{% if username %} {{username}} 
+            {% else %} Not yet selected {% endif %}"
             class="oppia-disabled-contenteditable" disabled/>
           <br><br>
-          <form ng-submit="submitUserProfileForm(userBio)">
+          <form ng-submit="submitUserProfileForm(userBio, selectedLanguages)">
             <strong>Bio</strong>
             (optional)
-            <textarea ng-model="userBio" text="some text"></textarea>
+            <textarea ng-model="userBio"></textarea>
             <hr />
             <strong>Language</strong>
-            <select2-dropdown choices="[English]" item="English"
-              allow-multiple-choices="true" new-choice-regex=".^" width="150"
-              placeholder="Filter languages..."
-              class="protractor-test-gallery-language-selector">
-            </select2-dropdown>
+            <!-- If you remove this ng-if, it will not update the directive
+                 after the initial page load, and it will be empty. -->
+            <div ng-if="hasPageLoaded">
+              <select2-dropdown choices="LANGUAGE_CHOICES"
+                item="$parent.selectedLanguages" allow-multiple-choices="true"
+                new-choice-regex=".^" width="150"
+                placeholder="Select languages...">
+              </select2-dropdown>
+            </div>
 
             <br><br>
             {% if profile_img_url %}

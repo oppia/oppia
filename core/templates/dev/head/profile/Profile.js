@@ -20,20 +20,34 @@
 
 oppia.controller('Profile', ['$scope', '$http', '$rootScope', function(
     $scope, $http, $rootScope) {
-  $scope.profileDataUrl = '/profilehandler/data/';
+  $scope.profileDataUrl = '/profilehandler/data';
   $rootScope.loadingMessage = 'Loading';
+
+  var _DEFAULT_LANGUAGE = 'English';
+
+  $scope.submitUserProfileForm = function(userBio, selectedLanguages) {
+    var requestParams = {
+      user_bio: userBio,
+      languages: selectedLanguages
+    };
+    $http.post($scope.profileDataUrl, requestParams).success(function(data) {});
+  }
+
+  $scope.LANGUAGE_CHOICES = GLOBALS.ALL_LANGUAGE_NAMES.map(function(languageName) {
+    return {
+      id: languageName,
+      text: languageName
+    };
+  });
+
+  // This is needed to force a refresh of the directive via ng-if
+  $scope.hasPageLoaded = false;
 
   // Retrieves profile data from the server.
   $http.get($scope.profileDataUrl).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
+    $scope.selectedLanguages = data.languages;
+    $scope.hasPageLoaded = true;
   });
-
-  $scope.submitUserProfileForm = function(userBio) {
-    var requestParams = {
-      user_bio: userBio
-    };
-    $http.post($scope.profileDataUrl, requestParams).success(function(data) {
-    });
-  }
 }]);

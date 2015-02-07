@@ -31,6 +31,14 @@ EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
 )
 
 
+def _get_short_language_description(full_language_description):
+    if ' (' not in full_language_description:
+        return full_language_description
+    else:
+        ind = full_language_description.find(' (')
+        return full_language_description[:ind]
+
+
 class ProfilePage(base.BaseHandler):
     """The profile page."""
 
@@ -41,6 +49,10 @@ class ProfilePage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
+            'ALL_LANGUAGE_NAMES': [
+                _get_short_language_description(lc['description'])
+                for lc in feconf.ALL_LANGUAGE_CODES]
+
         })
         self.render_template('profile/profile.html')
 
@@ -56,6 +68,7 @@ class ProfileHandler(base.BaseHandler):
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
             'user_bio': user_settings.user_bio,
+            'languages': user_settings.languages.split(',')
         })
         self.render_json(self.values)
 
@@ -64,6 +77,8 @@ class ProfileHandler(base.BaseHandler):
         """Handles POST requests."""
         user_bio = self.payload.get('user_bio')
         user_services.update_user_bio(self.user_id, user_bio)
+        languages = self.payload.get('languages')
+        user_services.update_user_languages(self.user_id, languages)
 
 
 class EditorPrerequisitesPage(base.BaseHandler):

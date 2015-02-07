@@ -35,7 +35,8 @@ class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
-            last_started_state_editor_tutorial=None, user_bio=""):
+            last_started_state_editor_tutorial=None, user_bio="",
+            languages=""):
         self.user_id = user_id
         self.email = email
         self.username = username
@@ -43,6 +44,7 @@ class UserSettings(object):
         self.last_started_state_editor_tutorial = (
             last_started_state_editor_tutorial)
         self.user_bio = user_bio
+        self.languages = languages
 
     def validate(self):
         if not isinstance(self.user_id, basestring):
@@ -157,6 +159,7 @@ def get_users_settings(user_ids):
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
                 user_bio=model.user_bio,
+                languages=model.languages
             ))
         else:
             result.append(None)
@@ -183,7 +186,8 @@ def _save_user_settings(user_settings):
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
             user_settings.last_started_state_editor_tutorial),
-        user_bio=user_settings.user_bio
+        user_bio=user_settings.user_bio,
+        languages=user_settings.languages
     ).put()
 
 
@@ -247,6 +251,12 @@ def record_agreement_to_terms(user_id):
 def update_user_bio(user_id, user_bio):
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.user_bio = user_bio
+    _save_user_settings(user_settings)
+
+
+def update_user_languages(user_id, user_languages):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.languages = ','.join(user_languages)
     _save_user_settings(user_settings)
 
 

@@ -42,6 +42,8 @@ class UserSettingsModel(base_models.BaseModel):
     last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
     # User specified bio from the profile page.
     user_bio = ndb.TextProperty(indexed=False)
+    # Languages as specified by the uesr
+    languages = ndb.TextProperty(indexed=False)
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
