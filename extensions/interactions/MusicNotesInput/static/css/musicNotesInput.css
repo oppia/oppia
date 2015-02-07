@@ -109,5 +109,9 @@
 }
 
 .oppia-music-input-control-buttons {
-  padding: 40% 0 5% 17.2%;
+  padding: 40% 0 5% 2%;
+}
+
+.oppia-music-input-btn {
+  padding: 6px 10px;
 }

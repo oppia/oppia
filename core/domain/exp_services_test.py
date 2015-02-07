@@ -1559,12 +1559,22 @@ class ExplorationCommitLogSpecialCasesUnitTests(ExplorationServicesUnitTests):
 class SearchTests(ExplorationServicesUnitTests):
     """Test exploration search."""
 
-    def test_index_explorations_given_domain_objects(self):
+    def test_demo_explorations_are_added_to_search_index(self):
+        results, cursor = exp_services.search_explorations('Welcome')
+        self.assertEqual(results, [])
 
-        expected_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_exp_titles = [
+        exp_services.load_demo('0')
+        results, cursor = exp_services.search_explorations('Welcome')
+        self.assertEqual(results, ['0'])
+
+    def test_index_explorations_given_ids(self):
+        all_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
+        expected_exp_ids = all_exp_ids[:-1]
+        all_exp_titles = [
             'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
-        expected_exp_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
+        expected_exp_titles = all_exp_titles[:-1]
+        all_exp_categories = ['cat0', 'cat1', 'cat2', 'cat3', 'cat4']
+        expected_exp_categories = all_exp_categories[:-1]
 
         def mock_add_documents_to_index(docs, index):
             self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
@@ -1581,45 +1591,12 @@ class SearchTests(ExplorationServicesUnitTests):
                                   'add_documents_to_index',
                                   add_docs_counter)
 
-        exp_objs = [exp_domain.Exploration.create_default_exploration(
-            'id%d' % i, 'title %d' % i, 'cat%d' % i) for i in xrange(5)]
-
-        for exp in exp_objs:
-            exp_services.save_new_exploration(self.OWNER_ID, exp)
-
-        for exp in exp_objs:
-            rights_manager.publish_exploration(self.OWNER_ID, exp.id)
-
-        with add_docs_swap:
-            exp_services.index_explorations_given_domain_objects(exp_objs)
-
-        self.assertEqual(add_docs_counter.times_called, 1)
-
-    def test_index_explorations_given_ids(self):
-        all_exp_ids = ['id0', 'id1', 'id2', 'id3', 'id4']
-        expected_exp_ids = all_exp_ids[:-1]
-        all_exp_titles = [
-            'title 0', 'title 1', 'title 2', 'title 3', 'title 4']
-        expected_exp_titles = all_exp_titles[:-1]
-
-        def mock_add_documents_to_index(docs, index):
-            self.assertEqual(index, exp_services.SEARCH_INDEX_EXPLORATIONS)
-            ids = [doc['id'] for doc in docs]
-            titles = [doc['title'] for doc in docs]
-            self.assertEqual(set(ids), set(expected_exp_ids))
-            self.assertEqual(set(titles), set(expected_exp_titles))
-            return ids
-
-        add_docs_counter = test_utils.CallCounter(mock_add_documents_to_index)
-        add_docs_swap = self.swap(search_services,
-                                  'add_documents_to_index',
-                                  add_docs_counter)
-
         for i in xrange(5):
-            self.save_new_default_exploration(
+            self.save_new_valid_exploration(
                 all_exp_ids[i],
                 self.OWNER_ID,
-                all_exp_titles[i])
+                all_exp_titles[i],
+                category=all_exp_categories[i])
 
         # We're only publishing the first 4 explorations, so we're not
         # expecting the last exploration to be indexed.

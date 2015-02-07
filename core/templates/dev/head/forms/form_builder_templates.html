@@ -16,21 +16,24 @@
                            local-value="$parent.localValue" is-disabled="isDisabled()"
                            allow-expressions="allowExpressions()"
                            validators="schema().validators"
-                           label-for-focus-target="labelForFocusTarget()">
+                           label-for-focus-target="labelForFocusTarget()"
+                           on-input-blur="onInputBlur">
   </schema-based-int-editor>
 
   <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices"
                              local-value="$parent.localValue" is-disabled="isDisabled()"
                              allow-expressions="allowExpressions()"
                              validators="schema().validators"
-                             label-for-focus-target="labelForFocusTarget()">
+                             label-for-focus-target="labelForFocusTarget()"
+                             on-input-blur="onInputBlur">
   </schema-based-float-editor>
 
   <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices"
                                local-value="$parent.localValue" is-disabled="isDisabled()"
                                validators="schema().validators" ui-config="schema().ui_config"
                                allow-expressions="allowExpressions()"
-                               label-for-focus-target="labelForFocusTarget()">
+                               label-for-focus-target="labelForFocusTarget()"
+                               on-input-blur="onInputBlur">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices"
@@ -99,9 +102,11 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <md-text-float type="number" ng-model="$parent.localValue" class="long" ng-disabled="isDisabled()"
-                     required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>">
-      </md-text-float>
+      <md-input-group class="long md-default-theme">
+        <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
+               required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
+               on-input-blur="onInputBlur()">
+      </md-input-group>
     </span>
 
     <span ng-if="allowExpressions()">
@@ -125,10 +130,12 @@
   <span>
     <span class="input-group" ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <md-text-float type="text" name="floatValue" ng-model="$parent.localValue" class="long" 
-                       require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
-                       focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)">
-        </md-text-float>
+        <md-input-group class="long md-default-theme">
+          <input type="text" name="floatValue" ng-model="$parent.localValue"
+                 require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
+                 focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
+                 on-input-blur="onInputBlur()">
+        </md-input-group>
       </span>
 
       <span ng-if="allowExpressions()">
@@ -167,18 +174,17 @@
               rows="<[getRows()]>"
               placeholder="<[getPlaceholder()]>"
               ng-disabled="isDisabled()"
-              class="form-control" focus-on="<[labelForFocusTarget()]>">
+              class="form-control" focus-on="<[labelForFocusTarget()]>"
+              ng-blur="onInputBlur()">
     </textarea>
 
-    <md-text-float class="long" ng-if="!getCodingMode() && !getRows()" 
-           type="text"
-           ng-model="$parent.$parent.localValue"
-           label="<[getPlaceholder()]>"
-           ng-disabled="isDisabled()"
-           ng-keypress="onKeypress($event)"
-           focus-on="<[labelForFocusTarget()]>">
-    </md-text-float>
+    <md-input-group class="long md-default-theme" ng-if="!getCodingMode() && !getRows()">
+      <input ng-disabled="isDisabled()" ng-model="$parent.$parent.localValue" type="text"
+             ng-blur="onInputBlur()" focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
+             placeholder="<[getPlaceholder()]>" style="padding-top: 20px;">
+    </md-input-group>
 
+    <!-- Note that we do not yet support ng-blur for the code editor. -->
     <div ng-if="getCodingMode()" style="border: 1px solid #ccc;">
       <div ui-codemirror
            ng-model="$parent.$parent.localValue"
@@ -188,6 +194,7 @@
     </div>
   </span>
 
+  <!-- Note that we do not yet support ng-blur for the expression editor. -->
   <span ng-if="allowExpressions()">
     <span ng-if="isDisabled()"
           ng-class="{'oppia-disabled-contenteditable': isDisabled()}"
@@ -235,7 +242,8 @@
       <td>
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
-                             label-for-focus-target="getFocusLabel($index)">
+                             label-for-focus-target="getFocusLabel($index)"
+                             on-input-blur="($last ? deleteLastElementIfUndefined : null)">
         </schema-based-editor>
       </td>
       <td ng-if="!len && (!minListLength || localValue.length > minListLength)">
