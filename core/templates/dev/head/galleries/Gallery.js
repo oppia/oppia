@@ -110,7 +110,7 @@ oppia.directive('checkboxGroup', function() {
             $scope.allCategoriesSelected = true;
           }
         }
-        $rootScope.$broadcast('galleryQueryChanged', $scope.model);
+        $rootScope.$broadcast('categorySelectionChanged', $scope.model);
       };
     }]
   };
@@ -215,7 +215,21 @@ oppia.controller('Gallery', [
   // Note that an empty query results in all explorations being shown.
   $scope.onSearchQueryChangeExec = function() {
     $scope.searchIsLoading = true;
-    $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
+
+    var _categorySuffix = '';
+    for (var key in $scope.selectedCategories) {
+      if ($scope.selectedCategories[key]) {
+        if (_categorySuffix) {
+          _categorySuffix += '" OR "';
+        }
+
+        _categorySuffix += key;
+      }
+    }
+
+    _categorySuffix = ' category=("' + _categorySuffix + '")';
+
+    $http.get($scope.galleryDataUrl + '?q=' + encodeURI($scope.searchQuery + _categorySuffix)).success(
       $scope.initGalleryData);
   };
 
@@ -239,7 +253,7 @@ oppia.controller('Gallery', [
   $scope.numItemsShown = _INITIAL_NUM_ITEMS;
   $scope.allExplorationsInOrder = [];
 
-  // Called only once.
+  // Called when the page loads, and after every search query.
   $scope.initGalleryData = function(data) {
     $scope.searchIsLoading = false;
     $scope.featuredExplorations = data.featured;
@@ -247,12 +261,6 @@ oppia.controller('Gallery', [
 
     $scope.allExplorationsInOrder = $scope.featuredExplorations.concat(
       $scope.publicExplorations);
-
-    $scope.selectedCategories = {};
-    $scope.allExplorationsInOrder.map(function(expDict) {
-      // This is a dict.
-      $scope.selectedCategories[expDict.category] = true;
-    });
 
     $scope.showGalleryData($scope.allExplorationsInOrder);
     $rootScope.loadingMessage = '';
@@ -270,7 +278,7 @@ oppia.controller('Gallery', [
     $scope.pageLoaderIsBusy = false;
   };
 
-  $scope.$on('galleryQueryChanged', function(event, selectedCategories) {
+  $scope.$on('categorySelectionChanged', function(evt, selectedCategories) {
     $scope.filteredExplorations = $scope.allExplorationsInOrder.filter(function(expDict) {
       return selectedCategories[expDict.category] === true;
     });
@@ -292,6 +300,14 @@ oppia.controller('Gallery', [
     if (data.is_moderator) {
       $scope.currentUserIsModerator = true;
     }
+
+    $scope.selectedCategories = {};
+    data['public'].map(function(expDict) {
+      $scope.selectedCategories[expDict.category] = true;
+    });
+    data.featured.map(function(expDict) {
+      $scope.selectedCategories[expDict.category] = true;
+    });
 
     $scope.initGalleryData(data);
 
