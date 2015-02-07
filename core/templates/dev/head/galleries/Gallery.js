@@ -212,14 +212,11 @@ oppia.controller('Gallery', [
     }
   };
 
+  // Note that an empty query results in all explorations being shown.
   $scope.onSearchQueryChangeExec = function() {
-    if (!$scope.searchQuery) {
-      $http.get($scope.galleryDataUrl).success($scope.initGalleryData);
-    } else {
-      $scope.searchIsLoading = true;
-      $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
-        $scope.initGalleryData);
-    }
+    $scope.searchIsLoading = true;
+    $http.get($scope.galleryDataUrl + '?q=' + $scope.searchQuery).success(
+      $scope.initGalleryData);
   };
 
   $scope.delayedOnSearchQueryChangeExec = oppiaDebouncer.debounce(

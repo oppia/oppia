@@ -33,7 +33,7 @@ def webapp_add_wsgi_middleware(app):
     This also sets the level of appstats log messages to 'debug' by
     monkey-patching. For details, see:
 
-        http://stackoverflow.com/questions/4305243/disable-appstats-logging
+        https://stackoverflow.com/questions/4305243/disable-appstats-logging
     """
     from google.appengine.ext.appstats import recording
 

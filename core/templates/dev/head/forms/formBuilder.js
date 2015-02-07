@@ -885,7 +885,7 @@ oppia.directive('requireIsValidExpression',
 
 // Prevents timeouts due to recursion in nested directives. See:
 //
-//   http://stackoverflow.com/questions/14430655/recursion-in-angular-directives
+//   https://stackoverflow.com/questions/14430655/recursion-in-angular-directives
 oppia.factory('recursionHelper', ['$compile', function($compile){
   return {
     /**
