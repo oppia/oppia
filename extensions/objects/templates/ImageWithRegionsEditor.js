@@ -143,7 +143,7 @@ oppia.directive('imageWithRegionsEditor', [
           if ($scope.rectWidth != 0 && $scope.rectHeight != 0) {
             var labels = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
             var newLabel = null;
-            for (var i = 0; i <= labels.length; i++) {
+            for (var i = 1; i <= labels.length+1; i++) {
               if (labels.indexOf(i.toString()) === -1) {
                 newLabel = i.toString();
                 break;
