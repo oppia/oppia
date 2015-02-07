@@ -469,6 +469,21 @@ oppia.factory('schemaDefaultValueService', [function() {
   };
 }]);
 
+oppia.factory('schemaUndefinedLastElementService', [function() {
+  return {
+    // Returns true if the input value, taken as the last element in a list,
+    // should be considered as 'undefined' and therefore deleted.
+    getUndefinedValue: function(schema) {
+      if (schema.type === 'unicode' || schema.type === 'html') {
+        return '';
+      } else {
+        return undefined;
+      }
+    }
+  };
+}]);
+
+
 
 // Directive for the rich text editor component.
 oppia.directive('richTextEditor', [
@@ -938,7 +953,8 @@ oppia.directive('schemaBasedEditor', [function() {
       isDisabled: '&',
       localValue: '=',
       allowExpressions: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '='
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'
@@ -1019,7 +1035,8 @@ oppia.directive('schemaBasedIntEditor', [function() {
       isDisabled: '&',
       allowExpressions: '&',
       validators: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '='
     },
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
@@ -1058,7 +1075,8 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       isDisabled: '&',
       allowExpressions: '&',
       validators: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '='
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
@@ -1115,7 +1133,8 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
       validators: '&',
       uiConfig: '&',
       allowExpressions: '&',
-      labelForFocusTarget: '&'
+      labelForFocusTarget: '&',
+      onInputBlur: '='
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
@@ -1229,7 +1248,10 @@ oppia.directive('schemaBasedHtmlEditor', [function() {
 
 oppia.directive('schemaBasedListEditor', [
     'schemaDefaultValueService', 'recursionHelper', 'focusService',
-    function(schemaDefaultValueService, recursionHelper, focusService) {
+    'schemaUndefinedLastElementService',
+    function(
+      schemaDefaultValueService, recursionHelper, focusService,
+      schemaUndefinedLastElementService) {
   return {
     scope: {
       localValue: '=',
@@ -1288,6 +1310,15 @@ oppia.directive('schemaBasedListEditor', [
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
+        };
+
+        $scope.deleteLastElementIfUndefined = function() {
+          var lastValueIndex = $scope.localValue.length - 1;
+          var valueToConsiderUndefined = (
+            schemaUndefinedLastElementService.getUndefinedValue($scope.itemSchema()));
+          if ($scope.localValue[lastValueIndex] === valueToConsiderUndefined) {
+            $scope.deleteElement(lastValueIndex);
+          }
         };
 
         $scope._onChildFormSubmit = function(evt) {
