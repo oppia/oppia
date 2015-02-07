@@ -120,61 +120,64 @@
                 {% endif %}
               </div>
 
-            <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1" infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
-              <div ng-repeat="exploration in shownExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
-                <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
-                  <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
-                    <!-- TODO(sll): Make the default image higher-res. -->
-                    <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>" height="128" width="128">
-                  </a>
-                  <div flex="75" class="oppia-gallery-tile-details-container">
-                    <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
-                      <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
-                      Edit
+              <!-- This fixes the 'float bug' in Firefox. Without this line, the "Create New Exploration" button will overlap the top-right of the exploration card, making it unclickable. -->
+              <div style="clear: both"></div>
+
+              <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1" infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+                <div ng-repeat="exploration in shownExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguagesFilter:selectedLanguages track by $index">
+                  <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
+                    <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
+                      <!-- TODO(sll): Make the default image higher-res. -->
+                      <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>" height="128" width="128">
                     </a>
-                    {% if is_moderator %}
-                      <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="!exploration.is_editable && currentUserIsModerator" ng-href="/create/<[exploration.id]>">
-                        <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit (as moderator)"></span>
-                        Edit (as moderator)
+                    <div flex="75" class="oppia-gallery-tile-details-container">
+                      <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
+                        <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
+                        Edit
                       </a>
-                    {% endif %}
+                      {% if is_moderator %}
+                        <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="!exploration.is_editable && currentUserIsModerator" ng-href="/create/<[exploration.id]>">
+                          <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit (as moderator)"></span>
+                          Edit (as moderator)
+                        </a>
+                      {% endif %}
 
-                    <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-details">
-                      <div class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
-                        <[exploration.title]>
-                      </div>
+                      <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-details">
+                        <div class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
+                          <[exploration.title]>
+                        </div>
 
-                      <div class="oppia-gallery-tile-objective">
-                        <span ng-if="exploration.objective" class="protractor-test-exploration-objective">
-                          <[getFormattedObjective(exploration.objective)]>
-                        </span>
-                        <span ng-if="!exploration.objective">
-                          <em>No objective specified.</em>
-                        </span>
-                      </div>
-
-                      <div class="oppia-gallery-tile-tags">
-                        <span class="label label-info oppia-gallery-tile-tag">
-                          <[exploration.category]>
-                        </span>
-                      </div>
-
-                      <div class="oppia-gallery-tile-metadata">
-                        <span class="oppia-gallery-tile-last-updated" ng-if="!gallerySidebarIsActive || screenIsLarge">
-                          Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                        </span>
-                        <span class="oppia-gallery-tile-rating">
-                          <span ng-if="exploration.status === 'publicized'">
-                            Featured
-                            <span class="glyphicon glyphicon-star"></span>
+                        <div class="oppia-gallery-tile-objective">
+                          <span ng-if="exploration.objective" class="protractor-test-exploration-objective">
+                            <[getFormattedObjective(exploration.objective)]>
                           </span>
-                        </span>
+                          <span ng-if="!exploration.objective">
+                            <em>No objective specified.</em>
+                          </span>
+                        </div>
+
+                        <div class="oppia-gallery-tile-tags">
+                          <span class="label label-info oppia-gallery-tile-tag">
+                            <[exploration.category]>
+                          </span>
+                        </div>
+
+                        <div class="oppia-gallery-tile-metadata">
+                          <span class="oppia-gallery-tile-last-updated" ng-if="!gallerySidebarIsActive || screenIsLarge">
+                            Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                          </span>
+                          <span class="oppia-gallery-tile-rating">
+                            <span ng-if="exploration.status === 'publicized'">
+                              Featured
+                              <span class="glyphicon glyphicon-star"></span>
+                            </span>
+                          </span>
+                        </div>
                       </div>
-                    </div>
-                  </a>
-                </md-card>
+                    </a>
+                  </md-card>
+                </div>
               </div>
-            </div>
             </div>
           </div>
         </div>
