@@ -1,42 +1,40 @@
 <style>
-  .multiple-choice-form-container {
-    margin-top: -3px;
+  .multiple-choice-option-form-container {
+    margin-top: -5px;
   }
   
-  .multiple-choice-container {
+  .multiple-choice-option-container {
     border-bottom: thin solid #EEEEEE; 
     margin-bottom: 5px;
   }
 
-  .multiple-choice {
+  .multiple-choice-option {
+    background: none;
+    border: none;
     color: #BDBDBD;
-    font-size: 17px;
-    line-height: 2;
+    font-size: 16px;
+    margin: 0;
+    padding-left: 0;
+    padding-top: 9px;
+    text-align: left;
   }
 
-  a.multiple-choice:link {
-    cursor: default;
-    text-decoration: none;
-  }
-
-  a.multiple-choice:hover {
+  .multiple-choice-option:hover {
     color: #00897B;
-    cursor: default;
-    text-decoration: none;
   }
 
-  .multiple-choice-container md-input-group.md-default-theme label {
+  .multiple-choice-option-container md-input-group.md-default-theme label {
     border-bottom: 0px;
   }
 </style>
 
 <script type="text/ng-template" id="interaction/MultipleChoiceInput">
-  <div class="multiple-choice-form-container">
+  <div class="multiple-choice-option-form-container">
     <form ng-submit="submitAnswer(answer)">
-      <div class = "multiple-choice-container" ng-repeat="choice in choices track by $index">
-        <a class = "multiple-choice" href ng-click="submitAnswer($index)" style="margin: 5px 0; text-align: left; white-space: normal; max-width: 350px;">
+      <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
+        <button class="multiple-choice-option" ng-click="submitAnswer($index)">
           <span angular-html-bind="choice"></span>
-        </a>
+        </button>
       </div>
     </form>
   </div>

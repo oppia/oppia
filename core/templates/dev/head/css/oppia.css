@@ -43,7 +43,7 @@ md-input-group.md-default-theme label
 {
   font-size: 16px;
   font-weight: 200;
-  margin-bottom:0px;
+  margin-bottom:0;
 }
 
 .md-button-success {
