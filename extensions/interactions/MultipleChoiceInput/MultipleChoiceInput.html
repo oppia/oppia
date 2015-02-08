@@ -1,11 +1,15 @@
 <style>
-  .multiple-choice-option-form-container {
+  .multiple-choice-form-container {
     margin-top: -5px;
   }
   
   .multiple-choice-option-container {
     border-bottom: thin solid #EEEEEE; 
     margin-bottom: 5px;
+  }
+
+  .multiple-choice-option-container md-input-group.md-default-theme label {
+    border-bottom: 0px;
   }
 
   .multiple-choice-option {
@@ -22,14 +26,10 @@
   .multiple-choice-option:hover {
     color: #00897B;
   }
-
-  .multiple-choice-option-container md-input-group.md-default-theme label {
-    border-bottom: 0px;
-  }
 </style>
 
 <script type="text/ng-template" id="interaction/MultipleChoiceInput">
-  <div class="multiple-choice-option-form-container">
+  <div class="multiple-choice-form-container">
     <form ng-submit="submitAnswer(answer)">
       <div class="multiple-choice-option-container" ng-repeat="choice in choices track by $index">
         <button class="multiple-choice-option" ng-click="submitAnswer($index)">
