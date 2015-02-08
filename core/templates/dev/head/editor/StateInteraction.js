@@ -67,7 +67,7 @@ oppia.controller('StateInteraction', [
 
   $scope.hasLoaded = false;
 
-  $scope._getStateCustArgsFromInteractionCustArgs = function(interactionCustomizationArgs) {
+  var _getStateCustomizationArgsFromInteractionCustomizationArgs = function(interactionCustomizationArgs) {
     var result = {};
     for (var i = 0; i < interactionCustomizationArgs.length; i++) {
       result[interactionCustomizationArgs[i].name] = {
@@ -77,7 +77,7 @@ oppia.controller('StateInteraction', [
     return result;
   };
 
-  $scope._getInteractionPreviewTag = function(interactionId, interactionCustomizationArgsList) {
+  var _getInteractionPreviewTag = function(interactionId, interactionCustomizationArgsList) {
     var el = $('<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '/>');
     for (var i = 0; i < interactionCustomizationArgsList.length; i++) {
       el.attr(
@@ -138,7 +138,7 @@ oppia.controller('StateInteraction', [
 
     stateInteractionStickyService.restoreFromMemento();
 
-    $scope.interactionPreviewHtml = $scope._getInteractionPreviewTag(
+    $scope.interactionPreviewHtml = _getInteractionPreviewTag(
       $scope.interactionId, interactionTemplate.customization_args);
     $scope.interactionCustomizerIsShown = false;
     $scope.tmpInteraction = null;
@@ -212,7 +212,7 @@ oppia.controller('StateInteraction', [
   $scope.saveInteractionCustomizations = function(tmpInteraction) {
     var newInteraction = angular.copy(tmpInteraction);
 
-    stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromInteractionCustArgs(
+    stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
       newInteraction.customization_args);
     stateCustomizationArgsService.saveDisplayedValue();
     stateInteractionStickyService.saveDisplayedValue();
@@ -245,7 +245,7 @@ oppia.controller('StateInteraction', [
         newInteraction.customization_args[i].value = (
           newInteraction.customization_args[i].default_value);
       }
-      stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromInteractionCustArgs(
+      stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
         newInteraction.customization_args);
     }
 

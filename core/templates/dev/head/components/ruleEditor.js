@@ -314,12 +314,7 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
       };
 
       $scope.onSelectNewRuleType = function() {
-        for (var desc in $scope.allRuleTypes) {
-          if (desc === $scope.currentRuleDescription) {
-            $scope.currentRuleDefinition.name = $scope.allRuleTypes[desc];
-            break;
-          }
-        }
+        $scope.currentRuleDefinition.name = $scope.allRuleTypes[$scope.currentRuleDescription];
         $scope.currentRuleDefinition.inputs = {};
         _computeRuleDescriptionFragments();
 

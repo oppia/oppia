@@ -237,6 +237,8 @@ oppia.controller('StateRules', [
       $scope.interactionHandlers, _interactionHandlersMemento);
   };
 
+  // This registers the change to the handlers in the list of changes, and also
+  // updates the states object in explorationStatesService.
   $scope.saveInteractionHandlers = function(newHandlers, oldHandlers) {
     if (newHandlers && oldHandlers && !angular.equals(newHandlers, oldHandlers)) {
       changeListService.editStateProperty(
