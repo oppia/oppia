@@ -201,7 +201,7 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
         raise SearchFailureError(e)
 
 
-def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
+def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
            sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 

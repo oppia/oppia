@@ -110,7 +110,7 @@ oppia.directive('checkboxGroup', function() {
             $scope.allCategoriesSelected = true;
           }
         }
-        $rootScope.$broadcast('categorySelectionChanged', $scope.model);
+        $rootScope.$broadcast('categorySelectionChanged');
       };
     }]
   };
@@ -212,10 +212,7 @@ oppia.controller('Gallery', [
     }
   };
 
-  // Note that an empty query results in all explorations being shown.
-  $scope.onSearchQueryChangeExec = function() {
-    $scope.searchIsLoading = true;
-
+  var _getCategorySuffixForQuery = function() {
     var _categorySuffix = '';
     for (var key in $scope.selectedCategories) {
       if ($scope.selectedCategories[key]) {
@@ -226,11 +223,20 @@ oppia.controller('Gallery', [
         _categorySuffix += key;
       }
     }
+    return ' category=("' + _categorySuffix + '")';
+  };
 
-    _categorySuffix = ' category=("' + _categorySuffix + '")';
+  // Note that an empty query results in all explorations being shown.
+  $scope.onSearchQueryChangeExec = function() {
+    $scope.searchIsLoading = true;
 
-    $http.get($scope.galleryDataUrl + '?q=' + encodeURI($scope.searchQuery + _categorySuffix)).success(
-      $scope.initGalleryData);
+    var _categorySuffix = _getCategorySuffixForQuery();    
+    var queryUrl = $scope.galleryDataUrl + '?q=' + encodeURI($scope.searchQuery + _categorySuffix);
+    if ($scope.searchCursor) {
+      queryUrl += '&cursor=' + $scope.searchCursor;
+    }
+
+    $http.get(queryUrl).success($scope.initGalleryData);
   };
 
   $scope.delayedOnSearchQueryChangeExec = oppiaDebouncer.debounce(
@@ -247,53 +253,45 @@ oppia.controller('Gallery', [
   // This is a list.
   $scope.selectedLanguages = [_DEFAULT_LANGUAGE];
 
-  var _INITIAL_NUM_ITEMS = 2;
-  var _INCREMENT_SIZE = 1;
-
-  $scope.numItemsShown = _INITIAL_NUM_ITEMS;
   $scope.allExplorationsInOrder = [];
+  $scope.searchCursor = null;
 
   // Called when the page loads, and after every search query.
   $scope.initGalleryData = function(data) {
     $scope.searchIsLoading = false;
     $scope.featuredExplorations = data.featured;
     $scope.publicExplorations = data['public'];
+    $scope.searchCursor = data.search_cursor;
 
     $scope.allExplorationsInOrder = $scope.featuredExplorations.concat(
       $scope.publicExplorations);
 
-    $scope.showGalleryData($scope.allExplorationsInOrder);
+    $scope.finishedLoadingPage = ($scope.searchCursor === null);
+
     $rootScope.loadingMessage = '';
   };
 
-  // Called as needed to show more explorations.
-  $scope.showGalleryData = function(data) {
-    if (data.length > $scope.numItemsShown) {
-      $scope.finishedLoadingPage = false;
-      $scope.shownExplorationsInOrder = data.slice(0, $scope.numItemsShown);
-    } else {
-      $scope.finishedLoadingPage = true;
-      $scope.shownExplorationsInOrder = data;
-    }
-    $scope.pageLoaderIsBusy = false;
-  };
-
-  $scope.$on('categorySelectionChanged', function(evt, selectedCategories) {
-    $scope.filteredExplorations = $scope.allExplorationsInOrder.filter(function(expDict) {
-      return selectedCategories[expDict.category] === true;
-    });
-
-    $scope.numItemsShown = Math.min(_INITIAL_NUM_ITEMS, $scope.filteredExplorations.length);
-    $scope.finishedLoadingPage = ($scope.filteredExplorations.length <= $scope.numItemsShown);
-
-    $scope.shownExplorationsInOrder = $scope.filteredExplorations.slice(0, $scope.numItemsShown);
-  });
-
   $scope.showMoreExplorations = function(data) {
     $scope.pageLoaderIsBusy = true;
-    $scope.numItemsShown += _INCREMENT_SIZE;
-    $scope.showGalleryData($scope.allExplorationsInOrder);
+
+    var queryUrl = $scope.galleryDataUrl + '?';
+    if ($scope.searchCursor) {
+      queryUrl += 'cursor=' + $scope.searchCursor + '&';
+    }
+    queryUrl += 'q=' + encodeURI($scope.searchQuery + _getCategorySuffixForQuery());
+
+    $http.get(queryUrl).success(function(data) {
+      $scope.searchCursor = data.search_cursor;
+      $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(data.featured);
+      $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(data['public']);
+      $scope.finishedLoadingPage = ($scope.searchCursor === null);
+      $scope.pageLoaderIsBusy = false;
+    });
   };
+
+  $scope.$on('categorySelectionChanged', function(evt) {
+    $scope.onSearchQueryChangeExec();
+  });
 
   // Retrieves gallery data from the server.
   $http.get($scope.galleryDataUrl).success(function(data) {

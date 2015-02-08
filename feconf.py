@@ -54,8 +54,14 @@ DEFAULT_QUERY_LIMIT = 1000
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
-# The default number of items to show on a page in a paged view.
-DEFAULT_PAGE_SIZE = 50
+# The default number of exploration tiles to load at a time in the gallery page.
+GALLERY_PAGE_SIZE = 10
+
+# The default number of commits to show on a page in the exploration history tab.
+COMMIT_LIST_PAGE_SIZE = 50
+
+# The default number of items to show on a page in the exploration feedback tab.
+FEEDBACK_TAB_PAGE_SIZE = 20
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First State'

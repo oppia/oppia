@@ -52,6 +52,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'public': [],
             'featured': [],
+            'search_cursor': None,
         }, response_dict)
 
         # Load a public demo exploration.
@@ -126,7 +127,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'public': [],
             'featured': [],
             'user_email': self.OWNER_EMAIL,
-            'username': 'defaultusername'
+            'username': 'defaultusername',
+            'search_cursor': None,
         }, response_dict)
 
         # Create exploration A

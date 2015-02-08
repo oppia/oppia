@@ -101,13 +101,15 @@ class GalleryHandler(base.BaseHandler):
         }
 
         query_string = self.request.get('q')
+        search_cursor = self.request.get('cursor', None)
         if query_string:
             # The user is performing a search.
-            exp_summaries_dict = (
+            exp_summaries_dict, search_cursor = (
                 exp_services.get_exploration_summaries_matching_query(
-                    query_string))
+                    query_string, cursor=search_cursor))
         else:
             # Get non-private exploration summaries
+            search_cursor = None
             exp_summaries_dict = (
                 exp_services.get_non_private_exploration_summaries())
 
@@ -155,6 +157,7 @@ class GalleryHandler(base.BaseHandler):
         self.values.update({
             'featured': publicized_explorations_list,
             'public': public_explorations_list,
+            'search_cursor': search_cursor,
         })
         self.render_json(self.values)
 
