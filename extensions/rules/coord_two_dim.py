@@ -22,7 +22,8 @@ import math
 
 from extensions.rules import base
 
-_RADIUS_OF_EARTH = 6371.0
+RADIUS_OF_EARTH = 6371.0
+
 
 class Within(base.CoordTwoDimRule):
     description = 'is within {{d|Real}} km of {{p|CoordTwoDim}}'
@@ -34,8 +35,14 @@ class Within(base.CoordTwoDimRule):
         lat_diff = math.radians(subject[0] - self.p[0])
         lon_diff = math.radians(subject[1] - self.p[1])
         # Haversine formula
-        haversine_of_central_angle = math.sin(lat_diff / 2) * math.sin(lat_diff / 2) + math.cos(lat1) * math.cos(lat2) * math.sin(lon_diff / 2) * math.sin(lon_diff / 2)
-        actual_distance = _RADIUS_OF_EARTH * 2 * math.asin(math.sqrt(haversine_of_central_angle))
+        haversine_of_central_angle = (
+            math.sin(lat_diff / 2) ** 2 +
+            math.cos(lat1) * math.cos(lat2) *
+            math.sin(lon_diff / 2) ** 2)
+
+        actual_distance = (
+            RADIUS_OF_EARTH * 2 *
+            math.asin(math.sqrt(haversine_of_central_angle)))
         return actual_distance < self.d
 
 
