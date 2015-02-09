@@ -31,7 +31,10 @@
         ng-attr-y="<[labeledRegion.region.regionArea[0][1] * imageHeight]>"
         ng-attr-width="<[(labeledRegion.region.regionArea[1][0] - labeledRegion.region.regionArea[0][0]) * imageWidth]>"
         ng-attr-height="<[(labeledRegion.region.regionArea[1][1] - labeledRegion.region.regionArea[0][1]) * imageHeight]>"
-        ng-attr-style="<[REGION_STYLE]>">
+        ng-attr-style="<[REGION_STYLE]>"
+        ng-mouseover="onMouseoverRegion($index)"
+        ng-mouseout="onMouseoutRegion($index)"
+        ng-mousedown="onMousedownRegion($index)">
       </rect>
       <text ng-repeat="region in $parent.$parent.value.imageRegions"
         ng-attr-style="<[REGION_LABEL_STYLE]>"

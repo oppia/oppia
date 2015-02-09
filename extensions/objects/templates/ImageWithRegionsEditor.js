@@ -54,6 +54,8 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.imageWidth = $scope.imageHeight = 0;
 
         $scope.regionDrawMode = false;
+        $scope.hoveredRegion = null;
+        $scope.selectedRegion = null;
 
         
         // Temporary label list
@@ -178,6 +180,19 @@ oppia.directive('imageWithRegionsEditor', [
             $scope.$parent.value.imageRegions.push(newRegion);
             labelList.push(newLabel);
           }
+        };
+        $scope.onMouseoverRegion = function(index) {
+          if ($scope.hoveredRegion === null) {
+            $scope.hoveredRegion = index;
+          }
+        };
+        $scope.onMouseoutRegion = function(index) {
+          if ($scope.hoveredRegion === index) {
+            $scope.hoveredRegion = null;
+          }
+        };
+        $scope.onMousedownRegion = function(index) {
+          $scope.selectedRegion = $scope.hoveredRegion;
         };
         $scope.onDocumentMouseUp = function(evt) {
           if ($scope.regionDrawMode && !$scope.userIsCurrentlyDragging) {
