@@ -897,10 +897,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   right: 25px;
 }
 
-.oppia-rules-container {
-  height: 100%;
-}
-
 .oppia-rule-tab {
   background: #eeedee;
   border-radius: 0;
@@ -913,7 +909,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   border-right: 0;
 }
 
-.oppia-rule-bodies-container {
+.oppia-rule-body-container {
   padding-left: 15px;
   padding-right: 15px;
   width: 100%;

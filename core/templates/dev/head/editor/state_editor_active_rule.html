@@ -1,0 +1,6 @@
+<div ng-controller="StateEditorActiveRule">
+  <div class="oppia-rule-body-container" ng-if="activeRule">
+    <rule-editor rule="activeRule" save-rule="saveRule" delete-rule="deleteActiveRule()" is-editable="editabilityService.isEditable()" class="protractor-test-rule-body">
+    </rule-editor>
+  </div>
+</div>

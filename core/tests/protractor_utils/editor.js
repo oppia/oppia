@@ -234,7 +234,7 @@ var RuleEditor = function(ruleNum) {
   tabElem.click();
 
   var bodyElem = (ruleNum === 'default') ?
-    element(by.css('.protractor-test-default-rule-body')):
+    element.all(by.css('.protractor-test-rule-body')).last() :
     element.all(by.css('.protractor-test-rule-body')).get(ruleNum);
   // The clickable well is not shown if the rule editor is already open.
   bodyElem.all(by.css('.protractor-test-edit-rule')).then(function(buttons) {

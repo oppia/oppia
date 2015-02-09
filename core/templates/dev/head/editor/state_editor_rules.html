@@ -1,10 +1,5 @@
 <div id="tutorialStateRules">
-  <div class="oppia-rules-container" ng-repeat="(handlerName, handler) in interactionHandlers">
-    <div class="oppia-rule-bodies-container">
-      <rule-editor rule="handler[activeRuleIndex]" num-rules="handler.length" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" save-rule="saveRule" delete-rule="deleteRule(handlerName, activeRuleIndex)" is-editable="editabilityService.isEditable()" ng-class="{'protractor-test-rule-body': activeRuleIndex !== handler.length - 1, 'protractor-test-default-rule-body': activeRuleIndex === handler.length - 1}">
-      </rule-editor>
-    </div>
-
+  <div ng-repeat="(handlerName, handler) in interactionHandlers">
     <div>
       <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
         <!-- An HTML element marked ui-sortable should contain only one element,
@@ -16,11 +11,15 @@
           <span class="oppia-rule-sort-arrows-container oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
             <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
           </span>
-          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab oppia-rule-sort-handle protractor-test-rule-tab" ng-class="{'active': activeRuleIndex == $index}">Rule #<[$index + 1]></a>
+          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab oppia-rule-sort-handle protractor-test-rule-tab" ng-class="{'active': activeRuleIndex == $index}">
+            <[rule | parameterizeRuleDescription: getAnswerChoices()]>...
+          </a>
         </li>
 
         <li ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
-          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab protractor-test-default-rule-tab" ng-class="{'active': activeRuleIndex == $index}">Default</a>
+          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab protractor-test-default-rule-tab" ng-class="{'active': activeRuleIndex == $index}">
+            Default
+          </a>
         </li>
       </ul>
 
@@ -39,7 +38,7 @@
   </div>
 
   <div class="modal-body">
-    <rule-description-editor current-rule-description="currentRuleDescription" current-rule-definition="currentRuleDefinition" interaction-handler-specs="interactionHandlerSpecs" answer-choices="answerChoices" class="protractor-test-temporary-rule"></rule-description-editor>
+    <rule-description-editor current-rule-description="currentRuleDescription" current-rule-definition="currentRuleDefinition" answer-choices="answerChoices" class="protractor-test-temporary-rule"></rule-description-editor>
   </div>
 
   <div class="modal-footer">

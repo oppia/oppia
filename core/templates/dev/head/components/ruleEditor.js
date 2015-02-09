@@ -78,17 +78,17 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       rule: '=',
-      answerChoices: '=',
-      interactionHandlerSpecs: '=',
       saveRule: '=',
       deleteRule: '&',
-      isEditable: '=',
-      numRules: '&'
+      isEditable: '='
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
-      function($scope, $attrs, editorContextService, explorationStatesService, routerService, validatorsService) {
+      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService',
+      'validatorsService', 'rulesService',
+      function(
+          $scope, $attrs, editorContextService, explorationStatesService, routerService,
+          validatorsService, rulesService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
@@ -244,22 +244,22 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
   return {
     restrict: 'E',
     scope: {
-      answerChoices: '=',
       currentRuleDescription: '=',
-      currentRuleDefinition: '=',
-      interactionHandlerSpecs: '='
+      currentRuleDefinition: '='
     },
     templateUrl: 'rules/ruleDescriptionEditor',
     controller: [
         '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
-        function($scope, $attrs, editorContextService, explorationStatesService, routerService, validatorsService) {
+        'rulesService',
+        function($scope, $attrs, editorContextService, explorationStatesService, routerService, validatorsService, rulesService) {
 
       var _generateAllRuleTypes = function() {
-        for (var i = 0; i < $scope.interactionHandlerSpecs.length; i++) {
-          if ($scope.interactionHandlerSpecs[i].name == 'submit') {
+        var _interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
+        for (var i = 0; i < _interactionHandlerSpecs.length; i++) {
+          if (_interactionHandlerSpecs[i].name == 'submit') {
             $scope.allRuleTypes = {};
-            for (var description in $scope.interactionHandlerSpecs[i].rules) {
-              $scope.allRuleTypes[description] = $scope.interactionHandlerSpecs[i].rules[description].classifier;
+            for (var description in _interactionHandlerSpecs[i].rules) {
+              $scope.allRuleTypes[description] = _interactionHandlerSpecs[i].rules[description].classifier;
             }
             return;
           }
@@ -290,12 +290,13 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
             break;
           }
 
-          if ($scope.answerChoices && $scope.answerChoices.length) {
+          var _answerChoices = rulesService.getAnswerChoices();
+
+          if (_answerChoices && _answerChoices.length) {
             // This rule is for a multiple-choice interaction.
             // TODO(sll): Remove the need for this special case for multiple-choice
             // input.
-            var _choices = angular.copy($scope.answerChoices);
-            $scope.ruleDescriptionChoices = $scope.answerChoices.map(function(choice, ind) {
+            $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
               return {
                 val: choice.label,
                 id: choice.val
@@ -363,7 +364,7 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
 
       _computeRuleDescriptionFragments();
 
-      $scope.$watch('interactionHandlerSpecs', function() {
+      $scope.$watch('rulesService.interactionHandlerSpecs', function() {
         _generateAllRuleTypes();
       });
     }]
