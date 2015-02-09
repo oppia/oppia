@@ -18,7 +18,7 @@
 
 // TODO(czx): Uniquify the labels of image regions
 oppia.directive('imageWithRegionsEditor', [
-  '$rootScope', '$sce', '$compile', 'warningsData', function($rootScope, $sce, $compile, warningsData) {
+  '$rootScope', '$sce', '$compile', 'warningsData', '$document', function($rootScope, $sce, $compile, warningsData, $document) {
     return {
       link: function(scope, element, attrs) {
         scope.getTemplateUrl = function() {
@@ -179,15 +179,21 @@ oppia.directive('imageWithRegionsEditor', [
             labelList.push(newLabel);
           }
         };
+        $scope.onDocumentMouseUp = function(evt) {
+          if ($scope.regionDrawMode && !$scope.userIsCurrentlyDragging) {
+            $scope.regionDrawMode = false;
+          }
+        }
+        $document.on('mouseup', $scope.onDocumentMouseUp);
 
         $scope.setDrawMode = function() {
           $scope.regionDrawMode = true;
         };
         $scope.getCursorStyle = function() {
           if ($scope.regionDrawMode) {
-            return "crosshair";
+            return 'crosshair';
           } else {
-            return "default";
+            return 'default';
           }
         };
 
