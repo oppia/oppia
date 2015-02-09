@@ -45,12 +45,15 @@ oppia.directive('imageWithRegionsEditor', [
         // Coordinates for currently drawn rectangle (when user is dragging)
         $scope.rectX = $scope.rectY = 0;
         $scope.rectWidth = $scope.rectHeight = 0;
+
         // Is user currently dragging?
         $scope.userIsCurrentlyDragging = false;
         // Dimensions of original image
         $scope.originalImageWidth = $scope.originalImageHeight = 0;
         // Dimensions of displayed image
         $scope.imageWidth = $scope.imageHeight = 0;
+
+        $scope.regionDrawMode = false;
 
         
         // Temporary label list
@@ -133,13 +136,20 @@ oppia.directive('imageWithRegionsEditor', [
         };
         $scope.onSvgMouseDown = function(evt) {
           evt.preventDefault();
+          if (!$scope.regionDrawMode) {
+            return;
+          }
           $scope.origX = $scope.mouseX;
           $scope.origY = $scope.mouseY;
           $scope.rectWidth = $scope.rectHeight = 0;
           $scope.userIsCurrentlyDragging = true;
         }
         $scope.onSvgMouseUp = function(evt) {
+          if (!$scope.regionDrawMode) {
+            return;
+          }
           $scope.userIsCurrentlyDragging = false;
+          $scope.regionDrawMode = false;
           if ($scope.rectWidth != 0 && $scope.rectHeight != 0) {
             var labels = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
             var newLabel = null;
@@ -167,6 +177,17 @@ oppia.directive('imageWithRegionsEditor', [
             };
             $scope.$parent.value.imageRegions.push(newRegion);
             labelList.push(newLabel);
+          }
+        };
+
+        $scope.setDrawMode = function() {
+          $scope.regionDrawMode = true;
+        };
+        $scope.getCursorStyle = function() {
+          if ($scope.regionDrawMode) {
+            return "crosshair";
+          } else {
+            return "default";
           }
         };
 

@@ -4,8 +4,8 @@
     schema="{type: 'custom', obj_type: 'Filepath'}">
   </schema-based-editor>
 </div>
-<div ng-if="$parent.value.imagePath !== ''">
-  (Drag on the image to draw new input regions)
+<div ng-if="$parent.value.imagePath !== ''" ng-attr-style="cursor: <[getCursorStyle()]>;">
+  <button type="button" class="btn btn-default" ng-click="setDrawMode()">Draw New Region</button>
   <div>
     <svg class="oppia-image-with-regions-editor-svg"
       width="100%"
@@ -48,5 +48,6 @@
     </ul>
   </div>
   <br><div style="color: red;"><[errorText]></div>
-  <br><button type="button" class="btn btn-default" ng-click="resetEditor()">Clear Image and Regions</button>
+  <br>
+  <button type="button" class="btn btn-danger" ng-click="resetEditor()">Clear Image and Regions</button>
 </div>
