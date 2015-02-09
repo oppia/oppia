@@ -86,4 +86,12 @@ html, body {
 
 .conversation-skin-supplemental-interaction {
   max-width: 600px;
+  margin-left: -42px;
+}
+
+.conversation-skin-supplemental-card {
+  background: rgb(255,255,255);
+  margin: 30px;
+  padding-left: 60px;
+  width: 600px;
 }
