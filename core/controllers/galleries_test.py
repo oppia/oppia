@@ -66,7 +66,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'Welcome',
             'title': 'Welcome to Oppia!',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
         }, response_dict['public'][0])
@@ -105,7 +105,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'A new category',
             'title': 'A new title!',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['featured'][0])
@@ -163,7 +163,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': 'A',
             'category': 'Category A',
             'title': 'Title A',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'Objective A',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
         }, response_dict['public'][0])
@@ -171,7 +171,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': 'B',
             'category': 'Category B',
             'title': 'Title B',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'Objective B',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['featured'][0])
@@ -187,7 +187,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': 'B',
             'category': 'Category B',
             'title': 'Title B',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'Objective B',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['featured'][0])

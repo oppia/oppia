@@ -1025,7 +1025,7 @@ def _exp_to_search_dict(exp):
     }
     doc.update(_exp_rights_to_search_dict(rights))
 
-    #TODO(frederik): Calculate an exploration's 'rank' based on statistics.
+    # TODO(frederik): Calculate an exploration's 'rank' based on statistics.
     # By default, a document's rank is the time it was indexed, so the most
     # recently changed explorations would rank higher.
 

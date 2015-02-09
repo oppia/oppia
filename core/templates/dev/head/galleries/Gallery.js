@@ -30,19 +30,19 @@ oppia.filter('selectedCategoriesFilter', function() {
   };
 });
 
-oppia.filter('selectedLanguagesFilter', function() {
-  return function(items, selectedLanguages) {
+oppia.filter('selectedLanguageCodesFilter', function() {
+  return function(items, selectedLanguageCodes) {
     if (!items) {
       return [];
     }
 
     // If no languages are selected, show all explorations.
-    if (selectedLanguages.length === 0) {
+    if (selectedLanguageCodes.length === 0) {
       return items;
     }
 
     return items.filter(function(item) {
-      return selectedLanguages.indexOf(item.language) !== -1;
+      return selectedLanguageCodes.indexOf(item.language_code) !== -1;
     });
   };
 });
@@ -212,25 +212,34 @@ oppia.controller('Gallery', [
     }
   };
 
-  var _getCategorySuffixForQuery = function() {
-    var _categorySuffix = '';
+  // Appends a suffix to the query describing allowed category and language
+  // codes to filter on.
+  var _getSuffixForQuery = function() {
+    var _categories = '';
+    var _allCategoriesAreSelected = true;
     for (var key in $scope.selectedCategories) {
       if ($scope.selectedCategories[key]) {
-        if (_categorySuffix) {
-          _categorySuffix += '" OR "';
+        if (_categories) {
+          _categories += '" OR "';
         }
-
-        _categorySuffix += key;
+        _categories += key;
+      } else {
+        _allCategoriesAreSelected = false;
       }
     }
-    return ' category=("' + _categorySuffix + '")';
+
+    var querySuffix = _allCategoriesAreSelected ? '' : ' category=("' + _categories + '")';
+    if ($scope.selectedLanguageCodes.length > 0) {
+      querySuffix += ' language_code=("' + $scope.selectedLanguageCodes.join('" OR "') + '")';
+    }
+    return querySuffix;
   };
 
   // Note that an empty query results in all explorations being shown.
   $scope.onSearchQueryChangeExec = function() {
     $scope.searchIsLoading = true;
 
-    var _categorySuffix = _getCategorySuffixForQuery();    
+    var _categorySuffix = _getSuffixForQuery();
     var queryUrl = $scope.galleryDataUrl + '?q=' + encodeURI($scope.searchQuery + _categorySuffix);
     if ($scope.searchCursor) {
       queryUrl += '&cursor=' + $scope.searchCursor;
@@ -242,16 +251,16 @@ oppia.controller('Gallery', [
   $scope.delayedOnSearchQueryChangeExec = oppiaDebouncer.debounce(
     $scope.onSearchQueryChangeExec, 400);
 
-  $scope.LANGUAGE_CHOICES = GLOBALS.ALL_LANGUAGE_NAMES.map(function(languageName) {
+  $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {
     return {
-      id: languageName,
-      text: languageName
+      id: languageItem.code,
+      text: languageItem.name
     };
   });
 
-  var _DEFAULT_LANGUAGE = 'English';
+  var _DEFAULT_LANGUAGE_CODE = 'en';
   // This is a list.
-  $scope.selectedLanguages = [_DEFAULT_LANGUAGE];
+  $scope.selectedLanguageCodes = [_DEFAULT_LANGUAGE_CODE];
 
   $scope.allExplorationsInOrder = [];
   $scope.searchCursor = null;
@@ -272,26 +281,32 @@ oppia.controller('Gallery', [
   };
 
   $scope.showMoreExplorations = function(data) {
-    $scope.pageLoaderIsBusy = true;
+    if (!$rootScope.loadingMessage) {
+      $scope.pageLoaderIsBusy = true;
 
-    var queryUrl = $scope.galleryDataUrl + '?';
-    if ($scope.searchCursor) {
-      queryUrl += 'cursor=' + $scope.searchCursor + '&';
+      var queryUrl = $scope.galleryDataUrl + '?';
+      if ($scope.searchCursor) {
+        queryUrl += 'cursor=' + $scope.searchCursor + '&';
+      }
+      queryUrl += 'q=' + encodeURI($scope.searchQuery + _getSuffixForQuery());
+
+      $http.get(queryUrl).success(function(data) {
+        $scope.searchCursor = data.search_cursor;
+        $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(data.featured);
+        $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(data['public']);
+        $scope.finishedLoadingPage = ($scope.searchCursor === null);
+        $scope.pageLoaderIsBusy = false;
+      });
     }
-    queryUrl += 'q=' + encodeURI($scope.searchQuery + _getCategorySuffixForQuery());
-
-    $http.get(queryUrl).success(function(data) {
-      $scope.searchCursor = data.search_cursor;
-      $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(data.featured);
-      $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(data['public']);
-      $scope.finishedLoadingPage = ($scope.searchCursor === null);
-      $scope.pageLoaderIsBusy = false;
-    });
   };
 
   $scope.$on('categorySelectionChanged', function(evt) {
     $scope.onSearchQueryChangeExec();
   });
+
+  $scope.onLanguageCodeSelectionChange = function() {
+    $scope.onSearchQueryChangeExec();
+  };
 
   // Retrieves gallery data from the server.
   $http.get($scope.galleryDataUrl).success(function(data) {
