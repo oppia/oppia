@@ -1,94 +1,90 @@
-{% extends "editor/state_editor_row.html" %}
-
-{% block label %}interaction{% endblock %}
-
-{% block cls %}oppia-interaction-display{% endblock %}
-
-{% block left_margin %}
-  <img src="/images/user.png">
-{% endblock %}
-
-{% block center %}
-  <div ng-if="!hasLoaded" class="oppia-align-center">
-    Loading
-    <span class="oppia-loading-dot-one">.</span>
-    <span class="oppia-loading-dot-two">.</span>
-    <span class="oppia-loading-dot-three">.</span>
+<div class="row">
+  <div class="col-lg-1 col-md-1 col-sm-1">
+    <img src="/images/user.png">
   </div>
 
-  <div id="tutorialStateInteraction" class="protractor-test-interaction">
-    <div ng-if="hasLoaded">
-      <div ng-if="!interactionCustomizerIsShown"
-           class="protractor-test-edit-interaction"
-           ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
-           ng-disabled="!hasLoaded">
-
-        <!-- We use a transparent div overlay here so that buttons within the
-        interaction itself do not receive the click events. -->
-        <div class="oppia-click-to-start-editing" ng-click="showInteractionCustomizer()">
-        </div>
-
-        <div class="row" style="margin-bottom: 10px;">
-          <div class="col-lg-8 col-md-8 col-sm-8">
-          </div>
-          <div class="col-lg-4 col-md-4 col-sm-4">
-            <select ng-show="editabilityService.isEditable()"
-                    class="form-control oppia-interaction-selector protractor-test-select-interaction-id"
-                    ng-model="$parent.$parent.interactionId" ng-options="interactionId as interaction.name for (interactionId, interaction) in interactionRepository"
-                    ng-change="onChangeInteractionType(interactionId)">
-            </select>
-          </div>
-        </div>
-        <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-cog oppia-editor-edit-icon" title="Edit Interaction" style="position: absolute; right: 30px; top: 35px;">
-        </span>
-        <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview well">
-        </div>
-      </div>
+  <div class="col-lg-11 col-md-11 col-sm-11">
+    <div ng-if="!hasLoaded" class="oppia-align-center">
+      Loading
+      <span class="oppia-loading-dot-one">.</span>
+      <span class="oppia-loading-dot-two">.</span>
+      <span class="oppia-loading-dot-three">.</span>
     </div>
 
-    <div ng-if="interactionCustomizerIsShown" class="oppia-state-item-editor-div">
-      <div class="oppia-interaction-editor protractor-test-interaction-editor">
-        <h3>Customize Interaction</h3>
-        <br>
+    <div id="tutorialStateInteraction" class="protractor-test-interaction">
+      <div ng-if="hasLoaded">
+        <div ng-if="!interactionCustomizerIsShown"
+             class="protractor-test-edit-interaction"
+             ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
+             ng-disabled="!hasLoaded">
 
-        <div class="row">
-          <div class="col-lg-12 col-md-12 col-sm-12">
-            <form name="form.schemaForm">
-              <div ng-repeat="customizationArg in tmpInteraction.customization_args">
-                <span><[customizationArg.description]></span>
-                <div>
-                  <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
-                  </schema-based-editor>
-                  <div style="margin-bottom: 15px;"></div>
+          <!-- We use a transparent div overlay here so that buttons within the
+          interaction itself do not receive the click events. -->
+          <div class="oppia-click-to-start-editing" ng-click="showInteractionCustomizer()">
+          </div>
+
+          <div class="row" style="margin-bottom: 10px;">
+            <div class="col-lg-8 col-md-8 col-sm-8">
+            </div>
+            <div class="col-lg-4 col-md-4 col-sm-4">
+              <select ng-show="editabilityService.isEditable()"
+                      class="form-control oppia-interaction-selector protractor-test-select-interaction-id"
+                      ng-model="$parent.$parent.interactionId" ng-options="interactionId as interaction.name for (interactionId, interaction) in interactionRepository"
+                      ng-change="onChangeInteractionType(interactionId)">
+              </select>
+            </div>
+          </div>
+          <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-cog oppia-editor-edit-icon" title="Edit Interaction" style="position: absolute; right: 20px; top: 20px;">
+          </span>
+          <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview well">
+          </div>
+        </div>
+      </div>
+
+      <div ng-if="interactionCustomizerIsShown" class="oppia-state-item-editor-div">
+        <div class="oppia-interaction-editor protractor-test-interaction-editor">
+          <h3>Customize Interaction</h3>
+          <br>
+
+          <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+              <form name="form.schemaForm">
+                <div ng-repeat="customizationArg in tmpInteraction.customization_args">
+                  <span><[customizationArg.description]></span>
+                  <div>
+                    <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+                    </schema-based-editor>
+                    <div style="margin-bottom: 15px;"></div>
+                  </div>
                 </div>
+              </form>
+
+              <div ng-if="!isEmpty(tmpInteraction.customization_args)">
+                <hr>
               </div>
-            </form>
 
-            <div ng-if="!isEmpty(tmpInteraction.customization_args)">
-              <hr>
-            </div>
-
-            <div class="checkbox">
-              <label>
-                <input type="checkbox" ng-model="stateInteractionStickyService.displayed" ng-disabled="!editabilityService.isEditable()">
-                Reuse the previous state's interaction, if possible.
-                <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
-                  <span class="glyphicon glyphicon-question-sign"></span>
-                </a>
-              </label>
+              <div class="checkbox">
+                <label>
+                  <input type="checkbox" ng-model="stateInteractionStickyService.displayed" ng-disabled="!editabilityService.isEditable()">
+                  Reuse the previous state's interaction, if possible.
+                  <a href="https://code.google.com/p/oppia/wiki/InteractiveWidgets#Other_options" target="_blank">
+                    <span class="glyphicon glyphicon-question-sign"></span>
+                  </a>
+                </label>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      <div ng-if="tmpInteraction">
-        <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-interaction" ng-click="saveInteractionCustomizations(tmpInteraction)" ng-disabled="form.schemaForm.$invalid">
-          Save Interaction
-        </button>
-        <button type="button" class="btn btn-default" ng-click="resetInteractionCustomizer()">
-          Cancel
-        </button>
+        <div ng-if="tmpInteraction">
+          <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-interaction" ng-click="saveInteractionCustomizations(tmpInteraction)" ng-disabled="form.schemaForm.$invalid">
+            Save Interaction
+          </button>
+          <button type="button" class="btn btn-default" ng-click="resetInteractionCustomizer()">
+            Cancel
+          </button>
+        </div>
       </div>
     </div>
   </div>
-{% endblock %}
+</div>

@@ -18,9 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-// A state-specific cache for interaction details. It stores customization and
-// handlers corresponding to an interaction id so that they can be restored if
-// the interaction is changed back while the user is still in this state. This
+// A state-specific cache for interaction details. It stores customization args
+// corresponding to an interaction id so that they can be restored if the
+// interaction is changed back while the user is still in this state. This
 // cache should be reset each time the state editor is initialized.
 oppia.factory('interactionDetailsCache', [function() {
   var _cache = {};
@@ -31,10 +31,9 @@ oppia.factory('interactionDetailsCache', [function() {
     contains: function(interactionId) {
       return _cache.hasOwnProperty(interactionId);
     },
-    set: function(interactionId, interactionCustomizationArgs, interactionHandlers) {
+    set: function(interactionId, interactionCustomizationArgs) {
       _cache[interactionId] = {
-        customization: angular.copy(interactionCustomizationArgs),
-        handlers: angular.copy(interactionHandlers)
+        customization: angular.copy(interactionCustomizationArgs)
       };
     },
     get: function(interactionId) {
@@ -48,22 +47,16 @@ oppia.factory('interactionDetailsCache', [function() {
 
 
 oppia.controller('StateInteraction', [
-    '$scope', '$http', '$filter', '$modal', '$window', 'warningsData',
-    'editorContextService', 'changeListService', 'oppiaHtmlEscaper',
-    'interactionRepositoryService', 'stateInteractionIdService',
-    'stateCustomizationArgsService', 'stateInteractionStickyService',
-    'editabilityService', 'explorationStatesService', 'graphDataService',
-    'interactionDetailsCache',
-    function($scope, $http, $filter, $modal, $window, warningsData,
-      editorContextService, changeListService, oppiaHtmlEscaper,
-      interactionRepositoryService, stateInteractionIdService,
-      stateCustomizationArgsService, stateInteractionStickyService,
-      editabilityService, explorationStatesService, graphDataService,
-      interactionDetailsCache) {
-  // Variables storing specifications for the interaction parameters and
-  // possible rules.
-  $scope.interactionHandlerSpecs = [];
-  $scope.interactionHandlers = {};
+    '$scope', '$http', '$rootScope', '$filter', 'warningsData',
+    'editorContextService', 'oppiaHtmlEscaper', 'interactionRepositoryService',
+    'stateInteractionIdService', 'stateCustomizationArgsService',
+    'stateInteractionStickyService', 'editabilityService',
+    'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
+    function($scope, $http, $rootScope, $filter, warningsData,
+      editorContextService, oppiaHtmlEscaper, interactionRepositoryService,
+      stateInteractionIdService, stateCustomizationArgsService,
+      stateInteractionStickyService, editabilityService,
+      explorationStatesService, graphDataService, interactionDetailsCache) {
 
   $scope.form = {};
 
@@ -74,7 +67,7 @@ oppia.controller('StateInteraction', [
 
   $scope.hasLoaded = false;
 
-  $scope._getStateCustArgsFromInteractionCustArgs = function(interactionCustomizationArgs) {
+  var _getStateCustomizationArgsFromInteractionCustomizationArgs = function(interactionCustomizationArgs) {
     var result = {};
     for (var i = 0; i < interactionCustomizationArgs.length; i++) {
       result[interactionCustomizationArgs[i].name] = {
@@ -84,11 +77,7 @@ oppia.controller('StateInteraction', [
     return result;
   };
 
-  $scope.getCurrentInteractionId = function() {
-    return stateInteractionIdService.savedMemento;
-  };
-
-  $scope._getInteractionPreviewTag = function(interactionId, interactionCustomizationArgsList) {
+  var _getInteractionPreviewTag = function(interactionId, interactionCustomizationArgsList) {
     var el = $('<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '/>');
     for (var i = 0; i < interactionCustomizationArgsList.length; i++) {
       el.attr(
@@ -99,7 +88,7 @@ oppia.controller('StateInteraction', [
   };
 
   $scope.resetInteractionCustomizer = function() {
-    $scope.interactionId = $scope.getCurrentInteractionId();
+    $scope.interactionId = stateInteractionIdService.savedMemento;
     var stateCustomizationArgs = stateCustomizationArgsService.savedMemento;
 
     var interactionTemplate = angular.copy($scope.interactionRepository[$scope.interactionId]);
@@ -113,43 +102,46 @@ oppia.controller('StateInteraction', [
     }
 
     // Special cases for multiple choice input and image click input.
-    $scope.answerChoices = null;
-    if ($scope.interactionId == 'MultipleChoiceInput') {
+    if ($scope.interactionId === 'MultipleChoiceInput') {
       for (var i = 0; i < interactionTemplate.customization_args.length; i++) {
         if (interactionTemplate.customization_args[i].name == 'choices') {
-          $scope.answerChoices = interactionTemplate.customization_args[i].value.map(
-            function(val, ind) {
+          $rootScope.$broadcast(
+            'updateAnswerChoices', interactionTemplate.customization_args[i].value.map(function(val, ind) {
               return {
                 val: ind,
                 label: val
               };
-            }
+            })
           );
+          break;
         }
       }
-    } else if ($scope.interactionId == 'ImageClickInput') {
+    } else if ($scope.interactionId === 'ImageClickInput') {
       for (var i = 0; i < interactionTemplate.customization_args.length; i++) {
         if (interactionTemplate.customization_args[i].name == 'imageAndRegions') {
-          $scope.answerChoices = [];
+          var _answerChoices = [];
           var imageWithRegions = interactionTemplate.customization_args[i].value;
           for (var j = 0; j < imageWithRegions.imageRegions.length; j++) {
-            $scope.answerChoices.push({
+            _answerChoices.push({
               val: imageWithRegions.imageRegions[j].label,
               label: imageWithRegions.imageRegions[j].label
             });
           }
+
+          $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
+          break;
         }
       }
+    } else {
+      $rootScope.$broadcast('updateAnswerChoices', null);
     }
 
     stateInteractionStickyService.restoreFromMemento();
 
-    $scope.interactionHandlerSpecs = interactionTemplate.handler_specs;
-    $scope.interactionPreviewHtml = $scope._getInteractionPreviewTag(
+    $scope.interactionPreviewHtml = _getInteractionPreviewTag(
       $scope.interactionId, interactionTemplate.customization_args);
     $scope.interactionCustomizerIsShown = false;
     $scope.tmpInteraction = null;
-    $scope.interactionHandlersMemento = angular.copy($scope.interactionHandlers);
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -160,7 +152,6 @@ oppia.controller('StateInteraction', [
     // TODO(sll): Build a file containing this data and serve it statically,
     // since it rarely changes. (But don't cache it, since it does change.)
     interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
-      $scope.tmpRule = null;
       $scope.stateName = editorContextService.getActiveStateName();
       $scope.interactionRepository = interactionRepository;
 
@@ -171,26 +162,17 @@ oppia.controller('StateInteraction', [
         $scope.stateName, stateData.interaction.customization_args,
         stateData.interaction, 'widget_customization_args');
       stateInteractionStickyService.init(
-        $scope.stateName, stateData.interaction.sticky, stateData.interaction,
-        'widget_sticky');
+        $scope.stateName, stateData.interaction.sticky,
+        stateData.interaction, 'widget_sticky');
 
       $scope.stateInteractionStickyService = stateInteractionStickyService;
 
-      // Stores rules as key-value pairs. For each pair, the key is the
-      // corresponding handler name and the value has several keys:
-      // - 'definition' (the rule definition)
-      // - 'description' (the rule description string)
-      // - 'dest' (the destination for this rule)
-      // - 'feedback' (list of feedback given for this rule)
-      // - 'param_changes' (parameter changes associated with this rule)
-      $scope.interactionHandlers = {};
-      for (var i = 0; i < stateData.interaction.handlers.length; i++) {
-        $scope.interactionHandlers[stateData.interaction.handlers[i].name] = (
-          stateData.interaction.handlers[i].rule_specs);
-      }
+      $rootScope.$broadcast('initializeHandlers', {
+        'interactionId': stateData.interaction.id,
+        'handlers': stateData.interaction.handlers
+      });
 
       $scope.resetInteractionCustomizer(stateData.interaction);
-      $scope.ruleEditorsAreShown = false;
       $scope.hasLoaded = true;
     });
   });
@@ -200,11 +182,10 @@ oppia.controller('StateInteraction', [
       warningsData.clear();
 
       $scope.interactionCustomizerIsShown = true;
-      $scope.interactionHandlersMemento = angular.copy($scope.interactionHandlers);
       $scope.$broadcast('schemaBasedFormsShown');
 
       $scope.tmpInteraction = angular.copy(
-        $scope.interactionRepository[$scope.getCurrentInteractionId()]);
+        $scope.interactionRepository[stateInteractionIdService.savedMemento]);
       for (var i = 0; i < $scope.tmpInteraction.customization_args.length; i++) {
         var caName = $scope.tmpInteraction.customization_args[i].name;
         $scope.tmpInteraction.customization_args[i].value = (
@@ -216,17 +197,27 @@ oppia.controller('StateInteraction', [
     }
   };
 
+  var _updateStatesDict = function() {
+    var activeStateName = editorContextService.getActiveStateName();
+    var _stateDict = explorationStatesService.getState(activeStateName);
+    _stateDict.interaction.id = angular.copy(
+      stateInteractionIdService.savedMemento);
+    _stateDict.interaction.customization_args = angular.copy(
+      stateCustomizationArgsService.savedMemento);
+    _stateDict.interaction.sticky = angular.copy(
+      stateInteractionStickyService.savedMemento);
+    explorationStatesService.setState(activeStateName, _stateDict);
+  };
+
   $scope.saveInteractionCustomizations = function(tmpInteraction) {
     var newInteraction = angular.copy(tmpInteraction);
 
-    stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromInteractionCustArgs(
+    stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
       newInteraction.customization_args);
     stateCustomizationArgsService.saveDisplayedValue();
-
     stateInteractionStickyService.saveDisplayedValue();
 
-    $scope.tmpRule = null;
-    $scope.updateStateInteractionHandlerData();
+    _updateStatesDict();
     graphDataService.recompute();
     $scope.resetInteractionCustomizer();
   };
@@ -240,141 +231,31 @@ oppia.controller('StateInteraction', [
   $scope.onChangeInteractionType = function(newInteractionId) {
     interactionDetailsCache.set(
       stateInteractionIdService.savedMemento,
-      stateCustomizationArgsService.savedMemento,
-      $scope.interactionHandlers);
+      stateCustomizationArgsService.savedMemento);
 
     stateInteractionIdService.displayed = newInteractionId;
     stateInteractionIdService.saveDisplayedValue();
 
     if (interactionDetailsCache.contains(newInteractionId)) {
-      var _cachedCustomizationAndHandlers = interactionDetailsCache.get(newInteractionId);
-      stateCustomizationArgsService.displayed = _cachedCustomizationAndHandlers.customization;
-      $scope.interactionHandlers = _cachedCustomizationAndHandlers.handlers;
+      var _cachedCustomization = interactionDetailsCache.get(newInteractionId);
+      stateCustomizationArgsService.displayed = _cachedCustomization.customization;
     } else {
       var newInteraction = angular.copy($scope.interactionRepository[newInteractionId]);
       for (var i = 0; i < newInteraction.customization_args.length; i++) {
         newInteraction.customization_args[i].value = (
           newInteraction.customization_args[i].default_value);
       }
-      stateCustomizationArgsService.displayed = $scope._getStateCustArgsFromInteractionCustArgs(
+      stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
         newInteraction.customization_args);
-
-      // Change the interaction handlers, but preserve the old default rule.
-      $scope.interactionHandlers = {
-        'submit': [$scope.interactionHandlers['submit'][$scope.interactionHandlers['submit'].length - 1]]
-      };
     }
 
     stateCustomizationArgsService.saveDisplayedValue();
-    changeListService.editStateProperty(
-      editorContextService.getActiveStateName(), 'widget_handlers', $scope.interactionHandlers,
-      $scope.interactionHandlersMemento);
 
-    $scope.tmpRule = null;
-    $scope.updateStateInteractionHandlerData();
+    // This must be called here so that the rules are updated before the state
+    // graph is recomputed.
+    $rootScope.$broadcast('onInteractionIdChanged', newInteractionId);
+    _updateStatesDict();
     graphDataService.recompute();
     $scope.resetInteractionCustomizer();
-  };
-
-  $scope.createTmpRule = function() {
-    // A rule name of 'null' triggers the opening of the rule description
-    // editor.
-    $scope.tmpRule = {
-      description: null,
-      definition: {
-        rule_type: 'atomic',
-        name: null,
-        inputs: {},
-        subject: 'answer'
-      },
-      dest: editorContextService.getActiveStateName(),
-      feedback: [],
-      param_changes: []
-    };
-  };
-
-  $scope.saveTmpRule = function() {
-    $scope.interactionHandlersMemento = angular.copy($scope.interactionHandlers);
-
-    // Move the tmp rule into the list of 'real' rules.
-    var rules = $scope.interactionHandlers['submit'];
-    rules.splice(rules.length - 1, 0, angular.copy($scope.tmpRule));
-
-    $scope.saveInteractionHandlers(
-      $scope.interactionHandlers, $scope.interactionHandlersMemento);
-    $scope.tmpRule = null;
-  }
-
-  $scope.cancelTmpRule = function() {
-    $scope.tmpRule = null;
-  };
-
-  $scope.RULE_LIST_SORTABLE_OPTIONS = {
-    axis: 'y',
-    cursor: 'move',
-    handle: '.oppia-rule-sort-handle',
-    items: '.oppia-sortable-rule-block',
-    tolerance: 'pointer',
-    start: function(e, ui) {
-      $scope.$broadcast('externalSave');
-      $scope.$apply();
-      $scope.interactionHandlersMemento = angular.copy($scope.interactionHandlers);
-      ui.placeholder.height(ui.item.height());
-    },
-    stop: function(e, ui) {
-      $scope.$apply();
-      $scope.saveInteractionHandlers(
-        $scope.interactionHandlers, $scope.interactionHandlersMemento);
-    }
-  };
-
-  $scope.deleteRule = function(handlerName, index) {
-    if (!window.confirm('Are you sure you want to delete this rule?')) {
-      return;
-    }
-    $scope.interactionHandlersMemento = angular.copy($scope.interactionHandlers);
-    $scope.interactionHandlers[handlerName].splice(index, 1);
-    $scope.saveInteractionHandlers(
-      $scope.interactionHandlers, $scope.interactionHandlersMemento);
-  };
-
-  $scope.saveRule = function() {
-    $scope.saveInteractionHandlers(
-      $scope.interactionHandlers, $scope.interactionHandlersMemento);
-  };
-
-  $scope.saveInteractionHandlers = function(newHandlers, oldHandlers) {
-    if (newHandlers && oldHandlers && !angular.equals(newHandlers, oldHandlers)) {
-      changeListService.editStateProperty(
-        editorContextService.getActiveStateName(), 'widget_handlers',
-        angular.copy(newHandlers), angular.copy(oldHandlers));
-      $scope.updateStateInteractionHandlerData();
-      graphDataService.recompute();
-      $scope.interactionHandlersMemento = angular.copy(newHandlers);
-    }
-  };
-
-  $scope.updateStateInteractionHandlerData = function() {
-    // Updates the exploration states from the interaction handlers.
-    var activeStateName = editorContextService.getActiveStateName();
-    var _stateDict = explorationStatesService.getState(activeStateName);
-
-    _stateDict.interaction.id = angular.copy(
-      stateInteractionIdService.savedMemento);
-    _stateDict.interaction.customization_args = angular.copy(
-      stateCustomizationArgsService.savedMemento);
-    _stateDict.interaction.sticky = angular.copy(
-      stateInteractionStickyService.savedMemento);
-    for (var i = 0; i < _stateDict.interaction.handlers.length; i++) {
-      var handlerName = _stateDict.interaction.handlers[i].name;
-      _stateDict.interaction.handlers[i].rule_specs = $scope.interactionHandlers[
-        handlerName];
-    }
-
-    explorationStatesService.setState(activeStateName, _stateDict);
-  };
-
-  $scope.showRuleEditors = function() {
-    $scope.ruleEditorsAreShown = true;
   };
 }]);
