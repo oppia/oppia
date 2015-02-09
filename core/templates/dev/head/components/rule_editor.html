@@ -68,10 +68,17 @@
             <div style="font-size: 2em;">
               ↓
             </div>
-            <div>
-              <[rule.dest]>
-            </div>
           </div>
+        </div>
+      </div>
+      <div ng-if="rule.dest !== getActiveStateName()" style="padding-bottom: 20px;">
+        <div style="text-align: center;">
+          <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
+            <[rule.dest]>
+          </a>
+          <span ng-if="rule.dest === 'END'">
+            END
+          </span>
         </div>
       </div>
     </div>
