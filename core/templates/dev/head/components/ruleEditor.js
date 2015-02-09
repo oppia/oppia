@@ -102,6 +102,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
+        $scope.getAnswerChoices = function() {
+          return rulesService.getAnswerChoices();
+        };
+
         $scope.ruleDestMemento = null;
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;

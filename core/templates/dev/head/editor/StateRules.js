@@ -229,6 +229,11 @@ oppia.controller('StateRules', [
     $rootScope.$broadcast('activeRuleChanged');
   });
 
+  $scope.$on('ruleSaved', function(evt) {
+    $scope.interactionHandlers = rulesService.getInteractionHandlers();
+    $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+  });
+
   // Updates answer choices when the interaction requires it -- for example,
   // the rules for multiple choice need to refer to the multiple choice
   // interaction's customization arguments.
@@ -239,6 +244,7 @@ oppia.controller('StateRules', [
 
   $scope.openAddRuleModal = function() {
     warningsData.clear();
+    $rootScope.$broadcast('externalSave');
 
     $modal.open({
       templateUrl: 'modals/addRule',
@@ -326,5 +332,6 @@ oppia.controller('StateEditorActiveRule', [
 
   $scope.saveRule = function() {
     rulesService.saveActiveRule($scope.activeRule);
+    $rootScope.$broadcast('ruleSaved');
   };
 }]);

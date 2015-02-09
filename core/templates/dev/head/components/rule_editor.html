@@ -18,7 +18,7 @@
 
             <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
               <span ng-if="!answerChoices">
-                [<em><[rule | parameterizeRuleDescription: answerChoices]>...</em>]
+                [<em><[rule | parameterizeRuleDescription: getAnswerChoices()]>...</em>]
               </span>
               <span ng-if="answerChoices">
                 [<em><span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...</em>]
