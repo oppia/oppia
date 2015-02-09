@@ -75,8 +75,10 @@
 
     <div class="conversation-skin-supplemental-interaction">
       <div ng-if="!finished && !nextCardContent && !interactionIsInline">
-        <div class="protractor-test-conversation-input" angular-html-bind="inputTemplate">
-        </div>
+        <md-card class="conversation-skin-supplemental-card">
+          <div class="protractor-test-conversation-input" angular-html-bind="inputTemplate">
+          </div>
+        </md-card>
       </div>
     </div>
   </div>

@@ -180,7 +180,7 @@
 
     <md-input-group class="long md-default-theme" ng-if="!getCodingMode() && !getRows()">
       <input ng-disabled="isDisabled()" ng-model="$parent.$parent.localValue" type="text"
-             ng-blur="onInputBlur()" focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
+             ng-blur="onInputBlur()" focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)" 
              placeholder="<[getPlaceholder()]>" style="padding-top: 20px;">
     </md-input-group>
 
@@ -237,7 +237,7 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/list">
-  <table class="table">
+  <table style="width: 100%;">
     <tr ng-repeat="item in localValue track by $index">
       <td>
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
@@ -259,7 +259,7 @@
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
   <button ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
           type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
-          ng-disabled="isDisabled()" style="margin-left: 8px;">
+          ng-disabled="isDisabled()" style="margin-left: 0;">
     <[addElementText]>
   </button>
 </script>
