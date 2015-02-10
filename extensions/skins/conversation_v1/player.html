@@ -18,7 +18,7 @@
               <td class="conversation-skin-row-avatar" valign="top">
                 <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_black.png">
               </td>
-              <td style="padding-top: 5px;">
+              <td class="conversation-skin-oppia-content">
                 <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
                      angular-html-bind="state.content"></div>
                 <div ng-show="$last && finished" class="protractor-test-conversation-finished">
@@ -42,7 +42,7 @@
                 <td class="conversation-skin-row-avatar" valign="top">
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_black.png">
                 </td>
-                <td class="protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
+                <td class="conversation-skin-oppia-feedback protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
               </tr>
             </table>
           </div>
@@ -54,7 +54,7 @@
                   <td class="conversation-skin-row-avatar" valign="top">
                     <img class="conversation-skin-row-avatar-img" src="/images/user.png">
                   </td>
-                  <td class="protractor-test-conversation-input"
+                  <td class="conversation-skin-learner-input protractor-test-conversation-input"
                       angular-html-bind="inputTemplate">
                   </td>
                 </tr>

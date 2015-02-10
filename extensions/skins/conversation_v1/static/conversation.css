@@ -39,6 +39,7 @@ html, body {
 
 .conversation-skin-card-row-container {
   margin-bottom: 17px;
+  table-layout: fixed;
   width: 100%;
 }
 
@@ -80,8 +81,27 @@ html, body {
   text-align: justify;
 }
 
+.conversation-skin-learner-input {
+  padding-left: 15px;
+}
+
 .conversation-skin-learner-answer {
   color: #579287;
+  padding-left: 15px;
+  width: 100%;
+  word-wrap: break-word;
+}
+
+.conversation-skin-oppia-content {
+  padding-left: 15px;
+  padding-top: 5px;
+}
+
+.conversation-skin-oppia-feedback {
+  padding-left: 15px;
+  text-align: left;
+  width: 100%;
+  word-wrap: break-word;
 }
 
 .conversation-skin-supplemental-interaction {
