@@ -23,31 +23,32 @@ oppia.controller('Profile', ['$scope', '$http', '$rootScope', function(
   $scope.profileDataUrl = '/profilehandler/data';
   $rootScope.loadingMessage = 'Loading';
 
-  var _DEFAULT_LANGUAGE = 'English';
+  $scope.saveUserBio = function(userBio) {
+    $http.put($scope.profileDataUrl, {
+      update_type: 'user_bio',
+      data: userBio
+    });
+  };
 
-  $scope.submitUserProfileForm = function(userBio, selectedLanguages) {
-    var requestParams = {
-      user_bio: userBio,
-      languages: selectedLanguages
-    };
-    $http.post($scope.profileDataUrl, requestParams).success(function(data) {});
-  }
+  $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
+    $http.put($scope.profileDataUrl, {
+      update_type: 'preferred_language_codes',
+      data: preferredLanguageCodes
+    });
+  };
 
-  $scope.LANGUAGE_CHOICES = GLOBALS.ALL_LANGUAGE_NAMES.map(function(languageName) {
+  $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {
     return {
-      id: languageName,
-      text: languageName
+      id: languageItem.code,
+      text: languageItem.name
     };
   });
 
-  // This is needed to force a refresh of the directive via ng-if
   $scope.hasPageLoaded = false;
-
-  // Retrieves profile data from the server.
   $http.get($scope.profileDataUrl).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
-    $scope.selectedLanguages = data.languages;
+    $scope.preferredLanguageCodes = data.preferred_language_codes;
     $scope.hasPageLoaded = true;
   });
 }]);

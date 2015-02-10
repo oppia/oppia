@@ -20,6 +20,7 @@ __author__ = 'Stephanie Federwisch'
 
 from core.platform import models
 (base_models,) = models.Registry.import_models([models.NAMES.base_model])
+import feconf
 
 from google.appengine.ext import ndb
 
@@ -40,10 +41,14 @@ class UserSettingsModel(base_models.BaseModel):
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
     last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
-    # User specified bio from the profile page.
+    # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
-    # Languages as specified by the uesr
-    languages = ndb.TextProperty(indexed=False)
+    # Language preferences specified by the user.
+    # TODO(sll): Add another field for the language that the user wants the
+    # site to display in. These language preferences are mainly for the purpose
+    # of figuring out what to show by default in the gallery.
+    preferred_language_codes = ndb.StringProperty(repeated=True, indexed=True,
+        choices=[lc['code'] for lc in feconf.ALL_LANGUAGE_CODES])
 
     @classmethod
     def is_normalized_username_taken(cls, normalized_username):
