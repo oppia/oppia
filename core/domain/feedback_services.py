@@ -120,7 +120,7 @@ def create_message(
 
 
 def get_next_page_of_all_feedback_messages(
-        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+        page_size=feconf.FEEDBACK_TAB_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of feedback messages in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
