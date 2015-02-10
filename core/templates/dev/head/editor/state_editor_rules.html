@@ -11,7 +11,7 @@
           <span class="oppia-rule-sort-arrows-container oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
             <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
           </span>
-          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab oppia-rule-sort-handle protractor-test-rule-tab" ng-class="{'active': activeRuleIndex == $index}">
+          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'active': activeRuleIndex == $index}">
             <[rule | parameterizeRuleDescription: getAnswerChoices()]>...
           </a>
         </li>
