@@ -1,7 +1,7 @@
 <div id="tutorialStateRules">
-  <div class="oppia-rules-container" ng-repeat="(handlerName, handler) in interactionHandlers">
-    <div class="oppia-rule-tabs-container">
-      <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler" style="margin-right: -15px;">
+  <div ng-repeat="(handlerName, handler) in interactionHandlers">
+    <div>
+      <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
         <!-- An HTML element marked ui-sortable should contain only one element,
         and this element should have an ng-repeat defined on it. See the
         ui-sortable documentation for more details. -->
@@ -11,11 +11,15 @@
           <span class="oppia-rule-sort-arrows-container oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
             <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
           </span>
-          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab oppia-rule-sort-handle protractor-test-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Rule #<[$index + 1]></a>
+          <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab oppia-rule-sort-handle protractor-test-rule-tab" ng-class="{'active': activeRuleIndex == $index}">
+            <[rule | parameterizeRuleDescription: getAnswerChoices()]>...
+          </a>
         </li>
 
         <li ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
-          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab protractor-test-default-rule-tab" ng-class="{'active': activeRuleIndex == $index}" style="border-radius: 0;">Default</a>
+          <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab protractor-test-default-rule-tab" ng-class="{'active': activeRuleIndex == $index}">
+            Default
+          </a>
         </li>
       </ul>
 
@@ -25,20 +29,8 @@
         </button>
       </div>
     </div>
-
-    <div class="oppia-rule-bodies-container">
-      <div ng-repeat="rule in handler track by $index" class="tab-pane" ng-show="activeRuleIndex == $index" style="height: 100%;">
-        <rule-editor rule="rule" num-rules="handler.length" answer-choices="answerChoices" interaction-handler-specs="interactionHandlerSpecs" save-rule="saveRule" delete-rule="deleteRule(handlerName, $index)" is-editable="editabilityService.isEditable()" ng-class="{'protractor-test-rule-body': !$last, 'protractor-test-default-rule-body': $last}">
-        </rule-editor>
-      </div>
-    </div>
   </div>
 </div>
-
-<a class="oppia-state-navigation-bar" ng-if="nextStateName !== editorContextService.getActiveStateName() && nextStateName !== 'END'" ng-click="navigateToState(nextStateName)">
-  <span class="glyphicon glyphicon-chevron-down" style="margin-top: 7px;">
-  </span>
-</a>
 
 <script type="text/ng-template" id="modals/addRule">
   <div class="modal-header">
@@ -46,7 +38,7 @@
   </div>
 
   <div class="modal-body">
-    <rule-description-editor current-rule-description="currentRuleDescription" current-rule-definition="currentRuleDefinition" interaction-handler-specs="interactionHandlerSpecs" answer-choices="answerChoices" class="protractor-test-temporary-rule"></rule-description-editor>
+    <rule-description-editor current-rule-description="currentRuleDescription" current-rule-definition="currentRuleDefinition" answer-choices="answerChoices" class="protractor-test-temporary-rule"></rule-description-editor>
   </div>
 
   <div class="modal-footer">

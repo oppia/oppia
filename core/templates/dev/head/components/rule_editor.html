@@ -18,7 +18,7 @@
 
             <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
               <span ng-if="!answerChoices">
-                [<em><[rule | parameterizeRuleDescription: answerChoices]>...</em>]
+                [<em><[rule | parameterizeRuleDescription: getAnswerChoices()]>...</em>]
               </span>
               <span ng-if="answerChoices">
                 [<em><span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...</em>]
@@ -68,10 +68,17 @@
             <div style="font-size: 2em;">
               ↓
             </div>
-            <div>
-              <[rule.dest]>
-            </div>
           </div>
+        </div>
+      </div>
+      <div ng-if="rule.dest !== getActiveStateName()" style="padding-bottom: 20px;">
+        <div style="text-align: center;">
+          <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
+            <[rule.dest]>
+          </a>
+          <span ng-if="rule.dest === 'END'">
+            END
+          </span>
         </div>
       </div>
     </div>
@@ -80,7 +87,7 @@
   <div ng-if="isEditable && ruleEditorIsOpen" class="oppia-rule-editable-view">
     <div class="oppia-rule-bubble">
       <span ng-if="rule.description !== 'Default'">
-        <rule-description-editor current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition" interaction-handler-specs="interactionHandlerSpecs" answer-choices="answerChoices"></rule-description-editor>
+        <rule-description-editor current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition"></rule-description-editor>
       </span>
 
       <span ng-if="rule.description === 'Default'">
