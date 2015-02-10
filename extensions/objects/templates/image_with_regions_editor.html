@@ -9,15 +9,15 @@
   <div>
     <svg class="oppia-image-with-regions-editor-svg"
       width="100%"
-      ng-attr-height="<[calculateImageDimensions().height]>"
+      ng-attr-height="<[imageHeight()]>"
       ng-mousedown="onSvgMouseDown($event)"
       ng-mousemove="onSvgMouseMove($event)"
       ng-mouseup="onSvgMouseUp($event)">
       <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
         x="0"
         y="0"
-        ng-attr-height="<[calculateImageDimensions().height]>"
-        ng-attr-width="<[calculateImageDimensions().width]>">
+        ng-attr-height="<[imageHeight()]>"
+        ng-attr-width="<[imageWidth()]>">
       </image>
       <rect ng-if="userIsCurrentlyDragging"
         ng-attr-x="<[rectX]>"
@@ -27,10 +27,10 @@
         ng-attr-style="<[REGION_STYLE]>">
       </rect>
       <rect ng-repeat="labeledRegion in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[labeledRegion.region.regionArea[0][0] * imageWidth]>"
-        ng-attr-y="<[labeledRegion.region.regionArea[0][1] * imageHeight]>"
-        ng-attr-width="<[(labeledRegion.region.regionArea[1][0] - labeledRegion.region.regionArea[0][0]) * imageWidth]>"
-        ng-attr-height="<[(labeledRegion.region.regionArea[1][1] - labeledRegion.region.regionArea[0][1]) * imageHeight]>"
+        ng-attr-x="<[labeledRegion.region.regionArea[0][0] * imageWidth()]>"
+        ng-attr-y="<[labeledRegion.region.regionArea[0][1] * imageHeight()]>"
+        ng-attr-width="<[(labeledRegion.region.regionArea[1][0] - labeledRegion.region.regionArea[0][0]) * imageWidth()]>"
+        ng-attr-height="<[(labeledRegion.region.regionArea[1][1] - labeledRegion.region.regionArea[0][1]) * imageHeight()]>"
         ng-attr-style="<[REGION_STYLE]>"
         ng-mouseover="onMouseoverRegion($index)"
         ng-mouseout="onMouseoutRegion($index)"
@@ -38,8 +38,8 @@
       </rect>
       <text ng-repeat="region in $parent.$parent.value.imageRegions"
         ng-attr-style="<[REGION_LABEL_STYLE]>"
-        ng-attr-x="<[region.region.regionArea[0][0] * imageWidth + REGION_LABEL_OFFSET_X]>"
-        ng-attr-y="<[region.region.regionArea[0][1] * imageHeight + REGION_LABEL_OFFSET_Y]>">
+        ng-attr-x="<[region.region.regionArea[0][0] * imageWidth() + REGION_LABEL_OFFSET_X]>"
+        ng-attr-y="<[region.region.regionArea[0][1] * imageHeight() + REGION_LABEL_OFFSET_Y]>">
         <[region.label]>
       </text>
     </svg>

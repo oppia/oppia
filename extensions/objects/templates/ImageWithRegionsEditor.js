@@ -37,41 +37,59 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.REGION_STYLE = 'fill: blue; opacity: 0.5;';
         $scope.REGION_LABEL_STYLE = 'fill: white; font-size: large;';
 
-        //All coordinates have origin at top-left, increasing in x to the right and increasing in y down
+        // All coordinates have origin at top-left, 
+        // increasing in x to the right and increasing in y down
         // Current mouse position in SVG coordinates
-        $scope.mouseX = $scope.mouseY = 0;
+        $scope.mouseX = 0; 
+        $scope.mouseY = 0;
         // Original mouse click position for rectangle drawing
-        $scope.origX = $scope.origY = 0;
+        $scope.origX = 0; 
+        $scope.origY = 0;
         // Coordinates for currently drawn rectangle (when user is dragging)
-        $scope.rectX = $scope.rectY = 0;
-        $scope.rectWidth = $scope.rectHeight = 0;
+        $scope.rectX = 0; 
+        $scope.rectY = 0;
+        $scope.rectWidth = 0; 
+        $scope.rectHeight = 0;
 
         // Is user currently dragging?
         $scope.userIsCurrentlyDragging = false;
         // Dimensions of original image
-        $scope.originalImageWidth = $scope.originalImageHeight = 0;
-        // Dimensions of displayed image
-        $scope.imageWidth = $scope.imageHeight = 0;
+        var originalImageWidth = 0; 
+        var originalImageHeight = 0;
+        // We recalculate image dimensions when the image changes
+        var needRecalculateImageDimensions = true;
 
         $scope.regionDrawMode = false;
         $scope.hoveredRegion = null;
         $scope.selectedRegion = null;
 
-        
         // Temporary label list
         var labelList = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
         
         // Calculates the dimensions of the image, assuming that the width
         // of the image is scaled down to fit the svg element if necessary
-        $scope.calculateImageDimensions = function() {
-          var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
-          $scope.imageWidth = Math.min(svgElement.width(), $scope.originalImageWidth);
-          var scalingRatio = svgElement.width() / $scope.originalImageWidth;
-          $scope.imageHeight = $scope.originalImageHeight * scalingRatio;
+        function calculateImageDimensions() {
+          if (needRecalculateImageDimensions) {
+            var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
+            this.displayedImageWidth = Math.min(svgElement.width(), originalImageWidth);
+            var scalingRatio = this.displayedImageWidth / originalImageWidth; 
+            this.displayedImageHeight = originalImageHeight * scalingRatio;
+            needRecalculateImageDimensions = false;
+          }
           return {
-            width: $scope.imageWidth,
-            height: $scope.imageHeight 
+            width: this.displayedImageWidth,
+            height: this.displayedImageHeight 
           };
+        };
+        // Previously calculated image width and height
+        calculateImageDimensions.displayedImageWidth = 0;
+        calculateImageDimensions.displayedImageHeight = 0;
+        // Use these two functions to get the calculated image width and height
+        $scope.imageWidth = function() {
+          return calculateImageDimensions().width;
+        };
+        $scope.imageHeight = function() {
+          return calculateImageDimensions().height;
         };
 
         $scope.getPreviewUrl = function(imageUrl) {
@@ -89,8 +107,9 @@ oppia.directive('imageWithRegionsEditor', [
           // width and height
           $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
             function() {
-              $scope.originalImageWidth = this.width;
-              $scope.originalImageHeight = this.height;
+              originalImageWidth = this.width;
+              originalImageHeight = this.height;
+              needRecalculateImageDimensions = true;
               $scope.$apply();
             }
           );
@@ -168,11 +187,11 @@ oppia.directive('imageWithRegionsEditor', [
                 regionArea: [
                   convertCoordsToFraction(
                     [$scope.rectX, $scope.rectY], 
-                    [$scope.imageWidth, $scope.imageHeight]
+                    [$scope.imageWidth(), $scope.imageHeight()]
                   ),
                   convertCoordsToFraction(
                     [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
-                    [$scope.imageWidth, $scope.imageHeight]
+                    [$scope.imageWidth(), $scope.imageHeight()]
                   )
                 ]
               }
