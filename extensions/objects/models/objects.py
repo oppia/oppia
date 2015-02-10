@@ -566,7 +566,7 @@ class ImageRegion(BaseObject):
             'name': 'regionType',
             'schema': UnicodeString.SCHEMA
         }, {
-            'name': 'regionArea',
+            'name': 'area',
             'schema': NormalizedRectangle2D.SCHEMA
         }]
     }
@@ -585,7 +585,7 @@ class ImageWithRegions(BaseObject):
             'name': 'imagePath',
             'schema': Filepath.SCHEMA
         }, {
-            'name': 'imageRegions',
+            'name': 'labeledRegions',
             'schema': {
                 'type': 'list',
                 'items': {

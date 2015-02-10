@@ -9,15 +9,15 @@
   <div>
     <svg class="oppia-image-with-regions-editor-svg"
       width="100%"
-      ng-attr-height="<[imageHeight()]>"
+      ng-attr-height="<[getImageHeight()]>"
       ng-mousedown="onSvgMouseDown($event)"
       ng-mousemove="onSvgMouseMove($event)"
       ng-mouseup="onSvgMouseUp($event)">
       <image xlink:href="<[getPreviewUrl($parent.$parent.value.imagePath)]>"
         x="0"
         y="0"
-        ng-attr-height="<[imageHeight()]>"
-        ng-attr-width="<[imageWidth()]>">
+        ng-attr-height="<[getImageHeight()]>"
+        ng-attr-width="<[getImageWidth()]>">
       </image>
       <rect ng-if="userIsCurrentlyDragging"
         ng-attr-x="<[rectX]>"
@@ -26,25 +26,25 @@
         ng-attr-height="<[rectHeight]>"
         ng-attr-style="<[REGION_STYLE]>">
       </rect>
-      <rect ng-repeat="labeledRegion in $parent.$parent.value.imageRegions"
-        ng-attr-x="<[labeledRegion.region.regionArea[0][0] * imageWidth()]>"
-        ng-attr-y="<[labeledRegion.region.regionArea[0][1] * imageHeight()]>"
-        ng-attr-width="<[(labeledRegion.region.regionArea[1][0] - labeledRegion.region.regionArea[0][0]) * imageWidth()]>"
-        ng-attr-height="<[(labeledRegion.region.regionArea[1][1] - labeledRegion.region.regionArea[0][1]) * imageHeight()]>"
+      <rect ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
+        ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth()]>"
+        ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight()]>"
+        ng-attr-width="<[(labeledRegion.region.area[1][0] - labeledRegion.region.area[0][0]) * getImageWidth()]>"
+        ng-attr-height="<[(labeledRegion.region.area[1][1] - labeledRegion.region.area[0][1]) * getImageHeight()]>"
         ng-attr-style="<[REGION_STYLE]>"
         ng-mouseover="onMouseoverRegion($index)"
         ng-mouseout="onMouseoutRegion($index)"
         ng-mousedown="onMousedownRegion($index)">
       </rect>
-      <text ng-repeat="region in $parent.$parent.value.imageRegions"
+      <text ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
         ng-attr-style="<[REGION_LABEL_STYLE]>"
-        ng-attr-x="<[region.region.regionArea[0][0] * imageWidth() + REGION_LABEL_OFFSET_X]>"
-        ng-attr-y="<[region.region.regionArea[0][1] * imageHeight() + REGION_LABEL_OFFSET_Y]>">
-        <[region.label]>
+        ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth() + REGION_LABEL_OFFSET_X]>"
+        ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight() + REGION_LABEL_OFFSET_Y]>">
+        <[labeledRegion.label]>
       </text>
     </svg>
     <ul>
-      <li ng-repeat="region in $parent.$parent.value.imageRegions">
+      <li ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions">
         <input type="text" ng-model="regionLabelGetterSetter($index)" ng-model-options="{getterSetter: true}"></input>
         <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion($index)">Delete</button>
       </li>

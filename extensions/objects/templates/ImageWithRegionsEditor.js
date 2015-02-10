@@ -64,7 +64,11 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.selectedRegion = null;
 
         // Temporary label list
-        var labelList = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
+        var labelList = $scope.$parent.value.labeledRegions.map(
+          function(region) {
+            return region.label;
+          }
+        );
         
         // Calculates the dimensions of the image, assuming that the width
         // of the image is scaled down to fit the svg element if necessary
@@ -85,10 +89,10 @@ oppia.directive('imageWithRegionsEditor', [
         calculateImageDimensions.displayedImageWidth = 0;
         calculateImageDimensions.displayedImageHeight = 0;
         // Use these two functions to get the calculated image width and height
-        $scope.imageWidth = function() {
+        $scope.getImageWidth = function() {
           return calculateImageDimensions().width;
         };
-        $scope.imageHeight = function() {
+        $scope.getImageHeight = function() {
           return calculateImageDimensions().height;
         };
 
@@ -134,7 +138,7 @@ oppia.directive('imageWithRegionsEditor', [
               } else {
                 $scope.errorText = '';
                 for (var i = 0; i < labelList.length; i++) {
-                  $scope.$parent.value.imageRegions[i].label = labelList[i];
+                  $scope.$parent.value.labeledRegions[i].label = labelList[i];
                 }
               }
             }
@@ -172,9 +176,13 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.userIsCurrentlyDragging = false;
           $scope.regionDrawMode = false;
           if ($scope.rectWidth != 0 && $scope.rectHeight != 0) {
-            var labels = $scope.$parent.value.imageRegions.map(function(region) {return region.label;});
+            var labels = $scope.$parent.value.labeledRegions.map(
+              function(region) {
+                return region.label;
+              }
+            );
             var newLabel = null;
-            for (var i = 1; i <= labels.length+1; i++) {
+            for (var i = 1; i <= labels.length + 1; i++) {
               if (labels.indexOf(i.toString()) === -1) {
                 newLabel = i.toString();
                 break;
@@ -184,19 +192,19 @@ oppia.directive('imageWithRegionsEditor', [
               label: newLabel,
               region: {
                 regionType: 'Rectangle', 
-                regionArea: [
+                area: [
                   convertCoordsToFraction(
                     [$scope.rectX, $scope.rectY], 
-                    [$scope.imageWidth(), $scope.imageHeight()]
+                    [$scope.getImageWidth(), $scope.getImageHeight()]
                   ),
                   convertCoordsToFraction(
                     [$scope.rectX + $scope.rectWidth, $scope.rectY + $scope.rectHeight],
-                    [$scope.imageWidth(), $scope.imageHeight()]
+                    [$scope.getImageWidth(), $scope.getImageHeight()]
                   )
                 ]
               }
             };
-            $scope.$parent.value.imageRegions.push(newRegion);
+            $scope.$parent.value.labeledRegions.push(newRegion);
             labelList.push(newLabel);
           }
         };
@@ -233,10 +241,10 @@ oppia.directive('imageWithRegionsEditor', [
 
         $scope.resetEditor = function() {
           $scope.$parent.value.imagePath = '';
-          $scope.$parent.value.imageRegions = [];
+          $scope.$parent.value.labeledRegions = [];
         };
         $scope.deleteRegion = function(index) {
-          $scope.$parent.value.imageRegions.splice(index, 1);
+          $scope.$parent.value.labeledRegions.splice(index, 1);
           labelList.splice(index, 1);
         };
       }
