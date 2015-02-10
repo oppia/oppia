@@ -203,9 +203,13 @@ urls = [
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
 
-    get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
-        r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
+        r'/profile/<username>', profile.ProfilePage, 'profile_page'),
+    get_redirect_route(
+        r'/preferences', profile.PreferencesPage, 'preferences_page'),
+    get_redirect_route(
+        r'/preferenceshandler/data', profile.PreferencesHandler,
+        'preferences_handler'),
     get_redirect_route(
         r'%s' % feconf.EDITOR_PREREQUISITES_URL,
         profile.EditorPrerequisitesPage, 'editor_prerequisites_page'),

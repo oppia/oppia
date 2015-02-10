@@ -31,19 +31,29 @@ EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
 )
 
 
-# TODO(sll): This duplicates the method in galleries.py; remove it.
-def _get_short_language_description(full_language_description):
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
 class ProfilePage(base.BaseHandler):
-    """The profile page."""
+    """The (view-only) profile page."""
 
-    PAGE_NAME_FOR_CSRF = 'profile'
+    def get(self, username):
+        """Handles GET requests for the publicly-viewable profile page."""
+        if not username:
+            raise self.PageNotFoundException
+
+        user_settings = user_services.get_user_settings_from_username(username)
+        if not user_settings:
+            raise self.PageNotFoundException
+
+        self.values.update({
+            'nav_mode': feconf.NAV_MODE_PROFILE,
+            'user_bio': user_settings.user_bio,
+        })
+        self.render_template('profile/profile.html')
+
+
+class PreferencesPage(base.BaseHandler):
+    """The preferences page."""
+
+    PAGE_NAME_FOR_CSRF = 'preferences'
 
     @base.require_user
     def get(self):
@@ -52,16 +62,17 @@ class ProfilePage(base.BaseHandler):
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'LANGUAGE_CODES_AND_NAMES': [{
                 'code': lc['code'],
-                'name': _get_short_language_description(lc['description']),
+                'name': utils.get_short_language_description(
+                    lc['description']),
             } for lc in feconf.ALL_LANGUAGE_CODES],
         })
-        self.render_template('profile/profile.html')
+        self.render_template('profile/preferences.html')
 
 
-class ProfileHandler(base.BaseHandler):
-    """Provides data for the profile page."""
+class PreferencesHandler(base.BaseHandler):
+    """Provides data for the preferences page."""
 
-    PAGE_NAME_FOR_CSRF = 'profile'
+    PAGE_NAME_FOR_CSRF = 'preferences'
 
     @base.require_user
     def get(self):

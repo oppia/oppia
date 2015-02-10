@@ -125,6 +125,8 @@ oppia.controller('Gallery', [
   $scope.currentUserIsModerator = false;
   $scope.searchIsLoading = false;
   $scope.pageLoaderIsBusy = false;
+  // Whether the initial page load has happened.
+  $scope.pageHasLoaded = false;
 
   // Default color.
   var _COLOR_TEAL = 'teal';
@@ -258,10 +260,7 @@ oppia.controller('Gallery', [
     };
   });
 
-  var _DEFAULT_LANGUAGE_CODE = 'en';
-  // This is a list.
-  $scope.selectedLanguageCodes = [_DEFAULT_LANGUAGE_CODE];
-
+  $scope.selectedLanguageCodes = [];
   $scope.allExplorationsInOrder = [];
   $scope.searchCursor = null;
 
@@ -314,6 +313,8 @@ oppia.controller('Gallery', [
       $scope.currentUserIsModerator = true;
     }
 
+    $scope.selectedLanguageCodes = data.preferred_language_codes;
+
     $scope.selectedCategories = {};
     data['public'].map(function(expDict) {
       $scope.selectedCategories[expDict.category] = true;
@@ -323,6 +324,8 @@ oppia.controller('Gallery', [
     });
 
     $scope.initGalleryData(data);
+
+    $scope.pageHasLoaded = true;
 
     if (data.username) {
       var urlParams = urlService.getUrlParams();

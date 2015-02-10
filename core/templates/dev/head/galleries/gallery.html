@@ -59,8 +59,9 @@
 
             <div class="oppia-gallery-menu" ng-if="gallerySidebarIsActive || screenIsLarge">
               <h3>Languages</h3>
-              <div>
-                <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.selectedLanguageCodes" allow-multiple-choices="true" new-choice-regex=".^" width="200" placeholder="Filter languages..." class="protractor-test-gallery-language-selector" on-selection-change="onLanguageCodeSelectionChange()">
+              <!-- Without the ng-if, the value of the select2-dropdown directive will fail to change after the initial load. -->
+              <div ng-if="pageHasLoaded">
+                <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.selectedLanguageCodes" allow-multiple-choices="true" new-choice-regex=".^" width="200" placeholder="Filter by language..." class="protractor-test-gallery-language-selector" on-selection-change="onLanguageCodeSelectionChange()">
                 </select2-dropdown>
               </div>
 

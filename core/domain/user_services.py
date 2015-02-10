@@ -138,6 +138,19 @@ def get_user_id_from_username(username):
         return user_model.id
 
 
+def get_user_settings_from_username(username):
+    """Gets the user settings for a given username.
+
+    Returns None if the user is not found.
+    """
+    user_model = user_models.UserSettingsModel.get_by_normalized_username(
+        UserSettings.normalize_username(username))
+    if user_model is None:
+        return None
+    else:
+        return get_user_settings(user_model.id)
+
+
 def get_users_settings(user_ids):
     """Gets domain objects representing the settings for the given user_ids.
 

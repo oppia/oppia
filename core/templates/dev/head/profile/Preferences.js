@@ -13,28 +13,29 @@
 // limitations under the License.
 
 /**
- * @fileoverview Data and controllers for the Oppia profile page.
+ * @fileoverview Data and controllers for the Oppia 'edit preferences' page.
  *
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('Profile', ['$scope', '$http', '$rootScope', function(
+oppia.controller('Preferences', ['$scope', '$http', '$rootScope', function(
     $scope, $http, $rootScope) {
-  $scope.profileDataUrl = '/profilehandler/data';
+  var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
 
-  $scope.saveUserBio = function(userBio) {
-    $http.put($scope.profileDataUrl, {
-      update_type: 'user_bio',
-      data: userBio
+  var _saveDataItem = function(updateType, data) {
+    $http.put(_PREFERENCES_DATA_URL, {
+      update_type: updateType,
+      data: data
     });
   };
 
+  $scope.saveUserBio = function(userBio) {
+    _saveDataItem('user_bio', userBio);
+  };
+
   $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
-    $http.put($scope.profileDataUrl, {
-      update_type: 'preferred_language_codes',
-      data: preferredLanguageCodes
-    });
+    _saveDataItem('preferred_language_codes', preferredLanguageCodes);
   };
 
   $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {
@@ -45,7 +46,7 @@ oppia.controller('Profile', ['$scope', '$http', '$rootScope', function(
   });
 
   $scope.hasPageLoaded = false;
-  $http.get($scope.profileDataUrl).success(function(data) {
+  $http.get(_PREFERENCES_DATA_URL).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
     $scope.preferredLanguageCodes = data.preferred_language_codes;

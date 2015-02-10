@@ -19,7 +19,8 @@
 __author__ = 'sbhowmik@google.com (Shantanu Bhowmik)'
 
 import Cookie
-import os
+
+import feconf
 
 from google.appengine.api import users
 from google.appengine.ext import webapp
@@ -27,17 +28,23 @@ from google.appengine.ext import webapp
 
 class LogoutPage(webapp.RequestHandler):
 
-  ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
+    ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 
-  def get(self):
-      """Logs the user out and returns them to the current page."""
-      # AppEngine sets the ACSID cookie for http:// and the SACSID cookie for
-      # https:// . We just unset both below.
-      cookie = Cookie.SimpleCookie()
-      for cookie_name in ['ACSID', 'SACSID']:
-          cookie = Cookie.SimpleCookie()
-          cookie[cookie_name] = ''
-          cookie[cookie_name]['expires'] = self.ONE_DAY_AGO_IN_SECS # In the past, a day ago.
-          self.response.headers.add_header(*cookie.output().split(': ', 1)) 
-      
-      self.redirect(self.request.get('url') or '/') 
+    def get(self):
+        """Logs the user out and returns them to the current page."""
+
+        # AppEngine sets the ACSID cookie for http:// and the SACSID cookie
+        # for https:// . We just unset both below.
+        cookie = Cookie.SimpleCookie()
+        for cookie_name in ['ACSID', 'SACSID']:
+            cookie = Cookie.SimpleCookie()
+            cookie[cookie_name] = ''
+            cookie[cookie_name]['expires'] = self.ONE_DAY_AGO_IN_SECS
+            self.response.headers.add_header(
+                *cookie.output().split(': ', 1))
+
+        url_to_redirect_to = self.request.get('url') or '/'
+        if feconf.DEV_MODE:
+            self.redirect(users.create_logout_url(url_to_redirect_to))
+        else:
+            self.redirect(url_to_redirect_to)

@@ -60,7 +60,8 @@ describe('Gallery controller', function() {
           community_owned: false,
           status: 'public'
         }],
-        'featured': []
+        'featured': [],
+        'preferred_language_codes': ['en']
       });
 
       GLOBALS.LANGUAGE_CODES_AND_NAMES = [{

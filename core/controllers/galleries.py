@@ -52,14 +52,6 @@ BANNER_ALT_TEXT = config_domain.ConfigProperty(
     'The alt text for the site banner image', default_value='')
 
 
-def _get_short_language_description(full_language_description):
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
 
@@ -78,7 +70,8 @@ class GalleryPage(base.BaseHandler):
                 'return_url', feconf.GALLERY_CREATE_MODE_URL),
             'LANGUAGE_CODES_AND_NAMES': [{
                 'code': lc['code'],
-                'name': _get_short_language_description(lc['description']),
+                'name': utils.get_short_language_description(
+                    lc['description']),
             } for lc in feconf.ALL_LANGUAGE_CODES],
             'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
         })
@@ -97,7 +90,7 @@ class GalleryHandler(base.BaseHandler):
         # explorations in 'Other'.
 
         language_codes_to_short_descs = {
-            lc['code']: _get_short_language_description(lc['description'])
+            lc['code']: utils.get_short_language_description(lc['description'])
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 
@@ -154,9 +147,15 @@ class GalleryHandler(base.BaseHandler):
             featured_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
 
+        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        if self.user_id:
+            user_settings = user_services.get_user_settings(self.user_id)
+            preferred_language_codes = user_settings.preferred_language_codes
+
         self.values.update({
             'featured': publicized_explorations_list,
             'public': public_explorations_list,
+            'preferred_language_codes': preferred_language_codes,
             'search_cursor': search_cursor,
         })
         self.render_json(self.values)

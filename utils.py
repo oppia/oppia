@@ -391,3 +391,14 @@ def vfs_normpath(path):
     if initial_slashes:
         path = slash * initial_slashes + path
     return path or dot
+
+
+def get_short_language_description(full_language_description):
+    """Given one of the descriptions in feconf.ALL_LANGUAGE_CODES, generates
+    the corresponding short description.
+    """
+    if ' (' not in full_language_description:
+        return full_language_description
+    else:
+        ind = full_language_description.find(' (')
+        return full_language_description[:ind]
