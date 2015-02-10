@@ -18,6 +18,8 @@
 
 __author__ = 'Sean Lip'
 
+import logging
+
 import urlparse
 
 from google.appengine.api import users
@@ -67,8 +69,10 @@ def get_user_id_from_email(email):
     try:
         u = users.User(email)
     except users.UserNotFoundError:
-        raise utils.InvalidInputException(
-            'User with email address %s not found' % email)
+        logging.error(
+            'The email address %s does not correspond to a valid user_id'
+            % email)
+        return None
 
     key = _FakeUser(id=email, user=u).put()
     obj = _FakeUser.get_by_id(key.id())
