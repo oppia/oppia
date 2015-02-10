@@ -99,21 +99,8 @@
                     </div>
 
                     <div class="collapse navbar-collapse">
-                      {% if nav_mode in ['explore', 'create'] %}
-                        {% block navbar_breadcrumb %}
-                        {% endblock navbar_breadcrumb %}
-                      {% else %}
-                        <ul class="nav navbar-nav oppia-navbar-nav">
-                          {% if SHOW_FORUM_PAGE %}
-                            <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-                              <a href="/forum">Forum</a>
-                            </li>
-                          {% endif %}
-                          <li {% if nav_mode == 'about' %}class="active"{% endif %}>
-                            <a href="/about">About</a>
-                          </li>
-                        </ul>
-                      {% endif %}
+                      {% block navbar_breadcrumb %}
+                      {% endblock navbar_breadcrumb %}
 
                       <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px; margin-right: 0;">
                         {% if user_email %}

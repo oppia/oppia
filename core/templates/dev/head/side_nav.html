@@ -3,45 +3,34 @@
     <div class="oppia-sidebar-logo-container">
     </div>
   </div>
-  {% if nav_mode in ['explore', 'create'] %}
-    <ul>
-      {% if username %}
-        <li {% if nav_mode == 'home' %}class="active"{% endif %}>
-          <a href="/dashboard">
-            <span class="glyphicon glyphicon-wrench oppia-sidebar-menu-icon"></span>
-            Dashboard
-            <span ng-if="numUnseenNotifications > 0">
-              (<[numUnseenNotifications]>)
-            </span>
-          </a>
-        </li>
-      {% endif %}
 
-      {% if SHOW_FORUM_PAGE %}
-        <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
-          <a href="/forum">
-            <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
-            Forum
-          </a>
-        </li>
-      {% endif %}
-
-      <li {% if nav_mode == 'about' %}class="active"{% endif %}>
-        <a href="/about">
-          <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
-          About
+  <ul>
+    {% if username %}
+      <li {% if nav_mode == 'home' %}class="active"{% endif %}>
+        <a href="/dashboard">
+          <span class="glyphicon glyphicon-wrench oppia-sidebar-menu-icon"></span>
+          Dashboard
+          <span ng-if="numUnseenNotifications > 0">
+            (<[numUnseenNotifications]>)
+          </span>
         </a>
       </li>
-    </ul>
-  {% else %}
-    <ul>
-      <li>
-        <!-- TODO(sll): Replace this with actual content. -->
-        <a href="#">
-          <span class="glyphicon glyphicon-remove oppia-sidebar-menu-icon"></span>
-          Nothing here yet!
+    {% endif %}
+
+    {% if SHOW_FORUM_PAGE %}
+      <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
+        <a href="/forum">
+          <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
+          Forum
         </a>
       </li>
-    </ul>
-  {% endif %}
+    {% endif %}
+
+    <li {% if nav_mode == 'about' %}class="active"{% endif %}>
+      <a href="/about">
+        <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
+        About
+      </a>
+    </li>
+  </ul>
 </nav>

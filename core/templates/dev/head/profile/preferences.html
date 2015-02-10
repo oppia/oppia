@@ -4,6 +4,15 @@
   Preferences
 {% endblock subtitle %}
 
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Preferences
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
