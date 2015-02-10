@@ -31,6 +31,15 @@ EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
 )
 
 
+# TODO(sll): This duplicates the method in galleries.py; remove it.
+def _get_short_language_description(full_language_description):
+    if ' (' not in full_language_description:
+        return full_language_description
+    else:
+        ind = full_language_description.find(' (')
+        return full_language_description[:ind]
+
+
 class ProfilePage(base.BaseHandler):
     """The profile page."""
 
@@ -41,6 +50,10 @@ class ProfilePage(base.BaseHandler):
         """Handles GET requests."""
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
+            'LANGUAGE_CODES_AND_NAMES': [{
+                'code': lc['code'],
+                'name': _get_short_language_description(lc['description']),
+            } for lc in feconf.ALL_LANGUAGE_CODES],
         })
         self.render_template('profile/profile.html')
 
@@ -48,10 +61,31 @@ class ProfilePage(base.BaseHandler):
 class ProfileHandler(base.BaseHandler):
     """Provides data for the profile page."""
 
+    PAGE_NAME_FOR_CSRF = 'profile'
+
     @base.require_user
     def get(self):
         """Handles GET requests."""
+        user_settings = user_services.get_user_settings(self.user_id)
+        self.values.update({
+            'user_bio': user_settings.user_bio,
+            'preferred_language_codes': user_settings.preferred_language_codes,
+        })
         self.render_json(self.values)
+
+    @base.require_user
+    def put(self):
+        """Handles POST requests."""
+        update_type = self.payload.get('update_type')
+        data = self.payload.get('data')
+
+        if update_type == 'user_bio':
+            user_services.update_user_bio(self.user_id, data)
+        elif update_type == 'preferred_language_codes':
+            user_services.update_preferred_language_codes(self.user_id, data)
+        else:
+            raise self.InvalidInputException(
+                'Invalid update type: %s' % update_type)
 
 
 class EditorPrerequisitesPage(base.BaseHandler):
