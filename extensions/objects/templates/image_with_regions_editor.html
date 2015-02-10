@@ -19,19 +19,19 @@
         ng-attr-height="<[getImageHeight()]>"
         ng-attr-width="<[getImageWidth()]>">
       </image>
-      <rect ng-if="userIsCurrentlyDragging"
+      <rect ng-if="userIsCurrentlyDrawing"
         ng-attr-x="<[rectX]>"
         ng-attr-y="<[rectY]>"
         ng-attr-width="<[rectWidth]>"
         ng-attr-height="<[rectHeight]>"
-        ng-attr-style="<[REGION_STYLE]>">
+        ng-attr-style="<[getRegionStyle(null)]>">
       </rect>
       <rect ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions"
         ng-attr-x="<[labeledRegion.region.area[0][0] * getImageWidth()]>"
         ng-attr-y="<[labeledRegion.region.area[0][1] * getImageHeight()]>"
         ng-attr-width="<[(labeledRegion.region.area[1][0] - labeledRegion.region.area[0][0]) * getImageWidth()]>"
         ng-attr-height="<[(labeledRegion.region.area[1][1] - labeledRegion.region.area[0][1]) * getImageHeight()]>"
-        ng-attr-style="<[REGION_STYLE]>"
+        ng-attr-style="<[getRegionStyle($index)]>"
         ng-mouseover="onMouseoverRegion($index)"
         ng-mouseout="onMouseoutRegion($index)"
         ng-mousedown="onMousedownRegion($index)">
@@ -43,12 +43,19 @@
         <[labeledRegion.label]>
       </text>
     </svg>
-    <ul>
+    <div ng-if="selectedRegion !== null">
+      <input type="text" 
+        ng-model="regionLabelGetterSetter(selectedRegion)" 
+        ng-model-options="{getterSetter: true}">
+      </input>
+      <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion(selectedRegion)">Delete</button>
+    </div>
+    <!--<ul>
       <li ng-repeat="labeledRegion in $parent.$parent.value.labeledRegions">
         <input type="text" ng-model="regionLabelGetterSetter($index)" ng-model-options="{getterSetter: true}"></input>
         <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion($index)">Delete</button>
       </li>
-    </ul>
+    </ul>-->
   </div>
   <br><div style="color: red;"><[errorText]></div>
   <br>
