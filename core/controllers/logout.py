@@ -31,7 +31,11 @@ class LogoutPage(webapp.RequestHandler):
     ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
 
     def get(self):
-        """Logs the user out and returns them to the current page."""
+        """Logs the user out, and returns them to a specified page or the home
+        page.
+        """
+
+        url_to_redirect_to = self.request.get('return_url') or '/'
 
         # AppEngine sets the ACSID cookie for http:// and the SACSID cookie
         # for https:// . We just unset both below.
@@ -43,7 +47,6 @@ class LogoutPage(webapp.RequestHandler):
             self.response.headers.add_header(
                 *cookie.output().split(': ', 1))
 
-        url_to_redirect_to = self.request.get('url') or '/'
         if feconf.DEV_MODE:
             self.redirect(users.create_logout_url(url_to_redirect_to))
         else:

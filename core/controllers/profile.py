@@ -27,11 +27,29 @@ EDITOR_PREREQUISITES_AGREEMENT = config_domain.ConfigProperty(
     'editor_prerequisites_agreement', 'Html',
     'The agreement that editors are asked to accept before making any '
     'contributions.',
-    default_value=feconf.DEFAULT_EDITOR_PREREQUISITES_AGREEMENT
-)
+    default_value=feconf.DEFAULT_EDITOR_PREREQUISITES_AGREEMENT)
 
 
-class ProfilePage(base.BaseHandler):
+def require_user_id_else_redirect_to_homepage(handler):
+    """Decorator that checks if a user_id is associated to the current
+    session. If not, the user is redirected to the main page.
+
+    Note that the user may not yet have registered.
+    """
+    def test_login(self, **kwargs):
+        """Checks if the user for the current session is logged in.
+
+        If not, redirects the user to the home page.
+        """
+        if not self.user_id:
+            self.redirect('/')
+            return
+        return handler(self, **kwargs)
+
+    return test_login
+
+
+class ViewProfilePage(base.BaseHandler):
     """The (view-only) profile page."""
 
     def get(self, username):
@@ -66,7 +84,8 @@ class PreferencesPage(base.BaseHandler):
                     lc['description']),
             } for lc in feconf.ALL_LANGUAGE_CODES],
         })
-        self.render_template('profile/preferences.html')
+        self.render_template(
+            'profile/preferences.html', redirect_url_on_logout='/')
 
 
 class PreferencesHandler(base.BaseHandler):
@@ -99,27 +118,29 @@ class PreferencesHandler(base.BaseHandler):
                 'Invalid update type: %s' % update_type)
 
 
-class EditorPrerequisitesPage(base.BaseHandler):
+class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 
-    PAGE_NAME_FOR_CSRF = 'editor_prerequisites_page'
+    PAGE_NAME_FOR_CSRF = 'signup'
+    REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @base.require_user
+    @require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
         self.values.update({
             'agreement': EDITOR_PREREQUISITES_AGREEMENT.value,
             'nav_mode': feconf.NAV_MODE_PROFILE,
         })
-        self.render_template('profile/editor_prerequisites.html')
+        self.render_template('profile/signup.html')
 
 
-class EditorPrerequisitesHandler(base.BaseHandler):
+class SignupHandler(base.BaseHandler):
     """Provides data for the editor prerequisites page."""
 
-    PAGE_NAME_FOR_CSRF = 'editor_prerequisites_page'
+    PAGE_NAME_FOR_CSRF = 'signup'
+    REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @base.require_user
+    @require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
@@ -128,7 +149,7 @@ class EditorPrerequisitesHandler(base.BaseHandler):
             'username': user_settings.username,
         })
 
-    @base.require_user
+    @require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
         username = self.payload.get('username')
@@ -157,9 +178,10 @@ class EditorPrerequisitesHandler(base.BaseHandler):
 class UsernameCheckHandler(base.BaseHandler):
     """Checks whether a username has already been taken."""
 
-    PAGE_NAME_FOR_CSRF = 'editor_prerequisites_page'
+    PAGE_NAME_FOR_CSRF = 'signup'
+    REDIRECT_UNFINISHED_SIGNUPS = False
 
-    @base.require_user
+    @require_user_id_else_redirect_to_homepage
     def post(self):
         """Handles POST requests."""
         username = self.payload.get('username')

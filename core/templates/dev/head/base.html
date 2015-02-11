@@ -120,31 +120,32 @@
                               <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                              <li>
-                                <a href="/profile/{{username}}">Profile</a>
-                              </li>
-                              <li>
-                                <a href="/preferences">Preferences</a>
-                              </li>
-                              <li>
-                                <a href="/dashboard">Dashboard</a>
-                              </li>
-                              {% if is_moderator %}
+                              {% if username %}
                                 <li>
-                                  <a href="/moderator" target="_blank">
-                                    Moderator Page
-                                  </a>
+                                  <a href="/profile/{{username}}">Profile</a>
                                 </li>
-                              {% endif %}
-
-                              {% if is_super_admin %}
                                 <li>
-                                  <a href="/admin" target="_blank">
-                                    Admin Page
-                                  </a>
+                                  <a href="/preferences">Preferences</a>
                                 </li>
-                              {% endif %}
+                                <li>
+                                  <a href="/dashboard">Dashboard</a>
+                                </li>
 
+                                {% if is_moderator %}
+                                  <li>
+                                    <a href="/moderator" target="_blank">
+                                      Moderator Page
+                                    </a>
+                                  </li>
+                                {% endif %}
+                                {% if is_super_admin %}
+                                  <li>
+                                    <a href="/admin" target="_blank">
+                                      Admin Page
+                                    </a>
+                                  </li>
+                                {% endif %}
+                              {% endif %}
                               <li>
                                 <a href="{{logout_url}}">Logout</a>
                               </li>

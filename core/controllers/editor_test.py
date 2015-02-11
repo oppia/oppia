@@ -35,6 +35,21 @@ class BaseEditorControllerTest(test_utils.GenericTestBase):
     CAN_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'true\');'
     CANNOT_EDIT_STR = 'GLOBALS.can_edit = JSON.parse(\'false\');'
 
+    def setUp(self):
+        """Completes the sign-up process for self.EDITOR_EMAIL."""
+        super(BaseEditorControllerTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
+        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
+        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
+        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
+        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
+
+        self.set_admins([self.ADMIN_EMAIL])
+
     def assert_can_edit(self, response_body):
         """Returns True if the response body indicates that the exploration is
         editable."""
@@ -58,17 +73,15 @@ class EditorTest(BaseEditorControllerTest):
         # Check that non-editors can access, but not edit, the editor page.
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 200)
+        self.assertIn('Welcome to Oppia!', response.body)
         self.assert_cannot_edit(response.body)
 
-        # Register and login as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
+        # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
-
-        # Check if exploration title was loaded.
-        self.assertIn('Welcome to Oppia!', response.body)
 
         # Check that it is now possible to access and edit the editor page.
         response = self.testapp.get('/create/0')
+        self.assertIn('Welcome to Oppia!', response.body)
         self.assertEqual(response.status_int, 200)
         self.assert_can_edit(response.body)
         self.assertIn('Stats', response.body)
@@ -94,7 +107,6 @@ class EditorTest(BaseEditorControllerTest):
         exp_services.load_demo('0')
         CURRENT_VERSION = 1
 
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/create/0')
         csrf_token = self.get_csrf_token_from_response(response)
@@ -195,8 +207,7 @@ class EditorTest(BaseEditorControllerTest):
         for _ in range(3):
             self.submit_answer('0', state_name, 'blah3')
 
-        # Register and log in as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
+        # Log in as an editor.
         self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get('/create/0')
@@ -242,20 +253,6 @@ class EditorTest(BaseEditorControllerTest):
         self.assertEqual(_get_unresolved_answers(), {})
 
         self.logout()
-
-
-class StatsIntegrationTest(BaseEditorControllerTest):
-    """Test statistics recording using the default exploration."""
-
-    def test_state_stats_for_default_exploration(self):
-        exp_services.delete_demo('0')
-        exp_services.load_demo('0')
-
-        EXPLORATION_STATISTICS_URL = '/createhandler/statistics/0/1'
-
-        # Check, from the editor perspective, that no stats have been recorded.
-        self.register_editor(self.EDITOR_EMAIL)
-        self.login(self.EDITOR_EMAIL)
 
 
 class DownloadIntegrationTest(BaseEditorControllerTest):
@@ -356,8 +353,6 @@ param_changes: []
 
     def test_exploration_download_handler_for_default_exploration(self):
 
-        # Register and log in as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -423,8 +418,6 @@ param_changes: []
 
     def test_state_download_handler_for_default_exploration(self):
 
-        # Register and log in as an editor.
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
         self.OWNER_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
@@ -453,22 +446,6 @@ param_changes: []
 
 
 class ExplorationDeletionRightsTest(BaseEditorControllerTest):
-
-    def setUp(self):
-        """Creates dummy users."""
-        super(ExplorationDeletionRightsTest, self).setUp()
-
-        self.register_editor(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
-        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
-
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        self.set_admins([self.ADMIN_EMAIL])
 
     def test_deletion_rights_for_unpublished_exploration(self):
         """Test rights management for deletion of unpublished explorations."""
@@ -548,7 +525,6 @@ class VersioningIntegrationTest(BaseEditorControllerTest):
         exp_services.delete_demo(self.EXP_ID)
         exp_services.load_demo(self.EXP_ID)
 
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
 
         # In version 2, change the objective and the initial state content.
@@ -664,9 +640,9 @@ class ExplorationEditRightsTest(BaseEditorControllerTest):
         exp_services.delete_demo(EXP_ID)
         exp_services.load_demo(EXP_ID)
 
-        # Register new editors Joe and Sandra.
-        self.register_editor('joe@example.com', username='joe')
-        self.register_editor('sandra@example.com', username='sandra')
+        # Sign-up new editors Joe and Sandra.
+        self.signup('joe@example.com', 'joe')
+        self.signup('sandra@example.com', 'sandra')
 
         # Joe logs in.
         self.login('joe@example.com')
@@ -714,23 +690,15 @@ class ExplorationRightsIntegrationTest(BaseEditorControllerTest):
         """Test exploration rights handler."""
 
         # Create several users
-        self.register_editor(self.ADMIN_EMAIL, username=self.ADMIN_USERNAME)
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
-        self.register_editor(
+        self.signup(
             self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
-        self.register_editor(
+        self.signup(
             self.COLLABORATOR2_EMAIL, username=self.COLLABORATOR2_USERNAME)
-        self.register_editor(
+        self.signup(
             self.COLLABORATOR3_EMAIL, username=self.COLLABORATOR3_USERNAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
 
-        self.admin_id = self.get_user_id_from_email(self.ADMIN_EMAIL)
-        self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.collaborator_id = self.get_user_id_from_email(
             self.COLLABORATOR_EMAIL)
-        self.viewer_id = self.get_user_id_from_email(self.VIEWER_EMAIL)
-
-        self.set_admins([self.ADMIN_EMAIL])
 
         # Owner creates exploration
         self.login(self.OWNER_EMAIL)

@@ -194,9 +194,6 @@ urls = [
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_LOGIN_REDIRECT_URL,
-        galleries.GalleryLoginRedirector, 'gallery_redirect'),
-    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
@@ -204,18 +201,17 @@ urls = [
         galleries.UploadExploration, 'upload_exploration'),
 
     get_redirect_route(
-        r'/profile/<username>', profile.ProfilePage, 'profile_page'),
+        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
     get_redirect_route(
         r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(
         r'/preferenceshandler/data', profile.PreferencesHandler,
         'preferences_handler'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_URL,
-        profile.EditorPrerequisitesPage, 'editor_prerequisites_page'),
+        r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
-        profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
+        r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler,
+        'signup_handler'),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL,
         profile.UsernameCheckHandler, 'username_check_handler'),
