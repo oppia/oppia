@@ -510,11 +510,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   max-width: 170px;
 }
 
-.oppia-gallery-body {
-  background: -webkit-gradient(linear, 100 0, 100 100, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
-  margin-top: -100px;
-}
-
 .oppia-gallery-main {
   float: left;
   -moz-transition: all 0.5s;
@@ -1099,6 +1094,16 @@ oppia-parameter {
   padding-top: 140px;
   text-align: center;
   width: 450px;
+}
+
+.oppia-gallery-interstitial {
+  background: -webkit-gradient(linear, 50 0, 50 50, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
+  font-size: 1.3em;
+  height: 150px;
+  margin-top: -50px;
+  padding-top: 50px;
+  text-align: center;
+  width: 100%;
 }
 
 .oppia-splash-search {
