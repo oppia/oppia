@@ -33,9 +33,7 @@ class SignupTest(test_utils.GenericTestBase):
 
         response = response.follow()
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Welcome to the Oppia contributor community!',
-            'My preferred Oppia username')
+        response.mustcontain('Oppia username')
 
         self.logout()
 

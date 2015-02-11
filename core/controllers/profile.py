@@ -17,6 +17,7 @@
 __author__ = 'sfederwisch@google.com (Stephanie Federwisch)'
 
 from core.controllers import base
+from core.controllers import pages
 from core.domain import config_domain
 from core.domain import user_services
 import feconf
@@ -128,8 +129,8 @@ class SignupPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
-            'agreement': EDITOR_PREREQUISITES_AGREEMENT.value,
             'nav_mode': feconf.NAV_MODE_PROFILE,
+            'SITE_NAME': pages.SITE_NAME.value,
         })
         self.render_template('profile/signup.html')
 

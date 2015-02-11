@@ -19,8 +19,8 @@
  */
 
 oppia.controller('Signup', [
-    '$scope', '$http', '$rootScope', 'warningsData', 'urlService',
-    function($scope, $http, $rootScope, warningsData, urlService) {
+    '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService',
+    function($scope, $http, $rootScope, $modal, warningsData, urlService) {
   var _SIGNUP_DATA_URL = '/signuphandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
@@ -39,6 +39,19 @@ oppia.controller('Signup', [
       $scope.agreedToTerms &&
       ($scope.hasUsername || !$scope.getWarningText($scope.username))
     );
+  };
+
+  $scope.showLicenseExplanationModal = function() {
+    $modal.open({
+      templateUrl: 'modals/licenseExplanation',
+      backdrop: 'static',
+      resolve: {},
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.close = function() {
+          $modalInstance.dismiss('cancel');
+        };
+      }]
+    });
   };
 
   $scope.onUsernameInputFormBlur = function(username) {
