@@ -122,6 +122,9 @@ XSSI_PREFIX = ')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # Invalid names for parameters used in expressions.
+# TODO(sll): We may actually be able to allow the use of stateSticky -- its
+# prior use in the codebase has been deprecated. If this is still the case by
+# June 2015, remove stateSticky from this list.
 AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
 INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
     'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',

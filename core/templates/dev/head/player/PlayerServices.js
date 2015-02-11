@@ -54,7 +54,7 @@ oppia.factory('learnerParamsService', ['$log', function($log) {
   var _paramDict = {};
 
   return {
-    // TODO(sll): Forbid use of 'answer', 'choices', 'stateSticky' as possible keys.
+    // TODO(sll): Forbid use of 'answer', 'choices' as possible keys.
     init: function(initParamSpecs) {
       // initParamSpecs is a dict mapping the parameter names used in the
       // exploration to their default values.
@@ -184,26 +184,13 @@ oppia.factory('oppiaPlayerService', [
     return ($('<div>').append(el)).html();
   };
 
-  var _getReaderResponseHtml = function(interactionId, answer, isSticky, choices) {
-    var el = $(
-      '<oppia-response-' + $filter('camelCaseToHyphens')(interactionId) + '>');
-    el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
-    el.attr('state-sticky', oppiaHtmlEscaper.objToEscapedJson(isSticky));
-    if (choices) {
-      el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(choices));
-    }
-    return ($('<div>').append(el)).html();
-  };
-
   var stopwatch = stopwatchProviderService.getInstance();
 
-  var _onStateTransitionProcessed = function(
-      newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
-      handler, successCallback) {
-    var oldStateName = _currentStateName;
+  var _isInteractionSticky = function(newStateName, oldStateName) {
     var oldStateData = _exploration.states[oldStateName];
     // NB: This may be undefined if newStateName === END_DEST.
     var newStateData = _exploration.states[newStateName];
+
     // TODO(sll): If the new interaction is the same as the old interaction,
     // and the new interaction is sticky, do not render the reader response.
     // The interaction in the frontend should take care of this.
@@ -211,9 +198,23 @@ oppia.factory('oppiaPlayerService', [
     // interface for updating the frontend more generic so that all the updates
     // happen in the same place. Perhaps in the non-sticky case we should call
     // a frontend method named appendFeedback() or similar.
-    var isSticky = (
+    return (
       newStateName && newStateData.interaction.sticky &&
       newStateData.interaction.id === oldStateData.interaction.id);
+  };
+
+  var _onStateTransitionProcessed = function(
+      newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
+      handler, successCallback) {
+    var oldStateName = _currentStateName;
+    // TODO(sll): If the new interaction is the same as the old interaction,
+    // and the new interaction is sticky, do not render the reader response.
+    // The interaction in the frontend should take care of this.
+    // TODO(sll): This special-casing is not great; we should make the
+    // interface for updating the frontend more generic so that all the updates
+    // happen in the same place. Perhaps in the non-sticky case we should call
+    // a frontend method named appendFeedback() or similar.
+    var isSticky = _isInteractionSticky(newStateName, oldStateName);
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -237,15 +238,8 @@ oppia.factory('oppiaPlayerService', [
     _updateStatus(newParams, newStateName);
     stopwatch.resetStopwatch();
 
-    // TODO(sll): Get rid of this special case for multiple choice.
-    var oldInteractionChoices = null;
-    if (_exploration.states[oldStateName].interaction.customization_args.choices) {
-      oldInteractionChoices = _exploration.states[oldStateName].interaction.customization_args.choices.value;
-    }
-
-    var readerResponseHtml = _getReaderResponseHtml(
-      _exploration.states[oldStateName].interaction.id, answer, isSticky,
-      oldInteractionChoices);
+    // NB: This may be undefined if newStateName === END_DEST.
+    var newStateData = _exploration.states[newStateName];
     if (newStateData) {
       learnerParamsService.init(newParams);
     }
@@ -253,8 +247,7 @@ oppia.factory('oppiaPlayerService', [
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
-      newStateName, isSticky, newQuestionHtml, readerResponseHtml,
-      newFeedbackHtml);
+      newStateName, isSticky, newQuestionHtml, newFeedbackHtml);
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
@@ -383,6 +376,24 @@ oppia.factory('oppiaPlayerService', [
     },
     isInPreviewMode: function() {
       return !!_editorPreviewMode;
+    },
+    getAnswerAsHtml: function(answer) {
+      var currentInteraction = _exploration.states[_currentStateName].interaction;
+      var currentInteractionId = currentInteraction.id;
+
+      // TODO(sll): Get rid of this special case for multiple choice.
+      var currentInteractionChoices = null;
+      if (currentInteraction.customization_args.choices) {
+        currentInteractionChoices = currentInteraction.customization_args.choices.value;
+      }
+
+      var el = $(
+        '<oppia-response-' + $filter('camelCaseToHyphens')(currentInteractionId) + '>');
+      el.attr('answer', oppiaHtmlEscaper.objToEscapedJson(answer));
+      if (currentInteractionChoices) {
+        el.attr('choices', oppiaHtmlEscaper.objToEscapedJson(currentInteractionChoices));
+      }
+      return ($('<div>').append(el)).html();
     },
     submitAnswer: function(answer, handler, successCallback) {
       if (answerIsBeingProcessed) {

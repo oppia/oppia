@@ -26,13 +26,15 @@ oppia.directive('conversationSkin', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'skins/Conversation',
-    controller: ['$scope', '$timeout', '$window', 'warningsData', 'messengerService', 'oppiaPlayerService', 'urlService',
-        function($scope, $timeout, $window, warningsData, messengerService, oppiaPlayerService, urlService) {
+    controller: ['$scope', '$timeout', '$rootScope', '$window', 'warningsData', 'messengerService', 'oppiaPlayerService', 'urlService',
+        function($scope, $timeout, $rootScope, $window, warningsData, messengerService, oppiaPlayerService, urlService) {
       $scope.iframed = urlService.isIframed();
 
       $scope.showPage = !$scope.iframed;
       $scope.hasInteractedAtLeastOnce = false;
       $scope.isAnswerBeingProcessed = oppiaPlayerService.isAnswerBeingProcessed;
+
+      $rootScope.loadingMessage = 'Loading';
 
       // If the exploration is iframed, send data to its parent about its height so
       // that the parent can be resized as necessary.
@@ -113,6 +115,7 @@ oppia.directive('conversationSkin', [function() {
           messengerService.sendMessage(
             messengerService.EXPLORATION_LOADED, null);
           $scope.showPage = true;
+          $rootScope.loadingMessage = '';
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
         });
@@ -121,8 +124,8 @@ oppia.directive('conversationSkin', [function() {
       $scope.initializePage();
 
       // Temporary storage for the next card's content. This is not null iff a 'next card'
-      // exists (At this point the feedback for the 'current card' is displayed, the user
-      // gets 2 seconds to read it and then 'next card' is shown).
+      // exists. (As soon as the feedback for the 'current card' is displayed, the user
+      // gets 2 seconds to read it and then the 'next card' is shown.)
       $scope.nextCardContent = null;
       $scope.continueToNextCard = function() {
         _addNewCard($scope.nextCardContent);
@@ -130,9 +133,23 @@ oppia.directive('conversationSkin', [function() {
         $scope.nextCardContent = null;
       };
 
+      var _answerIsBeingProcessed = false;
+
       $scope.submitAnswer = function(answer, handler) {
+        // For some reason, answers are getting submitted twice when the submit
+        // button is clicked. This guards against that.
+        if (_answerIsBeingProcessed) {
+          return;
+        }
+        _answerIsBeingProcessed = true;
+
+        $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs.push({
+          learnerAnswer: oppiaPlayerService.getAnswerAsHtml(answer),
+          oppiaFeedback: ''
+        });
+
         oppiaPlayerService.submitAnswer(answer, handler, function(
-            newStateName, isSticky, questionHtml, readerResponseHtml, feedbackHtml) {
+            newStateName, isSticky, questionHtml, feedbackHtml) {
           warningsData.clear();
           $scope.hasInteractedAtLeastOnce = true;
           var oldStateName = $scope.stateName;
@@ -147,10 +164,8 @@ oppia.directive('conversationSkin', [function() {
               newStateName);
           }
 
-          $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs.push({
-            learnerAnswer: readerResponseHtml,
-            oppiaFeedback: feedbackHtml
-          });
+          var pairs = $scope.allResponseStates[$scope.allResponseStates.length - 1].answerFeedbackPairs;
+          pairs[pairs.length - 1].oppiaFeedback = feedbackHtml;
 
           // If there is a change in state, use a new card.
           if (oldStateName !== newStateName) {
@@ -173,6 +188,7 @@ oppia.directive('conversationSkin', [function() {
               messengerService.EXPLORATION_COMPLETED, null);
           }
           _scrollToLastEntry();
+          _answerIsBeingProcessed = false;
         });
       };
 
