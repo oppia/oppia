@@ -32,7 +32,11 @@ oppia.directive('conversationSkin', [function() {
 
       $scope.showPage = !$scope.iframed;
       $scope.hasInteractedAtLeastOnce = false;
-      $scope.isAnswerBeingProcessed = oppiaPlayerService.isAnswerBeingProcessed;
+
+      var _answerIsBeingProcessed = false;
+      $scope.isAnswerBeingProcessed = function() {
+        return _answerIsBeingProcessed;
+      };
 
       $rootScope.loadingMessage = 'Loading';
 
@@ -87,7 +91,7 @@ oppia.directive('conversationSkin', [function() {
           if (lastEntryEls.length > 0) {
             // TODO(sll): Try and drop this in favor of an Angular-based solution.
             $('html, body, iframe').animate(
-              {'scrollTop': $(document).height()}, 'slow', 'swing');
+              {'scrollTop': $(document).height()}, 300, 'swing');
           }
         });
       };
@@ -132,8 +136,6 @@ oppia.directive('conversationSkin', [function() {
         _scrollToLastEntry();
         $scope.nextCardContent = null;
       };
-
-      var _answerIsBeingProcessed = false;
 
       $scope.submitAnswer = function(answer, handler) {
         // For some reason, answers are getting submitted twice when the submit
