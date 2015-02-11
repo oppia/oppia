@@ -26,13 +26,21 @@ oppia.directive('conversationSkin', [function() {
     restrict: 'E',
     scope: {},
     templateUrl: 'skins/Conversation',
-    controller: ['$scope', '$timeout', '$rootScope', '$window', 'warningsData', 'messengerService', 'oppiaPlayerService', 'urlService',
-        function($scope, $timeout, $rootScope, $window, warningsData, messengerService, oppiaPlayerService, urlService) {
+    controller: [
+        '$scope', '$timeout', '$rootScope', '$window', '$modal', 'warningsData',
+        'messengerService', 'oppiaPlayerService', 'urlService',
+        function(
+          $scope, $timeout, $rootScope, $window, $modal, warningsData,
+          messengerService, oppiaPlayerService, urlService) {
       $scope.iframed = urlService.isIframed();
 
       $scope.showPage = !$scope.iframed;
       $scope.hasInteractedAtLeastOnce = false;
-      $scope.isAnswerBeingProcessed = oppiaPlayerService.isAnswerBeingProcessed;
+
+      var _answerIsBeingProcessed = false;
+      $scope.isAnswerBeingProcessed = function() {
+        return _answerIsBeingProcessed;
+      };
 
       $rootScope.loadingMessage = 'Loading';
 
@@ -73,8 +81,9 @@ oppia.directive('conversationSkin', [function() {
         }
       });
 
-      var _addNewCard = function(contentHtml) {
+      var _addNewCard = function(stateName, contentHtml) {
         $scope.allResponseStates.push({
+          stateName: stateName,
           content: contentHtml,
           answerFeedbackPairs: []
         });
@@ -87,9 +96,13 @@ oppia.directive('conversationSkin', [function() {
           if (lastEntryEls.length > 0) {
             // TODO(sll): Try and drop this in favor of an Angular-based solution.
             $('html, body, iframe').animate(
-              {'scrollTop': $(document).height()}, 'slow', 'swing');
+              {'scrollTop': $(document).height()}, 300, 'swing');
           }
         });
+      };
+
+      $scope.openCardFeedbackModal = function(stateName) {
+        oppiaPlayerService.openPlayerFeedbackModal(stateName);
       };
 
       $scope.isLoggedIn = false;
@@ -109,7 +122,7 @@ oppia.directive('conversationSkin', [function() {
           $scope.stateName = stateName;
           $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName);
           $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(stateName);
-          _addNewCard(initHtml);
+          _addNewCard($scope.stateName, initHtml);
           $scope.mostRecentQuestionIndex = 0;
 
           messengerService.sendMessage(
@@ -128,12 +141,10 @@ oppia.directive('conversationSkin', [function() {
       // gets 2 seconds to read it and then the 'next card' is shown.)
       $scope.nextCardContent = null;
       $scope.continueToNextCard = function() {
-        _addNewCard($scope.nextCardContent);
+        _addNewCard($scope.stateName, $scope.nextCardContent);
         _scrollToLastEntry();
         $scope.nextCardContent = null;
       };
-
-      var _answerIsBeingProcessed = false;
 
       $scope.submitAnswer = function(answer, handler) {
         // For some reason, answers are getting submitted twice when the submit
@@ -179,7 +190,7 @@ oppia.directive('conversationSkin', [function() {
               _scrollToLastEntry();
               $timeout($scope.continueToNextCard, 2000);
             } else {
-              _addNewCard(questionHtml);
+              _addNewCard($scope.stateName, questionHtml);
             }
           }
 

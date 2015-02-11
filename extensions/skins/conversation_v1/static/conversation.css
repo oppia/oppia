@@ -90,7 +90,20 @@ md-card.conversation-skin-card {
   margin: 20px auto;
   max-width: 560px;
   padding: 40px 60px 27px 22px;
+  position: relative;
   text-align: justify;
+}
+
+.conversation-skin-card-dropdown {
+  position: absolute;
+  right: 5px;
+  top: 10px;
+  width: 20px;
+}
+.conversation-skin-card-dropdown-toggle {
+  cursor: pointer;
+  height: 20px;
+  opacity: 0.5;
 }
 
 .conversation-skin-learner-input {
@@ -126,7 +139,7 @@ md-card.conversation-skin-inline-interaction {
   border-top-right-radius: 0;
   border-top: 1px solid rgba(0,0,0,0.1);
   margin: -20px auto;
-  max-width: 560px; 
+  max-width: 560px;
 }
 
 .conversation-skin-supplemental-interaction {

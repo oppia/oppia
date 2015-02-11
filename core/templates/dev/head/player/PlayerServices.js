@@ -455,7 +455,61 @@ oppia.factory('oppiaPlayerService', [
         state_name: stateHistory[stateHistory.length - 1],
         version: version
       });
-    }
+    },
+    // If the feedback is exploration-scoped, 'stateName' should be null.
+    openPlayerFeedbackModal: function(stateName) {
+      var modalConfig = {
+        templateUrl: 'modals/playerFeedback',
+        backdrop: 'static',
+        resolve: {
+          stateName: function() {
+            return stateName;
+          }
+        },
+        controller: ['$scope', '$modalInstance', 'oppiaPlayerService', 'stateName', function(
+            $scope, $modalInstance, oppiaPlayerService, stateName) {
+          $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
+
+          $scope.isSubmitterAnonymized = false;
+          $scope.stateName = stateName;
+          $scope.subject = '';
+          $scope.feedback = '';
+
+          $scope.submit = function(subject, feedback, isSubmitterAnonymized) {
+            $modalInstance.close({
+              subject: subject,
+              feedback: feedback,
+              isSubmitterAnonymized: isSubmitterAnonymized
+            });
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+          };
+        }]
+      };
+
+      $modal.open(modalConfig).result.then(function(result) {
+        if (result.feedback) {
+          $http.post('/explorehandler/give_feedback/' + _explorationId, {
+            subject: result.subject,
+            feedback: result.feedback,
+            include_author: !result.isSubmitterAnonymized && _isLoggedIn,
+            state_name: stateName
+          });
+
+          $modal.open({
+            templateUrl: 'modals/playerFeedbackConfirmation',
+            backdrop: 'static',
+            controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+              };
+            }]
+          });
+        }
+      });
+    },
   };
 }]);
 
@@ -473,52 +527,6 @@ oppia.controller('LearnerLocalNav', [
   $scope.showEmbedExplorationModal = embedExplorationButtonService.showModal;
 
   $scope.showFeedbackModal = function() {
-    $modal.open({
-      templateUrl: 'modals/playerFeedback',
-      backdrop: 'static',
-      resolve: {},
-      controller: ['$scope', '$modalInstance', 'oppiaPlayerService', function(
-          $scope, $modalInstance, oppiaPlayerService) {
-        $scope.isLoggedIn = oppiaPlayerService.isLoggedIn();
-        $scope.currentStateName = oppiaPlayerService.getCurrentStateName();
-
-        $scope.isSubmitterAnonymized = false;
-        $scope.relatedTo = $scope.currentStateName === _END_DEST ? 'exploration' : 'state';
-        $scope.subject = '';
-        $scope.feedback = '';
-
-        $scope.submit = function(subject, feedback, relatedTo, isSubmitterAnonymized) {
-          $modalInstance.close({
-            subject: subject,
-            feedback: feedback,
-            isStateRelated: relatedTo === 'state',
-            isSubmitterAnonymized: isSubmitterAnonymized
-          });
-        };
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-        };
-      }]
-    }).result.then(function(result) {
-      if (result.feedback) {
-        $http.post('/explorehandler/give_feedback/' + $scope.explorationId, {
-          subject: result.subject,
-          feedback: result.feedback,
-          include_author: !result.isSubmitterAnonymized && oppiaPlayerService.isLoggedIn(),
-          state_name: result.isStateRelated ? oppiaPlayerService.getCurrentStateName() : null
-        });
-
-        $modal.open({
-          templateUrl: 'modals/playerFeedbackConfirmation',
-          backdrop: 'static',
-          controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-            $scope.cancel = function() {
-              $modalInstance.dismiss('cancel');
-            };
-          }]
-        });
-      }
-    });
+    oppiaPlayerService.openPlayerFeedbackModal(null);
   };
 }]);
