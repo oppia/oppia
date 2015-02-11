@@ -510,6 +510,11 @@ div.wysiwyg iframe.wysiwyg-content-large {
   max-width: 170px;
 }
 
+.oppia-gallery-body {
+  background: -webkit-gradient(linear, 100 0, 100 100, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
+  margin-top: -100px;
+}
+
 .oppia-gallery-main {
   float: left;
   -moz-transition: all 0.5s;
@@ -541,7 +546,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tiles-container {
-  background-color: white;
   border-radius: 3px;
   height: 100%;
   /* This is the same as the min-height in .oppia-gallery-menu. */
