@@ -62,9 +62,9 @@ class ExplorationServicesUnitTests(test_utils.GenericTestBase):
         user_services.get_or_create_user(self.EDITOR_ID, self.EDITOR_EMAIL)
         user_services.get_or_create_user(self.VIEWER_ID, self.VIEWER_EMAIL)
 
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
-        self.register_editor(self.EDITOR_EMAIL, username=self.EDITOR_USERNAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         self.set_admins([self.ADMIN_EMAIL])
         self.user_id_admin = self.get_user_id_from_email(self.ADMIN_EMAIL)
@@ -1439,8 +1439,8 @@ class ExplorationCommitLogUnitTests(ExplorationServicesUnitTests):
 
         self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
-        self.register_editor(self.ALBERT_EMAIL, username=self.ALBERT_NAME)
-        self.register_editor(self.BOB_EMAIL, username=self.BOB_NAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
         # This needs to be done in a toplevel wrapper because the datastore
         # puts to the event log are asynchronous.
@@ -1851,8 +1851,8 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
 
         self.ALBERT_ID = self.get_user_id_from_email(self.ALBERT_EMAIL)
         self.BOB_ID = self.get_user_id_from_email(self.BOB_EMAIL)
-        self.register_editor(self.ALBERT_EMAIL, username=self.ALBERT_NAME)
-        self.register_editor(self.BOB_EMAIL, username=self.BOB_NAME)
+        self.signup(self.ALBERT_EMAIL, self.ALBERT_NAME)
+        self.signup(self.BOB_EMAIL, self.BOB_NAME)
 
         exploration_1 = self.save_new_valid_exploration(
             self.EXP_ID_1, self.ALBERT_ID)
@@ -1880,7 +1880,6 @@ class ExplorationSummaryGetTests(ExplorationServicesUnitTests):
             rights_manager.publish_exploration(self.BOB_ID, self.EXP_ID_2)
 
         rights_manager.publish_exploration(self.ALBERT_ID, self.EXP_ID_2)
-
 
     def test_get_non_private_exploration_summaries(self):
 

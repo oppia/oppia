@@ -53,11 +53,11 @@ class DashboardPage(base.BaseHandler):
             self.values.update({
                 'nav_mode': feconf.NAV_MODE_HOME,
             })
-            self.render_template('dashboard/dashboard.html')
+            self.render_template(
+                'dashboard/dashboard.html', redirect_url_on_logout='/')
         else:
             self.redirect(utils.set_url_query_parameter(
-                feconf.EDITOR_PREREQUISITES_URL,
-                'return_url', '/dashboard'))
+                feconf.SIGNUP_URL, 'return_url', '/dashboard'))
 
 
 class DashboardHandler(base.BaseHandler):

@@ -188,27 +188,27 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             EXP_2_ID = 'eid2'
             EXP_2_TITLE = 'Title2'
             FEEDBACK_THREAD_SUBJECT = 'feedback thread subject'
-            USER_EMAIL = 'user@example.com'
-            USER_USERNAME = 'username'
-            self.register_editor(USER_EMAIL, username=USER_USERNAME)
-            user_id = self.get_user_id_from_email(USER_EMAIL)
+
+            self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+            self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
             # User creates an exploration.
             self._save_new_default_exploration(
-                user_id, EXP_1_ID, EXP_1_TITLE, 'Category')
+                self.EDITOR_ID, EXP_1_ID, EXP_1_TITLE, 'Category')
             exp1_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_1_ID).last_updated)
 
             # User gives feedback on it.
             feedback_services.create_thread(
-                EXP_1_ID, None, user_id, FEEDBACK_THREAD_SUBJECT, 'text')
+                EXP_1_ID, None, self.EDITOR_ID, FEEDBACK_THREAD_SUBJECT,
+                'text')
             thread_id = (
                 feedback_services.get_threadlist(EXP_1_ID)[0]['thread_id'])
             message = feedback_services.get_messages(thread_id)[0]
 
             # User creates another exploration.
             self._save_new_default_exploration(
-                user_id, EXP_2_ID, EXP_2_TITLE, 'Category')
+                self.EDITOR_ID, EXP_2_ID, EXP_2_TITLE, 'Category')
             exp2_last_updated_ms = utils.get_time_in_millisecs(
                 exp_services.get_exploration_by_id(EXP_2_ID).last_updated)
 
@@ -220,20 +220,23 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             self.process_and_flush_pending_tasks()
 
             recent_updates = (
-                ModifiedRecentUpdatesAggregator.get_recent_updates(user_id)[1])
+                ModifiedRecentUpdatesAggregator.get_recent_updates(
+                    self.EDITOR_ID)[1])
             self.assertEqual([(
                 self._get_expected_exploration_created_dict(
-                    user_id, EXP_2_ID, EXP_2_TITLE, exp2_last_updated_ms)
+                    self.EDITOR_ID, EXP_2_ID, EXP_2_TITLE,
+                    exp2_last_updated_ms)
             ), {
                 'activity_id': EXP_1_ID,
                 'activity_title': EXP_1_TITLE,
-                'author_id': user_id,
+                'author_id': self.EDITOR_ID,
                 'last_updated_ms': message['created_on'],
                 'subject': FEEDBACK_THREAD_SUBJECT,
                 'type': feconf.UPDATE_TYPE_FEEDBACK_MESSAGE,
             }, (
                 self._get_expected_exploration_created_dict(
-                    user_id, EXP_1_ID, EXP_1_TITLE, exp1_last_updated_ms)
+                    self.EDITOR_ID, EXP_1_ID, EXP_1_TITLE,
+                    exp1_last_updated_ms)
             )], recent_updates)
 
     def test_making_feedback_thread_does_not_subscribe_to_exp(self):
@@ -243,14 +246,15 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             EXP_ID = 'eid'
             EXP_TITLE = 'Title'
             FEEDBACK_THREAD_SUBJECT = 'feedback thread subject'
+
             USER_A_EMAIL = 'user_a@example.com'
             USER_A_USERNAME = 'a'
-            self.register_editor(USER_A_EMAIL, username=USER_A_USERNAME)
+            self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
 
             USER_B_EMAIL = 'user_b@example.com'
             USER_B_USERNAME = 'b'
-            self.register_editor(USER_B_EMAIL, username=USER_B_USERNAME)
+            self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
             # User A creates an exploration.
@@ -308,14 +312,15 @@ class RecentUpdatesAggregatorUnitTests(test_utils.GenericTestBase):
             EXP_ID = 'eid'
             EXP_TITLE = 'Title'
             FEEDBACK_THREAD_SUBJECT = 'feedback thread subject'
+
             USER_A_EMAIL = 'user_a@example.com'
             USER_A_USERNAME = 'a'
-            self.register_editor(USER_A_EMAIL, username=USER_A_USERNAME)
+            self.signup(USER_A_EMAIL, USER_A_USERNAME)
             user_a_id = self.get_user_id_from_email(USER_A_EMAIL)
 
             USER_B_EMAIL = 'user_b@example.com'
             USER_B_USERNAME = 'b'
-            self.register_editor(USER_B_EMAIL, username=USER_B_USERNAME)
+            self.signup(USER_B_EMAIL, USER_B_USERNAME)
             user_b_id = self.get_user_id_from_email(USER_B_EMAIL)
 
             # User A creates an exploration.
@@ -402,11 +407,11 @@ class DashboardSubscriptionsOneOffJobTests(test_utils.GenericTestBase):
     def setUp(self):
         super(DashboardSubscriptionsOneOffJobTests, self).setUp()
 
-        self.register_editor(self.USER_A_EMAIL, username=self.USER_A_USERNAME)
+        self.signup(self.USER_A_EMAIL, self.USER_A_USERNAME)
         self.user_a_id = self.get_user_id_from_email(self.USER_A_EMAIL)
-        self.register_editor(self.USER_B_EMAIL, username=self.USER_B_USERNAME)
+        self.signup(self.USER_B_EMAIL, self.USER_B_USERNAME)
         self.user_b_id = self.get_user_id_from_email(self.USER_B_EMAIL)
-        self.register_editor(self.USER_C_EMAIL, username=self.USER_C_USERNAME)
+        self.signup(self.USER_C_EMAIL, self.USER_C_USERNAME)
         self.user_c_id = self.get_user_id_from_email(self.USER_C_EMAIL)
 
         with self.swap(

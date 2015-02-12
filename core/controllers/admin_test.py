@@ -28,13 +28,16 @@ SITE_NAME = 'sitename.org'
 
 class AdminIntegrationTest(test_utils.GenericTestBase):
 
+    def setUp(self):
+        """Complete the signup process for self.ADMIN_EMAIL."""
+        super(AdminIntegrationTest, self).setUp()
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
     def test_admin_page(self):
         """Test that the admin page shows the expected sections."""
-        # Login as an admin.
-        self.login(self.EDITOR_EMAIL, is_super_admin=True)
-
+        self.login(self.ADMIN_EMAIL, is_super_admin=True)
         response = self.testapp.get('/admin')
-
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
             'Performance Counters',
@@ -120,6 +123,12 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
     def test_change_rights(self):
         """Test that the correct role indicators show up on app pages."""
 
+        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
+
+        self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
+        self.signup('superadmin@example.com', 'superadm1n')
+        self.signup(BOTH_MODERATOR_AND_ADMIN_EMAIL, 'moderatorandadm1n')
+
         # Navigate to any page. The role is not set.
         self.testapp.get('/').mustcontain(
             no=['(Moderator)', '(Admin)', '/moderator', '/admin'])
@@ -131,7 +140,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         # Add a moderator, an admin, and a person with both roles, then log
         # out.
-        BOTH_MODERATOR_AND_ADMIN_EMAIL = 'moderator.and.admin@example.com'
         response = self.testapp.get('/admin')
         csrf_token = self.get_csrf_token_from_response(response)
         self.post_json('/adminhandler', {
