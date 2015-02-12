@@ -34,24 +34,24 @@ class HomePageTest(test_utils.GenericTestBase):
             # No navbar tabs should be highlighted.
             no=['class="active"', 'Logout', 'Dashboard'])
 
-    def test_logged_in_but_not_registered_as_editor_homepage(self):
-        """Test the logged-in-but-not-editor version of the home page."""
+    def test_dashboard_redirects_for_logged_out_users(self):
+        """Test the logged-out view of the dashboard."""
         response = self.testapp.get('/dashboard')
         self.assertEqual(response.status_int, 302)
         # This should redirect to the login page.
-        self.assertIn(
-            self.get_expected_login_url('/dashboard'),
-            response.headers['location'])
+        self.assertIn('signup', response.headers['location'])
+        self.assertIn('dashboard', response.headers['location'])
 
         self.login('reader@example.com')
         response = self.testapp.get('/dashboard')
-        # This should redirect to the registration page.
+        # This should redirect the user to complete signup.
         self.assertEqual(response.status_int, 302)
         self.logout()
 
-    def test_logged_in_and_registered_as_editor_homepage(self):
-        """Test the logged-in-and-editor home page (the 'dashboard')."""
-        self.register_editor(self.EDITOR_EMAIL)
+    def test_logged_in_dashboard(self):
+        """Test the logged-in view of the dashboard."""
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+
         self.login(self.EDITOR_EMAIL)
         response = self.testapp.get('/dashboard')
         self.assertEqual(response.status_int, 200)
@@ -73,10 +73,10 @@ class DashboardHandlerTest(test_utils.GenericTestBase):
 
     def setUp(self):
         super(DashboardHandlerTest, self).setUp()
-        self.register_editor(self.OWNER_EMAIL, username=self.OWNER_USERNAME)
-        self.register_editor(
-            self.COLLABORATOR_EMAIL, username=self.COLLABORATOR_USERNAME)
-        self.register_editor(self.VIEWER_EMAIL, username=self.VIEWER_USERNAME)
+        self.signup(self.OWNER_EMAIL, self.OWNER_USERNAME)
+        self.signup(self.COLLABORATOR_EMAIL, self.COLLABORATOR_USERNAME)
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
+
         self.owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
         self.collaborator_id = self.get_user_id_from_email(
             self.COLLABORATOR_EMAIL)

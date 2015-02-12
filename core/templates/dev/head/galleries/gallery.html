@@ -96,8 +96,6 @@
                   <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
                   {% if not user_email %}
                     <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
-                  {% elif not username %}
-                    <a href="{{gallery_register_redirect_url}}">Would you like to create one?</a>
                   {% else %}
                     <a ng-click="showCreateExplorationModal(getCategoryList())">Would you like to create one?</a>
                   {% endif %}
@@ -109,11 +107,6 @@
                 {% if not user_email %}
                   <!-- User must log in. -->
                   <a class="btn btn-success protractor-test-create-exploration" href="{{gallery_login_redirect_url}}">
-                    Create New Exploration
-                  </a>
-                {% elif not username %}
-                  <!-- User must register. -->
-                  <a class="btn btn-success protractor-test-create-exploration" href="{{gallery_register_redirect_url}}">
                     Create New Exploration
                   </a>
                 {% else %}

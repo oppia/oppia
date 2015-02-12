@@ -152,14 +152,6 @@ def require_editor(handler):
             raise self.UnauthorizedUserException(
                 'You do not have the credentials to access this page.')
 
-        redirect_url = feconf.EDITOR_PREREQUISITES_URL
-
-        if not user_services.has_user_registered_as_editor(self.user_id):
-            redirect_url = utils.set_url_query_parameter(
-                redirect_url, 'return_url', self.request.uri)
-            self.redirect(redirect_url)
-            return
-
         try:
             exploration = exp_services.get_exploration_by_id(exploration_id)
         except:
@@ -200,24 +192,16 @@ class ExplorationPage(EditorHandler):
         """Handles GET requests."""
         exploration = exp_services.get_exploration_by_id(
             exploration_id, strict=False)
-        if exploration is None:
-            raise self.PageNotFoundException
-
-        if not rights_manager.Actor(self.user_id).can_view(exploration_id):
-            raise self.PageNotFoundException
+        if (exploration is None or
+                not rights_manager.Actor(self.user_id).can_view(
+                    exploration_id)):
+            self.redirect('/')
+            return
 
         can_edit = (
             bool(self.user_id) and
             self.username not in config_domain.BANNED_USERNAMES.value and
             rights_manager.Actor(self.user_id).can_edit(exploration_id))
-
-        if (can_edit and not
-                user_services.has_user_registered_as_editor(self.user_id)):
-            redirect_url = utils.set_url_query_parameter(
-                feconf.EDITOR_PREREQUISITES_URL, 'return_url',
-                self.request.uri)
-            self.redirect(redirect_url)
-            return
 
         # TODO(sll): Consider including the obj_generator html in a ng-template
         # to remove the need for an additional RPC?

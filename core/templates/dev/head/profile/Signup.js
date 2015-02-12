@@ -18,14 +18,14 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('EditorPrerequisites', [
-    '$scope', '$http', '$rootScope', 'warningsData', 'urlService',
-    function($scope, $http, $rootScope, warningsData, urlService) {
-  $scope.editorPrerequisitesDataUrl = '/editor_prerequisites_handler/data/';
+oppia.controller('Signup', [
+    '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService',
+    function($scope, $http, $rootScope, $modal, warningsData, urlService) {
+  var _SIGNUP_DATA_URL = '/signuphandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
 
-  $http.get($scope.editorPrerequisitesDataUrl).success(function(data) {
+  $http.get(_SIGNUP_DATA_URL).success(function(data) {
     $rootScope.loadingMessage = '';
     $scope.username = data.username;
     $scope.agreedToTerms = data.has_agreed_to_terms;
@@ -39,6 +39,19 @@ oppia.controller('EditorPrerequisites', [
       $scope.agreedToTerms &&
       ($scope.hasUsername || !$scope.getWarningText($scope.username))
     );
+  };
+
+  $scope.showLicenseExplanationModal = function() {
+    $modal.open({
+      templateUrl: 'modals/licenseExplanation',
+      backdrop: 'static',
+      resolve: {},
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.close = function() {
+          $modalInstance.dismiss('cancel');
+        };
+      }]
+    });
   };
 
   $scope.onUsernameInputFormBlur = function(username) {
@@ -96,7 +109,7 @@ oppia.controller('EditorPrerequisites', [
       requestParams.username = username;
     }
 
-    $http.post('/editor_prerequisites_handler/data', requestParams).success(function(data) {
+    $http.post(_SIGNUP_DATA_URL, requestParams).success(function(data) {
       window.location = window.decodeURIComponent(urlService.getUrlParams().return_url);
     });
   };

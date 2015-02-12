@@ -672,12 +672,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   z-index: 3000;
 }
 
-.oppia-editor-prerequisites-form {
-  background: #eee;
-  border-radius: 5px;
-  padding: 5px;
-}
-
 .oppia-form input.ng-invalid.ng-dirty {
   border: 2px solid #FA787E;
 }
