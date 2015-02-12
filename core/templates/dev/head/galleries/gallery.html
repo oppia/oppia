@@ -7,6 +7,25 @@
 {% block navbar_breadcrumb %}
 {% endblock navbar_breadcrumb %}
 
+{% block local_top_nav_options %}
+  <div ng-controller="SearchBar">
+    <form class="navbar-form navbar-left" role="search">
+      <div class="form-group">
+        <div class="input-group" style="max-width: 280px;">
+          <div class="input-group-addon oppia-splash-search-icon">
+            <span class="glyphicon"
+                  ng-class="{'glyphicon-search': !searchIsLoading,
+                             'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
+            </span>
+          </div>
+          <input type="text" class="form-control oppia-splash-search-input" placeholder="What are you curious about?"
+                 ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+        </div>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
 {% block header_js %}
   {{ super() }}
   <script type="text/javascript">
@@ -17,35 +36,25 @@
 
 {% block content %}
   <div ng-controller="Gallery">
-    <div class="oppia-gallery-banner">
-      <div class="oppia-gallery-banner-content">
-        <div>
-          Hi, I'm Oppia.
-        </div>
-
-        <form role="search" style="margin-top: 15px;">
-          <div class="form-group">
-            <div class="input-group">
-              <div class="input-group-addon oppia-splash-search-icon">
-                 <span class="glyphicon"
-                       ng-class="{'glyphicon-search': !searchIsLoading,
-                                  'glyphicon-refresh': searchIsLoading,
-                                  'oppia-animate-spin': searchIsLoading}">
-                 </span>
-              </div>
-              <input type="text" class="form-control oppia-splash-search" placeholder="What are you curious about?"
-                     ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
-            </div>
+    <div ng-if="showBannerImage">
+      <div class="oppia-gallery-banner">
+        <div class="oppia-gallery-banner-content">
+          <div style="font-size: 36px;">
+            Hi, I&rsquo;m Oppia.
           </div>
-        </form>
+          <br>
+          <div style="font-size: 20px;">
+            Your personal tutor for <a class="oppia-gallery-banner-link">astronomy</a>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="oppia-gallery-interstitial">
-      <img src="/images/oppia_favicon_black.png" style="width: 32px; height: 32px;">
-      <span>
-        I'm a free, open source, community-built tutor for everybody. <a href="/about">Learn more.</a>
-      </span>
+      <div class="oppia-gallery-interstitial">
+        <img src="/images/oppia_favicon_black.png" style="width: 32px; height: 32px;">
+        <span>
+          I'm a free, open source, community-built tutor for everybody. <a href="/about">Learn more.</a>
+        </span>
+      </div>
     </div>
 
     <div class="container-fluid" style="background-color: #eeedee;">
@@ -71,7 +80,7 @@
             <div class="oppia-gallery-menu" ng-if="gallerySidebarIsActive || screenIsLarge">
               <h3>Languages</h3>
               <!-- Without the ng-if, the value of the select2-dropdown directive will fail to change after the initial load. -->
-              <div ng-if="pageHasLoaded">
+              <div ng-if="!loadingMessage">
                 <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.$parent.selectedLanguageCodes"
                                   allow-multiple-choices="true" new-choice-regex=".^" width="200"
                                   placeholder="Filter by language..."
@@ -94,10 +103,7 @@
               <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguageCodesFilter:selectedLanguageCodes).length === 0">
                 <div>
                   <em>
-                    We don't have any explorations
-                    <span ng-if="searchQuery">on this topic </span>
-                    <span ng-if="!searchQuery">satisfying these filters </span>
-                    yet.
+                    We don't have any explorations on this topic yet.
                   </em>
                   <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
                   {% if not user_email %}

@@ -1081,13 +1081,18 @@ oppia-parameter {
 .oppia-gallery-banner-content {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 56px;
-  font-weight: bolder;
   margin-left: auto;
   margin-right: auto;
-  padding-top: 140px;
+  padding-top: 100px;
   text-align: center;
   width: 450px;
+}
+.oppia-gallery-banner-link {
+  color: rgba(251, 234, 43, 0.9);
+}
+.oppia-gallery-banner-link:hover {
+  color: rgba(251, 234, 43, 1.0);
+  text-decoration: none;
 }
 
 .oppia-gallery-interstitial {
@@ -1100,22 +1105,30 @@ oppia-parameter {
   width: 100%;
 }
 
-.oppia-splash-search {
-  border-left: none;
-  border-radius: 28px;
-  font-size: 23px;
-  height: 62px;
+.oppia-splash-search-input {
+  background: #04857c;
+  border: 1px solid #018c7f;
+  color: white;
+  font-size: 15px;
+  height: 34px;
+}
+.oppia-splash-search-input::-webkit-input-placeholder {
+  color: #ccc;
+}
+.oppia-splash-search-input:-moz-placeholder {
+  color: #ccc;
+}
+.oppia-splash-search-input::-moz-placeholder {
+  color: #ccc;
+}
+.oppia-splash-search-input:-ms-input-placeholder {
+  color: #ccc;
 }
 
 .oppia-splash-search-icon {
-  background-color: #fff;
-  border-radius: 28px;
-}
-
-.oppia-splash-search-icon .glyphicon {
-  font-size: 20px;
-  margin-left: 7px;
-  margin-right: 3px;
+  background: #04857c;
+  border: 1px solid #018c7f;
+  color: white;
 }
 
 /* CSS3 Animations */
