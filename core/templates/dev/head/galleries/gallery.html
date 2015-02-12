@@ -33,7 +33,8 @@
                                   'oppia-animate-spin': searchIsLoading}">
                  </span>
               </div>
-              <input type="text" class="form-control oppia-splash-search" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+              <input type="text" class="form-control oppia-splash-search" placeholder="What are you curious about?"
+                     ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
             </div>
           </div>
         </form>
@@ -71,7 +72,11 @@
               <h3>Languages</h3>
               <!-- Without the ng-if, the value of the select2-dropdown directive will fail to change after the initial load. -->
               <div ng-if="pageHasLoaded">
-                <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.$parent.selectedLanguageCodes" allow-multiple-choices="true" new-choice-regex=".^" width="200" placeholder="Filter by language..." class="protractor-test-gallery-language-selector" on-selection-change="onLanguageCodeSelectionChange()">
+                <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.$parent.selectedLanguageCodes"
+                                  allow-multiple-choices="true" new-choice-regex=".^" width="200"
+                                  placeholder="Filter by language..."
+                                  class="protractor-test-gallery-language-selector"
+                                  on-selection-change="onLanguageCodeSelectionChange()">
                 </select2-dropdown>
               </div>
 
@@ -83,7 +88,8 @@
             </div>
           </div>
 
-          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
+          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main"
+               ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
             <div class="tab-content oppia-gallery-tiles-container">
               <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguageCodesFilter:selectedLanguageCodes).length === 0">
                 <div>
@@ -116,28 +122,39 @@
                   </a>
                   {% if allow_yaml_file_upload %}
                     <a class="btn btn-default btn-lg"
-                        ng-click="showUploadExplorationModal(getCategoryList())">
+                       ng-click="showUploadExplorationModal(getCategoryList())">
                       Upload Existing Exploration
                     </a>
                   {% endif %}
                 {% endif %}
               </div>
 
-              <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1" infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+              <!-- This fixes the 'float bug' in Firefox. Without this line, the "Create New Exploration" button will overlap the top-right of the exploration card, making it unclickable. -->
+              <div style="clear: both"></div>
+
+              <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
+                   infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
                 <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguageCodesFilter:selectedLanguageCodes track by $index">
                   <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
-                    <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>" ng-class="getImageContainerClass(exploration)">
+                    <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>"
+                       ng-class="getImageContainerClass(exploration)">
                       <!-- TODO(sll): Make the default image higher-res. -->
-                      <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>" height="128" width="128">
+                      <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>"
+                           height="128" width="128">
                     </a>
                     <div flex="75" class="oppia-gallery-tile-details-container">
-                      <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
-                        <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit this exploration"></span>
+                      <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
+                         ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
+                        <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
+                              title="Edit this exploration"></span>
                         Edit
                       </a>
                       {% if is_moderator %}
-                        <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn" ng-if="!exploration.is_editable && currentUserIsModerator" ng-href="/create/<[exploration.id]>">
-                          <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration" title="Edit (as moderator)"></span>
+                        <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
+                           ng-if="!exploration.is_editable && currentUserIsModerator"
+                           ng-href="/create/<[exploration.id]>">
+                          <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
+                                title="Edit (as moderator)"></span>
                           Edit (as moderator)
                         </a>
                       {% endif %}
@@ -163,7 +180,8 @@
                         </div>
 
                         <div class="oppia-gallery-tile-metadata">
-                          <span class="oppia-gallery-tile-last-updated" ng-if="!gallerySidebarIsActive || screenIsLarge">
+                          <span class="oppia-gallery-tile-last-updated"
+                                ng-if="!gallerySidebarIsActive || screenIsLarge">
                             Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
                           </span>
                           <span class="oppia-gallery-tile-rating">
