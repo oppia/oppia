@@ -43,12 +43,10 @@ var logout = function() {
   driver.findElement(protractor.By.id('submit-logout')).click();
 };
 
-// The user needs to be logged in before this method is called. Note that this
-// will fail if the user already has a username.
+// The user needs to log in immediately before this method is called. Note
+// that this will fail if the user already has a username.
 var _completeSignup = function(username) {
-  // Visiting any page while logged in (but not signed up) should trigger the
-  // registration flow.
-  browser.get('/about');
+  browser.get('/signup');
   element(by.css('.protractor-test-username-input')).sendKeys(username);
   element(by.css('.protractor-test-agree-to-terms-checkbox')).click();
   element(by.css('.protractor-test-register-user')).click();
