@@ -23,17 +23,16 @@ import feconf
 
 class SignupTest(test_utils.GenericTestBase):
 
-    def test_redirect_to_signup_page_happens(self):
-        self.login(self.EDITOR_EMAIL)
-
+    def test_going_somewhere_else_while_signing_in_logs_user_out(self):
         exp_services.load_demo('0')
+
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 302)
-        self.assertIn(feconf.SIGNUP_URL, response.headers['location'])
-
-        response = response.follow()
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain('Oppia username')
+        self.assertIn('Logout', response.headers['location'])
+        self.assertIn('create', response.headers['location'])
 
         self.logout()
 

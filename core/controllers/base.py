@@ -17,6 +17,7 @@
 __author__ = 'Sean Lip'
 
 import base64
+import Cookie
 import datetime
 import hmac
 import json
@@ -41,6 +42,8 @@ import utils
 
 import jinja2
 import webapp2
+
+from google.appengine.api import users
 
 
 DEFAULT_CSRF_SECRET = 'oppia csrf secret'
@@ -107,6 +110,34 @@ def require_fully_signed_up(handler):
     return test_registered_as_editor
 
 
+def _clear_login_cookies(response_headers):
+    ONE_DAY_AGO_IN_SECS = -24 * 60 * 60
+
+    # AppEngine sets the ACSID cookie for http:// and the SACSID cookie
+    # for https:// . We just unset both below.
+    cookie = Cookie.SimpleCookie()
+    for cookie_name in ['ACSID', 'SACSID']:
+        cookie = Cookie.SimpleCookie()
+        cookie[cookie_name] = ''
+        cookie[cookie_name]['expires'] = ONE_DAY_AGO_IN_SECS
+        response_headers.add_header(*cookie.output().split(': ', 1))
+
+
+class LogoutPage(webapp2.RequestHandler):
+
+    def get(self):
+        """Logs the user out, and returns them to a specified page or the home
+        page.
+        """
+        url_to_redirect_to = self.request.get('return_url') or '/'
+        _clear_login_cookies(self.response.headers)
+
+        if feconf.DEV_MODE:
+            self.redirect(users.create_logout_url(url_to_redirect_to))
+        else:
+            self.redirect(url_to_redirect_to)
+
+
 class BaseHandler(webapp2.RequestHandler):
     """Base class for all Oppia handlers."""
 
@@ -140,20 +171,26 @@ class BaseHandler(webapp2.RequestHandler):
         self.user = current_user_services.get_current_user(self.request)
         self.user_id = current_user_services.get_user_id(
             self.user) if self.user else None
-
+        self.username = None
         self.user_has_started_state_editor_tutorial = False
+        self.partially_logged_in = False
 
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
             user_settings = user_services.get_or_create_user(
                 self.user_id, email)
 
-            self.username = user_settings.username
-            self.last_agreed_to_terms = user_settings.last_agreed_to_terms
-            self.values['user_email'] = user_settings.email
-            self.values['username'] = self.username
-            if user_settings.last_started_state_editor_tutorial:
-                self.user_has_started_state_editor_tutorial = True
+            if self.REDIRECT_UNFINISHED_SIGNUPS and not user_settings.username:
+                _clear_login_cookies(self.response.headers)
+                self.partially_logged_in = True
+                self.user_id = None
+            else:
+                self.username = user_settings.username
+                self.last_agreed_to_terms = user_settings.last_agreed_to_terms
+                self.values['user_email'] = user_settings.email
+                self.values['username'] = self.username
+                if user_settings.last_started_state_editor_tutorial:
+                    self.user_has_started_state_editor_tutorial = True
 
         self.is_moderator = rights_manager.Actor(self.user_id).is_moderator()
         self.is_admin = rights_manager.Actor(self.user_id).is_admin()
@@ -181,11 +218,10 @@ class BaseHandler(webapp2.RequestHandler):
             self.redirect('https://oppiatestserver.appspot.com', True)
             return
 
-        if (self.REDIRECT_UNFINISHED_SIGNUPS and self.user_id and (
-                not self.username or not self.last_agreed_to_terms)):
-            redirect_url = utils.set_url_query_parameter(
-                feconf.SIGNUP_URL, 'return_url', self.request.uri)
-            self.redirect(redirect_url)
+        # In DEV_MODE, clearing cookies does not log out the user, so we
+        # force-clear them by redirecting to the logout URL.
+        if feconf.DEV_MODE and self.partially_logged_in:
+            self.redirect(users.create_logout_url(self.request.uri))
             return
 
         if self.payload and self.REQUIRE_PAYLOAD_CSRF_CHECK:
@@ -270,6 +306,7 @@ class BaseHandler(webapp2.RequestHandler):
             'SHOW_FORUM_PAGE': feconf.SHOW_FORUM_PAGE,
             'ALL_LANGUAGE_CODES': feconf.ALL_LANGUAGE_CODES,
             'DEFAULT_LANGUAGE_CODE': feconf.ALL_LANGUAGE_CODES[0]['code'],
+            'user_is_logged_in': bool(self.username),
         })
 
         if redirect_url_on_logout is None:

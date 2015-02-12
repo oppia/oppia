@@ -208,6 +208,7 @@ class TestBase(unittest.TestCase):
         self.login(email)
 
         response = self.testapp.get(feconf.SIGNUP_URL)
+        self.assertEqual(response.status_int, 200)
         csrf_token = self.get_csrf_token_from_response(response)
         response = self.testapp.post(feconf.SIGNUP_DATA_URL, {
             'csrf_token': csrf_token,

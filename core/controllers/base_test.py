@@ -19,11 +19,15 @@
 __author__ = 'Sean Lip'
 
 import copy
+import datetime
 import feconf
 import re
 import types
 
 from core.controllers import base
+from core.domain import exp_services
+from core.platform import models
+current_user_services = models.Registry.import_current_user_services()
 from core.tests import test_utils
 import main
 
@@ -203,3 +207,20 @@ class EscapingTest(test_utils.GenericTestBase):
         self.assertIn('\\n\\u003cscript\\u003e\\u9a6c={{', response.body)
         self.assertNotIn('<script>', response.body)
         self.assertNotIn('马', response.body)
+
+
+class LogoutPageTest(test_utils.GenericTestBase):
+
+    def test_logout_page(self):
+        """Tests for logout handler."""
+        exp_services.load_demo('0') 
+        # Logout with valid query arg. This test only validates that the login
+        # cookies have expired after hitting the logout url.
+        current_page = '/explore/0'
+        response = self.testapp.get(current_page)
+        self.assertEqual(response.status_int, 200)
+        response = self.testapp.get(current_user_services.create_logout_url(
+            current_page))
+        expiry_date = response.headers['Set-Cookie'].rsplit('=', 1)
+        self.assertTrue(datetime.datetime.now() > datetime.datetime.strptime(
+            expiry_date[1], "%a, %d %b %Y %H:%M:%S GMT",))

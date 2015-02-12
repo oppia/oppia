@@ -128,6 +128,13 @@ class SignupPage(base.BaseHandler):
     @require_user_id_else_redirect_to_homepage
     def get(self):
         """Handles GET requests."""
+        return_url = str(self.request.get('return_url', self.request.uri))
+
+        user_settings = user_services.get_user_settings(self.user_id)
+        if user_settings.last_agreed_to_terms and user_settings.username:
+            self.redirect(return_url)
+            return
+
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
             'SITE_NAME': pages.SITE_NAME.value,

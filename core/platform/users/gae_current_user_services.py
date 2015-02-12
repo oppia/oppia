@@ -18,6 +18,7 @@
 
 __author__ = 'Sean Lip'
 
+import feconf
 import logging
 import utils
 
@@ -27,7 +28,8 @@ from google.appengine.ext import ndb
 
 def create_login_url(slug):
     """Creates a login url."""
-    return users.create_login_url(slug)
+    return users.create_login_url(utils.set_url_query_parameter(
+        feconf.SIGNUP_URL, 'return_url', slug))
 
 
 def create_logout_url(slug):

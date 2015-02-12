@@ -39,9 +39,8 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/dashboard')
         self.assertEqual(response.status_int, 302)
         # This should redirect to the login page.
-        self.assertIn(
-            self.get_expected_login_url('/dashboard'),
-            response.headers['location'])
+        self.assertIn('signup', response.headers['location'])
+        self.assertIn('dashboard', response.headers['location'])
 
         self.login('reader@example.com')
         response = self.testapp.get('/dashboard')

@@ -14,8 +14,11 @@
 {% endblock navbar_breadcrumb %}
 
 {% block content %}
+  <!-- NOTE: This page should not contain any direct anchors to internal links. If the user visits an internal
+  link before completing the signup process, they will be logged out.
+  -->
   <div class="container" ng-controller="Signup">
-      <div class="row">
+    <div class="row">
       <div class="col-lg-8 col-md-8 col-sm-8">
         <br>
         <h3 class="oppia-page-title">Complete Your Registration</h3>

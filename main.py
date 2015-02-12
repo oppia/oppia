@@ -25,7 +25,6 @@ from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
 from core.controllers import home
-from core.controllers import logout
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
@@ -323,7 +322,7 @@ urls = [
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
 
     get_redirect_route(
-        r'/logout', logout.LogoutPage, 'logout_page_handler'),
+        r'/logout', base.LogoutPage, 'logout_page_handler'),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),

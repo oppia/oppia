@@ -61,7 +61,8 @@
         ALL_LANGUAGE_CODES: JSON.parse(
           '{{ALL_LANGUAGE_CODES|js_string}}'),
         DEFAULT_LANGUAGE_CODE: JSON.parse(
-          '{{DEFAULT_LANGUAGE_CODE|js_string}}')
+          '{{DEFAULT_LANGUAGE_CODE|js_string}}'),
+        userIsLoggedIn: JSON.parse('{{user_is_logged_in|js_string}}')
       };
 
       {% if additional_angular_modules %}
@@ -103,14 +104,10 @@
                       {% endblock navbar_breadcrumb %}
 
                       <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px; margin-right: 0;">
-                        {% if user_email %}
+                        {% if username %}
                           <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown">
-                              {% if username %}
-                                {{username}}
-                              {% else %}
-                                {{user_email}}
-                              {% endif %}
+                              {{username}}
 
                               {% if is_admin %}
                                 (Admin)
@@ -120,31 +117,29 @@
                               <span class="caret"></span>
                             </a>
                             <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-                              {% if username %}
-                                <li>
-                                  <a href="/profile/{{username}}">Profile</a>
-                                </li>
-                                <li>
-                                  <a href="/preferences">Preferences</a>
-                                </li>
-                                <li>
-                                  <a href="/dashboard">Dashboard</a>
-                                </li>
+                              <li>
+                                <a href="/profile/{{username}}">Profile</a>
+                              </li>
+                              <li>
+                                <a href="/preferences">Preferences</a>
+                              </li>
+                              <li>
+                                <a href="/dashboard">Dashboard</a>
+                              </li>
 
-                                {% if is_moderator %}
-                                  <li>
-                                    <a href="/moderator" target="_blank">
-                                      Moderator Page
-                                    </a>
-                                  </li>
-                                {% endif %}
-                                {% if is_super_admin %}
-                                  <li>
-                                    <a href="/admin" target="_blank">
-                                      Admin Page
-                                    </a>
-                                  </li>
-                                {% endif %}
+                              {% if is_moderator %}
+                                <li>
+                                  <a href="/moderator" target="_blank">
+                                    Moderator Page
+                                  </a>
+                                </li>
+                              {% endif %}
+                              {% if is_super_admin %}
+                                <li>
+                                  <a href="/admin" target="_blank">
+                                    Admin Page
+                                  </a>
+                                </li>
                               {% endif %}
                               <li>
                                 <a href="{{logout_url}}">Logout</a>

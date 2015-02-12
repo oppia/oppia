@@ -127,7 +127,6 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
 
         self.signup(self.MODERATOR_EMAIL, self.MODERATOR_USERNAME)
         self.signup('superadmin@example.com', 'superadm1n')
-        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.signup(BOTH_MODERATOR_AND_ADMIN_EMAIL, 'moderatorandadm1n')
 
         # Navigate to any page. The role is not set.
