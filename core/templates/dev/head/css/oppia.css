@@ -490,67 +490,41 @@ div.wysiwyg iframe.wysiwyg-content-large {
   -webkit-animation-delay: 0.6s;
 }
 
-.oppia-light-border-right {
-  border-right: 1px solid #bbb;
+.oppia-gallery-navbar-button-container {
+  margin-top: 8px;
 }
 
-/* Gallery sidebar menu for small screens. Includes animation. */
-.oppia-gallery-sidebar {
-  float: left;
-  height: 100%;
-  min-height: 700px;
-  -moz-transition: all 0.5s;
-  -ms-transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+.btn.oppia-gallery-add-exploration-button {
+  background-color: rgb(5, 190, 178);
+  color: white;
+  padding: 3px 12px;
 }
-.oppia-gallery-sidebar.oppia-gallery-sidebar-active {
-  width: 50%;
-  max-width: 170px;
+.oppia-gallery-add-exploration-button-plus {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-right: 5px;
+  vertical-align: middle;
 }
 
-.oppia-gallery-main {
-  float: left;
-  -moz-transition: all 0.5s;
-  -ms-transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+.oppia-gallery-tiles-introduction {
+  font-size: 1.2em;
+  padding-bottom: 20px;
+  padding-top: 10px;
 }
-.oppia-gallery-main.oppia-gallery-sidebar-active {
-  width: 45%;
-}
-
-.oppia-gallery-menu {
-  float: left;
-  min-height: 600px;
-  padding: 0 15px 0 15px;
-  width: 150px;
-}
-.oppia-gallery-menu.ng-enter {
-  opacity: 0;
-  -moz-transition: all 0.2s linear 0.2s;
-  -ms-transition: all 0.2s linear 0.2s;
-  -webkit-transition: all 0.2s linear 0.2s;
-  -o-transition: all 0.2s linear 0.2s;
-  transition: all 0.2s linear 0.2s;
-}
-.oppia-gallery-menu.ng-enter.ng-enter-active {
-  opacity: 1;
-}
-
 .oppia-gallery-tiles-container {
-  border-radius: 3px;
   height: 100%;
-  /* This is the same as the min-height in .oppia-gallery-menu. */
-  min-height: 600px;
+  margin-left: 160px;
+  margin-right: 160px;
+  max-width: 900px;
+  min-height: 500px;
+  padding-top: 25px;
 }
 
-.oppia-gallery-tile {
+md-card.oppia-gallery-tile {
   background-color: #fff;
   border: 1px solid #b3b3b3;
-  margin-bottom: 20px;
+  height: 96px;
+  margin: -1px 0;
   padding: 0;
   width: 100%;
 }
@@ -559,16 +533,22 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tile-image-container {
+  height: 96px;
+  left: 0;
+  max-width: 96px;
   position: relative;
+  top: 0;
+  width: 96px;
 }
 /* This centers the image horizontally and vertically. */
 .oppia-gallery-tile-image {
   bottom: 0;
+  height: 96px;
   left: 0;
   margin: auto;
-  position: absolute;
   right: 0;
   top: 0;
+  width: 96px;
 }
 
 .oppia-gallery-tile-image-translucent {
@@ -590,51 +570,30 @@ div.wysiwyg iframe.wysiwyg-content-large {
   background-color: #607d8b;
 }
 
-.oppia-gallery-tile-details-container {
-  margin-left: 8px;
-  padding: 8px;
+.oppia-gallery-tile-container {
+  color: #888;
+  padding: 15px 50px;
   position: relative;
+  width: 100%;
 }
-.oppia-gallery-tile-details:hover {
+.oppia-gallery-tile-contents:hover {
   text-decoration: none;
 }
 
+.oppia-gallery-tile-details {
+  padding-left: 85px;
+}
+.oppia-gallery-tile-first-row {
+  font-size: 120%;
+  margin-bottom: 8px;
+}
 .oppia-gallery-tile-title {
   color: #333;
-  font-size: 150%;
-  font-weight: bold;
-  margin-top: 10px;
-}
-.oppia-gallery-tile-objective {
-  color: #555;
-  font-size: 120%;
   font-weight: bold;
 }
-.oppia-gallery-tile-tags {
-  margin-left: -5px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-.oppia-gallery-tile-tag {
-  background-color: #607d8b;
-  border-radius: 0.7em;
-  color: #eee;
-  display: inline;
+
+.oppia-gallery-tile-second-row {
   font-size: 90%;
-  font-weight: bold;
-  line-height: 1;
-  padding: .3em 1em .4em;
-  text-align: center;
-  vertical-align: baseline;
-  white-space: nowrap;
-}
-.oppia-gallery-tile-metadata {
-  color: #666;
-  line-height: 1;
-}
-.oppia-gallery-tile-rating {
-  float: right;
-  margin-right: 20px;
 }
 
 .oppia-gallery-edit-btn {
@@ -642,7 +601,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   font-size: 12px;
   margin-top: 10px;
   position: absolute;
-  right: 7px;
+  right: -1px;
   top: -11px;
 }
 .oppia-gallery-edit-btn:hover {
@@ -1071,40 +1030,6 @@ oppia-parameter {
 
 /* Splash page. */
 
-.oppia-gallery-banner {
-  background-image: url("/images/banner.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 500px;
-  width: 100%;
-}
-.oppia-gallery-banner-content {
-  color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 100px;
-  text-align: center;
-  width: 450px;
-}
-.oppia-gallery-banner-link {
-  color: rgba(251, 234, 43, 0.9);
-}
-.oppia-gallery-banner-link:hover {
-  color: rgba(251, 234, 43, 1.0);
-  text-decoration: none;
-}
-
-.oppia-gallery-interstitial {
-  background: -webkit-gradient(linear, 50 0, 50 50, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
-  font-size: 1.3em;
-  height: 150px;
-  margin-top: -50px;
-  padding-top: 50px;
-  text-align: center;
-  width: 100%;
-}
-
 .oppia-splash-search-input {
   background: #04857c;
   border: 1px solid #018c7f;
@@ -1169,6 +1094,40 @@ oppia-parameter {
   animation-duration: 1000ms;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
+}
+
+.oppia-gallery-banner {
+  background-image: url("/images/banner.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 500px;
+  width: 100%;
+}
+.oppia-gallery-banner-content {
+  color: #fff;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 100px;
+  text-align: center;
+  width: 450px;
+}
+.oppia-gallery-banner-link {
+  color: rgba(251, 234, 43, 0.9);
+}
+.oppia-gallery-banner-link:hover {
+  color: rgba(251, 234, 43, 1.0);
+  text-decoration: none;
+}
+
+.oppia-gallery-interstitial {
+  background: -webkit-gradient(linear, 50 0, 50 50, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
+  font-size: 1.3em;
+  height: 150px;
+  margin-top: -50px;
+  padding-top: 50px;
+  text-align: center;
+  width: 100%;
 }
 
 oppia-expression-error-tag {

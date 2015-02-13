@@ -29,7 +29,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response = self.testapp.get('/')
         self.assertEqual(response.status_int, 200)
         response.mustcontain(
-            'Hi, I\'m Oppia.',
+            'Your personal tutor',
             'Oppia - Gallery', 'About', 'Login',
             # No navbar tabs should be highlighted.
             no=['class="active"', 'Logout', 'Dashboard'])
@@ -58,7 +58,7 @@ class HomePageTest(test_utils.GenericTestBase):
         response.mustcontain(
             'Dashboard', 'Logout',
             self.get_expected_logout_url('/'),
-            no=['Login', 'Hi, I\'m Oppia.',
+            no=['Login', 'Your personal tutor',
                 self.get_expected_login_url('/')])
         self.logout()
 

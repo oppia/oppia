@@ -29,7 +29,6 @@ from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
 (exp_models,) = models.Registry.import_models([models.NAMES.exploration])
-import feconf
 import utils
 
 

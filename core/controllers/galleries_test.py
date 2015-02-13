@@ -217,13 +217,13 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['Upload Existing Exploration'])
+        response.mustcontain(no=['Upload Exploration'])
 
         config_services.set_property(
             feconf.ADMIN_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('Upload Existing Exploration')
+        response.mustcontain('Upload Exploration')
 
         self.logout()

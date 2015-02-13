@@ -42,15 +42,6 @@ describe('Gallery controller', function() {
           community_owned: false,
           status: 'public'
         }, {
-          id: '3',
-          title: 'Geography 2',
-          category: 'Geography',
-          objective: 'can view more maps',
-          language: 'español',
-          last_updated: 12345678912345,
-          community_owned: false,
-          status: 'public'
-        }, {
           id: '6',
           title: 'My Exploration',
           category: 'Personal',
@@ -60,7 +51,16 @@ describe('Gallery controller', function() {
           community_owned: false,
           status: 'public'
         }],
-        'featured': [],
+        'featured': [{
+          id: '3',
+          title: 'Geography 2',
+          category: 'Geography',
+          objective: 'can view more maps',
+          language: 'español',
+          last_updated: 12345678912345,
+          community_owned: false,
+          status: 'featured'
+        }],
         'preferred_language_codes': ['en']
       });
 
@@ -86,13 +86,11 @@ describe('Gallery controller', function() {
       });
     }));
 
-    it('should show correct categories', function() {
+    it('should show correct explorations', function() {
       $httpBackend.flush();
-      expect(scope.selectedCategories).toEqual({
-        'Geography': true,
-        'Personal': true
-      });
-      expect(scope.selectedLanguageCodes).toEqual(['en']);
+      expect(scope.allExplorationsInOrder.length).toEqual(3);
+      // The featured one should come first.
+      expect(scope.allExplorationsInOrder[0].id).toEqual('3');
     });
   });
 });

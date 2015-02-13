@@ -30,7 +30,7 @@
     <noscript>
       <meta http-equiv="refresh" content="1;url=/static/pages/noscript.txt">
     </noscript>
-    <meta charset=utf-8>
+    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
     <link rel="apple-touch-icon" href="/images/logo.png">
@@ -90,7 +90,7 @@
               <nav class="navbar navbar-default oppia-navbar oppia-prevent-selection" role="navigation">
                 <div class="navbar-container">
                   <div>
-                    <div class="navbar-header protractor-test-navbar-header" ng-if="!screenIsLarge">
+                    <div class="navbar-header protractor-test-navbar-header">
                       <a ng-click="openSidebar()" class="navbar-brand oppia-navbar-menu">
                         <img src="/images/menu.png">
                       </a>
@@ -99,10 +99,10 @@
                       </a>
                     </div>
 
-                    <div class="collapse navbar-collapse">
-                      {% block navbar_breadcrumb %}
-                      {% endblock navbar_breadcrumb %}
+                    {% block navbar_breadcrumb %}
+                    {% endblock navbar_breadcrumb %}
 
+                    <div class="collapse navbar-collapse">
                       <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px; margin-right: 0;">
                         {% if username %}
                           <li class="dropdown">

@@ -9,9 +9,33 @@
 
 {% block local_top_nav_options %}
   <div ng-controller="SearchBar">
-    <form class="navbar-form navbar-left" role="search">
+    <div class="hidden-xs pull-right oppia-gallery-navbar-button-container">
+      <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
+      {% if not user_email %}
+        <!-- User must log in. -->
+        <a class="btn oppia-gallery-add-exploration-button protractor-test-create-exploration"
+           href="{{gallery_login_redirect_url}}">
+          <span class="oppia-gallery-add-exploration-button-plus">+</span>
+          <span style="vertical-align: middle;">Create Exploration</span>
+        </a>
+      {% else %}
+        <a class="btn oppia-gallery-add-exploration-button protractor-test-create-exploration"
+           ng-click="showCreateExplorationModal()">
+          <span class="oppia-gallery-add-exploration-button-plus">+</span>
+          <span style="vertical-align: middle;">Create Exploration</span>
+        </a>
+        {% if allow_yaml_file_upload %}
+          <a class="btn oppia-gallery-add-exploration-button"
+             ng-click="showUploadExplorationModal()">
+            <span style="vertical-align: middle;">Upload Exploration</span>
+          </a>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <form class="navbar-form navbar-left" role="search" style="padding-right: 0;">
       <div class="form-group">
-        <div class="input-group" style="max-width: 280px;">
+        <div class="input-group" style="max-width: 260px;">
           <div class="input-group-addon oppia-splash-search-icon">
             <span class="glyphicon"
                   ng-class="{'glyphicon-search': !searchIsLoading,
@@ -23,6 +47,38 @@
         </div>
       </div>
     </form>
+
+    <div dropdown class="dropdown navbar-left oppia-gallery-navbar-button-container hidden-xs">
+      <button dropdown-toggle type="button" class="btn btn-primary dropdown-toggle oppia-splash-search-input ng-cloak"
+              title="<[selectionDetails.categories.description]>">
+        <[selectionDetails.categories.summary]>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
+        <li ng-repeat="item in selectionDetails.categories.masterList track by $index">
+          <a href ng-click="toggleSelection('categories', item.id)">
+            <[item.text]>
+            <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div dropdown class="dropdown navbar-left oppia-gallery-navbar-button-container hidden-xs protractor-test-gallery-language-selector">
+      <button dropdown-toggle type="button" class="btn btn-primary dropdown-toggle oppia-splash-search-input ng-cloak"
+              title="<[selectionDetails.languageCodes.description]>">
+        <[selectionDetails.languageCodes.summary]>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
+        <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index">
+          <a href ng-click="toggleSelection('languageCodes', item.id)">
+            <[item.text]>
+            <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
+          </a>
+        </li>
+      </ul>
+    </div>
   </div>
 {% endblock %}
 
@@ -32,11 +88,17 @@
     GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
       '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
   </script>
+
+  <style>
+    html, body {
+      background-color: #eeedee;
+    }
+  </style>
 {% endblock header_js %}
 
 {% block content %}
   <div ng-controller="Gallery">
-    <div ng-if="showBannerImage">
+    <div ng-if="inSplashMode">
       <div class="oppia-gallery-banner">
         <div class="oppia-gallery-banner-content">
           <div style="font-size: 36px;">
@@ -57,174 +119,89 @@
       </div>
     </div>
 
-    <div class="container-fluid" style="background-color: #eeedee;">
-      <div class="oppia-main-content">
-        <div class="row">
-          <div class="col-lg-3 col-md-3 col-sm-3 col-xs-1 oppia-gallery-sidebar oppia-light-border-right" ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
-            <div class="visible-xs">
-              <div ng-if="!gallerySidebarIsActive">
-                <button ng-click="toggleGallerySidebar()" class="pull-right">
-                  <span class="glyphicon glyphicon-chevron-right">
-                  </span>
-                </button>
-              </div>
+    <div>
+      <div class="oppia-gallery-tiles-container">
+        <div ng-if="allExplorationsInOrder.length === 0">
+          <em>
+            We don't have any explorations on this topic yet.
+          </em>
+          <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
+          {% if not user_email %}
+            <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
+          {% else %}
+            <a ng-click="showCreateExplorationModal()">Would you like to create one?</a>
+          {% endif %}
+        </div>
 
-              <div ng-if="gallerySidebarIsActive">
-                <button ng-click="toggleGallerySidebar()" class="pull-right">
-                  <span class="glyphicon glyphicon-chevron-left">
-                  </span>
-                </button>
-              </div>
-            </div>
+        <div ng-if="inSplashMode && allExplorationsInOrder.length > 0" class="oppia-gallery-tiles-introduction">
+          <span>
+            Here are some explorations that the Oppia community has created:
+          </span>
+        </div>
 
-            <div class="oppia-gallery-menu" ng-if="gallerySidebarIsActive || screenIsLarge">
-              <h3>Languages</h3>
-              <!-- Without the ng-if, the value of the select2-dropdown directive will fail to change after the initial load. -->
-              <div ng-if="!loadingMessage">
-                <select2-dropdown choices="LANGUAGE_CHOICES" item="$parent.$parent.selectedLanguageCodes"
-                                  allow-multiple-choices="true" new-choice-regex=".^" width="200"
-                                  placeholder="Filter by language..."
-                                  class="protractor-test-gallery-language-selector"
-                                  on-selection-change="onLanguageCodeSelectionChange()">
-                </select2-dropdown>
-              </div>
-
-              <br>
-
-              <h3>Categories</h3>
-              <checkbox-group all-categories-label="All categories" model="selectedCategories">
-              </checkbox-group>
-            </div>
-          </div>
-
-          <div class="col-lg-8 col-md-8 col-sm-8 col-xs-10 oppia-gallery-main"
-               ng-class="{'oppia-gallery-sidebar-active': gallerySidebarIsActive}">
-            <div class="tab-content oppia-gallery-tiles-container">
-              <div ng-if="(allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguageCodesFilter:selectedLanguageCodes).length === 0">
-                <div>
-                  <em>
-                    We don't have any explorations on this topic yet.
-                  </em>
-                  <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
-                  {% if not user_email %}
-                    <a href="{{gallery_login_redirect_url}}">Would you like to create one?</a>
-                  {% else %}
-                    <a ng-click="showCreateExplorationModal(getCategoryList())">Would you like to create one?</a>
-                  {% endif %}
-                </div>
-              </div>
-
-              <div class="hidden-xs pull-right" style="padding-bottom: 10px;">
-                <!-- NOTE: If you change the links here, please make the corresponding change in the 'no results' message. -->
-                {% if not user_email %}
-                  <!-- User must log in. -->
-                  <a class="btn btn-success protractor-test-create-exploration" href="{{gallery_login_redirect_url}}">
-                    Create New Exploration
+        <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
+             infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
+          <div ng-repeat="exploration in allExplorationsInOrder track by $index">
+            <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
+              <div class="oppia-gallery-tile-container">
+                <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
+                   ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
+                  <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
+                        title="Edit this exploration"></span>
+                  Edit
+                </a>
+                {% if is_moderator %}
+                  <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
+                     ng-if="!exploration.is_editable && currentUserIsModerator"
+                     ng-href="/create/<[exploration.id]>">
+                    <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
+                          title="Edit (as moderator)"></span>
+                    Edit (as moderator)
                   </a>
-                {% else %}
-                  <a class="btn btn-success protractor-test-create-exploration"
-                     ng-click="showCreateExplorationModal(getCategoryList())">
-                    Create New Exploration
-                  </a>
-                  {% if allow_yaml_file_upload %}
-                    <a class="btn btn-default btn-lg"
-                       ng-click="showUploadExplorationModal(getCategoryList())">
-                      Upload Existing Exploration
-                    </a>
-                  {% endif %}
                 {% endif %}
-              </div>
 
-              <!-- This fixes the 'float bug' in Firefox. Without this line, the "Create New Exploration" button will overlap the top-right of the exploration card, making it unclickable. -->
-              <div style="clear: both"></div>
+                <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-contents">
+                  <span class="oppia-gallery-tile-image-container"
+                        ng-class="getImageContainerClass(exploration)"
+                        style="position: absolute;">
+                    <!-- TODO(sll): Make the default image higher-res. -->
+                    <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>">
+                  </span>
 
-              <div infinite-scroll="showMoreExplorations()" infinite-scroll-distance="1"
-                   infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
-                <div ng-repeat="exploration in allExplorationsInOrder | selectedCategoriesFilter:selectedCategories:'category' | selectedLanguageCodesFilter:selectedLanguageCodes track by $index">
-                  <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
-                    <a class="oppia-gallery-tile-image-container" flex="25" href="/explore/<[exploration.id]>"
-                       ng-class="getImageContainerClass(exploration)">
-                      <!-- TODO(sll): Make the default image higher-res. -->
-                      <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>"
-                           height="128" width="128">
-                    </a>
-                    <div flex="75" class="oppia-gallery-tile-details-container">
-                      <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
-                         ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
-                        <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                              title="Edit this exploration"></span>
-                        Edit
-                      </a>
-                      {% if is_moderator %}
-                        <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
-                           ng-if="!exploration.is_editable && currentUserIsModerator"
-                           ng-href="/create/<[exploration.id]>">
-                          <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                                title="Edit (as moderator)"></span>
-                          Edit (as moderator)
-                        </a>
-                      {% endif %}
+                  <div class="oppia-gallery-tile-details">
+                    <div class="oppia-gallery-tile-first-row">
+                      <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
+                        <[exploration.title]>
+                      </span>
+                      <span ng-if="exploration.objective" class="protractor-test-exploration-objective">
+                        <span style="font-weight: bold;">&middot;</span>
+                        <span style="color: #888">
+                          <[getFormattedObjective(exploration.objective)]>
+                        </span>
+                      </span>
+                    </div>
 
-                      <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-details">
-                        <div class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
-                          <[exploration.title]>
-                        </div>
-
-                        <div class="oppia-gallery-tile-objective">
-                          <span ng-if="exploration.objective" class="protractor-test-exploration-objective">
-                            <[getFormattedObjective(exploration.objective)]>
-                          </span>
-                          <span ng-if="!exploration.objective">
-                            <em>No objective specified.</em>
-                          </span>
-                        </div>
-
-                        <div class="oppia-gallery-tile-tags">
-                          <span class="label label-info oppia-gallery-tile-tag">
-                            <[exploration.category]>
-                          </span>
-                        </div>
-
-                        <div class="oppia-gallery-tile-metadata">
-                          <span class="oppia-gallery-tile-last-updated"
-                                ng-if="!gallerySidebarIsActive || screenIsLarge">
-                            Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                          </span>
-                          <span class="oppia-gallery-tile-rating">
-                            <span ng-if="exploration.status === 'publicized'">
-                              Featured
-                              <span class="glyphicon glyphicon-star"></span>
-                            </span>
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </md-card>
+                    <div class="oppia-gallery-tile-second-row">
+                      <span ng-if="exploration.status === 'publicized'" style="color: #888">
+                        Featured
+                        <span class="glyphicon glyphicon-star"></span>
+                        <span style="font-weight: bold;">&middot;</span>
+                      </span>
+                      <span style="color: #888">
+                        <strong><[exploration.category]></strong>
+                        <span style="font-weight: bold;">&middot;</span>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                      </span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              </a>
+            </md-card>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <script type="text/ng-template" id="checkboxGroup/master">
-    <ul class="nav nav-pills nav-stacked">
-      <li class="checkbox">
-        <label>
-          <input type="checkbox" ng-model="allCategoriesSelected" ng-change="onChangeSelection(true)">
-          <strong><[allCategoriesLabel]></strong>
-        </label>
-      </li>
-      <li ng-repeat="(category, status) in model" class="checkbox protractor-test-gallery-category">
-        <label>
-          <input type="checkbox" ng-model="individualCategoryCheckboxStatuses[category]" ng-change="onChangeSelection(false)" class="protractor-test-gallery-checkbox">
-          <[category]>
-        </label>
-      </li>
-    </ul>
-  </script>
 
   {% include 'components/exploration_creation_button.html' %}
 {% endblock %}

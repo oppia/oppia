@@ -442,9 +442,12 @@ class ExplorationRightsHandler(EditorHandler):
 
                 rights_manager.publish_exploration(
                     self.user_id, exploration_id)
+                exp_services.index_explorations_given_ids([exploration_id])
             else:
                 rights_manager.unpublish_exploration(
                     self.user_id, exploration_id)
+                exp_services.delete_documents_from_search_index([
+                    exploration_id])
 
         elif is_publicized is not None:
             exploration = exp_services.get_exploration_by_id(exploration_id)

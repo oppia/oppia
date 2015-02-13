@@ -646,8 +646,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
     #delete the exploration from search.
-    search_services.delete_documents_from_index([exploration_id],
-                                                SEARCH_INDEX_EXPLORATIONS)
+    delete_documents_from_search_index([exploration_id])
 
     # delete summary of exploration
     delete_exploration_summary(exploration_id, force_deletion=force_deletion)
@@ -1054,11 +1053,15 @@ def patch_exploration_search_document(exp_id, update):
 def update_exploration_status_in_search(exp_id):
     rights = rights_manager.get_exploration_rights(exp_id)
     if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
-        search_services.delete_documents_from_index(
-            [exp_id], SEARCH_INDEX_EXPLORATIONS)
+        delete_documents_from_search_index([exp_id])
     else:
         patch_exploration_search_document(
             rights.id, _exp_rights_to_search_dict(rights))
+
+
+def delete_documents_from_search_index(exploration_ids):
+    search_services.delete_documents_from_index(
+        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
 
 
 def search_explorations(
