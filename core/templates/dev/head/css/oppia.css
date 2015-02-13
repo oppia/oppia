@@ -206,7 +206,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: white;
   height: 100%;
   left: 0;
-  position: absolute;
+  position: fixed;
   top: 0;
   -webkit-transform: translate3d(-100%, 0, 0);
   transform: translate3d(-100%, 0, 0);
