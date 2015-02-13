@@ -1097,7 +1097,6 @@ oppia-parameter {
 }
 
 .oppia-gallery-banner {
-  background-image: url("/images/banner.png");
   background-repeat: no-repeat;
   background-size: cover;
   height: 500px;
@@ -1121,11 +1120,12 @@ oppia-parameter {
 }
 
 .oppia-gallery-interstitial {
-  background: -webkit-gradient(linear, 50 0, 50 50, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
+  background: -webkit-gradient(linear, 30 0, 30 30, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
   font-size: 1.3em;
-  height: 150px;
-  margin-top: -50px;
+  height: 120px;
+  margin-top: -25px;
   padding-top: 50px;
+  position: relative;
   text-align: center;
   width: 100%;
 }

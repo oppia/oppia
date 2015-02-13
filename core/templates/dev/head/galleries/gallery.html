@@ -99,17 +99,24 @@
 {% block content %}
   <div ng-controller="Gallery">
     <div ng-if="inSplashMode">
-      <div class="oppia-gallery-banner">
-        <div class="oppia-gallery-banner-content">
-          <div style="font-size: 36px;">
-            Hi, I&rsquo;m Oppia.
+      <carousel interval="CAROUSEL_INTERVAL">
+        <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
+          <div class="oppia-gallery-banner" style="background-image: url(<[slide.imageUrl]>);">
+            <div class="oppia-gallery-banner-content">
+              <div style="font-size: 36px;">
+                Hi, I&rsquo;m Oppia.
+              </div>
+              <br>
+              <div style="font-size: 20px;">
+                Your personal tutor for
+                <a ng-href="/explore/<[slide.explorationId]>" class="oppia-gallery-banner-link">
+                  <[slide.explorationSubject]>
+                </a>
+              </div>
+            </div>
           </div>
-          <br>
-          <div style="font-size: 20px;">
-            Your personal tutor for <a class="oppia-gallery-banner-link">astronomy</a>
-          </div>
-        </div>
-      </div>
+        </slide>
+      </carousel>
 
       <div class="oppia-gallery-interstitial">
         <img src="/images/oppia_favicon_black.png" style="width: 32px; height: 32px;">
