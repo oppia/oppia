@@ -17,7 +17,8 @@
                            allow-expressions="allowExpressions()"
                            validators="schema().validators"
                            label-for-focus-target="labelForFocusTarget()"
-                           on-input-blur="onInputBlur">
+                           on-input-blur="onInputBlur"
+                           on-input-focus="onInputFocus">
   </schema-based-int-editor>
 
   <schema-based-float-editor ng-if="schema().type === 'float' && !schema().choices"
@@ -25,7 +26,8 @@
                              allow-expressions="allowExpressions()"
                              validators="schema().validators"
                              label-for-focus-target="labelForFocusTarget()"
-                             on-input-blur="onInputBlur">
+                             on-input-blur="onInputBlur"
+                             on-input-focus="onInputFocus">
   </schema-based-float-editor>
 
   <schema-based-unicode-editor ng-if="schema().type === 'unicode' && !schema().choices"
@@ -33,7 +35,8 @@
                                validators="schema().validators" ui-config="schema().ui_config"
                                allow-expressions="allowExpressions()"
                                label-for-focus-target="labelForFocusTarget()"
-                               on-input-blur="onInputBlur">
+                               on-input-blur="onInputBlur"
+                               on-input-focus="onInputFocus">
   </schema-based-unicode-editor>
 
   <schema-based-html-editor ng-if="schema().type === 'html' && !schema().choices"
@@ -105,7 +108,8 @@
       <md-input-group class="long md-default-theme">
         <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
                required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
-               on-input-blur="onInputBlur()">
+               on-input-blur="onInputBlur()"
+               on-input-focus="onInputFocus()">
       </md-input-group>
     </span>
 
@@ -134,7 +138,8 @@
           <input type="text" name="floatValue" ng-model="$parent.localValue"
                  require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
                  focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
-                 on-input-blur="onInputBlur()">
+                 on-input-blur="onInputBlur()"
+                 on-input-focus="onInputFocus()">
         </md-input-group>
       </span>
 
@@ -175,13 +180,14 @@
               placeholder="<[getPlaceholder()]>"
               ng-disabled="isDisabled()"
               class="form-control" focus-on="<[labelForFocusTarget()]>"
-              ng-blur="onInputBlur()">
+              ng-blur="onInputBlur()"
+              ng-focus="onInputFocus()">
     </textarea>
 
     <md-input-group class="long md-default-theme" ng-if="!getCodingMode() && !getRows()">
       <input ng-disabled="isDisabled()" ng-model="$parent.$parent.localValue" type="text"
-             ng-blur="onInputBlur()" focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)" 
-             placeholder="<[getPlaceholder()]>" style="padding-top: 20px;">
+             ng-blur="onInputBlur()" ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>" 
+             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" style="padding-top: 20px;">
     </md-input-group>
 
     <!-- Note that we do not yet support ng-blur for the code editor. -->
@@ -243,7 +249,8 @@
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
                              label-for-focus-target="getFocusLabel($index)"
-                             on-input-blur="($last ? deleteLastElementIfUndefined : null)">
+                             on-input-blur="($last ? lastElementOnBlur : showAddItemButton)"
+                             on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
       </td>
       <td ng-if="!len && (!minListLength || localValue.length > minListLength)">
@@ -257,11 +264,13 @@
   </table>
 
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
-  <button ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
-          type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
-          ng-disabled="isDisabled()" style="margin-left: 0;">
-    <[addElementText]>
-  </button>
+  <div style="height: 30px;">
+    <button ng-show="isAddItemButtonPresent" ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
+            type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
+            ng-disabled="isDisabled()" style="margin-left: 0;">
+      <[addElementText]>
+    </button>
+  </div>
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/custom">

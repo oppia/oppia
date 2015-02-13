@@ -954,7 +954,8 @@ oppia.directive('schemaBasedEditor', [function() {
       localValue: '=',
       allowExpressions: '&',
       labelForFocusTarget: '&',
-      onInputBlur: '='
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/master',
     restrict: 'E'
@@ -1036,7 +1037,8 @@ oppia.directive('schemaBasedIntEditor', [function() {
       allowExpressions: '&',
       validators: '&',
       labelForFocusTarget: '&',
-      onInputBlur: '='
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/int',
     restrict: 'E',
@@ -1076,7 +1078,8 @@ oppia.directive('schemaBasedFloatEditor', [function() {
       allowExpressions: '&',
       validators: '&',
       labelForFocusTarget: '&',
-      onInputBlur: '='
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
@@ -1134,7 +1137,8 @@ oppia.directive('schemaBasedUnicodeEditor', [function() {
       uiConfig: '&',
       allowExpressions: '&',
       labelForFocusTarget: '&',
-      onInputBlur: '='
+      onInputBlur: '=',
+      onInputFocus: '='
     },
     templateUrl: 'schemaBasedEditor/unicode',
     restrict: 'E',
@@ -1283,6 +1287,7 @@ oppia.directive('schemaBasedListEditor', [
         return index === 0 ? baseFocusLabel : baseFocusLabel + index.toString();
       }
 
+      $scope.isAddItemButtonPresent = true;
       $scope.addElementText = 'Add element';
       if ($scope.uiConfig() && $scope.uiConfig().add_element_text) {
         $scope.addElementText = $scope.uiConfig().add_element_text;
@@ -1307,6 +1312,7 @@ oppia.directive('schemaBasedListEditor', [
 
       if ($scope.len === undefined) {
         $scope.addElement = function() {
+          $scope.hideAddItemButton();
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
@@ -1320,6 +1326,19 @@ oppia.directive('schemaBasedListEditor', [
             $scope.deleteElement(lastValueIndex);
           }
         };
+
+        $scope.lastElementOnBlur = function() {
+          $scope.deleteLastElementIfUndefined();
+          $scope.showAddItemButton();
+        } 
+
+        $scope.showAddItemButton = function() {
+          $scope.isAddItemButtonPresent = true;
+        } 
+
+        $scope.hideAddItemButton = function() {
+          $scope.isAddItemButtonPresent = false;
+        }
 
         $scope._onChildFormSubmit = function(evt) {
           if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
