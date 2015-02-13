@@ -35,13 +35,13 @@ oppia.directive('imageWithRegionsEditor', [
         $scope.REGION_LABEL_OFFSET_X = 6;
         $scope.REGION_LABEL_OFFSET_Y = 18;
         $scope.REGION_LABEL_STYLE = 'fill: white; font-size: large;';
+        $scope.SELECTED_REGION_STYLE = 'fill: orange; opacity: 0.5;';
+        $scope.UNSELECTED_REGION_STYLE = 'fill: blue; opacity: 0.5;';
         $scope.getRegionStyle = function(index) {
-          var SELECTED_REGION_STYLE = 'fill: orange; opacity: 0.5;';
-          var UNSELECTED_REGION_STYLE = 'fill: blue; opacity: 0.5;';
           if (index === $scope.selectedRegion) {
-            return SELECTED_REGION_STYLE;
+            return $scope.SELECTED_REGION_STYLE;
           } else {
-            return UNSELECTED_REGION_STYLE;
+            return $scope.UNSELECTED_REGION_STYLE;
           }
         };
 
@@ -91,7 +91,7 @@ oppia.directive('imageWithRegionsEditor', [
         
         // Calculates the dimensions of the image, assuming that the width
         // of the image is scaled down to fit the svg element if necessary
-        function calculateImageDimensions() {
+        var _calculateImageDimensions = function() {
           if (needRecalculateImageDimensions) {
             var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
             this.displayedImageWidth = Math.min(svgElement.width(), originalImageWidth);
@@ -105,14 +105,14 @@ oppia.directive('imageWithRegionsEditor', [
           };
         };
         // Previously calculated image width and height
-        calculateImageDimensions.displayedImageWidth = 0;
-        calculateImageDimensions.displayedImageHeight = 0;
+        _calculateImageDimensions.displayedImageWidth = 0;
+        _calculateImageDimensions.displayedImageHeight = 0;
         // Use these two functions to get the calculated image width and height
         $scope.getImageWidth = function() {
-          return calculateImageDimensions().width;
+          return _calculateImageDimensions().width;
         };
         $scope.getImageHeight = function() {
-          return calculateImageDimensions().height;
+          return _calculateImageDimensions().height;
         };
 
         $scope.getPreviewUrl = function(imageUrl) {
@@ -122,20 +122,21 @@ oppia.directive('imageWithRegionsEditor', [
           );
         };
 
+        // Called when the image is changed to calculate the required
+        // width and height, especially for large images
         $scope.$watch('$parent.value.imagePath', function(newVal) {
-          if (newVal === '') {
-            return;
+          if (newVal !== '') {
+            // Loads the image in hanging <img> tag so as to get the
+            // width and height
+            $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
+              function() {
+                originalImageWidth = this.width;
+                originalImageHeight = this.height;
+                needRecalculateImageDimensions = true;
+                $scope.$apply();
+              }
+            );
           }
-          // Loads the image in hanging <img> tag so as to get the
-          // width and height
-          $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
-            function() {
-              originalImageWidth = this.width;
-              originalImageHeight = this.height;
-              needRecalculateImageDimensions = true;
-              $scope.$apply();
-            }
-          );
         });
 
         function hasDuplicates(originalArray) {
@@ -236,6 +237,8 @@ oppia.directive('imageWithRegionsEditor', [
                   return region.label;
                 }
               );
+              // Searches numbers starting from 1 to find a valid label
+              // that doesn't overlap with currently existing labels
               var newLabel = null;
               for (var i = 1; i <= labels.length + 1; i++) {
                 if (labels.indexOf(i.toString()) === -1) {
@@ -292,11 +295,7 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.regionDrawMode = true;
         };
         $scope.getCursorStyle = function() {
-          if ($scope.regionDrawMode) {
-            return 'crosshair';
-          } else {
-            return 'default';
-          }
+          return ($scope.regionDrawMode) ? 'crosshair' : 'default';
         };
 
         $scope.resetEditor = function() {
@@ -304,7 +303,6 @@ oppia.directive('imageWithRegionsEditor', [
           $scope.$parent.value.labeledRegions = [];
         };
         $scope.deleteRegion = function(index) {
-          console.log(index);
           if ($scope.selectedRegion === index) {
             $scope.selectedRegion = null;
           } else if ($scope.selectedRegion > index) {
