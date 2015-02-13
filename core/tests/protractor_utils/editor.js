@@ -224,6 +224,7 @@ var addRule = function(interactionName, ruleName) {
   }
   _selectRule.apply(null, args);
   element(by.css('.protractor-test-add-new-rule')).click();
+  general.waitForSystem();
 };
 
 // Rules are zero-indexed; 'default' denotes the default rule.
@@ -443,6 +444,7 @@ var discardChanges = function() {
 var _runFromHistoryTab = function(callbackFunction) {
   element(by.css('.protractor-test-history-tab')).click();
   var result = callbackFunction();
+  general.waitForSystem();
   element(by.css('.protractor-test-main-tab')).click();
   return result;
 };

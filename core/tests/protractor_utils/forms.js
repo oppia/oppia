@@ -182,6 +182,7 @@ var RichTextEditor = function(elem) {
         null, args);
       modal.element(
         by.css('.protractor-test-close-rich-text-component-editor')).click();
+      general.waitForSystem();
       // TODO (Jacob) remove when issue 422 is fixed
       elem.element(by.tagName('rich-text-editor')).
         element(by.tagName('iframe')).click();
@@ -273,27 +274,28 @@ var MultiSelectEditor = function(elem) {
           // The dropdown menu needs to be reopened after each de-selection.
           elem.element(by.css('.dropdown-toggle')).click();
         }
-      });
 
-      var selectedIndexes = [];
-      elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(function(choiceElem, index) {
-        return choiceElem.getText().then(function(choiceText) {
-          return texts.indexOf(choiceText) !== -1;
-        });
-      }).then(function(filteredElements) {
-        if (filteredElements.length !== texts.length) {
-          throw 'Could not select all elements. Values requested: ' + texts + '. ' +
-            'Found ' + filteredElements.length + ' matching elements.';
-        }
+        // Now select the new choices.
+        var selectedIndexes = [];
+        elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(function(choiceElem, index) {
+          return choiceElem.getText().then(function(choiceText) {
+            return texts.indexOf(choiceText) !== -1;
+          });
+        }).then(function(filteredElements) {
+          if (filteredElements.length !== texts.length) {
+            throw 'Could not select all elements. Values requested: ' + texts + '. ' +
+              'Found ' + filteredElements.length + ' matching elements.';
+          }
 
-        for (var i = filteredElements.length - 1; i >= 0; i--) {
-          filteredElements[i].click();
-          // The dropdown menu needs to be reopened after each selection.
+          for (var i = filteredElements.length - 1; i >= 0; i--) {
+            filteredElements[i].click();
+            // The dropdown menu needs to be reopened after each selection.
+            elem.element(by.css('.dropdown-toggle')).click();
+          }
+
+          // Close the dropdown menu at the end.
           elem.element(by.css('.dropdown-toggle')).click();
-        }
-
-        // Close the dropdown menu at the end.
-        elem.element(by.css('.dropdown-toggle')).click();
+        });
       });
     },
     expectCurrentSelectionToBe: function(expectedCurrentSelection) {

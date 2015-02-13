@@ -532,6 +532,7 @@ describe('Exploration history', function() {
       .toBe(' ', STATE_2_STRING);
 
     // Check renaming a state
+    editor.moveToState('first');
     editor.setStateName('third');
     editor.saveChanges();
     editor.expectGraphComparisonOf(3, 4).toBe([

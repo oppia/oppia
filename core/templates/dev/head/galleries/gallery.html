@@ -55,7 +55,8 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
-        <li ng-repeat="item in selectionDetails.categories.masterList track by $index">
+        <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
+            ng-class="{'protractor-test-selected': selectionDetails.categories.selections[item.id]}">
           <a href ng-click="toggleSelection('categories', item.id)">
             <[item.text]>
             <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
