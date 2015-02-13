@@ -14,16 +14,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for ListOfRegion objects."""
+"""Rules for ImageClick objects."""
 
 __author__ = 'Zhan Xiong Chin'
 
 from extensions.rules import base
 
 
-class IsInRegion(base.ListOfRegionRule):
+class IsInRegion(base.ImageClickRule):
     description = 'is in the region {{x|UnicodeString}}'
     is_generic = False
 
     def _evaluate(self, subject):
-        return self.x in subject
+        return self.x in subject['clickedRegions']

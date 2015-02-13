@@ -606,9 +606,30 @@ class ImageWithRegions(BaseObject):
 class ListOfRegion(BaseObject):
     """List of Region class."""
 
-    description = "A list of regions by index."
+    description = "A list of regions by label."
 
     SCHEMA = {
         'type': 'list',
         'items': UnicodeString.SCHEMA
+    }
+
+
+class ImageClick(BaseObject):
+    """Image Click class."""
+
+    description = "Position of a click and a list of regions clicked."
+
+    SCHEMA = {
+        'type': 'dict',
+        'properties': [{
+            'name': 'clickPosition',
+            'schema': {
+                'type': 'list',
+                'items': Real.SCHEMA,
+                'len': 2
+            }
+        }, {
+            'name': 'clickedRegions',
+            'schema': ListOfRegion.SCHEMA 
+        }]
     }

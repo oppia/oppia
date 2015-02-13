@@ -35,6 +35,8 @@ oppia.directive('oppiaInteractiveImageClickInput', [
           '/imagehandler/' + $rootScope.explorationId + '/' +
           encodeURIComponent($scope.filepath)
         );
+        $scope.mouseX = 0;
+        $scope.mouseY = 0;
         $scope.currentlyHoveredRegions = [];
         $scope.allRegions = imageAndRegions.labeledRegions;
         $scope.getRegionDimensions = function(index) {
@@ -57,20 +59,25 @@ oppia.directive('oppiaInteractiveImageClickInput', [
         };
         $scope.onMousemoveImage = function(event) {
           var image = $($element).find('.oppia-image-click-img');
-          var mouseX = (event.pageX - image.offset().left) / image.width();
-          var mouseY = (event.pageY - image.offset().top) / image.height();
+          $scope.mouseX = (event.pageX - image.offset().left) / image.width();
+          $scope.mouseY = (event.pageY - image.offset().top) / image.height();
           $scope.currentlyHoveredRegions = [];
           for (var i = 0; i < imageAndRegions.labeledRegions.length; i++) {
             var labeledRegion = imageAndRegions.labeledRegions[i];
             var regionArea = labeledRegion.region.area;
-            if (regionArea[0][0] <= mouseX && mouseX <= regionArea[1][0] &&
-                regionArea[0][1] <= mouseY && mouseY <= regionArea[1][1]) {
+            if (regionArea[0][0] <= $scope.mouseX && 
+                $scope.mouseX <= regionArea[1][0] &&
+                regionArea[0][1] <= $scope.mouseY && 
+                $scope.mouseY <= regionArea[1][1]) {
               $scope.currentlyHoveredRegions.push(labeledRegion.label);
             }
           }
         };
         $scope.onClickImage = function(event) {
-          $scope.$parent.$parent.submitAnswer($scope.currentlyHoveredRegions, 'submit');
+          $scope.$parent.$parent.submitAnswer({
+            clickPosition: [$scope.mouseX, $scope.mouseY],
+            clickedRegions: $scope.currentlyHoveredRegions
+          }, 'submit');
         };
         // TODO(czx): Maybe this can be put in an angular directive?
         $('.oppia-image-click-img').error(function(){
@@ -91,6 +98,17 @@ oppia.directive('oppiaResponseImageClickInput', [
       templateUrl: 'response/ImageClickInput',
       controller: ['$scope', '$attrs', 'oppiaHtmlEscaper', function($scope, $attrs, oppiaHtmlEscaper) {
         $scope.answer = oppiaHtmlEscaper.escapedJsonToObj($attrs.answer);
+        // TODO(czxcjx): Add image to response template when there's an easier
+        // way to access customization args from here
+        $scope.isHoveringOverResponse = false;
+        $scope.onMouseoverDiv = function(evt) {
+          $scope.isHoveringOverResponse = true;
+        };
+        $scope.onMouseoutDiv = function(evt) {
+          $scope.isHoveringOverResponse = false;
+        };
+        $scope.onMousemoveDiv = function(evt) {
+        };
       }]
     };
   }
