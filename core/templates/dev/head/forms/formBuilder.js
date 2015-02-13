@@ -1318,7 +1318,7 @@ oppia.directive('schemaBasedListEditor', [
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
         };
 
-        $scope.deleteLastElementIfUndefined = function() {
+        var _deleteLastElementIfUndefined = function() {
           var lastValueIndex = $scope.localValue.length - 1;
           var valueToConsiderUndefined = (
             schemaUndefinedLastElementService.getUndefinedValue($scope.itemSchema()));
@@ -1328,17 +1328,17 @@ oppia.directive('schemaBasedListEditor', [
         };
 
         $scope.lastElementOnBlur = function() {
-          $scope.deleteLastElementIfUndefined();
+          _deleteLastElementIfUndefined();
           $scope.showAddItemButton();
-        } 
+        };
 
         $scope.showAddItemButton = function() {
           $scope.isAddItemButtonPresent = true;
-        } 
+        };
 
         $scope.hideAddItemButton = function() {
           $scope.isAddItemButtonPresent = false;
-        }
+        };
 
         $scope._onChildFormSubmit = function(evt) {
           if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
