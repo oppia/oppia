@@ -48,7 +48,7 @@
       </div>
     </form>
 
-    <div dropdown class="dropdown navbar-left oppia-gallery-navbar-button-container hidden-xs">
+    <div dropdown class="dropdown navbar-left oppia-gallery-navbar-button-container hidden-xs protractor-test-gallery-category-selector">
       <button dropdown-toggle type="button" class="btn btn-primary dropdown-toggle oppia-splash-search-input ng-cloak"
               title="<[selectionDetails.categories.description]>">
         <[selectionDetails.categories.summary]>
@@ -71,7 +71,8 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
-        <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index">
+        <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
+            ng-class="{'protractor-test-selected': selectionDetails.languageCodes.selections[item.id]}">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
             <[item.text]>
             <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
@@ -180,9 +181,9 @@
                       <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
                         <[exploration.title]>
                       </span>
-                      <span ng-if="exploration.objective" class="protractor-test-exploration-objective">
+                      <span ng-if="exploration.objective">
                         <span style="font-weight: bold;">&middot;</span>
-                        <span style="color: #888">
+                        <span style="color: #888" class="protractor-test-exploration-objective">
                           <[getFormattedObjective(exploration.objective)]>
                         </span>
                       </span>

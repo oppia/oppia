@@ -257,6 +257,63 @@ var AutocompleteMultiDropdownEditor = function(elem) {
   };
 };
 
+var MultiSelectEditor = function(elem) {
+  return {
+    setValues: function(texts) {
+      // Open the dropdown menu.
+      elem.element(by.css('.dropdown-toggle')).click();
+
+      // Clear all existing choices.
+      elem.element(by.css('.dropdown-menu'))
+          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+        return selectedElem;
+      }).then(function(selectedElements) {
+        for (var i = selectedElements.length - 1; i >= 0; i--) {
+          selectedElements[i].click();
+          // The dropdown menu needs to be reopened after each de-selection.
+          elem.element(by.css('.dropdown-toggle')).click();
+        }
+      });
+
+      var selectedIndexes = [];
+      elem.element(by.css('.dropdown-menu')).all(by.tagName('li')).filter(function(choiceElem, index) {
+        return choiceElem.getText().then(function(choiceText) {
+          return texts.indexOf(choiceText) !== -1;
+        });
+      }).then(function(filteredElements) {
+        if (filteredElements.length !== texts.length) {
+          throw 'Could not select all elements. Values requested: ' + texts + '. ' +
+            'Found ' + filteredElements.length + ' matching elements.';
+        }
+
+        for (var i = filteredElements.length - 1; i >= 0; i--) {
+          filteredElements[i].click();
+          // The dropdown menu needs to be reopened after each selection.
+          elem.element(by.css('.dropdown-toggle')).click();
+        }
+
+        // Close the dropdown menu at the end.
+        elem.element(by.css('.dropdown-toggle')).click();
+      });
+    },
+    expectCurrentSelectionToBe: function(expectedCurrentSelection) {
+      // Open the dropdown menu.
+      elem.element(by.css('.dropdown-toggle')).click();
+
+      // Find the selected elements.
+      elem.element(by.css('.dropdown-menu'))
+          .all(by.css('.protractor-test-selected')).map(function(selectedElem) {
+        return selectedElem.getText();
+      }).then(function(actualSelection) {
+        expect(actualSelection).toEqual(expectedCurrentSelection);
+
+        // Close the dropdown menu at the end.
+        elem.element(by.css('.dropdown-toggle')).click();
+      });
+    }
+  };
+};
+
 // This function is sent 'elem', which should be the element immediately
 // containing the various elements of a rich text area, for example
 // <div>
@@ -573,6 +630,7 @@ exports.RichTextEditor = RichTextEditor;
 exports.UnicodeEditor = UnicodeEditor;
 exports.AutocompleteDropdownEditor = AutocompleteDropdownEditor;
 exports.AutocompleteMultiDropdownEditor = AutocompleteMultiDropdownEditor;
+exports.MultiSelectEditor = MultiSelectEditor;
 
 exports.expectRichText = expectRichText;
 exports.RichTextChecker = RichTextChecker;

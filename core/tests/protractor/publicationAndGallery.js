@@ -28,28 +28,29 @@ var gallery = require('../protractor_utils/gallery.js');
 
 describe('Gallery view', function() {
   it('should display private, published and featured explorations', function() {
+
+    var EXPLORATION_SILMARILS = 'silmarils';
+    var EXPLORATION_VINGILOT = 'Vingilot';
+    var CATEGORY_BUSINESS = 'Business';
+    var CATEGORY_ENVIRONMENT = 'Environment';
+    var LANGUAGE_ENGLISH = 'English';
+    var LANGUAGE_FRANCAIS = 'français';
+    var LANGUAGE_DEUTSCH = 'Deutsch';
+
     users.createModerator('varda@example.com', 'Varda');
     users.createUser('feanor@exmple.com', 'Feanor');
     users.createUser('celebrimbor@example.com', 'Celebrimbor');
     users.createUser('earendil@example.com', 'Earendil');
 
-    var EXPLORATION_SILMARILS = 'silmarils';
-    var EXPLORATION_VINGILOT = 'Vingilot';
-    var CATEGORY_GEMS = 'gems';
-    var CATEGORY_SHIPS = 'ships';
-    var LANGUAGE_ENGLISH = 'English';
-    var LANGUAGE_FRANCAIS = 'français';
-    var LANGUAGE_DEUTSCH = 'Deutsch';
-
     users.login('feanor@exmple.com');
     workflow.createAndPublishExploration(
-      EXPLORATION_SILMARILS, CATEGORY_GEMS,
+      EXPLORATION_SILMARILS, CATEGORY_ENVIRONMENT,
       'hold the light of the two trees', LANGUAGE_DEUTSCH);
     users.logout();
 
     users.login('earendil@example.com');
     workflow.createAndPublishExploration(
-      EXPLORATION_VINGILOT, CATEGORY_SHIPS, 'seek the aid of the Valar');
+      EXPLORATION_VINGILOT, CATEGORY_BUSINESS, 'seek the aid of the Valar');
     users.logout();
 
     users.login('varda@example.com');
@@ -87,19 +88,19 @@ describe('Gallery view', function() {
       languages: [LANGUAGE_ENGLISH, LANGUAGE_DEUTSCH, LANGUAGE_FRANCAIS],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
-      categories: [CATEGORY_GEMS],
+      categories: [CATEGORY_ENVIRONMENT],
       languages: [],
       expectVisible: [EXPLORATION_SILMARILS]
     }, {
-      categories: [CATEGORY_GEMS, CATEGORY_SHIPS],
+      categories: [CATEGORY_ENVIRONMENT, CATEGORY_BUSINESS],
       languages: [],
       expectVisible: [EXPLORATION_SILMARILS, EXPLORATION_VINGILOT]
     }, {
-      categories: [CATEGORY_GEMS],
+      categories: [CATEGORY_ENVIRONMENT],
       languages: [LANGUAGE_DEUTSCH],
       expectVisible: [EXPLORATION_SILMARILS]
     }, {
-      categories: [CATEGORY_GEMS],
+      categories: [CATEGORY_ENVIRONMENT],
       languages: [LANGUAGE_FRANCAIS],
       expectVisible: []
     }];
@@ -108,12 +109,12 @@ describe('Gallery view', function() {
     browser.get('/gallery');
     // The initial language selection should be just English.
     gallery.expectCurrentLanguageSelectionToBe([LANGUAGE_ENGLISH]);
+    // At the start, no categories are selected.
+    gallery.expectCurrentCategorySelectionToBe([]);
 
     testCases.forEach(function(testCase) {
       gallery.setLanguages(testCase.languages);
-      testCase.categories.forEach(function(category) {
-        gallery.tickCheckbox('category', category);
-      });
+      gallery.setCategories(testCase.categories);
 
       for (var explorationTitle in ALL_PUBLIC_EXPLORATION_TITLES) {
         if (testCase.expectVisible.indexOf(explorationTitle) !== -1) {
@@ -124,18 +125,17 @@ describe('Gallery view', function() {
       }
 
       gallery.setLanguages([]);
-      testCase.categories.forEach(function(category) {
-        gallery.untickCheckbox('category', category);
-      });
+      gallery.setCategories([]);
     });
 
     // Private explorations are not shown in the gallery.
     gallery.expectExplorationToBeHidden('Vilya');
 
     // The first letter of the objective is automatically capitalized.
-    expect(gallery.getExplorationObjective('Vingilot')).toBe(
+    expect(gallery.getExplorationObjective(EXPLORATION_VINGILOT)).toBe(
       'Seek the aid of the Valar');
-    gallery.playExploration('silmarils');
+    general.waitForSystem();
+    gallery.playExploration(EXPLORATION_SILMARILS);
     player.expectExplorationNameToBe('silmarils');
     player.submitAnswer('Continue');
 
