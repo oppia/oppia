@@ -1,22 +1,28 @@
 <div ng-controller="StateEditor">
-  <div class="oppia-editor-cards-container">
-    <md-card class="oppia-editor-card">
-      <div class="oppia-editor-card-body" ng-show="!!stateName">
-        <div>
-          {% include 'editor/state_editor_content.html' %}
+  <!--
+    The 'height' styling keeps the scrollbar from juddering during the
+    fade-out/fade-in animation.
+  -->
+  <div style="height: 1000px;">
+    <div class="oppia-editor-cards-container">
+      <md-card class="oppia-editor-card">
+        <div class="oppia-editor-card-body" ng-show="!!stateName">
+          <div>
+            {% include 'editor/state_editor_content.html' %}
+          </div>
+          <br>
+          <div ng-controller="StateInteraction">
+            {% include 'editor/state_editor_interaction.html' %}
+          </div>
+          <hr>
+          {% include 'editor/state_editor_active_rule.html' %}
         </div>
-        <br>
-        <div ng-controller="StateInteraction">
-          {% include 'editor/state_editor_interaction.html' %}
+      </md-card>
+      <md-card class="oppia-editor-rules-card">
+        <div ng-controller="StateRules">
+          {% include 'editor/state_editor_rules.html' %}
         </div>
-        <hr>
-        {% include 'editor/state_editor_active_rule.html' %}
-      </div>
-    </md-card>
-    <md-card class="oppia-editor-rules-card">
-      <div ng-controller="StateRules">
-        {% include 'editor/state_editor_rules.html' %}
-      </div>
-    </md-card>
+      </md-card>
+    </div>
   </div>
 </div>

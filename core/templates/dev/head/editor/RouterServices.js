@@ -19,10 +19,10 @@
  */
 
 oppia.factory('routerService', [
-    '$rootScope', '$location', '$interval', '$log', 'explorationInitStateNameService',
+    '$rootScope', '$location', '$timeout', '$interval', '$log', 'explorationInitStateNameService',
     'editorContextService', 'explorationStatesService', 'oppiaPlayerService',
     'explorationParamSpecsService', 'explorationTitleService', 'explorationData',
-    function($rootScope, $location, $interval, $log, explorationInitStateNameService,
+    function($rootScope, $location, $timeout, $interval, $log, explorationInitStateNameService,
              editorContextService, explorationStatesService, oppiaPlayerService,
              explorationParamSpecsService, explorationTitleService, explorationData) {
 
@@ -127,10 +127,16 @@ oppia.factory('routerService', [
     },
     navigateToMainTab: function(stateName) {
       _savePendingChanges();
-      if (stateName) {
-        editorContextService.setActiveStateName(stateName);
-      }
-      $location.path('/gui/' + editorContextService.getActiveStateName());
+      $('.oppia-editor-cards-container').fadeOut(function() {
+        if (stateName) {
+          editorContextService.setActiveStateName(stateName);
+        }
+        $location.path('/gui/' + editorContextService.getActiveStateName());
+        $rootScope.$apply();
+        $timeout(function() {
+          $('.oppia-editor-cards-container').fadeIn();
+        }, 500);
+      });
     },
     navigateToPreviewTab: function() {
       _savePendingChanges();
