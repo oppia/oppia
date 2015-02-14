@@ -56,7 +56,7 @@
       </button>
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
         <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-            ng-class="protractor-test-selected"
+            class="protractor-test-selected"
             ng-if="selectionDetails.categories.selections[item.id]">
           <a href ng-click="toggleSelection('categories', item.id)">
             <[item.text]>
@@ -82,7 +82,7 @@
       </button>
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
         <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-            ng-class="protractor-test-selected"
+            class="protractor-test-selected"
             ng-if="selectionDetails.languageCodes.selections[item.id]">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
             <[item.text]>
