@@ -245,7 +245,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/list">
   <table style="width: 100%;">
     <tr ng-repeat="item in localValue track by $index">
-      <td>
+      <td style="padding: 4px 0px;">
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
                              label-for-focus-target="getFocusLabel($index)"
@@ -253,7 +253,7 @@
                              on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
       </td>
-      <td ng-if="!len && (!minListLength || localValue.length > minListLength)">
+      <td ng-if="!len && (!minListLength || localValue.length > minListLength)" style="padding-top: 4px; vertical-align: top;">
         <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button" ng-click="deleteElement($index)"
                 ng-disabled="isDisabled()">
           <span class="glyphicon glyphicon-remove" title="Delete item">

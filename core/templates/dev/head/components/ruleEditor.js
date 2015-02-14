@@ -84,11 +84,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService',
-      'validatorsService', 'rulesService',
+      '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'explorationStatesService', 'routerService',
+      'validatorsService', 'rulesService', 'explorationStatesService',
       function(
-          $scope, $attrs, editorContextService, explorationStatesService, routerService,
-          validatorsService, rulesService) {
+          $scope, $rootScope, $modal, $timeout, editorContextService, explorationStatesService, routerService,
+          validatorsService, rulesService, explorationStatesService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
@@ -219,6 +219,53 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         });
 
+        $scope.openAddStateModal = function(rule) {
+          $modal.open({
+            templateUrl: 'modals/addState',
+            backdrop: 'static',
+            resolve: {
+              isEditable: function() {
+                return $scope.isEditable;
+              }
+            },
+            controller: [
+                '$scope', '$timeout', '$modalInstance', 'explorationStatesService', 'isEditable', 'focusService',
+                function($scope, $timeout, $modalInstance, explorationStatesService, isEditable, focusService) {
+              $scope.isEditable = isEditable;
+              $scope.newStateName = '';
+              $timeout(function() {
+                focusService.setFocus('newStateNameInput');
+              });
+
+              $scope.isNewStateNameValid = function(newStateName) {
+                return explorationStatesService.isNewStateNameValid(newStateName, false);
+              }
+
+              $scope.submit = function(newStateName) {
+                $modalInstance.close(newStateName);
+              };
+
+              $scope.cancel = function() {
+                $modalInstance.dismiss('cancel');
+              };
+            }]
+          }).result.then(function(newStateName) {
+            if (!explorationStatesService.isNewStateNameValid(newStateName, false)) {
+              return;
+            }
+
+            $scope.reloadingDestinations = true;
+            explorationStatesService.addState(newStateName, function() {
+              $rootScope.$broadcast('refreshGraph');
+              $timeout(function() {
+                rule.dest = newStateName;
+                // Reload the select2 dropdown to include the new state.
+                $scope.reloadingDestinations = false;
+              });
+            });
+          });
+        };
+
         $scope.getActiveStateName = function() {
           return editorContextService.getActiveStateName();
         };
@@ -253,9 +300,9 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
     },
     templateUrl: 'rules/ruleDescriptionEditor',
     controller: [
-        '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
+        '$scope', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
         'rulesService',
-        function($scope, $attrs, editorContextService, explorationStatesService, routerService, validatorsService, rulesService) {
+        function($scope, editorContextService, explorationStatesService, routerService, validatorsService, rulesService) {
 
       var _generateAllRuleTypes = function() {
         var _interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
