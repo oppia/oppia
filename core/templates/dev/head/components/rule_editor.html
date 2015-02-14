@@ -83,12 +83,12 @@
           </span>
         </div>
 
-        <hr>
+        <hr />
 
         <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
           <img src="/images/oppia_favicon_mint.png" class="oppia-rule-oppia-avatar" style="left: -70px;">
           <span ng-if="rule.feedback.length > 1">
-            (<em>Oppia picks one of these, at random.</em>):
+            (<em>Oppia picks one of these at random</em>):
           </span>
           <span ng-if="rule.feedback.length == 0">
             <em>No feedback specified.</em>
@@ -98,10 +98,11 @@
           </schema-based-editor>
         </div>
 
-        <div class="oppia-dest-bubble protractor-test-dest-bubble">
-          <span style="font-size: 2em; margin: 0 10px;">
-            <span ng-if="rule.dest === getActiveStateName()">⟳</span>
-            <span ng-if="rule.dest !== getActiveStateName()">→</span>
+        <hr />
+
+        <div class="protractor-test-dest-bubble">
+          <span style="font-size: 1.1em; margin-right: 8px;">
+            Destination:
           </span>
           <span ng-if="!reloadingDestinations" style="width: 200px;">
             <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex=".^" dropdown-css-class="oppia-rule-dest-select2" format-new-selection="convertNewDestToText" invalid-search-term-message="Invalid state name">
@@ -160,7 +161,7 @@
 
     <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment">
       <span ng-if="item.type == 'select'" style="color: black;">
-        <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices">
+        <select class="form-control" ng-model="currentRuleDefinition.inputs[item.varName]" ng-options="choice.id as (choice.val|convertRuleChoiceToPlainText|truncate) for choice in ruleDescriptionChoices" style="max-width: 250px;">
         </select>
       </span>
 

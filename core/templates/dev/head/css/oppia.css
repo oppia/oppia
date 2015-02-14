@@ -936,12 +936,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-rule-edit-feedback {
-  padding-bottom: 15px;
   position: relative;
-}
-.oppia-dest-bubble {
-  background: #eee;
-  padding-bottom: 10px;
 }
 
 .about-tabs {
