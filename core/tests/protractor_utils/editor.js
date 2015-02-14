@@ -273,14 +273,23 @@ var RuleEditor = function(ruleNum) {
         bodyElem.element(by.css('.protractor-test-feedback-bubble'))
       ).deleteItem(index);
     },
-    // Enter 'END' for the end state.
     // This saves the rule after the destination is selected.
+    // Note that the supplied destinationName must be an existing state,
+    // or 'END' for the end state. To create a new state, use
+    // createNewStateAndSetDestination() instead.
     setDestination: function(destinationName) {
       var destinationElement =
         bodyElem.element(by.css('.protractor-test-dest-bubble'));
       forms.AutocompleteDropdownEditor(destinationElement).
         setValue(destinationName);
       bodyElem.element(by.css('.protractor-test-save-rule')).click();
+    },
+    // Sets a destination for this rule, creating a state in the proces.
+    createNewStateAndSetDestination: function(destinationName) {
+      bodyElem.element(by.css('.protractor-test-add-state-button')).click();
+      element(by.css('.protractor-test-add-state-input')).sendKeys(destinationName);
+      element(by.css('.protractor-test-add-state-submit')).click();
+      general.waitForSystem();
     },
     expectAvailableDestinationsToBe: function(stateNames) {
       forms.AutocompleteDropdownEditor(
@@ -295,11 +304,6 @@ var RuleEditor = function(ruleNum) {
 };
 
 // STATE GRAPH
-
-var createState = function(newStateName) {
-  element(by.css('.protractor-test-add-state-input')).sendKeys(newStateName);
-  element(by.css('.protractor-test-add-state-submit')).click();
-};
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
@@ -657,7 +661,6 @@ exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.addRule = addRule;
 exports.RuleEditor = RuleEditor;
 
-exports.createState = createState;
 exports.moveToState = moveToState;
 exports.deleteState = deleteState;
 exports.expectStateNamesToBe = expectStateNamesToBe;

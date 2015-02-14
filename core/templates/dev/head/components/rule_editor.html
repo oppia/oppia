@@ -83,7 +83,7 @@
           </span>
         </div>
 
-        <hr />
+        <hr>
 
         <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
           <img src="/images/oppia_favicon_mint.png" class="oppia-rule-oppia-avatar" style="left: -70px;">
@@ -98,7 +98,7 @@
           </schema-based-editor>
         </div>
 
-        <hr />
+        <hr>
 
         <div class="protractor-test-dest-bubble">
           <span style="font-size: 1.1em; margin-right: 8px;">
@@ -113,7 +113,7 @@
             or
           </span>
 
-          <button type="button" class="btn btn-default" ng-click="openAddStateModal(rule)">
+          <button type="button" class="btn btn-default protractor-test-add-state-button" ng-click="openAddStateModal(rule)">
             <span class="glyphicon glyphicon-plus">
             </span>
             Create New State
@@ -147,7 +147,9 @@
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-add-state-submit" ng-click="submit(newStateName)"      ng-disabled="!isNewStateNameValid(newStateName)">
+    <button class="btn btn-success protractor-test-add-state-submit"
+            ng-click="submit(newStateName)"
+            ng-disabled="!isNewStateNameValid(newStateName)">
       Add State
     </button>
   </div>
