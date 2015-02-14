@@ -169,8 +169,7 @@ describe('Full exploration editor', function() {
       editor.createState('second');
       editor.expectStateNamesToBe(['first', 'second', 'END']);
       editor.expectCurrentStateToBe('second');
-      // TODO (Jacob) remove the '' when issue 443 is fixed
-      editor.expectAvailableFirstStatesToBe(['', 'first', 'second']);
+      editor.expectAvailableFirstStatesToBe(['first', 'second']);
       editor.setFirstState('second');
       editor.moveToState('first');
       editor.deleteState('first');

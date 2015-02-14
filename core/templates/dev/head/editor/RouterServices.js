@@ -19,10 +19,10 @@
  */
 
 oppia.factory('routerService', [
-    '$rootScope', '$location', '$timeout', '$interval', '$log', 'explorationInitStateNameService',
+    '$rootScope', '$location', '$window', '$timeout', '$interval', '$log', 'explorationInitStateNameService',
     'editorContextService', 'explorationStatesService', 'oppiaPlayerService',
     'explorationParamSpecsService', 'explorationTitleService', 'explorationData',
-    function($rootScope, $location, $timeout, $interval, $log, explorationInitStateNameService,
+    function($rootScope, $location, $window, $timeout, $interval, $log, explorationInitStateNameService,
              editorContextService, explorationStatesService, oppiaPlayerService,
              explorationParamSpecsService, explorationTitleService, explorationData) {
 
@@ -104,6 +104,14 @@ oppia.factory('routerService', [
     }
   };
 
+  var _getCurrentStateFromLocationPath = function() {
+    if ($location.path().indexOf('/gui/') !== -1) {
+      return $location.path().substring('/gui/'.length);
+    } else {
+      return null;
+    }
+  };
+
   var routerService = {
     savePendingChanges: function() {
       _savePendingChanges();
@@ -119,24 +127,34 @@ oppia.factory('routerService', [
         currentPath === '/feedback');
     },
     getCurrentStateFromLocationPath: function() {
-      if ($location.path().indexOf('/gui/') !== -1) {
-        return $location.path().substring('/gui/'.length);
-      } else {
-        return null;
-      }
+      return _getCurrentStateFromLocationPath();
     },
     navigateToMainTab: function(stateName) {
       _savePendingChanges();
-      $('.oppia-editor-cards-container').fadeOut(function() {
-        if (stateName) {
-          editorContextService.setActiveStateName(stateName);
+
+      if (_getCurrentStateFromLocationPath() === stateName) {
+        return;
+      }
+
+      var _actuallyNavigate = function(newStateName) {
+        if (newStateName) {
+          editorContextService.setActiveStateName(newStateName);
         }
         $location.path('/gui/' + editorContextService.getActiveStateName());
-        $rootScope.$apply();
-        $timeout(function() {
-          $('.oppia-editor-cards-container').fadeIn();
-        }, 150);
-      });
+        $window.scrollTo(0, 0);
+      };
+
+      if (_tabs.active === MAIN_TAB) {
+        $('.oppia-editor-cards-container').fadeOut(function() {
+          _actuallyNavigate(stateName);
+          $rootScope.$apply();
+          $timeout(function() {
+            $('.oppia-editor-cards-container').fadeIn();
+          }, 150);
+        });
+      } else {
+        _actuallyNavigate(stateName);
+      }
     },
     navigateToPreviewTab: function() {
       _savePendingChanges();

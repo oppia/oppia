@@ -56,7 +56,7 @@
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
-      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator">
+      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()">
         <span class="oppia-exploration-warnings-count">
           <[countWarnings()]>
         </span>
