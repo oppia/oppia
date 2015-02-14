@@ -95,7 +95,7 @@ input.ng-dirty.ng-invalid {
 }
 
 .oppia-rule-warning-text {
-  color: black;
+  color: red;
   font-style: italic;
 }
 
@@ -869,7 +869,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-rule-body-container {
-  padding-left: 15px;
+  padding-left: 0;
   padding-right: 0;
   width: 100%;
 }
@@ -882,6 +882,23 @@ md-card.oppia-gallery-tile {
 }
 .oppia-readonly-rule-tile img {
   max-height: 50px;
+}
+
+.oppia-rule-user-avatar {
+  cursor: default;
+  height: 25px;
+  left: -55px;
+  position: absolute;
+  top: 8px;
+  width: 25px;
+}
+.oppia-rule-oppia-avatar {
+  cursor: default;
+  height: 25px;
+  left: -65px;
+  position: absolute;
+  top: -2px;
+  width: 25px;
 }
 
 .oppia-rule-editable-view {

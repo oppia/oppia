@@ -1,63 +1,48 @@
 <div style="height: 100%;">
-  <div ng-if="!ruleEditorIsOpen" class="protractor-test-edit-rule"
-       ng-class="{'oppia-editable-section': isEditable}"
-       style="height: 100%;">
-
-    <div class="oppia-click-to-start-editing" ng-click="openRuleEditor()">
-    </div>
-
-    <div class="oppia-readonly-rule-tile well well-sm" style="height: 100%;">
-      <div class="row">
-        <div class="col-lg-1 col-md-1 col-sm-1">
-          <img src="/images/user.png">
-        </div>
-
-        <div class="col-lg-11 col-md-11 col-sm-11">
-          <div>
-            <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
-
-            <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
-              <span ng-if="!answerChoices">
-                [<em><[rule | parameterizeRuleDescription: getAnswerChoices()]>...</em>]
-              </span>
-              <span ng-if="answerChoices">
-                [<em><span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...</em>]
-              </span>
-            </span>
-            <span ng-if="rule.description === 'Default'">
-              ...
-            </span>
-
-          </div>
-        </div>
+  <div ng-if="!ruleEditorIsOpen" style="height: 100%; margin-left: 55px;">
+    <div class="oppia-readonly-rule-tile well well-sm protractor-test-edit-rule" ng-class="{'oppia-editable-section': isEditable}">
+      <div class="oppia-click-to-start-editing" ng-click="openRuleEditor()">
       </div>
 
-      <div class="row" style="margin-top: 10px;">
-        <div class="col-lg-1 col-md-1 col-sm-1">
-          <img src="/images/oppia_favicon_mint.png">
-        </div>
+      <img src="/images/user.png" class="oppia-rule-user-avatar">
 
-        <div class="col-lg-11 col-md-11 col-sm-11">
-          <div ng-if="isRuleConfusing() || rule.feedback.length > 0">
-            <span ng-if="isRuleConfusing()">
-              <span class="glyphicon glyphicon-warning-sign"></span>
-              <span class="oppia-rule-warning-text">
-                Please provide a feedback message.
-              </span>
-            </span>
-            <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
-              <span angular-html-bind="rule.feedback[0]"></span>
-              <span ng-if="rule.feedback.length > 1">
-                <em>
-                  (or <span ng-if="rule.feedback.length > 2">one of </span> <[rule.feedback.length - 1]> other variation<span ng-if="rule.feedback.length > 2">s</span>)
-                </em>
-              </span>
-            </span>
-          </div>
-        </div>
+      <div>
+        <span ng-if="isEditable" class="glyphicon glyphicon-pencil oppia-editor-edit-icon pull-right" title="Edit Rule"></span>
+
+        <span ng-if="rule.description !== 'Default'" style="word-wrap: break-word;">
+          <span ng-if="!answerChoices">
+            [<em><[rule | parameterizeRuleDescription: getAnswerChoices()]>...</em>]
+          </span>
+          <span ng-if="answerChoices">
+            [<em><span angular-html-bind="rule | parameterizeRuleDescription: answerChoices"></span>...</em>]
+          </span>
+        </span>
+        <span ng-if="rule.description === 'Default'">
+          ...
+        </span>
       </div>
 
-      <div class="row" style="margin-top: 10px;">
+      <br>
+
+      <div style="position: relative;">
+        <img src="/images/oppia_favicon_mint.png" class="oppia-rule-oppia-avatar">
+        <span ng-if="isRuleConfusing()">
+          <span class="oppia-rule-warning-text">
+            <span class="glyphicon glyphicon-warning-sign"></span>
+            Please specify something for Oppia to say.
+          </span>
+        </span>
+        <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
+          <span angular-html-bind="rule.feedback[0]"></span>
+          <span ng-if="rule.feedback.length > 1">
+            <em>
+              (or <span ng-if="rule.feedback.length > 2">one of </span> <[rule.feedback.length - 1]> other variation<span ng-if="rule.feedback.length > 2">s</span>)
+            </em>
+          </span>
+        </span>
+      </div>
+
+      <div style="margin-top: 10px;">
         <div style="text-align: center;">
           <div ng-if="rule.dest === getActiveStateName()">
             <div style="font-size: 1.5em;">
