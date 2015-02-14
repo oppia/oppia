@@ -159,12 +159,16 @@ UI_BOOTSTRAP_FILES = [
     for suffix in ['js', 'min.js']]
 
 MATERIAL_DESIGN_ICONS_REV = '1.0.1'
+MATERIAL_DESIGN_ICONS_CONTENT_URL = (
+    'https://raw.githubusercontent.com/google/material-design-icons/%s/content/drawable-xxxhdpi'
+    % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_NAVIGATION_URL = (
     'https://raw.githubusercontent.com/google/material-design-icons/%s/navigation/drawable-xxxhdpi'
     % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR,
     'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
+MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
 MATERIAL_DESIGN_ICON_NAVIGATION_FILES = ['ic_more_vert_black_48dp.png']
 
 # Note that Angular 1.3.0 requires a jQuery version that is >= 2.1.1.
@@ -213,13 +217,13 @@ download_files(ANGULAR_URL, ANGULAR_DST, ANGULAR_FILES)
 download_files(ANGULAR_TEST_URL, ANGULAR_DST, ANGULAR_TEST_FILES)
 download_files(D3_URL, D3_DST, D3_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_NAVIGATION_URL,
-    MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICONS_CONTENT_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_CONTENT_FILES)
+download_files(
+    MATERIAL_DESIGN_ICONS_NAVIGATION_URL, MATERIAL_DESIGN_ICONS_DST,
     MATERIAL_DESIGN_ICON_NAVIGATION_FILES)
 download_files(
-    NG_INFINITE_SCROLL_URL,
-    NG_INFINITE_SCROLL_DST,
-    NG_INFINITE_SCROLL_FILES)
+    NG_INFINITE_SCROLL_URL, NG_INFINITE_SCROLL_DST, NG_INFINITE_SCROLL_FILES)
 
 # Download all the frontend library zip files.
 BOWER_MATERIAL_REV = '0.6.0-rc1'
