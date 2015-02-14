@@ -171,7 +171,7 @@ MATERIAL_DESIGN_ICONS_DST = os.path.join(
 MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
 MATERIAL_DESIGN_ICON_NAVIGATION_FILES = ['ic_more_vert_black_48dp.png']
 
-# Note that Angular 1.3.0 requires a jQuery version that is >= 2.1.1.
+# Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
 JQUERY_REV = '2.1.1'
 JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/%s' % JQUERY_REV
 JQUERY_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'jquery-%s' % JQUERY_REV)
@@ -184,7 +184,7 @@ JQUERYUI_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'jqueryui-%s' % JQUERYUI_REV)
 JQUERYUI_FILES = ['jquery-ui.min.js']
 
-ANGULAR_REV = '1.3.0-rc.5'
+ANGULAR_REV = '1.3.13'
 ANGULAR_URL = (
     'https://ajax.googleapis.com/ajax/libs/angularjs/%s' % ANGULAR_REV)
 ANGULAR_TEST_URL = 'https://code.angularjs.org/%s' % ANGULAR_REV

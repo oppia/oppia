@@ -135,7 +135,7 @@ oppia.factory('routerService', [
         $rootScope.$apply();
         $timeout(function() {
           $('.oppia-editor-cards-container').fadeIn();
-        }, 500);
+        }, 150);
       });
     },
     navigateToPreviewTab: function() {
