@@ -54,11 +54,13 @@
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
-    <li>
-      <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
-        <span class="glyphicon glyphicon-pencil"></span>
-      </a>
-    </li>
+    {% if can_edit %}
+      <li>
+        <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </a>
+      </li>
+    {% endif %}
   </ul>
 {% endblock local_top_nav_options %}
 
