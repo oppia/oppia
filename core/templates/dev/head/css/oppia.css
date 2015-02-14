@@ -491,6 +491,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-navbar-button-container {
+  border-radius: 0;
   margin-top: 8px;
 }
 
@@ -523,9 +524,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
 md-card.oppia-gallery-tile {
   background-color: #fff;
   border: 1px solid #b3b3b3;
+  color: #888;
   height: 96px;
   margin: -1px 0;
-  padding: 0;
+  position: relative;
   width: 100%;
 }
 .oppia-gallery-tile:hover {
@@ -570,10 +572,9 @@ md-card.oppia-gallery-tile {
   background-color: #607d8b;
 }
 
-.oppia-gallery-tile-container {
-  color: #888;
+.oppia-gallery-tile-contents {
+  height: 100%;
   padding: 15px 50px;
-  position: relative;
   width: 100%;
 }
 .oppia-gallery-tile-contents:hover {
@@ -1057,6 +1058,7 @@ oppia-parameter {
 .oppia-splash-search-input {
   background: #04857c;
   border: 1px solid #018c7f;
+  border-radius: 0;
   color: white;
   font-size: 15px;
   height: 34px;
