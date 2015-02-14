@@ -25,7 +25,6 @@ from core.controllers import editor
 from core.controllers import feedback
 from core.controllers import galleries
 from core.controllers import home
-from core.controllers import logout
 from core.controllers import moderator
 from core.controllers import pages
 from core.controllers import profile
@@ -194,24 +193,24 @@ urls = [
         r'%s' % feconf.CONTRIBUTE_GALLERY_URL, galleries.GalleryRedirectPage,
         'contribute_gallery_page'),
     get_redirect_route(
-        r'%s' % feconf.GALLERY_LOGIN_REDIRECT_URL,
-        galleries.GalleryLoginRedirector, 'gallery_redirect'),
-    get_redirect_route(
         r'%s' % feconf.NEW_EXPLORATION_URL,
         galleries.NewExploration, 'new_exploration'),
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
 
-    get_redirect_route(r'/profile', profile.ProfilePage, 'profile_page'),
     get_redirect_route(
-        r'/profilehandler/data', profile.ProfileHandler, 'profile_handler'),
+        r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_URL,
-        profile.EditorPrerequisitesPage, 'editor_prerequisites_page'),
+        r'/preferences', profile.PreferencesPage, 'preferences_page'),
     get_redirect_route(
-        r'%s' % feconf.EDITOR_PREREQUISITES_DATA_URL,
-        profile.EditorPrerequisitesHandler, 'editor_prerequisites_handler'),
+        r'/preferenceshandler/data', profile.PreferencesHandler,
+        'preferences_handler'),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
+    get_redirect_route(
+        r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler,
+        'signup_handler'),
     get_redirect_route(
         r'%s' % feconf.USERNAME_CHECK_DATA_URL,
         profile.UsernameCheckHandler, 'username_check_handler'),
@@ -323,7 +322,7 @@ urls = [
         r'/frontend_errors', FrontendErrorHandler, 'frontend_error_handler'),
 
     get_redirect_route(
-        r'/logout', logout.LogoutPage, 'logout_page_handler'),
+        r'/logout', base.LogoutPage, 'logout_page_handler'),
 
     # 404 error handler.
     get_redirect_route(r'/<:.*>', base.Error404Handler, 'error_404_handler'),

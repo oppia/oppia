@@ -1,3 +1,8 @@
 <script type="text/ng-template" id="richTextComponent/Link">
-  <a href="<[url]>" target="<[target]>"><[url]></a>
+  <span ng-if="showUrlInTooltip">
+    <a href="<[url]>" target="<[target]>" tooltip="<[url]>"><[text]></a>
+  </span>
+  <span ng-if="!showUrlInTooltip">
+    <a href="<[url]>" target="<[target]>"><[url]></a>
+  </span>
 </script>

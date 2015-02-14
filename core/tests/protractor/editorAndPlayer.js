@@ -169,8 +169,7 @@ describe('Full exploration editor', function() {
       editor.createState('second');
       editor.expectStateNamesToBe(['first', 'second', 'END']);
       editor.expectCurrentStateToBe('second');
-      // TODO (Jacob) remove the '' when issue 443 is fixed
-      editor.expectAvailableFirstStatesToBe(['', 'first', 'second']);
+      editor.expectAvailableFirstStatesToBe(['first', 'second']);
       editor.setFirstState('second');
       editor.moveToState('first');
       editor.deleteState('first');
@@ -532,6 +531,7 @@ describe('Exploration history', function() {
       .toBe(' ', STATE_2_STRING);
 
     // Check renaming a state
+    editor.moveToState('first');
     editor.setStateName('third');
     editor.saveChanges();
     editor.expectGraphComparisonOf(3, 4).toBe([

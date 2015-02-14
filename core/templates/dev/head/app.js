@@ -35,8 +35,10 @@ var oppia = angular.module(
 // Set default headers for POST and PUT requests.
 // Add an interceptor to convert requests to strings and to log and show
 // warnings for error responses.
-oppia.config(['$interpolateProvider', '$httpProvider',
-    function($interpolateProvider, $httpProvider) {
+// Disable ng-animate for carousel: see
+//     https://github.com/angular-ui/bootstrap/issues/1565
+oppia.config(['$interpolateProvider', '$httpProvider', '$animateProvider',
+    function($interpolateProvider, $httpProvider, $animateProvider) {
   $interpolateProvider.startSymbol('<[');
   $interpolateProvider.endSymbol(']>');
 
@@ -69,6 +71,8 @@ oppia.config(['$interpolateProvider', '$httpProvider',
       };
     }
   ]);
+
+  $animateProvider.classNameFilter(/carousel/);
 }]);
 
 oppia.config(['$provide', function($provide) {
@@ -261,10 +265,17 @@ oppia.factory('validatorsService', [
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
 oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+  var _nextLabelToFocusOn = null;
   return {
     setFocus: function(name) {
+      if (_nextLabelToFocusOn) {
+        return;
+      }
+
+      _nextLabelToFocusOn = name;
       $timeout(function() {
-        $rootScope.$broadcast('focusOn', name);
+        $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
+        _nextLabelToFocusOn = null;
       });
     }
   };

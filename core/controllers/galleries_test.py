@@ -30,8 +30,13 @@ CAN_EDIT_STR = 'can_edit'
 
 class GalleryPageTest(test_utils.GenericTestBase):
 
-    EDITOR_EMAIL = 'editor@example.com'
-    OWNER_EMAIL = 'owner@example.com'
+    def setUp(self):
+        super(GalleryPageTest, self).setUp()
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
+
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+        self.ADMIN_ID = self.get_user_id_from_email(self.ADMIN_EMAIL)
 
     def test_gallery_page(self):
         """Test access to the gallery page."""
@@ -41,10 +46,6 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
     def test_gallery_handler_demo_exploration(self):
         """Test the gallery data handler on demo explorations."""
-
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_EMAIL])
-
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': False,
@@ -52,6 +53,8 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'public': [],
             'featured': [],
+            'search_cursor': None,
+            'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
         # Load a public demo exploration.
@@ -65,13 +68,14 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'Welcome',
             'title': 'Welcome to Oppia!',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
         }, response_dict['public'][0])
 
         # Publicize the demo exploration.
-        rights_manager.publicize_exploration(owner_id, '0')
+        self.set_admins([self.ADMIN_EMAIL])
+        rights_manager.publicize_exploration(self.ADMIN_ID, '0')
 
         # Run migration job to create exploration summaries.
         # This is not necessary, but serves as additional check that
@@ -85,7 +89,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # change title and category
         exp_services.update_exploration(
-            owner_id, '0', [{
+            self.EDITOR_ID, '0', [{
                 'cmd': 'edit_exploration_property',
                 'property_name': 'title',
                 'new_value': 'A new title!'
@@ -104,20 +108,16 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': '0',
             'category': 'A new category',
             'title': 'A new title!',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'become familiar with Oppia\'s capabilities',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['featured'][0])
 
     def test_gallery_handler_for_created_explorations(self):
         """Test the gallery data handler for manually created explirations."""
+        self.set_admins([self.ADMIN_EMAIL])
 
-        owner_id = self.get_user_id_from_email(self.OWNER_EMAIL)
-        self.set_admins([self.OWNER_EMAIL])
-
-        self.register_editor(self.OWNER_EMAIL)
-        self.login(self.OWNER_EMAIL)
-
+        self.login(self.ADMIN_EMAIL)
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
         self.assertEqual({
             'is_admin': True,
@@ -125,16 +125,18 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'is_super_admin': False,
             'public': [],
             'featured': [],
-            'user_email': self.OWNER_EMAIL,
-            'username': 'defaultusername'
+            'user_email': self.ADMIN_EMAIL,
+            'username': self.ADMIN_USERNAME,
+            'search_cursor': None,
+            'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
         # Create exploration A
         exploration = self.save_new_valid_exploration(
-            'A', owner_id, title='Title A', category='Category A',
+            'A', self.ADMIN_ID, title='Title A', category='Category A',
             objective='Objective A')
         exp_services._save_exploration(
-            owner_id, exploration, 'Exploration A', [])
+            self.ADMIN_ID, exploration, 'Exploration A', [])
 
         # Test that the private exploration isn't displayed.
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
@@ -143,15 +145,15 @@ class GalleryPageTest(test_utils.GenericTestBase):
 
         # Create exploration B
         exploration = self.save_new_valid_exploration(
-            'B', owner_id, title='Title B', category='Category B',
+            'B', self.ADMIN_ID, title='Title B', category='Category B',
             objective='Objective B')
         exp_services._save_exploration(
-            owner_id, exploration, 'Exploration B', [])
-        rights_manager.publish_exploration(owner_id, 'B')
-        rights_manager.publicize_exploration(owner_id, 'B')
+            self.ADMIN_ID, exploration, 'Exploration B', [])
+        rights_manager.publish_exploration(self.ADMIN_ID, 'B')
+        rights_manager.publicize_exploration(self.ADMIN_ID, 'B')
 
         # Publish exploration A
-        rights_manager.publish_exploration(owner_id, 'A')
+        rights_manager.publish_exploration(self.ADMIN_ID, 'A')
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
@@ -161,7 +163,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': 'A',
             'category': 'Category A',
             'title': 'Title A',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'Objective A',
             'status': rights_manager.EXPLORATION_STATUS_PUBLIC,
         }, response_dict['public'][0])
@@ -169,13 +171,13 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': 'B',
             'category': 'Category B',
             'title': 'Title B',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'Objective B',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['featured'][0])
 
         # Delete exploration A
-        exp_services.delete_exploration(owner_id, 'A')
+        exp_services.delete_exploration(self.ADMIN_ID, 'A')
 
         # Test gallery
         response_dict = self.get_json(feconf.GALLERY_DATA_URL)
@@ -185,14 +187,13 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'id': 'B',
             'category': 'Category B',
             'title': 'Title B',
-            'language': 'English',
+            'language_code': 'en',
             'objective': 'Objective B',
             'status': rights_manager.EXPLORATION_STATUS_PUBLICIZED,
         }, response_dict['featured'][0])
 
     def test_new_exploration_ids(self):
         """Test generation of exploration ids."""
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get(feconf.GALLERY_URL)
@@ -208,20 +209,21 @@ class GalleryPageTest(test_utils.GenericTestBase):
         )[galleries.EXPLORATION_ID_KEY]
         self.assertEqual(len(exp_a_id), 12)
 
+        self.logout()
+
     def test_exploration_upload_button(self):
         """Test that the exploration upload button appears when appropriate."""
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain(no=['Upload Existing Exploration'])
+        response.mustcontain(no=['Upload Exploration'])
 
         config_services.set_property(
             feconf.ADMIN_COMMITTER_ID, 'allow_yaml_file_upload', True)
 
         response = self.testapp.get(feconf.GALLERY_URL)
         self.assertEqual(response.status_int, 200)
-        response.mustcontain('Upload Existing Exploration')
+        response.mustcontain('Upload Exploration')
 
         self.logout()

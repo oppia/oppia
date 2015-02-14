@@ -52,14 +52,6 @@ BANNER_ALT_TEXT = config_domain.ConfigProperty(
     'The alt text for the site banner image', default_value='')
 
 
-def _get_short_language_description(full_language_description):
-    if ' (' not in full_language_description:
-        return full_language_description
-    else:
-        ind = full_language_description.find(' (')
-        return full_language_description[:ind]
-
-
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
 
@@ -72,13 +64,12 @@ class GalleryPage(base.BaseHandler):
             'allow_yaml_file_upload': ALLOW_YAML_FILE_UPLOAD.value,
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
-                    feconf.GALLERY_LOGIN_REDIRECT_URL)),
-            'gallery_register_redirect_url': utils.set_url_query_parameter(
-                feconf.EDITOR_PREREQUISITES_URL,
-                'return_url', feconf.GALLERY_CREATE_MODE_URL),
-            'ALL_LANGUAGE_NAMES': [
-                _get_short_language_description(lc['description'])
-                for lc in feconf.ALL_LANGUAGE_CODES],
+                    feconf.GALLERY_CREATE_MODE_URL)),
+            'LANGUAGE_CODES_AND_NAMES': [{
+                'code': lc['code'],
+                'name': utils.get_short_language_description(
+                    lc['description']),
+            } for lc in feconf.ALL_LANGUAGE_CODES],
             'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
         })
         self.render_template('galleries/gallery.html')
@@ -96,18 +87,20 @@ class GalleryHandler(base.BaseHandler):
         # explorations in 'Other'.
 
         language_codes_to_short_descs = {
-            lc['code']: _get_short_language_description(lc['description'])
+            lc['code']: utils.get_short_language_description(lc['description'])
             for lc in feconf.ALL_LANGUAGE_CODES
         }
 
         query_string = self.request.get('q')
+        search_cursor = self.request.get('cursor', None)
         if query_string:
             # The user is performing a search.
-            exp_summaries_dict = (
+            exp_summaries_dict, search_cursor = (
                 exp_services.get_exploration_summaries_matching_query(
-                    query_string))
+                    query_string, cursor=search_cursor))
         else:
             # Get non-private exploration summaries
+            search_cursor = None
             exp_summaries_dict = (
                 exp_services.get_non_private_exploration_summaries())
 
@@ -118,8 +111,7 @@ class GalleryHandler(base.BaseHandler):
             'title': exp_summary.title,
             'category': exp_summary.category,
             'objective': exp_summary.objective,
-            'language': language_codes_to_short_descs.get(
-                exp_summary.language_code, exp_summary.language_code),
+            'language_code': exp_summary.language_code,
             'last_updated': utils.get_time_in_millisecs(
                 exp_summary.exploration_model_last_updated),
             'status': exp_summary.status,
@@ -152,29 +144,18 @@ class GalleryHandler(base.BaseHandler):
             featured_explorations_list, key=lambda x: x['last_updated'],
             reverse=True)
 
+        preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
+        if self.user_id:
+            user_settings = user_services.get_user_settings(self.user_id)
+            preferred_language_codes = user_settings.preferred_language_codes
+
         self.values.update({
             'featured': publicized_explorations_list,
             'public': public_explorations_list,
+            'preferred_language_codes': preferred_language_codes,
+            'search_cursor': search_cursor,
         })
         self.render_json(self.values)
-
-
-class GalleryLoginRedirector(base.BaseHandler):
-    """Redirects a logged-in user to the editor prerequisites page or the
-    gallery, according as to whether they are logged in or not.
-    """
-
-    @base.require_user
-    def get(self):
-        """Handles GET requests."""
-        if not user_services.has_user_registered_as_editor(self.user_id):
-            redirect_url = utils.set_url_query_parameter(
-                feconf.EDITOR_PREREQUISITES_URL,
-                'return_url', feconf.GALLERY_CREATE_MODE_URL)
-        else:
-            redirect_url = feconf.GALLERY_CREATE_MODE_URL
-
-        self.redirect(redirect_url)
 
 
 class NewExploration(base.BaseHandler):
@@ -182,7 +163,7 @@ class NewExploration(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'gallery'
 
-    @base.require_registered_as_editor
+    @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
         title = self.payload.get('title')
@@ -211,7 +192,7 @@ class UploadExploration(base.BaseHandler):
 
     PAGE_NAME_FOR_CSRF = 'gallery'
 
-    @base.require_registered_as_editor
+    @base.require_fully_signed_up
     def post(self):
         """Handles POST requests."""
         title = self.payload.get('title')

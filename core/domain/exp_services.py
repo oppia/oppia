@@ -217,14 +217,17 @@ def _get_exploration_summary_dicts_from_models(exp_summary_models):
     return result
 
 
-def get_exploration_summaries_matching_query(query_string):
+def get_exploration_summaries_matching_query(query_string, cursor=None):
     """Returns a dict with all exploration summary domain objects matching the
-    given search query string."""
-    exp_ids, unused_cursor = search_explorations(query_string)
+    given search query string, as well as a search cursor for future fetches.
+    """
+    exp_ids, search_cursor = search_explorations(query_string, cursor=cursor)
     summary_models = [
         model for model in exp_models.ExpSummaryModel.get_multi(exp_ids)
         if model is not None]
-    return _get_exploration_summary_dicts_from_models(summary_models)
+    return (
+        _get_exploration_summary_dicts_from_models(summary_models),
+        search_cursor)
 
 
 def get_non_private_exploration_summaries():
@@ -643,8 +646,7 @@ def delete_exploration(committer_id, exploration_id, force_deletion=False):
     memcache_services.delete(exploration_memcache_key)
 
     #delete the exploration from search.
-    search_services.delete_documents_from_index([exploration_id],
-                                                SEARCH_INDEX_EXPLORATIONS)
+    delete_documents_from_search_index([exploration_id])
 
     # delete summary of exploration
     delete_exploration_summary(exploration_id, force_deletion=force_deletion)
@@ -949,7 +951,7 @@ def load_demo(exploration_id):
 
 
 def get_next_page_of_all_commits(
-        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None):
+        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None):
     """Returns a page of commits to all explorations in reverse time order.
 
     The return value is a triple (results, cursor, more) as described in
@@ -970,7 +972,8 @@ def get_next_page_of_all_commits(
 
 
 def get_next_page_of_all_non_private_commits(
-        page_size=feconf.DEFAULT_PAGE_SIZE, urlsafe_start_cursor=None, max_age=None):
+        page_size=feconf.COMMIT_LIST_PAGE_SIZE, urlsafe_start_cursor=None,
+        max_age=None):
     """Returns a page of non-private commits in reverse time order. If max_age
     is given, it should be a datetime.timedelta instance.
 
@@ -1021,7 +1024,7 @@ def _exp_to_search_dict(exp):
     }
     doc.update(_exp_rights_to_search_dict(rights))
 
-    #TODO(frederik): Calculate an exploration's 'rank' based on statistics.
+    # TODO(frederik): Calculate an exploration's 'rank' based on statistics.
     # By default, a document's rank is the time it was indexed, so the most
     # recently changed explorations would rank higher.
 
@@ -1050,15 +1053,19 @@ def patch_exploration_search_document(exp_id, update):
 def update_exploration_status_in_search(exp_id):
     rights = rights_manager.get_exploration_rights(exp_id)
     if rights.status == rights_manager.EXPLORATION_STATUS_PRIVATE:
-        search_services.delete_documents_from_index(
-            [exp_id], SEARCH_INDEX_EXPLORATIONS)
+        delete_documents_from_search_index([exp_id])
     else:
         patch_exploration_search_document(
             rights.id, _exp_rights_to_search_dict(rights))
 
 
+def delete_documents_from_search_index(exploration_ids):
+    search_services.delete_documents_from_index(
+        exploration_ids, SEARCH_INDEX_EXPLORATIONS)
+
+
 def search_explorations(
-    query, sort=None, limit=feconf.DEFAULT_PAGE_SIZE, cursor=None):
+    query, sort=None, limit=feconf.GALLERY_PAGE_SIZE, cursor=None):
     """Searches through the available explorations.
 
     args:

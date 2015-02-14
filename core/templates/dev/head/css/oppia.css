@@ -34,9 +34,16 @@
 }
 
 /* Angular material overrides. */
-md-input-group.long > input 
+md-input-group.long > input
 {
-  width: 100%; 
+  width: 100%;
+}
+
+md-input-group.md-default-theme label
+{
+  font-size: 16px;
+  font-weight: 200;
+  margin-bottom: 0;
 }
 
 .md-button-success {
@@ -88,26 +95,12 @@ input.ng-dirty.ng-invalid {
 }
 
 .oppia-rule-warning-text {
-  color: black;
+  color: red;
   font-style: italic;
 }
 
 .oppia-serious-warning-text {
   color: red;
-}
-
-.oppia-editor h3 {
-  font-size: 18px;
-  margin: 0;
-}
-
-.oppia-editor h4 {
-  font-size: 14px;
-  margin: 0;
-}
-
-.oppia-editor form {
-  margin: 0;
 }
 
 .oppia-disabled-contenteditable {
@@ -175,13 +168,13 @@ div.wysiwyg iframe.wysiwyg-content-large {
   position: relative;
 }
 
-/* 
-  Note that adding "overflow-y: scroll;" will 
-  break infinite scrolling in the gallery page. 
+/*
+  Note that adding "overflow-y: scroll;" will
+  break infinite scrolling in the gallery page.
 */
 .oppia-content-container {
   height: 100%;
-  left: 0; 
+  left: 0;
   position: relative;
   transition: transform 0.5s;
   -webkit-transition: -webkit-transform 0.5s;
@@ -213,7 +206,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: white;
   height: 100%;
   left: 0;
-  position: absolute;
+  position: fixed;
   top: 0;
   -webkit-transform: translate3d(-100%, 0, 0);
   transform: translate3d(-100%, 0, 0);
@@ -497,69 +490,44 @@ div.wysiwyg iframe.wysiwyg-content-large {
   -webkit-animation-delay: 0.6s;
 }
 
-.oppia-light-border-right {
-  border-right: 1px solid #bbb;
+.oppia-gallery-navbar-button-container {
+  border-radius: 0;
+  margin-top: 8px;
 }
 
-/* Gallery sidebar menu for small screens. Includes animation. */
-.oppia-gallery-sidebar {
-  float: left;
-  height: 100%;
-  min-height: 700px;
-  -moz-transition: all 0.5s;
-  -ms-transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+.btn.oppia-gallery-add-exploration-button {
+  background-color: rgb(5, 190, 178);
+  color: white;
+  padding: 3px 12px;
 }
-.oppia-gallery-sidebar.oppia-gallery-sidebar-active {
-  width: 50%;
-  max-width: 170px;
+.oppia-gallery-add-exploration-button-plus {
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-right: 5px;
+  vertical-align: middle;
 }
 
-.oppia-gallery-main {
-  float: left;
-  -moz-transition: all 0.5s;
-  -ms-transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -o-transition: all 0.5s;
-  transition: all 0.5s;
+.oppia-gallery-tiles-introduction {
+  font-size: 1.2em;
+  padding-bottom: 20px;
+  padding-top: 10px;
 }
-.oppia-gallery-main.oppia-gallery-sidebar-active {
-  width: 45%;
-}
-
-.oppia-gallery-menu {
-  float: left;
-  min-height: 600px;
-  padding: 0 15px 0 15px;
-  width: 150px;
-}
-.oppia-gallery-menu.ng-enter {
-  opacity: 0;
-  -moz-transition: all 0.2s linear 0.2s;
-  -ms-transition: all 0.2s linear 0.2s;
-  -webkit-transition: all 0.2s linear 0.2s;
-  -o-transition: all 0.2s linear 0.2s;
-  transition: all 0.2s linear 0.2s;
-}
-.oppia-gallery-menu.ng-enter.ng-enter-active {
-  opacity: 1;
-}
-
 .oppia-gallery-tiles-container {
-  background-color: white;
-  border-radius: 3px;
   height: 100%;
-  /* This is the same as the min-height in .oppia-gallery-menu. */
-  min-height: 600px;
+  margin-left: 160px;
+  margin-right: 160px;
+  max-width: 900px;
+  min-height: 500px;
+  padding-top: 25px;
 }
 
-.oppia-gallery-tile {
+md-card.oppia-gallery-tile {
   background-color: #fff;
   border: 1px solid #b3b3b3;
-  margin-bottom: 20px;
-  padding: 0;
+  color: #888;
+  height: 96px;
+  margin: -1px 0;
+  position: relative;
   width: 100%;
 }
 .oppia-gallery-tile:hover {
@@ -567,16 +535,22 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-gallery-tile-image-container {
+  height: 96px;
+  left: 0;
+  max-width: 96px;
   position: relative;
+  top: 0;
+  width: 96px;
 }
 /* This centers the image horizontally and vertically. */
 .oppia-gallery-tile-image {
   bottom: 0;
+  height: 96px;
   left: 0;
   margin: auto;
-  position: absolute;
   right: 0;
   top: 0;
+  width: 96px;
 }
 
 .oppia-gallery-tile-image-translucent {
@@ -598,51 +572,29 @@ div.wysiwyg iframe.wysiwyg-content-large {
   background-color: #607d8b;
 }
 
-.oppia-gallery-tile-details-container {
-  margin-left: 8px;
-  padding: 8px;
-  position: relative;
+.oppia-gallery-tile-contents {
+  height: 100%;
+  padding: 15px 50px;
+  width: 100%;
 }
-.oppia-gallery-tile-details:hover {
+.oppia-gallery-tile-contents:hover {
   text-decoration: none;
 }
 
+.oppia-gallery-tile-details {
+  padding-left: 85px;
+}
+.oppia-gallery-tile-first-row {
+  font-size: 120%;
+  margin-bottom: 8px;
+}
 .oppia-gallery-tile-title {
   color: #333;
-  font-size: 150%;
-  font-weight: bold;
-  margin-top: 10px;
-}
-.oppia-gallery-tile-objective {
-  color: #555;
-  font-size: 120%;
   font-weight: bold;
 }
-.oppia-gallery-tile-tags {
-  margin-left: -5px;
-  margin-top: 10px;
-  margin-bottom: 20px;
-}
-.oppia-gallery-tile-tag {
-  background-color: #607d8b;
-  border-radius: 0.7em;
-  color: #eee;
-  display: inline;
+
+.oppia-gallery-tile-second-row {
   font-size: 90%;
-  font-weight: bold;
-  line-height: 1;
-  padding: .3em 1em .4em;
-  text-align: center;
-  vertical-align: baseline;
-  white-space: nowrap;
-}
-.oppia-gallery-tile-metadata {
-  color: #666;
-  line-height: 1;
-}
-.oppia-gallery-tile-rating {
-  float: right;
-  margin-right: 20px;
 }
 
 .oppia-gallery-edit-btn {
@@ -650,7 +602,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   font-size: 12px;
   margin-top: 10px;
   position: absolute;
-  right: 7px;
+  right: -1px;
   top: -11px;
 }
 .oppia-gallery-edit-btn:hover {
@@ -680,12 +632,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   z-index: 3000;
 }
 
-.oppia-editor-prerequisites-form {
-  background: #eee;
-  border-radius: 5px;
-  padding: 5px;
-}
-
 .oppia-form input.ng-invalid.ng-dirty {
   border: 2px solid #FA787E;
 }
@@ -699,10 +645,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin: 10px;
   padding: 10px;
   width: 100%;
-}
-
-.oppia-lightly-grayed {
-  color: #888;
 }
 
 .oppia-grayed {
@@ -764,13 +706,33 @@ div.wysiwyg iframe.wysiwyg-content-large {
   padding: 6px;
 }
 
-.oppia-state-editor-header {
-  margin-top: -10px;
+.oppia-editor-cards-container {
+  margin: 20px auto;
+  max-width: 700px;
+}
+.oppia-editor-card {
+  background: rgb(255,255,255);
+  padding-bottom: 20px;
 }
 
-.oppia-state-editor-body {
+.oppia-editor-card-body {
   padding: 5px 10px;
   position: relative;
+}
+.oppia-editor-card-body h3 {
+  font-size: 18px;
+  margin: 0;
+}
+.oppia-editor-card-body h4 {
+  font-size: 14px;
+  margin: 0;
+}
+.oppia-editor-card-body form {
+  margin: 0;
+}
+
+.oppia-editor-rules-card {
+  margin: -8px 18px 8px 70px;
 }
 
 .oppia-state-content {
@@ -809,11 +771,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   }
 }
 
-.oppia-interaction-display {
-  margin: 0;
-  padding: 0 0 0 10px;
-}
-
 .oppia-interaction-editor {
   border: 1px solid #ccc;
   padding: 15px 15px 0px 15px;
@@ -828,6 +785,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .oppia-editable-section {
   cursor: pointer;
+  position: relative;
 }
 .oppia-editable-section:hover .oppia-state-content-display,
 .oppia-editable-section:hover .oppia-interaction-preview,
@@ -848,10 +806,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   position: absolute;
   width: 100%;
   z-index: 50;
-}
-
-.oppia-rules {
-  padding: 0 10px 5px 25px;
 }
 
 /* Styles for the state graph vizualization. */
@@ -880,9 +834,8 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-add-rule-button {
-  margin-top: -10px;
-  margin-bottom: 10px;
-  padding: 5px 40px;
+  padding: 5px;
+  width: 100%;
 }
 
 .oppia-small-delete-button {
@@ -897,9 +850,31 @@ div.wysiwyg iframe.wysiwyg-content-large {
   right: 25px;
 }
 
-.oppia-readonly-rule-container {
-  margin-left: -30px;
+.oppia-rule-tab {
+  background: #eeedee;
+  border-radius: 0;
+  border-bottom: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  border-top: 1px solid #ddd;
+  width: 100%;
 }
+.nav-pills > li.active > a.oppia-rule-tab-active {
+  background: #d0d0d0;
+  border-right: 0;
+  color: #666;
+  cursor: default;
+}
+
+.oppia-default-rule-tab {
+  border-left: 1px solid #ddd;
+}
+
+.oppia-rule-body-container {
+  padding-left: 0;
+  padding-right: 0;
+  width: 100%;
+}
+
 .oppia-readonly-rule-tile {
   background: #f5f5f5;
   border-radius: 4px;
@@ -910,14 +885,34 @@ div.wysiwyg iframe.wysiwyg-content-large {
   max-height: 50px;
 }
 
+.oppia-rule-user-avatar {
+  cursor: default;
+  height: 25px;
+  left: -55px;
+  position: absolute;
+  top: 8px;
+  width: 25px;
+}
+.oppia-rule-oppia-avatar {
+  cursor: default;
+  height: 25px;
+  left: -65px;
+  position: absolute;
+  top: -2px;
+  width: 25px;
+}
+
 .oppia-rule-editable-view {
   padding-bottom: 20px;
 }
 
 .oppia-rule-dest-link {
+  left: 0;
+  margin: 0 auto;
   position: absolute;
+  right: 0;
   /* This must be larger than the z-index in
-     .oppia-click-to-start-editing, so that the rule does not
+     .oppia-interactive-section-click-handler, so that the rule does not
      switch to edit mode when the destination link is clicked. */
   z-index: 200;
 }
@@ -928,19 +923,21 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-rule-sort-handle {
-  background: #ccc;
+  cursor: move;
+}
+.oppia-rule-sort-arrows-container {
+  background: #ddd;
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
   float: left;
-  margin-left: -10px;
+  margin-left: -25px;
   width: 25px;
 }
 .oppia-rule-sort-arrows {
-  cursor: move;
-  font-size: 14px;
-  margin-left: 5px;
-  padding-top: 3px;
-  padding-bottom: 6px;
+  font-size: 18px;
+  margin-left: 3px;
+  padding-top: 11px;
+  padding-bottom: 11px;
 }
 
 .oppia-rule-bubble {
@@ -950,7 +947,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: #000;
   padding: 5px;
   text-align: center;
-  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
 }
 
 .oppia-feedback-and-dest {
@@ -1059,41 +1055,31 @@ oppia-parameter {
 
 /* Splash page. */
 
-.oppia-gallery-banner {
-  background-image: url("/images/banner.png");
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 500px;
-  width: 100%;
+.oppia-splash-search-input {
+  background: #04857c;
+  border: 1px solid #018c7f;
+  border-radius: 0;
+  color: white;
+  font-size: 15px;
+  height: 34px;
 }
-.oppia-gallery-banner-content {
-  color: #fff;
-  font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 56px;
-  font-weight: bolder;
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 140px;
-  text-align: center;
-  width: 450px;
+.oppia-splash-search-input::-webkit-input-placeholder {
+  color: #ccc;
 }
-
-.oppia-splash-search {
-  border-left: none;
-  border-radius: 28px;
-  font-size: 23px;
-  height: 62px;
+.oppia-splash-search-input:-moz-placeholder {
+  color: #ccc;
+}
+.oppia-splash-search-input::-moz-placeholder {
+  color: #ccc;
+}
+.oppia-splash-search-input:-ms-input-placeholder {
+  color: #ccc;
 }
 
 .oppia-splash-search-icon {
-  background-color: #fff;
-  border-radius: 28px;
-}
-
-.oppia-splash-search-icon .glyphicon {
-  font-size: 20px;
-  margin-left: 7px;
-  margin-right: 3px;
+  background: #04857c;
+  border: 1px solid #018c7f;
+  color: white;
 }
 
 /* CSS3 Animations */
@@ -1134,6 +1120,40 @@ oppia-parameter {
   animation-duration: 1000ms;
   animation-iteration-count: infinite;
   animation-timing-function: ease-in-out;
+}
+
+.oppia-gallery-banner {
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 500px;
+  width: 100%;
+}
+.oppia-gallery-banner-content {
+  color: #fff;
+  font-family: "Capriola", "Roboto", Arial, sans-serif;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 100px;
+  text-align: center;
+  width: 450px;
+}
+.oppia-gallery-banner-link {
+  color: rgba(251, 234, 43, 0.9);
+}
+.oppia-gallery-banner-link:hover {
+  color: rgba(251, 234, 43, 1.0);
+  text-decoration: none;
+}
+
+.oppia-gallery-interstitial {
+  background: -webkit-gradient(linear, 30 0, 30 30, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
+  font-size: 1.3em;
+  height: 120px;
+  margin-top: -25px;
+  padding-top: 50px;
+  position: relative;
+  text-align: center;
+  width: 100%;
 }
 
 oppia-expression-error-tag {
@@ -1196,6 +1216,7 @@ oppia-expression-error-tag:after {
   color: #555;
   padding: 5px;
 }
+
 .oppia-feedback-tab-row {
   cursor: pointer;
 }
@@ -1203,32 +1224,6 @@ oppia-expression-error-tag:after {
   background: #eee;
 }
 
-
-.oppia-state-card {
-  background: rgb(255,255,255);
-  margin: 30px;
-  max-width: 900px;
-}
-
-.oppia-show-rule-editors-ctrl {
-  background-color: #eee;
-  height: 50px;
-  margin-bottom: -13px;
-  margin-left: -3px;
-  margin-right: -3px;
-  padding-top: 15px;
-}
-.oppia-show-rule-editors-ctrl:hover {
-  background-color: #ccc;
-  cursor: pointer;
-}
-
-.oppia-state-next-card {
-  cursor: pointer;
-  margin-bottom: -100px;
-  margin-top: 40px;
-  opacity: 0.7;
-}
 
 .oppia-editor-sidebar {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);

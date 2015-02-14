@@ -26,7 +26,6 @@ import zipfile
 import common
 
 TOOLS_DIR = os.path.join('..', 'oppia_tools')
-STATIC_IMAGES_DIR = os.path.join('.', 'static', 'images')
 THIRD_PARTY_DIR = os.path.join('.', 'third_party')
 THIRD_PARTY_STATIC_DIR = os.path.join(THIRD_PARTY_DIR, 'static')
 
@@ -160,18 +159,19 @@ UI_BOOTSTRAP_FILES = [
     for suffix in ['js', 'min.js']]
 
 MATERIAL_DESIGN_ICONS_REV = '1.0.1'
-MATERIAL_DESIGN_ICONS_ACTION_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/action/drawable-xxxhdpi'
+MATERIAL_DESIGN_ICONS_CONTENT_URL = (
+    'https://raw.githubusercontent.com/google/material-design-icons/%s/content/drawable-xxxhdpi'
     % MATERIAL_DESIGN_ICONS_REV)
-MATERIAL_DESIGN_ICONS_TOGGLE_URL = (
-    'https://raw.githubusercontent.com/google/material-design-icons/%s/toggle/drawable-xxxhdpi'
+MATERIAL_DESIGN_ICONS_NAVIGATION_URL = (
+    'https://raw.githubusercontent.com/google/material-design-icons/%s/navigation/drawable-xxxhdpi'
     % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICONS_DST = os.path.join(
-    STATIC_IMAGES_DIR, 'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
-MATERIAL_DESIGN_ICON_ACTION_FILES = ['ic_bookmark_outline_black_48dp.png']
-MATERIAL_DESIGN_ICON_TOGGLE_FILES = ['ic_star_outline_black_48dp.png']
+    THIRD_PARTY_STATIC_DIR,
+    'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
+MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
+MATERIAL_DESIGN_ICON_NAVIGATION_FILES = ['ic_more_vert_black_48dp.png']
 
-# Note that Angular 1.3.0 requires a jQuery version that is >= 2.1.1.
+# Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
 JQUERY_REV = '2.1.1'
 JQUERY_URL = 'https://ajax.googleapis.com/ajax/libs/jquery/%s' % JQUERY_REV
 JQUERY_DST = os.path.join(THIRD_PARTY_STATIC_DIR, 'jquery-%s' % JQUERY_REV)
@@ -184,7 +184,7 @@ JQUERYUI_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'jqueryui-%s' % JQUERYUI_REV)
 JQUERYUI_FILES = ['jquery-ui.min.js']
 
-ANGULAR_REV = '1.3.0-rc.5'
+ANGULAR_REV = '1.3.13'
 ANGULAR_URL = (
     'https://ajax.googleapis.com/ajax/libs/angularjs/%s' % ANGULAR_REV)
 ANGULAR_TEST_URL = 'https://code.angularjs.org/%s' % ANGULAR_REV
@@ -203,7 +203,7 @@ D3_FILES = ['d3.min.js']
 
 NG_INFINITE_SCROLL_REV = '1.0.0'
 NG_INFINITE_SCROLL_URL = (
-    'https://raw.github.com/BinaryMuse/ngInfiniteScroll/%s/build/' 
+    'https://raw.github.com/BinaryMuse/ngInfiniteScroll/%s/build/'
     % NG_INFINITE_SCROLL_REV)
 NG_INFINITE_SCROLL_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR, 'nginfinitescroll-%s' % NG_INFINITE_SCROLL_REV)
@@ -217,17 +217,13 @@ download_files(ANGULAR_URL, ANGULAR_DST, ANGULAR_FILES)
 download_files(ANGULAR_TEST_URL, ANGULAR_DST, ANGULAR_TEST_FILES)
 download_files(D3_URL, D3_DST, D3_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_ACTION_URL,
-    MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_ACTION_FILES)
+    MATERIAL_DESIGN_ICONS_CONTENT_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_CONTENT_FILES)
 download_files(
-    MATERIAL_DESIGN_ICONS_TOGGLE_URL,
-    MATERIAL_DESIGN_ICONS_DST,
-    MATERIAL_DESIGN_ICON_TOGGLE_FILES)
+    MATERIAL_DESIGN_ICONS_NAVIGATION_URL, MATERIAL_DESIGN_ICONS_DST,
+    MATERIAL_DESIGN_ICON_NAVIGATION_FILES)
 download_files(
-    NG_INFINITE_SCROLL_URL, 
-    NG_INFINITE_SCROLL_DST, 
-    NG_INFINITE_SCROLL_FILES)
+    NG_INFINITE_SCROLL_URL, NG_INFINITE_SCROLL_DST, NG_INFINITE_SCROLL_FILES)
 
 # Download all the frontend library zip files.
 BOWER_MATERIAL_REV = '0.6.0-rc1'

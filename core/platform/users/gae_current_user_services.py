@@ -18,7 +18,9 @@
 
 __author__ = 'Sean Lip'
 
-import urlparse
+import feconf
+import logging
+import utils
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -26,15 +28,14 @@ from google.appengine.ext import ndb
 
 def create_login_url(slug):
     """Creates a login url."""
-    return users.create_login_url(slug)
+    return users.create_login_url(utils.set_url_query_parameter(
+        feconf.SIGNUP_URL, 'return_url', slug))
 
 
 def create_logout_url(slug):
     """Creates a logout url."""
-    # Extract the relative path from slug.
-    # Example: slug="http://www.example.com/gallery" path="/gallery".
-    path = list(urlparse.urlparse(slug))[2]
-    return '/logout?url=%s' % path
+    logout_url = utils.set_url_query_parameter('/logout', 'return_url', slug)
+    return logout_url
 
 
 def get_current_user(request):
@@ -67,8 +68,10 @@ def get_user_id_from_email(email):
     try:
         u = users.User(email)
     except users.UserNotFoundError:
-        raise utils.InvalidInputException(
-            'User with email address %s not found' % email)
+        logging.error(
+            'The email address %s does not correspond to a valid user_id'
+            % email)
+        return None
 
     key = _FakeUser(id=email, user=u).put()
     obj = _FakeUser.get_by_id(key.id())

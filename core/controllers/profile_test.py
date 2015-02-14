@@ -21,46 +21,42 @@ from core.tests import test_utils
 import feconf
 
 
-class EditorPrerequisitesTest(test_utils.GenericTestBase):
+class SignupTest(test_utils.GenericTestBase):
 
-    def test_redirect_to_prerequisites_page_happens(self):
-        self.login(self.EDITOR_EMAIL)
-
+    def test_going_somewhere_else_while_signing_in_logs_user_out(self):
         exp_services.load_demo('0')
+
+        self.login(self.EDITOR_EMAIL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
+        self.assertEqual(response.status_int, 200)
         response = self.testapp.get('/create/0')
         self.assertEqual(response.status_int, 302)
-        self.assertIn(
-            feconf.EDITOR_PREREQUISITES_URL, response.headers['location'])
-
-        response = response.follow()
-        self.assertEqual(response.status_int, 200)
-        response.mustcontain(
-            'Welcome to the Oppia contributor community!',
-            'My preferred Oppia username')
+        self.assertIn('Logout', response.headers['location'])
+        self.assertIn('create', response.headers['location'])
 
         self.logout()
 
     def test_accepting_terms_is_handled_correctly(self):
-        self.register_editor(self.EDITOR_EMAIL)
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL, {'agreed_to_terms': False},
+            feconf.SIGNUP_DATA_URL, {'agreed_to_terms': False},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(response_dict['code'], 400)
         self.assertIn('you will need to accept', response_dict['error'])
 
         response_dict = self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL,
+            feconf.SIGNUP_DATA_URL,
             {'agreed_to_terms': 'Hasta la vista!'},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(response_dict['code'], 400)
         self.assertIn('you will need to accept', response_dict['error'])
 
         self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL, {'agreed_to_terms': True},
+            feconf.SIGNUP_DATA_URL,
+            {'agreed_to_terms': True, 'username': 'myusername'},
             csrf_token=csrf_token)
 
         self.logout()
@@ -68,24 +64,24 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
     def test_username_is_handled_correctly(self):
         self.login(self.EDITOR_EMAIL)
 
-        response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL, {'agreed_to_terms': True},
+            feconf.SIGNUP_DATA_URL, {'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(response_dict['code'], 400)
         self.assertIn('Empty username supplied', response_dict['error'])
 
         response_dict = self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL,
+            feconf.SIGNUP_DATA_URL,
             {'username': '', 'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(response_dict['code'], 400)
         self.assertIn('Empty username supplied', response_dict['error'])
 
         response_dict = self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL,
+            feconf.SIGNUP_DATA_URL,
             {'username': '!a!', 'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(response_dict['code'], 400)
@@ -93,7 +89,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
             'can only have alphanumeric characters', response_dict['error'])
 
         response_dict = self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL,
+            feconf.SIGNUP_DATA_URL,
             {'username': self.UNICODE_TEST_STRING, 'agreed_to_terms': True},
             csrf_token=csrf_token, expect_errors=True, expected_status_int=400)
         self.assertEqual(response_dict['code'], 400)
@@ -101,7 +97,7 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
             'can only have alphanumeric characters', response_dict['error'])
 
         response_dict = self.post_json(
-            feconf.EDITOR_PREREQUISITES_DATA_URL,
+            feconf.SIGNUP_DATA_URL,
             {'username': 'abcde', 'agreed_to_terms': True},
             csrf_token=csrf_token)
 
@@ -111,10 +107,10 @@ class EditorPrerequisitesTest(test_utils.GenericTestBase):
 class UsernameCheckHandlerTests(test_utils.GenericTestBase):
 
     def test_username_check(self):
-        self.register_editor('abc@example.com', username='abc')
+        self.signup('abc@example.com', username='abc')
 
         self.login(self.EDITOR_EMAIL)
-        response = self.testapp.get(feconf.EDITOR_PREREQUISITES_URL)
+        response = self.testapp.get(feconf.SIGNUP_URL)
         csrf_token = self.get_csrf_token_from_response(response)
 
         response_dict = self.post_json(

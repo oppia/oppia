@@ -33,17 +33,19 @@ oppia.controller('Base', [
   // If this is nonempty, the whole page goes into 'Loading...' mode.
   $rootScope.loadingMessage = '';
 
-  // Show the number of unseen notifications in the navbar and page title,
-  // unless the user is already on the dashboard page.
-  $http.get('/notificationshandler').success(function(data) {
-    if ($window.location.pathname !== '/') {
-      $scope.numUnseenNotifications = data.num_unseen_notifications;
-      if ($scope.numUnseenNotifications > 0) {
-        $window.document.title = (
-          '(' + $scope.numUnseenNotifications + ') ' + $window.document.title);
+  if (GLOBALS.userIsLoggedIn) {
+    // Show the number of unseen notifications in the navbar and page title,
+    // unless the user is already on the dashboard page.
+    $http.get('/notificationshandler').success(function(data) {
+      if ($window.location.pathname !== '/') {
+        $scope.numUnseenNotifications = data.num_unseen_notifications;
+        if ($scope.numUnseenNotifications > 0) {
+          $window.document.title = (
+            '(' + $scope.numUnseenNotifications + ') ' + $window.document.title);
+        }
       }
-    }
-  });
+    });
+  }
 
   /**
    * Checks if an object is empty.

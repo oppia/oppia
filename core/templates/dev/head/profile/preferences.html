@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block subtitle %}
+  Preferences
+{% endblock subtitle %}
+
+{% block navbar_breadcrumb %}
+  <ul class="nav navbar-nav oppia-navbar-breadcrumb">
+    <li>
+      <span class="oppia-navbar-breadcrumb-separator"></span>
+      Preferences
+    </li>
+  </ul>
+{% endblock navbar_breadcrumb %}
+
+{% block header_js %}
+  {{ super() }}
+  <script type="text/javascript">
+    GLOBALS.LANGUAGE_CODES_AND_NAMES = JSON.parse(
+      '{{LANGUAGE_CODES_AND_NAMES|js_string}}');
+  </script>
+{% endblock header_js %}
+
+{% block content %}
+  <div class="container" ng-controller="Preferences">
+    <div class="row">
+      <h1>Edit Preferences</h1>
+    </div>
+    <div class="row">
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Email address</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            {{user_email}}
+            <span class="help-block" style="font-size: smaller">
+              <em>Only moderators and site admins can see this.</em>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Username</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            {% if username %}
+              {{username}}
+            {% else %}
+              <em>Not yet selected</em>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <hr>
+
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Bio</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            <textarea ng-model="userBio" ng-blur="saveUserBio(userBio)" rows="5"></textarea>
+            <span class="help-block" style="font-size: smaller">
+              This field is optional. Anything you write here is public and
+              world-viewable.
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Preferred Languages</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            <!--
+              If the ng-if is omitted, the select2-dropdown directive won't be
+              updated after the initial page load.
+            -->
+            <div ng-if="hasPageLoaded">
+              <select2-dropdown choices="LANGUAGE_CHOICES"
+                item="$parent.preferredLanguageCodes" allow-multiple-choices="true"
+                new-choice-regex=".^" width="400"
+                placeholder="Select preferred languages..."
+                on-selection-change="savePreferredLanguageCodes($parent.preferredLanguageCodes)">
+              </select2-dropdown>
+            </div>
+            <span class="help-block" style="font-size: smaller">
+              These languages will be selected by default when you search the
+              gallery for explorations.
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block footer_js %}
+  {{ super() }}
+  <script>
+    {{ include_js_file('/profile/Preferences.js') }}
+  </script>
+{% endblock footer_js %}

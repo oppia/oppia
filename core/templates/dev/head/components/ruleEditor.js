@@ -78,20 +78,17 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       rule: '=',
-      answerChoices: '=',
-      interactionHandlerSpecs: '=',
-      isTmpRule: '&',
       saveRule: '=',
-      cancelEdit: '&',
       deleteRule: '&',
-      isEditable: '=',
-      heading: '@',
-      numRules: '&'
+      isEditable: '='
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
-      function($scope, $attrs, editorContextService, explorationStatesService, routerService, validatorsService) {
+      '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService',
+      'validatorsService', 'rulesService',
+      function(
+          $scope, $attrs, editorContextService, explorationStatesService, routerService,
+          validatorsService, rulesService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
@@ -105,23 +102,14 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           }
         };
 
+        $scope.getAnswerChoices = function() {
+          return rulesService.getAnswerChoices();
+        };
+
         $scope.ruleDestMemento = null;
         $scope.ruleDescriptionMemento = null;
         $scope.ruleDefinitionMemento = null;
         $scope.ruleFeedbackMemento = null;
-
-        $scope.allRuleTypes = {};
-        $scope.generateAllRuleTypes = function() {
-          for (var i = 0; i < $scope.interactionHandlerSpecs.length; i++) {
-            if ($scope.interactionHandlerSpecs[i].name == 'submit') {
-              $scope.allRuleTypes = {};
-              for (var description in $scope.interactionHandlerSpecs[i].rules) {
-                $scope.allRuleTypes[description] = $scope.interactionHandlerSpecs[i].rules[description].classifier;
-              }
-              return;
-            }
-          }
-        };
 
         $scope.ruleEditorIsOpen = false;
         $scope.openRuleEditor = function() {
@@ -135,19 +123,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             if ($scope.rule.feedback.length === 0) {
               $scope.rule.feedback.push('');
             }
-            if ($scope.rule.description === null) {
-              $scope.generateAllRuleTypes();
-              for (var key in $scope.allRuleTypes) {
-                $scope.rule.description = key;
-                $scope.currentRuleDescription = $scope.rule.description;
-                $scope.onSelectNewRuleType();
-                break;
-              }
-            } else {
-              $scope.currentRuleDescription = $scope.rule.description;
-            }
-
-            $scope.computeRuleDescriptionFragments();
           }
         };
 
@@ -190,7 +165,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.ruleDefinitionMemento = null;
           $scope.ruleFeedbackMemento = null;
           $scope.ruleDestMemento = null;
-          $scope.cancelEdit();
         };
         $scope.deleteThisRule = function() {
           $scope.cancelThisEdit();
@@ -219,10 +193,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           }
         };
-
-        $scope.$watch('interactionHandlerSpecs', function() {
-          $scope.generateAllRuleTypes();
-        });
 
         $scope.isDefaultRule = function() {
           return ($scope.rule.description === 'Default');
@@ -259,100 +229,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.rule.dest === editorContextService.getActiveStateName());
         };
 
-        $scope.onSelectNewRuleType = function() {
-          var description = $scope.currentRuleDescription;
-          $scope.rule.description = description;
-          for (var desc in $scope.allRuleTypes) {
-            if (desc === description) {
-              $scope.rule.definition.name = $scope.allRuleTypes[desc];
-              break;
-            }
-          }
-          $scope.rule.definition.inputs = {};
-          $scope.computeRuleDescriptionFragments();
-
-          // Finds the parameters and sets them in $scope.rule.definition.inputs.
-          var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
-          var copyOfRule = description;
-          while (true) {
-            if (!copyOfRule.match(pattern)) {
-              break;
-            }
-            var varName = copyOfRule.match(pattern)[1];
-            var varType = null;
-            if (copyOfRule.match(pattern)[2]) {
-              varType = copyOfRule.match(pattern)[2].substring(1);
-            }
-
-            if (varType == 'Set') {
-              $scope.rule.definition.inputs[varName] = [];
-            } else if (varType == 'NonnegativeInt') {
-              // Set a default value.
-              $scope.rule.definition.inputs[varName] = 0;
-            } else if (varType == "Graph") {
-              $scope.rule.definition.inputs[varName] = {
-                'vertices': [],
-                'edges': [],
-                'isDirected': false,
-                'isWeighted': false,
-                'isLabeled': false
-              };
-            } else {
-              $scope.rule.definition.inputs[varName] = '';
-            }
-
-            copyOfRule = copyOfRule.replace(pattern, ' ');
-          }
-        };
-
-        $scope.ruleDescriptionFragments = [];
-        $scope.computeRuleDescriptionFragments = function() {
-          if (!$scope.rule.description) {
-            $scope.ruleDescriptionFragments = [];
-            return;
-          }
-
-          var pattern = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
-
-          var finalInputArray = $scope.rule.description.split(pattern);
-          if (finalInputArray.length % 3 !== 1) {
-            $log.error('Could not process rule description.');
-          }
-
-          var result = [];
-          for (var i = 0; i < finalInputArray.length; i += 3) {
-            result.push({
-              type: 'noneditable',
-              // Omit the leading noneditable string.
-              text: i !== 0 ? finalInputArray[i] : ''
-            });
-            if (i == finalInputArray.length - 1) {
-              break;
-            }
-
-            if ($scope.answerChoices && $scope.answerChoices.length) {
-              // This rule is for a multiple-choice interaction.
-              // TODO(sll): Remove the need for this special case for multiple-choice
-              // input.
-              var _choices = angular.copy($scope.answerChoices);
-              $scope.ruleDescriptionChoices = $scope.answerChoices.map(function(choice, ind) {
-                return {
-                  val: choice.label,
-                  id: choice.val
-                };
-              });
-
-              result.push({'type': 'select', 'varName': finalInputArray[i+1]});
-            } else {
-              result.push({
-                'type': finalInputArray[i+2],
-                'varName': finalInputArray[i+1]
-              });
-            }
-          }
-          $scope.ruleDescriptionFragments = result;
-        };
-
         // Method that converts newly typed-in destination strings to text in the
         // rule destination dropdown.
         $scope.convertNewDestToText = function(term) {
@@ -362,11 +238,139 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.navigateToRuleDest = function() {
           routerService.navigateToMainTab($scope.rule.dest);
         };
-
-        if ($scope.isTmpRule()) {
-          $scope.openRuleEditor();
-        }
       }
     ]
+  };
+}]);
+
+
+oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
+  return {
+    restrict: 'E',
+    scope: {
+      currentRuleDescription: '=',
+      currentRuleDefinition: '='
+    },
+    templateUrl: 'rules/ruleDescriptionEditor',
+    controller: [
+        '$scope', '$attrs', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
+        'rulesService',
+        function($scope, $attrs, editorContextService, explorationStatesService, routerService, validatorsService, rulesService) {
+
+      var _generateAllRuleTypes = function() {
+        var _interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
+        for (var i = 0; i < _interactionHandlerSpecs.length; i++) {
+          if (_interactionHandlerSpecs[i].name == 'submit') {
+            $scope.allRuleTypes = {};
+            for (var description in _interactionHandlerSpecs[i].rules) {
+              $scope.allRuleTypes[description] = _interactionHandlerSpecs[i].rules[description].classifier;
+            }
+            return;
+          }
+        }
+      };
+
+      var _computeRuleDescriptionFragments = function() {
+        if (!$scope.currentRuleDescription) {
+          $scope.ruleDescriptionFragments = [];
+          return;
+        }
+
+        var pattern = /\{\{\s*(\w+)\s*\|\s*(\w+)\s*\}\}/;
+
+        var finalInputArray = $scope.currentRuleDescription.split(pattern);
+        if (finalInputArray.length % 3 !== 1) {
+          $log.error('Could not process rule description.');
+        }
+
+        var result = [];
+        for (var i = 0; i < finalInputArray.length; i += 3) {
+          result.push({
+            type: 'noneditable',
+            // Omit the leading noneditable string.
+            text: i !== 0 ? finalInputArray[i] : ''
+          });
+          if (i == finalInputArray.length - 1) {
+            break;
+          }
+
+          var _answerChoices = rulesService.getAnswerChoices();
+
+          if (_answerChoices && _answerChoices.length) {
+            // This rule is for a multiple-choice interaction.
+            // TODO(sll): Remove the need for this special case for multiple-choice
+            // input.
+            $scope.ruleDescriptionChoices = _answerChoices.map(function(choice, ind) {
+              return {
+                val: choice.label,
+                id: choice.val
+              };
+            });
+
+            result.push({'type': 'select', 'varName': finalInputArray[i+1]});
+          } else {
+            result.push({
+              'type': finalInputArray[i+2],
+              'varName': finalInputArray[i+1]
+            });
+          }
+        }
+        $scope.ruleDescriptionFragments = result;
+      };
+
+      $scope.onSelectNewRuleType = function() {
+        $scope.currentRuleDefinition.name = $scope.allRuleTypes[$scope.currentRuleDescription];
+        $scope.currentRuleDefinition.inputs = {};
+        _computeRuleDescriptionFragments();
+
+        // Finds the parameters and sets them in $scope.currentRuleDefinition.inputs.
+        var pattern = /\{\{\s*(\w+)\s*(\|\s*\w+\s*)?\}\}/;
+        var copyOfRule = $scope.currentRuleDescription;
+        while (true) {
+          if (!copyOfRule.match(pattern)) {
+            break;
+          }
+          var varName = copyOfRule.match(pattern)[1];
+          var varType = null;
+          if (copyOfRule.match(pattern)[2]) {
+            varType = copyOfRule.match(pattern)[2].substring(1);
+          }
+
+          if (varType == 'Set') {
+            $scope.currentRuleDefinition.inputs[varName] = [];
+          } else if (varType == 'NonnegativeInt') {
+            // Set a default value.
+            $scope.currentRuleDefinition.inputs[varName] = 0;
+          } else if (varType == "Graph") {
+            $scope.currentRuleDefinition.inputs[varName] = {
+              'vertices': [],
+              'edges': [],
+              'isDirected': false,
+              'isWeighted': false,
+              'isLabeled': false
+            };
+          } else {
+            $scope.currentRuleDefinition.inputs[varName] = '';
+          }
+
+          copyOfRule = copyOfRule.replace(pattern, ' ');
+        }
+      };
+
+      _generateAllRuleTypes();
+      if ($scope.currentRuleDescription === null) {
+        for (var key in $scope.allRuleTypes) {
+          $scope.currentRuleDescription = key;
+          $scope.onSelectNewRuleType();
+          break;
+        }
+      }
+
+      _computeRuleDescriptionFragments();
+
+      $scope.$watch('rulesService.interactionHandlerSpecs', function() {
+        _generateAllRuleTypes();
+      });
+    }]
   };
 }]);

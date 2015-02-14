@@ -122,21 +122,21 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                              'category': default_category,
                              'status': default_status}
 
-            self.register_editor('admin@example.com')
-            self.login('admin@example.com')
-            self.owner_id = self.get_user_id_from_email('admin@example.com')
-            self.set_admins(['admin@example.com'])
+            self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
+            self.login(self.ADMIN_EMAIL)
+            self.ADMIN_ID = self.get_user_id_from_email(self.ADMIN_EMAIL)
+            self.set_admins([self.ADMIN_EMAIL])
 
             # create and delete an exploration (to make sure job handles
             # deleted explorations correctly)
             exp_id = '100'
             self.save_new_valid_exploration(
                 exp_id,
-                self.owner_id,
+                self.ADMIN_ID,
                 title=default_specs['title'],
                 category=default_specs['category'])
             exploration = exp_services.get_exploration_by_id(exp_id)
-            exp_services.delete_exploration(self.owner_id, exp_id)
+            exp_services.delete_exploration(self.ADMIN_ID, exp_id)
 
             # get dummy explorations
             num_exps = len(exp_specs)
@@ -148,18 +148,18 @@ class ExpSummariesCreationOneOffJobTest(test_utils.GenericTestBase):
                 spec.update(exp_specs[ind])
                 self.save_new_valid_exploration(
                     exp_id,
-                    self.owner_id,
+                    self.ADMIN_ID,
                     title=spec['title'],
                     category=spec['category'])
                 exploration = exp_services.get_exploration_by_id(exp_id)
 
                 # publish or publicize exploration
                 if spec['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
-                    rights_manager.publish_exploration(self.owner_id, exp_id)
+                    rights_manager.publish_exploration(self.ADMIN_ID, exp_id)
                 elif (spec['status'] ==
                         rights_manager.EXPLORATION_STATUS_PUBLICIZED):
-                    rights_manager.publish_exploration(self.owner_id, exp_id)
-                    rights_manager.publicize_exploration(self.owner_id, exp_id)
+                    rights_manager.publish_exploration(self.ADMIN_ID, exp_id)
+                    rights_manager.publicize_exploration(self.ADMIN_ID, exp_id)
 
                 # do not include user_id here, so all explorations are not
                 # editable for now (will be updated depending on user_id

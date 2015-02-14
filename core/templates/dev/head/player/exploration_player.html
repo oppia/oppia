@@ -29,7 +29,7 @@
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
       ng-controller="LearnerLocalNav">
     <li class="dropdown">
-      <a href="#" title="Share" class="dropdown-toggle" data-toggle="dropdown">
+      <a href="" title="Share" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-share"></span>
       </a>
       <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu">
@@ -43,22 +43,24 @@
           </a>
         </li>
         <li>
-          <a href="#" ng-click="showEmbedExplorationModal(explorationId)">
-            <span>&lt;&gt</span>
+          <a href="" ng-click="showEmbedExplorationModal(explorationId)">
+            <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
           </a>
         </li>
       </ul>
     </li>
     <li>
-      <a href="#" title="Give feedback" ng-click="showFeedbackModal()">
+      <a href="" title="Give feedback" ng-click="showFeedbackModal()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
-    <li>
-      <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
-        <span class="glyphicon glyphicon-pencil"></span>
-      </a>
-    </li>
+    {% if can_edit %}
+      <li>
+        <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
+          <span class="glyphicon glyphicon-pencil"></span>
+        </a>
+      </li>
+    {% endif %}
   </ul>
 {% endblock local_top_nav_options %}
 
@@ -68,13 +70,21 @@
 
   <script type="text/ng-template" id="modals/playerFeedback">
     <div class="modal-header">
-      <h3>Give Feedback to the Exploration Editor</h3>
+      <h3>
+        <span ng-if="!stateName">
+          Give Feedback on this Exploration
+        </span>
+        <span ng-if="stateName">
+          Give Feedback on this Card
+        </span>
+      </h3>
     </div>
 
     <div class="modal-body">
       <p>
         <em>
-          This form is meant for exploration-specific feedback. To give general feedback about Oppia, please consider using the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a>. Thanks in advance!
+          The feedback you write here will be sent to the editors of this exploration.
+          To give general feedback about Oppia, please use the <a href="https://code.google.com/p/oppia/issues/list"> bug tracker</a> or <a href="https://groups.google.com/forum/?fromgroups#!forum/oppia-dev">Google Group</a> instead. Thanks in advance!
         </em>
       </p>
 
@@ -85,21 +95,6 @@
         </div>
         <label for="feedback">Feedback</label>
         <textarea id="feedback" class="form-control" ng-model="feedback" rows="6" cols="200" placeholder="Please write your feedback or suggestions for the exploration editors here."></textarea>
-        <!-- Note that, for this to use the correct $scope.relatedTo, it must be an ng-show and not an ng-if. -->
-        <div ng-show="currentStateName !== 'END'">
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToState" value="state">
-              This feedback relates to the current question.
-            </label>
-          </div>
-          <div class="radio">
-            <label>
-              <input type="radio" ng-model="relatedTo" name="relatedTo" id="relatedToExploration" value="exploration">
-              This feedback relates to the exploration as a whole.
-            </label>
-          </div>
-        </div>
         <div ng-show="isLoggedIn">
           <hr>
           <div class="checkbox">
@@ -114,7 +109,7 @@
 
     <div class="modal-footer">
       <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-      <button class="btn btn-success" ng-click="submit(subject, feedback, relatedTo, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
+      <button class="btn btn-success" ng-click="submit(subject, feedback, isSubmitterAnonymized)" ng-disabled="!feedback">Submit</button>
     </div>
   </script>
 

@@ -18,9 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
-describe('Editor prerequisites controller', function() {
+describe('Signup controller', function() {
 
-  describe('EditorPrerequisitesCtrl', function() {
+  describe('SignupCtrl', function() {
     var scope, ctrl, $httpBackend, rootScope, mockWarningsData, urlParams;
 
     beforeEach(function() {
@@ -29,7 +29,7 @@ describe('Editor prerequisites controller', function() {
 
     beforeEach(inject(function(_$httpBackend_, $http, $rootScope, $controller) {
       $httpBackend = _$httpBackend_;
-      $httpBackend.expectGET('/editor_prerequisites_handler/data/').respond({
+      $httpBackend.expectGET('/signuphandler/data').respond({
         username: 'myUsername',
         has_agreed_to_terms: false
       });
@@ -46,7 +46,7 @@ describe('Editor prerequisites controller', function() {
         }
       };
 
-      ctrl = $controller('EditorPrerequisites', {
+      ctrl = $controller('Signup', {
         $scope: scope,
         $http: $http,
         $rootScope: rootScope,

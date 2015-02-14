@@ -19,10 +19,10 @@
  */
 
 oppia.factory('routerService', [
-    '$rootScope', '$location', '$log', 'explorationInitStateNameService',
+    '$rootScope', '$location', '$window', '$timeout', '$interval', '$log', 'explorationInitStateNameService',
     'editorContextService', 'explorationStatesService', 'oppiaPlayerService',
     'explorationParamSpecsService', 'explorationTitleService', 'explorationData',
-    function($rootScope, $location, $log, explorationInitStateNameService,
+    function($rootScope, $location, $window, $timeout, $interval, $log, explorationInitStateNameService,
              editorContextService, explorationStatesService, oppiaPlayerService,
              explorationParamSpecsService, explorationTitleService, explorationData) {
 
@@ -47,6 +47,11 @@ oppia.factory('routerService', [
       return;
     }
 
+    if (!oldPath) {
+      // This can happen when clicking on links whose href is "#".
+      return;
+    }
+
     $rootScope.$broadcast('externalSave');
 
     if (newPath === '/preview') {
@@ -66,14 +71,20 @@ oppia.factory('routerService', [
     } else if (newPath.indexOf('/gui/') !== -1) {
       _tabs.active = MAIN_TAB;
       var putativeStateName = newPath.substring('/gui/'.length);
-      if (!explorationStatesService.getStates()) {
-        return;
-      } else if (explorationStatesService.getState(putativeStateName)) {
-        editorContextService.setActiveStateName(putativeStateName);
-      } else {
-        $location.path('/gui/' + explorationInitStateNameService.savedMemento);
-      }
-      $rootScope.$broadcast('refreshStateEditor');
+
+      var waitForStatesToLoad = $interval(function() {
+        var allStates = explorationStatesService.getStates();
+        if (allStates) {
+          $interval.cancel(waitForStatesToLoad);
+
+          if (allStates.hasOwnProperty(putativeStateName)) {
+            editorContextService.setActiveStateName(putativeStateName);
+            $rootScope.$broadcast('refreshStateEditor');
+          } else {
+            $location.path('/gui/' + explorationInitStateNameService.savedMemento);
+          }
+        }
+      }, 300);
     } else {
       if (explorationInitStateNameService.savedMemento) {
         $location.path('/gui/' + explorationInitStateNameService.savedMemento);
@@ -93,6 +104,14 @@ oppia.factory('routerService', [
     }
   };
 
+  var _getCurrentStateFromLocationPath = function() {
+    if ($location.path().indexOf('/gui/') !== -1) {
+      return $location.path().substring('/gui/'.length);
+    } else {
+      return null;
+    }
+  };
+
   var routerService = {
     savePendingChanges: function() {
       _savePendingChanges();
@@ -108,18 +127,34 @@ oppia.factory('routerService', [
         currentPath === '/feedback');
     },
     getCurrentStateFromLocationPath: function() {
-      if ($location.path().indexOf('/gui/') !== -1) {
-        return $location.path().substring('/gui/'.length);
-      } else {
-        return null;
-      }
+      return _getCurrentStateFromLocationPath();
     },
     navigateToMainTab: function(stateName) {
       _savePendingChanges();
-      if (stateName) {
-        editorContextService.setActiveStateName(stateName);
+
+      if (_getCurrentStateFromLocationPath() === stateName) {
+        return;
       }
-      $location.path('/gui/' + editorContextService.getActiveStateName());
+
+      var _actuallyNavigate = function(newStateName) {
+        if (newStateName) {
+          editorContextService.setActiveStateName(newStateName);
+        }
+        $location.path('/gui/' + editorContextService.getActiveStateName());
+        $window.scrollTo(0, 0);
+      };
+
+      if (_tabs.active === MAIN_TAB) {
+        $('.oppia-editor-cards-container').fadeOut(function() {
+          _actuallyNavigate(stateName);
+          $rootScope.$apply();
+          $timeout(function() {
+            $('.oppia-editor-cards-container').fadeIn();
+          }, 150);
+        });
+      } else {
+        _actuallyNavigate(stateName);
+      }
     },
     navigateToPreviewTab: function() {
       _savePendingChanges();

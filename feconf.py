@@ -54,8 +54,17 @@ DEFAULT_QUERY_LIMIT = 1000
 # The id and name for the final state of an exploration.
 END_DEST = 'END'
 
-# The default number of items to show on a page in a paged view.
-DEFAULT_PAGE_SIZE = 50
+# The default number of exploration tiles to load at a time in the gallery
+# page.
+GALLERY_PAGE_SIZE = 10
+
+# The default number of commits to show on a page in the exploration history
+# tab.
+COMMIT_LIST_PAGE_SIZE = 50
+
+# The default number of items to show on a page in the exploration feedback
+# tab.
+FEEDBACK_TAB_PAGE_SIZE = 20
 
 # Default name for the initial state of an exploration.
 DEFAULT_INIT_STATE_NAME = 'First State'
@@ -113,6 +122,9 @@ XSSI_PREFIX = ')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # Invalid names for parameters used in expressions.
+# TODO(sll): We may actually be able to allow the use of stateSticky -- its
+# prior use in the codebase has been deprecated. If this is still the case by
+# June 2015, remove stateSticky from this list.
 AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
 INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
     'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
@@ -222,8 +234,6 @@ DEMO_EXPLORATIONS = [
 CLONE_EXPLORATION_URL = '/contributehandler/clone'
 CONTRIBUTE_GALLERY_URL = '/contribute'
 CONTRIBUTE_GALLERY_DATA_URL = '/contributehandler/data'
-EDITOR_PREREQUISITES_URL = '/editor_prerequisites'
-EDITOR_PREREQUISITES_DATA_URL = '/editor_prerequisites_handler/data'
 EDITOR_URL_PREFIX = '/create'
 EXPLORATION_RIGHTS_PREFIX = '/createhandler/rights'
 EXPLORATION_DATA_PREFIX = '/createhandler/data'
@@ -235,7 +245,6 @@ FEEDBACK_THREADLIST_URL_PREFIX = '/threadlisthandler'
 GALLERY_URL = '/gallery'
 GALLERY_CREATE_MODE_URL = '%s?mode=create' % GALLERY_URL
 GALLERY_DATA_URL = '/galleryhandler/data'
-GALLERY_LOGIN_REDIRECT_URL = '/gallery_login_redirect'
 LEARN_GALLERY_URL = '/learn'
 LEARN_GALLERY_DATA_URL = '/learnhandler/data'
 NEW_EXPLORATION_URL = '/contributehandler/create_new'
@@ -243,6 +252,8 @@ PLAYTEST_QUEUE_URL = '/playtest'
 PLAYTEST_QUEUE_DATA_URL = '/playtesthandler/data'
 RECENT_COMMITS_DATA_URL = '/recentcommitshandler/recent_commits'
 RECENT_FEEDBACK_MESSAGES_DATA_URL = '/recent_feedback_messages'
+SIGNUP_URL = '/signup'
+SIGNUP_DATA_URL = '/signuphandler/data'
 UPLOAD_EXPLORATION_URL = '/contributehandler/upload'
 USERNAME_CHECK_DATA_URL = '/usernamehandler/data'
 

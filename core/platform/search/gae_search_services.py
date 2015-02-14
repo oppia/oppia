@@ -108,12 +108,9 @@ def _dict_to_search_document(d):
     language_code = d.get('language_code')
 
     fields = []
-
     for key, value in d.iteritems():
-        if key == 'id' or key == 'rank' or key == 'language_code':
-            continue
-
-        fields += _make_fields(key, value)
+        if key not in ['id', 'rank']:
+            fields += _make_fields(key, value)
 
     doc = gae_search.Document(
         doc_id=doc_id, fields=fields, rank=rank, language=language_code)
@@ -201,7 +198,7 @@ def delete_documents_from_index(doc_ids, index, retries=DEFAULT_NUM_RETRIES):
         raise SearchFailureError(e)
 
 
-def search(query_string, index, cursor=None, limit=feconf.DEFAULT_PAGE_SIZE,
+def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
            sort='', ids_only=False, retries=DEFAULT_NUM_RETRIES):
     """Searches for documents in an index.
 

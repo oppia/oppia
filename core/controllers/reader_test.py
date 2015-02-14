@@ -34,14 +34,14 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         """Before each individual test, create a dummy exploration."""
         super(ReaderPermissionsTest, self).setUp()
 
-        self.editor_id = self.get_user_id_from_email(self.EDITOR_EMAIL)
-        self.register_editor(self.EDITOR_EMAIL)
+        self.signup(self.EDITOR_EMAIL, self.EDITOR_USERNAME)
+        self.EDITOR_ID = self.get_user_id_from_email(self.EDITOR_EMAIL)
 
         exploration = exp_domain.Exploration.create_default_exploration(
             self.EXP_ID, self.UNICODE_TEST_STRING, self.UNICODE_TEST_STRING)
         exploration.states[exploration.init_state_name].interaction.handlers[
             0].rule_specs[0].dest = feconf.END_DEST
-        exp_services.save_new_exploration(self.editor_id, exploration)
+        exp_services.save_new_exploration(self.EDITOR_ID, exploration)
 
     def test_unpublished_explorations_are_invisible_to_logged_out_users(self):
         response = self.testapp.get(
@@ -50,7 +50,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.assertEqual(response.status_int, 404)
 
     def test_unpublished_explorations_are_invisible_to_unconnected_users(self):
-        self.login('person@example.com')
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -58,14 +58,15 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_invisible_to_other_editors(self):
-        other_editor_email = 'another@example.com'
+        OTHER_EDITOR_EMAIL = 'another@example.com'
+        self.signup(OTHER_EDITOR_EMAIL, 'othereditorusername')
 
         other_exploration = exp_domain.Exploration.create_default_exploration(
             'eid2', 'A title', 'A category')
         exp_services.save_new_exploration(
-            other_editor_email, other_exploration)
+            OTHER_EDITOR_EMAIL, other_exploration)
 
-        self.login(other_editor_email)
+        self.login(OTHER_EDITOR_EMAIL)
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
@@ -80,6 +81,7 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_unpublished_explorations_are_visible_to_admins(self):
+        self.signup(self.ADMIN_EMAIL, self.ADMIN_USERNAME)
         self.set_admins([self.ADMIN_EMAIL])
         self.login(self.ADMIN_EMAIL)
         response = self.testapp.get(
@@ -88,12 +90,13 @@ class ReaderPermissionsTest(test_utils.GenericTestBase):
         self.logout()
 
     def test_published_explorations_are_visible_to_anyone(self):
-        rights_manager.publish_exploration(self.editor_id, self.EXP_ID)
+        rights_manager.publish_exploration(self.EDITOR_ID, self.EXP_ID)
 
         response = self.testapp.get(
             '%s/%s' % (feconf.EXPLORATION_URL_PREFIX, self.EXP_ID),
             expect_errors=True)
         self.assertEqual(response.status_int, 200)
+
 
 class ReaderControllerEndToEndTests(test_utils.GenericTestBase):
     """Test the reader controller using the sample explorations."""
@@ -198,7 +201,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
 
     def test_give_feedback_handler(self):
         """Test giving feedback handler."""
-        viewer_email = 'viewer@example.com'
+        self.signup(self.VIEWER_EMAIL, self.VIEWER_USERNAME)
 
         # Load demo exploration
         EXP_ID = '0'
@@ -206,7 +209,7 @@ class FeedbackIntegrationTest(test_utils.GenericTestBase):
         exp_services.load_demo('0')
 
         # Viewer opens exploration
-        self.login(viewer_email)
+        self.login(self.VIEWER_EMAIL)
         exploration_dict = self.get_json(
             '%s/%s' % (feconf.EXPLORATION_INIT_URL_PREFIX, EXP_ID))
         state_name_1 = exploration_dict['exploration']['init_state_name']
