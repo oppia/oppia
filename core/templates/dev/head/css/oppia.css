@@ -37,6 +37,12 @@
 md-input-group.long > input
 {
   width: 100%;
+  height: 45px;
+}
+
+md-input-group.blue-on-focus > input:focus {
+  border-bottom-color: rgb(63, 81, 181);
+  border-bottom-width: 2px;
 }
 
 md-input-group.md-default-theme label
@@ -81,7 +87,7 @@ a:hover {
 }
 
 input.ng-dirty.ng-invalid {
-  border: 1px solid red;
+  border-bottom-color: #F44336 !important;
 }
 
 /* Change the color of odd-numbered lines in a table. */
