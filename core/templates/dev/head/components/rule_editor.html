@@ -99,10 +99,24 @@
         </div>
 
         <div class="oppia-dest-bubble protractor-test-dest-bubble">
-          <span style="font-size: 2em; margin: 0 10px;">→</span>
-          <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex="^[A-Z a-z0-9\.]+$" dropdown-css-class="oppia-rule-dest-select2" format-new-selection="convertNewDestToText" invalid-search-term-message="Invalid state name">
-          </select2-dropdown>
-          <span ng-if="rule.dest == stateName"> ⟳ </span><br />
+          <span style="font-size: 2em; margin: 0 10px;">
+            <span ng-if="rule.dest === getActiveStateName()">⟳</span>
+            <span ng-if="rule.dest !== getActiveStateName()">→</span>
+          </span>
+          <span ng-if="!reloadingDestinations" style="width: 200px;">
+            <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex=".^" dropdown-css-class="oppia-rule-dest-select2" format-new-selection="convertNewDestToText" invalid-search-term-message="Invalid state name">
+            </select2-dropdown>
+          </span>
+
+          <span style="margin: 0 10px;">
+            or
+          </span>
+
+          <button type="button" class="btn btn-default" ng-click="openAddStateModal(rule)">
+            <span class="glyphicon glyphicon-plus">
+            </span>
+            Create New State
+          </button>
         </div>
       </div>
 
@@ -115,6 +129,28 @@
   </div>
 </div>
 
+<script type="text/ng-template" id="modals/addState">
+  <div class="modal-header">
+    <h3>Add New State</h3>
+  </div>
+
+  <div class="modal-body">
+    <div ng-show="isEditable">
+      <form role="form" class="form-inline">
+        <div class="form-group">
+          <input type="text" class="form-control protractor-test-add-state-input" ng-model="newStateName" placeholder="New State Name" focus-on="newStateNameInput">
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+    <button class="btn btn-success protractor-test-add-state-submit" ng-click="submit(newStateName)"      ng-disabled="!isNewStateNameValid(newStateName)">
+      Add State
+    </button>
+  </div>
+</script>
 
 <script type="text/ng-template" id="rules/ruleDescriptionEditor">
   <form class="form-inline" role="form">
