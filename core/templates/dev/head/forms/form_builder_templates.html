@@ -105,7 +105,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/int">
   <div class="input-group">
     <span ng-if="!expressionMode">
-      <md-input-group class="long blue-on-focus md-default-theme">
+      <md-input-group class="long oppia-blue-on-focus md-default-theme">
         <input type="number" ng-model="$parent.localValue" ng-disabled="isDisabled()"
                required apply-validation="validators()" focus-on="<[labelForFocusTarget()]>"
                on-input-blur="onInputBlur()"
@@ -134,7 +134,7 @@
   <span>
     <span class="input-group" ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <md-input-group class="long blue-on-focus md-default-theme" class="oppia-active-input">
+        <md-input-group class="long oppia-blue-on-focus md-default-theme" class="oppia-active-input">
           <input style="height: 25px; margin-top: 25px;" type="text" name="floatValue" ng-model="$parent.localValue"
                  require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
                  focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
@@ -184,7 +184,7 @@
               ng-focus="onInputFocus()">
     </textarea>
 
-    <md-input-group class="long blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()">
+    <md-input-group class="long oppia-blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()">
       <input ng-disabled="isDisabled()" ng-model="$parent.$parent.localValue" type="text"
              ng-blur="onInputBlur()" ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>" 
              ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" style="padding-top: 20px;">
