@@ -305,6 +305,7 @@ oppia.controller('SearchBar', [
       description: '',
       itemsName: 'categories',
       masterList: $scope.ALL_CATEGORIES,
+      numSelections: 0,
       selections: {},
       summary: ''
     },
@@ -312,39 +313,16 @@ oppia.controller('SearchBar', [
       description: '',
       itemsName: 'languages',
       masterList: $scope.ALL_LANGUAGE_CODES,
+      numSelections: 0,
       selections: {},
       summary: ''
     }
   };
 
-  // Returns a summary of the selected items in the given object.
-  var _getSelectionSummary = function(itemsType) {
+  // Update the description, numSelections and summary fields of the relevant
+  // entry of $scope.selectionDetails.
+  var _updateSelectionDetails = function(itemsType) {
     var itemsName = $scope.selectionDetails[itemsType].itemsName;
-
-    var totalCount = 0;
-    var lastSelectedItem = null;
-    for (var item in $scope.selectionDetails[itemsType].selections) {
-      if ($scope.selectionDetails[itemsType].selections[item]) {
-        totalCount++;
-        lastSelectedItem = item;
-      }
-    }
-
-    if (totalCount === 0) {
-      return itemsName.charAt(0).toUpperCase() + itemsName.substr(1) + '...';
-    } else if (totalCount === 1) {
-      var masterList = $scope.selectionDetails[itemsType].masterList;
-      for (var i = 0; i < masterList.length; i++) {
-        if (masterList[i].id === lastSelectedItem) {
-          return masterList[i].text;
-        }
-      }
-    } else {
-      return totalCount + ' ' + itemsName;
-    }
-  };
-
-  var _getSelectionDescription = function(itemsType) {
     var masterList = $scope.selectionDetails[itemsType].masterList;
 
     var selectedItems = [];
@@ -353,9 +331,18 @@ oppia.controller('SearchBar', [
         selectedItems.push(masterList[i].text);
       }
     }
-    return (
+
+    var totalCount = selectedItems.length;
+    $scope.selectionDetails[itemsType].numSelections = totalCount;
+
+    $scope.selectionDetails[itemsType].summary = (
+      totalCount === 0 ? itemsName.charAt(0).toUpperCase() + itemsName.substr(1) + '...' :
+      totalCount === 1 ? selectedItems[0] :
+      totalCount + ' ' + itemsName);
+
+    $scope.selectionDetails[itemsType].description = (
       selectedItems.length > 0 ? selectedItems.join(', ') :
-      'All ' + $scope.selectionDetails[itemsType].itemsName + ' selected');
+      'All ' + itemsName + ' selected');
   };
 
   $scope.toggleSelection = function(itemsType, optionName) {
@@ -366,9 +353,7 @@ oppia.controller('SearchBar', [
       selections[optionName] = !selections[optionName];
     }
 
-    $scope.selectionDetails[itemsType].description = _getSelectionDescription(itemsType);
-    $scope.selectionDetails[itemsType].summary = _getSelectionSummary(itemsType);
-
+    _updateSelectionDetails(itemsType);
     _onSearchQueryChangeExec();
   };
 
@@ -390,8 +375,7 @@ oppia.controller('SearchBar', [
 
   // Initialize the selection descriptions and summaries.
   for (var itemsType in $scope.selectionDetails) {
-    $scope.selectionDetails[itemsType].description =  _getSelectionDescription(itemsType);
-    $scope.selectionDetails[itemsType].summary = _getSelectionSummary(itemsType);
+    _updateSelectionDetails(itemsType);
   }
 
   $scope.onSearchQueryChange = function(evt) {
