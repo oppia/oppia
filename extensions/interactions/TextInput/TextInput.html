@@ -12,7 +12,7 @@
   <div class="row text-input-container">
     <form ng-submit="submitAnswer(answer)" role="form" class="form-horizontal">
       <div ng-class="rows > 1 ? 'col-lg-10 col-md-10 col-sm-10' : 'col-lg-12 col-md-12 col-sm-12' ">
-        <schema-based-editor schema="schema" local-value="answer">
+        <schema-based-editor schema="schema" local-value="answer" label-for-focus-target="textInputFocusLabel">
         </schema-based-editor>
       </div>
       <div ng-show="rows > 1" class="col-lg-2 col-md-2 col-sm-2">

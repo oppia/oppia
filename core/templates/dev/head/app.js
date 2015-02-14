@@ -265,10 +265,17 @@ oppia.factory('validatorsService', [
 // Service for setting focus. This broadcasts a 'focusOn' event which sets
 // focus to the element in the page with the corresponding focusOn attribute.
 oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $timeout) {
+  var _nextLabelToFocusOn = null;
   return {
     setFocus: function(name) {
+      if (_nextLabelToFocusOn) {
+        return;
+      }
+
+      _nextLabelToFocusOn = name;
       $timeout(function() {
-        $rootScope.$broadcast('focusOn', name);
+        $rootScope.$broadcast('focusOn', _nextLabelToFocusOn);
+        _nextLabelToFocusOn = null;
       });
     }
   };
