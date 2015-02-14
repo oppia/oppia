@@ -828,10 +828,6 @@ md-card.oppia-gallery-tile {
   margin-top: 25px;
 }
 
-.oppia-add-state-container {
-  margin-top: 10px;
-}
-
 /* Styles for the statistics page. */
 
 .oppia-back-arrow {
@@ -909,7 +905,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-rule-editable-view {
-  padding-bottom: 20px;
+  margin-left: 55px;
 }
 
 .oppia-rule-dest-link {
@@ -946,32 +942,8 @@ md-card.oppia-gallery-tile {
   padding-bottom: 11px;
 }
 
-.oppia-rule-bubble {
-  background: #F9EDBE;
-  border-top-left-radius: 8px;
-  border-top-right-radius: 8px;
-  color: #000;
-  padding: 5px;
-  text-align: center;
-}
-
-.oppia-feedback-and-dest {
-  display: table;
-  width: 100%;
-}
-.oppia-feedback-bubble {
-  background: #E0E0E0;
-  border-bottom-left-radius: 8px;
-  display: table-cell;
-  padding: 5px 10px 15px 10px;
-}
-.oppia-dest-bubble {
-  background: #EEEEEE;
-  border-bottom-right-radius: 8px;
-  display: table-cell;
-  padding: 5px;
-  vertical-align: middle;
-  width: 160px;
+.oppia-rule-edit-feedback {
+  position: relative;
 }
 
 .about-tabs {
