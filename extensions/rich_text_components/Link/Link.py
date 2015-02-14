@@ -36,6 +36,15 @@ class Link(base.BaseRichTextComponent):
         },
         'default_value': 'https://www.example.com',
     }, {
+        'name': 'text',
+        'description': (
+            'The description for this link. If left blank, the URL of the '
+            'link will be displayed instead.'),
+        'schema': {
+            'type': 'unicode',
+        },
+        'default_value': '',
+    }, {
         'name': 'open_link_in_same_window',
         'description': 'Open the linked page in the same window?',
         'schema': {
