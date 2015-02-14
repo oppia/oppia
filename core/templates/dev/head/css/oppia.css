@@ -711,6 +711,7 @@ md-card.oppia-gallery-tile {
 }
 .oppia-editor-card {
   background: rgb(255,255,255);
+  padding-bottom: 20px;
 }
 
 .oppia-editor-card-body {
@@ -730,7 +731,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-editor-rules-card {
-  margin: -8px 15px 8px 15px;
+  margin: -8px 18px 8px 70px;
 }
 
 .oppia-state-content {
@@ -856,13 +857,20 @@ md-card.oppia-gallery-tile {
   border-top: 1px solid #ddd;
   width: 100%;
 }
-.oppia-rule-tab.active {
+.nav-pills > li.active > a.oppia-rule-tab-active {
+  background: #d0d0d0;
   border-right: 0;
+  color: #666;
+  cursor: default;
+}
+
+.oppia-default-rule-tab {
+  border-left: 1px solid #ddd;
 }
 
 .oppia-rule-body-container {
   padding-left: 15px;
-  padding-right: 15px;
+  padding-right: 0;
   width: 100%;
 }
 
