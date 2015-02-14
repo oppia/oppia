@@ -121,10 +121,10 @@ oppia.controller('StateInteraction', [
         if (interactionTemplate.customization_args[i].name == 'imageAndRegions') {
           var _answerChoices = [];
           var imageWithRegions = interactionTemplate.customization_args[i].value;
-          for (var j = 0; j < imageWithRegions.imageRegions.length; j++) {
+          for (var j = 0; j < imageWithRegions.labeledRegions.length; j++) {
             _answerChoices.push({
-              val: imageWithRegions.imageRegions[j].label,
-              label: imageWithRegions.imageRegions[j].label
+              val: imageWithRegions.labeledRegions[j].label,
+              label: imageWithRegions.labeledRegions[j].label
             });
           }
 
