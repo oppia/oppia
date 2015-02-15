@@ -284,7 +284,8 @@ oppia.controller('EditorNavigation', [
 
 
 oppia.controller('EditorNavbarBreadcrumb', [
-    '$scope', 'explorationTitleService', function($scope, explorationTitleService) {
+    '$scope', 'explorationTitleService', 'routerService',
+    function($scope, explorationTitleService, routerService) {
   $scope.navbarTitle = null;
   $scope.$on('explorationPropertyChanged', function() {
     var _MAX_TITLE_LENGTH = 20;
@@ -293,6 +294,24 @@ oppia.controller('EditorNavbarBreadcrumb', [
       $scope.navbarTitle = $scope.navbarTitle.substring(0, _MAX_TITLE_LENGTH - 3) + '...';
     }
   });
+
+  var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
+    'main': 'Editor',
+    'preview': 'Preview',
+    'stats': 'Statistics',
+    'settings': 'Settings',
+    'history': 'History',
+    'feedback': 'Feedback'
+  };
+
+  $scope.getCurrentTabName = function() {
+    if (!routerService.getTabStatuses()) {
+      return '';
+    } else {
+      return _TAB_NAMES_TO_HUMAN_READABLE_NAMES[
+        routerService.getTabStatuses().active];
+    }
+  };
 }]);
 
 

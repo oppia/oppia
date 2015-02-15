@@ -41,7 +41,11 @@
     <li>
       <span class="oppia-navbar-breadcrumb-separator"></span>
       <span ng-if="navbarTitle">
-        <[navbarTitle]> (edit)
+        <[navbarTitle]>
+        <span class="oppia-navbar-breadcrumb-separator" style="margin-left: 5px;"></span>
+        <strong>
+          <[getCurrentTabName()]>
+        </strong>
       </span>
       <span ng-if="!navbarTitle">
         Loading...
