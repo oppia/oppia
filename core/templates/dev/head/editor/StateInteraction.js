@@ -154,6 +154,16 @@ oppia.controller('StateInteraction', [
     interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
       $scope.stateName = editorContextService.getActiveStateName();
       $scope.interactionRepository = interactionRepository;
+      $scope.interactionsByCategory = {};
+      for (var interactionId in $scope.interactionRepository) {
+        var interaction = $scope.interactionRepository[interactionId];
+        var category = interaction.category;
+        if ($scope.interactionsByCategory.hasOwnProperty(category)) {
+          $scope.interactionsByCategory[category].push(interactionId);
+        } else {
+          $scope.interactionsByCategory[category] = [interactionId];
+        }
+      }
 
       stateInteractionIdService.init(
         $scope.stateName, stateData.interaction.id,
@@ -248,7 +258,7 @@ oppia.controller('StateInteraction', [
       stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
         newInteraction.customization_args);
     }
-
+    
     stateCustomizationArgsService.saveDisplayedValue();
 
     // This must be called here so that the rules are updated before the state
