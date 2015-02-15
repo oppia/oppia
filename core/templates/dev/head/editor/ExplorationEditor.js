@@ -31,6 +31,7 @@ oppia.controller('ExplorationEditor', [
   'interactionRepositoryService', 'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationWarningsService',
+  '$templateCache',
   function(
     $scope, $http, $window, $rootScope, $log, $timeout,
     explorationData,  editorContextService, explorationTitleService,
@@ -39,7 +40,7 @@ oppia.controller('ExplorationEditor', [
     explorationInitStateNameService, editabilityService,
     interactionRepositoryService, explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
-    explorationParamSpecsService, explorationWarningsService) {
+    explorationParamSpecsService, explorationWarningsService, $templateCache) {
 
   $scope.editabilityService = editabilityService;
   $scope.editorContextService = editorContextService;
@@ -155,110 +156,89 @@ oppia.controller('ExplorationEditor', [
     $scope.initExplorationPage(successCallback);
   });
 
-  // Constants and methods relating to the state editor tutorial.
-  $scope.EDITOR_TUTORIAL_OPTIONS = {
-    disableInteraction: true,
-    doneLabel: 'Let\'s go!',
-    exitOnEsc: true,
-    exitOnOverlayClick: true,
-    keyboardNavigation: true,
-    scrollToElement: true,
-    showBullets: false,
-    showProgress: true,
-    showStepNumbers: false,
-    skipLabel: 'Exit',
-    tooltipClass: 'oppia-tutorial-tooltip',
-    steps: [{
-      intro: (
-        '<b>Welcome to the Oppia editor tutorial!</b><br><br>' +
-        'Oppia explorations mimic one-on-one conversations which are ' +
-        'divided into \'states\'. <br><br>A state consists of something you say, ' +
-        'followed by the learner\'s response. Based on the response, ' +
-        'you can decide what to say next.')
-    }, {
-      element: '#tutorialStateContent',
-      intro: (
-        'In the <b>Content</b> section, type what you want to tell the ' +
-        'learner before they respond. Here\'s an example:<br><br>' +
-        '<em>"Jane bought a new alarm clock with a 12-hour display. It now shows ' +
-        '12:45 and she wants to leave the house for lunch in half an hour. <br><br>' +
-        'What time should she set the alarm to?"</em>')
-    }, {
-      element: '#tutorialStateInteraction',
-      position: 'top',
-      intro: (
-        'In the <b>Interaction</b> section, you can choose how the learner ' +
-        'responds. You can edit details of the interaction by clicking on it.<br><br>' +
-        'For example, you could select a \'text\' input (which means the ' +
-        'learner is expected to enter some text), then customize it so that the ' +
-        'placeholder text says <em>\'Type the time here\'</em>.')
-    }, {
-      element: '#tutorialStateRules',
-      position: 'top',
-      intro: (
-        'After the learner responds, you can choose how you reply by ' +
-        'creating a <b>rule</b>. You can create different replies to different ' +
-        'responses, just as you would in a face-to-face conversation. For example:<br><br>' +
-        '<ul><li>If the learner types \'1:15\', you might send them to a new state that ' +
-        'congratulates them on solving the problem and poses a follow-up question.</li>' +
-        '<li>If the learner types \'13:15\', you might instead reply: ' +
-        '<em>"Remember, there is no \'13\' on a 12-hour clock. Try again?"</em>' +
-        '</li></ul>')
-    }, {
-      element: '#tutorialExplorationGraph',
-      position: 'left',
-      intro: (
-        'The <b>exploration graph</b> shows how your states relate to one another.<br><br>' +
-        'You can navigate to individual states by clicking on them, and you can also click ' +
-        'the top-right button to expand the graph.')
-    }, {
-      element: '#tutorialPreviewTab',
-      position: 'left',
-      intro: (
-        'At any time, click the \'Preview\' tab to preview an interactive version ' +
-        'of your exploration, where you can interact with it as a student would! This ' +
-        'is very useful for ensuring that the learning experience feels natural and ' +
-        'enjoyable.')
-    }, {
-      element: '#tutorialSaveExplorationButton',
-      position: 'left',
-      intro: (
-        'Finally, when you\'re happy with your changes, click the \'Save\' button. ' +
-        'This stores your changes so that they will appear when a learner next ' +
-        'plays the exploration.')
-    }, {
-      intro: (
-        'This completes the Oppia editor tutorial. For more information, including ' +
-        'exploration design tips, see the \'Help\' menu at the top of this ' +
-        'page.<br><br> If you run into any issues, feel free to post in the site ' +
-        'forum. Have fun!')
-    }]
+  $scope.EDITOR_TUTORIAL_OPTIONS = [{
+    type: 'title',
+    heading: 'Welcome to the Oppia editor tutorial!',
+    text: (
+      'Welcome to Oppia! Here\'s a quick overview of how the editor works.<br><br>' +
+      'You can think of an Oppia exploration as a one-on-one conversation that is divided ' +
+      'into several \'states\'. A state consists of Oppia asking a question, and the ' +
+      'learner responding. Based on the response, Oppia chooses what to say next.')
+  }, {
+    type: 'element',
+    selector: '#tutorialStateContent',
+    heading: 'Content',
+    text: (
+      'This is where you can tell Oppia what to say to the learner at the beginning. ' +
+      'For example, Oppia may say:<br><br>' +
+      '<em>"Jane bought a new alarm clock with a 12-hour display. It now shows ' +
+      '12:45 and she wants to leave the house for lunch in half an hour. <br><br>' +
+      'What time should she set the alarm to?"</em>'),
+    placement: 'bottom',
+    scroll: false
+  }, {
+    type: 'element',
+    selector: '#tutorialStateInteraction',
+    heading: 'Interaction',
+    text: (
+      'Next, choose how you\'d like the learner to respond by ' +
+      'selecting an interaction from the menu, then click on the preview ' +
+      'shown here to tweak its display.'),
+    placement: 'right',
+    scroll: true
+  }, {
+    type: 'element',
+    selector: '#tutorialStateActiveRule',
+    heading: 'Rules',
+    text: (
+      'After the learner responds, you can tell Oppia how to reply by ' +
+      'creating a <b>rule</b>.<br><br>' +
+      'For example, if the learner types \'13:15\', ' +
+      'Oppia might reply: <em>"Remember, there is no \'13\' on a 12-hour ' +
+      'clock. Try again?"</em>'),
+    placement: 'bottom',
+    scroll: true
+  }, {
+    type: 'function',
+    fn: function() {
+      $window.scrollTo(0, 0);
+    }
+  }, {
+    type: 'title',
+    heading: 'Get started!',
+    text: (
+      'At any time, you can click the \'Preview\' tab to play through an interactive ' +
+      'version of your exploration. When you\'re done, click \'Publish Draft\' to save ' +
+      'your changes.<br><br>' +
+      'That\'s the end of the tour! For more information, including exploration ' +
+      'design tips, see the \'Help\' menu at the top of this page. If you run ' +
+      'into any issues, feel free to post in the site forum.')
+  }];
+
+  // Replace the ng-joyride template with one that uses <[...]> interpolators instead of
+  // {{...}} interpolators.
+  var ngJoyrideTemplate = $templateCache.get('ng-joyride-title-tplv1.html');
+  ngJoyrideTemplate = ngJoyrideTemplate.replace(/\{\{/g, '<[').replace(/\}\}/g, ']>');
+  $templateCache.put('ng-joyride-title-tplv1.html', ngJoyrideTemplate);
+
+  $scope.onLeaveTutorial = function() {
+    editabilityService.onEndTutorial();
+    $scope.$apply();
+    stateEditorTutorialFirstTimeService.markTutorialFinished();
+    $scope.tutorialInProgress = false;
   };
 
-  $scope._actuallyStartTutorial = function() {
-    var intro = introJs();
-    intro.setOptions($scope.EDITOR_TUTORIAL_OPTIONS);
-
-    var _onLeaveTutorial = function() {
-      editabilityService.onEndTutorial();
-      $scope.$apply();
-      stateEditorTutorialFirstTimeService.markTutorialFinished();
-    };
-
-    intro.onexit(_onLeaveTutorial);
-    intro.oncomplete(_onLeaveTutorial);
-
-    editabilityService.onStartTutorial();
-    intro.start();
-  };
-
+  $scope.tutorialInProgress = false;
   $scope.startTutorial = function(firstTime) {
     routerService.navigateToMainTab();
 
     // The $timeout wrapper is needed for all components on the page to load,
     // otherwise elements within ng-if's are not guaranteed to be present on
     // the page.
-    $timeout($scope._actuallyStartTutorial);
+    $timeout(function() {
+      editabilityService.onStartTutorial();
+      $scope.tutorialInProgress = true;
+    });
   };
 
   $scope.$on('openEditorTutorial', $scope.startTutorial);

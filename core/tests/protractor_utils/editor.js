@@ -26,7 +26,7 @@ var rules = require('../../../extensions/rules/protractor.js');
 
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
-  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+  element.all(by.css('.skipBtn')).then(function(buttons) {
     if (buttons.length === 1) {
       buttons[0].click();
     } else if (buttons.length !== 0) {
