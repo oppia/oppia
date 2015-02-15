@@ -502,15 +502,22 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .btn.oppia-gallery-add-exploration-button {
-  background-color: rgb(5, 190, 178);
-  color: white;
-  padding: 3px 12px;
+  background-color: rgba(5, 190, 178, 0.9);
+  color: rgba(255,255,255,0.8);
+  font-size: 15px;
+  padding: 2px 12px 4px 12px;
 }
+
+
+.btn.oppia-gallery-add-exploration-button:hover {
+  background-color: rgba(5, 190, 178, 1);
+  color: rgba(255,255,255,1);
+}
+
 .oppia-gallery-add-exploration-button-plus {
   font-size: 1.2em;
   font-weight: bold;
   margin-right: 5px;
-  vertical-align: middle;
 }
 
 .oppia-gallery-tiles-introduction {
@@ -1041,6 +1048,15 @@ oppia-parameter {
   font-size: 15px;
   height: 34px;
 }
+
+.oppia-splash-search-input.btn {
+  color: rgba(255,255,255,0.7);
+}
+
+.oppia-splash-search-input.btn:hover {
+  color: #fff;
+}
+
 .oppia-splash-search-input::-webkit-input-placeholder {
   color: #ccc;
 }
@@ -1103,18 +1119,27 @@ oppia-parameter {
 .oppia-gallery-banner {
   background-repeat: no-repeat;
   background-size: cover;
-  height: 500px;
+  height: 550px;
   width: 100%;
 }
 .oppia-gallery-banner-content {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 100px;
+  font-size: 48px;
+  position: absolute;
   text-align: center;
-  width: 450px;
+  top: 150px;
+  width: 100%;
+  z-index: 100;
 }
+
+.oppia-gallery-banner-phrase {
+  color: #fff;
+  font-family: Capriola;
+  font-size: 20px;
+  padding-top: 190px;
+}
+
 .oppia-gallery-banner-link {
   color: rgba(251, 234, 43, 0.9);
 }
@@ -1124,10 +1149,11 @@ oppia-parameter {
 }
 
 .oppia-gallery-interstitial {
-  background: -webkit-gradient(linear, 30 0, 30 30, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
+  background: -webkit-gradient(linear, 30 0, 30 60, from(rgba(255,255,255,.9)), to(rgba(255,255,255,1)));
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.3em;
   height: 120px;
-  margin-top: -25px;
+  margin-top: -75px;
   padding-top: 50px;
   position: relative;
   text-align: center;

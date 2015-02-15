@@ -16,18 +16,18 @@
         <a class="btn oppia-gallery-add-exploration-button protractor-test-create-exploration"
            href="{{gallery_login_redirect_url}}">
           <span class="oppia-gallery-add-exploration-button-plus">+</span>
-          <span style="vertical-align: middle;">Create Exploration</span>
+          <span>Create Exploration</span>
         </a>
       {% else %}
         <a class="btn oppia-gallery-add-exploration-button protractor-test-create-exploration"
            ng-click="showCreateExplorationModal()">
           <span class="oppia-gallery-add-exploration-button-plus">+</span>
-          <span style="vertical-align: middle;">Create Exploration</span>
+          <span>Create Exploration</span>
         </a>
         {% if allow_yaml_file_upload %}
           <a class="btn oppia-gallery-add-exploration-button"
              ng-click="showUploadExplorationModal()">
-            <span style="vertical-align: middle;">Upload Exploration</span>
+            <span>Upload Exploration</span>
           </a>
         {% endif %}
       {% endif %}
@@ -35,7 +35,7 @@
 
     <form class="navbar-form navbar-left" role="search" style="padding-right: 0;">
       <div class="form-group">
-        <div class="input-group" style="max-width: 260px;">
+        <div class="input-group" style="max-width: 300px;">
           <div class="input-group-addon oppia-splash-search-icon">
             <span class="glyphicon"
                   ng-class="{'glyphicon-search': !searchIsLoading,
@@ -49,23 +49,14 @@
     </form>
 
     <div dropdown class="dropdown navbar-left oppia-gallery-navbar-button-container hidden-xs protractor-test-gallery-category-selector">
-      <button dropdown-toggle type="button" class="btn btn-primary dropdown-toggle oppia-splash-search-input ng-cloak"
+      <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-splash-search-input ng-cloak"
               title="<[selectionDetails.categories.description]>">
         <[selectionDetails.categories.summary]>
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
         <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-            class="protractor-test-selected"
-            ng-if="selectionDetails.categories.selections[item.id]">
-          <a href ng-click="toggleSelection('categories', item.id)">
-            <[item.text]>
-            <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
-          </a>
-        </li>
-        <hr ng-if="selectionDetails.categories.numSelections > 0" style="margin: 2px;">
-        <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
-            ng-if="!selectionDetails.categories.selections[item.id]">
+            ng-class="{'protractor-test-selected': selectionDetails.categories.selections[item.id]}">
           <a href ng-click="toggleSelection('categories', item.id)">
             <[item.text]>
             <span ng-if="selectionDetails.categories.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
@@ -75,23 +66,14 @@
     </div>
 
     <div dropdown class="dropdown navbar-left oppia-gallery-navbar-button-container hidden-xs protractor-test-gallery-language-selector">
-      <button dropdown-toggle type="button" class="btn btn-primary dropdown-toggle oppia-splash-search-input ng-cloak"
+      <button dropdown-toggle type="button" class="btn dropdown-toggle oppia-splash-search-input ng-cloak" style="border-bottom-right-radius: 4px; border-top-right-radius: 4px;"
               title="<[selectionDetails.languageCodes.description]>">
         <[selectionDetails.languageCodes.summary]>
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;">
         <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-            class="protractor-test-selected"
-            ng-if="selectionDetails.languageCodes.selections[item.id]">
-          <a href ng-click="toggleSelection('languageCodes', item.id)">
-            <[item.text]>
-            <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
-          </a>
-        </li>
-        <hr ng-if="selectionDetails.languageCodes.numSelections > 0" style="margin: 2px;">
-        <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
-            ng-if="!selectionDetails.languageCodes.selections[item.id]">
+            ng-class="{'protractor-test-selected': selectionDetails.languageCodes.selections[item.id]}">
           <a href ng-click="toggleSelection('languageCodes', item.id)">
             <[item.text]>
             <span ng-if="selectionDetails.languageCodes.selections[item.id]" class="glyphicon glyphicon-ok pull-right"></span>
@@ -119,20 +101,16 @@
 {% block content %}
   <div ng-controller="Gallery">
     <div ng-if="inSplashMode">
+      <div class="oppia-gallery-banner-content">
+        Hi, I&rsquo;m Oppia
+      </div>
       <carousel interval="CAROUSEL_INTERVAL">
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
           <div class="oppia-gallery-banner" style="background-image: url(<[slide.imageUrl]>);">
-            <div class="oppia-gallery-banner-content">
-              <div style="font-size: 36px;">
-                Hi, I&rsquo;m Oppia.
-              </div>
-              <br>
-              <div style="font-size: 20px;">
-                Your personal tutor for
-                <a ng-href="/explore/<[slide.explorationId]>" class="oppia-gallery-banner-link">
-                  <[slide.explorationSubject]>
-                </a>
-              </div>
+            <div class="oppia-gallery-banner-phrase">
+              Your personal tutor for <a ng-href="/explore/<[slide.explorationId]>" class="oppia-gallery-banner-link">
+              <[slide.explorationSubject]>
+            </a>
             </div>
           </div>
         </slide>
@@ -141,7 +119,7 @@
       <div class="oppia-gallery-interstitial">
         <img src="/images/oppia_favicon_black.png" style="width: 32px; height: 32px;">
         <span>
-          I'm a free, open source, community-built tutor for everybody. <a href="/about">Learn more.</a>
+          I'm a free, open source, community-built tutor for everybody. <a href="/about">Learn more about me.</a>
         </span>
       </div>
     </div>
@@ -170,54 +148,56 @@
              infinite-scroll-disabled="finishedLoadingPage || pageLoaderIsBusy">
           <div ng-repeat="exploration in allExplorationsInOrder track by $index">
             <md-card layout="row" class="oppia-gallery-tile protractor-test-gallery-tile">
-              <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
-                 ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
-                <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                      title="Edit this exploration"></span>
-                Edit
-              </a>
-              {% if is_moderator %}
+              <div class="oppia-gallery-tile-container">
                 <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
-                   ng-if="!exploration.is_editable && currentUserIsModerator"
-                   ng-href="/create/<[exploration.id]>">
+                   ng-if="exploration.is_editable" ng-href="/create/<[exploration.id]>">
                   <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
-                        title="Edit (as moderator)"></span>
-                  Edit (as moderator)
+                        title="Edit this exploration"></span>
+                  Edit
                 </a>
-              {% endif %}
+                {% if is_moderator %}
+                  <a class="btn btn-default btn-sm hidden-xs oppia-gallery-edit-btn"
+                     ng-if="!exploration.is_editable && currentUserIsModerator"
+                     ng-href="/create/<[exploration.id]>">
+                    <span class="glyphicon glyphicon-pencil protractor-test-edit-exploration"
+                          title="Edit (as moderator)"></span>
+                    Edit (as moderator)
+                  </a>
+                {% endif %}
 
-              <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-contents">
-                <span class="oppia-gallery-tile-image-container"
-                      ng-class="getImageContainerClass(exploration)"
-                      style="position: absolute;">
-                  <!-- TODO(sll): Make the default image higher-res. -->
-                  <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>">
-                </span>
+                <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-contents">
+                  <span class="oppia-gallery-tile-image-container"
+                        ng-class="getImageContainerClass(exploration)"
+                        style="position: absolute;">
+                    <!-- TODO(sll): Make the default image higher-res. -->
+                    <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>">
+                  </span>
 
-                <div class="oppia-gallery-tile-details">
-                  <div class="oppia-gallery-tile-first-row">
-                    <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
-                      <[exploration.title]>
-                    </span>
-                    <span ng-if="exploration.objective">
-                      <span style="font-weight: bold;">&middot;</span>
-                      <span style="color: #888" class="protractor-test-exploration-objective">
-                        <[getFormattedObjective(exploration.objective)]>
+                  <div class="oppia-gallery-tile-details">
+                    <div class="oppia-gallery-tile-first-row">
+                      <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
+                        <[exploration.title]>
                       </span>
-                    </span>
-                  </div>
+                      <span ng-if="exploration.objective">
+                        <span style="font-weight: bold;">&middot;</span>
+                        <span style="color: #888" class="protractor-test-exploration-objective">
+                          <[getFormattedObjective(exploration.objective)]>
+                        </span>
+                      </span>
+                    </div>
 
-                  <div class="oppia-gallery-tile-second-row">
-                    <span ng-if="exploration.status === 'publicized'" style="color: #888">
-                      Featured
-                      <span class="glyphicon glyphicon-star"></span>
-                      <span style="font-weight: bold;">&middot;</span>
-                    </span>
-                    <span style="color: #888">
-                      <strong><[exploration.category]></strong>
-                      <span style="font-weight: bold;">&middot;</span>
-                      Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
-                    </span>
+                    <div class="oppia-gallery-tile-second-row">
+                      <span ng-if="exploration.status === 'publicized'" style="color: #888">
+                        Featured
+                        <span class="glyphicon glyphicon-star"></span>
+                        <span style="font-weight: bold;">&middot;</span>
+                      </span>
+                      <span style="color: #888">
+                        <strong><[exploration.category]></strong>
+                        <span style="font-weight: bold;">&middot;</span>
+                        Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+                      </span>
+                    </div>
                   </div>
                 </div>
               </a>
