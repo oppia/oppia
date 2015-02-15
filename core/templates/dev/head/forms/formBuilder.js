@@ -1364,9 +1364,13 @@ oppia.directive('schemaBasedListEditor', [
         };
 
         $scope._onChildFormSubmit = function(evt) {
-          if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
-              !!$scope.localValue[$scope.localValue.length - 1]) {
-            $scope.addElement();
+          if (!$scope.isAddItemButtonPresent) {
+            if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
+                !!$scope.localValue[$scope.localValue.length - 1]) {
+              $scope.addElement();
+            }
+          } else {
+            focusService.setFocus("addMoreElements");
           }
           evt.stopPropagation();
         };

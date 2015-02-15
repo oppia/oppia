@@ -245,7 +245,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/list">
   <table style="width: 100%;">
     <tr ng-repeat="item in localValue track by $index">
-      <td style="padding: 4px 0;">
+      <td style="padding: 4px;">
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
                              label-for-focus-target="getFocusLabel($index)"
@@ -267,7 +267,7 @@
   <div style="height: 30px;">
     <button ng-show="isAddItemButtonPresent" ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
             type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"
-            ng-disabled="isDisabled()" style="margin-left: 0;">
+            ng-disabled="isDisabled()" style="margin-left: 0;" focus-on="addMoreElements">
       <[addElementText]>
     </button>
   </div>
