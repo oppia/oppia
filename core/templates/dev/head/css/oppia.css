@@ -417,6 +417,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
   text-align: center;
 }
 
+.nav .dropdown:hover > .dropdown-menu {
+  border: none;
+}
+
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
    screen size is large enough. */
 @media (min-width: 768px) {
