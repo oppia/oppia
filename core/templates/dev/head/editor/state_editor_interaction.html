@@ -26,7 +26,7 @@
             <div class="col-lg-8 col-md-8 col-sm-8">
             </div>
             <div class="col-lg-4 col-md-4 col-sm-4">
-              <div class="dropdown oppia-interaction-selector"
+              <div class="dropdown oppia-interaction-selector protractor-test-select-interaction-id"
                    ng-show"editabilityService.isEditable()">
                 <a role="button" data-toggle="dropdown" class="btn" style="width: 100%; height: 100%">
                   <[interactionRepository[interactionId].name]> 
@@ -35,11 +35,15 @@
                 <ul class="dropdown-menu" role="menu">
                   <li ng-repeat="(category, interactions) in interactionsByCategory"
                       class="dropdown-submenu">
-                    <a href="#"><[category]></a>
+                    <a href="#"
+                       class="protractor-test-interaction-category-<[$index]>">
+                      <[category]>
+                    </a>
                     <ul class="dropdown-menu">
                       <li ng-repeat="interaction in interactions">
                         <a href="#" 
-                           ng-click="onChangeInteractionType(interaction)">
+                           ng-click="onChangeInteractionType(interaction)"
+                           class="protractor-test-interaction-id-<[interaction]>">
                           <[interactionRepository[interaction].name]>
                         </a>
                       </li>
