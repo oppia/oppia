@@ -259,10 +259,6 @@ oppia.controller('StateInteraction', [
         newInteraction.customization_args);
     }
     
-    $scope.getInteractionId = function() {
-      return stateInteractionIdService.displayed;
-    };
-
     stateCustomizationArgsService.saveDisplayedValue();
 
     // This must be called here so that the rules are updated before the state
