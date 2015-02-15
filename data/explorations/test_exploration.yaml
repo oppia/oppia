@@ -12,15 +12,14 @@ param_specs:
     obj_type: UnicodeString
   c:
     obj_type: UnicodeString
-schema_version: 3
+schema_version: 4
 skill_tags: []
 states:
   Code REPL:
     content:
     - type: text
       value: Write a program the prints 12.<br>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         language:
           value: python
@@ -48,35 +47,39 @@ states:
           feedback:
           - Wrong.
           param_changes: []
+      id: CodeRepl
       sticky: false
-      widget_id: CodeRepl
+    param_changes: []
   Continue:
     content:
     - type: text
-      value: 'Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}
-        should be 1.</div><div><div style="font-size: 14.3999996185303px;">{{c}} should
-        be 2.</div></div><div><span style="font-size: 14px;">{{b}} should be 0.5.</span><br></div><div>{{a*b}}
-        should be 0.5.</div><div><span style="font-size: 14.3999996185303px;">{{-a*b}}
-        should be -0.5.</span><br></div><div><span style="font-size: 14.3999996185303px;">{{a
-        &nbsp; * b &nbsp;}} should be 0.5.</span></div><div>{{abs(-a*b)}} should be
-        0.5.</div><div>{{if a + a == c then ''yes'' else ''no''}} should be ''yes''</div><div><div
-        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{if
-        a == c then ''yes'' else ''no''}} should be ''no''</span><br></div><div style="font-size:
-        14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{floor(a*b)}}
-        should be 0.</span></div></div><div style="font-size: 14.3999996185303px;"><div
-        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{log(2,
-        10)}} should be around 0.3.</span><br></div><div style="font-size: 14.3999996185303px;"><div
-        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{pow(2,
-        10)}} should be 1024.</span></div><div style="font-size: 14.3999996185303px;"><span
-        style="font-size: 14.3999996185303px;">{{3 &lt; 4}} should be true.</span></div><div
-        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{3
-        &gt; 4}} should be false.</span></div><div style="font-size: 14.3999996185303px;"><span
-        style="font-size: 14.3999996185303px;">{{4 &lt;= 4}} should be true.</span></div><div
-        style="font-size: 14.3999996185303px;"><span style="font-size: 14.3999996185303px;">{{4
-        &gt;= 3}} should be true.</span></div><div style="font-size: 14.3999996185303px;"><span
-        style="font-size: 14.3999996185303px;">&lt; should be an unescaped ''less-than''
-        sign.</span></div><div style="font-size: 14.3999996185303px;"><span style="font-size:
-        14.3999996185303px;">&gt; should be an unescaped ''greater-than'' sign.</span></div></div></div>'
+      value: "Click continue.<br><div><br></div><div><b>Parameters</b></div><div>{{a}}\
+        \ should be 1.</div><div><div>{{c}} should be 2.</div></div><div><span>{{b}}\
+        \ should be 0.5.</span><br></div><div>{{a*b}} should be 0.5.</div><div><span>{{-a*b}}\
+        \ should be -0.5.</span><br></div><div><span>{{a \_ * b \_}} should be 0.5.</span></div><div>{{abs(-a*b)}}\
+        \ should be 0.5.</div><div>{{if a + a == c then 'yes' else 'no'}} should be\
+        \ 'yes'</div><div><div><span>{{if a == c then 'yes' else 'no'}} should be\
+        \ 'no'</span><br></div><div><span>{{floor(a*b)}} should be 0.</span></div></div><div><div><span>{{log(2,\
+        \ 10)}} should be around 0.3.</span><br></div><div><div><span>{{pow(2, 10)}}\
+        \ should be 1024.</span></div><div><span>{{3 &lt; 4}} should be true.</span></div><div><span>{{3\
+        \ &gt; 4}} should be false.</span></div><div><span>{{4 &lt;= 4}} should be\
+        \ true.</span></div><div><span>{{4 &gt;= 3}} should be true.</span></div><div><span>&lt;\
+        \ should be an unescaped 'less-than' sign.</span></div><div><span>&gt; should\
+        \ be an unescaped 'greater-than' sign.</span></div></div></div>"
+    interaction:
+      customization_args:
+        buttonText:
+          value: Continue
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            rule_type: default
+          dest: Multiple choice input
+          feedback: []
+          param_changes: []
+      id: Continue
+      sticky: false
     param_changes:
     - customization_args:
         parse_with_jinja: false
@@ -98,35 +101,13 @@ states:
         value: '{{b/c}}'
       generator_id: Copier
       name: b
-    widget:
-      customization_args:
-        buttonText:
-          value: Continue
-      handlers:
-      - name: submit
-        rule_specs:
-        - definition:
-            rule_type: default
-          dest: Multiple choice input
-          feedback: []
-          param_changes: []
-      sticky: false
-      widget_id: Continue
   Multiple choice input:
     content:
     - type: text
-      value: 'Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
-        should be 1.</div><div><span style="font-size: 14.3999996185303px;">{{b}}
-        should be 3.</span><br></div><div><div style="font-size: 14.3999996185303px;">{{c}}
-        should be 2.</div></div><div><span style="font-size: 14px;">{{a*b}} should
-        be 3.</span></div></div>'
-    param_changes:
-    - customization_args:
-        parse_with_jinja: true
-        value: '{{a+c}}'
-      generator_id: Copier
-      name: b
-    widget:
+      value: Choose option B.<br><div><br></div><div><b>Parameters</b></div><div><div>{{a}}
+        should be 1.</div><div><span>{{b}} should be 3.</span><br></div><div><div>{{c}}
+        should be 2.</div></div><div><span>{{a*b}} should be 3.</span></div></div>
+    interaction:
       customization_args:
         choices:
           value:
@@ -151,14 +132,19 @@ states:
           feedback:
           - Wrong.
           param_changes: []
+      id: MultipleChoiceInput
       sticky: false
-      widget_id: MultipleChoiceInput
+    param_changes:
+    - customization_args:
+        parse_with_jinja: true
+        value: '{{a+c}}'
+      generator_id: Copier
+      name: b
   Music notes input:
     content:
     - type: text
       value: Enter two E4 notes (bottom line).<br>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         initialSequence:
           value: []
@@ -198,14 +184,14 @@ states:
           feedback:
           - Wrong.
           param_changes: []
+      id: MusicNotesInput
       sticky: false
-      widget_id: MusicNotesInput
+    param_changes: []
   Numeric input:
     content:
     - type: text
       value: Enter a number larger than 6.<br>
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -225,14 +211,14 @@ states:
           feedback:
           - Wrong.
           param_changes: []
+      id: NumericInput
       sticky: false
-      widget_id: NumericInput
+    param_changes: []
   Set input:
     content:
     - type: text
       value: Enter the set {abc, xyz}<br>
-    param_changes: []
-    widget:
+    interaction:
       customization_args: {}
       handlers:
       - name: submit
@@ -254,14 +240,46 @@ states:
           feedback:
           - Wrong.
           param_changes: []
+      id: SetInput
       sticky: false
-      widget_id: SetInput
+    param_changes: []
+  Text Area Input:
+    content:
+    - type: text
+      value: Please type hello.
+    interaction:
+      customization_args:
+        placeholder:
+          value: Type your answer here.
+        rows:
+          value: 10
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              x: hello
+            name: Equals
+            rule_type: atomic
+            subject: answer
+          dest: Numeric input
+          feedback:
+          - Correct
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Text Area Input
+          feedback:
+          - Wrong
+          param_changes: []
+      id: TextInput
+      sticky: false
+    param_changes: []
   Text input:
     content:
     - type: text
       value: Enter the string rrrrr<br>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         placeholder:
           value: Type your answer here.
@@ -276,7 +294,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Numeric input
+          dest: Text Area Input
           feedback: []
           param_changes: []
         - definition:
@@ -285,14 +303,14 @@ states:
           feedback:
           - Wrong.
           param_changes: []
+      id: TextInput
       sticky: false
-      widget_id: TextInput
+    param_changes: []
   World map:
     content:
     - type: text
       value: Click on the USA.<br>
-    param_changes: []
-    widget:
+    interaction:
       customization_args:
         latitude:
           value: 0
@@ -321,5 +339,6 @@ states:
           feedback:
           - Wrong.
           param_changes: []
+      id: InteractiveMap
       sticky: false
-      widget_id: InteractiveMap
+    param_changes: []
