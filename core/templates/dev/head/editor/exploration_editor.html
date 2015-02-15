@@ -70,17 +70,19 @@
       </ul>
     </li>
 
-    <li ng-class="{'active': getTabStatuses().active === 'preview'}" id="tutorialPreviewTab">
-      <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
-        <span class="glyphicon glyphicon-play"></span>
-      </a>
-    </li>
+    {% if username %}
+      <li ng-class="{'active': getTabStatuses().active === 'preview'}">
+        <a href="#" tooltip="Preview" tooltip-placement="bottom" ng-click="selectPreviewTab()" class="protractor-test-preview-tab">
+          <span class="glyphicon glyphicon-play"></span>
+        </a>
+      </li>
 
-    <li ng-class="{'active': getTabStatuses().active === 'stats'}">
-      <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
-        <span class="glyphicon glyphicon-stats"></span>
-      </a>
-    </li>
+      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
+        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
+          <span class="glyphicon glyphicon-stats"></span>
+        </a>
+      </li>
+    {% endif %}
 
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">
       <a href="#" tooltip="Settings" tooltip-placement="bottom" ng-click="selectSettingsTab()" class="protractor-test-settings-tab">
@@ -100,36 +102,38 @@
       </a>
     </li>
 
-    <li class="dropdown">
-      <a href="#" tooltip="Help" tooltip-placement="right" class="dropdown-toggle" data-toggle="dropdown">
-        <span class="glyphicon glyphicon-question-sign"></span>
-      </a>
-      <ul class="dropdown-menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-        <li class="dropdown">
-          <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
-        </li>
-        <li class="dropdown">
-          <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
-            Planning Your Exploration
-          </a>
-        </li>
-        <li class="dropdown">
-          <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
-            Exploration Design Tips
-          </a>
-        </li>
-      </ul>
-      <div ng-if="postTutorialHelpPopoverIsShown" class="popover left oppia-post-tutorial-popover">
-        <div class="arrow"></div>
-        <div class="popover-content">If you need help in the future, click here!</div>
-      </div>
-    </li>
+    {% if username %}
+      <li class="dropdown">
+        <a href="#" tooltip="Help" tooltip-placement="right" class="dropdown-toggle" data-toggle="dropdown">
+          <span class="glyphicon glyphicon-question-sign"></span>
+        </a>
+        <ul class="dropdown-menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+          <li class="dropdown">
+            <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
+          </li>
+          <li class="dropdown">
+            <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
+              Planning Your Exploration
+            </a>
+          </li>
+          <li class="dropdown">
+            <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
+              Exploration Design Tips
+            </a>
+          </li>
+        </ul>
+        <div ng-if="postTutorialHelpPopoverIsShown" class="popover bottom oppia-post-tutorial-popover">
+          <div class="arrow"></div>
+          <div class="popover-content">If you need help in the future, click here!</div>
+        </div>
+      </li>
+    {% endif %}
   </ul>
 
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right ng-cloak" ng-controller="ExplorationPublishButton">
     <li ng-if="isEditableOutsideTutorialMode()">
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
-        <button id="tutorialSaveExplorationButton" class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
+        <button class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             Publish Draft
             <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
@@ -266,7 +270,7 @@
       </div>
     </script>
 
-    <div class="container-fluid">
+    <div class="container-fluid" ng-joy-ride="tutorialInProgress" config="EDITOR_TUTORIAL_OPTIONS" on-finish="onLeaveTutorial()" on-skip="onLeaveTutorial()">
       <div class="row" ng-if="explorationRightsService.isCloned()">
         <div class="col-lg-12 col-md-12 col-sm-12">
           <div class="oppia-align-center alert alert-warning" style="padding: 2px; width: 90%;">

@@ -184,7 +184,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   position: relative;
   transition: transform 0.5s;
   -webkit-transition: -webkit-transform 0.5s;
-  z-index: 99;
 }
 
 .oppia-content-container::after {
@@ -981,16 +980,9 @@ oppia-parameter {
 
 .oppia-post-tutorial-popover {
    display: block;
-   left: -185px;
-   top: 0;
+   left: -77px;
+   top: 40px;
    width: 200px;
-}
-
-.introjs-button.introjs-skipbutton,
-.introjs-button.introjs-prevbutton,
-.introjs-button.introjs-nextbutton {
-  font-size: 85%;
-  padding: .7em 1.0em
 }
 
 /* Hide the search icon in the rule destination dropdown. */
@@ -1152,11 +1144,28 @@ oppia-expression-error-tag:after {
   content: "Expression parsing error!";
 }
 
+/* Adjust the z-index for the tutorial components so that they do not go
+   above the navbar.
+*/
+.ng-joyride-element-static[data-original-title],
+div.ng-joyride-title {
+  z-index: 999;
+}
+.ng-joyride.popover.sharp-borders {
+  z-index: 1002;
+}
+div#ng-curtain {
+  z-index: 997;
+}
+
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
   position: fixed;
-  z-index: 300;
+  /* This is larger than the editor tutorial's z-index, but smaller than
+     the z-index for Bootstrap modals.
+  */
+  z-index: 1005;
 }
 .oppia-top-of-page-padding {
   /* This ensures that content is not tucked behind the fixed navbar. */
@@ -1271,4 +1280,55 @@ oppia-expression-error-tag:after {
 }
 .oppia-exploration-warnings-separator {
   margin: 0;
+}
+
+/* Adding multilevel submenu functionality to Bootstrap's dropdown 
+    See http://bootsnipp.com/snippets/featured/multi-level-dropdown-menu-bs3
+*/
+.oppia-dropdown-submenu {
+  position: relative;
+}
+
+.oppia-dropdown-submenu > .dropdown-menu {
+  border-radius: 0 6px 6px 6px;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  -moz-border-radius: 0 6px 6px;
+  top: 0;
+  -webkit-border-radius: 0 6px 6px 6px;
+}
+
+.oppia-dropdown-submenu:hover > .dropdown-menu {
+  display: block;
+}
+
+.oppia-dropdown-submenu > a:after {
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #ccc;
+  content: " ";
+  display: block;
+  float: right;
+  height: 0;
+  margin-top: 5px;
+  margin-right: -10px;
+  width: 0;
+}
+
+.oppia-dropdown-submenu:hover > a:after {
+  border-left-color: #fff;
+}
+
+.oppia-dropdown-submenu.pull-left {
+  float: none;
+}
+
+.oppia-dropdown-submenu.pull-left > .dropdown-menu {
+  border-radius: 6px 0 6px 6px;
+  left: -100%;
+  margin-left: 10px;
+  -moz-border-radius: 6px 0 6px 6px;
+  -webkit-border-radius: 6px 0 6px 6px;
 }

@@ -26,7 +26,7 @@ var rules = require('../../../extensions/rules/protractor.js');
 
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
-  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+  element.all(by.css('.skipBtn')).then(function(buttons) {
     if (buttons.length === 1) {
       buttons[0].click();
     } else if (buttons.length !== 0) {
@@ -112,8 +112,22 @@ var expectContentTextToEqual = function(text) {
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction editor.
 var setInteraction = function(interactionName) {
-  element(by.css('.protractor-test-select-interaction-id')).
-    element(by.css('option[value=' + interactionName + ']')).click();
+  // Searches through the dropdown menu for the correct interaction
+  var dropdown = element(by.css('.protractor-test-select-interaction-id'));
+  dropdown.click();
+  for (var i = 0; true; i++) {
+    var category = element(by.css('.protractor-test-interaction-category-' + i));
+    if (category.isPresent()) {
+      browser.actions().mouseMove(category).perform();
+      var interaction = element(by.css('.protractor-test-interaction-id-' + interactionName));
+      if (interaction.isDisplayed()) {
+        interaction.click();
+        break;
+      }
+    } else {
+      break;
+    }
+  }
 
   if (arguments.length > 1) {
     element(by.css('.protractor-test-edit-interaction')).click();
