@@ -2,7 +2,7 @@
   <div class="col-lg-1 col-md-1 col-sm-1">
   </div>
 
-  <div class="col-lg-11 col-md-11 col-sm-11">
+  <div class="col-lg-11 col-md-11 col-sm-11" style="margin-top: 55px;">
     <div ng-if="!hasLoaded" class="oppia-align-center">
       Loading
       <span class="oppia-loading-dot-one">.</span>
@@ -12,6 +12,36 @@
 
     <div id="tutorialStateInteraction" class="protractor-test-interaction">
       <div ng-if="hasLoaded">
+        <div class="row">
+          <div class="col-lg-4 col-md-4 col-sm-4">
+            <div class="dropdown oppia-interaction-selector protractor-test-select-interaction-id" ng-show"editabilityService.isEditable()">
+              <a role="button" data-toggle="dropdown" class="btn btn-default">
+                <[interactionRepository[interactionId].name]> 
+                <span class="caret"></span>
+              </a>
+              <ul class="dropdown-menu" role="menu">
+                <li ng-repeat="(category, interactions) in interactionsByCategory"
+                    class="oppia-dropdown-submenu">
+                  <a href="#"
+                     class="protractor-test-interaction-category-<[$index]>">
+                    <[category]>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li ng-repeat="interaction in interactions">
+                      <a href="#" 
+                         ng-click="onChangeInteractionType(interaction)"
+                         class="protractor-test-interaction-id-<[interaction]>">
+                        <[interactionRepository[interaction].name]>
+                      </a>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
+            </div> 
+          </div>
+          <div class="col-lg-8 col-md-8 col-sm-8">
+          </div>
+        </div>
         <div ng-if="!interactionCustomizerIsShown"
              class="protractor-test-edit-interaction"
              ng-class="{'oppia-editable-section': editabilityService.isEditable()}"
@@ -21,41 +51,9 @@
           interaction itself do not receive the click events. -->
           <div class="oppia-click-to-start-editing" ng-click="showInteractionCustomizer()">
           </div>
-
-          <div class="row" style="margin-bottom: 10px;">
-            <div class="col-lg-8 col-md-8 col-sm-8">
-            </div>
-            <div class="col-lg-4 col-md-4 col-sm-4">
-              <div class="dropdown oppia-interaction-selector protractor-test-select-interaction-id"
-                   ng-show"editabilityService.isEditable()">
-                <a role="button" data-toggle="dropdown" class="btn" style="width: 100%; height: 100%">
-                  <[interactionRepository[interactionId].name]> 
-                  <span class="caret"></span>
-                </a>
-                <ul class="dropdown-menu" role="menu">
-                  <li ng-repeat="(category, interactions) in interactionsByCategory"
-                      class="oppia-dropdown-submenu">
-                    <a href="#"
-                       class="protractor-test-interaction-category-<[$index]>">
-                      <[category]>
-                    </a>
-                    <ul class="dropdown-menu">
-                      <li ng-repeat="interaction in interactions">
-                        <a href="#" 
-                           ng-click="onChangeInteractionType(interaction)"
-                           class="protractor-test-interaction-id-<[interaction]>">
-                          <[interactionRepository[interaction].name]>
-                        </a>
-                      </li>
-                    </ul>
-                  </li>
-                </ul>
-              </div> 
-            </div>
-          </div>
-          <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-cog oppia-editor-edit-icon" title="Edit Interaction" style="position: absolute; right: 20px; top: 20px;">
+          <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-cog oppia-editor-edit-icon" title="Edit Interaction">
           </span>
-          <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview well">
+          <div angular-html-bind="interactionPreviewHtml" class="oppia-interaction-preview">
           </div>
         </div>
       </div>
