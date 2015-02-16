@@ -467,7 +467,7 @@ oppia.factory('oppiaPlayerService', [
     openPlayerFeedbackModal: function(stateName) {
       var modalConfig = {
         templateUrl: 'modals/playerFeedback',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           stateName: function() {
             return stateName;
@@ -507,7 +507,7 @@ oppia.factory('oppiaPlayerService', [
 
           $modal.open({
             templateUrl: 'modals/playerFeedbackConfirmation',
-            backdrop: 'static',
+            backdrop: true,
             controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');

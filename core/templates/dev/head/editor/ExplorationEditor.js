@@ -404,7 +404,7 @@ oppia.controller('ExplorationPublishButton', [
 
       var modalInstance = $modal.open({
         templateUrl: 'modals/saveExploration',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           explorationPropertyChanges: function() {
             return explorationPropertyChanges;

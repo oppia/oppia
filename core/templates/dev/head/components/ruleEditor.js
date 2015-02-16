@@ -222,7 +222,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.openAddStateModal = function(rule) {
           $modal.open({
             templateUrl: 'modals/addState',
-            backdrop: 'static',
+            backdrop: true,
             resolve: {
               isEditable: function() {
                 return $scope.isEditable;

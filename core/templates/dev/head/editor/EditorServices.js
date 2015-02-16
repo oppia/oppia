@@ -610,7 +610,7 @@ oppia.factory('explorationStatesService', [
 
       $modal.open({
         templateUrl: 'modals/deleteState',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           deleteStateName: function() {
             return deleteStateName;

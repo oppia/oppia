@@ -48,7 +48,7 @@ oppia.controller('ExplorationGraph', [
 
     $modal.open({
       templateUrl: 'modals/stateGraph',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {
         isEditable: function() {
           return $scope.isEditable;

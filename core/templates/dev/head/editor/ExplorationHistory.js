@@ -293,7 +293,7 @@ oppia.controller('ExplorationHistory', [
   $scope.showStateDiffModal = function(stateName, oldStateName, stateProperty) {
     $modal.open({
       templateUrl: 'modals/stateDiff',
-      backdrop: 'static',
+      backdrop: true,
       windowClass: 'state-diff-modal',
       resolve: {
         stateName: function() {
@@ -378,7 +378,7 @@ oppia.controller('ExplorationHistory', [
   $scope.showRevertExplorationModal = function(version) {
     $modal.open({
       templateUrl: 'modals/revertExploration',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {
         version: function() {
           return version;

@@ -186,7 +186,7 @@ oppia.directive('oppiaInteractiveLogicProof', [
         $scope.showHelp = function() {
           $modal.open({
             templateUrl: 'modals/logicProofHelp',
-            backdrop: 'static',
+            backdrop: true,
             controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
                 $scope.close = function() {
                   $modalInstance.close();
