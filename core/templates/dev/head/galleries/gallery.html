@@ -33,7 +33,7 @@
       {% endif %}
     </div>
 
-    <form class="navbar-form navbar-left" role="search" style="padding-right: 0;">
+    <form class="navbar-form navbar-left oppia-splash-search-form" role="search">
       <div class="form-group">
         <div class="input-group" style="max-width: 300px;">
           <div class="input-group-addon oppia-splash-search-icon">
@@ -107,7 +107,7 @@
       <carousel interval="CAROUSEL_INTERVAL">
         <slide ng-repeat="slide in CAROUSEL_SLIDES track by $index" active="slide.active">
           <div class="oppia-gallery-banner" style="background-image: url(<[slide.imageUrl]>);">
-            <div class="oppia-gallery-banner-phrase">
+            <div class="oppia-gallery-banner-tagline">
               Your personal tutor for <a ng-href="/explore/<[slide.explorationId]>" class="oppia-gallery-banner-link">
               <[slide.explorationSubject]>
             </a>
@@ -119,7 +119,8 @@
       <div class="oppia-gallery-interstitial">
         <img src="/images/oppia_favicon_black.png" style="width: 32px; height: 32px;">
         <span>
-          I'm a free, open source, community-built tutor for everybody. <a href="/about">Learn more about me.</a>
+          I'm a free, open source, community-built tutor for everybody. 
+          <div style="display: inline-block;"><a href="/about">Learn more about me.</a></div>
         </span>
       </div>
     </div>
