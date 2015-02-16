@@ -26,16 +26,14 @@ oppia.directive('oppiaInteractiveNumericInput', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/NumericInput',
-      controller: ['$scope', 'focusService', function($scope, focusService) {
+      controller: ['$scope', '$attrs', 'focusService', function($scope, $attrs, focusService) {
         $scope.answer = '';
+        $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
         $scope.NUMERIC_INPUT_FORM_SCHEMA = {
           type: 'float',
           ui_config: {}
         };
-
-        $scope.numericInputFocusLabel = Math.random().toString(36).slice(2);
-        focusService.setFocus($scope.numericInputFocusLabel);
 
         $scope.submitAnswer = function(answer) {
           if (answer) {

@@ -1086,9 +1086,11 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     controller: ['$scope', '$timeout', 'parameterSpecsService', function($scope, $timeout, parameterSpecsService) {
       $scope.hasLoaded = false;
       $scope.isInputInFocus = false;
+      $scope.hasFocusedAtLeastOnce = false;
 
       $scope.onFocus = function() {
         $scope.isInputInFocus = true;
+        $scope.hasFocusedAtLeastOnce = true;
         if ($scope.onInputFocus) {
           $scope.onInputFocus();
         }

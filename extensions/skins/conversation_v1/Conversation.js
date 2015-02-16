@@ -28,14 +28,16 @@ oppia.directive('conversationSkin', [function() {
     templateUrl: 'skins/Conversation',
     controller: [
         '$scope', '$timeout', '$rootScope', '$window', '$modal', 'warningsData',
-        'messengerService', 'oppiaPlayerService', 'urlService',
+        'messengerService', 'oppiaPlayerService', 'urlService', 'focusService',
         function(
           $scope, $timeout, $rootScope, $window, $modal, warningsData,
-          messengerService, oppiaPlayerService, urlService) {
+          messengerService, oppiaPlayerService, urlService, focusService) {
       $scope.iframed = urlService.isIframed();
 
       $scope.showPage = !$scope.iframed;
       $scope.hasInteractedAtLeastOnce = false;
+
+      var _labelForNextFocusTarget = null;
 
       var _answerIsBeingProcessed = false;
       $scope.isAnswerBeingProcessed = function() {
@@ -120,7 +122,8 @@ oppia.directive('conversationSkin', [function() {
           $scope.hasEditingRights = hasEditingRights;
 
           $scope.stateName = stateName;
-          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName);
+          _labelForNextFocusTarget = Math.random().toString(36).slice(2);
+          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName, _labelForNextFocusTarget);
           $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(stateName);
           _addNewCard($scope.stateName, initHtml);
           $scope.mostRecentQuestionIndex = 0;
@@ -131,6 +134,7 @@ oppia.directive('conversationSkin', [function() {
           $rootScope.loadingMessage = '';
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
+          focusService.setFocus(_labelForNextFocusTarget);
         });
       };
 
@@ -144,6 +148,7 @@ oppia.directive('conversationSkin', [function() {
         _addNewCard($scope.stateName, $scope.nextCardContent);
         _scrollToLastEntry();
         $scope.nextCardContent = null;
+        focusService.setFocus(_labelForNextFocusTarget);
       };
 
       $scope.submitAnswer = function(answer, handler) {
@@ -169,8 +174,9 @@ oppia.directive('conversationSkin', [function() {
 
           if (!$scope.finished && !isSticky) {
             // The previous interaction is not sticky and should be replaced.
+            _labelForNextFocusTarget = Math.random().toString(36).slice(2);
             $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
-              newStateName) + oppiaPlayerService.getRandomSuffix();
+              newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
             $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(
               newStateName);
           }
@@ -200,6 +206,7 @@ oppia.directive('conversationSkin', [function() {
           }
           _scrollToLastEntry();
           _answerIsBeingProcessed = false;
+          focusService.setFocus(_labelForNextFocusTarget);
         });
       };
 
