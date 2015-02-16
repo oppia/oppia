@@ -712,12 +712,15 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-editor-cards-container {
-  margin: 20px auto;
-  max-width: 700px;
+  margin: auto;
+  max-width: 560px;
 }
 .oppia-editor-card {
   background: rgb(255,255,255);
-  padding-bottom: 20px;
+  padding: 20px;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .oppia-editor-card-body {
@@ -737,7 +740,8 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-editor-rules-card {
-  margin: -8px 18px 8px 70px;
+  margin: 0px;
+  background-color: #f5f5f5;
 }
 
 .oppia-state-content {
@@ -746,8 +750,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-state-content-display {
-  background: rgba(0, 0, 0, 0.04);
-  border-radius: 6px;
+  padding: 2px;
 }
 
 .oppia-prevent-selection {
@@ -758,7 +761,7 @@ md-card.oppia-gallery-tile {
 
 .oppia-interaction-selector {
   position: absolute;
-  right: 15px;
+  left: 15px;
   /* This must be larger than the z-index in
      .oppia-click-to-start-editing, so that the rule does not
      switch to edit mode when the destination link is clicked. */
@@ -766,7 +769,7 @@ md-card.oppia-gallery-tile {
 }
 @media (min-width: 768px) {
   .oppia-interaction-selector {
-    bottom: -10px;
+    bottom: 10px;
   }
 }
 @media (max-width: 768px) {
@@ -793,17 +796,25 @@ md-card.oppia-gallery-tile {
   position: relative;
 }
 .oppia-editable-section:hover .oppia-state-content-display,
-.oppia-editable-section:hover .oppia-interaction-preview,
-.oppia-editable-section:hover .oppia-readonly-rule-tile {
+.oppia-editable-section:hover .oppia-interaction-preview {
   background: #eee;
+  border-radius: 4px;
+}
+
+.oppia-interaction-preview {
+  padding: 4px;
 }
 
 .oppia-editor-edit-icon {
   font-size: 16px;
-  opacity: 0.4;
+  opacity: 0.2;
+  position: absolute; 
+  right: -20px; 
+  top: 5px;
 }
+
 .oppia-editable-section:hover .oppia-editor-edit-icon {
-  opacity: 1.0;
+  opacity: 0.8;
 }
 
 .oppia-click-to-start-editing {
@@ -877,11 +888,16 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-readonly-rule-tile {
-  background: #f5f5f5;
   border-radius: 4px;
   margin-bottom: 0;
   margin-left: 0;
+  padding: 4px;
 }
+
+.oppia-readonly-rule-tile:hover {
+  background-color: #eee;
+}
+
 .oppia-readonly-rule-tile img {
   max-height: 50px;
 }

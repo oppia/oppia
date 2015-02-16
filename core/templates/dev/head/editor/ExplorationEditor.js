@@ -296,7 +296,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
   });
 
   var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
-    'main': 'Editor',
+    'main': 'Edit',
     'preview': 'Preview',
     'stats': 'Statistics',
     'settings': 'Settings',
