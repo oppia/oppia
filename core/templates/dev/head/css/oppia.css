@@ -1116,7 +1116,7 @@ oppia-parameter {
 }
 
 .oppia-gallery-interstitial {
-  background: -webkit-gradient(linear, 30 0, 30 30, from(rgba(255,255,255,.6)), to(rgba(255,255,255,1)));
+  background: linear-gradient(to bottom, rgba(255, 255, 255, .1), rgba(255, 255, 255, 1) 25%);
   font-size: 1.3em;
   height: 120px;
   margin-top: -25px;
@@ -1282,7 +1282,7 @@ div#ng-curtain {
   margin: 0;
 }
 
-/* Adding multilevel submenu functionality to Bootstrap's dropdown 
+/* Adding multilevel submenu functionality to Bootstrap's dropdown
     See http://bootsnipp.com/snippets/featured/multi-level-dropdown-menu-bs3
 */
 .oppia-dropdown-submenu {
