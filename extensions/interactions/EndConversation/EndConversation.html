@@ -1,0 +1,19 @@
+<script type="text/ng-template" id="interaction/EndConversation">
+  <div ng-if="recommendedExplorationIds.length > 0">
+    Other explorations you might enjoy:
+    <ul>
+      <li ng-repeat="expId in recommendedExplorationIds track by $index">
+        <a ng-href="/explore/<[expId]>">Exploration</a>
+      </li>
+    </ul>
+  </div>
+
+  <div ng-if="!isIframed">
+    <a class="btn btn-default" href="/">
+      Return to gallery
+    </a>
+  </div>
+</script>
+
+<script type="text/ng-template" id="response/MultipleChoiceInput">
+</script>

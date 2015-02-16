@@ -33,12 +33,16 @@ oppia.directive('conversationSkin', [function() {
           $scope, $timeout, $rootScope, $window, $modal, warningsData,
           messengerService, oppiaPlayerService, urlService, focusService) {
 
+      var _END_CONVERSATION_INTERACTION_ID = 'EndConversation';
+
       var hasInteractedAtLeastOnce = false;
       var _labelForNextFocusTarget = null;
       var _answerIsBeingProcessed = false;
       $scope.isAnswerBeingProcessed = function() {
         return _answerIsBeingProcessed;
       };
+
+      $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
 
       $rootScope.loadingMessage = 'Loading';
 
@@ -69,7 +73,7 @@ oppia.directive('conversationSkin', [function() {
 
       $window.addEventListener('beforeunload', function(e) {
         if (hasInteractedAtLeastOnce && !$scope.finished &&
-            !oppiaPlayerService.isInPreviewMode()) {
+            !$scope.isInPreviewMode) {
           oppiaPlayerService.registerMaybeLeaveEvent();
           var confirmationMessage = (
             'If you navigate away from this page, your progress on the ' +
@@ -80,7 +84,11 @@ oppia.directive('conversationSkin', [function() {
       });
 
       $scope.openCardFeedbackModal = function(stateName) {
-        oppiaPlayerService.openPlayerFeedbackModal(stateName);
+        if ($scope.isInPreviewMode) {
+          warningsData.addWarning('This functionality is not available in preview mode.');
+        } else {
+          oppiaPlayerService.openPlayerFeedbackModal(stateName);
+        }
       };
 
       var _scrollToLastEntry = function() {
@@ -157,11 +165,13 @@ oppia.directive('conversationSkin', [function() {
         });
 
         oppiaPlayerService.submitAnswer(answer, handler, function(
-            newStateName, isSticky, questionHtml, feedbackHtml) {
+            newStateName, isSticky, feedbackHtml, questionHtml, newInteractionId) {
           $timeout(function() {
             var oldStateName = $scope.stateName;
             $scope.stateName = newStateName;
-            $scope.finished = !Boolean(newStateName);
+            console.log(newInteractionId);
+            $scope.finished = !Boolean(newStateName) || (
+              newInteractionId === _END_CONVERSATION_INTERACTION_ID);
 
             if (!$scope.finished && !isSticky) {
               // The previous interaction is not sticky and should be replaced.

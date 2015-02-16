@@ -253,7 +253,8 @@ oppia.factory('oppiaPlayerService', [
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
-      newStateName, isSticky, newQuestionHtml, newFeedbackHtml);
+      newStateName, isSticky, newFeedbackHtml,
+      newQuestionHtml, newStateData.interaction.id);
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
