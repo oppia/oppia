@@ -832,8 +832,8 @@ md-card.oppia-gallery-tile {
 .oppia-editor-edit-icon {
   font-size: 16px;
   opacity: 0.2;
-  position: absolute; 
-  right: -20px; 
+  position: absolute;
+  right: -20px;
   top: 5px;
 }
 
@@ -1257,6 +1257,19 @@ div#ng-curtain {
   height: 40px;
   margin-left: 6px;
   margin-top: 9px;
+}
+.oppia-navbar-profile-picture {
+  height: 48px;
+  width: 58px;
+  margin-top: -12px;
+  margin-left: -5px;
+  text-align: right;
+  background-image: url('/images/user-white.png');
+  background-repeat: no-repeat;
+}
+.navbar-default .navbar-nav > li > a:hover .oppia-navbar-profile-picture,
+.open .oppia-navbar-profile-picture {
+  background-image: url('/images/user.png');
 }
 
 .oppia-select {

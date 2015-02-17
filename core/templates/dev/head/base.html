@@ -107,14 +107,9 @@
                         {% if username %}
                           <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown">
-                              {{username}}
-
-                              {% if is_admin %}
-                                (Admin)
-                              {% elif is_moderator %}
-                                (Moderator)
-                              {% endif %}
-                              <span class="caret"></span>
+                              <div class="oppia-navbar-profile-picture">
+                                <span class="caret" style="margin-top:20px;"></span>
+                              </div>
                             </a>
                             <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
