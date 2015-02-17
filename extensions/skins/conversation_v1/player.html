@@ -29,11 +29,7 @@
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_black.png">
                 </td>
                 <td class="conversation-skin-oppia-content">
-                  <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
-                       angular-html-bind="state.content"></div>
-                  <div ng-show="$last && finished" class="protractor-test-conversation-finished">
-                    Congratulations, you have finished this exploration!
-                  </div>
+                  <div class="protractor-test-conversation-content" angular-html-bind="state.content"></div>
                 </td>
               </tr>
             </table>
@@ -67,7 +63,7 @@
           </md-card>
         </div>
 
-        <div ng-if="!finished">
+        <div ng-if="stateName">
           <div ng-if="!contentToDisplayNext && interactionIsInline">
             <div ng-hide="isAnswerBeingProcessed()">
               <md-card class="conversation-skin-inline-interaction">

@@ -250,11 +250,14 @@ oppia.factory('oppiaPlayerService', [
       learnerParamsService.init(newParams);
     }
 
+    // NB: This may be undefined if newStateName === END_DEST.
+    var newInteractionId = newStateData ? newStateData.interaction.id : undefined;
+
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
       newStateName, isSticky, newFeedbackHtml,
-      newQuestionHtml, newStateData.interaction.id);
+      newQuestionHtml, newInteractionId);
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {

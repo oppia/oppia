@@ -89,7 +89,7 @@ oppia.factory('stateGraphArranger', [
     //   - reachableFromEnd: whether there is a path from this node to the END node.
     //   - id: a unique id for the node.
     //   - label: the full label of the node.
-    computeLayout: function(nodes, links, initStateId, finalStateId) {
+    computeLayout: function(nodes, links, initStateId, finalStateIds) {
       // In this implementation, nodes are snapped to a grid. We first compute
       // two additional internal variables for each node:
       //   - depth: its depth in the graph.
@@ -238,8 +238,10 @@ oppia.factory('stateGraphArranger', [
       }
 
       // Mark nodes that are reachable from the END state via backward links.
-      queue = [finalStateId];
-      nodeData[finalStateId].reachableFromEnd = true;
+      queue = finalStateIds;
+      for (var i = 0; i < finalStateIds.length; i++) {
+        nodeData[finalStateIds[i]].reachableFromEnd = true;
+      }
       while (queue.length > 0) {
         var currNodeId = queue[0];
         queue.shift();
@@ -276,7 +278,8 @@ oppia.directive('stateGraphViz', [
       //              corresponding linkPropertyMatching is undefined,
       //              link style defaults to the gray arrow.
       //  - 'initStateId': The initial state id
-      //  - 'finalStateId': The end state id
+      //  - 'finalStateIds': The list of ids corresponding to states with an
+      //             EndConversation interaction or the 'END' state.
       graphData: '&',
       // Object whose keys are ids of nodes to display a warning tooltip over
       highlightStates: '=',
@@ -310,7 +313,7 @@ oppia.directive('stateGraphViz', [
           $scope.graphLoaded = false;
           $scope.drawGraph(
             $scope.graphData().nodes, $scope.graphData().links,
-            $scope.graphData().initStateId, $scope.graphData().finalStateId
+            $scope.graphData().initStateId, $scope.graphData().finalStateIds
           );
 
           // Wait for the graph to finish loading before showing it again.
@@ -382,10 +385,10 @@ oppia.directive('stateGraphViz', [
         return Math.max($scope.GRAPH_HEIGHT, 300);
       };
 
-      $scope.drawGraph = function(nodes, links, initStateId, finalStateId) {
-        $scope.finalStateId = finalStateId;
+      $scope.drawGraph = function(nodes, links, initStateId, finalStateIds) {
+        $scope.finalStateIds = finalStateIds;
         var nodeData = stateGraphArranger.computeLayout(
-          nodes, links, initStateId, finalStateId);
+          nodes, links, initStateId, finalStateIds);
 
         var maxDepth = 0;
         for (var nodeId in nodeData) {
@@ -484,7 +487,7 @@ oppia.directive('stateGraphViz', [
         var _getNodeStrokeWidth = function(nodeId) {
           return nodeId == $scope.currentStateId() ? '4' :
                  (nodeId == initStateId || nodeId == $scope.initStateId2 ||
-                 nodeId == finalStateId) ? '2' : '1';
+                 nodeId == 'END') ? '2' : '1';
         };
 
         var _getNodeFillOpacity = function(nodeId) {
@@ -516,7 +519,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.onNodeDeletionClick = function(nodeId) {
-          if (nodeId != initStateId && nodeId != finalStateId) {
+          if (nodeId != initStateId && nodeId !== 'END') {
             $scope.onDeleteFunction(nodeId);
           }
         };
@@ -530,7 +533,7 @@ oppia.directive('stateGraphViz', [
         };
 
         $scope.canNavigateToNode = function(nodeId) {
-          return nodeId != finalStateId && nodeId != $scope.currentStateId();
+          return nodeId !== 'END' && nodeId != $scope.currentStateId();
         };
 
         $scope.getTruncatedLabel = function(nodeLabel) {
@@ -562,15 +565,15 @@ oppia.directive('stateGraphViz', [
           }
 
           nodeData[nodeId].isInitNode = (nodeId == initStateId);
-          nodeData[nodeId].isEndNode = (nodeId == finalStateId);
+          nodeData[nodeId].isEndNode = (nodeId == 'END');
           nodeData[nodeId].isBadNode = (
-            nodeId != initStateId && nodeId != finalStateId &&
+            nodeId != initStateId && nodeId != 'END' &&
             !(nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd));
           nodeData[nodeId].isNormalNode = (
-            nodeId != initStateId && nodeId != finalStateId &&
+            nodeId != initStateId && nodeId != 'END' &&
             nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd);
 
-          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId != finalStateId);
+          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId != 'END');
           $scope.nodeList.push(nodeData[nodeId]);
         }
 

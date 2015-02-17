@@ -169,11 +169,10 @@ oppia.directive('conversationSkin', [function() {
           $timeout(function() {
             var oldStateName = $scope.stateName;
             $scope.stateName = newStateName;
-            console.log(newInteractionId);
             $scope.finished = !Boolean(newStateName) || (
               newInteractionId === _END_CONVERSATION_INTERACTION_ID);
 
-            if (!$scope.finished && !isSticky) {
+            if ($scope.stateName && !isSticky) {
               // The previous interaction is not sticky and should be replaced.
               _labelForNextFocusTarget = Math.random().toString(36).slice(2);
               $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(

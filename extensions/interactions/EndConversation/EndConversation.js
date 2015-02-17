@@ -26,11 +26,21 @@ oppia.directive('oppiaInteractiveEndConversation', [
       restrict: 'E',
       scope: {},
       templateUrl: 'interaction/EndConversation',
-      controller: ['$scope', '$attrs', 'urlService', function($scope, $attrs, urlService) {
+      controller: ['$scope', '$http', '$attrs', 'urlService', function($scope, $http, $attrs, urlService) {
         $scope.isIframed = urlService.isIframed();
 
         $scope.recommendedExplorationIds = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.recommendedExplorationIdsWithValue);
+
+        $http({
+          method: 'GET',
+          url: '/explorationsummarieshandler/data',
+          params: {
+            stringified_exp_ids: JSON.stringify($scope.recommendedExplorationIds)
+          }
+        }).success(function(data) {
+          $scope.recommendedExplorationSummaries = data.summaries;
+        });
       }]
     };
   }

@@ -3,7 +3,12 @@
     Other explorations you might enjoy:
     <ul>
       <li ng-repeat="expId in recommendedExplorationIds track by $index">
-        <a ng-href="/explore/<[expId]>">Exploration</a>
+        <a ng-href="/explore/<[expId]>" target="<[isIframed ? '_blank' : '_self']>" ng-if="recommendedExplorationSummaries[$index]">
+          <[recommendedExplorationSummaries[$index].title]>
+        </a>
+        <span style="color: red;" ng-if="!recommendedExplorationSummaries[$index]">
+          <strong>Error:</strong> no published exploration found with ID '<[expId]>'
+        </span>
       </li>
     </ul>
   </div>
@@ -15,5 +20,5 @@
   </div>
 </script>
 
-<script type="text/ng-template" id="response/MultipleChoiceInput">
+<script type="text/ng-template" id="response/EndConversation">
 </script>

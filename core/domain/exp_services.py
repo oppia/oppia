@@ -217,6 +217,16 @@ def _get_exploration_summary_dicts_from_models(exp_summary_models):
     return result
 
 
+def get_exploration_summaries_matching_ids(exp_ids):
+    """Given a list of exploration ids, return a list with the corresponding
+    summary domain objects (or None if the corresponding summary does not
+    exist).
+    """
+    return [
+        (get_exploration_summary_from_model(model) if model else None)
+        for model in exp_models.ExpSummaryModel.get_multi(exp_ids)]
+
+
 def get_exploration_summaries_matching_query(query_string, cursor=None):
     """Returns a dict with all exploration summary domain objects matching the
     given search query string, as well as a search cursor for future fetches.

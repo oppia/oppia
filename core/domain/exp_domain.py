@@ -47,6 +47,8 @@ STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 
+INTERACTION_ID_END_CONVERSATION = 'EndConversation'
+
 
 class ExplorationChange(object):
     """Domain object class for an exploration change.
@@ -1019,28 +1021,31 @@ class Exploration(object):
     def _verify_no_self_loops(self):
         """Verify that there are no feedback-less self-loops."""
         for (state_name, state) in self.states.iteritems():
-            for handler in state.interaction.handlers:
-                for rule in handler.rule_specs:
-                    # Check that there are no feedback-less self-loops.
-                    # NB: Sometimes it makes sense for a self-loop to not have
-                    # feedback, such as unreachable rules in a ruleset for
-                    # multiple-choice questions. This should be handled in the
-                    # frontend so that a valid dict with feedback for every
-                    # self-loop is always saved to the backend.
-                    if (rule.dest == state_name and not rule.feedback
-                            and not state.interaction.sticky):
-                        if rule.is_default:
-                            error_msg = (
-                                'Please add feedback for the default rule in '
-                                'state "%s", otherwise the reader is likely '
-                                'to get frustrated.' % state_name)
-                        else:
-                            error_msg = (
-                                'Please add feedback for any rules in state '
-                                '"%s" which loop back to that state, '
-                                'otherwise the reader is likely to get '
-                                'frustrated.' % state_name)
-                        raise utils.ValidationError(error_msg)
+            if state.interaction.id != INTERACTION_ID_END_CONVERSATION:
+                for handler in state.interaction.handlers:
+                    for rule in handler.rule_specs:
+                        # Check that there are no feedback-less self-loops.
+                        # NB: Sometimes it makes sense for a self-loop to not
+                        # have feedback, such as unreachable rules in a
+                        # ruleset for multiple-choice questions. This should
+                        # be handled in the frontend so that a valid dict with
+                        # feedback for every self-loop is always saved to the
+                        # backend.
+                        if (rule.dest == state_name and not rule.feedback
+                                and not state.interaction.sticky):
+                            if rule.is_default:
+                                error_msg = (
+                                    'Please add feedback for the default '
+                                    'rule in state "%s", otherwise the '
+                                    'learner is likely to get frustrated.'
+                                    % state_name)
+                            else:
+                                error_msg = (
+                                    'Please add feedback for any rules in '
+                                    'state "%s" which loop back to that '
+                                    'state, otherwise the learner is likely '
+                                    'to get frustrated.' % state_name)
+                            raise utils.ValidationError(error_msg)
 
     def _verify_all_states_reachable(self):
         """Verifies that all states are reachable from the initial state."""
@@ -1059,13 +1064,14 @@ class Exploration(object):
 
             curr_state = self.states[curr_state_name]
 
-            for handler in curr_state.interaction.handlers:
-                for rule in handler.rule_specs:
-                    dest_state = rule.dest
-                    if (dest_state not in curr_queue and
-                            dest_state not in processed_queue and
-                            dest_state != feconf.END_DEST):
-                        curr_queue.append(dest_state)
+            if curr_state.interaction.id != INTERACTION_ID_END_CONVERSATION:
+                for handler in curr_state.interaction.handlers:
+                    for rule in handler.rule_specs:
+                        dest_state = rule.dest
+                        if (dest_state not in curr_queue and
+                                dest_state not in processed_queue and
+                                dest_state != feconf.END_DEST):
+                            curr_queue.append(dest_state)
 
         if len(self.states) != len(processed_queue):
             unseen_states = list(
@@ -1075,10 +1081,16 @@ class Exploration(object):
                 'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
-        """Verifies that the END state is reachable from all states."""
+        """Verifies that an END state or a state with
+        INTERACTION_ID_END_CONVERSATION is reachable from all states."""
         # This queue stores state names.
         processed_queue = []
         curr_queue = [feconf.END_DEST]
+
+        for (state_name, state) in self.states.iteritems():
+            if state.interaction.id == INTERACTION_ID_END_CONVERSATION:
+                processed_queue.append(state_name)
+                curr_queue.append(state_name)
 
         while curr_queue:
             curr_state_name = curr_queue[0]
@@ -1103,8 +1115,8 @@ class Exploration(object):
             dead_end_states = list(
                 set(self.states.keys()) - set(processed_queue))
             raise utils.ValidationError(
-                'The END state is not reachable from the following states: %s'
-                % ', '.join(dead_end_states))
+                'It is impossible to complete the exploration from the '
+                'following states: %s' % ', '.join(dead_end_states))
 
     # Derived attributes of an exploration,
     @property
