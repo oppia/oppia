@@ -256,7 +256,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       $scope.openEditParameterModal = function(currentParamName, eltToReplace) {
         return $modal.open({
           templateUrl: 'modals/editParamName',
-          backdrop: 'static',
+          backdrop: true,
           resolve: {
             allowedParameterNames: function() {
               return $scope.allowedParameterNames();
@@ -585,7 +585,7 @@ oppia.directive('richTextEditor', [
         $scope.openRteCustomizationModal = function(componentDefn, attrsCustomizationArgsDict) {
           $modal.open({
             templateUrl: 'modals/customizeRteComponent',
-            backdrop: 'static',
+            backdrop: true,
             resolve: {
               componentDefn: function() {
                 return componentDefn;

@@ -81,7 +81,7 @@ oppia.controller('ExplorationFeedback', [
 
     $modal.open({
       templateUrl: 'modals/editorFeedbackCreateThread',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {},
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.create = function(newThreadSubject, newThreadText) {
