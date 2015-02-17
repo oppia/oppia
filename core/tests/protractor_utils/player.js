@@ -21,6 +21,7 @@
 
 var interactions = require('../../../extensions/interactions/protractor.js');
 var forms = require('./forms.js');
+var general = require('./general.js');
 
 var restartExploration = function() {
   element(by.css('.protractor-test-restart-exploration')).click();
@@ -69,6 +70,7 @@ var submitAnswer = function(interactionName, answerData) {
   interactions.getInteraction(interactionName).submitAnswer(
     element.all(by.css('.protractor-test-conversation-input')).last(),
     answerData);
+  general.waitForSystem();
 };
 
 
