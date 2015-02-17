@@ -646,6 +646,13 @@ md-card.oppia-gallery-tile {
   display: none;
 }
 
+.carousel-control .glyphicon-chevron-left, 
+.carousel-control .glyphicon-chevron-right, 
+.carousel-control .icon-prev, 
+.carousel-control .icon-next {
+  margin-top: -80px;
+}
+
 .oppia-page-title {
   color: #222;
   font-size: 30px;
@@ -1146,7 +1153,7 @@ oppia-parameter {
 .oppia-gallery-banner {
   background-repeat: no-repeat;
   background-size: cover;
-  height: 550px;
+  height: 650px;
   width: 100%;
 }
 .oppia-gallery-banner-content {
@@ -1180,7 +1187,7 @@ oppia-parameter {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.3em;
   height: 120px;
-  margin-top: -75px;
+  margin-top: -120px;
   padding-top: 45px;
   position: relative;
   text-align: center;
