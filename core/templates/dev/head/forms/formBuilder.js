@@ -1365,14 +1365,23 @@ oppia.directive('schemaBasedListEditor', [
           $scope.isAddItemButtonPresent = false;
         };
 
+        
         $scope._onChildFormSubmit = function(evt) {
           if (!$scope.isAddItemButtonPresent) {
+            /** 
+             * If form submission happens on last element of the set (i.e the add item button is absent)
+             * then automatically add the element to the list.
+             */
             if (($scope.maxListLength === null || $scope.localValue.length < $scope.maxListLength) &&
                 !!$scope.localValue[$scope.localValue.length - 1]) {
               $scope.addElement();
             }
           } else {
-            focusService.setFocus("addMoreElements");
+            /** 
+             * If form submission happens on existing element move focus from existing element to addMore
+             * button.
+             */
+            focusService.setFocus('addMoreElements');
           }
           evt.stopPropagation();
         };
