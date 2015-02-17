@@ -171,9 +171,10 @@ oppia.factory('oppiaPlayerService', [
 
   // TODO(sll): Move this (and the corresponding code in the exploration editor) to
   // a common standalone service.
-  var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs) {
+  var _getInteractionHtml = function(interactionId, interactionCustomizationArgSpecs, labelForFocusTarget) {
     var el = $(
       '<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '>');
+
     for (var caSpecName in interactionCustomizationArgSpecs) {
       var caSpecValue = interactionCustomizationArgSpecs[caSpecName].value;
       // TODO(sll): Evaluate any values here that correspond to expressions.
@@ -181,6 +182,11 @@ oppia.factory('oppiaPlayerService', [
         $filter('camelCaseToHyphens')(caSpecName) + '-with-value',
         oppiaHtmlEscaper.objToEscapedJson(caSpecValue));
     }
+
+    if (labelForFocusTarget) {
+      el.attr('label-for-focus-target', labelForFocusTarget);
+    }
+
     return ($('<div>').append(el)).html();
   };
 
@@ -348,10 +354,11 @@ oppia.factory('oppiaPlayerService', [
     getCurrentStateName: function() {
       return _currentStateName;
     },
-    getInteractionHtml: function(stateName) {
+    getInteractionHtml: function(stateName, labelForFocusTarget) {
       return _getInteractionHtml(
         _exploration.states[stateName].interaction.id,
-        _exploration.states[stateName].interaction.customization_args);
+        _exploration.states[stateName].interaction.customization_args,
+        labelForFocusTarget);
     },
     isInteractionInline: function(stateName) {
       return GLOBALS.interactionDisplayModes[
@@ -460,7 +467,7 @@ oppia.factory('oppiaPlayerService', [
     openPlayerFeedbackModal: function(stateName) {
       var modalConfig = {
         templateUrl: 'modals/playerFeedback',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           stateName: function() {
             return stateName;
@@ -500,7 +507,7 @@ oppia.factory('oppiaPlayerService', [
 
           $modal.open({
             templateUrl: 'modals/playerFeedbackConfirmation',
-            backdrop: 'static',
+            backdrop: true,
             controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
               $scope.cancel = function() {
                 $modalInstance.dismiss('cancel');

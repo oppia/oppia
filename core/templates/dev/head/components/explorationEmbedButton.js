@@ -23,7 +23,7 @@ oppia.factory('embedExplorationButtonService', ['$modal', function($modal) {
     showModal: function(explorationId) {
       $modal.open({
         templateUrl: 'modals/embedExploration',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           explorationId: function() {
             return explorationId;

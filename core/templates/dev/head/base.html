@@ -103,7 +103,7 @@
                     {% endblock navbar_breadcrumb %}
 
                     <div class="collapse navbar-collapse">
-                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 20px; margin-right: 0;">
+                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
                         {% if username %}
                           <li class="dropdown">
                             <a class="dropdown-toggle" data-toggle="dropdown">
@@ -118,13 +118,13 @@
                             </a>
                             <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
                               <li>
+                                <a href="/dashboard">Dashboard</a>
+                              </li>
+                              <li>
                                 <a href="/profile/{{username}}">Profile</a>
                               </li>
                               <li>
                                 <a href="/preferences">Preferences</a>
-                              </li>
-                              <li>
-                                <a href="/dashboard">Dashboard</a>
                               </li>
 
                               {% if is_moderator %}

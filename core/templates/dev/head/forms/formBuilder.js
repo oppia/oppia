@@ -256,7 +256,7 @@ oppia.directive('unicodeWithParametersEditor', ['$modal', '$log', 'warningsData'
       $scope.openEditParameterModal = function(currentParamName, eltToReplace) {
         return $modal.open({
           templateUrl: 'modals/editParamName',
-          backdrop: 'static',
+          backdrop: true,
           resolve: {
             allowedParameterNames: function() {
               return $scope.allowedParameterNames();
@@ -585,7 +585,7 @@ oppia.directive('richTextEditor', [
         $scope.openRteCustomizationModal = function(componentDefn, attrsCustomizationArgsDict) {
           $modal.open({
             templateUrl: 'modals/customizeRteComponent',
-            backdrop: 'static',
+            backdrop: true,
             resolve: {
               componentDefn: function() {
                 return componentDefn;
@@ -1083,7 +1083,26 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
-    controller: ['$scope', 'parameterSpecsService', function($scope, parameterSpecsService) {
+    controller: ['$scope', '$timeout', 'parameterSpecsService', function($scope, $timeout, parameterSpecsService) {
+      $scope.hasLoaded = false;
+      $scope.isInputInFocus = false;
+      $scope.hasFocusedAtLeastOnce = false;
+
+      $scope.onFocus = function() {
+        $scope.isInputInFocus = true;
+        $scope.hasFocusedAtLeastOnce = true;
+        if ($scope.onInputFocus) {
+          $scope.onInputFocus();
+        }
+      };
+
+      $scope.onBlur = function() {
+        $scope.isInputInFocus = false;
+        if ($scope.onInputBlur) {
+          $scope.onInputBlur();
+        }
+      };
+
       // TODO(sll): Move these to ng-messages when we move to Angular 1.3.
       $scope.getMinValue = function() {
         for (var i = 0; i < $scope.validators().length; i++) {
@@ -1091,7 +1110,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             return $scope.validators()[i].min_value;
           }
         }
-      }
+      };
 
       $scope.getMaxValue = function() {
         for (var i = 0; i < $scope.validators().length; i++) {
@@ -1099,7 +1118,7 @@ oppia.directive('schemaBasedFloatEditor', [function() {
             return $scope.validators()[i].max_value;
           }
         }
-      }
+      };
 
       $scope.onKeypress = function(evt) {
         if (evt.keyCode === 13) {
@@ -1124,6 +1143,12 @@ oppia.directive('schemaBasedFloatEditor', [function() {
           $scope.localValue = $scope.expressionMode ? $scope.paramNames[0] : 0.0;
         };
       }
+
+      // This prevents the red 'invalid input' warning message from flashing
+      // at the outset.
+      $timeout(function() {
+        $scope.hasLoaded = true;
+      });
     }]
   };
 }]);

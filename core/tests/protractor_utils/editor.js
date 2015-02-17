@@ -26,7 +26,7 @@ var rules = require('../../../extensions/rules/protractor.js');
 
 var exitTutorialIfNecessary = function() {
   // If the editor tutorial shows up, exit it.
-  element.all(by.css('.introjs-skipbutton')).then(function(buttons) {
+  element.all(by.css('.skipBtn')).then(function(buttons) {
     if (buttons.length === 1) {
       buttons[0].click();
     } else if (buttons.length !== 0) {
@@ -112,8 +112,22 @@ var expectContentTextToEqual = function(text) {
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction editor.
 var setInteraction = function(interactionName) {
-  element(by.css('.protractor-test-select-interaction-id')).
-    element(by.css('option[value=' + interactionName + ']')).click();
+  // Searches through the dropdown menu for the correct interaction
+  var dropdown = element(by.css('.protractor-test-select-interaction-id'));
+  dropdown.click();
+  for (var i = 0; true; i++) {
+    var category = element(by.css('.protractor-test-interaction-category-' + i));
+    if (category.isPresent()) {
+      browser.actions().mouseMove(category).perform();
+      var interaction = element(by.css('.protractor-test-interaction-id-' + interactionName));
+      if (interaction.isDisplayed()) {
+        interaction.click();
+        break;
+      }
+    } else {
+      break;
+    }
+  }
 
   if (arguments.length > 1) {
     element(by.css('.protractor-test-edit-interaction')).click();
@@ -273,14 +287,23 @@ var RuleEditor = function(ruleNum) {
         bodyElem.element(by.css('.protractor-test-feedback-bubble'))
       ).deleteItem(index);
     },
-    // Enter 'END' for the end state.
     // This saves the rule after the destination is selected.
+    // Note that the supplied destinationName must be an existing state,
+    // or 'END' for the end state. To create a new state, use
+    // createNewStateAndSetDestination() instead.
     setDestination: function(destinationName) {
       var destinationElement =
         bodyElem.element(by.css('.protractor-test-dest-bubble'));
       forms.AutocompleteDropdownEditor(destinationElement).
         setValue(destinationName);
       bodyElem.element(by.css('.protractor-test-save-rule')).click();
+    },
+    // Sets a destination for this rule, creating a state in the proces.
+    createNewStateAndSetDestination: function(destinationName) {
+      bodyElem.element(by.css('.protractor-test-add-state-button')).click();
+      element(by.css('.protractor-test-add-state-input')).sendKeys(destinationName);
+      element(by.css('.protractor-test-add-state-submit')).click();
+      general.waitForSystem();
     },
     expectAvailableDestinationsToBe: function(stateNames) {
       forms.AutocompleteDropdownEditor(
@@ -295,11 +318,6 @@ var RuleEditor = function(ruleNum) {
 };
 
 // STATE GRAPH
-
-var createState = function(newStateName) {
-  element(by.css('.protractor-test-add-state-input')).sendKeys(newStateName);
-  element(by.css('.protractor-test-add-state-submit')).click();
-};
 
 // NOTE: if the state is not visible in the state graph this function will fail
 var moveToState = function(targetName) {
@@ -324,6 +342,7 @@ var moveToState = function(targetName) {
 };
 
 var deleteState = function(stateName) {
+  general.waitForSystem();
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();
@@ -657,7 +676,6 @@ exports.expectInteractionToMatch = expectInteractionToMatch;
 exports.addRule = addRule;
 exports.RuleEditor = RuleEditor;
 
-exports.createState = createState;
 exports.moveToState = moveToState;
 exports.deleteState = deleteState;
 exports.expectStateNamesToBe = expectStateNamesToBe;

@@ -248,7 +248,7 @@ oppia.controller('StateRules', [
 
     $modal.open({
       templateUrl: 'modals/addRule',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {},
       controller: [
           '$scope', '$modalInstance', 'rulesService',

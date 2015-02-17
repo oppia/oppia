@@ -27,7 +27,7 @@ oppia.factory('createExplorationButtonService', [
     _getCreateModalInstance: function(categoryList, isUploadModal) {
       var modalInstance = $modal.open({
         templateUrl: 'modals/galleryCreateNew',
-        backdrop: 'static',
+        backdrop: true,
         resolve: {
           categoriesForDropdown: function() {
             var result = [];
