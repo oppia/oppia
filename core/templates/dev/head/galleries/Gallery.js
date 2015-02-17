@@ -336,7 +336,7 @@ oppia.controller('SearchBar', [
     $scope.selectionDetails[itemsType].numSelections = totalCount;
 
     $scope.selectionDetails[itemsType].summary = (
-      totalCount === 0 ? itemsName.charAt(0).toUpperCase() + itemsName.substr(1) + '...' :
+      totalCount === 0 ? 'All ' + itemsName.charAt(0).toUpperCase() + itemsName.substr(1) :
       totalCount === 1 ? selectedItems[0] :
       totalCount + ' ' + itemsName);
 
