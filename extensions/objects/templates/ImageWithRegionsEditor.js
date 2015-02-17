@@ -71,10 +71,8 @@ oppia.directive('imageWithRegionsEditor', [
         // Is user currently dragging an existing region?
         $scope.userIsCurrentlyDragging = false;
         // Dimensions of original image
-        var originalImageWidth = 0; 
-        var originalImageHeight = 0;
-        // We recalculate image dimensions when the image changes
-        var needRecalculateImageDimensions = true;
+        $scope.originalImageWidth = 0; 
+        $scope.originalImageHeight = 0;
         // Is the user preparing to draw a rectangle?
         $scope.regionDrawMode = false;
         // Index of region currently hovered over
@@ -92,21 +90,15 @@ oppia.directive('imageWithRegionsEditor', [
         // Calculates the dimensions of the image, assuming that the width
         // of the image is scaled down to fit the svg element if necessary
         var _calculateImageDimensions = function() {
-          if (needRecalculateImageDimensions) {
-            var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
-            this.displayedImageWidth = Math.min(svgElement.width(), originalImageWidth);
-            var scalingRatio = this.displayedImageWidth / originalImageWidth; 
-            this.displayedImageHeight = originalImageHeight * scalingRatio;
-            needRecalculateImageDimensions = false;
-          }
+          var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
+          var displayedImageWidth = Math.min(svgElement.width(), $scope.originalImageWidth);
+          var scalingRatio = displayedImageWidth / $scope.originalImageWidth; 
+          var displayedImageHeight = $scope.originalImageHeight * scalingRatio;
           return {
-            width: this.displayedImageWidth,
-            height: this.displayedImageHeight 
+            width: displayedImageWidth,
+            height: displayedImageHeight 
           };
         };
-        // Previously calculated image width and height
-        _calculateImageDimensions.displayedImageWidth = 0;
-        _calculateImageDimensions.displayedImageHeight = 0;
         // Use these two functions to get the calculated image width and height
         $scope.getImageWidth = function() {
           return _calculateImageDimensions().width;
@@ -130,9 +122,8 @@ oppia.directive('imageWithRegionsEditor', [
             // width and height
             $('<img/>').attr('src', $scope.getPreviewUrl(newVal)).load(
               function() {
-                originalImageWidth = this.width;
-                originalImageHeight = this.height;
-                needRecalculateImageDimensions = true;
+                $scope.originalImageWidth = this.width;
+                $scope.originalImageHeight = this.height;
                 $scope.$apply();
               }
             );
