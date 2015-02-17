@@ -44,7 +44,7 @@ oppia.controller('Signup', [
   $scope.showLicenseExplanationModal = function() {
     $modal.open({
       templateUrl: 'modals/licenseExplanation',
-      backdrop: 'static',
+      backdrop: true,
       resolve: {},
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.close = function() {

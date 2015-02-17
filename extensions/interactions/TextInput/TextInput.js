@@ -29,6 +29,7 @@ oppia.directive('oppiaInteractiveTextInput', [
         $scope.placeholder = oppiaHtmlEscaper.escapedJsonToObj($attrs.placeholderWithValue);
         $scope.rows = oppiaHtmlEscaper.escapedJsonToObj($attrs.rowsWithValue);
         $scope.answer = '';
+        $scope.labelForFocusTarget = $attrs.labelForFocusTarget || null;
 
         $scope.schema = {
           type: 'unicode',
@@ -40,9 +41,6 @@ oppia.directive('oppiaInteractiveTextInput', [
         if ($scope.rows && $scope.rows !== 1) {
           $scope.schema.ui_config.rows = $scope.rows;
         }
-
-        $scope.textInputFocusLabel = Math.random().toString(36).slice(2);
-        focusService.setFocus($scope.textInputFocusLabel);
 
         $scope.submitAnswer = function(answer) {
           if (!answer) {

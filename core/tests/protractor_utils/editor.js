@@ -342,6 +342,7 @@ var moveToState = function(targetName) {
 };
 
 var deleteState = function(stateName) {
+  general.waitForSystem();
   element.all(by.css('.protractor-test-node')).map(function(stateElement) {
     return stateElement.element(by.css('.protractor-test-node-label')).
       getText();

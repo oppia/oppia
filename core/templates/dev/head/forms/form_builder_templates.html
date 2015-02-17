@@ -156,7 +156,7 @@
       </span>
     </span>
 
-    <span ng-if="hasLoaded && !isInputInFocus">
+    <span ng-if="hasLoaded && !isInputInFocus && hasFocusedAtLeastOnce">
       <span ng-if="floatForm.floatValue.$error.isFloat" class="oppia-form-error" aria-live="assertive">
         Please enter a valid decimal number.
       </span>

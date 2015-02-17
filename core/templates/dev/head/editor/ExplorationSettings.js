@@ -157,7 +157,7 @@ oppia.controller('ExplorationSettings', [
     warningsData.clear();
     $modal.open({
       templateUrl: 'modals/transferExplorationOwnership',
-      backdrop: 'static',
+      backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
           $scope.transfer = $modalInstance.close;
 
@@ -176,7 +176,7 @@ oppia.controller('ExplorationSettings', [
     warningsData.clear();
     $modal.open({
       templateUrl: 'modals/nominateExploration',
-      backdrop: 'static',
+      backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.close = function() {
           $modalInstance.dismiss('cancel');
@@ -191,7 +191,7 @@ oppia.controller('ExplorationSettings', [
 
     $modal.open({
       templateUrl: 'modals/deleteExploration',
-      backdrop: 'static',
+      backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.reallyDelete = $modalInstance.close;
 
@@ -231,7 +231,7 @@ oppia.controller('ExplorationSettings', [
     warningsData.clear();
     $modal.open({
       templateUrl: 'modals/publishExploration',
-      backdrop: 'static',
+      backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.publish = $modalInstance.close;
 

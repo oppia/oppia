@@ -320,6 +320,10 @@ oppia.directive('stateGraphViz', [
         }
       };
 
+      $scope.$on('redrawGraph', function() {
+        _redrawGraph();
+      });
+
       $scope.$watch('graphData()', _redrawGraph, true);
       $scope.$watch('currentStateId()', _redrawGraph);
       // If statistics for a different version of the exploration are loaded,
