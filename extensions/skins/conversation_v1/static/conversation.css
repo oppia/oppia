@@ -59,8 +59,9 @@ html, body {
 }
 
 .conversation-skin-row-avatar-img {
-  height: 30px;
-  max-width: 30px;
+  height: 24px;
+  margin-top: 2px;
+  max-width: 24px;
 }
 
 .conversation-skin-exploration-header {

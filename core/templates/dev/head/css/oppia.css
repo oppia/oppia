@@ -645,9 +645,9 @@ md-card.oppia-gallery-tile {
   display: none;
 }
 
-.carousel-control .glyphicon-chevron-left, 
-.carousel-control .glyphicon-chevron-right, 
-.carousel-control .icon-prev, 
+.carousel-control .glyphicon-chevron-left,
+.carousel-control .glyphicon-chevron-right,
+.carousel-control .icon-prev,
 .carousel-control .icon-next {
   margin-top: -80px;
 }
@@ -753,14 +753,14 @@ md-card.oppia-gallery-tile {
 }
 .oppia-editor-card {
   background: rgb(255,255,255);
-  padding: 20px;
-  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 30px;
+  max-width: 800px;
+  padding: 0;
 }
 
 .oppia-editor-card-body {
-  padding: 5px 10px;
   position: relative;
 }
 .oppia-editor-card-body h3 {
@@ -775,6 +775,11 @@ md-card.oppia-gallery-tile {
   margin: 0;
 }
 
+.oppia-editor-card-section {
+  margin-left: 35px;
+  padding: 0 50px 0 20px;
+}
+
 .oppia-editor-rules-card {
   margin: 0px;
   background-color: #f5f5f5;
@@ -786,7 +791,9 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-state-content-display {
-  padding: 2px;
+  padding: 4px;
+  text-align: justify;
+  width: 445px;
 }
 
 .oppia-prevent-selection {
@@ -795,34 +802,6 @@ md-card.oppia-gallery-tile {
   -webkit-user-select: none;
 }
 
-.oppia-interaction-selector {
-  position: absolute;
-  left: 15px;
-  /* This must be larger than the z-index in
-     .oppia-click-to-start-editing, so that the rule does not
-     switch to edit mode when the destination link is clicked. */
-  z-index: 200;
-}
-@media (min-width: 768px) {
-  .oppia-interaction-selector {
-    bottom: 10px;
-  }
-}
-@media (max-width: 768px) {
-  .oppia-interaction-selector {
-    top: -22px;
-    width: 60%;
-  }
-}
-
-.oppia-interaction-editor {
-  border: 1px solid #ccc;
-  padding: 15px 15px 0px 15px;
-}
-
-.oppia-state-item-editor-div {
-  margin-bottom: 20px;
-}
 .oppia-save-state-item-button {
   margin-top: 2px;
 }
@@ -844,8 +823,8 @@ md-card.oppia-gallery-tile {
 .oppia-editor-edit-icon {
   font-size: 16px;
   opacity: 0.2;
-  position: absolute; 
-  right: -20px; 
+  position: absolute;
+  right: -20px;
   top: 5px;
 }
 
