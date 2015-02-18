@@ -18,10 +18,14 @@
         </div>
       </md-card>
 
-      <md-card class="oppia-editor-rules-card">
-        {% include 'editor/state_editor_active_rule.html' %}
-        <div ng-controller="StateRules">
-          {% include 'editor/state_editor_rules.html' %}
+      <md-card class="oppia-editor-card">
+        <div class="oppia-editor-card-body">
+          <div style="background: #f5f5f5;">
+            {% include 'editor/state_editor_rules.html' %}
+          </div>
+          <div class="oppia-editor-card-section" style="padding-top: 10px; padding-bottom: 10px;">
+            {% include 'editor/state_editor_active_rule.html' %}
+          </div>
         </div>
       </md-card>
     </div>
