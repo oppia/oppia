@@ -54,6 +54,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'public': [],
             'featured': [],
             'search_cursor': None,
+            'profile_picture_data_url': None,
             'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 
@@ -128,6 +129,7 @@ class GalleryPageTest(test_utils.GenericTestBase):
             'user_email': self.ADMIN_EMAIL,
             'username': self.ADMIN_USERNAME,
             'search_cursor': None,
+            'profile_picture_data_url': None,
             'preferred_language_codes': [feconf.DEFAULT_LANGUAGE_CODE],
         }, response_dict)
 

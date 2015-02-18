@@ -59,11 +59,8 @@
             <div class="oppia-editable-section" title="Change profile picture" style="height: 150px; width: 150px">
               <div class="oppia-click-to-start-editing" ng-click="showEditProfilePictureModal()"></div>
               <span class="glyphicon glyphicon-pencil oppia-editor-edit-icon" style="right: 5px;"></span>
-              {% if profile_picture %}
-                <img src="{{profile_picture}}" class="img-thumbnail">
-              {% else %}
-                <img src="/images/no_profile_picture.png" class="img-thumbnail">
-              {% endif %}
+              <img ng-if="profilePictureDataUrl" ng-src="<[profilePictureDataUrl]>" class="img-thumbnail">
+              <img ng-if="!profilePictureDataUrl" src="/images/no_profile_picture.png" class="img-thumbnail">
             </div>
           </div>
         </div>
@@ -116,7 +113,7 @@
       <div class="modal-body">
         <div>Select an image file: <input type="file" class="profile-picture-input" /></div>
         <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
-          <img-crop image="uploadedImage" result-image="croppedImage" area-type="square" result-image-size="150"></img-crop>
+          <img-crop image="uploadedImage" result-image="croppedImageDataUrl" area-type="square" result-image-size="150"></img-crop>
         </div>
       </div>
 

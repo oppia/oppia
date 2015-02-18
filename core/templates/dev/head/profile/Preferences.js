@@ -22,6 +22,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
     function($scope, $http, $rootScope, $modal) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
+  $scope.profilePictureDataUrl = '';
 
   var _saveDataItem = function(updateType, data) {
     $http.put(_PREFERENCES_DATA_URL, {
@@ -44,7 +45,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
       backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.uploadedImage = '';
-        $scope.croppedImage = '';
+        $scope.croppedImageDataUrl = '';
 
         var handleFileSelect = function(event) {
           var file = event.currentTarget.files[0];
@@ -60,18 +61,20 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
           .on('change', '.profile-picture-input', handleFileSelect);
 
         $scope.confirm = function() {
-          $modalInstance.close($scope.croppedImage);
+          $modalInstance.close($scope.croppedImageDataUrl);
         };
 
         $scope.cancel = function() {
           $modalInstance.dismiss('cancel');
         };
       }]
-    }).result.then(function(newProfilePicture) {
+    }).result.then(function(newProfilePictureDataUrl) {
       $http.put(_PREFERENCES_DATA_URL, {
-        update_type: 'profile_picture',
-        data: newProfilePicture
+        update_type: 'profile_picture_data_url',
+        data: newProfilePictureDataUrl
       }).success(function(response) {
+        // The reload is needed in order to update the profile picture in the
+        // top-right corner.
         location.reload();
       });
     });
@@ -89,6 +92,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
     $scope.preferredLanguageCodes = data.preferred_language_codes;
+    $scope.profilePictureDataUrl = data.profile_picture_data_url;
     $scope.hasPageLoaded = true;
   });
 }]);
