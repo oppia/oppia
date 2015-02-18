@@ -227,7 +227,8 @@ DEMO_EXPLORATIONS = [
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
     ('test_exploration.yaml', 'Test of expressions and interactions', 'Test'),
-    ('modeling_graphs', 'Graph Modeling', 'Mathematics')
+    ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
+    ('solar_system', 'The Solar System', 'Astronomy')
 ]
 
 # TODO(sll): Add all other URLs here.
