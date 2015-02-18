@@ -169,7 +169,8 @@ MATERIAL_DESIGN_ICONS_DST = os.path.join(
     THIRD_PARTY_STATIC_DIR,
     'material-design-icons-%s' % MATERIAL_DESIGN_ICONS_REV)
 MATERIAL_DESIGN_ICON_CONTENT_FILES = ['ic_link_black_48dp.png']
-MATERIAL_DESIGN_ICON_NAVIGATION_FILES = ['ic_more_vert_black_48dp.png']
+MATERIAL_DESIGN_ICON_NAVIGATION_FILES = [
+    'ic_more_vert_black_48dp.png', 'ic_menu_black_48dp.png']
 
 # Note that Angular 1.3 requires a jQuery version that is >= 2.1.1.
 JQUERY_REV = '2.1.1'

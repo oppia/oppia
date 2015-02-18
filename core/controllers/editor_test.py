@@ -265,7 +265,7 @@ class DownloadIntegrationTest(BaseEditorControllerTest):
 interaction:
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
   handlers:
@@ -286,7 +286,7 @@ param_changes: []
 interaction:
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
   handlers:
@@ -311,7 +311,7 @@ param_changes: []
 interaction:
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
   handlers:
@@ -335,7 +335,7 @@ param_changes: []
 interaction:
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
   handlers:

@@ -125,7 +125,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             'name': 'placeholder',
             'description': 'The placeholder for the text input field.',
             'schema': {'type': 'unicode'},
-            'default_value': 'Type your answer here.',
+            'default_value': '',
         }, {
             'name': 'rows',
             'description': (

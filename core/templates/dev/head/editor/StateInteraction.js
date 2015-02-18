@@ -47,18 +47,16 @@ oppia.factory('interactionDetailsCache', [function() {
 
 
 oppia.controller('StateInteraction', [
-    '$scope', '$http', '$rootScope', '$filter', 'warningsData',
+    '$scope', '$http', '$rootScope', '$modal', '$filter', 'warningsData',
     'editorContextService', 'oppiaHtmlEscaper', 'interactionRepositoryService',
     'stateInteractionIdService', 'stateCustomizationArgsService',
     'stateInteractionStickyService', 'editabilityService',
     'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
-    function($scope, $http, $rootScope, $filter, warningsData,
+    function($scope, $http, $rootScope, $modal, $filter, warningsData,
       editorContextService, oppiaHtmlEscaper, interactionRepositoryService,
       stateInteractionIdService, stateCustomizationArgsService,
       stateInteractionStickyService, editabilityService,
       explorationStatesService, graphDataService, interactionDetailsCache) {
-
-  $scope.form = {};
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the
   // interaction preview.
@@ -140,7 +138,6 @@ oppia.controller('StateInteraction', [
 
     $scope.interactionPreviewHtml = _getInteractionPreviewTag(
       $scope.interactionId, interactionTemplate.customization_args);
-    $scope.interactionCustomizerIsShown = false;
     $scope.tmpInteraction = null;
   };
 
@@ -187,23 +184,48 @@ oppia.controller('StateInteraction', [
     });
   });
 
-  $scope.showInteractionCustomizer = function() {
+  $scope.openInteractionCustomizerModal = function() {
     if (editabilityService.isEditable()) {
       warningsData.clear();
 
-      $scope.interactionCustomizerIsShown = true;
-      $scope.$broadcast('schemaBasedFormsShown');
+      $scope.resetInteractionCustomizer();
 
-      $scope.tmpInteraction = angular.copy(
-        $scope.interactionRepository[stateInteractionIdService.savedMemento]);
-      for (var i = 0; i < $scope.tmpInteraction.customization_args.length; i++) {
-        var caName = $scope.tmpInteraction.customization_args[i].name;
-        $scope.tmpInteraction.customization_args[i].value = (
-          stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
-          angular.copy(stateCustomizationArgsService.displayed[caName].value) :
-          $scope.tmpInteraction.customization_args[i].default_value
-        );
-      }
+      $modal.open({
+        templateUrl: 'modals/customizeInteraction',
+        backdrop: true,
+        resolve: {
+          tmpInteraction: function() {
+            return angular.copy(
+              $scope.interactionRepository[stateInteractionIdService.savedMemento]);
+          }
+        },
+        controller: ['$scope', '$modalInstance', 'stateCustomizationArgsService', 'tmpInteraction', function($scope, $modalInstance, stateCustomizationArgsService, tmpInteraction) {
+          $scope.$broadcast('schemaBasedFormsShown');
+          $scope.tmpInteraction = tmpInteraction;
+          $scope.form = {};
+
+          for (var i = 0; i < $scope.tmpInteraction.customization_args.length; i++) {
+            var caName = $scope.tmpInteraction.customization_args[i].name;
+            $scope.tmpInteraction.customization_args[i].value = (
+              stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
+              angular.copy(stateCustomizationArgsService.displayed[caName].value) :
+              $scope.tmpInteraction.customization_args[i].default_value
+            );
+          }
+
+          $scope.save = function() {
+            $modalInstance.close({
+              tmpInteraction: $scope.tmpInteraction
+            });
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+          };
+        }]
+      }).result.then(function(result) {
+        $scope.saveInteractionCustomizations(result.tmpInteraction);
+      });
     }
   };
 
@@ -232,12 +254,6 @@ oppia.controller('StateInteraction', [
     $scope.resetInteractionCustomizer();
   };
 
-  $scope.$on('externalSave', function() {
-    if ($scope.interactionCustomizerIsShown) {
-      $scope.saveInteractionCustomizations($scope.tmpInteraction);
-    }
-  });
-
   $scope.onChangeInteractionType = function(newInteractionId) {
     interactionDetailsCache.set(
       stateInteractionIdService.savedMemento,
@@ -258,7 +274,7 @@ oppia.controller('StateInteraction', [
       stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
         newInteraction.customization_args);
     }
-    
+
     stateCustomizationArgsService.saveDisplayedValue();
 
     // This must be called here so that the rules are updated before the state

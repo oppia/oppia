@@ -59,7 +59,7 @@ NEW_STATE_TEMPLATE = {
     'interaction': {
         'customization_args': {
             'rows': {'value': 1},
-            'placeholder': {'value': 'Type your answer here.'}
+            'placeholder': {'value': ''}
         },
         'handlers': [{
             'name': 'submit',
