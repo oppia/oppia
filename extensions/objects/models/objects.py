@@ -553,7 +553,7 @@ class NormalizedRectangle2D(BaseObject):
 
 
 class ImageRegion(BaseObject):
-    """Image Region class."""
+    """A region of an image, including its shape and coordinates."""
 
     description = 'A region of an image.'
     
@@ -573,7 +573,7 @@ class ImageRegion(BaseObject):
 
 
 class ImageWithRegions(BaseObject):
-    """Image With Regions class."""
+    """An image overlaid with labeled regions."""
 
     description = 'An image overlaid with regions.'
     edit_html_filename = 'image_with_regions_editor'
@@ -603,19 +603,8 @@ class ImageWithRegions(BaseObject):
     }
 
 
-class ListOfRegion(BaseObject):
-    """List of Region class."""
-
-    description = "A list of regions by label."
-
-    SCHEMA = {
-        'type': 'list',
-        'items': UnicodeString.SCHEMA
-    }
-
-
-class ImageClick(BaseObject):
-    """Image Click class."""
+class ClickOnImage(BaseObject):
+    """A click on an image and the clicked regions."""
 
     description = "Position of a click and a list of regions clicked."
 
@@ -630,6 +619,9 @@ class ImageClick(BaseObject):
             }
         }, {
             'name': 'clickedRegions',
-            'schema': ListOfRegion.SCHEMA 
+            'schema': {
+                'type': 'list',
+                'items': UnicodeString.SCHEMA
+            } 
         }]
     }

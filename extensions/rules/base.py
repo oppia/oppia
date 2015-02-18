@@ -64,5 +64,5 @@ class ImageWithRegionsRule(rule_domain.Rule):
     subject_type = objects.ImageWithRegions
 
 
-class ImageClickRule(rule_domain.Rule):
-    subject_type = objects.ImageClick
+class ClickOnImageRule(rule_domain.Rule):
+    subject_type = objects.ClickOnImage

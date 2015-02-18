@@ -14,14 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Rules for ImageClick objects."""
+"""Rules for ClickOnImage objects."""
 
 __author__ = 'Zhan Xiong Chin'
 
 from extensions.rules import base
 
 
-class IsInRegion(base.ImageClickRule):
+class IsInRegion(base.ClickOnImageRule):
     description = 'is in the region {{x|UnicodeString}}'
     is_generic = False
 

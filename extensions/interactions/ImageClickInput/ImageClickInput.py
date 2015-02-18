@@ -28,7 +28,7 @@ class ImageClickInput(base.BaseInteraction):
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = []
     _handlers = [{
-        'name': 'submit', 'obj_type': 'ImageClick'
+        'name': 'submit', 'obj_type': 'ClickOnImage'
     }]
 
     _customization_arg_specs = [{
