@@ -83,8 +83,13 @@ a {
   color: #0844aa;
   cursor: pointer;
 }
+
 a:hover {
   color: #3f2c76;
+}
+
+a:focus {
+  outline-style: none;
 }
 
 input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-invalid {
@@ -666,6 +671,13 @@ md-card.oppia-gallery-tile {
   display: none;
 }
 
+.carousel-control .glyphicon-chevron-left, 
+.carousel-control .glyphicon-chevron-right, 
+.carousel-control .icon-prev, 
+.carousel-control .icon-next {
+  margin-top: -80px;
+}
+
 .oppia-page-title {
   color: #222;
   font-size: 30px;
@@ -1175,7 +1187,7 @@ oppia-parameter {
 .oppia-gallery-banner {
   background-repeat: no-repeat;
   background-size: cover;
-  height: 550px;
+  height: 650px;
   width: 100%;
 }
 .oppia-gallery-banner-content {
@@ -1209,7 +1221,7 @@ oppia-parameter {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.3em;
   height: 120px;
-  margin-top: -75px;
+  margin-top: -120px;
   padding-top: 45px;
   position: relative;
   text-align: center;
@@ -1263,18 +1275,22 @@ div#ng-curtain {
 }
 .oppia-navbar-menu {
   margin-left: 10px;
+  opacity: 0.9;
+  outline-color: transparent;
 }
+
 .oppia-navbar-brand-name {
   float: left;
   height: 56px;
   line-height: 20px;
   margin-left: -10px;
-  text-decoration: none;
+  opacity: 0.9;
 }
-.oppia-navbar-brand-name:hover {
-  color: white;
-  text-decoration: none;
+
+.oppia-navbar-brand-name:hover, .oppia-navbar-menu:hover {
+  opacity: 1;
 }
+
 .oppia-logo {
   display: inline-block;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
