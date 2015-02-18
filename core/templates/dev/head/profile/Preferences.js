@@ -18,8 +18,8 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('Preferences', ['$scope', '$http', '$rootScope', function(
-    $scope, $http, $rootScope) {
+oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
+    function($scope, $http, $rootScope, $modal) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
 
@@ -36,6 +36,45 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', function(
 
   $scope.savePreferredLanguageCodes = function(preferredLanguageCodes) {
     _saveDataItem('preferred_language_codes', preferredLanguageCodes);
+  };
+
+  $scope.showEditProfilePictureModal = function() {
+    $modal.open({
+      templateUrl: 'modals/editProfilePicture',
+      backdrop: true,
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.uploadedImage = '';
+        $scope.croppedImage = '';
+
+        var handleFileSelect = function(event) {
+          var file = event.currentTarget.files[0];
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            $scope.$apply(function() {
+              $scope.uploadedImage = event.target.result;
+            });
+          };
+          reader.readAsDataURL(file);
+        };
+        angular.element(document)
+          .on('change', '.profile-picture-input', handleFileSelect);
+
+        $scope.confirm = function() {
+          $modalInstance.close($scope.croppedImage);
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+        };
+      }]
+    }).result.then(function(newProfilePicture) {
+      $http.put(_PREFERENCES_DATA_URL, {
+        update_type: 'profile_picture',
+        data: newProfilePicture
+      }).success(function(response) {
+        location.reload();
+      });
+    });
   };
 
   $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {

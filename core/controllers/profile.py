@@ -64,6 +64,7 @@ class ViewProfilePage(base.BaseHandler):
 
         self.values.update({
             'nav_mode': feconf.NAV_MODE_PROFILE,
+            'profile_picture': user_settings.profile_picture,
             'user_bio': user_settings.user_bio,
         })
         self.render_template('profile/profile.html')
@@ -99,6 +100,7 @@ class PreferencesHandler(base.BaseHandler):
         """Handles GET requests."""
         user_settings = user_services.get_user_settings(self.user_id)
         self.values.update({
+            'profile_picture': user_settings.profile_picture,
             'user_bio': user_settings.user_bio,
             'preferred_language_codes': user_settings.preferred_language_codes,
         })
@@ -114,6 +116,8 @@ class PreferencesHandler(base.BaseHandler):
             user_services.update_user_bio(self.user_id, data)
         elif update_type == 'preferred_language_codes':
             user_services.update_preferred_language_codes(self.user_id, data)
+        elif update_type == 'profile_picture':
+            user_services.update_profile_picture(self.user_id, data)
         else:
             raise self.InvalidInputException(
                 'Invalid update type: %s' % update_type)

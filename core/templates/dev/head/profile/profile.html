@@ -24,6 +24,20 @@
     <div class="row">
       <div role="form" class="form-horizontal">
         <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Picture</label>
+          <div>
+            {% if profile_picture %}
+              <img src="{{profile_picture}}" class="img-thumbnail">
+            {% else %}
+              <img src="/images/no_profile_picture.png" class="img-thumbnail">
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
           <label class="col-lg-2 col-md-2 col-sm-2">Bio</label>
           <div>
             {% if user_bio %}
