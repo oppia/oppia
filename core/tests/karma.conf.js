@@ -20,6 +20,7 @@ module.exports = function(config) {
       'third_party/static/hammer-js-2.0.4/hammer.js',
       'third_party/static/ng-joyride-0.1.11/ng-joyride.js',
       'third_party/static/nginfinitescroll-1.0.0/ng-infinite-scroll.min.js',
+      'third_party/static/ng-img-crop-0.3.2/compile/minified/ng-img-crop.js',
       'core/templates/dev/head/*.js',
       // Note that unexpected errors occur ("Cannot read property 'num' of
       // undefined" in MusicNotesInput.js) if the order of core/templates/...
