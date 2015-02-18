@@ -116,12 +116,24 @@ oppia.controller('Base', [
     $scope.$apply();
   });
 
+  $scope.profileDropdownIsActive = false;
+
+  $scope.onMouseoverProfilePicture = function() {
+    $scope.profileDropdownIsActive = true;
+  }
+
+  $scope.onMouseoutProfilePicture = function() {
+    $scope.profileDropdownIsActive = false;
+  }
+
   $scope.onMouseoverDropdownMenu = function(evt) {
     angular.element(evt.currentTarget).parent().addClass('open');
+    $scope.profileDropdownIsActive = true;
   };
 
   $scope.onMouseoutDropdownMenu = function(evt) {
     angular.element(evt.currentTarget).parent().removeClass('open');
+    $scope.profileDropdownIsActive = false;
   };
 
   $scope.pageHasLoaded = false;

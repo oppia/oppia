@@ -27,6 +27,7 @@
         {% if allow_yaml_file_upload %}
           <a class="btn oppia-gallery-add-exploration-button"
              ng-click="showUploadExplorationModal()">
+            <span class="oppia-gallery-add-exploration-button-plus">+</span>
             <span>Upload Exploration</span>
           </a>
         {% endif %}
@@ -42,8 +43,7 @@
                              'glyphicon-refresh oppia-animate-spin': searchIsLoading}">
             </span>
           </div>
-          <input type="text" class="form-control oppia-splash-search-input" placeholder="What are you curious about?"
-                 ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
+          <input type="text" class="form-control oppia-splash-search-input oppia-splash-search-text-input" placeholder="What are you curious about?" ng-model="searchQuery" ng-keyup="onSearchQueryChange($event)">
         </div>
       </div>
     </form>
@@ -54,6 +54,7 @@
         <[selectionDetails.categories.summary]>
         <span class="caret"></span>
       </button>
+      <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
         <li ng-repeat="item in selectionDetails.categories.masterList track by $index"
             class="protractor-test-selected"
@@ -81,6 +82,7 @@
         <[selectionDetails.languageCodes.summary]>
         <span class="caret"></span>
       </button>
+      <!-- The $event.stopPropagation() prevents the dropdown from closing after an option is selected. -->
       <ul class="dropdown-menu" role="menu" style="max-height: 400px; overflow: auto;" ng-click="$event.stopPropagation()">
         <li ng-repeat="item in selectionDetails.languageCodes.masterList track by $index"
             class="protractor-test-selected"

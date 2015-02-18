@@ -517,6 +517,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   font-size: 15px;
   height: 34px;
   padding: 3px 12px 4px 12px;
+  margin-right: 20px;
 }
 
 @media (max-width: 973px) {
@@ -533,9 +534,9 @@ div.wysiwyg iframe.wysiwyg-content-large {
   .oppia-gallery-category-selector {
     display: none;
   }
-  .oppia-splash-search-input {
-    border-bottom-right-radius: 4px !important;
-    border-top-right-radius: 4px !important;
+  .oppia-splash-search-text-input {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
   }
 }
 
@@ -1283,18 +1284,31 @@ div#ng-curtain {
   margin-left: 6px;
   margin-top: 9px;
 }
-.oppia-navbar-profile-picture {
-  height: 48px;
-  width: 58px;
-  margin-top: -12px;
-  margin-left: -5px;
+.oppia-navbar-profile-picture-container {
   text-align: right;
-  background-image: url('/images/user-white.png');
-  background-repeat: no-repeat;
+  margin-top: -7px;
+  margin-left: -5px;
 }
-.navbar-default .navbar-nav > li > a:hover .oppia-navbar-profile-picture,
-.open .oppia-navbar-profile-picture {
-  background-image: url('/images/user.png');
+.oppia-navbar-profile-picture {
+  height: 32px;
+  width: 32px;
+}
+.oppia-navbar-role-indicator {
+  background-color: #f7a541;
+  position: absolute;
+  border-radius: 20px;
+  right: 25px;
+  bottom: 10px;
+  height: 15px;
+  width: 15px;
+}
+.oppia-navbar-role-text {
+  font-size: 0.7em;
+  font-weight: bold;
+  color: white;
+  position: absolute;
+  right: 3px;
+  bottom: -3px;
 }
 
 .oppia-select {
