@@ -61,6 +61,8 @@ var setStateName = function(name) {
   nameElement.element(by.css('.protractor-test-state-name-input')).
     sendKeys(name);
   nameElement.element(by.css('.protractor-test-state-name-submit')).click();
+  // Wait for the state to refresh.
+  general.waitForSystem();
 };
 
 var expectCurrentStateToBe = function(name) {
@@ -141,6 +143,8 @@ var setInteraction = function(interactionName) {
       null, args);
 
     element(by.css('.protractor-test-save-interaction')).click();
+    // Wait for the customization modal to close.
+    general.waitForSystem();
   }
 };
 
@@ -243,10 +247,17 @@ var addRule = function(interactionName, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
-  var tabElem = (ruleNum === 'default') ?
-    element(by.css('.protractor-test-default-rule-tab')):
-    element.all(by.css('.protractor-test-rule-tab')).get(ruleNum);
-  tabElem.click();
+  if (ruleNum === 'default') {
+    element(by.css('.protractor-test-default-rule-tab')).isPresent().then(function(isVisible) {
+      // If there is only one rule, no tabs are shown, so we don't have to click
+      // anything.
+      if (isVisible) {
+        element(by.css('.protractor-test-default-rule-tab')).click();
+      }
+    });
+  } else {
+    element.all(by.css('.protractor-test-rule-tab')).get(ruleNum).click();
+  }
 
   var bodyElem = (ruleNum === 'default') ?
     element.all(by.css('.protractor-test-rule-body')).last() :

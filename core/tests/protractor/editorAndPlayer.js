@@ -465,7 +465,7 @@ describe('Exploration history', function() {
       8: {text: 'interaction:', highlighted: true},
       9: {text: '  customization_args:', highlighted: true},
       10: {text: '    placeholder:', highlighted: true},
-      11: {text: '      value: Type your answer here.', highlighted: true},
+      11: {text: '      value: \'\'', highlighted: true},
       12: {text: '    rows:', highlighted: true},
       13: {text: '      value: 1', highlighted: true},
       14: {text: '  handlers:', highlighted: true},

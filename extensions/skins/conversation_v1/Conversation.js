@@ -127,7 +127,12 @@ oppia.directive('conversationSkin', [function() {
           $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName, _labelForNextFocusTarget);
           $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(stateName);
 
-          $rootScope.loadingMessage = '';
+          // This $timeout prevents a 'flash of unstyled content' when the preview tab is loaded from
+          // the editor tab.
+          $timeout(function() {
+            $rootScope.loadingMessage = '';
+          }, 500);
+
           $scope.adjustPageHeight(false, null);
           $window.scrollTo(0, 0);
 

@@ -174,7 +174,7 @@ class StateExportUnitTests(test_utils.GenericTestBase):
             'interaction': {
                 'customization_args': {
                     'placeholder': {
-                        'value': 'Type your answer here.'
+                        'value': ''
                     },
                     'rows': {
                         'value': 1
@@ -224,7 +224,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -245,7 +245,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -402,7 +402,7 @@ states:
     widget:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -423,7 +423,7 @@ states:
     widget:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -457,7 +457,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -478,7 +478,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -541,7 +541,7 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                 'interaction': {
                     'customization_args': {
                         'placeholder': {
-                            'value': 'Type your answer here.'
+                            'value': ''
                         },
                         'rows': {
                             'value': 1
