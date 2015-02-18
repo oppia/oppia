@@ -131,7 +131,7 @@ exports.config = {
 
     // Set a wide enough window size for the navbar in the gallery to display
     // fully.
-    browser.driver.manage().window().setSize(1000, 1200);
+    browser.driver.manage().window().setSize(1200, 1200);
   },
 
   // The params object will be passed directly to the protractor instance,

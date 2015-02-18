@@ -271,8 +271,6 @@ var MultiSelectEditor = function(elem) {
       }).then(function(selectedElements) {
         for (var i = selectedElements.length - 1; i >= 0; i--) {
           selectedElements[i].click();
-          // The dropdown menu needs to be reopened after each de-selection.
-          elem.element(by.css('.dropdown-toggle')).click();
         }
 
         // Now select the new choices.
@@ -289,8 +287,6 @@ var MultiSelectEditor = function(elem) {
 
           for (var i = filteredElements.length - 1; i >= 0; i--) {
             filteredElements[i].click();
-            // The dropdown menu needs to be reopened after each selection.
-            elem.element(by.css('.dropdown-toggle')).click();
           }
 
           // Close the dropdown menu at the end.
