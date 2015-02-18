@@ -41,6 +41,8 @@ class UserSettingsModel(base_models.BaseModel):
     last_agreed_to_terms = ndb.DateTimeProperty(default=None)
     # When the user last started the state editor tutorial. May be None.
     last_started_state_editor_tutorial = ndb.DateTimeProperty(default=None)
+    # User uploaded profile picture as a dataURI string. May be None.
+    profile_picture_data_url = ndb.TextProperty(default=None, indexed=False)
     # User specified biography (to be shown on their profile page).
     user_bio = ndb.TextProperty(indexed=False)
     # Language preferences specified by the user.

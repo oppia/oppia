@@ -315,6 +315,12 @@ MATHJAX_ZIP_URL = (
 MATHJAX_ZIP_ROOT_NAME = MATHJAX_ROOT_NAME
 MATHJAX_TARGET_ROOT_NAME = MATHJAX_ROOT_NAME
 
+NG_IMG_CROP_REV = '0.3.2'
+NG_IMG_CROP_ZIP_URL = (
+    'https://github.com/alexk111/ngImgCrop/archive/v%s.zip' % NG_IMG_CROP_REV)
+NG_IMG_CROP_ZIP_ROOT_NAME = 'ngImgCrop-%s' % NG_IMG_CROP_REV
+NG_IMG_CROP_TARGET_ROOT_NAME = 'ng-img-crop-%s' % NG_IMG_CROP_REV
+
 download_and_unzip_files(
     BOWER_MATERIAL_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     BOWER_MATERIAL_ZIP_ROOT_NAME, BOWER_MATERIAL_TARGET_ROOT_NAME)
@@ -355,6 +361,9 @@ download_and_unzip_files(
 download_and_unzip_files(
     MATHJAX_ZIP_URL, THIRD_PARTY_STATIC_DIR,
     MATHJAX_ZIP_ROOT_NAME, MATHJAX_TARGET_ROOT_NAME)
+download_and_unzip_files(
+    NG_IMG_CROP_ZIP_URL, THIRD_PARTY_STATIC_DIR,
+    NG_IMG_CROP_ZIP_ROOT_NAME, NG_IMG_CROP_TARGET_ROOT_NAME)
 # MathJax is too big. Remove many unneeded files by following these
 # instructions:
 #   https://github.com/mathjax/MathJax/wiki/Shrinking-MathJax-for-%22local%22-installation

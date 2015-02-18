@@ -1438,3 +1438,11 @@ div#ng-curtain {
   -moz-border-radius: 6px 0 6px 6px;
   -webkit-border-radius: 6px 0 6px 6px;
 }
+
+
+.oppia-profile-picture-crop-area {
+  background: #E4E4E4;
+  height: 350px;
+  overflow: hidden;
+  width: 500px;
+}
