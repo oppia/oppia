@@ -14,7 +14,7 @@
 
       <div class="conversation-skin-iframe-container">
         <div ng-repeat="state in allResponseStates track by $index"
-             ng-class="{'conversation-skin-last-log-entry': $last, 'conversation-skin-old-content': !$last}">
+             ng-class="{'conversation-skin-last-log-entry': $last}">
           <md-card class="conversation-skin-card">
             <div dropdown class="dropdown conversation-skin-card-dropdown" ng-if="state.stateName">
               <img dropdown-toggle src="/third_party/static/material-design-icons-1.0.1/ic_more_vert_black_48dp.png" class="dropdown-toggle conversation-skin-card-dropdown-toggle">
@@ -66,37 +66,35 @@
                 <span class="oppia-loading-dot-three">.</span>
               </center>
             </div>
+
+            <div ng-if="!finished && $last">
+              <div ng-if="!contentToDisplayNext && interactionIsInline">
+                <div ng-hide="isAnswerBeingProcessed()">
+                  <div class="conversation-skin-inline-interaction">
+                    <table class="conversation-skin-card-row-container" style="margin-bottom: 0;">
+                      <tr class="conversation-skin-card-row">
+                        <td class="conversation-skin-row-avatar" valign="top">
+                          <img class="conversation-skin-row-avatar-img" src="/images/user.png">
+                        </td>
+                        <td class="conversation-skin-learner-input protractor-test-conversation-input"
+                            angular-html-bind="inputTemplate">
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
           </md-card>
         </div>
+      </div>
 
-        <div ng-if="!finished">
-          <div ng-if="!contentToDisplayNext && interactionIsInline">
-            <div ng-hide="isAnswerBeingProcessed()">
-              <md-card class="conversation-skin-inline-interaction">
-                <div style="padding: 10px;">
-                  <table class="conversation-skin-card-row-container">
-                    <tr class="conversation-skin-card-row">
-                      <td class="conversation-skin-row-avatar" valign="top">
-                        <img class="conversation-skin-row-avatar-img" src="/images/user.png">
-                      </td>
-                      <td class="conversation-skin-learner-input protractor-test-conversation-input"
-                          angular-html-bind="inputTemplate">
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </md-card>
-            </div>
-          </div>
-
-          <div ng-if="contentToDisplayNext">
-            <center style="font-size: 8em; margin-top: -90px;">
-              <span class="oppia-loading-dot-one">.</span>
-              <span class="oppia-loading-dot-two">.</span>
-              <span class="oppia-loading-dot-three">.</span>
-            </center>
-          </div>
-        </div>
+      <div ng-if="contentToDisplayNext">
+        <center style="font-size: 8em; margin-top: -90px;">
+          <span class="oppia-loading-dot-one">.</span>
+          <span class="oppia-loading-dot-two">.</span>
+          <span class="oppia-loading-dot-three">.</span>
+        </center>
       </div>
 
       <div class="conversation-skin-supplemental-interaction">

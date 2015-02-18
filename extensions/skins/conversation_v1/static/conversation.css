@@ -78,10 +78,6 @@ html, body {
   -webkit-overflow-scrolling: touch;
 }
 
-.conversation-skin-old-content {
-  opacity: 0.8;
-}
-
 /* 'md-card' is needed to ensure that this takes precedence over the default
    Material Design stylesheet. */
 md-card.conversation-skin-card {

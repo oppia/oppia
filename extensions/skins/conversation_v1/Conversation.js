@@ -83,14 +83,15 @@ oppia.directive('conversationSkin', [function() {
         oppiaPlayerService.openPlayerFeedbackModal(stateName);
       };
 
-      var _scrollToLastEntry = function() {
+      var _scrollToLastEntry = function(postScrollCallback) {
         var lastEntryEls = document.getElementsByClassName(
           'conversation-skin-last-log-entry');
         $scope.adjustPageHeight(true, function() {
           if (lastEntryEls.length > 0) {
             // TODO(sll): Try and drop this in favor of an Angular-based solution.
             $('html, body, iframe').animate(
-              {'scrollTop': $(document).height()}, 1000, 'swing');
+              {'scrollTop': $(document).height() - $(window).height() - 80}, 1000, 'easeOutQuad',
+              postScrollCallback);
           }
         });
       };
@@ -101,7 +102,6 @@ oppia.directive('conversationSkin', [function() {
           content: contentHtml,
           answerFeedbackPairs: []
         });
-        _scrollToLastEntry();
       };
 
       $scope.initializePage = function() {
@@ -135,7 +135,9 @@ oppia.directive('conversationSkin', [function() {
           $timeout(function() {
             _addNewCard($scope.stateName, $scope.contentToDisplayNext);
             $scope.contentToDisplayNext = null;
-            focusService.setFocus(_labelForNextFocusTarget);
+            _scrollToLastEntry(function() {
+              focusService.setFocus(_labelForNextFocusTarget);
+            });
           }, 1000);
         });
       };
@@ -185,11 +187,14 @@ oppia.directive('conversationSkin', [function() {
 
                 $timeout(function() {
                   _addNewCard($scope.stateName, $scope.contentToDisplayNext);
+                  _scrollToLastEntry(function() {
+                    focusService.setFocus(_labelForNextFocusTarget);
+                  });
                   $scope.contentToDisplayNext = null;
-                  focusService.setFocus(_labelForNextFocusTarget);
                 }, 2000);
               } else {
                 _addNewCard($scope.stateName, questionHtml);
+                _scrollToLastEntry();
               }
             }
 
@@ -197,9 +202,10 @@ oppia.directive('conversationSkin', [function() {
               messengerService.sendMessage(
                 messengerService.EXPLORATION_COMPLETED, null);
             }
-            _scrollToLastEntry();
             _answerIsBeingProcessed = false;
-            focusService.setFocus(_labelForNextFocusTarget);
+            _scrollToLastEntry(function() {
+              focusService.setFocus(_labelForNextFocusTarget);
+            });
           }, 1000);
         });
       };
