@@ -115,6 +115,13 @@
                                   <img ng-if="!profileDropdownIsActive" src="/images/user_white_48px.png" class="oppia-navbar-profile-picture ng-cloak">
                                 {% endif %}
                                 <span class="caret" style="margin-top: 10px;"></span>
+
+                                <div class="oppia-navbar-dashboard-indicator" ng-if="numUnseenNotifications > 0">
+                                  <span class="oppia-navbar-dashboard-indicator-text">
+                                    <[numUnseenNotifications]>
+                                  </span>
+                                </div>
+
                                 {% if is_admin or is_moderator %}
                                   <div class="oppia-navbar-role-indicator">
                                     {% if is_admin %}
@@ -129,7 +136,12 @@
                             </a>
                             <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <li>
-                                <a href="/dashboard">Dashboard</a>
+                                <a href="/dashboard">
+                                  Dashboard
+                                  <span ng-if="numUnseenNotifications > 0">
+                                    (<[numUnseenNotifications]>)
+                                  </span>
+                                </a>
                               </li>
                               <li>
                                 <a href="/profile/{{username}}">Profile</a>

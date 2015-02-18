@@ -143,7 +143,7 @@ oppia.controller('Gallery', [
     function($scope, $http, $rootScope, $window, createExplorationButtonService,
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              searchService) {
-  $scope.CAROUSEL_INTERVAL = 5000;
+  $scope.CAROUSEL_INTERVAL = 2500;
 
   $scope.CAROUSEL_SLIDES = [{
     explorationId: '1',

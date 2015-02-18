@@ -5,31 +5,27 @@
   </div>
 
   <ul>
-    {% if username %}
-      <li {% if nav_mode == 'home' %}class="active"{% endif %}>
-        <a href="/dashboard">
-          <span class="glyphicon glyphicon-wrench oppia-sidebar-menu-icon"></span>
-          Dashboard
-          <span ng-if="numUnseenNotifications > 0">
-            (<[numUnseenNotifications]>)
-          </span>
-        </a>
-      </li>
-    {% endif %}
+    <li {% if nav_mode == 'about' %}class="active"{% endif %}>
+      <a href="/about">
+        <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
+        About
+      </a>
+    </li>
 
     {% if SHOW_FORUM_PAGE %}
       <li {% if nav_mode == 'forum' %}class="active"{% endif %}>
         <a href="/forum">
-          <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
+          <img src="/third_party/static/material-design-icons-1.0.1/ic_forum_black_48dp.png"
+               style="height: 18px; margin-left: 9px; margin-right: 7px; width: 18px;">
           Forum
         </a>
       </li>
     {% endif %}
 
-    <li {% if nav_mode == 'about' %}class="active"{% endif %}>
-      <a href="/about">
-        <span class="glyphicon glyphicon-question-sign oppia-sidebar-menu-icon"></span>
-        About
+    <li>
+      <a href="https://code.google.com/p/oppia/issues/entry" target="_blank">
+        <span class="glyphicon glyphicon-comment oppia-sidebar-menu-icon"></span>
+        Give Feedback
       </a>
     </li>
   </ul>

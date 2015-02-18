@@ -267,7 +267,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: #333;
   display: block;
   font-weight: bold;
-  padding: 1em 0;
+  padding: 1em 0 1em 18px;
   text-decoration: none;
 }
 .oppia-sidebar-menu a:hover {
@@ -1170,7 +1170,7 @@ oppia-parameter {
   font-size: 48px;
   position: absolute;
   text-align: center;
-  top: 150px;
+  top: 230px;
   width: 100%;
   z-index: 100;
 }
@@ -1179,7 +1179,7 @@ oppia-parameter {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
-  padding-top: 190px;
+  padding-top: 275px;
 }
 
 .oppia-gallery-banner-link {
@@ -1299,6 +1299,24 @@ div#ng-curtain {
   font-weight: bold;
   position: absolute;
   right: 3px;
+}
+
+.oppia-navbar-dashboard-indicator {
+  background-color: #f7a541;
+  border-radius: 20px;
+  height: 15px;
+  position: absolute;
+  right: 25px;
+  top: 8px;
+  width: 15px;
+}
+.oppia-navbar-dashboard-indicator-text {
+  bottom: -3px;
+  color: white;
+  font-size: 0.7em;
+  font-weight: bold;
+  position: absolute;
+  right: 4px;
 }
 
 .oppia-select {
