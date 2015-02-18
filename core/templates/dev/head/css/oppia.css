@@ -1285,9 +1285,9 @@ div#ng-curtain {
   margin-top: 9px;
 }
 .oppia-navbar-profile-picture-container {
-  text-align: right;
   margin-top: -7px;
   margin-left: -5px;
+  text-align: right;
 }
 .oppia-navbar-profile-picture {
   height: 32px;
@@ -1295,20 +1295,20 @@ div#ng-curtain {
 }
 .oppia-navbar-role-indicator {
   background-color: #f7a541;
-  position: absolute;
   border-radius: 20px;
-  right: 25px;
   bottom: 10px;
   height: 15px;
+  position: absolute;
+  right: 25px;
   width: 15px;
 }
 .oppia-navbar-role-text {
+  bottom: -3px;
+  color: white;
   font-size: 0.7em;
   font-weight: bold;
-  color: white;
   position: absolute;
   right: 3px;
-  bottom: -3px;
 }
 
 .oppia-select {
