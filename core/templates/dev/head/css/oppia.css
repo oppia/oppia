@@ -751,13 +751,28 @@ md-card.oppia-gallery-tile {
   margin: auto;
   max-width: 560px;
 }
+.oppia-editor-card-with-avatar {
+  background: rgb(255,255,255);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  max-width: 560px;
+  padding: 0;
+}
+
 .oppia-editor-card {
   background: rgb(255,255,255);
   margin-left: auto;
   margin-right: auto;
   margin-top: 30px;
   max-width: 800px;
-  padding: 0;
+}
+
+.oppia-editor-avatar {
+  height: 24px;
+  left: -40px;
+  position: absolute;
+  width: 24px;
 }
 
 .oppia-editor-card-body {
@@ -876,17 +891,17 @@ md-card.oppia-gallery-tile {
 }
 
 .nav-pills > li > a.oppia-rule-tab {
-  background: #eee;
+  background: #f3f3f3;
   border-radius: 0;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #f0f0f0;
   padding: 5px 15px;
   width: 100%;
 }
 .nav-pills > li:hover > a.oppia-rule-tab {
-  background: #e4e4e4;
+  background: #eaeaea;
 }
 .nav-pills > li.active > a.oppia-rule-tab-active {
-  background: #d0d0d0;
+  background: #e5e5e5;
   border-right: 0;
   color: #666;
   cursor: default;
@@ -915,10 +930,6 @@ md-card.oppia-gallery-tile {
 
 .oppia-readonly-rule-tile img {
   max-height: 50px;
-}
-
-.oppia-rule-editable-view {
-  margin-left: 55px;
 }
 
 .oppia-rule-dest-link {
@@ -1258,6 +1269,7 @@ div#ng-curtain {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   height: 100%;
   max-width: 25%;
+  padding-top: 7px;
   position: fixed;
   right: 0;
   top: 50px;
