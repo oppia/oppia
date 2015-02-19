@@ -84,10 +84,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'explorationStatesService', 'routerService',
+      '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
       'validatorsService', 'rulesService', 'explorationStatesService',
       function(
-          $scope, $rootScope, $modal, $timeout, editorContextService, explorationStatesService, routerService,
+          $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
           validatorsService, rulesService, explorationStatesService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
