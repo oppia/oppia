@@ -39,7 +39,7 @@ oppia.directive('snapshotsSkin', [function() {
 
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
-            newStateName, isSticky, questionHtml, feedbackHtml) {
+            newStateName, isSticky, feedbackHtml, questionHtml, newInteractionId) {
           if (!newStateName) {
             $scope.currentQuestion = 'You have finished.';
             $scope.inputTemplate = '';

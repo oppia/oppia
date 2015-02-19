@@ -16,7 +16,7 @@
         <div ng-repeat="state in allResponseStates track by $index"
              ng-class="{'conversation-skin-last-log-entry': $last}">
           <md-card class="conversation-skin-card">
-            <div dropdown class="dropdown conversation-skin-card-dropdown" ng-if="state.stateName">
+            <div dropdown class="dropdown conversation-skin-card-dropdown" ng-if="state.stateName && !isInPreviewMode">
               <img dropdown-toggle src="/third_party/static/material-design-icons-1.0.1/ic_more_vert_black_48dp.png" class="dropdown-toggle conversation-skin-card-dropdown-toggle">
               <ul class="dropdown-menu dropdown-menu-right">
                 <li>
@@ -31,11 +31,7 @@
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_black_48px.png">
                 </td>
                 <td class="conversation-skin-oppia-content">
-                  <div ng-show="!$last || !finished" class="protractor-test-conversation-content"
-                       angular-html-bind="state.content"></div>
-                  <div ng-show="$last && finished" class="protractor-test-conversation-finished">
-                    Congratulations, you have finished this exploration!
-                  </div>
+                  <div class="protractor-test-conversation-content" angular-html-bind="state.content"></div>
                 </td>
               </tr>
             </table>
@@ -67,7 +63,7 @@
               </center>
             </div>
 
-            <div ng-if="!finished && $last">
+            <div ng-if="stateName">
               <div ng-if="!contentToDisplayNext && interactionIsInline">
                 <div ng-hide="isAnswerBeingProcessed()">
                   <div class="conversation-skin-inline-interaction">

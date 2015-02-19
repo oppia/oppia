@@ -148,8 +148,8 @@ class ExplorationPage(base.BaseHandler):
             'exploration_title': exploration.title,
             'exploration_version': version,
             'iframed': is_iframed,
-            'interaction_display_modes': (
-                interaction_registry.Registry.get_all_display_modes()),
+            'interaction_configs': (
+                interaction_registry.Registry.get_all_configs()),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'is_private': rights_manager.is_exploration_private(

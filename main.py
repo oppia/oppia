@@ -198,6 +198,9 @@ urls = [
     get_redirect_route(
         r'%s' % feconf.UPLOAD_EXPLORATION_URL,
         galleries.UploadExploration, 'upload_exploration'),
+    get_redirect_route(
+        r'/explorationsummarieshandler/data',
+        galleries.ExplorationSummariesHandler, 'exploration_summaries_handler'),
 
     get_redirect_route(
         r'/profile/<username>', profile.ViewProfilePage, 'profile_page'),

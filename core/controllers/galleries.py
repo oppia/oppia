@@ -16,6 +16,7 @@
 
 __author__ = 'sll@google.com (Sean Lip)'
 
+import json
 import logging
 
 from core.controllers import base
@@ -238,3 +239,36 @@ class GalleryRedirectPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.redirect('/gallery')
+
+
+class ExplorationSummariesHandler(base.BaseHandler):
+    """Returns summaries corresponding to ids of public explorations."""
+
+    def get(self):
+        """Handles GET requests."""
+        try:
+            exp_ids = json.loads(self.request.get('stringified_exp_ids'))
+        except Exception:
+            raise self.PageNotFoundException
+
+        if (not isinstance(exp_ids, list) or not all([
+                isinstance(exp_id, basestring) for exp_id in exp_ids])):
+            raise self.PageNotFoundException
+
+        exp_summaries = exp_services.get_exploration_summaries_matching_ids(
+            exp_ids)
+
+        self.values.update({
+            'summaries': [(None if exp_summary is None else {
+                'id': exp_summary.id,
+                'title': exp_summary.title,
+                'category': exp_summary.category,
+                'objective': exp_summary.objective,
+                'language_code': exp_summary.language_code,
+                'last_updated': utils.get_time_in_millisecs(
+                    exp_summary.exploration_model_last_updated),
+                'status': exp_summary.status,
+                'community_owned': exp_summary.community_owned,
+            }) for exp_summary in exp_summaries]
+        })
+        self.render_json(self.values)

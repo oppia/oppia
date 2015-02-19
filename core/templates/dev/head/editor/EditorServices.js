@@ -836,7 +836,12 @@ oppia.factory('computeGraphService', [function() {
   var _computeGraphData = function(initStateId, states) {
     var nodes = {};
     var links = [];
+    var finalStateIds = [END_DEST];
     for (var stateName in states) {
+      if (GLOBALS.interactionConfigs[states[stateName].interaction.id].is_terminal) {
+        finalStateIds.push(stateName);
+      }
+
       nodes[stateName] = stateName;
 
       var handlers = states[stateName].interaction.handlers;
@@ -856,7 +861,7 @@ oppia.factory('computeGraphService', [function() {
       nodes: nodes,
       links: links,
       initStateId: initStateId,
-      finalStateId: END_DEST
+      finalStateIds: finalStateIds
     };
   };
 
@@ -942,14 +947,17 @@ oppia.factory('explorationWarningsService', [
     function(graphDataService, explorationStatesService, explorationObjectiveService) {
   var _warningsList = [];
 
-  // Given an initial node id, a object with keys node ids, and values node
-  // names, and a list of edges (each of which is an object with keys 'source'
-  // and 'target', and values equal to the respective node names), returns a
-  // list of names of all nodes which are unreachable from the initial node.
-  var _getUnreachableNodeNames = function(initNodeId, nodes, edges) {
-    var queue = [initNodeId];
+  // Given a list of initial node ids, a object with keys node ids, and values
+  // node names, and a list of edges (each of which is an object with keys
+  // 'source' and 'target', and values equal to the respective node names),
+  // returns a list of names of all nodes which are unreachable from the
+  // initial node.
+  var _getUnreachableNodeNames = function(initNodeIds, nodes, edges) {
+    var queue = initNodeIds;
     var seen = {};
-    seen[initNodeId] = true;
+    for (var i = 0; i < initNodeIds.length; i++) {
+      seen[initNodeIds[i]] = true;
+    }
     while (queue.length > 0) {
       var currNodeId = queue.shift();
       edges.forEach(function(edge) {
@@ -989,6 +997,10 @@ oppia.factory('explorationWarningsService', [
     var problematicStates = [];
     var _states = explorationStatesService.getStates();
     for (var stateName in _states) {
+      if (GLOBALS.interactionConfigs[_states[stateName].interaction.id].is_terminal) {
+        continue;
+      }
+
       var handlers = _states[stateName].interaction.handlers;
       var isProblematic = handlers.some(function(handler) {
         return handler.rule_specs.some(function(ruleSpec) {
@@ -1015,7 +1027,7 @@ oppia.factory('explorationWarningsService', [
     var _graphData = graphDataService.getGraphData();
     if (_graphData) {
       var unreachableStateNames = _getUnreachableNodeNames(
-        _graphData.initStateId, _graphData.nodes, _graphData.links);
+        [_graphData.initStateId], _graphData.nodes, _graphData.links);
       if (unreachableStateNames.length) {
         _warningsList.push(
           'The following state(s) are unreachable: ' +
@@ -1023,7 +1035,7 @@ oppia.factory('explorationWarningsService', [
       } else {
         // Only perform this check if all states are reachable.
         var deadEndStates = _getUnreachableNodeNames(
-          _graphData.finalStateId, _graphData.nodes,
+          _graphData.finalStateIds, _graphData.nodes,
           _getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
           _warningsList.push(

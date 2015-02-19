@@ -177,7 +177,8 @@ oppia.factory('stateTransitionService', [
       }
 
       var question = (
-        newState ? makeQuestion(newState, [newParams, {answer: 'answer'}]) : '');
+        newState ? makeQuestion(newState, [newParams, {answer: 'answer'}]) :
+        'Congratulations, you have finished this exploration!');
       if (question === null) {
         return null;
       }

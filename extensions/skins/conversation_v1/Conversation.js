@@ -40,6 +40,8 @@ oppia.directive('conversationSkin', [function() {
         return _answerIsBeingProcessed;
       };
 
+      $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
+
       $rootScope.loadingMessage = 'Loading';
 
       // If the exploration is iframed, send data to its parent about its height so
@@ -69,7 +71,7 @@ oppia.directive('conversationSkin', [function() {
 
       $window.addEventListener('beforeunload', function(e) {
         if (hasInteractedAtLeastOnce && !$scope.finished &&
-            !oppiaPlayerService.isInPreviewMode()) {
+            !$scope.isInPreviewMode) {
           oppiaPlayerService.registerMaybeLeaveEvent();
           var confirmationMessage = (
             'If you navigate away from this page, your progress on the ' +
@@ -80,7 +82,11 @@ oppia.directive('conversationSkin', [function() {
       });
 
       $scope.openCardFeedbackModal = function(stateName) {
-        oppiaPlayerService.openPlayerFeedbackModal(stateName);
+        if ($scope.isInPreviewMode) {
+          warningsData.addWarning('This functionality is not available in preview mode.');
+        } else {
+          oppiaPlayerService.openPlayerFeedbackModal(stateName);
+        }
       };
 
       var _scrollToLastEntry = function(postScrollCallback) {
@@ -164,13 +170,13 @@ oppia.directive('conversationSkin', [function() {
         });
 
         oppiaPlayerService.submitAnswer(answer, handler, function(
-            newStateName, isSticky, questionHtml, feedbackHtml) {
+            newStateName, isSticky, feedbackHtml, questionHtml, newInteractionId) {
           $timeout(function() {
             var oldStateName = $scope.stateName;
             $scope.stateName = newStateName;
-            $scope.finished = !Boolean(newStateName);
+            $scope.finished = oppiaPlayerService.isStateTerminal(newStateName);
 
-            if (!$scope.finished && !isSticky) {
+            if ($scope.stateName && !isSticky) {
               // The previous interaction is not sticky and should be replaced.
               _labelForNextFocusTarget = Math.random().toString(36).slice(2);
               $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(

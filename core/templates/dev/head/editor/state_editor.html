@@ -5,7 +5,6 @@
   -->
   <div style="height: 1000px;">
     <div class="oppia-editor-cards-container">
-
       <div style="font-size: 20px; margin-top: 20px;">
         {% include 'editor/sidebar_state_name.html' %}
       </div>
@@ -23,7 +22,7 @@
         </div>
       </md-card>
 
-      <md-card class="oppia-editor-card-with-avatar">
+      <md-card class="oppia-editor-card-with-avatar" ng-hide="isCurrentStateTerminal">
         <div class="oppia-editor-card-body">
           <div style="background: #f5f5f5;">
             {% include 'editor/state_editor_rules.html' %}
