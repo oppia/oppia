@@ -70,6 +70,29 @@ oppia.factory('rulesService', [
     });
   };
 
+  var _saveInteractionHandlers = function(newHandlers) {
+    var oldHandlers = _interactionHandlersMemento;
+    if (newHandlers && oldHandlers && !angular.equals(newHandlers, oldHandlers)) {
+      _interactionHandlers = newHandlers;
+
+      changeListService.editStateProperty(
+        editorContextService.getActiveStateName(), 'widget_handlers',
+        angular.copy(newHandlers), angular.copy(oldHandlers));
+
+      var activeStateName = editorContextService.getActiveStateName();
+
+      var _stateDict = explorationStatesService.getState(activeStateName);
+      for (var i = 0; i < _stateDict.interaction.handlers.length; i++) {
+        var handlerName = _stateDict.interaction.handlers[i].name;
+        _stateDict.interaction.handlers[i].rule_specs = _interactionHandlers[handlerName];
+      }
+      explorationStatesService.setState(activeStateName, _stateDict);
+
+      graphDataService.recompute();
+      _interactionHandlersMemento = angular.copy(newHandlers);
+    }
+  };
+
   return {
     // The 'data' arg is a list of interaction handlers for the currently-active state.
     init: function(data) {
@@ -94,24 +117,33 @@ oppia.factory('rulesService', [
       _activeRuleIndex = 0;
     },
     onInteractionIdChanged: function(newInteractionId) {
-      _refreshHandlerSpecs();
-      if (interactionHandlersCache.contains(newInteractionId)) {
-        _interactionHandlers = interactionHandlersCache.get(newInteractionId);
-      } else {
-        // Preserve just the default rule.
-        _interactionHandlers = {
-          'submit': [
-            _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
-          ]
-        };
-      }
+      interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
+        _refreshHandlerSpecs();
 
-      this.save(_interactionHandlers);
-      interactionHandlersCache.set(
-        stateInteractionIdService.savedMemento, _interactionHandlers);
+        if (interactionHandlersCache.contains(newInteractionId)) {
+          _interactionHandlers = interactionHandlersCache.get(newInteractionId);
+        } else {
+          // Preserve just the default rule, unless the new interaction id is a
+          // terminal one (in which case, change its destination to be a
+          // self-loop instead).
+          _interactionHandlers = {
+            'submit': [
+              _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
+            ]
+          };
+        }
 
-      _interactionHandlersMemento = angular.copy(_interactionHandlers);
-      _activeRuleIndex = 0;
+        if (interactionRepository[newInteractionId].is_terminal) {
+          _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
+        }
+
+        _saveInteractionHandlers(_interactionHandlers);
+        interactionHandlersCache.set(
+          stateInteractionIdService.savedMemento, _interactionHandlers);
+
+        _interactionHandlersMemento = angular.copy(_interactionHandlers);
+        _activeRuleIndex = 0;
+      });
     },
     getActiveRuleIndex: function() {
       return _activeRuleIndex;
@@ -139,12 +171,12 @@ oppia.factory('rulesService', [
       }
       _interactionHandlersMemento = angular.copy(_interactionHandlers);
       _interactionHandlers['submit'].splice(_activeRuleIndex, 1);
-      this.save(_interactionHandlers);
+      _saveInteractionHandlers(_interactionHandlers);
       _activeRuleIndex = 0;
     },
     saveActiveRule: function(activeRule) {
       _interactionHandlers['submit'][_activeRuleIndex] = activeRule;
-      this.save(_interactionHandlers);
+      _saveInteractionHandlers(_interactionHandlers);
     },
     getInteractionHandlerSpecs: function() {
       return angular.copy(_interactionHandlerSpecs);
@@ -161,26 +193,7 @@ oppia.factory('rulesService', [
     // This registers the change to the handlers in the list of changes, and also
     // updates the states object in explorationStatesService.
     save: function(newHandlers) {
-      var oldHandlers = _interactionHandlersMemento;
-      if (newHandlers && oldHandlers && !angular.equals(newHandlers, oldHandlers)) {
-        _interactionHandlers = newHandlers;
-
-        changeListService.editStateProperty(
-          editorContextService.getActiveStateName(), 'widget_handlers',
-          angular.copy(newHandlers), angular.copy(oldHandlers));
-
-        var activeStateName = editorContextService.getActiveStateName();
-
-        var _stateDict = explorationStatesService.getState(activeStateName);
-        for (var i = 0; i < _stateDict.interaction.handlers.length; i++) {
-          var handlerName = _stateDict.interaction.handlers[i].name;
-          _stateDict.interaction.handlers[i].rule_specs = _interactionHandlers[handlerName];
-        }
-        explorationStatesService.setState(activeStateName, _stateDict);
-
-        graphDataService.recompute();
-        _interactionHandlersMemento = angular.copy(newHandlers);
-      }
+      _saveInteractionHandlers(newHandlers);
     }
   };
 }]);
