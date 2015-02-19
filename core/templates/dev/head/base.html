@@ -102,7 +102,7 @@
                     {% block navbar_breadcrumb %}
                     {% endblock navbar_breadcrumb %}
 
-                    <div class="collapse navbar-collapse">
+                    <div class="collapse navbar-collapse ng-cloak">
                       <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 0px;">
                         {% if username %}
                           <li class="dropdown">
@@ -111,12 +111,12 @@
                                 {% if profile_picture_data_url %}
                                   <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
                                 {% else %}
-                                  <img ng-if="profileDropdownIsActive" src="/images/user_mint_48px.png" class="oppia-navbar-profile-picture ng-cloak">
-                                  <img ng-if="!profileDropdownIsActive" src="/images/user_white_48px.png" class="oppia-navbar-profile-picture ng-cloak">
+                                  <img ng-if="profileDropdownIsActive" src="/images/user_mint_48px.png" class="oppia-navbar-profile-picture">
+                                  <img ng-if="!profileDropdownIsActive" src="/images/user_white_48px.png" class="oppia-navbar-profile-picture">
                                 {% endif %}
                                 <span class="caret" style="margin-top: 10px;"></span>
 
-                                <div class="oppia-navbar-dashboard-indicator" ng-if="numUnseenNotifications > 0">
+                                <div class="oppia-navbar-dashboard-indicator ng-cloak" ng-if="numUnseenNotifications > 0">
                                   <span class="oppia-navbar-dashboard-indicator-text">
                                     <[numUnseenNotifications]>
                                   </span>
@@ -134,7 +134,7 @@
                                 {% endif %}
                               </div>
                             </a>
-                            <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                            <ul class="dropdown-menu ng-cloak" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <li>
                                 <a href="/dashboard">
                                   Dashboard
@@ -142,9 +142,6 @@
                                     (<[numUnseenNotifications]>)
                                   </span>
                                 </a>
-                              </li>
-                              <li>
-                                <a href="/profile/{{username}}">Profile</a>
                               </li>
                               <li>
                                 <a href="/preferences">Preferences</a>

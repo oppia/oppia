@@ -19,8 +19,8 @@
  */
 
 oppia.controller('Signup', [
-    '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService',
-    function($scope, $http, $rootScope, $modal, warningsData, urlService) {
+    '$scope', '$http', '$rootScope', '$modal', 'warningsData', 'urlService', 'focusService',
+    function($scope, $http, $rootScope, $modal, warningsData, urlService, focusService) {
   var _SIGNUP_DATA_URL = '/signuphandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.warningText = '';
@@ -30,6 +30,7 @@ oppia.controller('Signup', [
     $scope.username = data.username;
     $scope.agreedToTerms = data.has_agreed_to_terms;
     $scope.hasUsername = Boolean($scope.username);
+    focusService.setFocus('usernameInputField');
   });
 
   $scope.blurredAtLeastOnce = false;
