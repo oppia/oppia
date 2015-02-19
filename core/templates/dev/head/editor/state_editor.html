@@ -14,13 +14,13 @@
           <div ng-controller="StateInteraction">
             {% include 'editor/state_editor_interaction.html' %}
           </div>
-          <div ng-show="doesCurrentStateHaveRules">
+          <div ng-hide="isCurrentStateTerminal">
             <hr>
             {% include 'editor/state_editor_active_rule.html' %}
           </div>
         </div>
       </md-card>
-      <md-card class="oppia-editor-rules-card" ng-show="doesCurrentStateHaveRules">
+      <md-card class="oppia-editor-rules-card" ng-hide="isCurrentStateTerminal">
         <div ng-controller="StateRules">
           {% include 'editor/state_editor_rules.html' %}
         </div>
