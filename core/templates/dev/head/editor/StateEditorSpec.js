@@ -34,7 +34,15 @@ describe('State Editor controller', function() {
       cls = $injector.get('changeListService');
       ess = $injector.get('explorationStatesService');
 
-      GLOBALS = {INVALID_NAME_CHARS: '#@&^%$'};
+      GLOBALS = {
+        INVALID_NAME_CHARS: '#@&^%$',
+        interactionConfigs: {
+          TextInput: {
+            display_mode: 'inline',
+            is_terminal: false
+          }
+        }
+      };
 
       ess.setStates({
         'First State': {
@@ -43,6 +51,7 @@ describe('State Editor controller', function() {
             value: 'First State Content'
           }],
           interaction: {
+            id: 'TextInput',
             handlers: [{
               rule_specs: [{
                 dest: 'Second State'
@@ -57,6 +66,7 @@ describe('State Editor controller', function() {
             value: 'Second State Content'
           }],
           interaction: {
+            id: 'TextInput',
             handlers: [{
               rule_specs: [{
                 dest: 'Second State'
@@ -71,6 +81,7 @@ describe('State Editor controller', function() {
             value: 'This is some content.'
           }],
           interaction: {
+            id: 'TextInput',
             handlers: [{
               rule_specs: [{
                 dest: 'Second State'
