@@ -26,7 +26,7 @@ class EndConversation(base.BaseInteraction):
     """
 
     name = 'End Conversation'
-    category = 'Basic Input'
+    category = ''
     description = (
         'Suggests recommendations for explorations to try next.')
     display_mode = base.DISPLAY_MODE_INLINE

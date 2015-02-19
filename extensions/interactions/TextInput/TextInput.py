@@ -21,7 +21,7 @@ class TextInput(base.BaseInteraction):
     """Interaction for entering text strings."""
 
     name = 'Text'
-    category = 'Basic Input'
+    category = ''
     description = 'Allows learners to enter arbitrary text strings.'
     display_mode = base.DISPLAY_MODE_INLINE
     _dependency_ids = []

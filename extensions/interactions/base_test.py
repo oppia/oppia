@@ -237,8 +237,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
                     getattr(interaction, item), item_type))
-                # The string attributes should be non-empty.
-                if item_type == basestring:
+                # The string attributes should be non-empty (except for
+                # 'category').
+                if item_type == basestring and item != 'category':
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)

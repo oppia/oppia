@@ -96,7 +96,8 @@ class BaseInteraction(object):
     # The human-readable name of the interaction. Overridden in subclasses.
     name = ''
     # The category the interaction falls under in the repository. Overridden in
-    # subclasses.
+    # subclasses; a value of '' means that this should be displayed as a
+    # top-level interaction.
     category = ''
     # A description of the interaction. Overridden in subclasses.
     description = ''

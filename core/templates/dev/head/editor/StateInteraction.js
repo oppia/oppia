@@ -97,15 +97,26 @@ oppia.controller('StateInteraction', [
     interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
       $scope.stateName = editorContextService.getActiveStateName();
       $scope.interactionRepository = interactionRepository;
+
+      $scope.topLevelInteractionIds = [];
       $scope.interactionsByCategory = {};
       for (var interactionId in $scope.interactionRepository) {
-        var interaction = $scope.interactionRepository[interactionId];
-        var category = interaction.category;
-        if ($scope.interactionsByCategory.hasOwnProperty(category)) {
-          $scope.interactionsByCategory[category].push(interactionId);
+        var category = $scope.interactionRepository[interactionId].category;
+
+        if (category === '') {
+          $scope.topLevelInteractionIds.push(interactionId);
         } else {
-          $scope.interactionsByCategory[category] = [interactionId];
+          if ($scope.interactionsByCategory.hasOwnProperty(category)) {
+            $scope.interactionsByCategory[category].push(interactionId);
+          } else {
+            $scope.interactionsByCategory[category] = [interactionId];
+          }
         }
+      }
+
+      $scope.topLevelInteractionIds.sort();
+      for (var category in $scope.interactionsByCategory) {
+        $scope.interactionsByCategory[category].sort();
       }
 
       stateInteractionIdService.init(
