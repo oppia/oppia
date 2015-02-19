@@ -35,7 +35,8 @@ class UserSettings(object):
     """Value object representing a user's settings."""
     def __init__(
             self, user_id, email, username=None, last_agreed_to_terms=None,
-            last_started_state_editor_tutorial=None, user_bio='',
+            last_started_state_editor_tutorial=None,
+            profile_picture_data_url=None, user_bio='',
             preferred_language_codes=None):
         self.user_id = user_id
         self.email = email
@@ -43,6 +44,7 @@ class UserSettings(object):
         self.last_agreed_to_terms = last_agreed_to_terms
         self.last_started_state_editor_tutorial = (
             last_started_state_editor_tutorial)
+        self.profile_picture_data_url = profile_picture_data_url
         self.user_bio = user_bio
         self.preferred_language_codes = (
             preferred_language_codes if preferred_language_codes else [])
@@ -172,6 +174,7 @@ def get_users_settings(user_ids):
                 last_agreed_to_terms=model.last_agreed_to_terms,
                 last_started_state_editor_tutorial=(
                     model.last_started_state_editor_tutorial),
+                profile_picture_data_url=model.profile_picture_data_url,
                 user_bio=model.user_bio,
                 preferred_language_codes=model.preferred_language_codes
             ))
@@ -200,6 +203,7 @@ def _save_user_settings(user_settings):
         last_agreed_to_terms=user_settings.last_agreed_to_terms,
         last_started_state_editor_tutorial=(
             user_settings.last_started_state_editor_tutorial),
+        profile_picture_data_url=user_settings.profile_picture_data_url,
         user_bio=user_settings.user_bio,
         preferred_language_codes=user_settings.preferred_language_codes,
     ).put()
@@ -261,6 +265,12 @@ def record_agreement_to_terms(user_id):
     """Records that the user has agreed to the license terms."""
     user_settings = get_user_settings(user_id, strict=True)
     user_settings.last_agreed_to_terms = datetime.datetime.utcnow()
+    _save_user_settings(user_settings)
+
+
+def update_profile_picture_data_url(user_id, profile_picture_data_url):
+    user_settings = get_user_settings(user_id, strict=True)
+    user_settings.profile_picture_data_url = profile_picture_data_url
     _save_user_settings(user_settings)
 
 

@@ -59,7 +59,7 @@ NEW_STATE_TEMPLATE = {
     'interaction': {
         'customization_args': {
             'rows': {'value': 1},
-            'placeholder': {'value': 'Type your answer here.'}
+            'placeholder': {'value': ''}
         },
         'handlers': [{
             'name': 'submit',
@@ -246,8 +246,8 @@ class ExplorationPage(EditorHandler):
             'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
                 exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'interaction_display_modes': (
-                interaction_registry.Registry.get_all_display_modes()),
+            'interaction_configs': (
+                interaction_registry.Registry.get_all_configs()),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,

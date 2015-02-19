@@ -47,18 +47,16 @@ oppia.factory('interactionDetailsCache', [function() {
 
 
 oppia.controller('StateInteraction', [
-    '$scope', '$http', '$rootScope', '$filter', 'warningsData',
+    '$scope', '$http', '$rootScope', '$modal', '$filter', 'warningsData',
     'editorContextService', 'oppiaHtmlEscaper', 'interactionRepositoryService',
     'stateInteractionIdService', 'stateCustomizationArgsService',
     'stateInteractionStickyService', 'editabilityService',
     'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
-    function($scope, $http, $rootScope, $filter, warningsData,
+    function($scope, $http, $rootScope, $modal, $filter, warningsData,
       editorContextService, oppiaHtmlEscaper, interactionRepositoryService,
       stateInteractionIdService, stateCustomizationArgsService,
       stateInteractionStickyService, editabilityService,
       explorationStatesService, graphDataService, interactionDetailsCache) {
-
-  $scope.form = {};
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the
   // interaction preview.
@@ -77,71 +75,16 @@ oppia.controller('StateInteraction', [
     return result;
   };
 
-  var _getInteractionPreviewTag = function(interactionId, interactionCustomizationArgsList) {
-    var el = $('<oppia-interactive-' + $filter('camelCaseToHyphens')(interactionId) + '/>');
-    for (var i = 0; i < interactionCustomizationArgsList.length; i++) {
+  var _getInteractionPreviewTag = function(interactionCustomizationArgs) {
+    var el = $(
+      '<oppia-interactive-' +
+      $filter('camelCaseToHyphens')(stateInteractionIdService.savedMemento) + '/>');
+    for (var caName in interactionCustomizationArgs) {
       el.attr(
-        $filter('camelCaseToHyphens')(interactionCustomizationArgsList[i].name) + '-with-value',
-        oppiaHtmlEscaper.objToEscapedJson(interactionCustomizationArgsList[i].value));
+        $filter('camelCaseToHyphens')(caName) + '-with-value',
+        oppiaHtmlEscaper.objToEscapedJson(interactionCustomizationArgs[caName].value));
     }
     return el.get(0).outerHTML;
-  };
-
-  $scope.resetInteractionCustomizer = function() {
-    $scope.interactionId = stateInteractionIdService.savedMemento;
-    var stateCustomizationArgs = stateCustomizationArgsService.savedMemento;
-
-    var interactionTemplate = angular.copy($scope.interactionRepository[$scope.interactionId]);
-    for (var i = 0; i < interactionTemplate.customization_args.length; i++) {
-      var caName = interactionTemplate.customization_args[i].name;
-      interactionTemplate.customization_args[i].value = (
-        stateCustomizationArgs.hasOwnProperty(caName) ?
-        stateCustomizationArgs[caName].value :
-        interactionTemplate.customization_args[i].default_value
-      );
-    }
-
-    // Special cases for multiple choice input and image click input.
-    if ($scope.interactionId === 'MultipleChoiceInput') {
-      for (var i = 0; i < interactionTemplate.customization_args.length; i++) {
-        if (interactionTemplate.customization_args[i].name == 'choices') {
-          $rootScope.$broadcast(
-            'updateAnswerChoices', interactionTemplate.customization_args[i].value.map(function(val, ind) {
-              return {
-                val: ind,
-                label: val
-              };
-            })
-          );
-          break;
-        }
-      }
-    } else if ($scope.interactionId === 'ImageClickInput') {
-      for (var i = 0; i < interactionTemplate.customization_args.length; i++) {
-        if (interactionTemplate.customization_args[i].name == 'imageAndRegions') {
-          var _answerChoices = [];
-          var imageWithRegions = interactionTemplate.customization_args[i].value;
-          for (var j = 0; j < imageWithRegions.imageRegions.length; j++) {
-            _answerChoices.push({
-              val: imageWithRegions.imageRegions[j].label,
-              label: imageWithRegions.imageRegions[j].label
-            });
-          }
-
-          $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
-          break;
-        }
-      }
-    } else {
-      $rootScope.$broadcast('updateAnswerChoices', null);
-    }
-
-    stateInteractionStickyService.restoreFromMemento();
-
-    $scope.interactionPreviewHtml = _getInteractionPreviewTag(
-      $scope.interactionId, interactionTemplate.customization_args);
-    $scope.interactionCustomizerIsShown = false;
-    $scope.tmpInteraction = null;
   };
 
   $scope.$on('stateEditorInitialized', function(evt, stateData) {
@@ -182,28 +125,98 @@ oppia.controller('StateInteraction', [
         'handlers': stateData.interaction.handlers
       });
 
-      $scope.resetInteractionCustomizer(stateData.interaction);
+      _updateInteractionPreviewAndAnswerChoices();
       $scope.hasLoaded = true;
     });
   });
 
-  $scope.showInteractionCustomizer = function() {
+  $scope.openInteractionCustomizerModal = function() {
     if (editabilityService.isEditable()) {
       warningsData.clear();
 
-      $scope.interactionCustomizerIsShown = true;
-      $scope.$broadcast('schemaBasedFormsShown');
+      var interactionSpec = $scope.interactionRepository[stateInteractionIdService.savedMemento];
 
-      $scope.tmpInteraction = angular.copy(
-        $scope.interactionRepository[stateInteractionIdService.savedMemento]);
-      for (var i = 0; i < $scope.tmpInteraction.customization_args.length; i++) {
-        var caName = $scope.tmpInteraction.customization_args[i].name;
-        $scope.tmpInteraction.customization_args[i].value = (
-          stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
-          angular.copy(stateCustomizationArgsService.displayed[caName].value) :
-          $scope.tmpInteraction.customization_args[i].default_value
-        );
+      $modal.open({
+        templateUrl: 'modals/customizeInteraction',
+        backdrop: true,
+        resolve: {
+          customizationArgSpecs: function() {
+            return interactionSpec.customization_arg_specs;
+          },
+          tmpCustomizationArgs: function() {
+            var tmpCustomizationArgs = [];
+            for (var i = 0; i < interactionSpec.customization_arg_specs.length; i++) {
+              var caName = interactionSpec.customization_arg_specs[i].name;
+              tmpCustomizationArgs.push({
+                name: caName,
+                value: (
+                  stateCustomizationArgsService.displayed.hasOwnProperty(caName) ?
+                  angular.copy(stateCustomizationArgsService.displayed[caName].value) :
+                  angular.copy(interactionSpec.customization_arg_specs[i].default_value)
+                )
+              });
+            }
+
+            return tmpCustomizationArgs;
+          }
+        },
+        controller: [
+            '$scope', '$modalInstance', 'tmpCustomizationArgs', 'customizationArgSpecs',
+            function($scope, $modalInstance, tmpCustomizationArgs, customizationArgSpecs) {
+          $scope.$broadcast('schemaBasedFormsShown');
+          $scope.tmpCustomizationArgs = tmpCustomizationArgs;
+          $scope.customizationArgSpecs = customizationArgSpecs;
+          $scope.form = {};
+
+          $scope.save = function() {
+            $modalInstance.close($scope.tmpCustomizationArgs);
+          };
+
+          $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+          };
+        }]
+      }).result.then(function(tmpCustomizationArgs) {
+        stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
+          tmpCustomizationArgs);
+        stateCustomizationArgsService.saveDisplayedValue();
+
+        _updateStatesDict();
+        graphDataService.recompute();
+        _updateInteractionPreviewAndAnswerChoices();
+      });
+    }
+  };
+
+  var _updateInteractionPreviewAndAnswerChoices = function() {
+    $scope.interactionId = stateInteractionIdService.savedMemento;
+
+    var currentCustomizationArgs = stateCustomizationArgsService.savedMemento;
+    $scope.interactionPreviewHtml = _getInteractionPreviewTag(currentCustomizationArgs);
+
+    // Special cases for multiple choice input and image click input.
+    if ($scope.interactionId === 'MultipleChoiceInput') {
+      $rootScope.$broadcast(
+        'updateAnswerChoices', currentCustomizationArgs['choices'].value.map(function(val, ind) {
+          return {
+            val: ind,
+            label: val
+          };
+        })
+      );
+    } else if ($scope.interactionId === 'ImageClickInput') {
+      var _answerChoices = [];
+      var imageWithRegions = currentCustomizationArgs['imageAndRegions'].value;
+      for (var j = 0; j < imageWithRegions.imageRegions.length; j++) {
+        _answerChoices.push({
+          val: imageWithRegions.imageRegions[j].label,
+          label: imageWithRegions.imageRegions[j].label
+        });
       }
+
+      $rootScope.$broadcast('updateAnswerChoices', _answerChoices);
+    } else {
+      $rootScope.$broadcast('updateAnswerChoices', null);
     }
   };
 
@@ -219,25 +232,6 @@ oppia.controller('StateInteraction', [
     explorationStatesService.setState(activeStateName, _stateDict);
   };
 
-  $scope.saveInteractionCustomizations = function(tmpInteraction) {
-    var newInteraction = angular.copy(tmpInteraction);
-
-    stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
-      newInteraction.customization_args);
-    stateCustomizationArgsService.saveDisplayedValue();
-    stateInteractionStickyService.saveDisplayedValue();
-
-    _updateStatesDict();
-    graphDataService.recompute();
-    $scope.resetInteractionCustomizer();
-  };
-
-  $scope.$on('externalSave', function() {
-    if ($scope.interactionCustomizerIsShown) {
-      $scope.saveInteractionCustomizations($scope.tmpInteraction);
-    }
-  });
-
   $scope.onChangeInteractionType = function(newInteractionId) {
     interactionDetailsCache.set(
       stateInteractionIdService.savedMemento,
@@ -250,15 +244,20 @@ oppia.controller('StateInteraction', [
       var _cachedCustomization = interactionDetailsCache.get(newInteractionId);
       stateCustomizationArgsService.displayed = _cachedCustomization.customization;
     } else {
-      var newInteraction = angular.copy($scope.interactionRepository[newInteractionId]);
-      for (var i = 0; i < newInteraction.customization_args.length; i++) {
-        newInteraction.customization_args[i].value = (
-          newInteraction.customization_args[i].default_value);
+      var interactionSpec = $scope.interactionRepository[newInteractionId];
+      var customizationArgs = [];
+      for (var i = 0; i < interactionSpec.customization_arg_specs.length; i++) {
+        var caName = interactionSpec.customization_arg_specs[i].name;
+        customizationArgs.push({
+          name: caName,
+          value: angular.copy(interactionSpec.customization_arg_specs[i].default_value)
+        });
       }
+
       stateCustomizationArgsService.displayed = _getStateCustomizationArgsFromInteractionCustomizationArgs(
-        newInteraction.customization_args);
+        customizationArgs);
     }
-    
+
     stateCustomizationArgsService.saveDisplayedValue();
 
     // This must be called here so that the rules are updated before the state
@@ -266,6 +265,6 @@ oppia.controller('StateInteraction', [
     $rootScope.$broadcast('onInteractionIdChanged', newInteractionId);
     _updateStatesDict();
     graphDataService.recompute();
-    $scope.resetInteractionCustomizer();
+    _updateInteractionPreviewAndAnswerChoices();
   };
 }]);

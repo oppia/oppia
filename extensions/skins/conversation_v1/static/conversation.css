@@ -19,7 +19,7 @@
   mode.
 */
 html, body {
-  background-color: #eeedee;
+  background-color: #eee;
 }
 
 /*
@@ -59,8 +59,9 @@ html, body {
 }
 
 .conversation-skin-row-avatar-img {
-  height: 30px;
-  max-width: 30px;
+  height: 24px;
+  margin-top: 2px;
+  max-width: 24px;
 }
 
 .conversation-skin-exploration-header {
@@ -76,10 +77,6 @@ html, body {
 
 .conversation-skin-iframe-container {
   -webkit-overflow-scrolling: touch;
-}
-
-.conversation-skin-old-content {
-  opacity: 0.8;
 }
 
 /* 'md-card' is needed to ensure that this takes precedence over the default

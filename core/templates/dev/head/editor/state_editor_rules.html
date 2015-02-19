@@ -1,4 +1,4 @@
-<div>
+<div ng-controller="StateRules">
   <div ng-repeat="(handlerName, handler) in interactionHandlers">
     <div>
       <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
@@ -7,24 +7,27 @@
         ui-sortable documentation for more details. -->
         <!-- Note that adding "track by $index" here seems to mess up the final
         index in the stop() event handler. -->
-        <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex === $index}" class="oppia-sortable-rule-block" ng-hide="$last" style="margin-top: 0;">
+        <li ng-repeat="rule in handler" ng-class="{'active': activeRuleIndex === $index}" class="oppia-sortable-rule-block" ng-if="!$last" style="margin-top: 0;">
           <span class="oppia-rule-sort-arrows-container oppia-rule-sort-handle" ng-if="!$last && handler.length > 2">
-            <span class="glyphicon glyphicon-sort oppia-rule-sort-arrows"></span>
+            <img src="/third_party/static/material-design-icons-1.0.1/ic_menu_black_48dp.png" style="width: 18px; height: 18px;">
           </span>
           <a ng-click="changeActiveRuleIndex($index)" href="#" class="oppia-rule-tab protractor-test-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex === $index}">
-            <[rule | parameterizeRuleDescription: getAnswerChoices()]>...
+            <span style="padding-left: 45px;">
+              <[rule | parameterizeRuleDescription: getAnswerChoices()]>...
+            </span>
           </a>
         </li>
 
-        <li ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
+        <li ng-if="handler.length > 1" ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
           <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex == handler.length - 1}">
-            If no other rules apply...
+            <span style="padding-left: 45px;">
+              None of the above rules apply...
+            </span>
           </a>
         </li>
       </ul>
 
-      <div ng-if="getCurrentInteractionId() !== 'Continue' && editabilityService.isEditable()">
-        <br>
+      <div ng-if="getCurrentInteractionId() !== 'Continue' && editabilityService.isEditable()" class="oppia-add-rule-button-container">
         <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-open-add-rule-modal" ng-click="openAddRuleModal()">
           Add Rule
         </button>

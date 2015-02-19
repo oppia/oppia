@@ -250,10 +250,14 @@ oppia.factory('oppiaPlayerService', [
       learnerParamsService.init(newParams);
     }
 
+    // NB: This may be undefined if newStateName === END_DEST.
+    var newInteractionId = newStateData ? newStateData.interaction.id : undefined;
+
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
-      newStateName, isSticky, newQuestionHtml, newFeedbackHtml);
+      newStateName, isSticky, newFeedbackHtml,
+      newQuestionHtml, newInteractionId);
   };
 
   var _onInitialStateProcessed = function(initStateName, initHtml, newParams, callback) {
@@ -361,9 +365,13 @@ oppia.factory('oppiaPlayerService', [
         labelForFocusTarget);
     },
     isInteractionInline: function(stateName) {
-      return GLOBALS.interactionDisplayModes[
+      return GLOBALS.interactionConfigs[
         _exploration.states[stateName].interaction.id
-      ] === _INTERACTION_DISPLAY_MODE_INLINE;
+      ].display_mode === _INTERACTION_DISPLAY_MODE_INLINE;
+    },
+    isStateTerminal: function(stateName) {
+      return !stateName || GLOBALS.interactionConfigs[
+        _exploration.states[stateName].interaction.id].is_terminal;
     },
     getRandomSuffix: function() {
       // This is a bit of a hack. When a refresh to a $scope variable happens,

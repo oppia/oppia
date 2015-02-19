@@ -156,6 +156,10 @@ oppia.controller('ExplorationEditor', [
     $scope.initExplorationPage(successCallback);
   });
 
+  var _ID_TUTORIAL_STATE_CONTENT = '#tutorialStateContent';
+  var _ID_TUTORIAL_STATE_INTERACTION = '#tutorialStateInteraction';
+  var _ID_TUTORIAL_STATE_ACTIVE_RULE = '#tutorialStateActiveRule';
+
   $scope.EDITOR_TUTORIAL_OPTIONS = [{
     type: 'title',
     heading: 'Welcome to the Oppia editor tutorial!',
@@ -165,8 +169,17 @@ oppia.controller('ExplorationEditor', [
       'into several \'states\'. A state consists of Oppia asking a question, and the ' +
       'learner responding. Based on the response, Oppia chooses what to say next.')
   }, {
+    type: 'function',
+    fn: function(isGoingForward) {
+      var positionToScrollTo = (
+        isGoingForward ? angular.element(_ID_TUTORIAL_STATE_CONTENT).offset().top - 80 : 0);
+      $('body').animate({
+        scrollTop: positionToScrollTo
+      }, 'slow');
+    }
+  }, {
     type: 'element',
-    selector: '#tutorialStateContent',
+    selector: _ID_TUTORIAL_STATE_CONTENT,
     heading: 'Content',
     text: (
       'This is where you can tell Oppia what to say to the learner at the beginning. ' +
@@ -177,18 +190,38 @@ oppia.controller('ExplorationEditor', [
     placement: 'bottom',
     scroll: false
   }, {
+    type: 'function',
+    fn: function(isGoingForward) {
+      var idToScrollTo = (
+        isGoingForward ? _ID_TUTORIAL_STATE_INTERACTION :
+        _ID_TUTORIAL_STATE_CONTENT);
+      $('body').animate({
+        scrollTop: angular.element(idToScrollTo).offset().top - 80
+      }, 'slow');
+    }
+  }, {
     type: 'element',
-    selector: '#tutorialStateInteraction',
+    selector: _ID_TUTORIAL_STATE_INTERACTION,
     heading: 'Interaction',
     text: (
       'Next, choose how you\'d like the learner to respond by ' +
       'selecting an interaction from the menu, then click on the preview ' +
       'shown here to tweak its display.'),
-    placement: 'right',
-    scroll: true
+    placement: 'bottom',
+    scroll: false
+  }, {
+    type: 'function',
+    fn: function(isGoingForward) {
+      var idToScrollTo = (
+        isGoingForward ? _ID_TUTORIAL_STATE_ACTIVE_RULE :
+        _ID_TUTORIAL_STATE_INTERACTION);
+      $('body').animate({
+        scrollTop: angular.element(idToScrollTo).offset().top - 80
+      }, 'slow');
+    }
   }, {
     type: 'element',
-    selector: '#tutorialStateActiveRule',
+    selector: _ID_TUTORIAL_STATE_ACTIVE_RULE,
     heading: 'Rules',
     text: (
       'After the learner responds, you can tell Oppia how to reply by ' +
@@ -197,11 +230,16 @@ oppia.controller('ExplorationEditor', [
       'Oppia might reply: <em>"Remember, there is no \'13\' on a 12-hour ' +
       'clock. Try again?"</em>'),
     placement: 'bottom',
-    scroll: true
+    scroll: false
   }, {
     type: 'function',
-    fn: function() {
-      $window.scrollTo(0, 0);
+    fn: function(isGoingForward) {
+      var positionToScrollTo = (
+        isGoingForward ? 0 :
+        angular.element(_ID_TUTORIAL_STATE_ACTIVE_RULE).offset().top - 80);
+      $('body').animate({
+        scrollTop: positionToScrollTo
+      }, 'slow');
     }
   }, {
     type: 'title',

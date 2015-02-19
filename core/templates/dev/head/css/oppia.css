@@ -83,8 +83,13 @@ a {
   color: #0844aa;
   cursor: pointer;
 }
+
 a:hover {
   color: #3f2c76;
+}
+
+a:focus {
+  outline-style: none;
 }
 
 input.ng-dirty.ng-invalid, md-input-group.md-default-theme input.ng-dirty.ng-invalid {
@@ -262,7 +267,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: #333;
   display: block;
   font-weight: bold;
-  padding: 1em 0;
+  padding: 1em 0 1em 18px;
   text-decoration: none;
 }
 .oppia-sidebar-menu a:hover {
@@ -344,7 +349,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-navbar-breadcrumb-separator {
-  padding-right: 10px;
+  padding-right: 7px;
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";
@@ -442,16 +447,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   }
 }
 
-.oppia-signup-button {
-  border: 2px solid #04568c;
-  font-weight: bold;
-  margin-left: 5px;
-  padding: 5px 10px;
-}
-.oppia-signup-button:hover {
-  background: #008076;
-}
-
 .oppia-main-content {
   margin: 10px;
   padding: 10px;
@@ -517,8 +512,34 @@ div.wysiwyg iframe.wysiwyg-content-large {
   font-size: 15px;
   height: 34px;
   padding: 3px 12px 4px 12px;
+  margin-right: 20px;
 }
 
+@media (max-width: 973px) {
+  .oppia-gallery-language-selector {
+    display: none;
+  }
+  .oppia-gallery-category-selector .btn {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+}
+
+@media (max-width: 890px) {
+  .oppia-gallery-category-selector {
+    display: none;
+  }
+  .oppia-splash-search-text-input {
+    border-bottom-right-radius: 4px;
+    border-top-right-radius: 4px;
+  }
+}
+
+@media (max-width: 768px) {
+  .oppia-gallery-add-exploration-button {
+    display: none;
+  }
+}
 
 .btn.oppia-gallery-add-exploration-button:hover {
   background-color: rgba(5, 190, 178, 1);
@@ -640,6 +661,13 @@ md-card.oppia-gallery-tile {
   display: none;
 }
 
+.carousel-control .glyphicon-chevron-left,
+.carousel-control .glyphicon-chevron-right,
+.carousel-control .icon-prev,
+.carousel-control .icon-next {
+  margin-top: -80px;
+}
+
 .oppia-page-title {
   color: #222;
   font-size: 30px;
@@ -739,16 +767,31 @@ md-card.oppia-gallery-tile {
   margin: auto;
   max-width: 560px;
 }
-.oppia-editor-card {
+.oppia-editor-card-with-avatar {
   background: rgb(255,255,255);
-  padding: 20px;
-  max-width: 800px;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 30px;
+  max-width: 560px;
+  padding: 0;
+}
+
+.oppia-editor-card {
+  background: rgb(255,255,255);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  max-width: 800px;
+}
+
+.oppia-editor-avatar {
+  height: 24px;
+  left: -40px;
+  position: absolute;
+  width: 24px;
 }
 
 .oppia-editor-card-body {
-  padding: 5px 10px;
   position: relative;
 }
 .oppia-editor-card-body h3 {
@@ -763,9 +806,9 @@ md-card.oppia-gallery-tile {
   margin: 0;
 }
 
-.oppia-editor-rules-card {
-  margin: 0px;
-  background-color: #f5f5f5;
+.oppia-editor-card-section {
+  margin-left: 35px;
+  padding: 0 50px 0 20px;
 }
 
 .oppia-state-content {
@@ -774,7 +817,9 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-state-content-display {
-  padding: 2px;
+  padding: 4px;
+  text-align: justify;
+  width: 445px;
 }
 
 .oppia-prevent-selection {
@@ -783,34 +828,6 @@ md-card.oppia-gallery-tile {
   -webkit-user-select: none;
 }
 
-.oppia-interaction-selector {
-  position: absolute;
-  left: 15px;
-  /* This must be larger than the z-index in
-     .oppia-click-to-start-editing, so that the rule does not
-     switch to edit mode when the destination link is clicked. */
-  z-index: 200;
-}
-@media (min-width: 768px) {
-  .oppia-interaction-selector {
-    bottom: 10px;
-  }
-}
-@media (max-width: 768px) {
-  .oppia-interaction-selector {
-    top: -22px;
-    width: 60%;
-  }
-}
-
-.oppia-interaction-editor {
-  border: 1px solid #ccc;
-  padding: 15px 15px 0px 15px;
-}
-
-.oppia-state-item-editor-div {
-  margin-bottom: 20px;
-}
 .oppia-save-state-item-button {
   margin-top: 2px;
 }
@@ -832,8 +849,8 @@ md-card.oppia-gallery-tile {
 .oppia-editor-edit-icon {
   font-size: 16px;
   opacity: 0.2;
-  position: absolute; 
-  right: -20px; 
+  position: absolute;
+  right: -20px;
   top: 5px;
 }
 
@@ -869,6 +886,9 @@ md-card.oppia-gallery-tile {
   margin-right: 5px;
 }
 
+.oppia-add-rule-button-container {
+  padding: 5px;
+}
 .oppia-add-rule-button {
   padding: 5px;
   width: 100%;
@@ -886,16 +906,18 @@ md-card.oppia-gallery-tile {
   right: 25px;
 }
 
-.oppia-rule-tab {
-  background: #eeedee;
+.nav-pills > li > a.oppia-rule-tab {
+  background: #f3f3f3;
   border-radius: 0;
-  border-bottom: 1px solid #ddd;
-  border-right: 1px solid #ddd;
-  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 5px 15px;
   width: 100%;
 }
+.nav-pills > li:hover > a.oppia-rule-tab {
+  background: #eaeaea;
+}
 .nav-pills > li.active > a.oppia-rule-tab-active {
-  background: #d0d0d0;
+  background: #e5e5e5;
   border-right: 0;
   color: #666;
   cursor: default;
@@ -926,32 +948,10 @@ md-card.oppia-gallery-tile {
   max-height: 50px;
 }
 
-.oppia-rule-user-avatar {
-  cursor: default;
-  height: 25px;
-  left: -55px;
-  position: absolute;
-  top: 8px;
-  width: 25px;
-}
-.oppia-rule-oppia-avatar {
-  cursor: default;
-  height: 25px;
-  left: -65px;
-  position: absolute;
-  top: -2px;
-  width: 25px;
-}
-
-.oppia-rule-editable-view {
-  margin-left: 55px;
-}
-
 .oppia-rule-dest-link {
-  left: 0;
-  margin: 0 auto;
+  margin-left: 5px;
   position: absolute;
-  right: 0;
+  width: 400px;
   /* This must be larger than the z-index in
      .oppia-interactive-section-click-handler, so that the rule does not
      switch to edit mode when the destination link is clicked. */
@@ -967,12 +967,14 @@ md-card.oppia-gallery-tile {
   cursor: move;
 }
 .oppia-rule-sort-arrows-container {
-  background: #ddd;
-  border-bottom-left-radius: 4px;
-  border-top-left-radius: 4px;
-  float: left;
-  margin-left: -25px;
+  left: 10px;
+  margin-left: 5px;
+  opacity: 0.7;
+  position: absolute;
+  top: 4px;
   width: 25px;
+  /* This is needed for the sort handle to be above the rule tile. */
+  z-index: 1;
 }
 .oppia-rule-sort-arrows {
   font-size: 18px;
@@ -1149,7 +1151,7 @@ oppia-parameter {
 .oppia-gallery-banner {
   background-repeat: no-repeat;
   background-size: cover;
-  height: 550px;
+  height: 650px;
   width: 100%;
 }
 .oppia-gallery-banner-content {
@@ -1158,7 +1160,7 @@ oppia-parameter {
   font-size: 48px;
   position: absolute;
   text-align: center;
-  top: 150px;
+  top: 230px;
   width: 100%;
   z-index: 100;
 }
@@ -1167,7 +1169,7 @@ oppia-parameter {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
   font-size: 20px;
-  padding-top: 190px;
+  padding-top: 275px;
 }
 
 .oppia-gallery-banner-link {
@@ -1183,7 +1185,7 @@ oppia-parameter {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   font-size: 1.3em;
   height: 120px;
-  margin-top: -75px;
+  margin-top: -120px;
   padding-top: 45px;
   position: relative;
   text-align: center;
@@ -1237,18 +1239,22 @@ div#ng-curtain {
 }
 .oppia-navbar-menu {
   margin-left: 10px;
+  opacity: 0.9;
+  outline-color: transparent;
 }
+
 .oppia-navbar-brand-name {
   float: left;
   height: 56px;
   line-height: 20px;
   margin-left: -10px;
-  text-decoration: none;
+  opacity: 0.9;
 }
-.oppia-navbar-brand-name:hover {
-  color: white;
-  text-decoration: none;
+
+.oppia-navbar-brand-name:hover, .oppia-navbar-menu:hover {
+  opacity: 1;
 }
+
 .oppia-logo {
   display: inline-block;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
@@ -1257,6 +1263,50 @@ div#ng-curtain {
   height: 40px;
   margin-left: 6px;
   margin-top: 9px;
+}
+.oppia-navbar-profile-picture-container {
+  margin-top: -7px;
+  margin-left: -5px;
+  text-align: right;
+}
+.oppia-navbar-profile-picture {
+  height: 32px;
+  width: 32px;
+}
+.oppia-navbar-role-indicator {
+  background-color: #f7a541;
+  border-radius: 20px;
+  bottom: 10px;
+  height: 15px;
+  position: absolute;
+  right: 25px;
+  width: 15px;
+}
+.oppia-navbar-role-text {
+  bottom: -3px;
+  color: white;
+  font-size: 0.7em;
+  font-weight: bold;
+  position: absolute;
+  right: 3px;
+}
+
+.oppia-navbar-dashboard-indicator {
+  background-color: #f7a541;
+  border-radius: 20px;
+  height: 15px;
+  position: absolute;
+  right: 25px;
+  top: 8px;
+  width: 15px;
+}
+.oppia-navbar-dashboard-indicator-text {
+  bottom: -3px;
+  color: white;
+  font-size: 0.7em;
+  font-weight: bold;
+  position: absolute;
+  right: 4px;
 }
 
 .oppia-select {
@@ -1279,6 +1329,7 @@ div#ng-curtain {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   height: 100%;
   max-width: 25%;
+  padding-top: 7px;
   position: fixed;
   right: 0;
   top: 50px;
@@ -1394,4 +1445,12 @@ div#ng-curtain {
   margin-left: 10px;
   -moz-border-radius: 6px 0 6px 6px;
   -webkit-border-radius: 6px 0 6px 6px;
+}
+
+
+.oppia-profile-picture-crop-area {
+  background: #E4E4E4;
+  height: 350px;
+  overflow: hidden;
+  width: 500px;
 }

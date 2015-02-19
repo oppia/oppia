@@ -41,7 +41,7 @@ class TextInput(base.BaseInteraction):
         'schema': {
             'type': 'unicode',
         },
-        'default_value': 'Type your answer here.'
+        'default_value': ''
     }, {
         'name': 'rows',
         'description': (

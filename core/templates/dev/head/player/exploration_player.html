@@ -9,7 +9,7 @@
   {% if exploration_version %}
     <script type="text/javascript">
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
-      GLOBALS.interactionDisplayModes = JSON.parse('{{interaction_display_modes|js_string}}');
+      GLOBALS.interactionConfigs = JSON.parse('{{interaction_configs|js_string}}');
     </script>
   {% endif %}
 
@@ -26,8 +26,7 @@
 {% endblock navbar_breadcrumb %}
 
 {% block local_top_nav_options %}
-  <ul class="nav navbar-nav oppia-navbar-nav navbar-right"
-      ng-controller="LearnerLocalNav">
+  <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
     <li class="dropdown">
       <a href="" title="Share" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-share"></span>
@@ -67,6 +66,8 @@
 {% block content %}
   {{ skin_tag }}
   <br><br><br>
+
+  {% include 'attribution_guide.html' %}
 
   <script type="text/ng-template" id="modals/playerFeedback">
     <div class="modal-header">

@@ -143,16 +143,20 @@ oppia.controller('Gallery', [
     function($scope, $http, $rootScope, $window, createExplorationButtonService,
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              searchService) {
-  $scope.CAROUSEL_INTERVAL = 5000;
+  $scope.CAROUSEL_INTERVAL = 2500;
 
   $scope.CAROUSEL_SLIDES = [{
-    explorationId: '1',
-    explorationSubject: 'programming',
+    explorationId: '14',
+    explorationSubject: 'astronomy',
     imageUrl: '/images/splash-image-0.jpg'
   }, {
     explorationId: '9',
     explorationSubject: 'music',
     imageUrl: '/images/splash-image-1.jpg'
+  }, {
+    explorationId: '1',
+    explorationSubject: 'programming',
+    imageUrl: '/images/splash-image-2.jpg'
   }];
 
   // Default color.

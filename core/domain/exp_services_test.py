@@ -380,7 +380,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -401,7 +401,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -440,7 +440,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -461,7 +461,7 @@ states:
     interaction:
       customization_args:
         placeholder:
-          value: Type your answer here.
+          value: ''
         rows:
           value: 1
       handlers:
@@ -564,7 +564,7 @@ class YAMLExportUnitTests(ExplorationServicesUnitTests):
 interaction:
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
   handlers:
@@ -588,7 +588,7 @@ param_changes: []
 interaction:
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
   handlers:
@@ -613,7 +613,7 @@ param_changes: []
 interaction:
   customization_args:
     placeholder:
-      value: Type your answer here.
+      value: ''
     rows:
       value: 1
   handlers:

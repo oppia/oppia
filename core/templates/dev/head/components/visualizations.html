@@ -114,7 +114,7 @@
                 <g ng-if="highlightStates && isStateFlagged(node.id)">
                   <rect ng-click="onClickFunction(node.id)" class="highlight"
                         width="22" height="22" ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                        ng-class="{clickable: node.id != finalStateId}"
+                        ng-class="{clickable: node.id != 'END'}"
                         ng-attr-transform="<[getHighlightTransform(node.x0, node.y0)]>">
                   </rect>
                   <text fill="firebrick" text-anchor="middle" ng-attr-x="<[node.x0 + 11]>"

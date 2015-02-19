@@ -53,19 +53,6 @@ if [ ! -f "$GOOGLE_APP_ENGINE_HOME/appcfg.py" ]; then
   rm gae-download.zip
 fi
 
-# webtest is used for tests.
-echo Checking if webtest is installed in third_party
-if [ ! -d "$TOOLS_DIR/webtest-1.4.2" ]; then
-  echo Installing webtest framework
-  curl --silent http://pypi.python.org/packages/source/W/WebTest/WebTest-1.4.2.zip -o webtest-download.zip
-  unzip webtest-download.zip -d $TOOLS_DIR
-  rm webtest-download.zip
-  # Move WebTest-1.4.2 to tmp directory first to get around case insensitivity
-  # on Windows.
-  mv $TOOLS_DIR/WebTest-1.4.2 $TOOLS_DIR/tmp-webtest-1.4.2
-  mv $TOOLS_DIR/tmp-webtest-1.4.2 $TOOLS_DIR/webtest-1.4.2
-fi
-
 # Install third party dependencies.
 bash scripts/install_third_party.sh
 

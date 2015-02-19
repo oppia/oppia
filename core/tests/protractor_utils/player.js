@@ -76,16 +76,14 @@ var submitAnswer = function(interactionName, answerData) {
 
 var expectExplorationToBeOver = function() {
   expect(
-    element.all(by.css('.protractor-test-conversation-finished')).last().
-      isDisplayed()
-  ).toBe(true);
+    element.all(by.css('.protractor-test-conversation-content')).last().getText()
+  ).toEqual('Congratulations, you have finished this exploration!');
 };
 
 var expectExplorationToNotBeOver = function() {
   expect(
-    element.all(by.css('.protractor-test-conversation-finished')).last().
-      isDisplayed()
-  ).toBe(false);
+    element.all(by.css('.protractor-test-conversation-content')).last().getText()
+  ).not.toEqual('Congratulations, you have finished this exploration!');
 };
 
 exports.restartExploration = restartExploration;

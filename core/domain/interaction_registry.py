@@ -94,9 +94,13 @@ class Registry(object):
         return list(result)
 
     @classmethod
-    def get_all_display_modes(cls):
-        """Returns a dict mapping interaction ids to their display modes."""
+    def get_all_configs(cls):
+        """Returns a dict whose keys are interaction ids and whose values are
+        dicts that each contain two keys: 'display_mode' and 'is_terminal'.
+        """
         return {
-            interaction.id: interaction.display_mode
-            for interaction in cls.get_all_interactions()
+            interaction.id: {
+                'display_mode': interaction.display_mode,
+                'is_terminal': interaction.is_terminal,
+            } for interaction in cls.get_all_interactions()
         }

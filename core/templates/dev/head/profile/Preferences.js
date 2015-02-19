@@ -18,10 +18,11 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('Preferences', ['$scope', '$http', '$rootScope', function(
-    $scope, $http, $rootScope) {
+oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
+    function($scope, $http, $rootScope, $modal) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
+  $scope.profilePictureDataUrl = '';
 
   var _saveDataItem = function(updateType, data) {
     $http.put(_PREFERENCES_DATA_URL, {
@@ -38,6 +39,47 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', function(
     _saveDataItem('preferred_language_codes', preferredLanguageCodes);
   };
 
+  $scope.showEditProfilePictureModal = function() {
+    $modal.open({
+      templateUrl: 'modals/editProfilePicture',
+      backdrop: true,
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.uploadedImage = '';
+        $scope.croppedImageDataUrl = '';
+
+        var handleFileSelect = function(event) {
+          var file = event.currentTarget.files[0];
+          var reader = new FileReader();
+          reader.onload = function(event) {
+            $scope.$apply(function() {
+              $scope.uploadedImage = event.target.result;
+            });
+          };
+          reader.readAsDataURL(file);
+        };
+        angular.element(document)
+          .on('change', '.profile-picture-input', handleFileSelect);
+
+        $scope.confirm = function() {
+          $modalInstance.close($scope.croppedImageDataUrl);
+        };
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+        };
+      }]
+    }).result.then(function(newProfilePictureDataUrl) {
+      $http.put(_PREFERENCES_DATA_URL, {
+        update_type: 'profile_picture_data_url',
+        data: newProfilePictureDataUrl
+      }).success(function(response) {
+        // The reload is needed in order to update the profile picture in the
+        // top-right corner.
+        location.reload();
+      });
+    });
+  };
+
   $scope.LANGUAGE_CHOICES = GLOBALS.LANGUAGE_CODES_AND_NAMES.map(function(languageItem) {
     return {
       id: languageItem.code,
@@ -50,6 +92,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', function(
     $rootScope.loadingMessage = '';
     $scope.userBio = data.user_bio;
     $scope.preferredLanguageCodes = data.preferred_language_codes;
+    $scope.profilePictureDataUrl = data.profile_picture_data_url;
     $scope.hasPageLoaded = true;
   });
 }]);

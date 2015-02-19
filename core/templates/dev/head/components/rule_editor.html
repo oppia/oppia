@@ -1,11 +1,11 @@
 <div style="height: 100%;">
-  <div ng-if="!ruleEditorIsOpen" style="height: 100%; margin-left: 55px;" title="Edit this rule, or change its destination">
+  <div ng-if="!ruleEditorIsOpen" style="height: 100%;" title="Edit this rule, or change its destination">
     <div class="oppia-readonly-rule-tile protractor-test-edit-rule" ng-class="{'oppia-editable-section': isEditable}">
       <div class="oppia-click-to-start-editing" ng-click="openRuleEditor()">
       </div>
 
       <div style="position: relative;">
-        <img src="/images/user.png" class="oppia-rule-user-avatar" style="left: -65px; top: -2px;">
+        <img src="/images/user_mint_48px.png" class="oppia-editor-avatar" style="top: -2px;">
       </div>
 
       <div>
@@ -20,19 +20,22 @@
           </span>
         </span>
         <span ng-if="rule.description === 'Default'">
-          ...
+          [<em>Answer is not recognized...</em>]
         </span>
       </div>
 
       <br>
 
       <div style="position: relative;">
-        <img src="/images/oppia_favicon_mint.png" class="oppia-rule-oppia-avatar">
+        <img src="/images/oppia_favicon_black_48px.png" style="position: absolute; left: -40px; top: -2px; height: 24px; width: 24px;">
         <span ng-if="isRuleConfusing()">
           <span class="oppia-rule-warning-text">
             <span class="glyphicon glyphicon-warning-sign"></span>
-            Please specify something for Oppia to say.
+            Please give Oppia something useful to say here.
           </span>
+        </span>
+        <span ng-if="!isRuleConfusing() && rule.feedback.length === 0" style="color: #888">
+          [<em>says nothing...</em>]
         </span>
         <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
           <span angular-html-bind="rule.feedback[0]"></span>
@@ -44,90 +47,67 @@
         </span>
       </div>
 
-      <div style="margin-top: 10px;">
-        <div style="text-align: center;">
-          <div ng-if="rule.dest === getActiveStateName()">
-            <div style="font-size: 1.5em;">
-              <span class="glyphicon glyphicon-repeat"></span>
-            </div>
-          </div>
-          <div ng-if="rule.dest !== getActiveStateName()">
-            <div style="font-size: 2em;">
-              ↓
-            </div>
-          </div>
-        </div>
-      </div>
-      <div ng-if="rule.dest !== getActiveStateName()" style="padding-bottom: 20px;">
-        <div style="text-align: center;">
+      <br>
+
+      <div style="padding-bottom: 20px;" ng-if="rule.dest !== getActiveStateName()">
+        Destination:
+        <span style="position: relative;">
           <a ng-click="navigateToRuleDest()" ng-if="rule.dest !== 'END'" class="oppia-rule-dest-link">
             <[rule.dest]>
           </a>
-          <span ng-if="rule.dest === 'END'">
-            END
-          </span>
-        </div>
+        </span>
+        <span ng-if="rule.dest === 'END'">
+          END
+        </span>
       </div>
     </div>
   </div>
 
   <div ng-if="isEditable && ruleEditorIsOpen">
-    <div class="oppia-rule-editable-view">
-      <div style="border: 1px solid #ccc; padding: 15px;">
-        <div style="position: relative;">
-          <img src="/images/user.png" class="oppia-rule-user-avatar" style="left: -70px; top: 2px;">
-          <span ng-if="rule.description !== 'Default'">
-            <rule-description-editor current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition"></rule-description-editor>
-          </span>
+    <div>
+      <div style="position: relative;">
+        <img src="/images/user_mint_48px.png" class="oppia-editor-avatar" style="top: -2px;">
+        <span ng-if="rule.description !== 'Default'">
+          <rule-description-editor current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition"></rule-description-editor>
+        </span>
 
-          <span ng-if="rule.description === 'Default'">
-            If no other rules apply...
-          </span>
-        </div>
-
-        <hr>
-
-        <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
-          <img src="/images/oppia_favicon_mint.png" class="oppia-rule-oppia-avatar" style="left: -70px;">
-          <span ng-if="rule.feedback.length > 1">
-            (<em>Oppia picks one of these at random</em>):
-          </span>
-          <span ng-if="rule.feedback.length == 0">
-            <em>No feedback specified.</em>
-          </span>
-
-          <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
-          </schema-based-editor>
-        </div>
-
-        <hr>
-
-        <div class="protractor-test-dest-bubble">
-          <span style="font-size: 1.1em; margin-right: 8px;">
-            Destination:
-          </span>
-          <span ng-if="!reloadingDestinations" style="width: 200px;">
-            <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex=".^" dropdown-css-class="oppia-rule-dest-select2" format-new-selection="convertNewDestToText" invalid-search-term-message="Invalid state name">
-            </select2-dropdown>
-          </span>
-
-          <span style="margin: 0 10px;">
-            or
-          </span>
-
-          <button type="button" class="btn btn-default protractor-test-add-state-button" ng-click="openAddStateModal(rule)">
-            <span class="glyphicon glyphicon-plus">
-            </span>
-            Create New
-          </button>
-        </div>
+        <span ng-if="rule.description === 'Default'">
+          If answer is not recognized...
+        </span>
       </div>
 
-      <div class="oppia-rule-save-cancel-buttons">
-        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
-        <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-        <button type="button" class="btn btn-danger pull-right protractor-test-delete-rule" ng-if="!isDefaultRule()" ng-click="deleteThisRule()">Delete Rule</button>
+      <hr>
+
+      <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
+        <img src="/images/oppia_favicon_black_48px.png" style="position: absolute; left: -40px; top: -2px; height: 24px; width: 24px;">
+        <span ng-if="rule.feedback.length > 1">
+          (<em>Oppia picks one of these at random</em>):
+        </span>
+        <span ng-if="rule.feedback.length == 0">
+          <em>No feedback specified.</em>
+        </span>
+
+        <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
+        </schema-based-editor>
       </div>
+
+      <hr>
+
+      <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
+        <div class="form-group" style="font-size: 1.1em;">
+          <label for="ruleDestination">Destination:</label>
+          <span ng-if="!reloadingDestinations">
+            <select class="form-control" ng-model="rule.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="margin-left: 10px; width: 200px;">
+            </select>
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="oppia-rule-save-cancel-buttons">
+      <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
+      <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
+      <button type="button" class="btn btn-danger pull-right protractor-test-delete-rule" ng-if="!isDefaultRule()" ng-click="deleteThisRule()">Delete Rule</button>
     </div>
   </div>
 </div>

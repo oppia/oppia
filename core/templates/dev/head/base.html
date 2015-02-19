@@ -103,22 +103,45 @@
                     {% endblock navbar_breadcrumb %}
 
                     <div class="collapse navbar-collapse">
-                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right">
+                      <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 0px;">
                         {% if username %}
                           <li class="dropdown">
-                            <a class="dropdown-toggle" data-toggle="dropdown">
-                              {{username}}
+                            <a class="dropdown-toggle" data-toggle="dropdown" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
+                              <div class="oppia-navbar-profile-picture-container">
+                                {% if profile_picture_data_url %}
+                                  <img src="{{profile_picture_data_url}}" class="oppia-navbar-profile-picture img-circle">
+                                {% else %}
+                                  <img ng-if="profileDropdownIsActive" src="/images/user_mint_48px.png" class="oppia-navbar-profile-picture ng-cloak">
+                                  <img ng-if="!profileDropdownIsActive" src="/images/user_white_48px.png" class="oppia-navbar-profile-picture ng-cloak">
+                                {% endif %}
+                                <span class="caret" style="margin-top: 10px;"></span>
 
-                              {% if is_admin %}
-                                (Admin)
-                              {% elif is_moderator %}
-                                (Moderator)
-                              {% endif %}
-                              <span class="caret"></span>
+                                <div class="oppia-navbar-dashboard-indicator" ng-if="numUnseenNotifications > 0">
+                                  <span class="oppia-navbar-dashboard-indicator-text">
+                                    <[numUnseenNotifications]>
+                                  </span>
+                                </div>
+
+                                {% if is_admin or is_moderator %}
+                                  <div class="oppia-navbar-role-indicator">
+                                    {% if is_admin %}
+                                      <!-- "right: 4px;" is necessary here but not in moderator to prevent 'A' from appearing off-center because 'A' is slightly thinner than 'M' in this font -->
+                                      <span class="oppia-navbar-role-text" style="right: 4px;">A</span>
+                                    {% elif is_moderator %}
+                                      <span class="oppia-navbar-role-text">M</span>
+                                    {% endif %}
+                                  </div>
+                                {% endif %}
+                              </div>
                             </a>
-                            <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                            <ul class="dropdown-menu" role="menu" ng-mouseover="onMouseoverProfilePictureOrDropdown($event)" ng-mouseleave="onMouseoutProfilePictureOrDropdown($event)">
                               <li>
-                                <a href="/dashboard">Dashboard</a>
+                                <a href="/dashboard">
+                                  Dashboard
+                                  <span ng-if="numUnseenNotifications > 0">
+                                    (<[numUnseenNotifications]>)
+                                  </span>
+                                </a>
                               </li>
                               <li>
                                 <a href="/profile/{{username}}">Profile</a>
@@ -147,17 +170,18 @@
                             </ul>
                           </li>
                         {% else %}
-                          <li>
-                            <a href="{{login_url}}" style="font-size: 0.8em; margin-right: -20px;" class="oppia-no-hover-change">
-                              Log in
+                          <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 1.0em;">
+                              Sign in
+                              <span class="caret"></span>
                             </a>
-                          </li>
-                          <li>
-                            <a href="{{login_url}}" style="font-size: 0.8em;" class="oppia-no-hover-change">
-                              <span class="oppia-signup-button">
-                                Sign up
-                              </span>
-                            </a>
+                            <ul class="dropdown-menu" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                              <li>
+                                <a href="{{login_url}}" style="padding: 0; width: 200px;">
+                                  <img src="/images/signin/Red-signin-Long-base-44dp.png">
+                                </a>
+                              </li>
+                            </ul>
                           </li>
                         {% endif %}
                       </ul>
@@ -176,15 +200,6 @@
             </div>
 
             {% include 'side_nav.html' %}
-
-            {% if nav_mode in ['explore'] %}
-              <span class="oppia-cc-icon">
-                <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank">
-                  <img alt="Creative Commons Licence" style="border-width: 0; height: 24px;" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                </a><br />
-                <a href="/about#license" target="_blank" style="font-size: 9px;">Attribution Guide</a>
-              </span>
-            {% endif %}
 
           </div>
         </div>
