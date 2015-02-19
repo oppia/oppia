@@ -121,12 +121,12 @@ oppia.controller('Base', [
   $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
     angular.element(evt.currentTarget).parent().addClass('open');
     $scope.profileDropdownIsActive = true;
-  }
+  };
 
   $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
     angular.element(evt.currentTarget).parent().removeClass('open');
     $scope.profileDropdownIsActive = false;
-  }
+  };
 
   $scope.onMouseoverDropdownMenu = function(evt) {
     angular.element(evt.currentTarget).parent().addClass('open');

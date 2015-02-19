@@ -447,16 +447,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
   }
 }
 
-.oppia-signup-button {
-  border: 2px solid #04568c;
-  font-weight: bold;
-  margin-left: 5px;
-  padding: 5px 10px;
-}
-.oppia-signup-button:hover {
-  background: #008076;
-}
-
 .oppia-main-content {
   margin: 10px;
   padding: 10px;

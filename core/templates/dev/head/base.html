@@ -170,17 +170,18 @@
                             </ul>
                           </li>
                         {% else %}
-                          <li>
-                            <a href="{{login_url}}" style="font-size: 0.8em; margin-right: -20px;" class="oppia-no-hover-change">
-                              Log in
+                          <li class="dropdown">
+                            <a class="dropdown-toggle" data-toggle="dropdown" style="font-size: 1.0em;">
+                              Sign in
+                              <span class="caret"></span>
                             </a>
-                          </li>
-                          <li>
-                            <a href="{{login_url}}" style="font-size: 0.8em;" class="oppia-no-hover-change">
-                              <span class="oppia-signup-button">
-                                Sign up
-                              </span>
-                            </a>
+                            <ul class="dropdown-menu" role="menu" style="padding: 0;" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
+                              <li>
+                                <a href="{{login_url}}" style="padding: 0; width: 200px;">
+                                  <img src="/images/signin/Red-signin-Long-base-44dp.png">
+                                </a>
+                              </li>
+                            </ul>
                           </li>
                         {% endif %}
                       </ul>
