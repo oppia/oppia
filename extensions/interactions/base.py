@@ -191,12 +191,9 @@ class BaseInteraction(object):
             'name': self.name,
             'category': self.category,
             'description': self.description,
-            # TODO(sll): Instead of our passing 'display_mode' and
-            # 'is_terminal' around the editor each time, the editor
-            # should read these values from GLOBALS.interactionConfigs.
             'display_mode': self.display_mode,
             'is_terminal': self.is_terminal,
-            'customization_args': [{
+            'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,

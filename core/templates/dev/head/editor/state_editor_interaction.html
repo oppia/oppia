@@ -22,11 +22,11 @@
                 <[category]>
               </a>
               <ul class="dropdown-menu">
-                <li ng-repeat="interaction in interactions">
+                <li ng-repeat="interactionId in interactions">
                   <a href="#"
-                     ng-click="onChangeInteractionType(interaction)"
-                     class="protractor-test-interaction-id-<[interaction]>">
-                    <[interactionRepository[interaction].name]>
+                     ng-click="onChangeInteractionType(interactionId)"
+                     class="protractor-test-interaction-id-<[interactionId]>">
+                    <[interactionRepository[interactionId].name]>
                   </a>
                 </li>
               </ul>
@@ -58,10 +58,10 @@
   <div class="modal-body">
     <div class="protractor-test-interaction-editor">
       <form name="form.schemaForm">
-        <div ng-repeat="customizationArg in tmpInteraction.customization_args">
-          <h3><[customizationArg.description]></h3>
+        <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
+          <h3><[customizationArgSpec.description]></h3>
           <div>
-            <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+            <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
             </schema-based-editor>
             <div style="margin-bottom: 15px;"></div>
           </div>

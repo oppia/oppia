@@ -380,10 +380,10 @@
 
   <div class="modal-body">
     <form name="form.schemaForm">
-      <div ng-repeat="customizationArg in customizationArgsList">
-        <strong><[customizationArg.description]></strong>
+      <div ng-repeat="customizationArgSpec in customizationArgSpecs track by $index">
+        <strong><[customizationArgSpec.description]></strong>
         <div>
-          <schema-based-editor local-value="customizationArg.value" schema="customizationArg.schema">
+          <schema-based-editor local-value="tmpCustomizationArgs[$index].value" schema="customizationArgSpec.schema">
           </schema-based-editor>
         </div>
       </div>

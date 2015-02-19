@@ -587,26 +587,28 @@ oppia.directive('richTextEditor', [
             templateUrl: 'modals/customizeRteComponent',
             backdrop: true,
             resolve: {
-              componentDefn: function() {
-                return componentDefn;
+              customizationArgSpecs: function() {
+                return componentDefn.customization_arg_specs;
               },
               attrsCustomizationArgsDict: function() {
                 return attrsCustomizationArgsDict;
               }
             },
             controller: [
-              '$scope', '$modalInstance', 'componentDefn', 'attrsCustomizationArgsDict',
-              function($scope, $modalInstance, componentDefn, attrsCustomizationArgsDict) {
-                $scope.componentDefn = componentDefn;
+              '$scope', '$modalInstance', 'customizationArgSpecs', 'attrsCustomizationArgsDict',
+              function($scope, $modalInstance, customizationArgSpecs, attrsCustomizationArgsDict) {
+                $scope.customizationArgSpecs = customizationArgSpecs;
 
-                $scope.customizationArgsList = angular.copy(componentDefn.customization_args);
-                for (var i = 0; i < $scope.customizationArgsList.length; i++) {
-                  var caName = $scope.customizationArgsList[i].name;
-                  if (attrsCustomizationArgsDict.hasOwnProperty(caName)) {
-                    $scope.customizationArgsList[i].value = attrsCustomizationArgsDict[caName];
-                  } else {
-                    $scope.customizationArgsList[i].value = $scope.customizationArgsList[i].default_value;
-                  }
+                $scope.tmpCustomizationArgs = [];
+                for (var i = 0; i < customizationArgSpecs.length; i++) {
+                  var caName = customizationArgSpecs[i].name;
+                  $scope.tmpCustomizationArgs.push({
+                    name: caName,
+                    value: (
+                      attrsCustomizationArgsDict.hasOwnProperty(caName) ?
+                      attrsCustomizationArgsDict[caName] :
+                      customizationArgSpecs[i].default_value)
+                  });
                 }
 
                 $scope.cancel = function() {
@@ -617,20 +619,17 @@ oppia.directive('richTextEditor', [
                   $scope.$broadcast('externalSave');
 
                   var customizationArgsDict = {};
-                  for (var i = 0; i < $scope.customizationArgsList.length; i++) {
-                    var caName = $scope.customizationArgsList[i].name;
-                    customizationArgsDict[caName] = $scope.customizationArgsList[i].value;
+                  for (var i = 0; i < $scope.tmpCustomizationArgs.length; i++) {
+                    var caName = $scope.tmpCustomizationArgs[i].name;
+                    customizationArgsDict[caName] = $scope.tmpCustomizationArgs[i].value;
                   }
 
-                  $modalInstance.close({
-                    customizationArgsDict: customizationArgsDict,
-                    componentDefn: $scope.componentDefn
-                  });
+                  $modalInstance.close(customizationArgsDict);
                 };
               }
             ]
-          }).result.then(function(result) {
-            var el = $scope._createRteElement(result.componentDefn, result.customizationArgsDict);
+          }).result.then(function(customizationArgsDict) {
+            var el = $scope._createRteElement(componentDefn, customizationArgsDict);
             var insertionPoint = $scope.editorDoc.querySelector('.insertionPoint');
             insertionPoint.parentNode.replaceChild(el, insertionPoint);
             $(rteNode).wysiwyg('save');
