@@ -39,8 +39,8 @@ oppia.controller('StateEditor', [
   });
 
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-    $scope.doesCurrentStateHaveRules = (
-      newInteractionId !== 'EndConversation');
+    $scope.doesCurrentStateHaveRules = !GLOBALS.interactionConfigs[
+      newInteractionId].is_terminal;
   });
 
   $scope.initStateEditor = function() {
@@ -55,8 +55,7 @@ oppia.controller('StateEditor', [
 
     if ($scope.stateName && stateData) {
       $rootScope.$broadcast('stateEditorInitialized', stateData);
-      $scope.doesCurrentStateHaveRules = (
-        stateData.interaction.id !== 'EndConversation');
+      $scope.doesCurrentStateHaveRules = !stateData.interaction.is_terminal;
     }
   };
 

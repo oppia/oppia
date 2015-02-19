@@ -18,13 +18,19 @@ from extensions.interactions import base
 
 
 class EndConversation(base.BaseInteraction):
-    """'Interaction' that allows the conversation to end."""
+    """Interaction that allows the conversation to end.
+
+    This interaction is unusual in that there is no way for the learner to
+    submit an answer, so the exploration effectively terminates at the state
+    containing it.
+    """
 
     name = 'End Conversation'
     category = 'Basic Input'
     description = (
         'Suggests recommendations for explorations to try next.')
     display_mode = base.DISPLAY_MODE_INLINE
+    is_terminal = True
     _dependency_ids = []
     _handlers = [{
         'name': 'submit', 'obj_type': 'Null'

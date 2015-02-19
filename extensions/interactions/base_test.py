@@ -119,7 +119,7 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'category', 'description', 'display_mode',
-            'handler_specs', 'customization_args'])
+            'handler_specs', 'customization_args', 'is_terminal'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
         self.assertEqual(interaction_dict['customization_args'], [{
             'name': 'placeholder',

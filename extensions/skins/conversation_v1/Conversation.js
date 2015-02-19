@@ -33,8 +33,6 @@ oppia.directive('conversationSkin', [function() {
           $scope, $timeout, $rootScope, $window, $modal, warningsData,
           messengerService, oppiaPlayerService, urlService, focusService) {
 
-      var _END_CONVERSATION_INTERACTION_ID = 'EndConversation';
-
       var hasInteractedAtLeastOnce = false;
       var _labelForNextFocusTarget = null;
       var _answerIsBeingProcessed = false;
@@ -169,8 +167,7 @@ oppia.directive('conversationSkin', [function() {
           $timeout(function() {
             var oldStateName = $scope.stateName;
             $scope.stateName = newStateName;
-            $scope.finished = !Boolean(newStateName) || (
-              newInteractionId === _END_CONVERSATION_INTERACTION_ID);
+            $scope.finished = oppiaPlayerService.isStateTerminal(newStateName);
 
             if ($scope.stateName && !isSticky) {
               // The previous interaction is not sticky and should be replaced.

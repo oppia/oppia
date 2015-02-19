@@ -47,7 +47,13 @@ STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
 STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
 
-INTERACTION_ID_END_CONVERSATION = 'EndConversation'
+
+def _is_interaction_terminal(interaction_id):
+    """Returns whether the given interaction id marks the end of an
+    exploration.
+    """
+    return interaction_registry.Registry.get_interaction_by_id(
+        interaction_id).is_terminal
 
 
 class ExplorationChange(object):
@@ -1021,7 +1027,7 @@ class Exploration(object):
     def _verify_no_self_loops(self):
         """Verify that there are no feedback-less self-loops."""
         for (state_name, state) in self.states.iteritems():
-            if state.interaction.id != INTERACTION_ID_END_CONVERSATION:
+            if not _is_interaction_terminal(state.interaction.id):
                 for handler in state.interaction.handlers:
                     for rule in handler.rule_specs:
                         # Check that there are no feedback-less self-loops.
@@ -1064,7 +1070,7 @@ class Exploration(object):
 
             curr_state = self.states[curr_state_name]
 
-            if curr_state.interaction.id != INTERACTION_ID_END_CONVERSATION:
+            if not _is_interaction_terminal(curr_state.interaction.id):
                 for handler in curr_state.interaction.handlers:
                     for rule in handler.rule_specs:
                         dest_state = rule.dest
@@ -1081,14 +1087,13 @@ class Exploration(object):
                 'state: %s' % ', '.join(unseen_states))
 
     def _verify_no_dead_ends(self):
-        """Verifies that an END state or a state with
-        INTERACTION_ID_END_CONVERSATION is reachable from all states."""
+        """Verifies that all states can reach a terminal state."""
         # This queue stores state names.
         processed_queue = []
         curr_queue = [feconf.END_DEST]
 
         for (state_name, state) in self.states.iteritems():
-            if state.interaction.id == INTERACTION_ID_END_CONVERSATION:
+            if _is_interaction_terminal(state.interaction.id):
                 processed_queue.append(state_name)
                 curr_queue.append(state_name)
 

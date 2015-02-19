@@ -9,7 +9,7 @@
   {% if exploration_version %}
     <script type="text/javascript">
       GLOBALS.explorationVersion = JSON.parse('{{exploration_version|js_string}}');
-      GLOBALS.interactionDisplayModes = JSON.parse('{{interaction_display_modes|js_string}}');
+      GLOBALS.interactionConfigs = JSON.parse('{{interaction_configs|js_string}}');
     </script>
   {% endif %}
 
