@@ -1318,6 +1318,20 @@ oppia.directive('schemaBasedListEditor', [
         $scope.addElementText = $scope.uiConfig().add_element_text;
       }
 
+      // Only hide the 'add item' button in the case of single-line unicode input.
+      $scope.isOneLineInput = true;
+      if ($scope.itemSchema().type !== 'unicode') {
+        $scope.isOneLineInput = false;
+      } else if ($scope.itemSchema().ui_config) {
+        if ($scope.itemSchema().ui_config.coding_mode) {
+          $scope.isOneLineInput = false;
+        } else if (
+            $scope.itemSchema().ui_config.hasOwnProperty('rows') &&
+            $scope.itemSchema().ui_config.rows > 2) {
+          $scope.isOneLineInput = false;
+        }
+      }
+
       $scope.minListLength = null;
       $scope.maxListLength = null;
       if ($scope.validators()) {
@@ -1337,7 +1351,10 @@ oppia.directive('schemaBasedListEditor', [
 
       if ($scope.len === undefined) {
         $scope.addElement = function() {
-          $scope.hideAddItemButton();
+          if ($scope.isOneLineInput) {
+            $scope.hideAddItemButton();
+          }
+
           $scope.localValue.push(
             schemaDefaultValueService.getDefaultValue($scope.itemSchema()));
           focusService.setFocus($scope.getFocusLabel($scope.localValue.length - 1));
