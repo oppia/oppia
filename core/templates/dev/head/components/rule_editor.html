@@ -31,8 +31,11 @@
         <span ng-if="isRuleConfusing()">
           <span class="oppia-rule-warning-text">
             <span class="glyphicon glyphicon-warning-sign"></span>
-            Please specify something for Oppia to say.
+            Please give Oppia something useful to say here.
           </span>
+        </span>
+        <span ng-if="!isRuleConfusing() && rule.feedback.length === 0" style="color: #888">
+          [<em>says nothing...</em>]
         </span>
         <span ng-if="rule.feedback.length > 0" style="word-wrap: break-word;">
           <span angular-html-bind="rule.feedback[0]"></span>
@@ -90,24 +93,14 @@
 
       <hr>
 
-      <div class="protractor-test-dest-bubble">
-        <span style="font-size: 1.1em; margin-right: 8px;">
-          Destination:
-        </span>
-        <span ng-if="!reloadingDestinations" style="width: 200px;">
-          <select2-dropdown width="150" item="rule.dest" choices="destChoices" placeholder="Type destination state name" new-choice-regex=".^" dropdown-css-class="oppia-rule-dest-select2" format-new-selection="convertNewDestToText" invalid-search-term-message="Invalid state name">
-          </select2-dropdown>
-        </span>
-
-        <span style="margin: 0 10px;">
-          or
-        </span>
-
-        <button type="button" class="btn btn-default protractor-test-add-state-button" ng-click="openAddStateModal(rule)">
-          <span class="glyphicon glyphicon-plus">
+      <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
+        <div class="form-group" style="font-size: 1.1em;">
+          <label for="ruleDestination">Destination:</label>
+          <span ng-if="!reloadingDestinations">
+            <select class="form-control" ng-model="rule.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="margin-left: 10px; width: 200px;">
+            </select>
           </span>
-          Create New
-        </button>
+        </div>
       </div>
     </div>
 

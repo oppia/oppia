@@ -349,7 +349,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 .oppia-navbar-breadcrumb-separator {
-  padding-right: 10px;
+  padding-right: 7px;
 }
 .oppia-navbar-breadcrumb-separator:after {
   content: ">";

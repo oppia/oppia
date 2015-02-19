@@ -247,6 +247,8 @@ var addRule = function(interactionName, ruleName) {
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
+  var _OPTION_CREATE_NEW = 'Create New...';
+
   if (ruleNum === 'default') {
     element(by.css('.protractor-test-default-rule-tab')).isPresent().then(function(isVisible) {
       // If there is only one rule, no tabs are shown, so we don't have to click
@@ -305,21 +307,34 @@ var RuleEditor = function(ruleNum) {
     setDestination: function(destinationName) {
       var destinationElement =
         bodyElem.element(by.css('.protractor-test-dest-bubble'));
-      forms.AutocompleteDropdownEditor(destinationElement).
-        setValue(destinationName);
+      destinationElement.element(
+        by.cssContainingText('option', destinationName)).click();
       bodyElem.element(by.css('.protractor-test-save-rule')).click();
     },
-    // Sets a destination for this rule, creating a state in the proces.
+    // Sets a destination for this rule, creating a state in the process.
     createNewStateAndSetDestination: function(destinationName) {
-      bodyElem.element(by.css('.protractor-test-add-state-button')).click();
+      var destinationElement =
+        bodyElem.element(by.css('.protractor-test-dest-bubble'));
+      destinationElement.element(
+        by.cssContainingText('option', _OPTION_CREATE_NEW)).click();
       element(by.css('.protractor-test-add-state-input')).sendKeys(destinationName);
       element(by.css('.protractor-test-add-state-submit')).click();
+      // Wait for the modal to close.
       general.waitForSystem();
+      bodyElem.element(by.css('.protractor-test-save-rule')).click();
     },
+    // The current state name must be at the front of the list.
     expectAvailableDestinationsToBe: function(stateNames) {
-      forms.AutocompleteDropdownEditor(
-        bodyElem.element(by.css('.protractor-test-dest-bubble'))
-      ).expectOptionsToBe(stateNames);
+      var expectedOptionTexts = [_OPTION_CREATE_NEW].concat(stateNames);
+      expectedOptionTexts[1] = expectedOptionTexts[1] + ' ⟳';
+
+      var destinationElement =
+        bodyElem.element(by.css('.protractor-test-dest-bubble'));
+      destinationElement.all(by.tagName('option')).map(function(optionElem) {
+        return optionElem.getText();
+      }).then(function(actualOptionTexts) {
+        expect(actualOptionTexts).toEqual(expectedOptionTexts);
+      });
     },
     delete: function() {
       bodyElem.element(by.css('.protractor-test-delete-rule')).click();
@@ -466,6 +481,7 @@ var discardChanges = function() {
   element(by.css('.protractor-test-save-discard-toggle')).click();
   element(by.css('.protractor-test-discard-changes')).click();
   browser.driver.switchTo().alert().accept();
+  general.waitForSystem();
 };
 
 // HISTORY

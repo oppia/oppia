@@ -1031,14 +1031,15 @@ class Exploration(object):
                             and not state.interaction.sticky):
                         if rule.is_default:
                             error_msg = (
-                                'Please add feedback for the default rule in '
-                                'state "%s", otherwise the reader is likely '
-                                'to get frustrated.' % state_name)
+                                'Please give Oppia something to say for the '
+                                'default rule in state "%s", otherwise the '
+                                'learner is likely to get frustrated.' %
+                                state_name)
                         else:
                             error_msg = (
                                 'Please add feedback for any rules in state '
                                 '"%s" which loop back to that state, '
-                                'otherwise the reader is likely to get '
+                                'otherwise the learner is likely to get '
                                 'frustrated.' % state_name)
                         raise utils.ValidationError(error_msg)
 

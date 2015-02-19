@@ -51,6 +51,15 @@ class ExplorationDomainUnitTests(test_utils.GenericTestBase):
 
         exploration.category = 'Category'
 
+        # Note: If '/' ever becomes a valid state name, ensure that the rule
+        # editor frontend tenplate is fixed -- it currently uses '/' as a
+        # sentinel for an invalid state name.
+        bad_state = exp_domain.State.create_default_state('/')
+        exploration.states = {'/': bad_state}
+        with self.assertRaisesRegexp(
+                utils.ValidationError, 'Invalid character / in a state name'):
+            exploration.validate()
+
         new_state = exp_domain.State.create_default_state('ABC')
 
         # The 'states' property must be a non-empty dict of states.
