@@ -1394,10 +1394,9 @@ oppia.directive('schemaBasedListEditor', [
             }
           } else {
             /** 
-             * If form submission happens on existing element move focus from existing element to addMore
-             * button.
+             * If form submission happens on existing element remove focus from it
              */
-            focusService.setFocus('addMoreElements');
+             document.activeElement.blur();
           }
           evt.stopPropagation();
         };

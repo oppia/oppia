@@ -64,7 +64,7 @@
             </div>
 
             <div ng-if="stateName">
-              <div ng-if="!contentToDisplayNext && interactionIsInline">
+              <div ng-if="!contentToDisplayNext && interactionIsInline && $last">
                 <div ng-hide="isAnswerBeingProcessed()">
                   <div class="conversation-skin-inline-interaction">
                     <table class="conversation-skin-card-row-container" style="margin-bottom: 0;">
