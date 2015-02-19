@@ -278,8 +278,8 @@ oppia.directive('stateGraphViz', [
       //              corresponding linkPropertyMatching is undefined,
       //              link style defaults to the gray arrow.
       //  - 'initStateId': The initial state id
-      //  - 'finalStateIds': The list of ids corresponding to states with an
-      //             EndConversation interaction or the 'END' state.
+      //  - 'finalStateIds': The list of ids corresponding to terminal states (i.e.,
+      //             those whose interactions are terminal, or 'END').
       graphData: '&',
       // Object whose keys are ids of nodes to display a warning tooltip over
       highlightStates: '=',

@@ -838,7 +838,7 @@ oppia.factory('computeGraphService', [function() {
     var links = [];
     var finalStateIds = [END_DEST];
     for (var stateName in states) {
-      if (states[stateName].interaction.id === 'EndConversation') {
+      if (GLOBALS.interactionConfigs[states[stateName].interaction.id].is_terminal) {
         finalStateIds.push(stateName);
       }
 
@@ -997,7 +997,7 @@ oppia.factory('explorationWarningsService', [
     var problematicStates = [];
     var _states = explorationStatesService.getStates();
     for (var stateName in _states) {
-      if (_states[stateName].interaction.id === 'EndConversation') {
+      if (GLOBALS.interactionConfigs[_states[stateName].interaction.id].is_terminal) {
         continue;
       }
 
