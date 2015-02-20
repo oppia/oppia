@@ -46,19 +46,27 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
         $scope.uploadedImage = '';
         $scope.croppedImageDataUrl = '';
+        $scope.invalidImageWarningIsShown = false;
 
-        var handleFileSelect = function(event) {
-          var file = event.currentTarget.files[0];
+        angular.element(document).on(
+            'change', '.oppia-profile-picture-input', function(evt) {
+          $scope.invalidImageWarningIsShown = false;
+
+          var file = evt.currentTarget.files[0];
           var reader = new FileReader();
-          reader.onload = function(event) {
+          reader.onload = function(e) {
             $scope.$apply(function() {
-              $scope.uploadedImage = event.target.result;
+              $scope.uploadedImage = e.target.result;
             });
           };
           reader.readAsDataURL(file);
+        });
+
+        $scope.onInvalidImageLoaded = function() {
+          $scope.uploadedImage = '';
+          $scope.croppedImageDataUrl = '';
+          $scope.invalidImageWarningIsShown = true;
         };
-        angular.element(document)
-          .on('change', '.profile-picture-input', handleFileSelect);
 
         $scope.confirm = function() {
           $modalInstance.close($scope.croppedImageDataUrl);

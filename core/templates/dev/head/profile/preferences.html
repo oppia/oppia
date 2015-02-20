@@ -111,15 +111,30 @@
       </div>
 
       <div class="modal-body">
-        <div>Select an image file: <input type="file" class="profile-picture-input" /></div>
+        <div>
+          Select an image file:
+          <input type="file" class="oppia-profile-picture-input">
+        </div>
+
+        <div class="oppia-form-error" ng-if="invalidImageWarningIsShown">
+          <br>
+          Error: Could not read image file.
+        </div>
+
         <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
-          <img-crop image="uploadedImage" result-image="croppedImageDataUrl" area-type="square" result-image-size="150"></img-crop>
+          <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
+                    area-type="square" result-image-size="150"
+                    on-load-error="onInvalidImageLoaded()"
+                    result-image-format="image/png">
+          </img-crop>
         </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-click="confirm()">Add Profile Picture</button>
+        <button class="btn btn-success" ng-click="confirm()" ng-disabled="!croppedImageDataUrl">
+          Add Profile Picture
+        </button>
       </div>
     </script>
   </div>
