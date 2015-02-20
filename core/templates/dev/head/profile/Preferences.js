@@ -18,8 +18,8 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
-    function($scope, $http, $rootScope, $modal) {
+oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$timeout',
+    function($scope, $http, $rootScope, $modal, $timeout) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -44,21 +44,38 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
       templateUrl: 'modals/editProfilePicture',
       backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.uploadedImage = '';
+        $scope.uploadedImage = null;
         $scope.croppedImageDataUrl = '';
+        $scope.invalidImageWarningIsShown = false;
 
-        var handleFileSelect = function(event) {
-          var file = event.currentTarget.files[0];
-          var reader = new FileReader();
-          reader.onload = function(event) {
-            $scope.$apply(function() {
-              $scope.uploadedImage = event.target.result;
-            });
-          };
-          reader.readAsDataURL(file);
+        $scope.onFileChanged = function(file) {
+          $('.oppia-profile-image-uploader').fadeOut(function() {
+            $scope.invalidImageWarningIsShown = false;
+
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              $scope.$apply(function() {
+                $scope.uploadedImage = e.target.result;
+              });
+            };
+            reader.readAsDataURL(file);
+
+            $timeout(function() {
+              $('.oppia-profile-image-uploader').fadeIn();
+            }, 100);
+          });
         };
-        angular.element(document)
-          .on('change', '.profile-picture-input', handleFileSelect);
+
+        $scope.reset = function() {
+          $scope.uploadedImage = null;
+          $scope.croppedImageDataUrl = '';
+        };
+
+        $scope.onInvalidImageLoaded = function() {
+          $scope.uploadedImage = null;
+          $scope.croppedImageDataUrl = '';
+          $scope.invalidImageWarningIsShown = true;
+        };
 
         $scope.confirm = function() {
           $modalInstance.close($scope.croppedImageDataUrl);

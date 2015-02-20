@@ -18,37 +18,23 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.constant('DEFAULT_DASHBOARD_TAB_NAME', 'timeline');
+
+
 oppia.controller('Dashboard', [
     '$scope', '$http', '$rootScope', 'warningsData', 'oppiaDatetimeFormatter',
-    'createExplorationButtonService',
+    'DEFAULT_DASHBOARD_TAB_NAME',
     function($scope, $http, $rootScope, warningsData, oppiaDatetimeFormatter,
-             createExplorationButtonService) {
+             DEFAULT_DASHBOARD_TAB_NAME) {
+  $scope.activeTab = DEFAULT_DASHBOARD_TAB_NAME;
+
+  $scope.$on('activeTabChanged', function(evt, tabName) {
+    $scope.activeTab = tabName;
+  });
+
   var EXPLORATION_STATUS_PRIVATE = 'private';
   var EXPLORATION_STATUS_PUBLIC = 'public';
   var EXPLORATION_STATUS_FEATURED = 'publicized';
-  // TODO(sll): Consider replacing this with an actual list of categories when
-  // we have found a way to do this that does not involve iterating through all
-  // explorations.
-  var CATEGORY_LIST = [
-    'Architecture',
-    'Art',
-    'Biology',
-    'Business',
-    'Chemistry',
-    'Computing',
-    'Earth Science',
-    'Education',
-    'Geography',
-    'Languages',
-    'Law',
-    'Life Skills',
-    'Mathematics',
-    'Music',
-    'Philosophy',
-    'Physics',
-    'Programming',
-    'Statistics'
-  ];
 
   $scope.navigateToItem = function(activityId, updateType) {
     window.location.href = (
@@ -65,10 +51,6 @@ oppia.controller('Dashboard', [
 
   $scope.getEditorPageUrl = function(activityId, locationHash) {
     return '/create/' + activityId + (locationHash ? '#' + locationHash : '');
-  };
-
-  $scope.showCreateExplorationModal = function() {
-    createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
   };
 
   // Retrieves dashboard data from the server.
@@ -98,4 +80,41 @@ oppia.controller('Dashboard', [
 
     $rootScope.loadingMessage = '';
   });
+}]);
+
+
+oppia.controller('DashboardNavbarBreadcrumb', [
+    '$scope', 'DEFAULT_DASHBOARD_TAB_NAME', function($scope, DEFAULT_DASHBOARD_TAB_NAME) {
+  $scope.activeTab = DEFAULT_DASHBOARD_TAB_NAME;
+
+  $scope.activeTabNames = {
+    'timeline': 'Timeline',
+    'myExplorations': 'My Explorations'
+  };
+
+  $scope.$on('activeTabChanged', function(evt, tabName) {
+    $scope.activeTab = tabName;
+  });
+}]);
+
+
+oppia.controller('DashboardLocalNav', [
+    '$scope', '$rootScope', 'DEFAULT_DASHBOARD_TAB_NAME',
+    function($scope, $rootScope, DEFAULT_DASHBOARD_TAB_NAME) {
+
+  $scope.activeTab = DEFAULT_DASHBOARD_TAB_NAME;
+
+  $scope.setActiveTab = function(tabName) {
+    $scope.activeTab = tabName;
+    $rootScope.$broadcast('activeTabChanged', tabName);
+  };
+}]);
+
+
+oppia.controller('CreateExplorationButton', [
+    '$scope', 'CATEGORY_LIST', 'createExplorationButtonService',
+    function($scope, CATEGORY_LIST, createExplorationButtonService) {
+  $scope.showCreateExplorationModal = function() {
+    createExplorationButtonService.showCreateExplorationModal(CATEGORY_LIST);
+  };
 }]);

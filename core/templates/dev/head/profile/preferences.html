@@ -33,7 +33,7 @@
           <div class="col-lg-10 col-md-10 col-sm-10">
             {{user_email}}
             <span class="help-block" style="font-size: smaller">
-              <em>Only moderators and site admins can see this.</em>
+              Only moderators and site admins can see this.
             </span>
           </div>
         </div>
@@ -107,19 +107,41 @@
     </div>
     <script type="text/ng-template" id="modals/editProfilePicture">
       <div class="modal-header">
-        <h3>Edit Profile Picture</h3>
+        <h3>Upload Profile Picture</h3>
       </div>
 
-      <div class="modal-body">
-        <div>Select an image file: <input type="file" class="profile-picture-input" /></div>
-        <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
-          <img-crop image="uploadedImage" result-image="croppedImageDataUrl" area-type="square" result-image-size="150"></img-crop>
+      <div class="modal-body" style="min-height: 300px;">
+        <div class="oppia-profile-image-uploader">
+          <div ng-hide="uploadedImage">
+            <image-uploader on-file-changed="onFileChanged">
+            </image-uploader>
+          </div>
+
+          <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">
+            Error: Could not read image file.
+          </div>
+
+          <div ng-show="uploadedImage">
+            Drag to crop and resize:
+            <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
+              <button class="btn btn-default oppia-profile-picture-reset-button" ng-click="reset()">
+                <span class="glyphicon glyphicon-remove"></span>
+              </button>
+              <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
+                        area-type="square" result-image-size="150"
+                        on-load-error="onInvalidImageLoaded()"
+                        result-image-format="image/png">
+              </img-crop>
+            </div>
+          </div>
         </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-click="confirm()">Add Profile Picture</button>
+        <button class="btn btn-success" ng-click="confirm()" ng-disabled="!croppedImageDataUrl">
+          Add Profile Picture
+        </button>
       </div>
     </script>
   </div>
