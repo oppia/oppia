@@ -1454,3 +1454,41 @@ div#ng-curtain {
   overflow: hidden;
   width: 500px;
 }
+
+
+.oppia-about-cards-container {
+  margin: auto;
+  max-width: 560px;
+  position: relative;
+}
+.oppia-about-card {
+  background: rgb(255,255,255);
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 30px;
+  max-width: 800px;
+  padding: 20px 40px;
+}
+.oppia-about-card li {
+  margin-bottom: 10px;
+}
+.oppia-about-anchor {
+  display: block;
+  position: relative;
+  top: -70px;
+  visibility: hidden;
+}
+
+.oppia-about-right-menu {
+  max-width: 300px;
+  position: fixed;
+  top: 60px;
+}
+.oppia-about-right-menu p {
+  line-height: 1;
+  margin: 0.5em 0;
+}
+.oppia-about-right-menu ul {
+  list-style-type: none;
+  padding-left: 20px;
+}
