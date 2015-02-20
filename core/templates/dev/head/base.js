@@ -18,6 +18,38 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.constant('CATEGORY_LIST', [
+  'Architecture',
+  'Art',
+  'Biology',
+  'Business',
+  'Chemistry',
+  'Computing',
+  'Economics',
+  'Education',
+  'Engineering',
+  'Environment',
+  'Geography',
+  'Government',
+  'Hobbies',
+  'Languages',
+  'Law',
+  'Life Skills',
+  'Mathematics',
+  'Medicine',
+  'Music',
+  'Philosophy',
+  'Physics',
+  'Programming',
+  'Psychology',
+  'Puzzles',
+  'Reading',
+  'Religion',
+  'Sport',
+  'Statistics',
+  'Welcome'
+]);
+
 
 // Global utility methods.
 oppia.controller('Base', [

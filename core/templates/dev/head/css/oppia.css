@@ -501,12 +501,12 @@ div.wysiwyg iframe.wysiwyg-content-large {
   -webkit-animation-delay: 0.6s;
 }
 
-.oppia-gallery-navbar-button-container {
+.oppia-navbar-button-container {
   border-radius: 0;
   margin-top: 10px;
 }
 
-.btn.oppia-gallery-add-exploration-button {
+.btn.oppia-navbar-add-exploration-button {
   background-color: rgba(5, 190, 178, 0.9);
   color: rgba(255,255,255,0.8);
   font-size: 15px;
@@ -515,7 +515,7 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin-right: 20px;
 }
 
-@media (max-width: 973px) {
+@media (max-width: 1050px) {
   .oppia-gallery-language-selector {
     display: none;
   }
@@ -536,17 +536,17 @@ div.wysiwyg iframe.wysiwyg-content-large {
 }
 
 @media (max-width: 768px) {
-  .oppia-gallery-add-exploration-button {
+  .oppia-navbar-add-exploration-button {
     display: none;
   }
 }
 
-.btn.oppia-gallery-add-exploration-button:hover {
+.btn.oppia-navbar-add-exploration-button:hover {
   background-color: rgba(5, 190, 178, 1);
   color: rgba(255,255,255,1);
 }
 
-.oppia-gallery-add-exploration-button-plus {
+.oppia-navbar-add-exploration-button-plus {
   font-size: 1.2em;
   font-weight: bold;
   margin-right: 5px;
