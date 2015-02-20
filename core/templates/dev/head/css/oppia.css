@@ -1458,7 +1458,7 @@ div#ng-curtain {
 
 .oppia-about-cards-container {
   margin: auto;
-  max-width: 560px;
+  max-width: 660px;
   position: relative;
 }
 .oppia-about-card {
@@ -1466,7 +1466,6 @@ div#ng-curtain {
   margin-left: auto;
   margin-right: auto;
   margin-top: 30px;
-  max-width: 800px;
   padding: 20px 40px;
 }
 .oppia-about-card li {
@@ -1480,10 +1479,18 @@ div#ng-curtain {
 }
 
 .oppia-about-right-menu {
-  max-width: 300px;
+  width: 300px;
   position: fixed;
-  top: 60px;
+  top: 80px;
+  left: 50%;
+  margin-left: 360px;
 }
+
+.oppia-about-right-menu-subnav {
+  font-size: 12px;
+  margin-left: 0.7em;
+}
+
 .oppia-about-right-menu p {
   line-height: 1;
   margin: 0.5em 0;
