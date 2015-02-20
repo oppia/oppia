@@ -18,8 +18,8 @@
  * @author sfederwisch@google.com (Stephanie Federwisch)
  */
 
-oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
-    function($scope, $http, $rootScope, $modal) {
+oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$timeout',
+    function($scope, $http, $rootScope, $modal, $timeout) {
   var _PREFERENCES_DATA_URL = '/preferenceshandler/data';
   $rootScope.loadingMessage = 'Loading';
   $scope.profilePictureDataUrl = '';
@@ -44,26 +44,35 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal',
       templateUrl: 'modals/editProfilePicture',
       backdrop: true,
       controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.uploadedImage = '';
+        $scope.uploadedImage = null;
         $scope.croppedImageDataUrl = '';
         $scope.invalidImageWarningIsShown = false;
 
-        angular.element(document).on(
-            'change', '.oppia-profile-picture-input', function(evt) {
-          $scope.invalidImageWarningIsShown = false;
+        $scope.onFileChanged = function(file) {
+          $('.oppia-profile-image-uploader').fadeOut(function() {
+            $scope.invalidImageWarningIsShown = false;
 
-          var file = evt.currentTarget.files[0];
-          var reader = new FileReader();
-          reader.onload = function(e) {
-            $scope.$apply(function() {
-              $scope.uploadedImage = e.target.result;
-            });
-          };
-          reader.readAsDataURL(file);
-        });
+            var reader = new FileReader();
+            reader.onload = function(e) {
+              $scope.$apply(function() {
+                $scope.uploadedImage = e.target.result;
+              });
+            };
+            reader.readAsDataURL(file);
+
+            $timeout(function() {
+              $('.oppia-profile-image-uploader').fadeIn();
+            }, 100);
+          });
+        };
+
+        $scope.reset = function() {
+          $scope.uploadedImage = null;
+          $scope.croppedImageDataUrl = '';
+        };
 
         $scope.onInvalidImageLoaded = function() {
-          $scope.uploadedImage = '';
+          $scope.uploadedImage = null;
           $scope.croppedImageDataUrl = '';
           $scope.invalidImageWarningIsShown = true;
         };
