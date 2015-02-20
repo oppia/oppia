@@ -116,7 +116,7 @@ oppia.factory('rulesService', [
       _interactionHandlersMemento = angular.copy(_interactionHandlers);
       _activeRuleIndex = 0;
     },
-    onInteractionIdChanged: function(newInteractionId) {
+    onInteractionIdChanged: function(newInteractionId, callback) {
       interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
         _refreshHandlerSpecs();
 
@@ -131,18 +131,20 @@ oppia.factory('rulesService', [
               _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
             ]
           };
-        }
-
-        if (interactionRepository[newInteractionId].is_terminal) {
-          _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
+          if (interactionRepository[newInteractionId].is_terminal) {
+            _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
+          }
         }
 
         _saveInteractionHandlers(_interactionHandlers);
-        interactionHandlersCache.set(
-          stateInteractionIdService.savedMemento, _interactionHandlers);
+        interactionHandlersCache.set(newInteractionId, _interactionHandlers);
 
         _interactionHandlersMemento = angular.copy(_interactionHandlers);
         _activeRuleIndex = 0;
+
+        if (callback) {
+          callback();
+        }
       });
     },
     getActiveRuleIndex: function() {
@@ -230,10 +232,11 @@ oppia.controller('StateRules', [
   });
 
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-    rulesService.onInteractionIdChanged(newInteractionId);
-    $scope.interactionHandlers = rulesService.getInteractionHandlers();
-    $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
-    $rootScope.$broadcast('activeRuleChanged');
+    rulesService.onInteractionIdChanged(newInteractionId, function() {
+      $scope.interactionHandlers = rulesService.getInteractionHandlers();
+      $scope.activeRuleIndex = rulesService.getActiveRuleIndex();
+      $rootScope.$broadcast('activeRuleChanged');
+    });
   });
 
   $scope.$on('ruleDeleted', function(evt) {

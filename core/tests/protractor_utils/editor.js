@@ -114,38 +114,55 @@ var expectContentTextToEqual = function(text) {
 // Additional arguments may be sent to this function, and they will be
 // passed on to the relevant interaction editor.
 var setInteraction = function(interactionName) {
-  // Searches through the dropdown menu for the correct interaction
-  var dropdown = element(by.css('.protractor-test-select-interaction-id'));
-  dropdown.click();
-  for (var i = 0; true; i++) {
-    var category = element(by.css('.protractor-test-interaction-category-' + i));
-    if (category.isPresent()) {
-      browser.actions().mouseMove(category).perform();
-      var interaction = element(by.css('.protractor-test-interaction-id-' + interactionName));
-      if (interaction.isDisplayed()) {
-        interaction.click();
-        break;
-      }
+  var elem = element(by.css('.protractor-test-interaction-editor'));
+  var customizationArgs = [elem];
+  for (var i = 1; i < arguments.length; i++) {
+    customizationArgs.push(arguments[i]);
+  }
+
+  element(by.css('.protractor-test-select-interaction-id')).click();
+
+  // Try to find the interaction in the top-level dropdown menu.
+  element.all(by.css(
+      '.protractor-test-top-level-interaction-id-' + interactionName)).count().then(function(count) {
+    if (count === 1) {
+      element(by.css('.protractor-test-top-level-interaction-id-' + interactionName)).click();
+    } else if (count === 0) {
+      var interactionFound = false;
+
+      // Search through the sub-dropdown menus for the correct interaction.
+      element.all(by.css('.protractor-test-interaction-category')).map(function(categoryElem) {
+        if (!interactionFound) {
+          browser.actions().mouseMove(categoryElem).perform();
+          var interactionElem = element(by.css('.protractor-test-interaction-id-' + interactionName));
+          interactionElem.isDisplayed().then(function(isInteractionVisible) {
+            if (isInteractionVisible) {
+              interactionElem.click();
+              interactionFound = true;
+            }
+          });
+        }
+      });
     } else {
-      break;
+      throw (
+        'Found more than one instance of ' +
+        interactionName + 'in the interaction dropdown menu');
     }
-  }
 
-  if (arguments.length > 1) {
-    element(by.css('.protractor-test-edit-interaction')).click();
+    // Click a neutral element on the page to reset the dropdown menu.
+    element(by.css('.protractor-test-state-editor-oppia-avatar')).click();
 
-    var elem = element(by.css('.protractor-test-interaction-editor'));
-    var args = [elem];
-    for (var i = 1; i < arguments.length; i++) {
-      args.push(arguments[i]);
+    if (customizationArgs.length > 1) {
+      element(by.css('.protractor-test-edit-interaction')).click();
+
+      interactions.getInteraction(interactionName).customizeInteraction.apply(
+        null, customizationArgs);
+
+      element(by.css('.protractor-test-save-interaction')).click();
+      // Wait for the customization modal to close.
+      general.waitForSystem();
     }
-    interactions.getInteraction(interactionName).customizeInteraction.apply(
-      null, args);
-
-    element(by.css('.protractor-test-save-interaction')).click();
-    // Wait for the customization modal to close.
-    general.waitForSystem();
-  }
+  });
 };
 
 // Likewise this can receive additional arguments.
@@ -235,6 +252,8 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
 // parameters may be specified after the ruleName.
 var addRule = function(interactionName, ruleName) {
   element(by.css('.protractor-test-open-add-rule-modal')).click();
+  general.waitForSystem();
+
   var ruleElement = element(by.css('.protractor-test-temporary-rule'));
   var args = [ruleElement];
   for (var i = 0; i < arguments.length; i++) {

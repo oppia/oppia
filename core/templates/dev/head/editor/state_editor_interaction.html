@@ -18,14 +18,14 @@
             <li ng-repeat="interactionId in topLevelInteractionIds track by $index">
               <a href="#"
                  ng-click="onChangeInteractionType(interactionId)"
-                 class="protractor-test-interaction-id-<[interactionId]>">
+                 class="protractor-test-top-level-interaction-id-<[interactionId]>">
                 <[interactionRepository[interactionId].name]>
               </a>
             </li>
             <li ng-repeat="(category, interactions) in interactionsByCategory"
                 class="oppia-dropdown-submenu">
               <a href="#"
-                 class="protractor-test-interaction-category-<[$index]>">
+                 class="protractor-test-interaction-category">
                 <[category]>
               </a>
               <ul class="dropdown-menu">
