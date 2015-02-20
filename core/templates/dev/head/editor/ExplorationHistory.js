@@ -203,7 +203,7 @@ oppia.controller('ExplorationHistory', [
           'nodes': diffGraphNodes,
           'links': response.links,
           'initStateId': response.v2InitStateId,
-          'finalStateIds': response.endStateId
+          'finalStateIds': [response.endStateId]
         };
 
         // Generate the legend graph

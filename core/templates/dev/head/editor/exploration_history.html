@@ -40,25 +40,21 @@
     </div>
   </md-card>
 
-  <md-card class="oppia-editor-card" ng-hide="hideHistoryGraph || !explorationVersionMetadata">
+  <md-card class="oppia-editor-card" ng-hide="hideHistoryGraph || !explorationVersionMetadata" style="position: relative;">
     <h3>Changes from version <[compareVersionMetadata.earlierVersion.versionNumber]> to version <[compareVersionMetadata.laterVersion.versionNumber]></h3>
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-8 col-md-8 col-sm-8">
-          <div ng-hide="diffGraphData" class="oppia-align-center">
-            Loading
-            <span class="oppia-loading-dot-one">.</span>
-            <span class="oppia-loading-dot-two">.</span>
-            <span class="oppia-loading-dot-three">.</span>
-          </div>
-          <div state-graph-viz class='protractor-test-history-graph' graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
-          </div>
-        </div>
-        <div class="col-lg-4 col-md-4 col-sm-4">
-          <h4>Exploration Graph Legend</h4>
-          <div state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
-        </div>
-      </div>
+
+    <div ng-hide="diffGraphData" class="oppia-align-center">
+      Loading
+      <span class="oppia-loading-dot-one">.</span>
+      <span class="oppia-loading-dot-two">.</span>
+      <span class="oppia-loading-dot-three">.</span>
+    </div>
+    <div state-graph-viz class='protractor-test-history-graph' graph-data="diffGraphData" node-colors="diffGraphNodeColors" node-secondary-labels="diffGraphSecondaryLabels" init-state-id2="v1InitStateId" link-property-mapping="DIFF_GRAPH_LINK_PROPERTY_MAPPING" on-click-function="onClickStateInHistoryGraph">
+    </div>
+
+    <div style="position: absolute; right: -100px; top: 10px;" ng-show="diffGraphData">
+      <h4>Exploration Graph Legend</h4>
+      <div state-graph-viz graph-data="legendGraph" node-colors="LEGEND_GRAPH_COLORS" node-secondary-labels="LEGEND_GRAPH_SECONDARY_LABELS" link-property-mapping="LEGEND_GRAPH_LINK_PROPERTY_MAPPING"></div>
     </div>
   </md-card>
 </div>

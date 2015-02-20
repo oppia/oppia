@@ -58,7 +58,7 @@ oppia.directive('barChart', [function() {
 }]);
 
 // The maximum number of nodes to show in a row of the state graph.
-oppia.constant('MAX_NODES_PER_ROW', 5);
+oppia.constant('MAX_NODES_PER_ROW', 4);
 // The following variable must be at least 3. It represents the maximum length,
 // in characters, for the name of each node label in the state graph.
 oppia.constant('MAX_NODE_LABEL_LENGTH', 15);
@@ -237,7 +237,7 @@ oppia.factory('stateGraphArranger', [
         nodeData[nodeId].label = nodes[nodeId];
       }
 
-      // Mark nodes that are reachable from the END state via backward links.
+      // Mark nodes that are reachable from any end state via backward links.
       queue = finalStateIds;
       for (var i = 0; i < finalStateIds.length; i++) {
         nodeData[finalStateIds[i]].reachableFromEnd = true;
@@ -392,7 +392,7 @@ oppia.directive('stateGraphViz', [
       $scope.drawGraph = function(nodes, links, initStateId, finalStateIds) {
         $scope.finalStateIds = finalStateIds;
         var nodeData = stateGraphArranger.computeLayout(
-          nodes, links, initStateId, finalStateIds);
+          nodes, links, initStateId, angular.copy(finalStateIds));
 
         var maxDepth = 0;
         for (var nodeId in nodeData) {
@@ -568,19 +568,21 @@ oppia.directive('stateGraphViz', [
             }
           }
 
+          var currentNodeIsTerminal = (
+            $scope.finalStateIds.indexOf(nodeId) !== -1);
+
           nodeData[nodeId].isInitNode = (nodeId == initStateId);
-          nodeData[nodeId].isEndNode = (nodeId == 'END');
+          nodeData[nodeId].isEndNode = currentNodeIsTerminal;
           nodeData[nodeId].isBadNode = (
-            nodeId != initStateId && nodeId != 'END' &&
+            nodeId != initStateId && !currentNodeIsTerminal &&
             !(nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd));
           nodeData[nodeId].isNormalNode = (
-            nodeId != initStateId && nodeId != 'END' &&
+            nodeId != initStateId && !currentNodeIsTerminal &&
             nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd);
 
           nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId != 'END');
           $scope.nodeList.push(nodeData[nodeId]);
         }
-
 
         // The translation applied when the graph is first loaded.
         var originalTranslationAmounts = [0, 0];

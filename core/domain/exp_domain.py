@@ -1094,7 +1094,6 @@ class Exploration(object):
 
         for (state_name, state) in self.states.iteritems():
             if _is_interaction_terminal(state.interaction.id):
-                processed_queue.append(state_name)
                 curr_queue.append(state_name)
 
         while curr_queue:

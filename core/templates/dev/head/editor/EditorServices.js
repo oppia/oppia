@@ -1028,6 +1028,13 @@ oppia.factory('explorationWarningsService', [
     if (_graphData) {
       var unreachableStateNames = _getUnreachableNodeNames(
         [_graphData.initStateId], _graphData.nodes, _graphData.links);
+
+      // We do not care if the END state is unreachable.
+      var endIndex = unreachableStateNames.indexOf('END');
+      if (endIndex !== -1) {
+        unreachableStateNames.splice(endIndex, 1);
+      }
+
       if (unreachableStateNames.length) {
         _warningsList.push(
           'The following state(s) are unreachable: ' +
@@ -1039,7 +1046,8 @@ oppia.factory('explorationWarningsService', [
           _getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
           _warningsList.push(
-            'The END state is unreachable from: ' + deadEndStates.join(', ') + '.');
+            'It is impossible to complete the exploration starting from: ' +
+            deadEndStates.join(', ') + '.');
         }
       }
     }
