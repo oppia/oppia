@@ -103,10 +103,10 @@ oppia.factory('searchService', [
 }]);
 
 oppia.controller('Gallery', [
-    '$scope', '$http', '$rootScope', '$window', 'createExplorationButtonService',
+    '$scope', '$http', '$rootScope', '$window', '$timeout', 'createExplorationButtonService',
     'oppiaDatetimeFormatter', 'oppiaDebouncer', 'urlService', 'GALLERY_DATA_URL',
     'CATEGORY_LIST', 'searchService',
-    function($scope, $http, $rootScope, $window, createExplorationButtonService,
+    function($scope, $http, $rootScope, $window, $timeout, createExplorationButtonService,
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              CATEGORY_LIST, searchService) {
   $scope.CAROUSEL_INTERVAL = 2500;
@@ -199,7 +199,14 @@ oppia.controller('Gallery', [
 
   $scope.inSplashMode = true;
   $scope.$on('hasChangedSearchQuery', function() {
-    $scope.inSplashMode = false;
+    if ($scope.inSplashMode) {
+      $('.oppia-gallery-container').fadeOut(function() {
+        $scope.inSplashMode = false;
+        $timeout(function() {
+          $('.oppia-gallery-container').fadeIn();
+        }, 50);
+      });
+    }
   });
 
   // SEARCH FUNCTIONALITY

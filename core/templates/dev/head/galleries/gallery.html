@@ -120,7 +120,7 @@
 {% endblock header_js %}
 
 {% block content %}
-  <div ng-controller="Gallery">
+  <div ng-controller="Gallery" class="oppia-gallery-container">
     <div ng-if="inSplashMode">
       <div class="oppia-gallery-banner-content">
         Hi, I&rsquo;m Oppia
@@ -150,7 +150,7 @@
       <div class="oppia-gallery-tiles-container">
         <div ng-if="allExplorationsInOrder.length === 0">
           <em>
-            We don't have any explorations on this topic yet.
+            We don't have any explorations matching this query yet.
           </em>
           <!-- NOTE: If you change the links here, please make the corresponding change for the 'Create New Exploration' button. -->
           {% if not user_email %}
