@@ -96,7 +96,7 @@ oppia.directive('conversationSkin', [function() {
           if (lastEntryEls.length > 0) {
             // TODO(sll): Try and drop this in favor of an Angular-based solution.
             $('html, body, iframe').animate(
-              {'scrollTop': $(document).height() - $(window).height() - 80}, 1000, 'easeOutQuad',
+              {'scrollTop': $(document).height() - $(window).height() - 60}, 1000, 'easeOutQuad',
               postScrollCallback);
           }
         });
