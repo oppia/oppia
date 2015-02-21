@@ -18,6 +18,9 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
+oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
+
 // A simple service that provides stopwatch instances. Each stopwatch can be
 // independently reset and queried for the current time.
 oppia.factory('stopwatchProviderService', ['$log', function($log) {
@@ -119,10 +122,12 @@ oppia.factory('oppiaPlayerService', [
     '$http', '$rootScope', '$modal', '$filter', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
+    'INTERACTION_SPECS',
     function(
       $http, $rootScope, $modal, $filter, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
-      oppiaHtmlEscaper, answerClassificationService, stateTransitionService) {
+      oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
+      INTERACTION_SPECS) {
   var _END_DEST = 'END';
   var _INTERACTION_DISPLAY_MODE_INLINE = 'inline';
 
@@ -365,12 +370,12 @@ oppia.factory('oppiaPlayerService', [
         labelForFocusTarget);
     },
     isInteractionInline: function(stateName) {
-      return GLOBALS.interactionConfigs[
+      return INTERACTION_SPECS[
         _exploration.states[stateName].interaction.id
       ].display_mode === _INTERACTION_DISPLAY_MODE_INLINE;
     },
     isStateTerminal: function(stateName) {
-      return !stateName || GLOBALS.interactionConfigs[
+      return !stateName || INTERACTION_SPECS[
         _exploration.states[stateName].interaction.id].is_terminal;
     },
     getRandomSuffix: function() {

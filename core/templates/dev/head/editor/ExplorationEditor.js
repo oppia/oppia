@@ -22,13 +22,16 @@
 // TODO(sll): Move all hardcoded strings to the top of the file.
 var END_DEST = 'END';
 
+// The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
+oppia.constant('INTERACTION_SPECS', window.GLOBALS ? GLOBALS.INTERACTION_SPECS : {});
+
 oppia.controller('ExplorationEditor', [
   '$scope', '$http', '$window', '$rootScope', '$log', '$timeout',
   'explorationData', 'editorContextService', 'explorationTitleService',
   'explorationCategoryService', 'explorationObjectiveService',
   'explorationLanguageCodeService', 'explorationRightsService',
   'explorationInitStateNameService', 'editabilityService',
-  'interactionRepositoryService', 'explorationStatesService', 'routerService',
+  'explorationStatesService', 'routerService',
   'graphDataService', 'stateEditorTutorialFirstTimeService',
   'explorationParamSpecsService', 'explorationWarningsService',
   '$templateCache',
@@ -38,7 +41,7 @@ oppia.controller('ExplorationEditor', [
     explorationCategoryService, explorationObjectiveService,
     explorationLanguageCodeService, explorationRightsService,
     explorationInitStateNameService, editabilityService,
-    interactionRepositoryService, explorationStatesService, routerService,
+    explorationStatesService, routerService,
     graphDataService,  stateEditorTutorialFirstTimeService,
     explorationParamSpecsService, explorationWarningsService, $templateCache) {
 
@@ -86,7 +89,6 @@ oppia.controller('ExplorationEditor', [
   // page load.
   $scope.initExplorationPage = function(successCallback) {
     explorationData.getData().then(function(data) {
-      interactionRepositoryService.setInteractionRepository(data.ALL_INTERACTIONS);
       explorationStatesService.setStates(data.states);
 
       explorationTitleService.init(data.title);

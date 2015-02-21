@@ -105,20 +105,6 @@ class StaticFileHandler(base.BaseHandler):
             self.response.set_status(404)
 
 
-class InteractionRepositoryHandler(base.BaseHandler):
-    """Populates the interaction repository."""
-
-    def get(self):
-        """Handles GET requests."""
-        self.render_json({
-            'repository': {
-                interaction.id: interaction.to_dict()
-                for interaction in
-                interaction_registry.Registry.get_all_interactions()
-            }
-        })
-
-
 class RteComponentRepositoryHandler(base.BaseHandler):
     """Populates the RTE component repository."""
 

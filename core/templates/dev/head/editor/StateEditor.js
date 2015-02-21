@@ -20,10 +20,10 @@
 
 oppia.controller('StateEditor', [
   '$scope', '$rootScope', 'editorContextService', 'changeListService',
-  'editabilityService', 'explorationStatesService',
+  'editabilityService', 'explorationStatesService', 'INTERACTION_SPECS',
   function(
     $scope, $rootScope, editorContextService, changeListService,
-    editabilityService, explorationStatesService) {
+    editabilityService, explorationStatesService, INTERACTION_SPECS) {
 
   $scope.STATE_CONTENT_SCHEMA = {
     type: 'html',
@@ -39,7 +39,7 @@ oppia.controller('StateEditor', [
   });
 
   $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
-    $scope.isCurrentStateTerminal = GLOBALS.interactionConfigs[
+    $scope.isCurrentStateTerminal = INTERACTION_SPECS[
       newInteractionId].is_terminal;
   });
 
@@ -55,7 +55,7 @@ oppia.controller('StateEditor', [
 
     if ($scope.stateName && stateData) {
       $rootScope.$broadcast('stateEditorInitialized', stateData);
-      $scope.isCurrentStateTerminal = GLOBALS.interactionConfigs[
+      $scope.isCurrentStateTerminal = INTERACTION_SPECS[
         stateData.interaction.id].is_terminal;
     }
   };

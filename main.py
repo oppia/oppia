@@ -168,10 +168,6 @@ urls = [
         r'/value_generator_handler/<generator_id>',
         resources.ValueGeneratorHandler, 'value_generator_handler'),
     get_redirect_route(
-        r'/interaction_repository/data',
-        resources.InteractionRepositoryHandler,
-        'interaction_repository_handler'),
-    get_redirect_route(
         r'/rich_text_component_repository/data',
         resources.RteComponentRepositoryHandler,
         'rte_component_repository_handler'),

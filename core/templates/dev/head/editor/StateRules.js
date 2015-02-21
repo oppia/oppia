@@ -45,29 +45,27 @@ oppia.factory('interactionHandlersCache', [function() {
 
 
 oppia.factory('rulesService', [
-    'stateInteractionIdService', 'interactionRepositoryService', 'interactionHandlersCache',
+    'stateInteractionIdService', 'INTERACTION_SPECS', 'interactionHandlersCache',
     'editorContextService', 'changeListService', 'explorationStatesService', 'graphDataService',
     'warningsData',
     function(
-      stateInteractionIdService, interactionRepositoryService, interactionHandlersCache,
+      stateInteractionIdService, INTERACTION_SPECS, interactionHandlersCache,
       editorContextService, changeListService, explorationStatesService, graphDataService,
       warningsData) {
 
   var _interactionHandlersMemento = null;
   var _activeRuleIndex = null;
   var _interactionHandlers = null;
-  var _interactionHandlerSpecs = null;
   var _answerChoices = null;
+  var _interactionHandlerSpecs = null;
 
   var _refreshHandlerSpecs = function() {
     if (!stateInteractionIdService.savedMemento) {
       $log.error('ERROR: Interaction id not specified.');
     }
 
-    interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
-      _interactionHandlerSpecs = angular.copy(
-        interactionRepository[stateInteractionIdService.savedMemento].handler_specs);
-    });
+    _interactionHandlerSpecs = INTERACTION_SPECS[
+      stateInteractionIdService.savedMemento].handler_specs;
   };
 
   var _saveInteractionHandlers = function(newHandlers) {
@@ -117,35 +115,33 @@ oppia.factory('rulesService', [
       _activeRuleIndex = 0;
     },
     onInteractionIdChanged: function(newInteractionId, callback) {
-      interactionRepositoryService.getInteractionRepository().then(function(interactionRepository) {
-        _refreshHandlerSpecs();
+      _refreshHandlerSpecs();
 
-        if (interactionHandlersCache.contains(newInteractionId)) {
-          _interactionHandlers = interactionHandlersCache.get(newInteractionId);
-        } else {
-          // Preserve just the default rule, unless the new interaction id is a
-          // terminal one (in which case, change its destination to be a
-          // self-loop instead).
-          _interactionHandlers = {
-            'submit': [
-              _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
-            ]
-          };
-          if (interactionRepository[newInteractionId].is_terminal) {
-            _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
-          }
+      if (interactionHandlersCache.contains(newInteractionId)) {
+        _interactionHandlers = interactionHandlersCache.get(newInteractionId);
+      } else {
+        // Preserve just the default rule, unless the new interaction id is a
+        // terminal one (in which case, change its destination to be a
+        // self-loop instead).
+        _interactionHandlers = {
+          'submit': [
+            _interactionHandlers['submit'][_interactionHandlers['submit'].length - 1]
+          ]
+        };
+        if (INTERACTION_SPECS[newInteractionId].is_terminal) {
+          _interactionHandlers['submit'][0].dest = editorContextService.getActiveStateName();
         }
+      }
 
-        _saveInteractionHandlers(_interactionHandlers);
-        interactionHandlersCache.set(newInteractionId, _interactionHandlers);
+      _saveInteractionHandlers(_interactionHandlers);
+      interactionHandlersCache.set(newInteractionId, _interactionHandlers);
 
-        _interactionHandlersMemento = angular.copy(_interactionHandlers);
-        _activeRuleIndex = 0;
+      _interactionHandlersMemento = angular.copy(_interactionHandlers);
+      _activeRuleIndex = 0;
 
-        if (callback) {
-          callback();
-        }
-      });
+      if (callback) {
+        callback();
+      }
     },
     getActiveRuleIndex: function() {
       return _activeRuleIndex;
