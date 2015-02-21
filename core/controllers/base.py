@@ -174,6 +174,7 @@ class BaseHandler(webapp2.RequestHandler):
         self.username = None
         self.user_has_started_state_editor_tutorial = False
         self.partially_logged_in = False
+        self.values['profile_picture_data_url'] = None
 
         if self.user_id:
             email = current_user_services.get_user_email(self.user)
@@ -189,6 +190,8 @@ class BaseHandler(webapp2.RequestHandler):
                 self.last_agreed_to_terms = user_settings.last_agreed_to_terms
                 self.values['user_email'] = user_settings.email
                 self.values['username'] = self.username
+                self.values['profile_picture_data_url'] = (
+                    user_settings.profile_picture_data_url)
                 if user_settings.last_started_state_editor_tutorial:
                     self.user_has_started_state_editor_tutorial = True
 

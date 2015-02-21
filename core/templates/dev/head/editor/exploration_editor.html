@@ -15,7 +15,8 @@
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
-    GLOBALS.interactionDisplayModes = JSON.parse('{{interaction_display_modes|js_string}}');
+    // This is needed for the preview mode.
+    GLOBALS.interactionConfigs = JSON.parse('{{interaction_configs|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -29,7 +30,7 @@
 
   <style>
     html, body {
-      background-color: #eeedee;
+      background-color: #eee;
     }
   </style>
 
@@ -176,7 +177,7 @@
           Congratulations, you are about to publish an exploration!
         </p>
         <p>
-          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/site_guidelines#/publication-criteria" target="_blank">why?</a>):
+          <strong>Important:</strong> Site moderators are likely to remove published explorations that do not meet the following basic criteria (<a href="/about#publication-criteria" target="_blank">why?</a>):
           <ul>
             <li>It should help its intended audience learn something new.</li>
             <li>It should convey more than a single isolated factoid.</li>
@@ -185,15 +186,10 @@
           </ul>
         </p>
         <p>
-          You can read more about these criteria on the <a href="/site_guidelines#/publication-criteria" target="_blank">exploration publishing criteria</a> page.
-        </p>
-
-        <p>
-          If your exploration meets all these criteria, please feel free to publish
-          it so that others can playtest and improve it! Good explorations can subsequently be
-          moved to the gallery. (You can find more information
-          <a href="/site_guidelines#/how-to-use" target="_blank">here</a>
-          about how this works.)
+          You can read more about these criteria on the
+          <a href="/about#publication-criteria" target="_blank">About page</a>.
+          If your exploration meets them all, please feel free to publish it so that others
+          can learn from and improve it!
         </p>
       </div>
 
@@ -288,15 +284,10 @@
         <div class="row">
           <div class="col-lg-9 col-md-9 col-sm-9">
             {% include 'editor/state_editor.html' %}
+            {% include 'attribution_guide.html' %}
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
             <div class="oppia-editor-sidebar hidden-xs">
-              <div class="oppia-editor-sidebar-section-header">
-                Current State
-              </div>
-              <div class="oppia-editor-sidebar-section-body">
-                {% include 'editor/sidebar_state_name.html' %}
-              </div>
               <accordion close-others="true">
                 <accordion-group is-open="true">
                   <accordion-heading>
@@ -307,17 +298,6 @@
                 <accordion-group>
                   <accordion-heading>Statistics<span class="caret"></span></accordion-heading>
                   {% include 'editor/state_statistics.html' %}
-                </accordion-group>
-                <accordion-group>
-                  <accordion-heading>License information<span class="caret"></span></accordion-heading>
-                  <div role="contentinfo">
-                    <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">
-                      <img alt="Creative Commons Licence" style="border-width:0" src="https://i.creativecommons.org/l/by-sa/4.0/88x31.png" />
-                    </a>
-                    <span style="font-size: 0.8em">
-                      <span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">This exploration</span> by <a xmlns:cc="https://creativecommons.org/ns#" href="{{FULL_SITE_URL}}/static/pages/attribution.txt" property="cc:attributionName" rel="cc:attributionURL">[no attribution required]</a> is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>. Based on a work at <a xmlns:dct="http://purl.org/dc/terms/" href="{{FULL_SITE_URL}}" rel="dct:source">{{FULL_SITE_URL}}</a>.
-                    </span>
-                  </div>
                 </accordion-group>
               </accordion>
             </div>

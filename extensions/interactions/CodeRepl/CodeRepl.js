@@ -72,7 +72,6 @@ oppia.directive('oppiaInteractiveCodeRepl', [
             $scope.sendResponse(res, '');
           },
           error: function(err) {
-            var err = '';
             if ($scope.output) {
               // Part of the error message can be in the output string.
               err += $scope.output;

@@ -18,6 +18,38 @@
  * @author sll@google.com (Sean Lip)
  */
 
+oppia.constant('CATEGORY_LIST', [
+  'Architecture',
+  'Art',
+  'Biology',
+  'Business',
+  'Chemistry',
+  'Computing',
+  'Economics',
+  'Education',
+  'Engineering',
+  'Environment',
+  'Geography',
+  'Government',
+  'Hobbies',
+  'Languages',
+  'Law',
+  'Life Skills',
+  'Mathematics',
+  'Medicine',
+  'Music',
+  'Philosophy',
+  'Physics',
+  'Programming',
+  'Psychology',
+  'Puzzles',
+  'Reading',
+  'Religion',
+  'Sport',
+  'Statistics',
+  'Welcome'
+]);
+
 
 // Global utility methods.
 oppia.controller('Base', [
@@ -115,6 +147,18 @@ oppia.controller('Base', [
     }
     $scope.$apply();
   });
+
+  $scope.profileDropdownIsActive = false;
+
+  $scope.onMouseoverProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().addClass('open');
+    $scope.profileDropdownIsActive = true;
+  };
+
+  $scope.onMouseoutProfilePictureOrDropdown = function(evt) {
+    angular.element(evt.currentTarget).parent().removeClass('open');
+    $scope.profileDropdownIsActive = false;
+  };
 
   $scope.onMouseoverDropdownMenu = function(evt) {
     angular.element(evt.currentTarget).parent().addClass('open');

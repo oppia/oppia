@@ -1,42 +1,37 @@
-<div class="row">
-  <div class="col-lg-1 col-md-1 col-sm-1"></div>
-  <div class="col-lg-11 col-md-11 col-sm-11">
+<div>
+  <div>
     <param-change-editor param-changes="stateParamChanges"
         save-param-changes="saveStateParamChanges"
         is-editable="editabilityService.isEditable()">
     </param-change-editor>
   </div>
-  <br><br>
-</div>
+  <br>
 
-<div class="row">
-  <div class="col-lg-1 col-md-1 col-sm-1">
-    <img src="/images/oppia_favicon_mint.png" class="protractor-test-state-editor-oppia-avatar">
+  <div style="position: relative;">
+    <img src="/images/oppia_favicon_black_48px.png" class="oppia-editor-avatar protractor-test-state-editor-oppia-avatar" style="top: 2px;">
   </div>
 
-  <div class="col-lg-11 col-md-11 col-sm-11">
-    <div id="tutorialStateContent">
-      <div ng-if="!contentMemento" class="protractor-test-edit-content"
-           ng-click="openStateContentEditor()"
-           ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
-        <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit State Content">
+  <div id="tutorialStateContent">
+    <div ng-if="!contentMemento" class="protractor-test-edit-content"
+         ng-click="openStateContentEditor()"
+         ng-class="{'oppia-editable-section': editabilityService.isEditable()}">
+      <span ng-if="editabilityService.isEditable()" class="glyphicon glyphicon-pencil oppia-editor-edit-icon" title="Edit State Content">
+      </span>
+      <div class="oppia-state-content-display protractor-test-state-edit-content" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="State Content">
+        <span ng-show="content[0].value == ''" class="oppia-placeholder">
+          You can give context to the learner here, and ask a question -- then,
+          in the space below, choose a suitable way for the learner to respond.
         </span>
-        <div class="oppia-state-content-display protractor-test-state-edit-content" ng-class="{'oppia-prevent-selection': editabilityService.isEditable()}" title="State Content">
-          <span ng-show="content[0].value == ''" class="oppia-placeholder">
-            You can give context to the learner here, and ask a question -- then,
-            in the space below, choose a suitable way for the learner to respond.
-          </span>
-          <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
-        </div>
+        <span angular-html-bind="content[0].value" class="protractor-test-state-content-display"></span>
       </div>
     </div>
+  </div>
 
-    <!-- The margin-bottom here preserves parity with the 'well' in the readonly mode. -->
-    <div ng-if="!!contentMemento" class="oppia-state-item-editor-div protractor-test-state-content-editor">
-      <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
-      </schema-based-editor>
-      <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content" ng-click="saveTextContent()">Save Content</button>
-      <button type="button" class="btn btn-default"` ng-click="cancelEdit()">Cancel</button>
-    </div>
+  <!-- The margin-bottom here preserves parity with the 'well' in the readonly mode. -->
+  <div ng-if="!!contentMemento" class="oppia-state-item-editor-div protractor-test-state-content-editor">
+    <schema-based-editor schema="STATE_CONTENT_SCHEMA" local-value="content[0].value">
+    </schema-based-editor>
+    <button type="button" class="btn btn-success oppia-save-state-item-button protractor-test-save-state-content" ng-click="saveTextContent()">Save Content</button>
+    <button type="button" class="btn btn-default"` ng-click="cancelEdit()">Cancel</button>
   </div>
 </div>

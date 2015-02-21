@@ -119,13 +119,13 @@ class InteractionUnitTests(test_utils.GenericTestBase):
         interaction_dict = interaction.to_dict()
         self.assertItemsEqual(interaction_dict.keys(), [
             'id', 'name', 'category', 'description', 'display_mode',
-            'handler_specs', 'customization_args'])
+            'handler_specs', 'customization_arg_specs', 'is_terminal'])
         self.assertEqual(interaction_dict['id'], TEXT_INPUT_ID)
-        self.assertEqual(interaction_dict['customization_args'], [{
+        self.assertEqual(interaction_dict['customization_arg_specs'], [{
             'name': 'placeholder',
             'description': 'The placeholder for the text input field.',
             'schema': {'type': 'unicode'},
-            'default_value': 'Type your answer here.',
+            'default_value': '',
         }, {
             'name': 'rows',
             'description': (
@@ -237,8 +237,9 @@ class InteractionUnitTests(test_utils.GenericTestBase):
             for item, item_type in _INTERACTION_CONFIG_SCHEMA:
                 self.assertTrue(isinstance(
                     getattr(interaction, item), item_type))
-                # The string attributes should be non-empty.
-                if item_type == basestring:
+                # The string attributes should be non-empty (except for
+                # 'category').
+                if item_type == basestring and item != 'category':
                     self.assertTrue(getattr(interaction, item))
 
             self.assertIn(interaction.display_mode, base.ALLOWED_DISPLAY_MODES)

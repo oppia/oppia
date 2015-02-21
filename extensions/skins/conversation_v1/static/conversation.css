@@ -19,7 +19,7 @@
   mode.
 */
 html, body {
-  background-color: #eeedee;
+  background-color: #eee;
 }
 
 /*
@@ -37,7 +37,7 @@ html, body {
   margin: 20px auto;
   max-height: 567px;
   max-width: 560px;
-  padding: 0 0 5px 0;
+  padding: 0px;
   text-align: center;
 }
 
@@ -59,27 +59,23 @@ html, body {
 }
 
 .conversation-skin-row-avatar-img {
-  height: 30px;
-  max-width: 30px;
+  height: 24px;
+  margin-top: 2px;
+  max-width: 24px;
 }
 
 .conversation-skin-exploration-header {
-  background: linear-gradient(to bottom, rgba(255, 255, 255, .1), rgba(255, 255, 255, 1) 25%);
-  font-size: 24px;
+  background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
+  font-size: 20px;
   text-align: center;
-  height: 115px;
-  margin-top: -25px;
-  padding-top: 30px;
-  padding-bottom: 25px;
+  height: 95px;
+  margin-top: -95px;
+  padding-top: 10px;
   position: relative;
 }
 
 .conversation-skin-iframe-container {
   -webkit-overflow-scrolling: touch;
-}
-
-.conversation-skin-old-content {
-  opacity: 0.8;
 }
 
 /* 'md-card' is needed to ensure that this takes precedence over the default
@@ -92,6 +88,7 @@ md-card.conversation-skin-card {
   border-top-right-radius: 2px;
   font-family: 'Roboto';
   margin: 20px auto;
+  margin-top: -5px;
   max-width: 560px;
   padding: 40px 60px 27px 22px;
   position: relative;
@@ -153,6 +150,6 @@ md-card.conversation-skin-inline-interaction {
 
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
-  margin: 8px 0;
+  margin: -5px 0;
   width: 600px;
 }

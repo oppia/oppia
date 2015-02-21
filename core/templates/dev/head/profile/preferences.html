@@ -33,7 +33,7 @@
           <div class="col-lg-10 col-md-10 col-sm-10">
             {{user_email}}
             <span class="help-block" style="font-size: smaller">
-              <em>Only moderators and site admins can see this.</em>
+              Only moderators and site admins can see this.
             </span>
           </div>
         </div>
@@ -48,6 +48,20 @@
             {% else %}
               <em>Not yet selected</em>
             {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div role="form" class="form-horizontal">
+        <div class="form-group">
+          <label class="col-lg-2 col-md-2 col-sm-2">Profile picture</label>
+          <div class="col-lg-10 col-md-10 col-sm-10">
+            <div class="oppia-editable-section" title="Change profile picture" style="height: 150px; width: 150px">
+              <div class="oppia-click-to-start-editing" ng-click="showEditProfilePictureModal()"></div>
+              <span class="glyphicon glyphicon-pencil oppia-editor-edit-icon" style="right: 5px;"></span>
+              <img ng-if="profilePictureDataUrl" ng-src="<[profilePictureDataUrl]>" class="img-thumbnail">
+              <img ng-if="!profilePictureDataUrl" src="/images/no_profile_picture.png" class="img-thumbnail">
+            </div>
           </div>
         </div>
       </div>
@@ -91,6 +105,50 @@
         </div>
       </div>
     </div>
+    <script type="text/ng-template" id="modals/editProfilePicture">
+      <div class="modal-header">
+        <h3>Upload Profile Picture</h3>
+      </div>
+
+      <div class="modal-body" style="min-height: 300px;">
+        <div class="oppia-profile-image-uploader">
+          <div ng-hide="uploadedImage">
+            <image-uploader on-file-changed="onFileChanged">
+            </image-uploader>
+          </div>
+
+          <div class="oppia-form-error" ng-if="invalidImageWarningIsShown" style="margin-top: 15px;">
+            Error: Could not read image file.
+          </div>
+
+          <div ng-show="uploadedImage">
+            Drag to crop and resize:
+            <div class="oppia-profile-picture-crop-area" ng-show="uploadedImage">
+              <button class="btn btn-default oppia-profile-picture-reset-button" ng-click="reset()">
+                <span class="glyphicon glyphicon-remove"></span>
+              </button>
+              <img-crop image="uploadedImage" result-image="croppedImageDataUrl"
+                        area-type="square" result-image-size="150"
+                        on-load-error="onInvalidImageLoaded()"
+                        result-image-format="image/png">
+              </img-crop>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-default" ng-click="cancel()">Cancel</button>
+        <!--
+          The two checks for ng-disabled are necessary. The former is needed because
+          img-crop loads a default white image even when nothing is uploaded. The latter
+          is needed to prevent the saving of invalid files.
+        -->
+        <button class="btn btn-success" ng-click="confirm()" ng-disabled="!uploadedImage || !croppedImageDataUrl">
+          Add Profile Picture
+        </button>
+      </div>
+    </script>
   </div>
 {% endblock %}
 

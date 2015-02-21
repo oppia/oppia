@@ -124,3 +124,42 @@ oppia.directive('focusOn', [function() {
     });
   };
 }]);
+
+oppia.directive('imageUploader', [function() {
+  return {
+    restrict: 'E',
+    scope: {
+      height: '@',
+      onFileChanged: '=',
+      width: '@'
+    },
+    templateUrl: 'components/imageUploader',
+    link: function(scope, elt, attrs) {
+      var onDragEnd = function(e) {
+        e.preventDefault();
+        $(elt).removeClass('image-uploader-is-active');
+      };
+
+      $(elt).bind('drop', function(e) {
+        onDragEnd(e);
+        scope.onFileChanged(e.originalEvent.dataTransfer.files[0]);
+      });
+
+      $(elt).bind('dragover', function(e) {
+        e.preventDefault();
+        $(elt).addClass('image-uploader-is-active');
+      });
+
+      $(elt).bind('dragleave', onDragEnd);
+
+      // We generate a random class name to distinguish this input from
+      // others in the DOM.
+      scope.fileInputClassName = (
+        'image-uploader-file-input' + Math.random().toString(36).substring(5));
+      angular.element(document).on(
+          'change', '.' + scope.fileInputClassName, function(evt) {
+        scope.onFileChanged(evt.currentTarget.files[0]);
+      });
+    }
+  };
+}]);

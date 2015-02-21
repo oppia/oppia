@@ -84,10 +84,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
     },
     templateUrl: 'inline/rule_editor',
     controller: [
-      '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'explorationStatesService', 'routerService',
+      '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
       'validatorsService', 'rulesService', 'explorationStatesService',
       function(
-          $scope, $rootScope, $modal, $timeout, editorContextService, explorationStatesService, routerService,
+          $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
           validatorsService, rulesService, explorationStatesService) {
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
@@ -143,9 +143,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           // TODO(sll): Add more validation prior to saving.
           $scope.ruleEditorIsOpen = false;
 
-          // If a new state has been entered, create it.
-          $scope._createRuleDestIfNecessary();
-
           $scope.removeNullFeedback();
           $scope.ruleDescriptionMemento = null;
           $scope.ruleDefinitionMemento = null;
@@ -171,26 +168,66 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.deleteRule();
         };
 
-        $scope._createRuleDestIfNecessary = function() {
-          var foundInExistingStateList = false;
-          for (var stateName in explorationStatesService.getStates()) {
-            if (stateName === $scope.rule.dest) {
-              foundInExistingStateList = true;
-            }
-          }
+        // We use a slash because this character is forbidden in a state name.
+        var _PLACEHOLDER_RULE_DEST = '/';
 
-          if (!foundInExistingStateList && $scope.rule.dest !== 'END') {
-            try {
-              explorationStatesService.addState($scope.rule.dest);
-              $scope.ruleDestMemento = $scope.rule.dest;
-              $scope.destChoices.push({
-                id: $scope.rule.dest,
-                text: $scope.rule.dest
-              });
-            } catch(e) {
-              $scope.rule.dest = $scope.ruleDestMemento;
-              throw e;
-            }
+        $scope.createNewDestIfNecessary = function() {
+          if ($scope.rule.dest === _PLACEHOLDER_RULE_DEST) {
+            $modal.open({
+              templateUrl: 'modals/addState',
+              backdrop: true,
+              resolve: {
+                isEditable: function() {
+                  return $scope.isEditable;
+                }
+              },
+              controller: [
+                  '$scope', '$timeout', '$modalInstance', 'explorationStatesService', 'isEditable', 'focusService',
+                  function($scope, $timeout, $modalInstance, explorationStatesService, isEditable, focusService) {
+                $scope.isEditable = isEditable;
+                $scope.newStateName = '';
+                $timeout(function() {
+                  focusService.setFocus('newStateNameInput');
+                });
+
+                $scope.isNewStateNameValid = function(newStateName) {
+                  return explorationStatesService.isNewStateNameValid(newStateName, false);
+                }
+
+                $scope.submit = function(newStateName) {
+                  if (!$scope.isNewStateNameValid(newStateName, false)) {
+                    return;
+                  }
+
+                  $modalInstance.close({
+                    action: 'addNewState',
+                    newStateName: newStateName
+                  });
+                };
+
+                $scope.cancel = function() {
+                  $modalInstance.close({
+                    action: 'cancel'
+                  });
+                };
+              }]
+            }).result.then(function(result) {
+              if (result.action === 'addNewState') {
+                $scope.reloadingDestinations = true;
+                explorationStatesService.addState(result.newStateName, function() {
+                  $rootScope.$broadcast('refreshGraph');
+                  $timeout(function() {
+                    $scope.rule.dest = result.newStateName;
+                    // Reload the dropdown to include the new state.
+                    $scope.reloadingDestinations = false;
+                  });
+                });
+              } else if (result.action === 'cancel') {
+                $scope.rule.dest = $scope.ruleDestMemento;
+              } else {
+                throw 'Invalid result action from add state modal: ' + result.action;
+              }
+            });
           }
         };
 
@@ -200,16 +237,28 @@ oppia.directive('ruleEditor', ['$log', function($log) {
 
         $scope.destChoices = [];
         $scope.$watch(explorationStatesService.getStates, function(newValue) {
-          // Returns a list of objects, each with an ID and name. These
-          // represent all states in alphabetical order, followed by 'END'.
-          $scope.destChoices = [];
+          var _currentStateName = editorContextService.getActiveStateName();
+
+          // This is a list of objects, each with an ID and name. These
+          // represent all states, including 'END', as well as an option to
+          // create a new state.
+          $scope.destChoices = [{
+            id: _PLACEHOLDER_RULE_DEST,
+            text: 'Create New...'
+          }, {
+            id: _currentStateName,
+            text: _currentStateName + ' ⟳'
+          }];
+
           var stateNames = Object.keys(explorationStatesService.getStates()).sort();
           stateNames.push(END_DEST);
           for (var i = 0; i < stateNames.length; i++) {
-            $scope.destChoices.push({
-              id: stateNames[i],
-              text: stateNames[i]
-            });
+            if (stateNames[i] !== _currentStateName) {
+              $scope.destChoices.push({
+                id: stateNames[i],
+                text: stateNames[i]
+              });
+            }
           }
         }, true);
 
@@ -218,53 +267,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $scope.saveThisRule();
           }
         });
-
-        $scope.openAddStateModal = function(rule) {
-          $modal.open({
-            templateUrl: 'modals/addState',
-            backdrop: true,
-            resolve: {
-              isEditable: function() {
-                return $scope.isEditable;
-              }
-            },
-            controller: [
-                '$scope', '$timeout', '$modalInstance', 'explorationStatesService', 'isEditable', 'focusService',
-                function($scope, $timeout, $modalInstance, explorationStatesService, isEditable, focusService) {
-              $scope.isEditable = isEditable;
-              $scope.newStateName = '';
-              $timeout(function() {
-                focusService.setFocus('newStateNameInput');
-              });
-
-              $scope.isNewStateNameValid = function(newStateName) {
-                return explorationStatesService.isNewStateNameValid(newStateName, false);
-              }
-
-              $scope.submit = function(newStateName) {
-                $modalInstance.close(newStateName);
-              };
-
-              $scope.cancel = function() {
-                $modalInstance.dismiss('cancel');
-              };
-            }]
-          }).result.then(function(newStateName) {
-            if (!explorationStatesService.isNewStateNameValid(newStateName, false)) {
-              return;
-            }
-
-            $scope.reloadingDestinations = true;
-            explorationStatesService.addState(newStateName, function() {
-              $rootScope.$broadcast('refreshGraph');
-              $timeout(function() {
-                rule.dest = newStateName;
-                // Reload the select2 dropdown to include the new state.
-                $scope.reloadingDestinations = false;
-              });
-            });
-          });
-        };
 
         $scope.getActiveStateName = function() {
           return editorContextService.getActiveStateName();

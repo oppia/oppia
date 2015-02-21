@@ -96,13 +96,19 @@ class BaseInteraction(object):
     # The human-readable name of the interaction. Overridden in subclasses.
     name = ''
     # The category the interaction falls under in the repository. Overridden in
-    # subclasses.
+    # subclasses; a value of '' means that this should be displayed as a
+    # top-level interaction.
     category = ''
     # A description of the interaction. Overridden in subclasses.
     description = ''
-    # Describes how the interaction should be displayed (either within the
-    # conversation, or as a separate object).
+    # Describes how the interaction should be displayed -- either within the
+    # conversation ('inline'), or as a separate object ('supplemental'). In the
+    # latter case, the interaction instance is reused if two adjacent states
+    # have the same interaction id.
     display_mode = ''
+    # Whether this interaction should be considered terminal, i.e. it ends
+    # the exploration. Defaults to False.
+    is_terminal = False
     # Additional JS library dependencies that should be loaded in pages
     # containing this interaction. These should correspond to names of files in
     # feconf.DEPENDENCIES_TEMPLATES_DIR. Overridden in subclasses.
@@ -187,12 +193,13 @@ class BaseInteraction(object):
             'category': self.category,
             'description': self.description,
             'display_mode': self.display_mode,
-            'customization_args': [{
+            'is_terminal': self.is_terminal,
+            'customization_arg_specs': [{
                 'name': ca_spec.name,
                 'description': ca_spec.description,
                 'default_value': ca_spec.default_value,
                 'schema': ca_spec.schema,
-            } for ca_spec in self.customization_arg_specs]
+            } for ca_spec in self.customization_arg_specs],
         }
 
         # Add information about the handlers.

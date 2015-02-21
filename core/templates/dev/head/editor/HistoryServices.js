@@ -383,7 +383,7 @@ oppia.factory('compareVersionsService', ['$http', '$q', 'versionsTreeService',
           'links': links,
           'v1InitStateId': originalStateIds[response.v1Data.data.init_state_name],
           'v2InitStateId': stateIds[response.v2Data.data.init_state_name],
-          'finalStateId': stateIds[END_DEST]
+          'endStateId': stateIds[END_DEST]
         };
       });
     }

@@ -32,8 +32,15 @@ oppia.controller('StateEditor', [
     }
   };
 
+  $scope.isCurrentStateTerminal = false;
+
   $scope.$on('refreshStateEditor', function() {
     $scope.initStateEditor();
+  });
+
+  $scope.$on('onInteractionIdChanged', function(evt, newInteractionId) {
+    $scope.isCurrentStateTerminal = GLOBALS.interactionConfigs[
+      newInteractionId].is_terminal;
   });
 
   $scope.initStateEditor = function() {
@@ -48,6 +55,8 @@ oppia.controller('StateEditor', [
 
     if ($scope.stateName && stateData) {
       $rootScope.$broadcast('stateEditorInitialized', stateData);
+      $scope.isCurrentStateTerminal = GLOBALS.interactionConfigs[
+        stateData.interaction.id].is_terminal;
     }
   };
 
