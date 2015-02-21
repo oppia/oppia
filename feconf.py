@@ -228,7 +228,7 @@ DEMO_EXPLORATIONS = [
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
     ('test_exploration.yaml', 'Test of expressions and interactions', 'Test'),
     ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
-    ('solar_system', 'The Solar System', 'Astronomy')
+    ('solar_system', 'The Solar System', 'Physics')
 ]
 
 # TODO(sll): Add all other URLs here.

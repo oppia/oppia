@@ -43,12 +43,13 @@
         <[labeledRegion.label]>
       </text>
     </svg>
+    <button type="button" class="btn btn-default" ng-click="setDrawMode()">Draw New Region</button>
     <div ng-if="selectedRegion !== null">
       <input type="text" 
         ng-model="regionLabelGetterSetter(selectedRegion)" 
         ng-model-options="{getterSetter: true}">
       </input>
-      <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion(selectedRegion)">Delete</button>
+      <button type="button" class="btn btn-default btn-xs" ng-click="deleteRegion(selectedRegion)">Delete region</button>
     </div>
   </div>
   <br><div style="color: red;"><[errorText]></div>
