@@ -139,7 +139,12 @@
 
       <div class="modal-footer">
         <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-        <button class="btn btn-success" ng-click="confirm()" ng-disabled="!croppedImageDataUrl">
+        <!--
+          The two checks for ng-disabled are necessary. The former is needed because
+          img-crop loads a default white image even when nothing is uploaded. The latter
+          is needed to prevent the saving of invalid files.
+        -->
+        <button class="btn btn-success" ng-click="confirm()" ng-disabled="!uploadedImage || !croppedImageDataUrl">
           Add Profile Picture
         </button>
       </div>
