@@ -298,14 +298,14 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       currentRuleDescription: '=',
-      currentRuleDefinition: '='
+      currentRuleDefinition: '=',
+      outerFormName: '@'
     },
     templateUrl: 'rules/ruleDescriptionEditor',
     controller: [
         '$scope', 'editorContextService', 'explorationStatesService', 'routerService', 'validatorsService',
         'rulesService',
         function($scope, editorContextService, explorationStatesService, routerService, validatorsService, rulesService) {
-
       var _generateAllRuleTypes = function() {
         var _interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
         for (var i = 0; i < _interactionHandlerSpecs.length; i++) {

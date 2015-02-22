@@ -42,11 +42,13 @@
   </div>
 
   <div class="modal-body">
-    <rule-description-editor current-rule-description="currentRuleDescription" current-rule-definition="currentRuleDefinition" answer-choices="answerChoices" class="protractor-test-temporary-rule"></rule-description-editor>
+    <form name="addRuleForm" class="form-inline">
+      <rule-description-editor current-rule-description="currentRuleDescription" current-rule-definition="currentRuleDefinition" answer-choices="answerChoices" outer-form-name="addRuleForm" class="protractor-test-temporary-rule"></rule-description-editor>
+    </form>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewRule()">Add New Rule</button>
+    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewRule()" ng-disabled="addRuleForm.$invalid">Add New Rule</button>
   </div>
 </script>

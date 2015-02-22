@@ -803,7 +803,13 @@ oppia.filter('isFloat', [function() {
     // point.
     var FLOAT_REGEXP = /^\-?\d*((\.|\,)\d+)?$/;
 
-    viewValue = input.toString();
+    var viewValue = '';
+    try {
+      var viewValue = input.toString();
+    } catch(e) {
+      return undefined;
+    }
+
     if (viewValue !== '' && viewValue !== '-' && FLOAT_REGEXP.test(viewValue)) {
       return parseFloat(viewValue.replace(',', '.'));
     }
@@ -1082,10 +1088,16 @@ oppia.directive('schemaBasedFloatEditor', [function() {
     },
     templateUrl: 'schemaBasedEditor/float',
     restrict: 'E',
-    controller: ['$scope', '$timeout', 'parameterSpecsService', function($scope, $timeout, parameterSpecsService) {
+    controller: [
+        '$scope', '$filter', '$timeout', 'parameterSpecsService',
+        function($scope, $filter, $timeout, parameterSpecsService) {
       $scope.hasLoaded = false;
       $scope.isInputInFocus = false;
       $scope.hasFocusedAtLeastOnce = false;
+
+      $scope.validate = function(localValue) {
+        return $filter('isFloat')(localValue) !== undefined;
+      };
 
       $scope.onFocus = function() {
         $scope.isInputInFocus = true;

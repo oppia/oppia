@@ -65,47 +65,49 @@
 
   <div ng-if="isEditable && ruleEditorIsOpen">
     <div>
-      <div style="position: relative;">
-        <img src="/images/user_mint_48px.png" class="oppia-editor-avatar" style="top: -2px;">
-        <span ng-if="rule.description !== 'Default'">
-          <rule-description-editor current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition"></rule-description-editor>
-        </span>
+      <form role="form" class="form-inline" name="editRuleForm">
+        <div style="position: relative;">
+          <img src="/images/user_mint_48px.png" class="oppia-editor-avatar" style="top: -2px;">
+          <span ng-if="rule.description !== 'Default'">
+            <rule-description-editor current-rule-description="$parent.$parent.rule.description" current-rule-definition="$parent.$parent.rule.definition"></rule-description-editor>
+          </span>
 
-        <span ng-if="rule.description === 'Default'">
-          If answer is not recognized...
-        </span>
-      </div>
-
-      <hr>
-
-      <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
-        <img src="/images/oppia_favicon_black_48px.png" style="position: absolute; left: -40px; top: -2px; height: 24px; width: 24px;">
-        <span ng-if="rule.feedback.length > 1">
-          (<em>Oppia picks one of these at random</em>):
-        </span>
-        <span ng-if="rule.feedback.length == 0">
-          <em>No feedback specified.</em>
-        </span>
-
-        <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
-        </schema-based-editor>
-      </div>
-
-      <hr>
-
-      <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
-        <div class="form-group" style="font-size: 1.1em;">
-          <label for="ruleDestination">Destination:</label>
-          <span ng-if="!reloadingDestinations">
-            <select class="form-control" ng-model="rule.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="margin-left: 10px; width: 200px;">
-            </select>
+          <span ng-if="rule.description === 'Default'">
+            If answer is not recognized...
           </span>
         </div>
+
+        <hr>
+
+        <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
+          <img src="/images/oppia_favicon_black_48px.png" style="position: absolute; left: -40px; top: -2px; height: 24px; width: 24px;">
+          <span ng-if="rule.feedback.length > 1">
+            (<em>Oppia picks one of these at random</em>):
+          </span>
+          <span ng-if="rule.feedback.length == 0">
+            <em>No feedback specified.</em>
+          </span>
+
+          <schema-based-editor schema="RULE_FEEDBACK_SCHEMA" local-value="$parent.rule.feedback">
+          </schema-based-editor>
+        </div>
+
+        <hr>
+
+        <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
+          <div class="form-group" style="font-size: 1.1em;">
+            <label for="ruleDestination">Destination:</label>
+            <span ng-if="!reloadingDestinations">
+              <select class="form-control" ng-model="rule.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="margin-left: 10px; width: 200px;">
+              </select>
+            </span>
+          </div>
+        </div>
       </div>
-    </div>
+    </form>
 
     <div class="oppia-rule-save-cancel-buttons">
-      <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description" ng-click="saveThisRule()">Save Rule</button>
+      <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description || editRuleForm.$invalid" ng-click="saveThisRule()">Save Rule</button>
       <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
       <button type="button" class="btn btn-danger pull-right protractor-test-delete-rule" ng-if="!isDefaultRule()" ng-click="deleteThisRule()">Delete Rule</button>
     </div>

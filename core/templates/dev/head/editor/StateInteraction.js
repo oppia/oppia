@@ -69,6 +69,11 @@ oppia.controller('StateInteraction', [
   // since it rarely changes. (But don't cache it, since it does change.)
   $scope.interactionRepository = INTERACTION_SPECS;
 
+  $scope.doesCurrentInteractionHaveCustomizations = function() {
+    var interactionSpec = $scope.interactionRepository[stateInteractionIdService.savedMemento];
+    return interactionSpec.customization_arg_specs.length > 0;
+  };
+
   var _getStateCustomizationArgsFromInteractionCustomizationArgs = function(interactionCustomizationArgs) {
     var result = {};
     for (var i = 0; i < interactionCustomizationArgs.length; i++) {

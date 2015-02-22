@@ -32,15 +32,18 @@ oppia.directive('oppiaInteractiveEndConversation', [
         $scope.recommendedExplorationIds = oppiaHtmlEscaper.escapedJsonToObj(
           $attrs.recommendedExplorationIdsWithValue);
 
-        $http({
-          method: 'GET',
-          url: '/explorationsummarieshandler/data',
-          params: {
-            stringified_exp_ids: JSON.stringify($scope.recommendedExplorationIds)
-          }
-        }).success(function(data) {
-          $scope.recommendedExplorationSummaries = data.summaries;
-        });
+        $scope.recommendedExplorationSummaries = [];
+        if ($scope.recommendedExplorationIds.length > 0) {
+          $http({
+            method: 'GET',
+            url: '/explorationsummarieshandler/data',
+            params: {
+              stringified_exp_ids: JSON.stringify($scope.recommendedExplorationIds)
+            }
+          }).success(function(data) {
+            $scope.recommendedExplorationSummaries = data.summaries;
+          });
+        }
       }]
     };
   }

@@ -130,7 +130,7 @@
 </script>
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
-  <span>
+  <span ng-model="localValue" ui-validate="'validate($value)'">
     <span class="input-group" ng-form="floatForm">
       <span ng-if="!expressionMode">
         <md-input-group class="long oppia-blue-on-focus md-default-theme" class="oppia-active-input">

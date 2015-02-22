@@ -41,7 +41,7 @@
           </ul>
         </span>
 
-        <span ng-if="editabilityService.isEditable()">
+        <span ng-if="editabilityService.isEditable() && doesCurrentInteractionHaveCustomizations()">
           <a href="" ng-click="openInteractionCustomizerModal()" style="margin-left: 8px;" class="protractor-test-edit-interaction">
             Customize
           </a>
