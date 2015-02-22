@@ -74,7 +74,6 @@ NEW_STATE_TEMPLATE = {
             }],
         }],
         'id': 'TextInput',
-        'sticky': False
     },
     'param_changes': [],
     'unresolved_answers': {},

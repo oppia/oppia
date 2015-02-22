@@ -462,7 +462,8 @@ states:
         - definition:
             rule_type: default
           dest: Not 6
-          feedback: []
+          feedback:
+          - No, try again.
           param_changes: []
       sticky: true
       widget_id: SetInput

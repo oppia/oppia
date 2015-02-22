@@ -531,7 +531,6 @@ oppia.controller('ExplorationPublishButton', [
               'content': 'Content',
               'widget_id': 'Interaction type',
               'widget_customization_args': 'Interaction customizations',
-              'widget_sticky': 'Whether to reuse the previous interaction',
               'widget_handlers': 'Reader submission rules'
             }
 
@@ -542,7 +541,7 @@ oppia.controller('ExplorationPublishButton', [
             // TODO(sll): Implement this fully. Currently there is no sorting.
             $scope.ORDERED_STATE_PROPERTIES = [
               'name', 'param_changes', 'content', 'widget_id',
-              'widget_customization_args', 'widget_sticky', 'widget_handlers'
+              'widget_customization_args', 'widget_handlers'
             ];
 
             $scope.explorationChangesExist = !$.isEmptyObject(

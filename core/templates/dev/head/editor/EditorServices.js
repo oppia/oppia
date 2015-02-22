@@ -194,7 +194,6 @@ oppia.factory('changeListService', [
     'widget_customization_args': true,
     'widget_id': true,
     'widget_handlers': true,
-    'widget_sticky': true,
     'state_name': true,
     'content': true,
     'param_changes': true
@@ -803,14 +802,6 @@ oppia.factory('stateCustomizationArgsService', [
   return child;
 }]);
 
-// A data service that stores the current sticky status for the interaction.
-// TODO(sll): Add validation.
-oppia.factory('stateInteractionStickyService', [
-    'statePropertyService', function(statePropertyService) {
-  var child = Object.create(statePropertyService);
-  child.propertyName = 'widget_sticky';
-  return child;
-}]);
 
 // A service that returns the frontend representation of a newly-added state.
 oppia.factory('newStateTemplateService', [function() {

@@ -52,7 +52,7 @@ var editConfigProperty = function(propertyName, objectType, editingInstructions)
   });
 };
 
-// The name should be as given in the admin page (not including '.yaml')
+// The name should be as given in the admin page (including '.yaml' if necessary).
 var reloadExploration = function(name) {
   browser.get(general.ADMIN_URL_SUFFIX);
   element.all(by.css('.protractor-test-reload-exploration-row')).
@@ -61,7 +61,7 @@ var reloadExploration = function(name) {
         by.css('.protractor-test-reload-exploration-title')
       ).getText().then(function(title) {
       // We use match here in case there is whitespace around the name
-      if (title.match(name + '.yaml')) {
+      if (title.match(name)) {
         explorationElement.element(
           by.css('.protractor-test-reload-exploration-button')
         ).click();

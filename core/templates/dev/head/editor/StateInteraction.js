@@ -50,13 +50,13 @@ oppia.controller('StateInteraction', [
     '$scope', '$http', '$rootScope', '$modal', '$filter', 'warningsData',
     'editorContextService', 'oppiaHtmlEscaper', 'INTERACTION_SPECS',
     'stateInteractionIdService', 'stateCustomizationArgsService',
-    'stateInteractionStickyService', 'editabilityService',
-    'explorationStatesService', 'graphDataService', 'interactionDetailsCache',
+    'editabilityService', 'explorationStatesService', 'graphDataService',
+    'interactionDetailsCache',
     function($scope, $http, $rootScope, $modal, $filter, warningsData,
       editorContextService, oppiaHtmlEscaper, INTERACTION_SPECS,
       stateInteractionIdService, stateCustomizationArgsService,
-      stateInteractionStickyService, editabilityService,
-      explorationStatesService, graphDataService, interactionDetailsCache) {
+      editabilityService, explorationStatesService, graphDataService,
+      interactionDetailsCache) {
 
   // Declare dummy submitAnswer() and adjustPageHeight() methods for the
   // interaction preview.
@@ -125,11 +125,6 @@ oppia.controller('StateInteraction', [
     stateCustomizationArgsService.init(
       $scope.stateName, stateData.interaction.customization_args,
       stateData.interaction, 'widget_customization_args');
-    stateInteractionStickyService.init(
-      $scope.stateName, stateData.interaction.sticky,
-      stateData.interaction, 'widget_sticky');
-
-    $scope.stateInteractionStickyService = stateInteractionStickyService;
 
     $rootScope.$broadcast('initializeHandlers', {
       'interactionId': stateData.interaction.id,
@@ -237,8 +232,6 @@ oppia.controller('StateInteraction', [
       stateInteractionIdService.savedMemento);
     _stateDict.interaction.customization_args = angular.copy(
       stateCustomizationArgsService.savedMemento);
-    _stateDict.interaction.sticky = angular.copy(
-      stateInteractionStickyService.savedMemento);
     explorationStatesService.setState(activeStateName, _stateDict);
   };
 

@@ -170,14 +170,14 @@ oppia.directive('conversationSkin', [function() {
         });
 
         oppiaPlayerService.submitAnswer(answer, handler, function(
-            newStateName, isSticky, feedbackHtml, questionHtml, newInteractionId) {
+            newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
           $timeout(function() {
             var oldStateName = $scope.stateName;
             $scope.stateName = newStateName;
             $scope.finished = oppiaPlayerService.isStateTerminal(newStateName);
 
-            if ($scope.stateName && !isSticky) {
-              // The previous interaction is not sticky and should be replaced.
+            if (newStateName && refreshInteraction) {
+              // The previous interaction should be replaced.
               _labelForNextFocusTarget = Math.random().toString(36).slice(2);
               $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
                 newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();

@@ -62,9 +62,9 @@ describe('Embedding', function() {
 
     users.createUser('embedder@example.com', 'Embedder');
     users.login('embedder@example.com', true);
-    admin.reloadExploration('counting');
+    admin.reloadExploration('protractor_test_1.yaml');
 
-    general.openEditor('4');
+    general.openEditor('12');
     editor.setContent(forms.toRichText('Version 2'));
     editor.saveChanges('demonstration edit');
 

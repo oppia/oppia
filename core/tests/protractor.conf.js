@@ -166,7 +166,7 @@ exports.config = {
     // If true, include stack traces in failures.
     includeStackTrace: true,
     // Default time to wait in ms before a test fails.
-    defaultTimeoutInterval: 400000
+    defaultTimeoutInterval: 600000
   },
 
   // ----- Options to be passed to mocha -----

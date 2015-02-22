@@ -277,7 +277,6 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
-  sticky: false
 param_changes: []
 """),
         "State B": ("""content:
@@ -298,7 +297,6 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
-  sticky: false
 param_changes: []
 """),
         feconf.DEFAULT_INIT_STATE_NAME: ("""content:
@@ -323,7 +321,6 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
-  sticky: false
 param_changes: []
 """) % feconf.DEFAULT_INIT_STATE_NAME
     }
@@ -347,7 +344,6 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
-  sticky: false
 param_changes: []
 """)
 

@@ -122,10 +122,7 @@ XSSI_PREFIX = ')]}\'\n'
 ALPHANUMERIC_REGEX = r'^[A-Za-z0-9]+$'
 
 # Invalid names for parameters used in expressions.
-# TODO(sll): We may actually be able to allow the use of stateSticky -- its
-# prior use in the codebase has been deprecated. If this is still the case by
-# June 2015, remove stateSticky from this list.
-AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices', 'stateSticky']
+AUTOMATICALLY_SET_PARAMETER_NAMES = ['answer', 'choices']
 INVALID_PARAMETER_NAMES = AUTOMATICALLY_SET_PARAMETER_NAMES + [
     'abs', 'all', 'and', 'any', 'else', 'floor', 'if', 'log', 'or',
     'pow', 'round', 'then']
@@ -220,7 +217,7 @@ DEMO_EXPLORATIONS = [
     ('binary_search', 'The Lazy Magician', 'Mathematics'),
     ('root_linear_coefficient_theorem.yaml', 'Root Linear Coefficient Theorem',
      'Mathematics'),
-    ('counting.yaml', 'Three Balls', 'Mathematics'),
+    ('three_balls', 'Three Balls', 'Mathematics'),
     ('cities.yaml', 'World Cities', 'Geography'),
     ('boot_verbs.yaml', 'Boot Verbs', 'Languages'),
     ('hola.yaml', u'¡Hola!', 'Languages'),
@@ -230,7 +227,8 @@ DEMO_EXPLORATIONS = [
     ('adventure.yaml', 'Parameterized Adventure', 'Interactive Fiction'),
     ('pitch_perfect.yaml', 'Pitch Perfect', 'Music'),
     ('test_exploration.yaml', 'Test of expressions and interactions', 'Test'),
-    ('modeling_graphs', 'Graph Modeling', 'Mathematics')
+    ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
+    ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
 ]
 
 # TODO(sll): Add all other URLs here.

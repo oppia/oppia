@@ -197,35 +197,16 @@ oppia.factory('oppiaPlayerService', [
 
   var stopwatch = stopwatchProviderService.getInstance();
 
-  var _isInteractionSticky = function(newStateName, oldStateName) {
-    var oldStateData = _exploration.states[oldStateName];
-    // NB: This may be undefined if newStateName === END_DEST.
-    var newStateData = _exploration.states[newStateName];
-
-    // TODO(sll): If the new interaction is the same as the old interaction,
-    // and the new interaction is sticky, do not render the reader response.
-    // The interaction in the frontend should take care of this.
-    // TODO(sll): This special-casing is not great; we should make the
-    // interface for updating the frontend more generic so that all the updates
-    // happen in the same place. Perhaps in the non-sticky case we should call
-    // a frontend method named appendFeedback() or similar.
-    return (
-      newStateName && newStateData.interaction.sticky &&
-      newStateData.interaction.id === oldStateData.interaction.id);
-  };
-
   var _onStateTransitionProcessed = function(
       newStateName, newParams, newQuestionHtml, newFeedbackHtml, answer,
       handler, successCallback) {
     var oldStateName = _currentStateName;
-    // TODO(sll): If the new interaction is the same as the old interaction,
-    // and the new interaction is sticky, do not render the reader response.
-    // The interaction in the frontend should take care of this.
-    // TODO(sll): This special-casing is not great; we should make the
-    // interface for updating the frontend more generic so that all the updates
-    // happen in the same place. Perhaps in the non-sticky case we should call
-    // a frontend method named appendFeedback() or similar.
-    var isSticky = _isInteractionSticky(newStateName, oldStateName);
+    var oldStateInteractionId = _exploration.states[oldStateName].interaction.id;
+
+    var refreshInteraction = (
+      oldStateName !== newStateName ||
+      INTERACTION_SPECS[oldStateInteractionId].display_mode ===
+        _INTERACTION_DISPLAY_MODE_INLINE);
 
     if (!_editorPreviewMode) {
       // Record the state hit to the event handler.
@@ -261,7 +242,7 @@ oppia.factory('oppiaPlayerService', [
     $rootScope.$broadcast('playerStateChange');
 
     successCallback(
-      newStateName, isSticky, newFeedbackHtml,
+      newStateName, refreshInteraction, newFeedbackHtml,
       newQuestionHtml, newInteractionId);
   };
 

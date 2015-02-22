@@ -202,7 +202,6 @@ class StateExportUnitTests(test_utils.GenericTestBase):
                     }]
                 }],
                 'id': u'TextInput',
-                'sticky': False,
             },
             'param_changes': [],
         }
@@ -245,7 +244,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   New state:
     content:
@@ -266,7 +264,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
 """) % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -478,7 +475,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   New state:
     content:
@@ -499,7 +495,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
 """)
 
@@ -569,7 +564,6 @@ class ConversionUnitTests(test_utils.GenericTestBase):
                         }],
                     }],
                     'id': 'TextInput',
-                    'sticky': False,
                 },
                 'param_changes': [],
             }

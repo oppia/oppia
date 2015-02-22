@@ -353,9 +353,6 @@ def apply_change_list(exploration_id, change_list):
                     state.update_interaction_customization_args(
                         change.new_value)
                 elif (change.property_name ==
-                        exp_domain.STATE_PROPERTY_INTERACTION_STICKY):
-                    state.update_interaction_sticky(change.new_value)
-                elif (change.property_name ==
                         exp_domain.STATE_PROPERTY_INTERACTION_HANDLERS):
                     state.update_interaction_handlers(change.new_value)
             elif change.cmd == 'edit_exploration_property':
