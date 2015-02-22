@@ -55,7 +55,7 @@
               </table>
             </div>
 
-            <div ng-if="$last" ng-show="isAnswerBeingProcessed()">
+            <div ng-if="$last" ng-show="waitingForOppiaFeedback">
               <center style="font-size: 8em; margin-top: -90px;">
                 <span class="oppia-loading-dot-one">.</span>
                 <span class="oppia-loading-dot-two">.</span>
@@ -63,29 +63,25 @@
               </center>
             </div>
 
-            <div ng-if="stateName">
-              <div ng-if="!contentToDisplayNext && interactionIsInline && $last">
-                <div ng-hide="isAnswerBeingProcessed()">
-                  <div class="conversation-skin-inline-interaction">
-                    <table class="conversation-skin-card-row-container" style="margin-bottom: 0;">
-                      <tr class="conversation-skin-card-row">
-                        <td class="conversation-skin-row-avatar" valign="top">
-                          <img class="conversation-skin-row-avatar-img" src="/images/user_mint_48px.png">
-                        </td>
-                        <td class="conversation-skin-learner-input protractor-test-conversation-input"
-                            angular-html-bind="inputTemplate">
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-                </div>
+            <div ng-if="stateName && !waitingForNewCard && !waitingForOppiaFeedback && interactionIsInline && $last">
+              <div class="conversation-skin-inline-interaction">
+                <table class="conversation-skin-card-row-container" style="margin-bottom: 0;">
+                  <tr class="conversation-skin-card-row">
+                    <td class="conversation-skin-row-avatar" valign="top">
+                      <img class="conversation-skin-row-avatar-img" src="/images/user_mint_48px.png">
+                    </td>
+                    <td class="conversation-skin-learner-input protractor-test-conversation-input"
+                        angular-html-bind="inputTemplate">
+                    </td>
+                  </tr>
+                </table>
               </div>
             </div>
           </md-card>
         </div>
       </div>
 
-      <div ng-if="contentToDisplayNext">
+      <div ng-if="waitingForNewCard">
         <center style="font-size: 8em; margin-top: -90px;">
           <span class="oppia-loading-dot-one">.</span>
           <span class="oppia-loading-dot-two">.</span>
@@ -94,7 +90,7 @@
       </div>
 
       <div class="conversation-skin-supplemental-interaction">
-        <div ng-if="!finished && !contentToDisplayNext && !interactionIsInline">
+        <div ng-if="!finished && !waitingForNewCard && !interactionIsInline">
           <md-card class="conversation-skin-supplemental-card">
             <div class="protractor-test-conversation-input" angular-html-bind="inputTemplate">
             </div>

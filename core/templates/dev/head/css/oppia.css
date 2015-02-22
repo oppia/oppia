@@ -409,6 +409,14 @@ div.wysiwyg iframe.wysiwyg-content-large {
   color: #fff;
 }
 
+/* In Bootstrap, the link at the top of the default dropdown menu cannot be
+   clicked -- so, in such cases (e.g. for the 'Sign in' link at the top right),
+   we use this instead.
+*/
+.oppia-clickable-dropdown:hover ul.dropdown-menu {
+  display: block;
+}
+
 .oppia-share-dropdown-menu {
   min-width: 30px;
   width: 47px;
