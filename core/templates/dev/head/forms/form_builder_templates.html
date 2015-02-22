@@ -131,13 +131,28 @@
 
 <script type="text/ng-template" id="schemaBasedEditor/float">
   <span ng-model="localValue" ui-validate="'validate($value)'">
-    <span class="input-group" ng-form="floatForm">
+    <span ng-form="floatForm">
       <span ng-if="!expressionMode">
-        <md-input-group class="long oppia-blue-on-focus md-default-theme" class="oppia-active-input">
-          <input style="height: 25px; margin-top: 25px;" type="text" name="floatValue" ng-model="$parent.localValue"
+        <md-input-group class="long oppia-blue-on-focus md-default-theme" style="display: inline; position: relative;">
+          <input style="display: inline; height: 25px; margin-top: 25px; width: 220px;" type="text" name="floatValue" ng-model="$parent.localValue"
                  require-is-float apply-validation="validators()" ng-disabled="isDisabled()"
                  focus-on="<[labelForFocusTarget()]>" ng-keypress="onKeypress($event)"
                  ng-blur="onBlur()" ng-focus="onFocus()">
+
+          <span ng-if="hasLoaded && !isInputInFocus && hasFocusedAtLeastOnce" style="font-size: 0.9em; left: 0; position: absolute; top: 25px;">
+            <span ng-if="floatForm.floatValue.$error.isFloat" class="oppia-form-error" aria-live="assertive">
+              Please enter a valid decimal number.
+            </span>
+            <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
+                  class="oppia-form-error" aria-live="assertive">
+              Please enter a number that is at least <[getMinValue()]>.
+            </span>
+            <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
+                  class="oppia-form-error" aria-live="assertive">
+              Please enter a number that is at most <[getMaxValue()]>.
+            </span>
+          </span>
+
         </md-input-group>
       </span>
 
@@ -153,20 +168,6 @@
             <span ng-if="expressionMode"><del>E</del></span>
           </button>
         </span>
-      </span>
-    </span>
-
-    <span ng-if="hasLoaded && !isInputInFocus && hasFocusedAtLeastOnce">
-      <span ng-if="floatForm.floatValue.$error.isFloat" class="oppia-form-error" aria-live="assertive">
-        Please enter a valid decimal number.
-      </span>
-      <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtLeast"
-            class="oppia-form-error" aria-live="assertive">
-        Please enter a number that is at least <[getMinValue()]>.
-      </span>
-      <span ng-if="!floatForm.floatValue.$error.isFloat && floatForm.floatValue.$error.isAtMost"
-            class="oppia-form-error" aria-live="assertive">
-        Please enter a number that is at most <[getMaxValue()]>.
       </span>
     </span>
   </span>
