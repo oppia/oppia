@@ -422,7 +422,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .nav .dropdown:hover > .dropdown-menu {
   border: none;
-  width: 46px;
 }
 
 /* Show the navbar submenu dropdowns on-hover rather than on-click, if the
@@ -880,12 +879,18 @@ md-card.oppia-gallery-tile {
   margin-right: 5px;
 }
 
-.oppia-add-rule-button-container {
-  padding: 5px;
-}
 .oppia-add-rule-button {
-  padding: 5px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-radius: 0;
+  font-size: 14px;
+  padding: 7px;
   width: 100%;
+}
+
+.oppia-add-rule-button:hover {
+  background-color: #eaeaea;
 }
 
 .oppia-small-delete-button {
@@ -901,19 +906,20 @@ md-card.oppia-gallery-tile {
 }
 
 .nav-pills > li > a.oppia-rule-tab {
-  background: #f3f3f3;
+  background: #e5e5e5;
   border-radius: 0;
   border-bottom: 1px solid #f0f0f0;
-  padding: 5px 15px;
+  color: #aaa;
+  padding: 7px 15px;
   width: 100%;
 }
 .nav-pills > li:hover > a.oppia-rule-tab {
   background: #eaeaea;
 }
 .nav-pills > li.active > a.oppia-rule-tab-active {
-  background: #e5e5e5;
+  background: #f5f5fa;
   border-right: 0;
-  color: #666;
+  color: #333;
   cursor: default;
 }
 
