@@ -38,6 +38,10 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
 
       $scope.explorationId = $rootScope.explorationId;
 
+      $scope.validate = function(localValue) {
+        return localValue.label && localValue.label.length > 0;
+      };
+
       $scope.hasExplorationId = function() {
         if ($scope.explorationId === null || $scope.explorationId === undefined) {
           return false;
@@ -65,22 +69,48 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
             '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
       };
 
-      $scope.openImageUploader = function() {
-        $scope.imageUploaderIsActive = true;
+      $scope.resetImageUploader = function() {
+        $scope.currentFile = null;
+        $scope.currentFilename = null;
+        $scope.imagePreview = null;
+      };
 
-        // Set the filename to match the name of the uploaded file.
-        document.getElementById('newImage').onchange = function(e) {
-          $scope.newImageFilename = e.target.value.split(/(\\|\/)/g).pop();
-          $scope.$apply();
-        };
+      $scope.openImageUploader = function() {
+        $scope.resetImageUploader();
+        $scope.uploadWarning = null;
+        $scope.imageUploaderIsActive = true;
       };
 
       $scope.closeImageUploader = function() {
         $scope.imageUploaderIsActive = false;
       };
 
-      $scope.uploadNewImage = function(filename) {
-        var file = document.getElementById('newImage').files[0];
+      $scope.onFileChanged = function(file, filename) {
+        if (!file || !file.size || !file.type.match('image.*')) {
+          $scope.uploadWarning = 'This file is not recognized as an image.';
+          $scope.resetImageUploader();
+          $scope.$apply();
+          return;
+        }
+
+        $scope.currentFile = file;
+        $scope.currentFilename = filename;
+        $scope.uploadWarning = null;
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          $scope.$apply(function() {
+            $scope.imagePreview = e.target.result;
+          });
+        };
+        reader.readAsDataURL(file);
+
+        $scope.$apply();
+      };
+
+      $scope.saveUploadedFile = function(file, filename) {
+        warningsData.clear();
+
         if (!file || !file.size) {
           warningsData.addWarning('Empty file detected.');
           return;
@@ -94,8 +124,6 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
           warningsData.addWarning('Filename must not be empty.');
           return;
         }
-
-        warningsData.clear();
 
         var form = new FormData();
         form.append('image', file);
@@ -116,8 +144,6 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
           dataType: 'text'
         }).done(function(data) {
           var inputElement = $('#newImage');
-          inputElement.wrap('<form>').closest('form').get(0).reset();
-          inputElement.unwrap();
           $scope.filepaths.push(data.filepath);
           $scope.closeImageUploader();
           $scope.localValue.label = data.filepath;
@@ -128,7 +154,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
           var transformedData = data.responseText.substring(5);
           var parsedResponse = JSON.parse(transformedData);
           warningsData.addWarning(
-              parsedResponse.error || 'Error communicating with server.');
+            parsedResponse.error || 'Error communicating with server.');
           $scope.$apply();
         });
       };

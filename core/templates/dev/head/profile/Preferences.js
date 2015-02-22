@@ -48,7 +48,7 @@ oppia.controller('Preferences', ['$scope', '$http', '$rootScope', '$modal', '$ti
         $scope.croppedImageDataUrl = '';
         $scope.invalidImageWarningIsShown = false;
 
-        $scope.onFileChanged = function(file) {
+        $scope.onFileChanged = function(file, filename) {
           $('.oppia-profile-image-uploader').fadeOut(function() {
             $scope.invalidImageWarningIsShown = false;
 
