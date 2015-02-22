@@ -245,20 +245,6 @@
       <div class="col-lg-6 col-md-6 col-sm-6">
         <h3>Controls</h3>
 
-        {% if can_publish %}
-          <p ng-hide="!explorationRightsService.isPrivate()">
-            <button type="button" class="btn btn-default protractor-test-publish-exploration"
-                    ng-class="{'btn-success': !isExplorationLockedForEditing() && !countWarnings()}"
-                    ng-click="showPublishExplorationModal()"
-                    ng-disabled="isExplorationLockedForEditing() || countWarnings()">
-              Publish in Gallery
-            </button>
-            <div ng-if="countWarnings()">
-              <[getPublishExplorationButtonTooltip()]>
-            </div>
-          </p>
-        {% endif %}
-
         {% if can_release_ownership %}
           <p ng-hide="explorationRightsService.isCommunityOwned()">
             <button type="button" class="btn btn-default" ng-click="showTransferExplorationOwnershipModal()" ng-disabled="isExplorationLockedForEditing()">

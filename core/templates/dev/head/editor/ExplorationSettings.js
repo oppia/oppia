@@ -226,36 +226,4 @@ oppia.controller('ExplorationSettings', [
   $scope.isExplorationLockedForEditing = function() {
     return changeListService.isExplorationLockedForEditing();
   };
-
-  $scope.showPublishExplorationModal = function() {
-    warningsData.clear();
-    $modal.open({
-      templateUrl: 'modals/publishExploration',
-      backdrop: true,
-      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
-        $scope.publish = $modalInstance.close;
-
-        $scope.cancel = function() {
-          $modalInstance.dismiss('cancel');
-          warningsData.clear();
-        };
-      }]
-    }).result.then(function() {
-      explorationRightsService.saveChangeToBackend({is_public: true});
-    });
-  };
-
-  $scope.getPublishExplorationButtonTooltip = function() {
-    if (explorationWarningsService.countWarnings() > 0) {
-      return 'Please resolve the warnings before publishing.';
-    } else if ($scope.isExplorationLockedForEditing()) {
-      return 'Please save your changes before publishing.';
-    } else {
-      return 'Click this button to publish your exploration to the gallery.';
-    }
-  };
-
-  $scope.countWarnings = function() {
-    return explorationWarningsService.countWarnings();
-  };
 }]);

@@ -355,7 +355,7 @@ oppia.controller('EditorNavbarBreadcrumb', [
 }]);
 
 
-oppia.controller('ExplorationPublishButton', [
+oppia.controller('ExplorationSaveAndPublishButtons', [
     '$scope', '$http', '$rootScope', '$window', '$timeout', '$modal', 'warningsData',
     'changeListService', 'focusService', 'routerService', 'explorationData',
     'explorationRightsService', 'editabilityService', 'explorationWarningsService',
@@ -371,6 +371,10 @@ oppia.controller('ExplorationPublishButton', [
   // yet), 'save' (the last action was a save) or 'discard' (the last action was a
   // discard).
   $scope.lastSaveOrDiscardAction = null;
+
+  $scope.isPrivate = function() {
+    return explorationRightsService.isPrivate();
+  };
 
   $scope.isExplorationLockedForEditing = function() {
     return changeListService.isExplorationLockedForEditing();
@@ -416,6 +420,38 @@ oppia.controller('ExplorationPublishButton', [
       return confirmationMessage;
     }
   });
+
+  $scope.isPublic = function() {
+    return explorationRightsService.isPublic();
+  };
+
+  $scope.showPublishExplorationModal = function() {
+    warningsData.clear();
+    $modal.open({
+      templateUrl: 'modals/publishExploration',
+      backdrop: true,
+      controller: ['$scope', '$modalInstance', function($scope, $modalInstance) {
+        $scope.publish = $modalInstance.close;
+
+        $scope.cancel = function() {
+          $modalInstance.dismiss('cancel');
+          warningsData.clear();
+        };
+      }]
+    }).result.then(function() {
+      explorationRightsService.saveChangeToBackend({is_public: true});
+    });
+  };
+
+  $scope.getPublishExplorationButtonTooltip = function() {
+    if (explorationWarningsService.countWarnings() > 0) {
+      return 'Please resolve the warnings before publishing.';
+    } else if ($scope.isExplorationLockedForEditing()) {
+      return 'Please save your changes before publishing.';
+    } else {
+      return 'Click this button to publish your exploration to the gallery.';
+    }
+  };
 
   $scope.saveChanges = function() {
     routerService.savePendingChanges();
