@@ -38,22 +38,26 @@
       -o-transition: all 0.15s;
       transition: all 0.15s;
     }
+    .oppia-graph-viz .node rect.end-node,
+    .oppia-graph-viz .node rect.terminal-node {
+      fill: green;
+    }
+    .oppia-graph-viz .node rect.current-node {
+      fill: #05a69a;
+    }
     .oppia-graph-viz .node rect.init-node {
       fill: #bbedb1;
-    }
-    .oppia-graph-viz .node rect.end-node {
-      fill: green;
     }
     .oppia-graph-viz .node rect.bad-node {
       fill: pink;
     }
-    .oppia-graph-viz .node rect.normal-node:hover,
+    .oppia-graph-viz .node rect.current-node:hover,
     .oppia-graph-viz .node rect.init-node:hover,
-    .oppia-graph-viz .node rect.bad-node:hover {
+    .oppia-graph-viz .node rect.terminal-node:hover,
+    .oppia-graph-viz .node rect.bad-node:hover,
+    .oppia-graph-viz .node rect.normal-node:hover {
       fill: blue;
     }
-
-
 
     .oppia-graph-viz .clickable {
       cursor: pointer;
@@ -90,10 +94,11 @@
 
               <g class="node protractor-test-node" ng-repeat="node in nodeList">
                 <rect rx="4" ry="4" ng-attr-height="<[node.height]>" ng-attr-width="<[node.width]>"
+                      class="protractor-test-node-background <[node.nodeClass]>"
                       ng-attr-x="<[node.x0]>" ng-attr-y="<[node.y0]>"
-                      ng-class="{clickable: canNavigateToNode(node.id), 'init-node': node.isInitNode, 'end-node': node.isEndNode, 'bad-node': node.isBadNode, 'normal-node': node.isNormalNode}"
+                      ng-class="{'clickable': canNavigateToNode(node.id)}"
                       ng-attr-style="<[node.style]>"
-                      ng-click="onClickFunction(node.id)" class="protractor-test-node-background">
+                      ng-click="onClickFunction(node.id)">
                 </rect>
                 <title><[getNodeTitle(node)]></title>
                 <text text-anchor="middle" ng-attr-x="<[node.xLabel]>" ng-attr-y="<[node.yLabel]>" class="protractor-test-node-label">

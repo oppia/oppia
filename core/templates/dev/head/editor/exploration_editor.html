@@ -80,12 +80,6 @@
           <span class="glyphicon glyphicon-play"></span>
         </a>
       </li>
-
-      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
-        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
-          <span class="glyphicon glyphicon-stats"></span>
-        </a>
-      </li>
     {% endif %}
 
     <li ng-class="{'active': getTabStatuses().active === 'settings'}">
@@ -93,6 +87,14 @@
         <span class="glyphicon glyphicon-cog"></span>
       </a>
     </li>
+
+    {% if username %}
+      <li ng-class="{'active': getTabStatuses().active === 'stats'}">
+        <a href="#" tooltip="Statistics" tooltip-placement="bottom" ng-click="selectStatsTab()">
+          <span class="glyphicon glyphicon-stats"></span>
+        </a>
+      </li>
+    {% endif %}
 
     <li ng-class="{'active': getTabStatuses().active === 'history'}">
       <a href="#" tooltip="History" tooltip-placement="bottom" ng-click="selectHistoryTab()" disabled="explorationRightsService.isCloned()" class="protractor-test-history-tab">
@@ -139,11 +141,11 @@
       <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
         <button class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
-            Publish Draft
+            Save Draft
             <span ng-if="getChangeListLength()">(<[getChangeListLength()]>)</span>
           </span>
           <span ng-if="isSaveInProgress">
-            Publishing...
+            Saving...
           </span>
         </button>
         <button type="button" class="btn btn-default dropdown-toggle protractor-test-save-discard-toggle"

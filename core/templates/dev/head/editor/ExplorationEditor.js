@@ -316,8 +316,8 @@ oppia.controller('EditorNavigation', [
   $scope.getTabStatuses = routerService.getTabStatuses;
   $scope.selectMainTab = routerService.navigateToMainTab;
   $scope.selectPreviewTab = routerService.navigateToPreviewTab;
-  $scope.selectStatsTab = routerService.navigateToStatsTab;
   $scope.selectSettingsTab = routerService.navigateToSettingsTab;
+  $scope.selectStatsTab = routerService.navigateToStatsTab;
   $scope.selectHistoryTab = routerService.navigateToHistoryTab;
   $scope.selectFeedbackTab = routerService.navigateToFeedbackTab;
 }]);
@@ -338,8 +338,8 @@ oppia.controller('EditorNavbarBreadcrumb', [
   var _TAB_NAMES_TO_HUMAN_READABLE_NAMES = {
     'main': 'Edit',
     'preview': 'Preview',
-    'stats': 'Statistics',
     'settings': 'Settings',
+    'stats': 'Statistics',
     'history': 'History',
     'feedback': 'Feedback'
   };

@@ -28,8 +28,8 @@ oppia.factory('routerService', [
 
   var MAIN_TAB = 'main';
   var PREVIEW_TAB = 'preview';
-  var STATS_TAB = 'stats';
   var SETTINGS_TAB = 'settings';
+  var STATS_TAB = 'stats';
   var HISTORY_TAB = 'history';
   var FEEDBACK_TAB = 'feedback';
 
@@ -56,12 +56,12 @@ oppia.factory('routerService', [
 
     if (newPath === '/preview') {
       _tabs.active = PREVIEW_TAB;
-    } else if (newPath === '/stats') {
-      _tabs.active = STATS_TAB;
-      $rootScope.$broadcast('refreshStatisticsTab');
     } else if (newPath === '/settings') {
       _tabs.active = SETTINGS_TAB;
       $rootScope.$broadcast('refreshSettingsTab');
+    } else if (newPath === '/stats') {
+      _tabs.active = STATS_TAB;
+      $rootScope.$broadcast('refreshStatisticsTab');
     } else if (newPath === '/history') {
       // TODO(sll): Do this on-hover rather than on-click.
       $rootScope.$broadcast('refreshVersionHistory', {forceRefresh: false});

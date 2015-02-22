@@ -571,16 +571,16 @@ oppia.directive('stateGraphViz', [
           var currentNodeIsTerminal = (
             $scope.finalStateIds.indexOf(nodeId) !== -1);
 
-          nodeData[nodeId].isInitNode = (nodeId == initStateId);
-          nodeData[nodeId].isEndNode = currentNodeIsTerminal;
-          nodeData[nodeId].isBadNode = (
-            nodeId != initStateId && !currentNodeIsTerminal &&
-            !(nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd));
-          nodeData[nodeId].isNormalNode = (
-            nodeId != initStateId && !currentNodeIsTerminal &&
-            nodeData[nodeId].reachable && nodeData[nodeId].reachableFromEnd);
+          nodeData[nodeId].nodeClass = (
+            nodeId === 'END'                     ? 'end-node' :
+            nodeId === $scope.currentStateId()   ? 'current-node' :
+            nodeId === initStateId               ? 'init-node' :
+            currentNodeIsTerminal                ? 'terminal-node' :
+            !(nodeData[nodeId].reachable &&
+              nodeData[nodeId].reachableFromEnd) ? 'bad-node' :
+                                                   'normal-node');
 
-          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId != 'END');
+          nodeData[nodeId].canDelete = (nodeId != initStateId && nodeId !== 'END');
           $scope.nodeList.push(nodeData[nodeId]);
         }
 
