@@ -194,7 +194,6 @@ oppia.factory('changeListService', [
     'widget_customization_args': true,
     'widget_id': true,
     'widget_handlers': true,
-    'widget_sticky': true,
     'state_name': true,
     'content': true,
     'param_changes': true
@@ -803,14 +802,6 @@ oppia.factory('stateCustomizationArgsService', [
   return child;
 }]);
 
-// A data service that stores the current sticky status for the interaction.
-// TODO(sll): Add validation.
-oppia.factory('stateInteractionStickyService', [
-    'statePropertyService', function(statePropertyService) {
-  var child = Object.create(statePropertyService);
-  child.propertyName = 'widget_sticky';
-  return child;
-}]);
 
 // A service that returns the frontend representation of a newly-added state.
 oppia.factory('newStateTemplateService', [function() {
@@ -831,14 +822,14 @@ oppia.factory('newStateTemplateService', [function() {
 }]);
 
 
-oppia.factory('computeGraphService', [function() {
+oppia.factory('computeGraphService', ['INTERACTION_SPECS', function(INTERACTION_SPECS) {
 
   var _computeGraphData = function(initStateId, states) {
     var nodes = {};
     var links = [];
     var finalStateIds = [END_DEST];
     for (var stateName in states) {
-      if (GLOBALS.interactionConfigs[states[stateName].interaction.id].is_terminal) {
+      if (INTERACTION_SPECS[states[stateName].interaction.id].is_terminal) {
         finalStateIds.push(stateName);
       }
 
@@ -943,8 +934,8 @@ oppia.factory('stateEditorTutorialFirstTimeService', ['$http', '$rootScope', fun
 
 // Service for the list of exploration warnings.
 oppia.factory('explorationWarningsService', [
-    'graphDataService', 'explorationStatesService', 'explorationObjectiveService',
-    function(graphDataService, explorationStatesService, explorationObjectiveService) {
+    'graphDataService', 'explorationStatesService', 'explorationObjectiveService', 'INTERACTION_SPECS',
+    function(graphDataService, explorationStatesService, explorationObjectiveService, INTERACTION_SPECS) {
   var _warningsList = [];
 
   // Given a list of initial node ids, a object with keys node ids, and values
@@ -997,7 +988,7 @@ oppia.factory('explorationWarningsService', [
     var problematicStates = [];
     var _states = explorationStatesService.getStates();
     for (var stateName in _states) {
-      if (GLOBALS.interactionConfigs[_states[stateName].interaction.id].is_terminal) {
+      if (INTERACTION_SPECS[_states[stateName].interaction.id].is_terminal) {
         continue;
       }
 

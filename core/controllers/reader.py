@@ -137,6 +137,7 @@ class ExplorationPage(base.BaseHandler):
                 interaction_ids))
 
         self.values.update({
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'can_edit': (
                 bool(self.username) and
@@ -148,8 +149,6 @@ class ExplorationPage(base.BaseHandler):
             'exploration_title': exploration.title,
             'exploration_version': version,
             'iframed': is_iframed,
-            'interaction_configs': (
-                interaction_registry.Registry.get_all_configs()),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'is_private': rights_manager.is_exploration_private(

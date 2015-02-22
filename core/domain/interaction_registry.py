@@ -94,13 +94,9 @@ class Registry(object):
         return list(result)
 
     @classmethod
-    def get_all_configs(cls):
-        """Returns a dict whose keys are interaction ids and whose values are
-        dicts that each contain two keys: 'display_mode' and 'is_terminal'.
-        """
+    def get_all_specs(cls):
+        """Returns a dict containing the full specs of each interaction."""
         return {
-            interaction.id: {
-                'display_mode': interaction.display_mode,
-                'is_terminal': interaction.is_terminal,
-            } for interaction in cls.get_all_interactions()
+            interaction.id: interaction.to_dict()
+            for interaction in cls.get_all_interactions()
         }

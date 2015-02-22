@@ -44,7 +44,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
             'Total processing time for all JSON responses',
             'Configuration',
             'Reload a single exploration',
-            'counting.yaml')
+            'three_balls')
 
         self.logout()
 

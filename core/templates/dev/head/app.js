@@ -303,31 +303,6 @@ oppia.factory('rteComponentRepositoryService', [
   };
 }]);
 
-oppia.factory('interactionRepositoryService', [
-    '$http', '$log', '$q', function($http, $log, $q) {
-  var _cachedInteractionRepository = null;
-
-  return {
-    // Returns a promise, caching the results.
-    getInteractionRepository: function() {
-      if (_cachedInteractionRepository) {
-        var deferred = $q.defer();
-        deferred.resolve(angular.copy(_cachedInteractionRepository));
-        return deferred.promise;
-      } else {
-        return $http.get('/interaction_repository/data').then(function(response) {
-          _cachedInteractionRepository = response.data.repository;
-          return angular.copy(_cachedInteractionRepository);
-        });
-      }
-    },
-    // This is used in the ExplorationEditor in order to prevent a second
-    // RPC to the backend.
-    setInteractionRepository: function(interactionRepository) {
-      _cachedInteractionRepository = interactionRepository;
-    }
-  };
-}]);
 
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {

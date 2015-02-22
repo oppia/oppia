@@ -44,8 +44,9 @@ STATE_PROPERTY_PARAM_CHANGES = 'param_changes'
 STATE_PROPERTY_CONTENT = 'content'
 STATE_PROPERTY_INTERACTION_ID = 'widget_id'
 STATE_PROPERTY_INTERACTION_CUST_ARGS = 'widget_customization_args'
-STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 STATE_PROPERTY_INTERACTION_HANDLERS = 'widget_handlers'
+# Kept for legacy purposes; not used anymore.
+STATE_PROPERTY_INTERACTION_STICKY = 'widget_sticky'
 
 
 def _is_interaction_terminal(interaction_id):
@@ -441,7 +442,6 @@ class InteractionInstance(object):
             'id': self.id,
             'customization_args': self._get_full_customization_args(),
             'handlers': [handler.to_dict() for handler in self.handlers],
-            'sticky': self.sticky
         }
 
     @classmethod
@@ -456,11 +456,10 @@ class InteractionInstance(object):
             interaction_dict['id'],
             interaction_dict['customization_args'],
             [AnswerHandlerInstance.from_dict_and_obj_type(h, obj_type)
-             for h in interaction_dict['handlers']],
-            interaction_dict['sticky'])
+             for h in interaction_dict['handlers']])
 
     def __init__(
-            self, interaction_id, customization_args, handlers, sticky=False):
+            self, interaction_id, customization_args, handlers):
         self.id = interaction_id
         # Customization args for the interaction's view. Parts of these
         # args may be Jinja templates that refer to state parameters.
@@ -471,9 +470,6 @@ class InteractionInstance(object):
         # Answer handlers and rule specs.
         self.handlers = [AnswerHandlerInstance(h.name, h.rule_specs)
                          for h in handlers]
-        # If true, keep the interaction instance from the previous state if
-        # both are of the same type.
-        self.sticky = sticky
 
     def validate(self):
         if not isinstance(self.id, basestring):
@@ -528,11 +524,6 @@ class InteractionInstance(object):
         for handler in self.handlers:
             handler.validate()
 
-        if not isinstance(self.sticky, bool):
-            raise utils.ValidationError(
-                'Expected interaction \'sticky\' flag to be a boolean, '
-                'received %s' % self.sticky)
-
     @classmethod
     def create_default_interaction(cls, default_dest_state_name):
         default_obj_type = InteractionInstance._get_obj_type(
@@ -559,7 +550,7 @@ class State(object):
         # The interaction instance associated with this state.
         self.interaction = InteractionInstance(
             interaction.id, interaction.customization_args,
-            interaction.handlers, interaction.sticky)
+            interaction.handlers)
 
     def validate(self):
         if not isinstance(self.content, list):
@@ -597,9 +588,6 @@ class State(object):
 
     def update_interaction_customization_args(self, customization_args):
         self.interaction.customization_args = customization_args
-
-    def update_interaction_sticky(self, interaction_is_sticky):
-        self.interaction.sticky = interaction_is_sticky
 
     def update_interaction_handlers(self, handlers_dict):
         if not isinstance(handlers_dict, dict):
@@ -1037,8 +1025,7 @@ class Exploration(object):
                         # be handled in the frontend so that a valid dict with
                         # feedback for every self-loop is always saved to the
                         # backend.
-                        if (rule.dest == state_name and not rule.feedback
-                                and not state.interaction.sticky):
+                        if (rule.dest == state_name and not rule.feedback):
                             if rule.is_default:
                                 error_msg = (
                                     'Please give Oppia something to say for '
@@ -1316,6 +1303,7 @@ class Exploration(object):
             state_defn['interaction']['id'] = copy.deepcopy(
                 state_defn['interaction']['widget_id'])
             del state_defn['interaction']['widget_id']
+            del state_defn['interaction']['sticky']
             del state_defn['widget']
 
         return exploration_dict
@@ -1407,7 +1395,7 @@ class Exploration(object):
 
             state.interaction = InteractionInstance(
                 idict['id'], idict['customization_args'],
-                interaction_handlers, idict['sticky'])
+                interaction_handlers)
 
             exploration.states[state_name] = state
 

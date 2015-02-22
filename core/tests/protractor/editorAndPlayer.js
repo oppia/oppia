@@ -450,9 +450,8 @@ describe('Exploration history', function() {
       21: {text: '      feedback: []', highlighted: false},
       22: {text: '      param_changes: []', highlighted: false},
       23: {text: '  id: NumericInput', highlighted: true},
-      24: {text: '  sticky: false', highlighted: false},
-      25: {text: 'param_changes: []', highlighted: false},
-      26: {text: ' ', highlighted: false}
+      24: {text: 'param_changes: []', highlighted: false},
+      25: {text: ' ', highlighted: false}
     };
     var VERSION_2_STATE_1_CONTENTS = {
       1: {text: 'content:', highlighted: false},
@@ -477,9 +476,8 @@ describe('Exploration history', function() {
       20: {text: '      feedback: []', highlighted: false},
       21: {text: '      param_changes: []', highlighted: false},
       22: {text: '  id: TextInput', highlighted: true},
-      23: {text: '  sticky: false', highlighted: false},
-      24: {text: 'param_changes: []', highlighted: false},
-      25: {text: ' ', highlighted: false}
+      23: {text: 'param_changes: []', highlighted: false},
+      24: {text: ' ', highlighted: false}
     };
     var STATE_2_STRING =
       'content:\n' +
@@ -498,7 +496,6 @@ describe('Exploration history', function() {
       '      feedback: []\n' +
       '      param_changes: []\n' +
       '  id: Continue\n' +
-      '  sticky: false\n' +
       'param_changes: []\n ';
 
     editor.expectGraphComparisonOf(1, 2).toBe([

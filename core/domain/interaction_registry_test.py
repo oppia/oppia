@@ -61,16 +61,16 @@ class InteractionRegistryUnitTests(test_utils.GenericTestBase):
                 os.path.join(os.getcwd(), interaction_definition['dir']))
             self.assertIn('%s.py' % interaction_name, contents)
 
-    def test_get_all_configs(self):
-        """Test the get_all_configs() method."""
+    def test_get_all_specs(self):
+        """Test the get_all_specs() method."""
         EXPECTED_TERMINAL_INTERACTIONS_COUNT = 1
 
-        configs_dict = interaction_registry.Registry.get_all_configs()
+        specs_dict = interaction_registry.Registry.get_all_specs()
         self.assertEqual(
-            len(configs_dict.keys()), len(feconf.ALLOWED_INTERACTIONS))
+            len(specs_dict.keys()), len(feconf.ALLOWED_INTERACTIONS))
 
         terminal_interactions_count = 0
-        for item in configs_dict.values():
+        for item in specs_dict.values():
             self.assertIn(item['display_mode'], base.ALLOWED_DISPLAY_MODES)
             self.assertTrue(isinstance(item['is_terminal'], bool))
             if item['is_terminal']:

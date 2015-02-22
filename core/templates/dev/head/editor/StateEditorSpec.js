@@ -35,13 +35,7 @@ describe('State Editor controller', function() {
       ess = $injector.get('explorationStatesService');
 
       GLOBALS = {
-        INVALID_NAME_CHARS: '#@&^%$',
-        interactionConfigs: {
-          TextInput: {
-            display_mode: 'inline',
-            is_terminal: false
-          }
-        }
+        INVALID_NAME_CHARS: '#@&^%$'
       };
 
       ess.setStates({
@@ -111,6 +105,12 @@ describe('State Editor controller', function() {
         editabilityService: {
           isEditable: function() {
             return true;
+          }
+        },
+        INTERACTION_SPECS: {
+          TextInput: {
+            display_mode: 'inline',
+            is_terminal: false
           }
         }
       });

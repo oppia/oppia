@@ -12,11 +12,10 @@
   {{ super() }}
   <script type="text/javascript">
     GLOBALS.can_edit = JSON.parse('{{can_edit|js_string}}');
+    GLOBALS.INTERACTION_SPECS = JSON.parse('{{INTERACTION_SPECS|js_string}}');
     GLOBALS.INVALID_PARAMETER_NAMES = JSON.parse('{{INVALID_PARAMETER_NAMES|js_string}}');
     GLOBALS.NEW_STATE_TEMPLATE = JSON.parse(
       '{{NEW_STATE_TEMPLATE|js_string}}');
-    // This is needed for the preview mode.
-    GLOBALS.interactionConfigs = JSON.parse('{{interaction_configs|js_string}}');
   </script>
 
   <script type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -367,8 +366,8 @@
   {{ super() }}
   <script src="/third_party/static/d3js-3.4.11/d3.min.js"></script>
   <script>
-    {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationEditor.js') }}
+    {{ include_js_file('editor/EditorServices.js') }}
     {{ include_js_file('editor/ExplorationGraph.js') }}
     {{ include_js_file('editor/ExplorationPreview.js') }}
     {{ include_js_file('components/explorationEmbedButton.js') }}

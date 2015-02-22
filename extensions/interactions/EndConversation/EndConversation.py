@@ -29,7 +29,7 @@ class EndConversation(base.BaseInteraction):
     category = ''
     description = (
         'Suggests recommendations for explorations to try next.')
-    display_mode = base.DISPLAY_MODE_INLINE
+    display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     is_terminal = True
     _dependency_ids = []
     _handlers = [{

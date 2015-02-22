@@ -74,7 +74,6 @@ NEW_STATE_TEMPLATE = {
             }],
         }],
         'id': 'TextInput',
-        'sticky': False
     },
     'param_changes': [],
     'unresolved_answers': {},
@@ -227,6 +226,7 @@ class ExplorationPage(EditorHandler):
             skins_services.Registry.get_all_skin_ids())
 
         self.values.update({
+            'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
             'announcement': jinja2.utils.Markup(
                 EDITOR_PAGE_ANNOUNCEMENT.value),
@@ -246,8 +246,6 @@ class ExplorationPage(EditorHandler):
             'can_unpublish': rights_manager.Actor(self.user_id).can_unpublish(
                 exploration_id),
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
-            'interaction_configs': (
-                interaction_registry.Registry.get_all_configs()),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
@@ -306,11 +304,6 @@ class ExplorationHandler(EditorHandler):
             'show_state_editor_tutorial_on_load': (
                 self.user_id and not
                 self.user_has_started_state_editor_tutorial),
-            'ALL_INTERACTIONS': {
-                interaction.id: interaction.to_dict()
-                for interaction
-                in interaction_registry.Registry.get_all_interactions()
-            },
         }
 
         if feconf.SHOW_SKIN_CHOOSER:

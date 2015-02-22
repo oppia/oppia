@@ -347,8 +347,7 @@ describe('New state template service', function() {
                 description: 'Default',
               }],
             }],
-            id: 'TextInput',
-            sticky: false
+            id: 'TextInput'
           },
           param_changes: [],
           unresolved_answers: {},
@@ -375,8 +374,7 @@ describe('New state template service', function() {
               description: 'Default'
             }]
           }],
-          id: 'TextInput',
-          sticky: false
+          id: 'TextInput'
         },
         param_changes: [],
         unresolved_answers: {}

@@ -39,15 +39,14 @@ oppia.directive('snapshotsSkin', [function() {
 
       $scope.submitAnswer = function(answer, handler) {
         oppiaPlayerService.submitAnswer(answer, handler, function(
-            newStateName, isSticky, feedbackHtml, questionHtml, newInteractionId) {
+            newStateName, refreshInteraction, feedbackHtml, questionHtml, newInteractionId) {
           if (!newStateName) {
             $scope.currentQuestion = 'You have finished.';
             $scope.inputTemplate = '';
             return;
           }
 
-          if (!isSticky) {
-            // The previous interaction is not sticky and should be replaced.
+          if (refreshInteraction) {
             $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
               newStateName) + oppiaPlayerService.getRandomSuffix();
           }

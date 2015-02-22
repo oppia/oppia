@@ -392,7 +392,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   New state:
     content:
@@ -413,7 +412,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -452,7 +450,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   Renamed state:
     content:
@@ -473,7 +470,6 @@ states:
           feedback: []
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
 """ % (
     feconf.DEFAULT_INIT_STATE_NAME, feconf.DEFAULT_INIT_STATE_NAME,
@@ -576,7 +572,6 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
-  sticky: false
 param_changes: []
 """) % (feconf.DEFAULT_INIT_STATE_NAME)
 
@@ -600,7 +595,6 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
-  sticky: false
 param_changes: []
 """)
     }
@@ -625,7 +619,6 @@ interaction:
       feedback: []
       param_changes: []
   id: TextInput
-  sticky: false
 param_changes: []
 """)
     }
@@ -820,35 +813,6 @@ class UpdateStateTests(ExplorationServicesUnitTests):
         self.assertEqual(
             exploration.init_state.interaction.customization_args[
                 'choices']['value'], ['Option A', 'Option B'])
-
-    def test_update_interaction_sticky(self):
-        """Test updating of interaction_sticky."""
-        exp_services.update_exploration(
-            self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_INTERACTION_STICKY, False), '')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.init_state.interaction.sticky, False)
-
-        exp_services.update_exploration(
-            self.OWNER_ID, self.EXP_ID, _get_change_list(
-                self.init_state_name,
-                exp_domain.STATE_PROPERTY_INTERACTION_STICKY, True), '')
-
-        exploration = exp_services.get_exploration_by_id(self.EXP_ID)
-        self.assertEqual(exploration.init_state.interaction.sticky, True)
-
-    def test_update_interaction_sticky_type(self):
-        """Test for error if interaction_sticky is made non-Boolean."""
-        with self.assertRaisesRegexp(
-                utils.ValidationError,
-                'Expected interaction \'sticky\' flag to be a boolean, '
-                'received 3'):
-            exp_services.update_exploration(
-                self.OWNER_ID, self.EXP_ID, _get_change_list(
-                    self.init_state_name,
-                    exp_domain.STATE_PROPERTY_INTERACTION_STICKY, 3), '')
 
     def test_update_interaction_handlers(self):
         """Test updating of interaction_handlers."""
