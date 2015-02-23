@@ -135,8 +135,6 @@ oppia.controller('ExplorationEditor', [
 
       explorationWarningsService.updateWarnings();
 
-      $rootScope.loadingMessage = '';
-
       $scope.$broadcast('refreshStatisticsTab');
       $scope.$broadcast('refreshVersionHistory', {forceRefresh: true});
 

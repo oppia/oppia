@@ -58,6 +58,8 @@ oppia.controller('StateEditor', [
       $scope.isCurrentStateTerminal = INTERACTION_SPECS[
         stateData.interaction.id].is_terminal;
     }
+
+    $rootScope.loadingMessage = '';
   };
 
   $scope.openStateContentEditor = function() {

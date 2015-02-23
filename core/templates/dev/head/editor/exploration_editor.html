@@ -303,18 +303,14 @@
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
             <div class="oppia-editor-sidebar hidden-xs">
-              <accordion close-others="true">
-                <accordion-group is-open="true">
-                  <accordion-heading>
-                    Map<span class="caret"></span>
-                  </accordion-heading>
-                  {% include 'editor/exploration_graph.html' %}
-                </accordion-group>
-                <accordion-group>
-                  <accordion-heading>Statistics<span class="caret"></span></accordion-heading>
-                  {% include 'editor/state_statistics.html' %}
-                </accordion-group>
-              </accordion>
+              <div>
+                <h3>Map</h3>
+                {% include 'editor/exploration_graph.html' %}
+              </div>
+              <div>
+                <h3>Statistics</h3>
+                {% include 'editor/state_statistics.html' %}
+              </div>
             </div>
           </div>
         </div>
