@@ -186,9 +186,11 @@
     </textarea>
 
     <md-input-group class="long oppia-blue-on-focus md-default-theme" ng-if="!getCodingMode() && !getRows()">
-      <input ng-disabled="isDisabled()" ng-model="$parent.$parent.localValue" type="text"
-             ng-blur="onInputBlur()" ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
-             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>" style="padding-top: 20px; margin-top: -30px;">
+      <input type="text" ng-disabled="isDisabled()"
+             ng-model="$parent.$parent.localValue" ng-blur="onInputBlur()"
+             ng-focus="onInputFocus()" focus-on="<[labelForFocusTarget()]>"
+             ng-keypress="onKeypress($event)" placeholder="<[getPlaceholder()]>"
+             style="padding-top: 20px; margin-top: -30px;">
     </md-input-group>
 
     <!-- Note that we do not yet support ng-blur for the code editor. -->

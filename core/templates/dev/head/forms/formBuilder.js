@@ -1321,7 +1321,7 @@ oppia.directive('schemaBasedListEditor', [
         // will assume (for now) that nested lists won't be used -- if they are,
         // this will need to be changed.
         return index === 0 ? baseFocusLabel : baseFocusLabel + index.toString();
-      }
+      };
 
       $scope.isAddItemButtonPresent = true;
       $scope.addElementText = 'Add element';
@@ -1331,7 +1331,7 @@ oppia.directive('schemaBasedListEditor', [
 
       // Only hide the 'add item' button in the case of single-line unicode input.
       $scope.isOneLineInput = true;
-      if ($scope.itemSchema().type !== 'unicode') {
+      if ($scope.itemSchema().type !== 'unicode' || $scope.itemSchema().hasOwnProperty('choices')) {
         $scope.isOneLineInput = false;
       } else if ($scope.itemSchema().ui_config) {
         if ($scope.itemSchema().ui_config.coding_mode) {
