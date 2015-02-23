@@ -48,7 +48,6 @@ states:
           - Wrong.
           param_changes: []
       id: CodeRepl
-      sticky: false
     param_changes: []
   Continue:
     content:
@@ -79,7 +78,6 @@ states:
           feedback: []
           param_changes: []
       id: Continue
-      sticky: false
     param_changes:
     - customization_args:
         parse_with_jinja: false
@@ -133,7 +131,6 @@ states:
           - Wrong.
           param_changes: []
       id: MultipleChoiceInput
-      sticky: false
     param_changes:
     - customization_args:
         parse_with_jinja: true
@@ -185,7 +182,83 @@ states:
           - Wrong.
           param_changes: []
       id: MusicNotesInput
-      sticky: false
+    param_changes: []
+  Network Graph:
+    content:
+    - type: text
+      value: Connect A to B.<br>Connect B to C.
+    interaction:
+      customization_args:
+        canAddEdge:
+          value: true
+        canAddVertex:
+          value: false
+        canDeleteEdge:
+          value: true
+        canDeleteVertex:
+          value: false
+        canEditEdgeWeight:
+          value: false
+        canEditVertexLabel:
+          value: false
+        canMoveVertex:
+          value: false
+        graph:
+          value:
+            edges: []
+            isDirected: false
+            isLabeled: true
+            isWeighted: false
+            vertices:
+            - label: A
+              x: 212
+              y: 46
+            - label: C
+              x: 366
+              y: 48
+            - label: B
+              x: 287
+              y: 117
+      handlers:
+      - name: submit
+        rule_specs:
+        - definition:
+            inputs:
+              g:
+                edges:
+                - dst: 2
+                  src: 0
+                  weight: 1
+                - dst: 1
+                  src: 2
+                  weight: 1
+                isDirected: false
+                isLabeled: true
+                isWeighted: false
+                vertices:
+                - label: A
+                  x: 140.328125
+                  y: 66.25
+                - label: C
+                  x: 193.328125
+                  y: 64.25
+                - label: B
+                  x: 171.328125
+                  y: 102.25
+            name: IsIsomorphicTo
+            rule_type: atomic
+            subject: answer
+          dest: Code REPL
+          feedback:
+          - Correct
+          param_changes: []
+        - definition:
+            rule_type: default
+          dest: Network Graph
+          feedback:
+          - Incorrect
+          param_changes: []
+      id: GraphInput
     param_changes: []
   Numeric input:
     content:
@@ -212,7 +285,6 @@ states:
           - Wrong.
           param_changes: []
       id: NumericInput
-      sticky: false
     param_changes: []
   Set input:
     content:
@@ -231,7 +303,7 @@ states:
             name: Equals
             rule_type: atomic
             subject: answer
-          dest: Code REPL
+          dest: Network Graph
           feedback: []
           param_changes: []
         - definition:
@@ -241,7 +313,6 @@ states:
           - Wrong.
           param_changes: []
       id: SetInput
-      sticky: false
     param_changes: []
   Text Area Input:
     content:
@@ -273,7 +344,6 @@ states:
           - Wrong
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   Text input:
     content:
@@ -304,7 +374,6 @@ states:
           - Wrong.
           param_changes: []
       id: TextInput
-      sticky: false
     param_changes: []
   World map:
     content:
@@ -340,5 +409,4 @@ states:
           - Wrong.
           param_changes: []
       id: InteractiveMap
-      sticky: false
     param_changes: []
