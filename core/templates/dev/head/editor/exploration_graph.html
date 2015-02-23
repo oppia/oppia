@@ -1,4 +1,6 @@
 <div ng-controller="ExplorationGraph">
+  <h3>Map</h3>
+
   <div>
     <div class="oppia-graph-viz-container protractor-test-exploration-graph">
       <div state-graph-viz graph-data="getGraphData()" current-state-id="getActiveStateName()" on-click-function="onClickStateInMinimap" on-delete-function="deleteState" on-maximize-function="openStateGraphModal" allow-panning="true" center-at-current-state="true" style="height: 100%;" is-editable="isEditable()">

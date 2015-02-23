@@ -121,8 +121,6 @@ describe('State Editor controller', function() {
       scope.initStateEditor();
       expect(scope.contentMemento).toBeNull();
       expect(scope.content[0].value).toEqual('This is some content.');
-      expect(scope.stateParamChanges[0].customization_args.value)
-        .toEqual('something clever');
     });
 
     it('should correctly handle no-op edits', function() {
@@ -183,37 +181,6 @@ describe('State Editor controller', function() {
       scope.cancelEdit();
       expect(scope.contentMemento).toBeNull();
       expect(scope.content).toEqual(contentBeforeEdit);
-    });
-
-    it('should save parameter edits correctly', function() {
-      ecs.setActiveStateName('First State');
-
-      var changeOne = {
-        name: 'comparison',
-        generator_id: 'Copier',
-        customization_args: {
-          value: 'something else',
-          parse_with_jinja: false
-        }
-      };
-
-      var changeTwo = {
-        name: 'comparison',
-        generator_id: 'Copier',
-        customization_args: {
-          value: 'And now for something completely different',
-          parse_with_jinja: false
-        }
-      };
-
-      scope.saveStateParamChanges(changeOne, []);
-      expect(cls.getChangeList()[0].new_value.customization_args.value)
-        .toEqual('something else');
-
-      scope.saveStateParamChanges(changeTwo, changeOne);
-      expect(cls.getChangeList()[1].new_value.customization_args.value).toEqual(
-        'And now for something completely different'
-      );
     });
   });
 });

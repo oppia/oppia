@@ -48,7 +48,6 @@ oppia.controller('StateEditor', [
 
     var stateData = explorationStatesService.getState($scope.stateName);
     $scope.content = stateData.content;
-    $scope.stateParamChanges = stateData.param_changes || [];
 
     // This should only be non-null when the content editor is open.
     $scope.contentMemento = null;
@@ -92,19 +91,5 @@ oppia.controller('StateEditor', [
        editorContextService.getActiveStateName());
      $scope.content = angular.copy(_stateData.content);
      $scope.contentMemento = null;
-  };
-
-  $scope.saveStateParamChanges = function(newValue, oldValue) {
-    if (!angular.equals(newValue, oldValue)) {
-      changeListService.editStateProperty(
-        editorContextService.getActiveStateName(), 'param_changes',
-        newValue, oldValue);
-
-      var _stateData = explorationStatesService.getState(
-        editorContextService.getActiveStateName());
-      _stateData.param_changes = angular.copy(newValue);
-      explorationStatesService.setState(
-        editorContextService.getActiveStateName(), _stateData);
-    }
   };
 }]);

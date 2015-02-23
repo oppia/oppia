@@ -719,7 +719,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-cc-icon {
-  bottom: 20px;
+  bottom: -50px;
   position: absolute;
   right: 25px;
 }
@@ -874,10 +874,6 @@ md-card.oppia-gallery-tile {
   height: 250px;
   margin-top: 5px;
   overflow-y: hidden;
-}
-
-.oppia-graph-and-stats-separator {
-  margin-top: 25px;
 }
 
 /* Styles for the statistics page. */

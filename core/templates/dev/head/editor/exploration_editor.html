@@ -299,17 +299,17 @@
         <div class="row">
           <div class="col-lg-9 col-md-9 col-sm-9">
             {% include 'editor/state_editor.html' %}
-            {% include 'attribution_guide.html' %}
           </div>
           <div class="col-lg-3 col-md-3 col-sm-3">
             <div class="oppia-editor-sidebar hidden-xs">
               <div>
-                <h3>Map</h3>
                 {% include 'editor/exploration_graph.html' %}
               </div>
               <div>
-                <h3>Statistics</h3>
                 {% include 'editor/state_statistics.html' %}
+              </div>
+              <div>
+                {% include 'editor/sidebar_state_parameter_changes.html' %}
               </div>
             </div>
           </div>
@@ -394,6 +394,7 @@
     {{ include_js_file('editor/HistoryServices.js') }}
     {{ include_js_file('editor/ExplorationFeedback.js') }}
     {{ include_js_file('editor/SidebarStateName.js') }}
+    {{ include_js_file('editor/SidebarStateParameterChanges.js') }}
     {{ include_js_file('editor/StateEditor.js') }}
     {{ include_js_file('editor/StateRules.js') }}
     {{ include_js_file('editor/StateStatistics.js') }}
