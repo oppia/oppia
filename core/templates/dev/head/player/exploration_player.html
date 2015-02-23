@@ -66,8 +66,9 @@
 {% block content %}
   {{ skin_tag }}
   <br><br><br>
-
-  {% include 'attribution_guide.html' %}
+  {% if not iframed %}
+    {% include 'attribution_guide.html' %}
+  {% endif %}
 
   <script type="text/ng-template" id="modals/playerFeedback">
     <div class="modal-header">

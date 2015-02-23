@@ -26,6 +26,15 @@
 {% block content %}
   <div class="oppia-about-cards-container">
     <md-card class="oppia-about-card">
+      <a class="oppia-about-anchor" name="introduction"></a>
+      <h2>Introduction</h2>
+
+      <p>
+        Oppia is a tool for creating interactive lessons called 'explorations'.
+        For a quick general overview of Oppia, click
+        <a href="/explore/{{ABOUT_EXPLORATION_ID}}">here</a>.
+      </p>
+
       <a class="oppia-about-anchor" name="community-guidelines"></a>
       <h2>Community Guidelines</h2>
 
@@ -304,6 +313,7 @@
 
   <div class="nav oppia-about-right-menu hidden-sm hidden-xs">
     <h4><strong>Quick links</strong></h4>
+    <p><a href="#introduction">Introduction</a></p>
     <p><a href="#community-guidelines">Community Guidelines</a></p>
     <p><a href="#exploration-publishing-criteria">Publishing Criteria</a></p>
     <p><a class="oppia-about-right-menu-subnav" href="#publication-criteria">Basic Criteria</a></p>

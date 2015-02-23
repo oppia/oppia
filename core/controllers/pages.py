@@ -37,6 +37,9 @@ SITE_FORUM_URL = config_domain.ConfigProperty(
 SITE_NAME = config_domain.ConfigProperty(
     'site_name', 'UnicodeString', 'The site name', default_value='SITE_NAME')
 
+# The id of the exploration for the About page.
+_ABOUT_EXPLORATION_ID = '14'
+
 
 class AboutPage(base.BaseHandler):
     """Page with information about Oppia."""
@@ -44,6 +47,7 @@ class AboutPage(base.BaseHandler):
     def get(self):
         """Handles GET requests."""
         self.values.update({
+            'ABOUT_EXPLORATION_ID': _ABOUT_EXPLORATION_ID,
             'ADMIN_EMAIL_ADDRESS': ADMIN_EMAIL_ADDRESS.value,
             'MODERATOR_REQUEST_FORUM_URL': (
                 editor.MODERATOR_REQUEST_FORUM_URL.value),

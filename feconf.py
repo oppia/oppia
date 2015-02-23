@@ -230,6 +230,7 @@ DEMO_EXPLORATIONS = [
     ('modeling_graphs', 'Graph Modeling', 'Mathematics'),
     ('protractor_test_1.yaml', 'Protractor Test', 'Mathematics'),
     ('solar_system', 'The Solar System', 'Physics'),
+    ('about_oppia.yaml', 'About Oppia', 'Welcome'),
 ]
 
 # TODO(sll): Add all other URLs here.
