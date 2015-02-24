@@ -830,7 +830,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-save-state-item-button {
-  margin-top: 2px;
+  margin-left: 5px;
 }
 
 .oppia-editable-section {
@@ -844,6 +844,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-interaction-preview {
+  opacity: 0.5;
   padding: 4px;
 }
 

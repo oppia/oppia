@@ -51,7 +51,7 @@ oppia.directive('oppiaInteractiveSetInput', [
 
         $scope.submitAnswer = function(answer) {
           if (hasDuplicates(answer)) {
-            $scope.errorMessage = 'Oops, it looks like your list has duplicates!';
+            $scope.errorMessage = 'Oops, it looks like your set has duplicates!';
           } else {
             $scope.errorMessage = '';
             $scope.$parent.$parent.submitAnswer(answer, 'submit');
