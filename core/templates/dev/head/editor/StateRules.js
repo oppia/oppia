@@ -254,6 +254,13 @@ oppia.controller('StateRules', [
     rulesService.updateAnswerChoices(newAnswerChoices);
   });
 
+  $scope.isDefaultRuleTabShown = function() {
+    var defaultRule = $scope.interactionHandlers[$scope.interactionHandlers.length - 1];
+    return (
+      defaultRule.dest !== stateName ||
+      defaultRule.feedback.length > 0);
+  };
+
   $scope.openAddRuleModal = function() {
     warningsData.clear();
     $rootScope.$broadcast('externalSave');
@@ -329,12 +336,20 @@ oppia.controller('StateRules', [
 
 
 oppia.controller('StateEditorActiveRule', [
-    '$scope', '$rootScope', 'rulesService', function($scope, $rootScope, rulesService) {
+    '$scope', '$rootScope', 'rulesService', 'editorContextService',
+    function($scope, $rootScope, rulesService, editorContextService) {
 
   $scope.interactionHandlers = rulesService.getInteractionHandlers();
+  $scope.ruleIsShown = false;
 
   $scope.$on('activeRuleChanged', function() {
     $scope.activeRule = rulesService.getActiveRule();
+    $scope.currentStateName = editorContextService.getActiveStateName();
+
+    $scope.ruleIsShown = (
+      $scope.activeRule.definition.rule_type !== 'default' ||
+      $scope.activeRule.dest !== stateName ||
+      $scope.activeRule.feedback.length > 0);
   });
 
   $scope.deleteActiveRule = function() {

@@ -1,4 +1,4 @@
-<div ng-controller="StateRules">
+<div ng-controller="StateRules" style="background: #f5f5f5;">
   <div ng-repeat="(handlerName, handler) in interactionHandlers">
     <div>
       <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
@@ -18,7 +18,8 @@
           </a>
         </li>
 
-        <li ng-if="handler.length > 1" ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
+        <li ng-if="isDefaultRuleTabShown()"
+            ng-class="{'active': activeRuleIndex === handler.length - 1}" style="margin-top: 0;">
           <a ng-click="changeActiveRuleIndex(handler.length - 1)" href="#" class="oppia-rule-tab oppia-default-rule-tab protractor-test-default-rule-tab" ng-class="{'oppia-rule-tab-active': activeRuleIndex == handler.length - 1}">
             <span style="padding-left: 45px;">
               None of the above rules apply...
