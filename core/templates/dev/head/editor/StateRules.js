@@ -255,9 +255,9 @@ oppia.controller('StateRules', [
   });
 
   $scope.isDefaultRuleTabShown = function() {
-    var defaultRule = $scope.interactionHandlers[$scope.interactionHandlers.length - 1];
+    var defaultRule = $scope.interactionHandlers.submit[$scope.interactionHandlers.submit.length - 1];
     return (
-      defaultRule.dest !== stateName ||
+      defaultRule.dest !== editorContextService.getActiveStateName() ||
       defaultRule.feedback.length > 0);
   };
 
@@ -348,7 +348,7 @@ oppia.controller('StateEditorActiveRule', [
 
     $scope.ruleIsShown = (
       $scope.activeRule.definition.rule_type !== 'default' ||
-      $scope.activeRule.dest !== stateName ||
+      $scope.activeRule.dest !== editorContextService.getActiveStateName() ||
       $scope.activeRule.feedback.length > 0);
   });
 
