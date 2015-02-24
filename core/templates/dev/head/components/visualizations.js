@@ -307,7 +307,7 @@ oppia.directive('stateGraphViz', [
       linkPropertyMapping: '='
     },
     templateUrl: 'visualizations/stateGraphViz',
-    controller: ['$scope', '$element', function($scope, $element) {
+    controller: ['$scope', '$element', '$timeout', function($scope, $element, $timeout) {
       var _redrawGraph = function() {
         if ($scope.graphData()) {
           $scope.graphLoaded = false;
@@ -466,8 +466,8 @@ oppia.directive('stateGraphViz', [
             dxperp /= norm;
             dyperp /= norm;
 
-            var midx = sourcex + dx/2 + dxperp*(sourceHeight/2),
-                midy = sourcey + dy/2 + dyperp*(targetHeight/2),
+            var midx = sourcex + dx/2 + dxperp*(sourceHeight/4),
+                midy = sourcey + dy/2 + dyperp*(targetHeight/4),
                 startx = sourcex + startCutoff*dx,
                 starty = sourcey + startCutoff*dy,
                 endx = targetx - endCutoff*dx,
@@ -592,7 +592,7 @@ oppia.directive('stateGraphViz', [
         if ($scope.allowPanning) {
           // Without the timeout, $element.find fails to find the required rect in the
           // state graph modal dialog.
-          setTimeout(function() {
+          $timeout(function() {
             var dimensions = _getElementDimensions();
 
             d3.select($element.find('rect.pannable-rect')[0]).call(
@@ -620,11 +620,11 @@ oppia.directive('stateGraphViz', [
               $scope.innerTransformStr = 'translate(' + d3.event.translate + ')';
               $scope.$apply();
             }));
-          });
+          }, 10);
         }
 
         if ($scope.centerAtCurrentState) {
-          setTimeout(function() {
+          $timeout(function() {
             var dimensions = _getElementDimensions();
 
             // Center the graph at the node representing the current state.
@@ -655,7 +655,7 @@ oppia.directive('stateGraphViz', [
 
             $scope.overallTransformStr = 'translate(' + originalTranslationAmounts + ')';
             $scope.$apply();
-          });
+          }, 20);
         }
       };
     }]
