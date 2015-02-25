@@ -206,6 +206,9 @@ urls = [
         r'/preferenceshandler/data', profile.PreferencesHandler,
         'preferences_handler'),
     get_redirect_route(
+        r'/preferenceshandler/profile_picture', profile.ProfilePictureHandler,
+        'profle_picture_handler'),
+    get_redirect_route(
         r'%s' % feconf.SIGNUP_URL, profile.SignupPage, 'signup_page'),
     get_redirect_route(
         r'%s' % feconf.SIGNUP_DATA_URL, profile.SignupHandler,

@@ -110,6 +110,11 @@ oppia.directive('conversationSkin', [function() {
         oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
+          oppiaPlayerService.getUserProfileImage().then(function(result) {
+            // $scope.profilePicture contains a dataURI representation of the
+            // user-uploaded profile image, or the path to the default image.
+            $scope.profilePicture = result;
+          });
           hasInteractedAtLeastOnce = false;
           $scope.finished = false;
           $scope.hasEditingRights = hasEditingRights;
