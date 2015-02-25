@@ -89,19 +89,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
           validatorsService, rulesService, explorationStatesService) {
-        $scope.RULE_FEEDBACK_SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'html',
-            ui_config: {
-              size: 'small'
-            }
-          },
-          ui_config: {
-            add_element_text: 'Add Variation'
-          }
-        };
-
         $scope.getAnswerChoices = function() {
           return rulesService.getAnswerChoices();
         };
@@ -168,6 +155,57 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.deleteRule();
         };
 
+        $scope.$on('externalSave', function() {
+          if ($scope.ruleEditorIsOpen) {
+            $scope.saveThisRule();
+          }
+        });
+
+        $scope.getActiveStateName = function() {
+          return editorContextService.getActiveStateName();
+        };
+
+        $scope.isRuleConfusing = function() {
+          return (
+            $scope.rule.feedback.length === 0 &&
+            $scope.rule.dest === editorContextService.getActiveStateName());
+        };
+
+        $scope.navigateToRuleDest = function() {
+          routerService.navigateToMainTab($scope.rule.dest);
+        };
+      }
+    ]
+  };
+}]);
+
+
+oppia.directive('ruleDetailsEditor', ['$log', function($log) {
+  return {
+    restrict: 'E',
+    scope: {
+      rule: '='
+    },
+    templateUrl: 'rules/ruleDetailsEditor',
+    controller: [
+      '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
+      'validatorsService', 'rulesService', 'explorationStatesService',
+      function(
+          $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
+          validatorsService, rulesService, explorationStatesService) {
+        $scope.RULE_FEEDBACK_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'html',
+            ui_config: {
+              size: 'small'
+            }
+          },
+          ui_config: {
+            add_element_text: 'Add Variation'
+          }
+        };
+
         // We use a slash because this character is forbidden in a state name.
         var _PLACEHOLDER_RULE_DEST = '/';
 
@@ -176,15 +214,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $modal.open({
               templateUrl: 'modals/addState',
               backdrop: true,
-              resolve: {
-                isEditable: function() {
-                  return $scope.isEditable;
-                }
-              },
+              resolve: {},
               controller: [
-                  '$scope', '$timeout', '$modalInstance', 'explorationStatesService', 'isEditable', 'focusService',
-                  function($scope, $timeout, $modalInstance, explorationStatesService, isEditable, focusService) {
-                $scope.isEditable = isEditable;
+                  '$scope', '$timeout', '$modalInstance', 'explorationStatesService', 'focusService',
+                  function($scope, $timeout, $modalInstance, explorationStatesService, focusService) {
                 $scope.newStateName = '';
                 $timeout(function() {
                   focusService.setFocus('newStateNameInput');
@@ -261,32 +294,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           }
         }, true);
-
-        $scope.$on('externalSave', function() {
-          if ($scope.ruleEditorIsOpen) {
-            $scope.saveThisRule();
-          }
-        });
-
-        $scope.getActiveStateName = function() {
-          return editorContextService.getActiveStateName();
-        };
-
-        $scope.isRuleConfusing = function() {
-          return (
-            $scope.rule.feedback.length === 0 &&
-            $scope.rule.dest === editorContextService.getActiveStateName());
-        };
-
-        // Method that converts newly typed-in destination strings to text in the
-        // rule destination dropdown.
-        $scope.convertNewDestToText = function(term) {
-          return term + ' (new)';
-        };
-
-        $scope.navigateToRuleDest = function() {
-          routerService.navigateToMainTab($scope.rule.dest);
-        };
       }
     ]
   };
@@ -298,8 +305,7 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       currentRuleDescription: '=',
-      currentRuleDefinition: '=',
-      outerFormName: '@'
+      currentRuleDefinition: '='
     },
     templateUrl: 'rules/ruleDescriptionEditor',
     controller: [

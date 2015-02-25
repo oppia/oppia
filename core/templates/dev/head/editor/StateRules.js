@@ -270,24 +270,26 @@ oppia.controller('StateRules', [
       backdrop: true,
       resolve: {},
       controller: [
-          '$scope', '$modalInstance', 'rulesService',
-          function($scope, $modalInstance, rulesService) {
-        $scope.currentRuleDescription = null;
-        $scope.currentRuleDefinition = {
-          rule_type: 'atomic',
-          name: null,
-          inputs: {},
-          subject: 'answer'
+          '$scope', '$modalInstance', 'rulesService', 'editorContextService',
+          function($scope, $modalInstance, rulesService, editorContextService) {
+        $scope.tmpRule = {
+          description: null,
+          definition: {
+            rule_type: 'atomic',
+            name: null,
+            inputs: {},
+            subject: 'answer'
+          },
+          dest: editorContextService.getActiveStateName(),
+          feedback: [],
+          param_changes: []
         };
 
         $scope.interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
         $scope.answerChoices = rulesService.getAnswerChoices();
 
         $scope.addNewRule = function() {
-          $modalInstance.close({
-            description: $scope.currentRuleDescription,
-            definition: $scope.currentRuleDefinition
-          });
+          $modalInstance.close($scope.tmpRule);
         };
 
         $scope.cancel = function() {
@@ -300,13 +302,7 @@ oppia.controller('StateRules', [
 
       // Move the tmp rule into the list of 'real' rules.
       var numRules = $scope.interactionHandlers['submit'].length;
-      $scope.interactionHandlers['submit'].splice(numRules - 1, 0, {
-        description: tmpRule.description,
-        definition: tmpRule.definition,
-        dest: editorContextService.getActiveStateName(),
-        feedback: [],
-        param_changes: []
-      });
+      $scope.interactionHandlers['submit'].splice(numRules - 1, 0, tmpRule);
 
       rulesService.save($scope.interactionHandlers);
 
