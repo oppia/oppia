@@ -44,7 +44,7 @@ class ImageClickInput(base.BaseInteraction):
         },
     }, {
         'name': 'highlightRegionsOnHover',
-        'description': 'Whether regions the learner is hovering over should be highlighted.',
+        'description': 'Highlight regions when the learner hovers over them',
         'schema': {
             'type': 'bool',
         },
