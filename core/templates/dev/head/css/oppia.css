@@ -163,7 +163,7 @@ div.wysiwyg, div.wysiwyg iframe.wysiwyg-content {
   width: 100%;
 }
 div.wysiwyg iframe.wysiwyg-content-small {
-  height: 50px;
+  height: 70px;
 }
 div.wysiwyg iframe.wysiwyg-content-large {
   height: 200px;
@@ -885,17 +885,22 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-add-rule-button {
+  background-color: #5C70B8;
   border: 0;
   border-top: 1px solid #ccc;
   border-bottom: 1px solid #ccc;
   border-radius: 0;
+  color: white;
   font-size: 14px;
+  opacity: 0.9;
   padding: 7px;
   width: 100%;
 }
 
 .oppia-add-rule-button:hover {
-  background-color: #eaeaea;
+  background-color: #5C70B8;
+  color: white;
+  opacity: 1;
 }
 
 .oppia-small-delete-button {

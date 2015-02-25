@@ -24,12 +24,8 @@
 
       <md-card class="oppia-editor-card-with-avatar" ng-hide="isCurrentStateTerminal">
         <div class="oppia-editor-card-body">
-          <div style="background: #f5f5f5;">
-            {% include 'editor/state_editor_rules.html' %}
-          </div>
-          <div class="oppia-editor-card-section" style="padding-top: 20px; padding-bottom: 10px;">
-            {% include 'editor/state_editor_active_rule.html' %}
-          </div>
+          {% include 'editor/state_editor_rules.html' %}
+          {% include 'editor/state_editor_active_rule.html' %}
         </div>
       </md-card>
     </div>
