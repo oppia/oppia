@@ -76,7 +76,7 @@
 
       <div class="pull-right">
         <button type="button" class="btn btn-default" ng-click="cancelThisEdit()">Cancel</button>
-        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description || editRuleForm.$invalid" ng-click="saveThisRule()">Save Rule</button>
+        <button type="button" class="btn btn-success protractor-test-save-rule" ng-disabled="!rule.description || editRuleForm.$invalid || isRuleEmpty(rule)" ng-click="saveThisRule()">Save Rule</button>
       </div>
     </div>
   </div>
@@ -87,11 +87,14 @@
     <div>
       <strong>Rule</strong>
     </div>
-    <span ng-if="rule.description !== 'Default'">
-      <rule-description-editor current-rule-description="rule.description" current-rule-definition="rule.definition"></rule-description-editor>
+    <span ng-if="rule.description !== 'Default' || canAddDefaultRule()">
+      <rule-description-editor current-rule-description="rule.description"
+                               current-rule-definition="rule.definition"
+                               can-add-default-rule="canAddDefaultRule()">
+      </rule-description-editor>
     </span>
 
-    <span ng-if="rule.description === 'Default'">
+    <span ng-if="rule.description === 'Default' && !canAddDefaultRule()">
       No other rules apply...
     </span>
   </div>
@@ -153,8 +156,7 @@
 
 <script type="text/ng-template" id="rules/ruleDescriptionEditor">
   <form class="form-inline" role="form">
-    Answer
-    <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="currentRuleDescription" on-selection-change="onSelectNewRuleType()">
+    <rule-type-selector class="protractor-test-rule-description" all-rule-types="allRuleTypes" local-value="currentRuleDescription" on-selection-change="onSelectNewRuleType()" can-add-default-rule="canAddDefaultRule()">
     </rule-type-selector>
 
     <span ng-repeat="item in ruleDescriptionFragments track by $index" class="form-group protractor-test-rule-description-fragment">

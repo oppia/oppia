@@ -24,19 +24,40 @@ oppia.directive('ruleTypeSelector', [function() {
     scope: {
       allRuleTypes: '&',
       localValue: '=',
-      onSelectionChange: '&'
+      onSelectionChange: '&',
+      canAddDefaultRule: '&'
     },
     template: '<input type="hidden">',
-    controller: ['$scope', '$element', '$filter', function($scope, $element, $filter) {
+    controller: [
+        '$scope', '$element', '$rootScope', '$filter',
+        function($scope, $element, $rootScope, $filter) {
+
       var choices = [];
-      var numberOfRuleTypes = 0 ;
+      var numberOfRuleTypes = 0;
       for (var ruleType in $scope.allRuleTypes()) {
         numberOfRuleTypes++;
         choices.push({
           id: ruleType,
-          text: $filter('replaceInputsWithEllipses')(ruleType)
+          text: 'Answer ' + $filter('replaceInputsWithEllipses')(ruleType)
         });
       }
+
+      if ($scope.canAddDefaultRule()) {
+        choices.push({
+          id: 'Default',
+          text: 'For all other cases'
+        });
+      }
+
+      choices.sort(function(a, b) {
+        if (a.text < b.text) {
+          return -1;
+        } else if (a.text > b.text) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
 
       var select2Node = $element[0].firstChild;
       $(select2Node).select2({
@@ -46,7 +67,11 @@ oppia.directive('ruleTypeSelector', [function() {
         allowClear: false,
         width: '200px',
         formatSelection: function(object, container) {
-          return $filter('truncateAtFirstInput')(object.id);
+          if (object.id === 'Default') {
+            return 'For all other cases';
+          } else {
+            return 'Answer ' + $filter('truncateAtFirstInput')(object.id);
+          }
         }
       });
 
@@ -89,6 +114,8 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
           validatorsService, rulesService, explorationStatesService) {
+        $scope.editRuleForm = {};
+
         $scope.getAnswerChoices = function() {
           return rulesService.getAnswerChoices();
         };
@@ -174,6 +201,19 @@ oppia.directive('ruleEditor', ['$log', function($log) {
         $scope.navigateToRuleDest = function() {
           routerService.navigateToMainTab($scope.rule.dest);
         };
+
+        $scope.isRuleEmpty = function(rule) {
+          var hasFeedback = false;
+          for (var i = 0; i < rule.feedback.length; i++) {
+            if (rule.feedback[i].length > 0) {
+              hasFeedback = true;
+            }
+          }
+
+          return (
+            rule.dest === editorContextService.getActiveStateName() &&
+            !hasFeedback);
+        };
       }
     ]
   };
@@ -184,7 +224,8 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
   return {
     restrict: 'E',
     scope: {
-      rule: '='
+      rule: '=',
+      canAddDefaultRule: '&'
     },
     templateUrl: 'rules/ruleDetailsEditor',
     controller: [
@@ -193,6 +234,7 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
           validatorsService, rulesService, explorationStatesService) {
+
         $scope.RULE_FEEDBACK_SCHEMA = {
           type: 'list',
           items: {
@@ -305,7 +347,8 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
     restrict: 'E',
     scope: {
       currentRuleDescription: '=',
-      currentRuleDefinition: '='
+      currentRuleDefinition: '=',
+      canAddDefaultRule: '&'
     },
     templateUrl: 'rules/ruleDescriptionEditor',
     controller: [

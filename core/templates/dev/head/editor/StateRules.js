@@ -268,10 +268,16 @@ oppia.controller('StateRules', [
     $modal.open({
       templateUrl: 'modals/addRule',
       backdrop: true,
-      resolve: {},
+      resolve: {
+        canAddDefaultRule: function() {
+          return !$scope.isDefaultRuleTabShown();
+        }
+      },
       controller: [
-          '$scope', '$modalInstance', 'rulesService', 'editorContextService',
-          function($scope, $modalInstance, rulesService, editorContextService) {
+          '$scope', '$modalInstance', 'rulesService', 'editorContextService', 'canAddDefaultRule',
+          function($scope, $modalInstance, rulesService, editorContextService, canAddDefaultRule) {
+        $scope.canAddDefaultRule = canAddDefaultRule;
+
         $scope.tmpRule = {
           description: null,
           definition: {
@@ -284,6 +290,21 @@ oppia.controller('StateRules', [
           feedback: [],
           param_changes: []
         };
+
+        $scope.isRuleEmpty = function(tmpRule) {
+          var hasFeedback = false;
+          for (var i = 0; i < tmpRule.feedback.length; i++) {
+            if (tmpRule.feedback[i].length > 0) {
+              hasFeedback = true;
+            }
+          }
+
+          return (
+            tmpRule.dest === editorContextService.getActiveStateName() &&
+            !hasFeedback);
+        };
+
+        $scope.addRuleForm = {};
 
         $scope.interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
         $scope.answerChoices = rulesService.getAnswerChoices();
@@ -300,9 +321,18 @@ oppia.controller('StateRules', [
     }).result.then(function(tmpRule) {
       _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
 
-      // Move the tmp rule into the list of 'real' rules.
       var numRules = $scope.interactionHandlers['submit'].length;
-      $scope.interactionHandlers['submit'].splice(numRules - 1, 0, tmpRule);
+
+      if (tmpRule.description === 'Default') {
+        if ($scope.isDefaultRuleTabShown()) {
+          warningsData.addWarning('Tried to add a duplicate default rule');
+          return;
+        } else {
+          $scope.interactionHandlers['submit'][numRules - 1] = tmpRule;
+        }
+      } else {
+        $scope.interactionHandlers['submit'].splice(numRules - 1, 0, tmpRule);
+      }
 
       rulesService.save($scope.interactionHandlers);
 

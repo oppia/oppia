@@ -43,14 +43,14 @@
   </div>
 
   <div class="modal-body">
-    <form name="addRuleForm" class="form-inline">
-      <rule-details-editor rule="tmpRule">
+    <form name="addRuleForm.ruleDetailsForm" class="form-inline">
+      <rule-details-editor rule="tmpRule" can-add-default-rule="canAddDefaultRule">
       </rule-details-editor>
     </form>
   </div>
 
   <div class="modal-footer">
     <button class="btn btn-default" ng-click="cancel()">Cancel</button>
-    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewRule()" ng-disabled="addRuleForm.$invalid">Add New Rule</button>
+    <button class="btn btn-success protractor-test-add-new-rule" ng-click="addNewRule()" ng-disabled="addRuleForm.ruleDetailsForm.$invalid || isRuleEmpty(tmpRule)">Add New Rule</button>
   </div>
 </script>
