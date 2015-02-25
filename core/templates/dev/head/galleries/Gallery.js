@@ -137,6 +137,26 @@ oppia.controller('Gallery', [
     explorationId: '1',
     explorationSubject: 'programming',
     imageUrl: '/images/splash-image-2.jpg'
+  }, {
+    explorationId: '3',
+    explorationSubject: 'algorithms',
+    imageUrl: '/images/splash-image-3.jpg'
+  }, {
+    explorationId: '4',
+    explorationSubject: 'physics',
+    imageUrl: '/images/splash-image-4.jpg'
+  }, {
+    explorationId: '6',
+    explorationSubject: 'languages',
+    imageUrl: '/images/splash-image-5.jpg'
+  }, {
+    explorationId: '7',
+    explorationSubject: 'logic',
+    imageUrl: '/images/splash-image-6.jpg'
+  }, {
+    explorationId: '8',
+    explorationSubject: 'math',
+    imageUrl: '/images/splash-image-7.jpg'
   }];
 
   // Default color.

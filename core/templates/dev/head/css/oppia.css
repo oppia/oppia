@@ -554,13 +554,13 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-gallery-tiles-introduction {
   font-size: 1em;
   padding-bottom: 20px;
-  padding-top: 40px;
 }
 
 .oppia-gallery-tiles-container {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 40px;
   max-width: 800px;
   min-height: 500px;
   padding-bottom: 25px;
@@ -1177,10 +1177,10 @@ oppia-parameter {
 }
 
 .oppia-gallery-banner-link {
-  color: rgba(251, 234, 43, 0.9);
+  color: rgba(251, 234, 43, 1);
 }
 .oppia-gallery-banner-link:hover {
-  color: rgba(251, 234, 43, 1.0);
+  color: rgba(255, 238, 47, 1);
   text-decoration: none;
 }
 
