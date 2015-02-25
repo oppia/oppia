@@ -69,7 +69,7 @@
       </rule-details-editor>
     </form>
 
-    <br><br>
+    <br>
 
     <div class="oppia-rule-save-cancel-buttons">
       <button type="button" class="btn btn-danger protractor-test-delete-rule" ng-if="!isDefaultRule()" ng-click="deleteThisRule()">Delete Rule</button>
@@ -99,7 +99,7 @@
     </span>
   </div>
 
-  <br><br>
+  <br>
 
   <div class="oppia-rule-edit-feedback protractor-test-feedback-bubble">
     <div>
@@ -116,7 +116,7 @@
     </schema-based-editor>
   </div>
 
-  <br><br>
+  <br>
 
   <div class="form-inline protractor-test-dest-bubble" style="margin-bottom: 10px;">
     <div>
@@ -124,7 +124,7 @@
     </div>
     <div class="form-group" style="font-size: 1.1em;">
       <span ng-if="!reloadingDestinations">
-        <select class="form-control" ng-model="rule.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="margin-left: 10px; width: 200px;">
+        <select class="form-control" ng-model="rule.dest" ng-change="createNewDestIfNecessary()" ng-options="choice.id as choice.text for choice in destChoices" style="width: 200px;">
         </select>
       </span>
     </div>

@@ -287,7 +287,7 @@ oppia.controller('StateRules', [
             subject: 'answer'
           },
           dest: editorContextService.getActiveStateName(),
-          feedback: [],
+          feedback: [''],
           param_changes: []
         };
 

@@ -42,13 +42,6 @@ oppia.directive('ruleTypeSelector', [function() {
         });
       }
 
-      if ($scope.canAddDefaultRule()) {
-        choices.push({
-          id: 'Default',
-          text: 'For all other cases'
-        });
-      }
-
       choices.sort(function(a, b) {
         if (a.text < b.text) {
           return -1;
@@ -59,16 +52,23 @@ oppia.directive('ruleTypeSelector', [function() {
         }
       });
 
+      if ($scope.canAddDefaultRule()) {
+        choices.unshift({
+          id: 'Default',
+          text: 'When no other rule applies...'
+        });
+      }
+
       var select2Node = $element[0].firstChild;
       $(select2Node).select2({
         data: choices,
         // Suppress the search box.
         minimumResultsForSearch: -1,
         allowClear: false,
-        width: '200px',
+        width: '210px',
         formatSelection: function(object, container) {
           if (object.id === 'Default') {
-            return 'For all other cases';
+            return 'When no other rule applies';
           } else {
             return 'Answer ' + $filter('truncateAtFirstInput')(object.id);
           }
