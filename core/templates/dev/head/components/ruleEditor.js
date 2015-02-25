@@ -59,6 +59,10 @@ oppia.directive('ruleTypeSelector', [function() {
         });
       }
 
+      if (!$scope.localValue) {
+        $scope.localValue = choices[0].id;
+      }
+
       var select2Node = $element[0].firstChild;
       $(select2Node).select2({
         data: choices,
@@ -74,10 +78,6 @@ oppia.directive('ruleTypeSelector', [function() {
           }
         }
       });
-
-      if (numberOfRuleTypes <= 1) {
-        $(select2Node).select2('enable', false);
-      }
 
       // Initialize the dropdown.
       $(select2Node).select2('val', $scope.localValue);
@@ -458,10 +458,11 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
       _generateAllRuleTypes();
       if ($scope.currentRuleDescription === null) {
         for (var key in $scope.allRuleTypes) {
-          $scope.currentRuleDescription = key;
-          $scope.onSelectNewRuleType();
-          break;
+          if ($scope.currentRuleDescription === null || key < $scope.currentRuleDescription) {
+            $scope.currentRuleDescription = key;
+          }
         }
+        $scope.onSelectNewRuleType();
       }
 
       _computeRuleDescriptionFragments();

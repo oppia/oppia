@@ -279,7 +279,7 @@ oppia.controller('StateRules', [
         $scope.canAddDefaultRule = canAddDefaultRule;
 
         $scope.tmpRule = {
-          description: null,
+          description: ($scope.canAddDefaultRule ? 'Default' : null),
           definition: {
             rule_type: 'atomic',
             name: null,
@@ -328,15 +328,16 @@ oppia.controller('StateRules', [
           warningsData.addWarning('Tried to add a duplicate default rule');
           return;
         } else {
+          tmpRule.definition = {rule_type: 'default'};
           $scope.interactionHandlers['submit'][numRules - 1] = tmpRule;
         }
+        rulesService.save($scope.interactionHandlers);
+        $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 1);
       } else {
         $scope.interactionHandlers['submit'].splice(numRules - 1, 0, tmpRule);
+        rulesService.save($scope.interactionHandlers);
+        $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 2);
       }
-
-      rulesService.save($scope.interactionHandlers);
-
-      $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 2);
     });
   };
 

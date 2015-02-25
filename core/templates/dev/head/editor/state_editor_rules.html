@@ -1,9 +1,10 @@
 <div ng-controller="StateRules" style="background: #f5f5f5;">
-  <div ng-if="getCurrentInteractionId() !== 'Continue' && editabilityService.isEditable()" class="oppia-add-rule-button-container">
+  <div ng-if="editabilityService.isEditable() && (getCurrentInteractionId() !== 'Continue' || !isDefaultRuleTabShown())" class="oppia-add-rule-button-container">
     <button type="button" class="btn btn-default btn-lg oppia-add-rule-button protractor-test-open-add-rule-modal" ng-click="openAddRuleModal()">
       + Add Rule
     </button>
   </div>
+
   <div ng-repeat="(handlerName, handler) in interactionHandlers">
     <div>
       <ul class="nav nav-stacked nav-pills" role="tablist" ui-sortable="RULE_LIST_SORTABLE_OPTIONS" ng-model="handler">
@@ -43,7 +44,7 @@
   </div>
 
   <div class="modal-body">
-    <form name="addRuleForm.ruleDetailsForm" class="form-inline">
+    <form name="addRuleForm.ruleDetailsForm" class="form-inline protractor-test-add-rule-details">
       <rule-details-editor rule="tmpRule" can-add-default-rule="canAddDefaultRule">
       </rule-details-editor>
     </form>

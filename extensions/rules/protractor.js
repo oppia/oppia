@@ -87,9 +87,13 @@ var DESCRIPTIONS = {
 };
 
 var getDescription = function(objectName, ruleName) {
+  if (ruleName === 'Default') {
+    return 'When no other rule applies';
+  }
+
   if (DESCRIPTIONS.hasOwnProperty(objectName)) {
     if (DESCRIPTIONS[objectName].hasOwnProperty(ruleName)) {
-      return DESCRIPTIONS[objectName][ruleName];
+      return 'Answer ' + DESCRIPTIONS[objectName][ruleName];
     } else {
       throw Error('Unknown rule: ' + ruleName);
     }
