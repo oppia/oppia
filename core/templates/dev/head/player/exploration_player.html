@@ -28,7 +28,7 @@
 {% block local_top_nav_options %}
   <ul class="nav navbar-nav oppia-navbar-nav navbar-right" ng-controller="LearnerLocalNav" style="margin-right: 0px;">
     <li class="dropdown">
-      <a href="" title="Share" class="dropdown-toggle" data-toggle="dropdown">
+      <a href="" tooltip="Share" tooltip-placement="left" class="dropdown-toggle" data-toggle="dropdown">
         <span class="glyphicon glyphicon-share"></span>
       </a>
       <ul class="dropdown-menu oppia-share-dropdown-menu" role="menu">
@@ -36,26 +36,27 @@
           <!-- TODO(wagnerdmike): Share link still doesn't show snippet image, name, or description. -->
           <a ng-href="https://plus.google.com/share?url=<[serverName]>/explore/<[explorationId]>"
              onclick="javascript:window.open(this.href,
-                      '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;">
+                      '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
+             tooltip="Share on Google+" tooltip-placement="right">
             <img src="https://www.gstatic.com/images/icons/gplus-64.png"
                  alt="Share on Google+"/>
           </a>
         </li>
         <li>
-          <a href="" ng-click="showEmbedExplorationModal(explorationId)">
+          <a href="" ng-click="showEmbedExplorationModal(explorationId)" tooltip="Embed" tooltip-placement="right">
             <img src="/third_party/static/material-design-icons-1.0.1/ic_link_black_48dp.png">
           </a>
         </li>
       </ul>
     </li>
     <li>
-      <a href="" title="Give feedback" ng-click="showFeedbackModal()">
+      <a href="" tooltip="Give feedback" tooltip-placement="bottom" ng-click="showFeedbackModal()">
         <span class="glyphicon glyphicon-comment"></span>
       </a>
     </li>
     {% if can_edit %}
       <li>
-        <a ng-href="/create/<[explorationId]>" title="Edit" target="_blank">
+        <a ng-href="/create/<[explorationId]>" tooltip="Edit" tooltip-placement="bottom" target="_blank">
           <span class="glyphicon glyphicon-pencil"></span>
         </a>
       </li>

@@ -32,8 +32,8 @@ oppia.directive('oppiaNoninteractiveVideo', [
         $scope.videoId = oppiaHtmlEscaper.escapedJsonToObj($attrs.videoIdWithValue);
         $scope.timingParams = '&start=' + start + '&end=' + end;
         $scope.videoUrl = $sce.trustAsResourceUrl(
-          'https://www.youtube.com/embed/' + $scope.videoId + '?rel=' + $scope.timingParams + $scope.autoplaySuffix
-        );
+          'https://www.youtube.com/embed/' + $scope.videoId + '?rel=0' +
+          $scope.timingParams + $scope.autoplaySuffix);
       }]
     };
   }

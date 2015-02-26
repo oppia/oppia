@@ -119,12 +119,12 @@ oppia.factory('answerClassificationService', [
 // and audit it to ensure it behaves differently for learner mode and editor
 // mode. Add tests to ensure this.
 oppia.factory('oppiaPlayerService', [
-    '$http', '$rootScope', '$modal', '$filter', 'messengerService',
+    '$http', '$rootScope', '$modal', '$filter', '$q', 'messengerService',
     'stopwatchProviderService', 'learnerParamsService', 'warningsData',
     'oppiaHtmlEscaper', 'answerClassificationService', 'stateTransitionService',
     'INTERACTION_SPECS',
     function(
-      $http, $rootScope, $modal, $filter, messengerService,
+      $http, $rootScope, $modal, $filter, $q, messengerService,
       stopwatchProviderService, learnerParamsService, warningsData,
       oppiaHtmlEscaper, answerClassificationService, stateTransitionService,
       INTERACTION_SPECS) {
@@ -511,6 +511,26 @@ oppia.factory('oppiaPlayerService', [
         }
       });
     },
+    // Returns a promise for the user profile picture, or the default image if
+    // user is not logged in or has not uploaded a profile picture, or the
+    // player is in preview mode.
+    getUserProfileImage: function() {
+      var DEFAULT_PROFILE_IMAGE_PATH = '/images/user_mint_48px.png';
+      var deferred = $q.defer();
+      if (_isLoggedIn && !_editorPreviewMode) {
+        $http.get('/preferenceshandler/profile_picture').success(function(data) {
+          var profilePictureDataUrl = data.profile_picture_data_url;
+          if (profilePictureDataUrl) {
+            deferred.resolve(profilePictureDataUrl);
+          } else {
+            deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+          }
+        });
+      } else {
+        deferred.resolve(DEFAULT_PROFILE_IMAGE_PATH);
+      }
+      return deferred.promise;
+    }
   };
 }]);
 
