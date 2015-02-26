@@ -21,7 +21,7 @@ class MusicNotesInput(base.BaseInteraction):
     """Interaction for music notes input."""
 
     name = 'Music Notes'
-    category = 'Music'
+    category = ''
     description = (
         'Allows learners to drag and drop notes onto the lines of a music '
         'staff.')

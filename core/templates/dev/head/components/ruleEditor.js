@@ -248,6 +248,8 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
           }
         };
 
+        var lastSetRuleDest = $scope.rule.dest;
+
         // We use a slash because this character is forbidden in a state name.
         var _PLACEHOLDER_RULE_DEST = '/';
 
@@ -293,16 +295,19 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
                   $rootScope.$broadcast('refreshGraph');
                   $timeout(function() {
                     $scope.rule.dest = result.newStateName;
+                    lastSetRuleDest = $scope.rule.dest;
                     // Reload the dropdown to include the new state.
                     $scope.reloadingDestinations = false;
                   });
                 });
               } else if (result.action === 'cancel') {
-                $scope.rule.dest = $scope.ruleDestMemento;
+                $scope.rule.dest = lastSetRuleDest;
               } else {
                 throw 'Invalid result action from add state modal: ' + result.action;
               }
             });
+          } else {
+            lastSetRuleDest = $scope.rule.dest;
           }
         };
 
@@ -318,11 +323,11 @@ oppia.directive('ruleDetailsEditor', ['$log', function($log) {
           // represent all states, including 'END', as well as an option to
           // create a new state.
           $scope.destChoices = [{
-            id: _PLACEHOLDER_RULE_DEST,
-            text: 'Create New...'
-          }, {
             id: _currentStateName,
             text: _currentStateName + ' ⟳'
+          }, {
+            id: _PLACEHOLDER_RULE_DEST,
+            text: 'Create New...'
           }];
 
           var stateNames = Object.keys(explorationStatesService.getStates()).sort();

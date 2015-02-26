@@ -110,24 +110,10 @@
 
     {% if username %}
       <li class="dropdown">
-        <a href="#" tooltip="Help" tooltip-placement="right" class="dropdown-toggle" data-toggle="dropdown">
+        <a href="#" tooltip="Help" tooltip-placement="bottom"
+           ng-click="openEditorTutorial()">
           <span class="glyphicon glyphicon-question-sign"></span>
         </a>
-        <ul class="dropdown-menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-          <li class="dropdown">
-            <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
-          </li>
-          <li class="dropdown">
-            <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
-              Planning Your Exploration
-            </a>
-          </li>
-          <li class="dropdown">
-            <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
-              Exploration Design Tips
-            </a>
-          </li>
-        </ul>
         <div ng-if="postTutorialHelpPopoverIsShown" class="popover bottom oppia-post-tutorial-popover">
           <div class="arrow"></div>
           <div class="popover-content">If you need help in the future, click here!</div>

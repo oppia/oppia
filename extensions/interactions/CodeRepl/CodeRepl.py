@@ -21,7 +21,7 @@ class CodeRepl(base.BaseInteraction):
     """Interaction that allows programs to be input."""
 
     name = 'Code'
-    category = 'Programming'
+    category = ''
     description = 'Allows learners to enter code and get it evaluated.'
     display_mode = base.DISPLAY_MODE_SUPPLEMENTAL
     _dependency_ids = ['jsrepl', 'codemirror']

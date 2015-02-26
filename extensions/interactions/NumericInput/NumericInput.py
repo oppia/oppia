@@ -21,7 +21,7 @@ class NumericInput(base.BaseInteraction):
     """Interaction for numeric input."""
 
     name = 'Number'
-    category = 'Maths'
+    category = 'Mathematics'
     description = (
         'Allows learners to enter integers and floating point numbers.')
     display_mode = base.DISPLAY_MODE_INLINE
