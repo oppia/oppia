@@ -130,6 +130,19 @@ md-card.conversation-skin-card {
   word-wrap: break-word;
 }
 
+.conversation-skin-loading-dots {
+  text-align: center;
+}
+.conversation-skin-loading-dots > .oppia-loading-dot-one, 
+.conversation-skin-loading-dots > .oppia-loading-dot-two, 
+.conversation-skin-loading-dots > .oppia-loading-dot-three {
+  background-color: black;
+  display: inline-block;
+  height: 10px;
+  margin: 10px;
+  width: 10px;
+}
+
 /* 'md-card' is needed to ensure that this takes precedence over the default
    Material Design stylesheet. */
 md-card.conversation-skin-inline-interaction {

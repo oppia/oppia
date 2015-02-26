@@ -719,7 +719,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-cc-icon {
-  bottom: -50px;
+  bottom: 0px;
   position: absolute;
   right: 25px;
 }
