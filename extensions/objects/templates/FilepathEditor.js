@@ -66,7 +66,7 @@ oppia.directive('filepathEditor', function($compile, $http, $rootScope, $sce, wa
       $scope.getPreviewUrl = function(filepath) {
         var encodedFilepath = window.encodeURIComponent(filepath);
         return $sce.trustAsResourceUrl(
-            '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
+          '/imagehandler/' + $scope.explorationId + '/' + encodedFilepath);
       };
 
       $scope.resetImageUploader = function() {

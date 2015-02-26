@@ -92,8 +92,11 @@ oppia.directive('imageWithRegionsEditor', [
         var _calculateImageDimensions = function() {
           var svgElement = $($element).find('.oppia-image-with-regions-editor-svg');
           var displayedImageWidth = Math.min(svgElement.width(), $scope.originalImageWidth);
-          var scalingRatio = displayedImageWidth / $scope.originalImageWidth; 
-          var displayedImageHeight = $scope.originalImageHeight * scalingRatio;
+          var scalingRatio = displayedImageWidth / $scope.originalImageWidth;
+          // Note that scalingRatio may be NaN if $scope.originalImageWidth is zero.
+          var displayedImageHeight = (
+            $scope.originalImageWidth === 0 ? 0.0 :
+            $scope.originalImageHeight * scalingRatio);
           return {
             width: displayedImageWidth,
             height: displayedImageHeight 
