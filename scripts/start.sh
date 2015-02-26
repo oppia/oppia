@@ -28,23 +28,6 @@
 #
 # Note that the root folder MUST be named 'oppia'.
 
-usage()
-{
-    echo "usage: start.sh [-c]"
-}
-
-clear=
-while [ "$1" != "" ]; do
-    case $1 in
-        -c | --clear )          shift
-                                clear=--clear_datastore=yes
-                                ;;
-        * )                     usage
-                                exit 1
-    esac
-    shift
-done
-
 if [ -z "$BASH_VERSION" ]
 then
   echo ""
@@ -105,6 +88,13 @@ else
   echo "  by navigating to localhost:8181 in a browser window."
   echo ""
 fi
+
+clear=
+for arg in "$@"; do
+  if [ "$arg" == "--clear" -o "$arg" == "-c" ]; then
+    clear="--clear_datastore=true"
+  fi
+done
 
 # Set up a local dev instance.
 # TODO(sll): do this in a new shell.
