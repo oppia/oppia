@@ -28,6 +28,23 @@
 #
 # Note that the root folder MUST be named 'oppia'.
 
+usage()
+{
+    echo "usage: start.sh [-c]"
+}
+
+clear=
+while [ "$1" != "" ]; do
+    case $1 in
+        -c | --clear )          shift
+                                clear=--clear_datastore=yes
+                                ;;
+        * )                     usage
+                                exit 1
+    esac
+    shift
+done
+
 if [ -z "$BASH_VERSION" ]
 then
   echo ""
@@ -95,5 +112,5 @@ echo Starting GAE development server
 # To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
-python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 --clear_datastore=yes .
+python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $clear .
 echo Done!
