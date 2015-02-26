@@ -89,10 +89,12 @@ else
   echo ""
 fi
 
-clear=
+# Argument passed to dev_appserver.py to indicate whether or not to
+# clear the datastore.
+CLEAR_DATASTORE_ARG="--clear_datastore=true"
 for arg in "$@"; do
-  if [ "$arg" == "--clear" -o "$arg" == "-c" ]; then
-    clear="--clear_datastore=true"
+  if [ "$arg" == "--save_datastore" ]; then
+    CLEAR_DATASTORE_ARG=""
   fi
 done
 
@@ -102,5 +104,5 @@ echo Starting GAE development server
 # To turn emailing on, add the option '--enable_sendmail=yes' and change the relevant
 # settings in feconf.py. Be careful with this -- you do not want to spam people
 # accidentally!
-python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $clear .
+python $GOOGLE_APP_ENGINE_HOME/dev_appserver.py --host=0.0.0.0 --port=8181 $CLEAR_DATASTORE_ARG .
 echo Done!
