@@ -92,17 +92,17 @@ oppia.directive('conversationSkin', [function() {
             .offset().top;
           var scrollAmountInPixels = null;
           if ($(document).height() - oppiaLastContentHeight - 60 <=
-              $(window).height() * 0.5) {
+              $(window).height() * 0.4) {
             // The -60 prevents the attribution guide from being scrolled into view.
             scrollAmountInPixels = $(document).height() - $(window).height() - 60;
             _learnerInputIsInView = true;
           } else {
-            scrollAmountInPixels = oppiaLastContentHeight - $(window).height() * 0.5;
+            scrollAmountInPixels = oppiaLastContentHeight - $(window).height() * 0.4;
             _learnerInputIsInView = false;
           }
           $('html, body, iframe').animate({
             'scrollTop': scrollAmountInPixels
-          }, 800, 'easeOutQuad').promise().done(postScrollCallback);
+          }, 1000, 'easeOutQuad').promise().done(postScrollCallback);
         });
       };
 

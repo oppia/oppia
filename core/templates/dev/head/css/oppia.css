@@ -463,6 +463,10 @@ div.wysiwyg iframe.wysiwyg-content-large {
   margin: 0 5px;
 }
 
+.oppia-loading-dots {
+
+}
+
 .oppia-loading-fullpage {
   border: 1px;
   border-radius: 5px;
@@ -719,7 +723,7 @@ md-card.oppia-gallery-tile {
 }
 
 .oppia-cc-icon {
-  bottom: -50px;
+  bottom: 0px;
   position: absolute;
   right: 25px;
 }

@@ -56,11 +56,11 @@
             </div>
 
             <div ng-if="$last" ng-show="waitingForOppiaFeedback">
-              <center style="font-size: 8em; margin-top: -90px;">
-                <span class="oppia-loading-dot-one">.</span>
-                <span class="oppia-loading-dot-two">.</span>
-                <span class="oppia-loading-dot-three">.</span>
-              </center>
+              <div class="conversation-skin-loading-dots">
+                <div class="oppia-loading-dot-one"></div>
+                <div class="oppia-loading-dot-two"></div>
+                <div class="oppia-loading-dot-three"></div>
+              </div>
             </div>
 
             <div ng-if="stateName && !waitingForNewCard && !waitingForOppiaFeedback && interactionIsInline && $last">
@@ -82,11 +82,11 @@
       </div>
 
       <div ng-if="waitingForNewCard">
-        <center style="font-size: 8em; margin-top: -90px;">
-          <span class="oppia-loading-dot-one">.</span>
-          <span class="oppia-loading-dot-two">.</span>
-          <span class="oppia-loading-dot-three">.</span>
-        </center>
+        <div class="conversation-skin-loading-dots">
+          <div class="oppia-loading-dot-one"></div>
+          <div class="oppia-loading-dot-two"></div>
+          <div class="oppia-loading-dot-three"></div>
+        </div>
       </div>
 
       <div class="conversation-skin-supplemental-interaction">
