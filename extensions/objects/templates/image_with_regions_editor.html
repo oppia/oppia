@@ -5,7 +5,6 @@
   </schema-based-editor>
 </div>
 <div ng-if="$parent.value.imagePath !== ''" ng-attr-style="cursor: <[getCursorStyle()]>;">
-  <!-- [<button type="button" class="btn btn-default" ng-click="setDrawMode()">Draw New Region</button>] -->
   <div>
     <svg class="oppia-image-with-regions-editor-svg"
       width="100%"
@@ -44,13 +43,13 @@
       </text>
     </svg>
    
-      <button  style="margin-top:10px;" type="button" class="btn btn-default" ng-click="setDrawMode()">Draw New Region</button>
-      <div style="display:inline-block; float:right; margin-top:10px; " ng-if="selectedRegion !== null">
-        <input  type="text" style="margin-left:10px; height:34px; width:100px; text-align:right;"
+  <button style="margin-top: 10px;" type="button" class="btn btn-default" ng-click="setDrawMode()">Draw New Region</button>
+      <div style="display: inline-block; float:right; margin-top:10px;" ng-if="selectedRegion !== null">
+        <input type="text" style="margin-left: 10px; height: 34px; width: 100px;"
           ng-model="regionLabelGetterSetter(selectedRegion)" 
           ng-model-options="{getterSetter: true}">
         </input>
-        <button  type="button" class="btn btn-danger" ng-click="deleteRegion(selectedRegion)">Delete Region</button>
+        <button type="button" class="btn btn-danger btn-sm" ng-click="deleteRegion(selectedRegion)">Delete Region</button>
       </div>  
 
   </div>
