@@ -34,7 +34,9 @@ oppia.directive('conversationSkin', [function() {
           messengerService, oppiaPlayerService, urlService, focusService) {
 
       var hasInteractedAtLeastOnce = false;
+      var _labelForNextFocusTarget = null;
       var _answerIsBeingProcessed = false;
+      var _learnerInputIsInView = false;
 
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
 
@@ -86,9 +88,21 @@ oppia.directive('conversationSkin', [function() {
 
       var _scrollToBottom = function(postScrollCallback) {
         $scope.adjustPageHeight(true, function() {
+          var oppiaLastContentHeight = $('.conversation-skin-oppia-output:last')
+            .offset().top;
+          var scrollAmountInPixels = null;
+          if ($(document).height() - oppiaLastContentHeight - 60 <=
+              $(window).height() * 0.5) {
+            // The -60 prevents the attribution guide from being scrolled into view.
+            scrollAmountInPixels = $(document).height() - $(window).height() - 60;
+            _learnerInputIsInView = true;
+          } else {
+            scrollAmountInPixels = oppiaLastContentHeight - $(window).height() * 0.5;
+            _learnerInputIsInView = false;
+          }
           $('html, body, iframe').animate({
-            'scrollTop': $('.conversation-skin-oppia:last').offset().top - $(window).height() * 0.5
-          }, 1000, 'easeOutQuad').promise().done(postScrollCallback);
+            'scrollTop': scrollAmountInPixels
+          }, 800, 'easeOutQuad').promise().done(postScrollCallback);
         });
       };
 
@@ -122,7 +136,8 @@ oppia.directive('conversationSkin', [function() {
             messengerService.EXPLORATION_LOADED, null);
 
           $scope.stateName = stateName;
-          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName);
+          _labelForNextFocusTarget = Math.random().toString(36).slice(2);
+          $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(stateName, _labelForNextFocusTarget);
           $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(stateName);
 
           // This $timeout prevents a 'flash of unstyled content' when the preview tab is loaded from
@@ -139,7 +154,11 @@ oppia.directive('conversationSkin', [function() {
           $timeout(function() {
             _addNewCard($scope.stateName, initHtml);
             $scope.waitingForNewCard = false;
-            _scrollToBottom(function() {});
+            _scrollToBottom(function() {
+              if (_learnerInputIsInView) {
+                focusService.setFocus(_labelForNextFocusTarget);
+              }
+            });
           }, 1000);
         });
       };
@@ -176,8 +195,9 @@ oppia.directive('conversationSkin', [function() {
 
             if (newStateName && refreshInteraction) {
               // The previous interaction should be replaced.
+              _labelForNextFocusTarget = Math.random().toString(36).slice(2);
               $scope.inputTemplate = oppiaPlayerService.getInteractionHtml(
-                newStateName) + oppiaPlayerService.getRandomSuffix();
+                newStateName, _labelForNextFocusTarget) + oppiaPlayerService.getRandomSuffix();
               $scope.interactionIsInline = oppiaPlayerService.isInteractionInline(
                 newStateName);
             }
@@ -188,6 +208,9 @@ oppia.directive('conversationSkin', [function() {
             if (oldStateName === newStateName) {
               $scope.waitingForOppiaFeedback = false;
               _scrollToBottom(function() {
+                if (_learnerInputIsInView) {
+                  focusService.setFocus(_labelForNextFocusTarget);
+                }
                 _answerIsBeingProcessed = false;
               });
             } else {
@@ -199,6 +222,9 @@ oppia.directive('conversationSkin', [function() {
                     $scope.waitingForNewCard = false;
                     _addNewCard($scope.stateName, questionHtml);
                     _scrollToBottom(function() {
+                      if (_learnerInputIsInView) {
+                        focusService.setFocus(_labelForNextFocusTarget);
+                      }
                       _answerIsBeingProcessed = false;
                     });
                   }, 1000);
@@ -207,6 +233,9 @@ oppia.directive('conversationSkin', [function() {
                 $scope.waitingForOppiaFeedback = false;
                 _addNewCard($scope.stateName, questionHtml);
                 _scrollToBottom(function() {
+                  if (_learnerInputIsInView) {
+                    focusService.setFocus(_labelForNextFocusTarget);
+                  }
                   _answerIsBeingProcessed = false;
                 });
               }
