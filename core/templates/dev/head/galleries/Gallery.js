@@ -257,11 +257,9 @@ oppia.controller('Gallery', [
   $http.get(GALLERY_DATA_URL).success(function(data) {
     $scope.currentUserIsModerator = Boolean(data.is_moderator);
 
+    // Note that this will cause an initial search query to be sent.
     $rootScope.$broadcast(
       'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-    // TODO(sll): Page the initial load as well.
-    _refreshGalleryData(data, true);
 
     if (data.username) {
       if (urlService.getUrlParams().mode === 'create') {
@@ -380,8 +378,18 @@ oppia.controller('SearchBar', [
 
   $scope.$on('preferredLanguageCodesLoaded', function(evt, preferredLanguageCodesList) {
     for (var i = 0; i < preferredLanguageCodesList.length; i++) {
-      $scope.toggleSelection('languageCodes', preferredLanguageCodesList[i]);
+      var selections = $scope.selectionDetails.languageCodes.selections;
+      var languageCode = preferredLanguageCodesList[i];
+      if (!selections.hasOwnProperty(languageCode)) {
+        selections[languageCode] = true;
+      } else {
+        selections[languageCode] = !selections[languageCode];
+      }
     }
+
+    _updateSelectionDetails('languageCodes');
+    _onSearchQueryChangeExec();
+
     _searchBarFullyLoaded = true;
   });
 
