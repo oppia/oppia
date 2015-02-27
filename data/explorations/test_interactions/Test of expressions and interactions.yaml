@@ -109,9 +109,9 @@ states:
       customization_args:
         choices:
           value:
-          - Option A<br>
+          - <oppia-noninteractive-image filepath-with-value="&amp;quot;A.png&amp;quot;"></oppia-noninteractive-image><br>
           - Option B<br>
-          - Option C<br>
+          - <span class=""></span><oppia-noninteractive-math raw_latex-with-value="&amp;quot;\\frac{x}{y}&amp;quot;"></oppia-noninteractive-math><br>
       handlers:
       - name: submit
         rule_specs:
@@ -186,39 +186,44 @@ states:
   Network Graph:
     content:
     - type: text
-      value: Connect A to B.<br>Connect B to C.
+      value: Do the following step by step:<br><br>1. Delete Node labelled B<span
+        class=""></span><div>2. Add Node labelled Z</div><div>3. Add Edge of weight
+        150 connecting A to Z</div><div>4. Delete Edge between A and F</div>
     interaction:
       customization_args:
         canAddEdge:
           value: true
         canAddVertex:
-          value: false
+          value: true
         canDeleteEdge:
           value: true
         canDeleteVertex:
-          value: false
+          value: true
         canEditEdgeWeight:
-          value: false
+          value: true
         canEditVertexLabel:
-          value: false
+          value: true
         canMoveVertex:
-          value: false
+          value: true
         graph:
           value:
-            edges: []
+            edges:
+            - dst: 2
+              src: 0
+              weight: 1000
             isDirected: false
             isLabeled: true
-            isWeighted: false
+            isWeighted: true
             vertices:
             - label: A
               x: 212
-              y: 46
-            - label: C
-              x: 366
-              y: 48
+              y: 45
             - label: B
-              x: 287
-              y: 117
+              x: 379
+              y: 44
+            - label: F
+              x: 215
+              y: 155.5
       handlers:
       - name: submit
         rule_specs:
@@ -226,25 +231,22 @@ states:
             inputs:
               g:
                 edges:
-                - dst: 2
-                  src: 0
-                  weight: 1
                 - dst: 1
-                  src: 2
-                  weight: 1
+                  src: 0
+                  weight: 150
                 isDirected: false
                 isLabeled: true
-                isWeighted: false
+                isWeighted: true
                 vertices:
                 - label: A
-                  x: 140.328125
-                  y: 66.25
-                - label: C
-                  x: 193.328125
-                  y: 64.25
-                - label: B
-                  x: 171.328125
-                  y: 102.25
+                  x: 128.328125
+                  y: 65.25
+                - label: Z
+                  x: 189.0
+                  y: 66.0
+                - label: F
+                  x: 155.0
+                  y: 125.0
             name: IsIsomorphicTo
             rule_type: atomic
             subject: answer
