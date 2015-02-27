@@ -230,7 +230,7 @@ oppia.controller('Gallery', [
   // Called when the page loads, and after every search query.
   var _refreshGalleryData = function(data, hasPageFinishedLoading) {
     $scope.searchIsLoading = false;
-    $scope.allExplorationsInOrder = data.featured.concat(data['public']);
+    $scope.allExplorationsInOrder = data.explorations_list;
     $scope.finishedLoadingPage = hasPageFinishedLoading;
     $rootScope.loadingMessage = '';
   };
@@ -242,7 +242,7 @@ oppia.controller('Gallery', [
 
       searchService.loadMoreData(function(data, hasPageFinishedLoading) {
         $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
-          data.featured).concat(data['public']);
+          data.explorations_list);
         $scope.finishedLoadingPage = hasPageFinishedLoading;
         $scope.pageLoaderIsBusy = false;
       });

@@ -153,3 +153,55 @@ class ParameterDiscoveryJobManager(jobs.BaseMapReduceJobManager):
     @staticmethod
     def reduce(key, values):
         yield (key, values)
+
+
+class SearchRankerRealtimeModel(
+        jobs.BaseRealtimeDatastoreClassForContinuousComputations):
+    pass
+
+
+class SearchRanker(jobs.BaseContinuousComputationManager):
+    """A continuous-computation job that refreshes the search ranking.
+
+    This job does not have a realtime component. There will be a delay in
+    propagating new updates to the gallery; the length of the delay will be
+    approximately the time it takes a batch job to run.
+    """
+    @classmethod
+    def get_event_types_listened_to(cls):
+        return []
+
+    @classmethod
+    def _get_realtime_datastore_class(cls):
+        return SearchRankerRealtimeModel
+
+    @classmethod
+    def _get_batch_job_manager_class(cls):
+        return SearchRankerMRJobManager
+
+    @classmethod
+    def _handle_incoming_event(cls, active_realtime_layer, event_type, *args):
+        pass
+
+
+class SearchRankerMRJobManager(
+        jobs.BaseMapReduceJobManagerForContinuousComputations):
+    """Manager for a MapReduce job that iterates through all explorations and
+    recomputes their search rankings.
+    """
+    @classmethod
+    def _get_continuous_computation_class(cls):
+        return SearchRanker
+
+    @classmethod
+    def entity_classes_to_map_over(cls):
+        return [exp_models.ExplorationModel]
+
+    @staticmethod
+    def map(item):
+        from core.domain import exp_services
+        exp_services.index_explorations_given_ids([item.id])
+
+    @staticmethod
+    def reduce(key, stringified_values):
+        pass

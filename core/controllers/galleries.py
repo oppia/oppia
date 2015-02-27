@@ -81,11 +81,8 @@ class GalleryHandler(base.BaseHandler):
 
     def get(self):
         """Handles GET requests."""
-        # TODO(sll): Implement paging.
-
-        # TODO(sll): Precompute and cache gallery categories. Or have a fixed
-        # list of categories and 'Other', and gradually classify the
-        # explorations in 'Other'.
+        # TODO(sll): Figure out what to do about explorations in categories
+        # other than those explicitly listed.
 
         language_codes_to_short_descs = {
             lc['code']: utils.get_short_language_description(lc['description'])
@@ -94,16 +91,9 @@ class GalleryHandler(base.BaseHandler):
 
         query_string = self.request.get('q')
         search_cursor = self.request.get('cursor', None)
-        if query_string:
-            # The user is performing a search.
-            exp_summaries_dict, search_cursor = (
-                exp_services.get_exploration_summaries_matching_query(
-                    query_string, cursor=search_cursor))
-        else:
-            # Get non-private exploration summaries
-            search_cursor = None
-            exp_summaries_dict = (
-                exp_services.get_non_private_exploration_summaries())
+        exp_summaries_list, search_cursor = (
+            exp_services.get_exploration_summaries_matching_query(
+                query_string, cursor=search_cursor))
 
         # TODO(msl): Store 'is_editable' in exploration summary to avoid O(n)
         # individual lookups. Note that this will depend on user_id.
@@ -120,7 +110,7 @@ class GalleryHandler(base.BaseHandler):
             'is_editable': exp_services.is_exp_summary_editable(
                 exp_summary,
                 user_id=self.user_id)
-        } for exp_summary in exp_summaries_dict.values()]
+        } for exp_summary in exp_summaries_list]
 
         if len(explorations_list) == feconf.DEFAULT_QUERY_LIMIT:
             logging.error(
@@ -128,31 +118,13 @@ class GalleryHandler(base.BaseHandler):
                 'You may be running up against the default query limits.'
                 % feconf.DEFAULT_QUERY_LIMIT)
 
-        public_explorations_list = []
-        featured_explorations_list = []
-
-        for e_dict in explorations_list:
-            if e_dict['status'] == rights_manager.EXPLORATION_STATUS_PUBLIC:
-                public_explorations_list.append(e_dict)
-            elif (e_dict['status'] ==
-                    rights_manager.EXPLORATION_STATUS_PUBLICIZED):
-                featured_explorations_list.append(e_dict)
-
-        public_explorations_list = sorted(
-            public_explorations_list, key=lambda x: x['last_updated'],
-            reverse=True)
-        publicized_explorations_list = sorted(
-            featured_explorations_list, key=lambda x: x['last_updated'],
-            reverse=True)
-
         preferred_language_codes = [feconf.DEFAULT_LANGUAGE_CODE]
         if self.user_id:
             user_settings = user_services.get_user_settings(self.user_id)
             preferred_language_codes = user_settings.preferred_language_codes
 
         self.values.update({
-            'featured': publicized_explorations_list,
-            'public': public_explorations_list,
+            'explorations_list': explorations_list,
             'preferred_language_codes': preferred_language_codes,
             'search_cursor': search_cursor,
         })
