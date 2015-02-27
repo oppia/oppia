@@ -6,7 +6,7 @@
     <div class="conversation-skin-cards-container">
       <md-card class="conversation-skin-exploration-intro-card">
         <!-- TODO(mgowano): Remove eclipse image once backend has image info for exploration. -->
-        <img itemprop="image" src="/images/eclipse.jpg">
+        <img src="/images/eclipse.jpg">
         <div class="conversation-skin-exploration-header">
           <h3 itemprop="description" role="heading" class="protractor-test-exploration-header"><[explorationTitle]></h3>
         </div>
@@ -30,7 +30,7 @@
                 <td class="conversation-skin-row-avatar" valign="top">
                   <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_black_48px.png">
                 </td>
-                <td class="conversation-skin-oppia-content">
+                <td class="conversation-skin-oppia-output conversation-skin-oppia-content">
                   <div class="protractor-test-conversation-content" angular-html-bind="state.content"></div>
                 </td>
               </tr>
@@ -40,7 +40,7 @@
               <table class="conversation-skin-card-row-container">
                 <tr ng-show="responsePair.learnerAnswer" class="conversation-skin-card-row">
                   <td class="conversation-skin-row-avatar" valign="top">
-                    <img class="conversation-skin-row-avatar-img" src="/images/user_mint_48px.png">
+                    <img class="conversation-skin-row-avatar-img img-circle" ng-src="<[profilePicture]>">
                   </td>
                   <td class="conversation-skin-learner-answer" angular-html-bind="responsePair.learnerAnswer"><td>
                 </tr>
@@ -50,17 +50,17 @@
                   <td class="conversation-skin-row-avatar" valign="top">
                     <img class="conversation-skin-row-avatar-img" src="/images/oppia_favicon_black_48px.png">
                   </td>
-                  <td class="conversation-skin-oppia-feedback protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
+                  <td class="conversation-skin-oppia-output conversation-skin-oppia-feedback protractor-test-conversation-feedback" angular-html-bind="responsePair.oppiaFeedback"></td>
                 </tr>
               </table>
             </div>
 
             <div ng-if="$last" ng-show="waitingForOppiaFeedback">
-              <center style="font-size: 8em; margin-top: -90px;">
-                <span class="oppia-loading-dot-one">.</span>
-                <span class="oppia-loading-dot-two">.</span>
-                <span class="oppia-loading-dot-three">.</span>
-              </center>
+              <div class="conversation-skin-loading-dots">
+                <div class="oppia-loading-dot-one"></div>
+                <div class="oppia-loading-dot-two"></div>
+                <div class="oppia-loading-dot-three"></div>
+              </div>
             </div>
 
             <div ng-if="stateName && !waitingForNewCard && !waitingForOppiaFeedback && interactionIsInline && $last">
@@ -68,7 +68,7 @@
                 <table class="conversation-skin-card-row-container" style="margin-bottom: 0;">
                   <tr class="conversation-skin-card-row">
                     <td class="conversation-skin-row-avatar" valign="top">
-                      <img class="conversation-skin-row-avatar-img" src="/images/user_mint_48px.png">
+                      <img class="conversation-skin-row-avatar-img img-circle" ng-src="<[profilePicture]>">
                     </td>
                     <td class="conversation-skin-learner-input protractor-test-conversation-input"
                         angular-html-bind="inputTemplate">
@@ -82,11 +82,11 @@
       </div>
 
       <div ng-if="waitingForNewCard">
-        <center style="font-size: 8em; margin-top: -90px;">
-          <span class="oppia-loading-dot-one">.</span>
-          <span class="oppia-loading-dot-two">.</span>
-          <span class="oppia-loading-dot-three">.</span>
-        </center>
+        <div class="conversation-skin-loading-dots">
+          <div class="oppia-loading-dot-one"></div>
+          <div class="oppia-loading-dot-two"></div>
+          <div class="oppia-loading-dot-three"></div>
+        </div>
       </div>
 
       <div class="conversation-skin-supplemental-interaction">

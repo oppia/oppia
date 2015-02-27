@@ -24,18 +24,43 @@ oppia.directive('ruleTypeSelector', [function() {
     scope: {
       allRuleTypes: '&',
       localValue: '=',
-      onSelectionChange: '&'
+      onSelectionChange: '&',
+      canAddDefaultRule: '&'
     },
     template: '<input type="hidden">',
-    controller: ['$scope', '$element', '$filter', function($scope, $element, $filter) {
+    controller: [
+        '$scope', '$element', '$rootScope', '$filter',
+        function($scope, $element, $rootScope, $filter) {
+
       var choices = [];
-      var numberOfRuleTypes = 0 ;
+      var numberOfRuleTypes = 0;
       for (var ruleType in $scope.allRuleTypes()) {
         numberOfRuleTypes++;
         choices.push({
           id: ruleType,
-          text: $filter('replaceInputsWithEllipses')(ruleType)
+          text: 'Answer ' + $filter('replaceInputsWithEllipses')(ruleType)
         });
+      }
+
+      choices.sort(function(a, b) {
+        if (a.text < b.text) {
+          return -1;
+        } else if (a.text > b.text) {
+          return 1;
+        } else {
+          return 0;
+        }
+      });
+
+      if ($scope.canAddDefaultRule()) {
+        choices.unshift({
+          id: 'Default',
+          text: 'When no other rule applies...'
+        });
+      }
+
+      if (!$scope.localValue) {
+        $scope.localValue = choices[0].id;
       }
 
       var select2Node = $element[0].firstChild;
@@ -44,15 +69,15 @@ oppia.directive('ruleTypeSelector', [function() {
         // Suppress the search box.
         minimumResultsForSearch: -1,
         allowClear: false,
-        width: '200px',
+        width: '210px',
         formatSelection: function(object, container) {
-          return $filter('truncateAtFirstInput')(object.id);
+          if (object.id === 'Default') {
+            return 'When no other rule applies';
+          } else {
+            return 'Answer ' + $filter('truncateAtFirstInput')(object.id);
+          }
         }
       });
-
-      if (numberOfRuleTypes <= 1) {
-        $(select2Node).select2('enable', false);
-      }
 
       // Initialize the dropdown.
       $(select2Node).select2('val', $scope.localValue);
@@ -89,18 +114,7 @@ oppia.directive('ruleEditor', ['$log', function($log) {
       function(
           $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
           validatorsService, rulesService, explorationStatesService) {
-        $scope.RULE_FEEDBACK_SCHEMA = {
-          type: 'list',
-          items: {
-            type: 'html',
-            ui_config: {
-              size: 'small'
-            }
-          },
-          ui_config: {
-            add_element_text: 'Add Variation'
-          }
-        };
+        $scope.editRuleForm = {};
 
         $scope.getAnswerChoices = function() {
           return rulesService.getAnswerChoices();
@@ -168,6 +182,74 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           $scope.deleteRule();
         };
 
+        $scope.$on('externalSave', function() {
+          if ($scope.ruleEditorIsOpen) {
+            $scope.saveThisRule();
+          }
+        });
+
+        $scope.getActiveStateName = function() {
+          return editorContextService.getActiveStateName();
+        };
+
+        $scope.isRuleConfusing = function() {
+          return (
+            $scope.rule.feedback.length === 0 &&
+            $scope.rule.dest === editorContextService.getActiveStateName());
+        };
+
+        $scope.navigateToRuleDest = function() {
+          routerService.navigateToMainTab($scope.rule.dest);
+        };
+
+        $scope.isRuleEmpty = function(rule) {
+          var hasFeedback = false;
+          for (var i = 0; i < rule.feedback.length; i++) {
+            if (rule.feedback[i].length > 0) {
+              hasFeedback = true;
+            }
+          }
+
+          return (
+            rule.dest === editorContextService.getActiveStateName() &&
+            !hasFeedback);
+        };
+      }
+    ]
+  };
+}]);
+
+
+oppia.directive('ruleDetailsEditor', ['$log', function($log) {
+  return {
+    restrict: 'E',
+    scope: {
+      rule: '=',
+      canAddDefaultRule: '&'
+    },
+    templateUrl: 'rules/ruleDetailsEditor',
+    controller: [
+      '$scope', '$rootScope', '$modal', '$timeout', 'editorContextService', 'routerService',
+      'validatorsService', 'rulesService', 'explorationStatesService',
+      function(
+          $scope, $rootScope, $modal, $timeout, editorContextService, routerService,
+          validatorsService, rulesService, explorationStatesService) {
+
+        $scope.RULE_FEEDBACK_SCHEMA = {
+          type: 'list',
+          items: {
+            type: 'html',
+            ui_config: {
+              size: 'small'
+            }
+          },
+          ui_config: {
+            add_element_text: 'Add Variation'
+          }
+        };
+
+        var lastSetRuleDest = $scope.rule.dest;
+
         // We use a slash because this character is forbidden in a state name.
         var _PLACEHOLDER_RULE_DEST = '/';
 
@@ -176,15 +258,10 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             $modal.open({
               templateUrl: 'modals/addState',
               backdrop: true,
-              resolve: {
-                isEditable: function() {
-                  return $scope.isEditable;
-                }
-              },
+              resolve: {},
               controller: [
-                  '$scope', '$timeout', '$modalInstance', 'explorationStatesService', 'isEditable', 'focusService',
-                  function($scope, $timeout, $modalInstance, explorationStatesService, isEditable, focusService) {
-                $scope.isEditable = isEditable;
+                  '$scope', '$timeout', '$modalInstance', 'explorationStatesService', 'focusService',
+                  function($scope, $timeout, $modalInstance, explorationStatesService, focusService) {
                 $scope.newStateName = '';
                 $timeout(function() {
                   focusService.setFocus('newStateNameInput');
@@ -218,16 +295,19 @@ oppia.directive('ruleEditor', ['$log', function($log) {
                   $rootScope.$broadcast('refreshGraph');
                   $timeout(function() {
                     $scope.rule.dest = result.newStateName;
+                    lastSetRuleDest = $scope.rule.dest;
                     // Reload the dropdown to include the new state.
                     $scope.reloadingDestinations = false;
                   });
                 });
               } else if (result.action === 'cancel') {
-                $scope.rule.dest = $scope.ruleDestMemento;
+                $scope.rule.dest = lastSetRuleDest;
               } else {
                 throw 'Invalid result action from add state modal: ' + result.action;
               }
             });
+          } else {
+            lastSetRuleDest = $scope.rule.dest;
           }
         };
 
@@ -243,11 +323,11 @@ oppia.directive('ruleEditor', ['$log', function($log) {
           // represent all states, including 'END', as well as an option to
           // create a new state.
           $scope.destChoices = [{
-            id: _PLACEHOLDER_RULE_DEST,
-            text: 'Create New...'
-          }, {
             id: _currentStateName,
             text: _currentStateName + ' ⟳'
+          }, {
+            id: _PLACEHOLDER_RULE_DEST,
+            text: 'Create New...'
           }];
 
           var stateNames = Object.keys(explorationStatesService.getStates()).sort();
@@ -261,32 +341,6 @@ oppia.directive('ruleEditor', ['$log', function($log) {
             }
           }
         }, true);
-
-        $scope.$on('externalSave', function() {
-          if ($scope.ruleEditorIsOpen) {
-            $scope.saveThisRule();
-          }
-        });
-
-        $scope.getActiveStateName = function() {
-          return editorContextService.getActiveStateName();
-        };
-
-        $scope.isRuleConfusing = function() {
-          return (
-            $scope.rule.feedback.length === 0 &&
-            $scope.rule.dest === editorContextService.getActiveStateName());
-        };
-
-        // Method that converts newly typed-in destination strings to text in the
-        // rule destination dropdown.
-        $scope.convertNewDestToText = function(term) {
-          return term + ' (new)';
-        };
-
-        $scope.navigateToRuleDest = function() {
-          routerService.navigateToMainTab($scope.rule.dest);
-        };
       }
     ]
   };
@@ -299,7 +353,7 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
     scope: {
       currentRuleDescription: '=',
       currentRuleDefinition: '=',
-      outerFormName: '@'
+      canAddDefaultRule: '&'
     },
     templateUrl: 'rules/ruleDescriptionEditor',
     controller: [
@@ -409,10 +463,11 @@ oppia.directive('ruleDescriptionEditor', ['$log', function($log) {
       _generateAllRuleTypes();
       if ($scope.currentRuleDescription === null) {
         for (var key in $scope.allRuleTypes) {
-          $scope.currentRuleDescription = key;
-          $scope.onSelectNewRuleType();
-          break;
+          if ($scope.currentRuleDescription === null || key < $scope.currentRuleDescription) {
+            $scope.currentRuleDescription = key;
+          }
         }
+        $scope.onSelectNewRuleType();
       }
 
       _computeRuleDescriptionFragments();

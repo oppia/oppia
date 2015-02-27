@@ -248,7 +248,7 @@
 <script type="text/ng-template" id="schemaBasedEditor/list">
   <table style="width: 100%;">
     <tr ng-repeat="item in localValue track by $index">
-      <td style="padding: 4px;">
+      <td>
         <schema-based-editor schema="itemSchema()" is-disabled="isDisabled()" local-value="localValue[$index]"
                              allow-expressions="allowExpressions()"
                              label-for-focus-target="getFocusLabel($index)"
@@ -256,7 +256,7 @@
                              on-input-focus="($last ? hideAddItemButton : showAddItemButton)">
         </schema-based-editor>
       </td>
-      <td ng-if="!len && (!minListLength || localValue.length > minListLength)" style="padding-top: 4px; vertical-align: top;">
+      <td ng-if="!len && (!minListLength || localValue.length > minListLength)" style="vertical-align: top;">
         <button class="btn btn-default btn-xs oppia-small-delete-button protractor-test-delete-list-entry" type="button"
                 ng-click="deleteElement($index)"
                 ng-disabled="isDisabled()">
@@ -268,7 +268,7 @@
   </table>
 
   <!-- The margin-left is added here to left-align the button with the previous list items. -->
-  <div style="height: 30px;">
+  <div style="height: 30px; margin-top: 4px;">
     <button ng-show="!isOneLineInput || isAddItemButtonPresent"
             ng-if="!len && (maxListLength === null || localValue.length < maxListLength)"
             type="button" class="btn btn-default btn-sm protractor-test-add-list-entry" ng-click="addElement()"

@@ -1037,7 +1037,7 @@ oppia.factory('explorationWarningsService', [
           _getReversedLinks(_graphData.links));
         if (deadEndStates.length) {
           _warningsList.push(
-            'It is impossible to complete the exploration starting from: ' +
+            'Please make sure there\'s a path to END from each of: ' +
             deadEndStates.join(', ') + '.');
         }
       }
@@ -1046,7 +1046,7 @@ oppia.factory('explorationWarningsService', [
     var statesWithInsufficientFeedback = _getStatesWithInsufficientFeedback();
     if (statesWithInsufficientFeedback.length) {
       _warningsList.push(
-        'The following states need more feedback: ' +
+        'Please give Oppia more detail about what to say in these states: ' +
         statesWithInsufficientFeedback.join(', ') + '.');
     }
 

@@ -254,6 +254,13 @@ oppia.controller('StateRules', [
     rulesService.updateAnswerChoices(newAnswerChoices);
   });
 
+  $scope.isDefaultRuleTabShown = function() {
+    var defaultRule = $scope.interactionHandlers.submit[$scope.interactionHandlers.submit.length - 1];
+    return (
+      defaultRule.dest !== editorContextService.getActiveStateName() ||
+      defaultRule.feedback.length > 0);
+  };
+
   $scope.openAddRuleModal = function() {
     warningsData.clear();
     $rootScope.$broadcast('externalSave');
@@ -261,26 +268,49 @@ oppia.controller('StateRules', [
     $modal.open({
       templateUrl: 'modals/addRule',
       backdrop: true,
-      resolve: {},
+      resolve: {
+        canAddDefaultRule: function() {
+          return !$scope.isDefaultRuleTabShown();
+        }
+      },
       controller: [
-          '$scope', '$modalInstance', 'rulesService',
-          function($scope, $modalInstance, rulesService) {
-        $scope.currentRuleDescription = null;
-        $scope.currentRuleDefinition = {
-          rule_type: 'atomic',
-          name: null,
-          inputs: {},
-          subject: 'answer'
+          '$scope', '$modalInstance', 'rulesService', 'editorContextService', 'canAddDefaultRule',
+          function($scope, $modalInstance, rulesService, editorContextService, canAddDefaultRule) {
+        $scope.canAddDefaultRule = canAddDefaultRule;
+
+        $scope.tmpRule = {
+          description: ($scope.canAddDefaultRule ? 'Default' : null),
+          definition: {
+            rule_type: 'atomic',
+            name: null,
+            inputs: {},
+            subject: 'answer'
+          },
+          dest: editorContextService.getActiveStateName(),
+          feedback: [''],
+          param_changes: []
         };
+
+        $scope.isRuleEmpty = function(tmpRule) {
+          var hasFeedback = false;
+          for (var i = 0; i < tmpRule.feedback.length; i++) {
+            if (tmpRule.feedback[i].length > 0) {
+              hasFeedback = true;
+            }
+          }
+
+          return (
+            tmpRule.dest === editorContextService.getActiveStateName() &&
+            !hasFeedback);
+        };
+
+        $scope.addRuleForm = {};
 
         $scope.interactionHandlerSpecs = rulesService.getInteractionHandlerSpecs();
         $scope.answerChoices = rulesService.getAnswerChoices();
 
         $scope.addNewRule = function() {
-          $modalInstance.close({
-            description: $scope.currentRuleDescription,
-            definition: $scope.currentRuleDefinition
-          });
+          $modalInstance.close($scope.tmpRule);
         };
 
         $scope.cancel = function() {
@@ -291,19 +321,23 @@ oppia.controller('StateRules', [
     }).result.then(function(tmpRule) {
       _interactionHandlersMemento = angular.copy($scope.interactionHandlers);
 
-      // Move the tmp rule into the list of 'real' rules.
       var numRules = $scope.interactionHandlers['submit'].length;
-      $scope.interactionHandlers['submit'].splice(numRules - 1, 0, {
-        description: tmpRule.description,
-        definition: tmpRule.definition,
-        dest: editorContextService.getActiveStateName(),
-        feedback: [],
-        param_changes: []
-      });
 
-      rulesService.save($scope.interactionHandlers);
-
-      $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 2);
+      if (tmpRule.description === 'Default') {
+        if ($scope.isDefaultRuleTabShown()) {
+          warningsData.addWarning('Tried to add a duplicate default rule');
+          return;
+        } else {
+          tmpRule.definition = {rule_type: 'default'};
+          $scope.interactionHandlers['submit'][numRules - 1] = tmpRule;
+        }
+        rulesService.save($scope.interactionHandlers);
+        $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 1);
+      } else {
+        $scope.interactionHandlers['submit'].splice(numRules - 1, 0, tmpRule);
+        rulesService.save($scope.interactionHandlers);
+        $scope.changeActiveRuleIndex($scope.interactionHandlers['submit'].length - 2);
+      }
     });
   };
 
@@ -329,12 +363,20 @@ oppia.controller('StateRules', [
 
 
 oppia.controller('StateEditorActiveRule', [
-    '$scope', '$rootScope', 'rulesService', function($scope, $rootScope, rulesService) {
+    '$scope', '$rootScope', 'rulesService', 'editorContextService',
+    function($scope, $rootScope, rulesService, editorContextService) {
 
   $scope.interactionHandlers = rulesService.getInteractionHandlers();
+  $scope.ruleIsShown = false;
 
   $scope.$on('activeRuleChanged', function() {
     $scope.activeRule = rulesService.getActiveRule();
+    $scope.currentStateName = editorContextService.getActiveStateName();
+
+    $scope.ruleIsShown = (
+      $scope.activeRule.definition.rule_type !== 'default' ||
+      $scope.activeRule.dest !== editorContextService.getActiveStateName() ||
+      $scope.activeRule.feedback.length > 0);
   });
 
   $scope.deleteActiveRule = function() {

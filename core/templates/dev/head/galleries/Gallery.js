@@ -18,6 +18,19 @@
  * @author sll@google.com (Sean Lip)
  */
 
+// Overwrite the default ui-bootstrap carousel template to remove the on-mouseover
+// behaviour, as well as the left and right arrows.
+angular.module("template/carousel/carousel.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("template/carousel/carousel.html",
+    "<div class=\"carousel\" ng-swipe-right=\"prev()\" ng-swipe-left=\"next()\">\n" +
+    "    <ol class=\"carousel-indicators\" ng-show=\"slides.length > 1\">\n" +
+    "        <li ng-repeat=\"slide in slides track by $index\" ng-class=\"{active: isActive(slide)}\" ng-click=\"select(slide)\"></li>\n" +
+    "    </ol>\n" +
+    "    <div class=\"carousel-inner\" ng-transclude></div>\n" +
+    "</div>\n" +
+    "");
+}]);
+
 oppia.constant('GALLERY_DATA_URL', '/galleryhandler/data');
 
 oppia.factory('searchService', [
@@ -109,7 +122,8 @@ oppia.controller('Gallery', [
     function($scope, $http, $rootScope, $window, $timeout, createExplorationButtonService,
              oppiaDatetimeFormatter, oppiaDebouncer, urlService, GALLERY_DATA_URL,
              CATEGORY_LIST, searchService) {
-  $scope.CAROUSEL_INTERVAL = 4000;
+
+  $scope.CAROUSEL_INTERVAL = 3000;
 
   $scope.CAROUSEL_SLIDES = [{
     explorationId: '14',

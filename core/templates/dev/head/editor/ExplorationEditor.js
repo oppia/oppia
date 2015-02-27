@@ -162,9 +162,37 @@ oppia.controller('ExplorationEditor', [
 
   $scope.EDITOR_TUTORIAL_OPTIONS = [{
     type: 'title',
+    heading: 'Help Menu',
+    text: (
+      '<div>' +
+      '  <ul>' +
+      '    <li>' +
+      '      <strong>New to Oppia?</strong> Click \'Next\'.' +
+      '    </li>' +
+      '    <li>' +
+      '      <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">' +
+      '        Planning Your Exploration' +
+      '      </a>' +
+      '    </li>' +
+      '    <li>' +
+      '      <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">' +
+      '        Exploration Design Tips' +
+      '      </a>' +
+      '    </li>' +
+      '  </ul>' +
+      '</div>')
+  }, {
+    type: 'function',
+    fn: function(isGoingForward) {
+      $('html, body').animate({
+        scrollTop: (isGoingForward ? 0 : 20)
+      }, 'slow');
+    }
+  }, {
+    type: 'title',
     heading: 'Welcome to the Oppia editor tutorial!',
     text: (
-      'Welcome to Oppia! Here\'s a quick overview of how the editor works.<br><br>' +
+      '<strong>Welcome to Oppia!</strong><br><br>' +
       'You can think of an Oppia exploration as a one-on-one conversation that is divided ' +
       'into several \'states\'. A state consists of Oppia asking a question, and the ' +
       'learner responding. Based on the response, Oppia chooses what to say next.')
@@ -173,7 +201,7 @@ oppia.controller('ExplorationEditor', [
     fn: function(isGoingForward) {
       var positionToScrollTo = (
         isGoingForward ? angular.element(_ID_TUTORIAL_STATE_CONTENT).offset().top - 80 : 0);
-      $('body').animate({
+      $('html', 'body').animate({
         scrollTop: positionToScrollTo
       }, 'slow');
     }
@@ -195,7 +223,7 @@ oppia.controller('ExplorationEditor', [
       var idToScrollTo = (
         isGoingForward ? _ID_TUTORIAL_STATE_INTERACTION :
         _ID_TUTORIAL_STATE_CONTENT);
-      $('body').animate({
+      $('html', 'body').animate({
         scrollTop: angular.element(idToScrollTo).offset().top - 80
       }, 'slow');
     }
@@ -215,7 +243,7 @@ oppia.controller('ExplorationEditor', [
       var idToScrollTo = (
         isGoingForward ? _ID_TUTORIAL_STATE_ACTIVE_RULE :
         _ID_TUTORIAL_STATE_INTERACTION);
-      $('body').animate({
+      $('html', 'body').animate({
         scrollTop: angular.element(idToScrollTo).offset().top - 80
       }, 'slow');
     }
@@ -237,7 +265,7 @@ oppia.controller('ExplorationEditor', [
       var positionToScrollTo = (
         isGoingForward ? 0 :
         angular.element(_ID_TUTORIAL_STATE_ACTIVE_RULE).offset().top - 80);
-      $('body').animate({
+      $('html', 'body').animate({
         scrollTop: positionToScrollTo
       }, 'slow');
     }
@@ -245,12 +273,12 @@ oppia.controller('ExplorationEditor', [
     type: 'title',
     heading: 'Get started!',
     text: (
-      'At any time, you can click the \'Preview\' tab to play through an interactive ' +
-      'version of your exploration. When you\'re done, click \'Publish Draft\' to save ' +
-      'your changes.<br><br>' +
+      'At any time, you can click the <span class="glyphicon glyphicon-play" style="opacity: 0.7;"></span> ' +
+      'button at the top to play through a preview of your exploration. When you\'re done, ' +
+      'click \'Publish Draft\' to save your changes.<br><br>' +
       'That\'s the end of the tour! For more information, including exploration ' +
-      'design tips, see the \'Help\' menu at the top of this page. If you run ' +
-      'into any issues, feel free to post in the site forum.')
+      'design tips, click the <span class="glyphicon glyphicon-question-sign" style="opacity: 0.7;"></span> button ' +
+      '(at the top right of the page). If you run into any issues, feel free to post in the site forum.')
   }];
 
   // Replace the ng-joyride template with one that uses <[...]> interpolators instead of

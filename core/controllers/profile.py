@@ -122,6 +122,20 @@ class PreferencesHandler(base.BaseHandler):
                 'Invalid update type: %s' % update_type)
 
 
+class ProfilePictureHandler(base.BaseHandler):
+    """Provides the dataURI of the user's profile picture, or none if no user
+    picture is uploaded."""
+
+    @base.require_user
+    def get(self):
+        """Handles GET requests."""
+        user_settings = user_services.get_user_settings(self.user_id)
+        self.values.update({
+            'profile_picture_data_url': user_settings.profile_picture_data_url
+        })
+        self.render_json(self.values)
+
+
 class SignupPage(base.BaseHandler):
     """The page which prompts for username and acceptance of terms."""
 

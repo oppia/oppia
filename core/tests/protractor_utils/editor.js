@@ -247,22 +247,48 @@ var _selectRule = function(ruleElement, interactionName, ruleName) {
   }
 };
 
+var _setRuleFeedback = function(ruleBodyElem, index, richTextInstructions) {
+  var feedbackEditor = forms.ListEditor(
+    ruleBodyElem.element(by.css('.protractor-test-feedback-bubble'))
+  ).editItem(index, 'RichText');
+  feedbackEditor.clear();
+  richTextInstructions(feedbackEditor);
+};
+
+var _setRuleDest = function(ruleBodyElem, destinationName) {
+  var destinationElement =
+    ruleBodyElem.element(by.css('.protractor-test-dest-bubble'));
+  destinationElement.element(
+    by.cssContainingText('option', destinationName)).click();
+};
+
 // This clicks the "add new rule" button and then selects the rule type and
 // enters its parameters, and closes the rule editor. Any number of rule
 // parameters may be specified after the ruleName.
-var addRule = function(interactionName, ruleName) {
+// Note that feedbackInstructions may be null (which means 'specify no feedback'),
+// and only represents a single feedback element.
+var addRule = function(interactionName, feedbackInstructions, dest, ruleName) {
   element(by.css('.protractor-test-open-add-rule-modal')).click();
   general.waitForSystem();
 
-  var ruleElement = element(by.css('.protractor-test-temporary-rule'));
-  var args = [ruleElement];
-  for (var i = 0; i < arguments.length; i++) {
+  var ruleElement = element(by.css('.protractor-test-add-rule-details'));
+  var args = [ruleElement, interactionName];
+  for (var i = 3; i < arguments.length; i++) {
     args.push(arguments[i]);
   }
   _selectRule.apply(null, args);
+
+  if (feedbackInstructions) {
+    _setRuleFeedback(ruleElement, 0, feedbackInstructions)
+  }
+  if (dest) {
+    _setRuleDest(ruleElement, dest);
+  }
+
   element(by.css('.protractor-test-add-new-rule')).click();
   general.waitForSystem();
 };
+
 
 // Rules are zero-indexed; 'default' denotes the default rule.
 var RuleEditor = function(ruleNum) {
@@ -303,11 +329,7 @@ var RuleEditor = function(ruleNum) {
       _selectRule.apply(null, args);
     },
     setFeedback: function(index, richTextInstructions) {
-      var feedbackEditor = forms.ListEditor(
-        bodyElem.element(by.css('.protractor-test-feedback-bubble'))
-      ).editItem(index, 'RichText');
-      feedbackEditor.clear();
-      richTextInstructions(feedbackEditor);
+      _setRuleFeedback(bodyElem, index, richTextInstructions);
     },
     addFeedback: function() {
       forms.ListEditor(
@@ -324,10 +346,7 @@ var RuleEditor = function(ruleNum) {
     // or 'END' for the end state. To create a new state, use
     // createNewStateAndSetDestination() instead.
     setDestination: function(destinationName) {
-      var destinationElement =
-        bodyElem.element(by.css('.protractor-test-dest-bubble'));
-      destinationElement.element(
-        by.cssContainingText('option', destinationName)).click();
+      _setRuleDest(bodyElem, destinationName);
       bodyElem.element(by.css('.protractor-test-save-rule')).click();
     },
     // Sets a destination for this rule, creating a state in the process.

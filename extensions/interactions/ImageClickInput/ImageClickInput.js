@@ -31,10 +31,12 @@ oppia.directive('oppiaInteractiveImageClickInput', [
         $scope.highlightRegionsOnHover = 
           ($attrs.highlightRegionsOnHoverWithValue === 'true');
         $scope.filepath = imageAndRegions.imagePath;
-        $scope.imageUrl = $sce.trustAsResourceUrl(
-          '/imagehandler/' + $rootScope.explorationId + '/' +
-          encodeURIComponent($scope.filepath)
-        );
+        $scope.imageUrl = (
+          $scope.filepath ?
+          $sce.trustAsResourceUrl(
+            '/imagehandler/' + $rootScope.explorationId + '/' +
+            encodeURIComponent($scope.filepath)) :
+          null);
         $scope.mouseX = 0;
         $scope.mouseY = 0;
         $scope.currentlyHoveredRegions = [];
@@ -79,11 +81,6 @@ oppia.directive('oppiaInteractiveImageClickInput', [
             clickedRegions: $scope.currentlyHoveredRegions
           }, 'submit');
         };
-        // TODO(czx): Maybe this can be put in an angular directive?
-        $('.oppia-image-click-img').error(function(){
-          $(this).parent().text('[Select an image to display]');
-          $(this).hide();
-        });
       }]
     };
   }

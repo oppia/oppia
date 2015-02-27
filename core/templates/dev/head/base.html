@@ -27,9 +27,6 @@
 <!DOCTYPE html>
 <html ng-app="oppia" ng-controller="Base" itemscope itemtype="http://schema.org/Organization">
   <head>
-    <noscript>
-      <meta http-equiv="refresh" content="1;url=/static/pages/noscript.txt">
-    </noscript>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
     <meta name="msapplication-config" content="none">
@@ -96,6 +93,10 @@
                       </a>
                       <a class="oppia-navbar-brand-name" href="/gallery">
                         <img src="/images/logo/288x288_oppia_white.png" class="oppia-logo">
+                      </a>
+                      <!-- This is needed for the right image to appear when an exploration is shared using G+. -->
+                      <a style="display: none;">
+                        <img src="/images/logo/288x288_oppia_mint.png" itemprop="image">
                       </a>
                     </div>
 

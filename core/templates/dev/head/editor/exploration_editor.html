@@ -110,24 +110,10 @@
 
     {% if username %}
       <li class="dropdown">
-        <a href="#" tooltip="Help" tooltip-placement="right" class="dropdown-toggle" data-toggle="dropdown">
+        <a href="#" tooltip="Help" tooltip-placement="bottom"
+           ng-click="openEditorTutorial()">
           <span class="glyphicon glyphicon-question-sign"></span>
         </a>
-        <ul class="dropdown-menu" ng-mouseover="onMouseoverDropdownMenu($event)" ng-mouseleave="onMouseoutDropdownMenu($event)">
-          <li class="dropdown">
-            <a href="#" ng-click="openEditorTutorial()">Tutorial</a>
-          </li>
-          <li class="dropdown">
-            <a href="https://code.google.com/p/oppia/wiki/PlanningYourExploration" target="_blank">
-              Planning Your Exploration
-            </a>
-          </li>
-          <li class="dropdown">
-            <a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">
-              Exploration Design Tips
-            </a>
-          </li>
-        </ul>
         <div ng-if="postTutorialHelpPopoverIsShown" class="popover bottom oppia-post-tutorial-popover">
           <div class="arrow"></div>
           <div class="popover-content">If you need help in the future, click here!</div>
@@ -342,17 +328,17 @@
   <!-- These definitions must be included exactly once on the page for the graph SVGs to work in Firefox. -->
   <svg width="0" height="0">
     <defs>
-      <marker id="arrowhead" viewBox="-5 -5 18 18" refX="10" refY="6"
-              markerWidth="6" markerHeight="9" orient="auto">
-        <path d="M -5 0 L 12 6 L -5 12 z" fill="grey"></path>
+      <marker id="arrowhead" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="grey"></path>
       </marker>
-      <marker id="arrowhead-green" viewBox="-5 -5 18 18" refX="10" refY="6"
-              markerWidth="6" markerHeight="9" orient="auto">
-        <path d="M -5 0 L 12 6 L -5 12 z" fill="#1F7D1F"></path>
+      <marker id="arrowhead-green" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="#1F7D1F"></path>
       </marker>
-      <marker id="arrowhead-red" viewBox="-5 -5 18 18" refX="10" refY="6"
-              markerWidth="6" markerHeight="9" orient="auto">
-        <path d="M -5 0 L 12 6 L -5 12 z" fill="#B22222"></path>
+      <marker id="arrowhead-red" viewBox="0 0 18 18" refX="10" refY="3"
+              markerWidth="10" markerHeight="6" orient="auto">
+        <path d="M 0 0 L 10 4 L 0 8 z" fill="#B22222"></path>
       </marker>
       <linearGradient id="nodegradient" x1="0%" x2="100%" y1="0%" y2="0%">
         <stop offset="0%" style="stop-opacity: 1; stop-color: darkseagreen;"></stop>

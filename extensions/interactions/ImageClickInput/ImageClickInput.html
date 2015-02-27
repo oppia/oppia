@@ -1,5 +1,9 @@
 <script type="text/ng-template" id="interaction/ImageClickInput">
-  <div style="position: relative;">
+  <div ng-if="!imageUrl">
+    [Select an image to display]
+  </div>
+
+  <div style="position: relative;" ng-if="imageUrl">
     <img 
       ng-src="<[imageUrl]>"
       class="oppia-image-click-img"
