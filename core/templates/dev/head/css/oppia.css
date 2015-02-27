@@ -838,7 +838,8 @@ md-card.oppia-gallery-tile {
   position: relative;
 }
 .oppia-editable-section:hover .oppia-state-content-display,
-.oppia-editable-section:hover .oppia-interaction-preview {
+.oppia-editable-section:hover .oppia-interaction-preview,
+.oppia-editable-section:hover .oppia-rule-preview {
   background: #eee;
   border-radius: 4px;
 }
@@ -947,10 +948,6 @@ md-card.oppia-gallery-tile {
   margin-bottom: 0;
   margin-left: 0;
   padding: 4px;
-}
-
-.oppia-readonly-rule-tile:hover {
-  background-color: #eee;
 }
 
 .oppia-readonly-rule-tile img {
