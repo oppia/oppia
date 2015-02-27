@@ -1055,6 +1055,36 @@ oppia-parameter {
   background: #ffe279;
 }
 
+.oppia-dashboard-tile-metadata-parent {
+  padding-top: 25px;
+  float: right;
+  width: 25%;
+}
+
+.oppia-dashboard-tile-metadata {
+  height: 70px;
+  padding-left: 20px;
+  border-left-color: #DADADA;
+  border-left-style: ridge;
+  border-left-width: thin;
+  padding-right: 30px;
+}
+
+md-card.oppia-dashboard-tile {
+  background-color: #fff;
+  border-bottom: 1px solid #ccc;
+  color: #888;
+  height: 120px;
+  margin: 0;
+  padding: 0;
+  position: relative;
+  width: 70%;
+}
+
+ul.oppia-dashboard-tiles {
+  list-style-type: none;
+}
+
 .oppia-large-modal-window .modal-dialog {
   max-width: 900px;
   width: 80%;

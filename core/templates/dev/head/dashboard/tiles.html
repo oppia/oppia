@@ -1,0 +1,42 @@
+<md-card layout="row" class="oppia-dashboard-tile protractor-test-gallery-tile">
+  <a href="/explore/<[exploration.id]>" class="oppia-gallery-tile-container-link" style="text-decoration: none;">
+    <div class="oppia-dashboard-tile-metadata-parent">
+      <div class="oppia-dashboard-tile-metadata">
+        Created: <[getLocaleAbbreviatedDatetimeString(exploration.created_on)]>
+      </div>
+    </div>
+    <div class="oppia-gallery-tile-contents">
+      <span class="oppia-gallery-tile-image-container" ng-class="getImageContainerClass(exploration)" style="position: absolute;">
+        <!-- TODO(sll): Make the default image higher-res. -->
+        <img class="oppia-gallery-tile-image" ng-src="<[getImageSrcUrl(exploration)]>">
+      </span>
+
+      <div class="oppia-gallery-tile-details">
+        <div class="oppia-gallery-tile-first-row">
+          <span class="oppia-gallery-tile-title protractor-test-gallery-tile-title">
+            <[exploration.title]>
+          </span>
+          <span ng-if="exploration.objective">
+            <span style="font-weight: bold;">&middot;</span>
+            <span style="color: #888" class="protractor-test-exploration-objective">
+              <[getFormattedObjective(exploration.objective)]>
+            </span>
+          </span>
+        </div>
+
+        <div class="oppia-gallery-tile-second-row">
+          <span ng-if="exploration.status === 'publicized'" style="color: #888">
+            Featured
+            <span class="glyphicon glyphicon-star"></span>
+            <span style="font-weight: bold;">&middot;</span>
+          </span>
+          <span style="color: #888">
+            <strong><[exploration.category]></strong>
+            <span style="font-weight: bold;">&middot;</span>
+            Last updated <[getLocaleAbbreviatedDatetimeString(exploration.last_updated)]>
+          </span>
+        </div>
+      </div>
+    </div>
+  </a>
+</md-card>
