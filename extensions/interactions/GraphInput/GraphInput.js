@@ -20,6 +20,8 @@
  * followed by the name of the arg.
  */
 
+oppia.constant('GRAPH_INPUT_LEFT_MARGIN', 120);
+
 oppia.directive('oppiaInteractiveGraphInput', [
   'oppiaHtmlEscaper', function(oppiaHtmlEscaper) {
     return {
@@ -119,7 +121,7 @@ oppia.factory('graphDetailService', [function() {
 }]);
 
 oppia.directive('oppiaResponseGraphInput', [
-  'oppiaHtmlEscaper', 'graphDetailService', function(oppiaHtmlEscaper, graphDetailService) {
+  'oppiaHtmlEscaper', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', function(oppiaHtmlEscaper, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
     return {
       restrict: 'E',
       scope: {},
@@ -129,6 +131,7 @@ oppia.directive('oppiaResponseGraphInput', [
 
         $scope.VERTEX_RADIUS = graphDetailService.VERTEX_RADIUS;
         $scope.EDGE_WIDTH = graphDetailService.EDGE_WIDTH;
+        $scope.GRAPH_INPUT_LEFT_MARGIN = GRAPH_INPUT_LEFT_MARGIN;
 
         $scope.getDirectedEdgeArrowPoints = function(index) {
           return graphDetailService.getDirectedEdgeArrowPoints($scope.graph, index);
@@ -141,6 +144,7 @@ oppia.directive('oppiaResponseGraphInput', [
     };
   }
 ]);
+
 
 /*
  * Directive for graph-viz.
@@ -161,7 +165,8 @@ oppia.directive('graphViz', function() {
       canEditOptions: '=',
     },
     templateUrl: 'graphViz/graphVizSvg',
-    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', function($scope, $element, $attrs, $document, focusService, graphDetailService) {
+    controller: ['$scope', '$element', '$attrs', '$document', 'focusService', 'graphDetailService', 'GRAPH_INPUT_LEFT_MARGIN', 
+    function($scope, $element, $attrs, $document, focusService, graphDetailService, GRAPH_INPUT_LEFT_MARGIN) {
       var _MODES = {
         MOVE: 0,
         ADD_EDGE: 1,
@@ -207,7 +212,7 @@ oppia.directive('graphViz', function() {
         // by label more natural, by moving the vertex according to the difference
         // from the original position. Otherwise, mouse-dragging by label will make
         // the vertex awkwardly jump to the mouse.
-        if ($scope.state.currentlyDraggedVertex !== null) {
+        if ($scope.state.currentlyDraggedVertex !== null && ($scope.state.mouseX > GRAPH_INPUT_LEFT_MARGIN)) {
           $scope.graph.vertices[$scope.state.currentlyDraggedVertex].x = $scope.state.vertexDragStartX + ($scope.state.mouseX - $scope.state.mouseDragStartX);
           $scope.graph.vertices[$scope.state.currentlyDraggedVertex].y = $scope.state.vertexDragStartY + ($scope.state.mouseY - $scope.state.mouseDragStartY);
         }
