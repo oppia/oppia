@@ -39,18 +39,9 @@ import jinja2
 EXPLORATION_ID_KEY = 'explorationId'
 
 ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
-    'allow_yaml_file_upload', 'Boolean',
+    'allow_yaml_file_upload', {'type': 'bool'},
     'Whether to allow file uploads via YAML in the gallery page.',
     default_value=False)
-
-CONTRIBUTE_GALLERY_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
-    'contribute_gallery_page_announcement', 'Html',
-    'An announcement to display on top of the contribute gallery page.',
-    default_value='')
-
-BANNER_ALT_TEXT = config_domain.ConfigProperty(
-    'banner_alt_text', 'UnicodeString',
-    'The alt text for the site banner image', default_value='')
 
 
 class GalleryPage(base.BaseHandler):
@@ -71,7 +62,6 @@ class GalleryPage(base.BaseHandler):
                 'name': utils.get_short_language_description(
                     lc['description']),
             } for lc in feconf.ALL_LANGUAGE_CODES],
-            'BANNER_ALT_TEXT': BANNER_ALT_TEXT.value,
         })
         self.render_template('galleries/gallery.html')
 

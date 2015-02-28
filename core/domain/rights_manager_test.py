@@ -16,7 +16,6 @@
 
 __author__ = 'Sean Lip'
 
-from core.domain import config_services
 from core.domain import exp_domain
 from core.domain import exp_services
 from core.domain import rights_manager
@@ -47,10 +46,7 @@ class ExplorationRightsTests(test_utils.GenericTestBase):
 
         self.EXP_ID = 'exp_id'
 
-    def test_splash_page_demo_exploration(self):
-        config_services.set_property(
-            feconf.ADMIN_COMMITTER_ID, 'splash_page_exploration_id', '1')
-
+    def test_demo_exploration(self):
         exp_services.load_demo('1')
 
         self.assertTrue(rights_manager.Actor(self.user_id_a).can_play('1'))

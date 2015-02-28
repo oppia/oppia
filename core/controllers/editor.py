@@ -90,20 +90,16 @@ def get_value_generators_js():
     return value_generators_js
 
 VALUE_GENERATORS_JS = config_domain.ComputedProperty(
-    'value_generators_js', 'UnicodeString',
+    'value_generators_js', {'type': 'unicode'},
     'JavaScript code for the value generators', get_value_generators_js)
 
 OBJECT_EDITORS_JS = config_domain.ComputedProperty(
-    'object_editors_js', 'UnicodeString',
+    'object_editors_js', {'type': 'unicode'},
     'JavaScript code for the object editors',
     obj_services.get_all_object_editor_js_templates)
 
-EDITOR_PAGE_ANNOUNCEMENT = config_domain.ConfigProperty(
-    'editor_page_announcement', 'Html',
-    'A persistent announcement to display on top of all editor pages.',
-    default_value='')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
-    'moderator_request_forum_url', 'UnicodeString',
+    'moderator_request_forum_url', {'type': 'unicode'},
     'A link to the forum for nominating explorations to be featured '
     'in the gallery',
     default_value='https://moderator/request/forum/url')
@@ -228,8 +224,6 @@ class ExplorationPage(EditorHandler):
         self.values.update({
             'INTERACTION_SPECS': interaction_registry.Registry.get_all_specs(),
             'additional_angular_modules': additional_angular_modules,
-            'announcement': jinja2.utils.Markup(
-                EDITOR_PAGE_ANNOUNCEMENT.value),
             'can_delete': rights_manager.Actor(
                 self.user_id).can_delete(exploration_id),
             'can_edit': can_edit,

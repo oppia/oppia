@@ -27,15 +27,16 @@ import feconf
 
 
 ADMIN_EMAIL_ADDRESS = config_domain.ConfigProperty(
-    'admin_email_address', 'UnicodeString',
+    'admin_email_address', {'type': 'unicode'},
     'The admin email address to display on the About pages',
     default_value='ADMIN_EMAIL_ADDRESS')
 SITE_FORUM_URL = config_domain.ConfigProperty(
-    'site_forum_url', 'UnicodeString',
+    'site_forum_url', {'type': 'unicode'},
     'The site forum URL (for links; the Forum page is configured separately)',
     default_value='https://site/forum/url')
 SITE_NAME = config_domain.ConfigProperty(
-    'site_name', 'UnicodeString', 'The site name', default_value='SITE_NAME')
+    'site_name', {'type': 'unicode'}, 'The site name',
+    default_value='SITE_NAME')
 
 # The id of the exploration for the About page.
 _ABOUT_EXPLORATION_ID = '14'
