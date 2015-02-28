@@ -39,6 +39,7 @@ oppia.directive('conversationSkin', [function() {
       var _learnerInputIsInView = false;
 
       $scope.isInPreviewMode = oppiaPlayerService.isInPreviewMode();
+      $scope.introCardImageUrl = null;
 
       $rootScope.loadingMessage = 'Loading';
 
@@ -121,9 +122,10 @@ oppia.directive('conversationSkin', [function() {
         $scope.waitingForOppiaFeedback = false;
         $scope.waitingForNewCard = false;
 
-        oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights) {
+        oppiaPlayerService.init(function(stateName, initHtml, hasEditingRights, introCardImageUrl) {
           $scope.explorationId = oppiaPlayerService.getExplorationId();
           $scope.explorationTitle = oppiaPlayerService.getExplorationTitle();
+          $scope.introCardImageUrl = introCardImageUrl;
           oppiaPlayerService.getUserProfileImage().then(function(result) {
             // $scope.profilePicture contains a dataURI representation of the
             // user-uploaded profile image, or the path to the default image.

@@ -68,9 +68,9 @@ html, body {
   background: linear-gradient(to bottom, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 1));
   font-size: 20px;
   text-align: center;
-  height: 95px;
-  margin-top: -95px;
-  padding-top: 10px;
+  height: 100px;
+  margin-top: -100px;
+  padding-top: 15px;
   position: relative;
 }
 

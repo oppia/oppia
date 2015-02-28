@@ -598,25 +598,6 @@ md-card.oppia-gallery-tile {
   width: 120px;
 }
 
-.oppia-gallery-tile-image-translucent {
-  opacity: 0.7;
-}
-.oppia-gallery-tile-image-teal {
-  background-color: #05a69a;
-}
-.oppia-gallery-tile-image-salmon {
-  background-color: #f35f55;
-}
-.oppia-gallery-tile-image-sunnyside {
-  background-color: #f7a541;
-}
-.oppia-gallery-tile-image-sharkfin {
-  background-color: #058ca6;
-}
-.oppia-gallery-tile-image-gunmetal {
-  background-color: #607d8b;
-}
-
 .oppia-gallery-tile-contents {
   height: 100%;
   padding: 23px 58px;

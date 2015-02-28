@@ -150,6 +150,8 @@ oppia.factory('oppiaPlayerService', [
     }
   }
 
+  var _introCardImageUrl = null;
+
   // The following line is needed for image displaying to work, since the image
   // URLs refer to $rootScope.explorationId.
   $rootScope.explorationId = _explorationId;
@@ -250,7 +252,7 @@ oppia.factory('oppiaPlayerService', [
     stopwatch.resetStopwatch();
     _updateStatus(newParams, initStateName);
     $rootScope.$broadcast('playerStateChange');
-    callback(initStateName, initHtml, _viewerHasEditingRights);
+    callback(initStateName, initHtml, _viewerHasEditingRights, _introCardImageUrl);
   };
 
   // This should only be called when _exploration is non-null.
@@ -324,6 +326,7 @@ oppia.factory('oppiaPlayerService', [
       } else {
         $http.get(explorationDataUrl).success(function(data) {
           _exploration = data.exploration;
+          _introCardImageUrl = data.intro_card_image_url;
           version = data.version,
           _isLoggedIn = data.is_logged_in;
           sessionId = data.session_id;
