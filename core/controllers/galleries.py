@@ -43,6 +43,30 @@ ALLOW_YAML_FILE_UPLOAD = config_domain.ConfigProperty(
     'Whether to allow file uploads via YAML in the gallery page.',
     default_value=False)
 
+CAROUSEL_SLIDES_CONFIG = config_domain.ConfigProperty(
+    'carousel_slides_config', {
+        'type': 'list',
+        'items': {
+            'type': 'dict',
+            'properties': [{
+                'name': 'topic',
+                'description': 'Topic of the exploration',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'exploration_id',
+                'description': 'The exploration ID',
+                'schema': {'type': 'unicode'},
+            }, {
+                'name': 'image_filename',
+                'description': (
+                    'Filename of the carousel image (in /images/splash)'),
+                'schema': {'type': 'unicode'},
+            }]
+        }
+    },
+    'Configuration for slides in the gallery carousel.',
+    default_value=[])
+
 
 class GalleryPage(base.BaseHandler):
     """The exploration gallery page."""
@@ -57,6 +81,7 @@ class GalleryPage(base.BaseHandler):
             'gallery_login_redirect_url': (
                 current_user_services.create_login_url(
                     feconf.GALLERY_CREATE_MODE_URL)),
+            'CAROUSEL_SLIDES_CONFIG': CAROUSEL_SLIDES_CONFIG.value,
             'LANGUAGE_CODES_AND_NAMES': [{
                 'code': lc['code'],
                 'name': utils.get_short_language_description(

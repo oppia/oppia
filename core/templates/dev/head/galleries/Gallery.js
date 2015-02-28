@@ -125,38 +125,41 @@ oppia.controller('Gallery', [
 
   $scope.CAROUSEL_INTERVAL = 3500;
 
+  // TODO(sll): Replace the following with
+  // $scope.CAROUSEL_SLIDES = GLOBALS.CAROUSEL_SLIDES_CONFIG;
+
   $scope.CAROUSEL_SLIDES = [{
-    explorationId: '14',
-    explorationSubject: 'astronomy',
-    imageUrl: '/images/splash-image-0.jpg'
+    topic: 'astronomy',
+    exploration_id: '13',
+    image_filename: 'astronomy.jpg'
   }, {
-    explorationId: '9',
-    explorationSubject: 'music',
-    imageUrl: '/images/splash-image-1.jpg'
+    topic: 'music',
+    exploration_id: '9',
+    image_filename: 'music.jpg'
   }, {
-    explorationId: '1',
-    explorationSubject: 'programming',
-    imageUrl: '/images/splash-image-2.jpg'
+    topic: 'programming',
+    exploration_id: '1',
+    image_filename: 'programming.jpg'
   }, {
-    explorationId: '3',
-    explorationSubject: 'algorithms',
-    imageUrl: '/images/splash-image-3.jpg'
+    topic: 'algorithms',
+    exploration_id: '2',
+    image_filename: 'algorithms.jpg'
   }, {
-    explorationId: '4',
-    explorationSubject: 'physics',
-    imageUrl: '/images/splash-image-4.jpg'
+    topic: 'physics',
+    exploration_id: 'TBD',
+    image_filename: 'physics.jpg'
   }, {
-    explorationId: '6',
-    explorationSubject: 'languages',
-    imageUrl: '/images/splash-image-5.jpg'
+    topic: 'languages',
+    exploration_id: 'TBD',
+    image_filename: 'languages.jpg'
   }, {
-    explorationId: '7',
-    explorationSubject: 'logic',
-    imageUrl: '/images/splash-image-6.jpg'
+    topic: 'logic',
+    exploration_id: 'TBD',
+    image_filename: 'logic.jpg'
   }, {
-    explorationId: '8',
-    explorationSubject: 'math',
-    imageUrl: '/images/splash-image-7.jpg'
+    topic: 'math',
+    exploration_id: '4',
+    image_filename: 'math.jpg'
   }];
 
   $scope.getFormattedObjective = function(objective) {
@@ -176,7 +179,7 @@ oppia.controller('Gallery', [
 
   $scope.currentUserIsModerator = false;
 
-  $scope.inSplashMode = true;
+  $scope.inSplashMode = ($scope.CAROUSEL_SLIDES.length > 0);
   $scope.$on('hasChangedSearchQuery', function() {
     if ($scope.inSplashMode) {
       $('.oppia-gallery-container').fadeOut(function() {
