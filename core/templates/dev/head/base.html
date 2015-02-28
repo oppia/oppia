@@ -100,10 +100,9 @@
                       </a>
                     </div>
 
-                    {% block navbar_breadcrumb %}
-                    {% endblock navbar_breadcrumb %}
-
                     <div class="collapse navbar-collapse ng-cloak">
+                      {% block navbar_breadcrumb %}
+                      {% endblock navbar_breadcrumb %}
                       <ul class="nav navbar-nav oppia-navbar-nav navbar-right" style="margin-left: 0px;">
                         {% if username %}
                           <li class="dropdown">

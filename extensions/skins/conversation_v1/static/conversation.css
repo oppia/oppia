@@ -164,5 +164,5 @@ md-card.conversation-skin-inline-interaction {
 md-card.conversation-skin-supplemental-card {
   background-color: #f6f6f6;
   margin: -5px 0;
-  width: 600px;
+  max-width: 600px;
 }

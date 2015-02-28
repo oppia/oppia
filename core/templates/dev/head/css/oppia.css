@@ -368,7 +368,6 @@ div.wysiwyg iframe.wysiwyg-content-large {
 
 .navbar-default .navbar-container {
   background: #05a69a;
-  box-shadow: 0 1px 5px rgba(12,12,24, .3);
   height: 56px;
 }
 
@@ -555,16 +554,16 @@ div.wysiwyg iframe.wysiwyg-content-large {
 .oppia-gallery-tiles-introduction {
   font-size: 1em;
   padding-bottom: 20px;
-  padding-top: 40px;
 }
 
 .oppia-gallery-tiles-container {
   height: 100%;
   margin-left: auto;
   margin-right: auto;
+  margin-top: 40px;
   max-width: 800px;
   min-height: 500px;
-  padding: 25px;
+  padding-bottom: 25px;
 }
 
 md-card.oppia-gallery-tile {
@@ -638,7 +637,7 @@ md-card.oppia-gallery-tile {
 }
 
 .carousel-indicators {
-  display: none;
+  margin-bottom: 120px;
 }
 
 .carousel-control .glyphicon-chevron-left,
@@ -1136,6 +1135,7 @@ oppia-parameter {
 }
 
 .oppia-gallery-banner {
+  background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
   height: 650px;
@@ -1144,7 +1144,7 @@ oppia-parameter {
 .oppia-gallery-banner-content {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 48px;
+  font-size: 56px;
   position: absolute;
   text-align: center;
   top: 205px;
@@ -1155,15 +1155,15 @@ oppia-parameter {
 .oppia-gallery-banner-tagline {
   color: #fff;
   font-family: "Capriola", "Roboto", Arial, sans-serif;
-  font-size: 20px;
-  padding-top: 245px;
+  font-size: 24px;
+  padding-top: 250px;
 }
 
 .oppia-gallery-banner-link {
-  color: rgba(251, 234, 43, 0.9);
+  color: rgba(251, 234, 43, 1);
 }
 .oppia-gallery-banner-link:hover {
-  color: rgba(251, 234, 43, 1.0);
+  color: rgba(255, 238, 47, 1);
   text-decoration: none;
 }
 
@@ -1214,12 +1214,18 @@ div#ng-curtain {
 .oppia-navbar {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   cursor: default;
+  height: 56px;
+  left: -2%;
+  padding-left: 2%;
+  padding-right: 2%;
   position: fixed;
+  width: 104%;
   /* This is larger than the editor tutorial's z-index, but smaller than
      the z-index for Bootstrap modals.
   */
   z-index: 1005;
 }
+
 .oppia-top-of-page-padding {
   /* This ensures that content is not tucked behind the fixed navbar. */
   padding-top: 50px;
