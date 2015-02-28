@@ -175,7 +175,7 @@ oppia.controller('Gallery', [
   // Called when the page loads, and after every search query.
   var _refreshGalleryData = function(data, hasPageFinishedLoading) {
     $scope.searchIsLoading = false;
-    $scope.allExplorationsInOrder = data.featured.concat(data['public']);
+    $scope.allExplorationsInOrder = data.explorations_list;
     $scope.finishedLoadingPage = hasPageFinishedLoading;
     $rootScope.loadingMessage = '';
   };
@@ -187,7 +187,7 @@ oppia.controller('Gallery', [
 
       searchService.loadMoreData(function(data, hasPageFinishedLoading) {
         $scope.allExplorationsInOrder = $scope.allExplorationsInOrder.concat(
-          data.featured).concat(data['public']);
+          data.explorations_list);
         $scope.finishedLoadingPage = hasPageFinishedLoading;
         $scope.pageLoaderIsBusy = false;
       });
@@ -202,11 +202,9 @@ oppia.controller('Gallery', [
   $http.get(GALLERY_DATA_URL).success(function(data) {
     $scope.currentUserIsModerator = Boolean(data.is_moderator);
 
+    // Note that this will cause an initial search query to be sent.
     $rootScope.$broadcast(
       'preferredLanguageCodesLoaded', data.preferred_language_codes);
-
-    // TODO(sll): Page the initial load as well.
-    _refreshGalleryData(data, true);
 
     if (data.username) {
       if (urlService.getUrlParams().mode === 'create') {
@@ -325,8 +323,18 @@ oppia.controller('SearchBar', [
 
   $scope.$on('preferredLanguageCodesLoaded', function(evt, preferredLanguageCodesList) {
     for (var i = 0; i < preferredLanguageCodesList.length; i++) {
-      $scope.toggleSelection('languageCodes', preferredLanguageCodesList[i]);
+      var selections = $scope.selectionDetails.languageCodes.selections;
+      var languageCode = preferredLanguageCodesList[i];
+      if (!selections.hasOwnProperty(languageCode)) {
+        selections[languageCode] = true;
+      } else {
+        selections[languageCode] = !selections[languageCode];
+      }
     }
+
+    _updateSelectionDetails('languageCodes');
+    _onSearchQueryChangeExec();
+
     _searchBarFullyLoaded = true;
   });
 

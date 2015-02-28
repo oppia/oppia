@@ -32,7 +32,16 @@ describe('Gallery controller', function() {
       $httpBackend = _$httpBackend_;
       $httpBackend.expectGET('/galleryhandler/data').respond({
         'allow_yaml_file_upload': false,
-        'public': [{
+        'explorations_list': [{
+          id: '3',
+          title: 'Geography 2',
+          category: 'Geography',
+          objective: 'can view more maps',
+          language: 'español',
+          last_updated: 12345678912345,
+          community_owned: false,
+          status: 'featured'
+        }, {
           id: '5',
           title: 'Landmarks',
           category: 'Geography',
@@ -50,16 +59,6 @@ describe('Gallery controller', function() {
           last_updated: 12345678954322,
           community_owned: false,
           status: 'public'
-        }],
-        'featured': [{
-          id: '3',
-          title: 'Geography 2',
-          category: 'Geography',
-          objective: 'can view more maps',
-          language: 'español',
-          last_updated: 12345678912345,
-          community_owned: false,
-          status: 'featured'
         }],
         'preferred_language_codes': ['en']
       });
