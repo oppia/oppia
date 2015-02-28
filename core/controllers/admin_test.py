@@ -78,7 +78,7 @@ class AdminIntegrationTest(test_utils.GenericTestBase):
         response_dict = self.get_json('/adminhandler')
         response_config_properties = response_dict['config_properties']
         self.assertDictContainsSubset({
-            'value': ''
+            'value': editor.MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE,
         }, response_config_properties[editor.MODERATOR_REQUEST_FORUM_URL.name])
 
         payload = {

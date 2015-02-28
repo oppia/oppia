@@ -98,11 +98,13 @@ OBJECT_EDITORS_JS = config_domain.ComputedProperty(
     'JavaScript code for the object editors',
     obj_services.get_all_object_editor_js_templates)
 
+MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE = (
+    'https://moderator/request/forum/url')
 MODERATOR_REQUEST_FORUM_URL = config_domain.ConfigProperty(
     'moderator_request_forum_url', {'type': 'unicode'},
     'A link to the forum for nominating explorations to be featured '
     'in the gallery',
-    default_value='https://moderator/request/forum/url')
+    default_value=MODERATOR_REQUEST_FORUM_URL_DEFAULT_VALUE)
 
 
 def _require_valid_version(version_from_payload, exploration_version):
