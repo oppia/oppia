@@ -55,7 +55,7 @@
           ng-attr-style="fill: black;">
         </polygon>
         <text ng-if="graph.isWeighted"
-          ng-attr-x="<[getEdgeCentre($index).x]>"
+          ng-attr-x="<[getEdgeCentre($index).x - GRAPH_INPUT_LEFT_MARGIN]>"
           ng-attr-y="<[getEdgeCentre($index).y - 12]>"
           class="unselectable-text">
           <[edge.weight]>
@@ -100,16 +100,6 @@
       pointer-events: none;
     }
   </style>
-  <div style="height: 35px;">
-    <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
-      <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
-      <md-button class="md-raised" ng-click="state.selectedVertex = null;">Update Label</md-button>
-    </div>
-    <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
-      <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
-      <md-button class="md-raised" ng-click="state.selectedEdge = null;">Update Weight</md-button>
-    </div>
-  </div>
   <div class="oppia-graph-viz-container">
     <svg class="oppia-graph-viz-svg" width="100%" height="250" ng-mousemove="mousemoveGraphSVG($event)" ng-click="onClickGraphSVG($event)">
       <svg viewBox="0 0 90 250" width="100%" height="250" preserveAspectRatio="xMaxYMin meet">
@@ -215,5 +205,16 @@
         </circle>
       </g>
     </svg>
+  </div>
+
+  <div style="float: right; height: 35px;">
+    <div ng-if="state.selectedVertex !== null && graph.isLabeled && canEditVertexLabel">
+      <input type="text" ng-model="selectedVertexLabelGetterSetter" ng-model-options="{getterSetter: true}" focus-on="vertexLabelEditBegun"></input>
+      <md-button class="md-raised" ng-click="state.selectedVertex = null;">Update Label</md-button>
+    </div>
+    <div ng-if="state.selectedEdge !== null && graph.isWeighted && canEditEdgeWeight">
+      <input type="number" ng-model="selectedEdgeWeight" ng-model-options="{getterSetter: true}" focus-on="edgeWeightEditBegun"></input>
+      <md-button class="md-raised" ng-click="state.selectedEdge = null;">Update Weight</md-button>
+    </div>
   </div>
 </script>
