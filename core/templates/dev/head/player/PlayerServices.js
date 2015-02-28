@@ -321,6 +321,10 @@ oppia.factory('oppiaPlayerService', [
 
       if (_editorPreviewMode) {
         if (_exploration) {
+          _introCardImageUrl = (
+            '/images/gallery/exploration_background_' +
+            (GLOBALS.CATEGORIES_TO_COLORS[_exploration.category] || 'teal') +
+            '_large.png');
           _loadInitialState(successCallback);
         }
       } else {
