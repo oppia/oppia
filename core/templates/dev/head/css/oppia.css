@@ -846,7 +846,7 @@ md-card.oppia-gallery-tile {
 .oppia-state-content-display {
   padding: 4px;
   text-align: justify;
-  width: 445px;
+  max-width: 445px;
 }
 
 .oppia-prevent-selection {
