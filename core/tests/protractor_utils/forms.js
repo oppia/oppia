@@ -285,7 +285,7 @@ var MultiSelectEditor = function(elem) {
               'Found ' + filteredElements.length + ' matching elements.';
           }
 
-          for (var i = filteredElements.length - 1; i >= 0; i--) {
+          for (var i = 0; i < filteredElements.length; i++) {
             filteredElements[i].click();
           }
 

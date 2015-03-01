@@ -363,8 +363,10 @@ var RuleEditor = function(ruleNum) {
     },
     // The current state name must be at the front of the list.
     expectAvailableDestinationsToBe: function(stateNames) {
-      var expectedOptionTexts = [_OPTION_CREATE_NEW].concat(stateNames);
-      expectedOptionTexts[1] = expectedOptionTexts[1] + ' ⟳';
+      var expectedOptionTexts = [
+        stateNames[0] + ' ⟳',
+        _OPTION_CREATE_NEW
+      ].concat(stateNames.slice(1));
 
       var destinationElement =
         bodyElem.element(by.css('.protractor-test-dest-bubble'));

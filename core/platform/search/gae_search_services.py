@@ -258,7 +258,7 @@ def search(query_string, index, cursor=None, limit=feconf.GALLERY_PAGE_SIZE,
         logging.debug('attempting a search with query %s' % query)
         results = index.search(query)
     except gae_search.TransientError as e:
-        logging.exception('something went wrng while searching.')
+        logging.exception('something went wrong while searching.')
         if retries > 1:
             logging.debug('%d attempts left, retrying...' % (retries - 1))
             return search(
