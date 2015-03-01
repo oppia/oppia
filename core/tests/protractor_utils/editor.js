@@ -40,7 +40,7 @@ var exitTutorialIfNecessary = function() {
 var navigateToMainTab = function() {
   element(by.css('.protractor-test-main-tab')).click();
   // Click a neutral element in order to dismiss any warnings.
-  element(by.css('.protractor-test-state-editor-oppia-avatar')).click();
+  element(by.css('.protractor-test-editor-neutral-element')).click();
 };
 
 var navigateToPreviewTab = function() {
@@ -150,7 +150,7 @@ var setInteraction = function(interactionName) {
     }
 
     // Click a neutral element on the page to reset the dropdown menu.
-    element(by.css('.protractor-test-state-editor-oppia-avatar')).click();
+    element(by.css('.protractor-test-editor-neutral-element')).click();
 
     if (customizationArgs.length > 1) {
       element(by.css('.protractor-test-edit-interaction')).click();

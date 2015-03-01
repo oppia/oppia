@@ -989,35 +989,6 @@ oppia.factory('explorationWarningsService', [
     });
   };
 
-  // Returns a list of states which have rules that have no feedback and that
-  // point back to the same state.
-  var _getStatesWithInsufficientFeedback = function() {
-    var problematicStates = [];
-    var _states = explorationStatesService.getStates();
-    for (var stateName in _states) {
-      if (INTERACTION_SPECS[_states[stateName].interaction.id].is_terminal) {
-        continue;
-      }
-
-      var handlers = _states[stateName].interaction.handlers;
-      var isProblematic = handlers.some(function(handler) {
-        return handler.rule_specs.some(function(ruleSpec) {
-          return (
-            ruleSpec.dest === stateName &&
-            !ruleSpec.feedback.some(function(feedbackItem) {
-              return feedbackItem.length > 0;
-            })
-          );
-        });
-      });
-
-      if (isProblematic) {
-        problematicStates.push(stateName);
-      }
-    }
-    return problematicStates;
-  };
-
   var _updateWarningsList = function() {
     _warningsList = [];
 
@@ -1054,16 +1025,6 @@ oppia.factory('explorationWarningsService', [
           });            
         }
       }
-    }
-
-    var statesWithInsufficientFeedback = _getStatesWithInsufficientFeedback();
-    if (statesWithInsufficientFeedback.length) {
-      _warningsList.push({
-        type: WARNING_TYPES.ERROR,
-        message: (
-          'Please give Oppia more detail about what to say in these states: ' +
-          statesWithInsufficientFeedback.join(', ') + '.')
-      });
     }
 
     var _states = explorationStatesService.getStates();
