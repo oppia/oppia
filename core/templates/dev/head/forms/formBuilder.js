@@ -23,6 +23,9 @@
 // when these forms first come into view.
 
 
+// The conditioning on window.GLOBALS is because Karma does not appear to see GLOBALS.
+oppia.constant('RTE_COMPONENT_SPECS', window.GLOBALS ? GLOBALS.RTE_COMPONENT_SPECS : {});
+
 // Service for retrieving parameter specifications.
 oppia.factory('parameterSpecsService', ['$log', function($log) {
   var paramSpecs = {};
@@ -487,8 +490,8 @@ oppia.factory('schemaUndefinedLastElementService', [function() {
 
 // Directive for the rich text editor component.
 oppia.directive('richTextEditor', [
-  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'rteComponentRepositoryService',
-  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, rteComponentRepositoryService) {
+  '$modal', '$filter', '$log', '$timeout', 'oppiaHtmlEscaper', 'RTE_COMPONENT_SPECS',
+  function($modal, $filter, $log, $timeout, oppiaHtmlEscaper, RTE_COMPONENT_SPECS) {
     return {
       restrict: 'E',
       scope: {
@@ -673,25 +676,26 @@ oppia.directive('richTextEditor', [
         $scope.hasFullyLoaded = false;
 
         $scope.init = function() {
-          rteComponentRepositoryService.getRteComponentRepository().then(function(rteComponents) {
-            $scope._RICH_TEXT_COMPONENTS = [];
-            if (!$scope.disallowOppiaRteComponents) {
-              var componentIds = Object.keys(rteComponents);
-              componentIds.sort().forEach(function(componentId) {
-                rteComponents[componentId].backendName = rteComponents[componentId].backend_name;
-                rteComponents[componentId].name = rteComponents[componentId].frontend_name;
-                rteComponents[componentId].iconDataUrl = rteComponents[componentId].icon_data_url;
-                $scope._RICH_TEXT_COMPONENTS.push(rteComponents[componentId]);
-              });
-            }
+          $scope._RICH_TEXT_COMPONENTS = [];
+          if (!$scope.disallowOppiaRteComponents) {
+            var componentIds = Object.keys(RTE_COMPONENT_SPECS);
+            componentIds.sort().forEach(function(componentId) {
+              RTE_COMPONENT_SPECS[componentId].backendName = RTE_COMPONENT_SPECS[componentId].backend_name;
+              RTE_COMPONENT_SPECS[componentId].name = RTE_COMPONENT_SPECS[componentId].frontend_name;
+              RTE_COMPONENT_SPECS[componentId].iconDataUrl = RTE_COMPONENT_SPECS[componentId].icon_data_url;
+              $scope._RICH_TEXT_COMPONENTS.push(RTE_COMPONENT_SPECS[componentId]);
+            });
+          }
 
-            $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
+          $scope.rteContent = $scope._convertHtmlToRte($scope.htmlContent);
 
-            var sizeClass = (
-              $scope.size == 'small' ? ' wysiwyg-content-small' :
-              $scope.size == 'large' ? ' wysiwyg-content-large' :
-              '');
+          var sizeClass = (
+            $scope.size == 'small' ? ' wysiwyg-content-small' :
+            $scope.size == 'large' ? ' wysiwyg-content-large' :
+            '');
 
+          // This is needed for tests, otherwise $(rteNode).wysiwyg is undefined.
+          $timeout(function() {
             $(rteNode).wysiwyg({
               autoGrow: true,
               autoSave: true,

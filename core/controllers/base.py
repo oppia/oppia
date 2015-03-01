@@ -32,6 +32,7 @@ from core import counters
 from core.domain import config_domain
 from core.domain import config_services
 from core.domain import rights_manager
+from core.domain import rte_component_registry
 from core.domain import user_services
 from core.platform import models
 current_user_services = models.Registry.import_current_user_services()
@@ -291,6 +292,7 @@ class BaseHandler(webapp2.RequestHandler):
             values = self.values
 
         values.update({
+            'RTE_COMPONENT_SPECS': rte_component_registry.Registry.get_all_specs(),
             'DEV_MODE': feconf.DEV_MODE,
             'INVALID_NAME_CHARS': feconf.INVALID_NAME_CHARS,
             'EXPLORATION_STATUS_PRIVATE': (

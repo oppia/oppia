@@ -281,28 +281,6 @@ oppia.factory('focusService', ['$rootScope', '$timeout', function($rootScope, $t
   };
 }]);
 
-// Service for caching RTE component definitions.
-oppia.factory('rteComponentRepositoryService', [
-    '$http', '$log', '$q', function($http, $log, $q) {
-  var _cachedRteComponentRepository = null;
-
-  return {
-    // Returns a promise, caching the results.
-    getRteComponentRepository: function() {
-      if (_cachedRteComponentRepository) {
-        var deferred = $q.defer();
-        deferred.resolve(angular.copy(_cachedRteComponentRepository));
-        return deferred.promise;
-      } else {
-        return $http.get('/rich_text_component_repository/data').then(function(response) {
-          _cachedRteComponentRepository = response.data.repository;
-          return angular.copy(_cachedRteComponentRepository);
-        });
-      }
-    }
-  };
-}]);
-
 
 // Service for manipulating the page URL.
 oppia.factory('urlService', ['$window', function($window) {
