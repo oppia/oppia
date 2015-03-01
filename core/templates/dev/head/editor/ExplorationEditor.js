@@ -176,7 +176,7 @@ oppia.controller('ExplorationEditor', [
       '<li><a href="https://code.google.com/p/oppia/wiki/DesignTips" target="_blank">' +
       '        Exploration Design Tips' +
       '</li>' +
-      '</ul')
+      '</ul>')
   }, {
     type: 'function',
     fn: function(isGoingForward) {
@@ -211,7 +211,7 @@ oppia.controller('ExplorationEditor', [
     text: (
       'Next, choose how you want the learner to respond by ' +
       'selecting an interaction type from the drop down menu.<br><br>' +
-      'You can see a preview the interaction below.'),
+      'You can see a preview of the interaction below.'),
     placement: 'right'
   }, {
     type: 'function',
