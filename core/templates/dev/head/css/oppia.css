@@ -1358,17 +1358,23 @@ div#ng-curtain {
 }
 
 .oppia-exploration-warnings-indicator {
-  border-color: transparent transparent rgb(244,244,15) transparent;
   border-style: inset;
   border-width: 0 9px 14px 9px;
   bottom: 10px;
-  color: #333;
   font-size: 0.8em;
   font-weight: bold;
   height: 0;
   position: absolute;
   right: 5px;
   width: 0;
+}
+.oppia-exploration-warnings-error-color {
+  border-color: transparent transparent rgb(244,244,15) transparent;
+  color: #333;
+}
+.oppia-exploration-warnings-critical-color {
+  border-color: transparent transparent rgb(231,15,15) transparent;
+  color: #fff;
 }
 .oppia-exploration-warnings-count {
   margin-left: -3px;

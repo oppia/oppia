@@ -81,6 +81,13 @@ class Registry(object):
             for interaction_id in interaction_ids])
 
     @classmethod
+    def get_validators_html(cls, interaction_ids):
+        """Returns the HTML bodies for the interaction validators."""
+        return ' \n'.join([
+            cls.get_interaction_by_id(interaction_id).validator_html
+            for interaction_id in interaction_ids])
+
+    @classmethod
     def get_deduplicated_dependency_ids(cls, interaction_ids):
         """Return a list of dependency ids for the given interactions.
 

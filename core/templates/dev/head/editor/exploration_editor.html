@@ -61,7 +61,7 @@
       <a href="#" tooltip="Editor" tooltip-placement="<[countWarnings() ? 'left' : 'bottom']>" ng-click="selectMainTab()" class="protractor-test-main-tab">
         <span class="glyphicon glyphicon-pencil"></span>
       </a>
-      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()">
+      <div ng-show="countWarnings()" class="oppia-exploration-warnings-indicator" ng-click="selectMainTab()" ng-class="{'oppia-exploration-warnings-critical-color': hasCriticalWarnings(), 'oppia-exploration-warnings-error-color': !hasCriticalWarnings()}">
         <span class="oppia-exploration-warnings-count">
           <[countWarnings()]>
         </span>
@@ -70,7 +70,12 @@
         <span class="oppia-exploration-warnings-header">Warnings</span>
         <li class="oppia-exploration-warnings-text" ng-repeat="warning in getWarnings() track by $index">
           <hr class="oppia-exploration-warnings-separator">
-          <[warning]>
+          <span ng-if="warning.type === 'critical'">
+            <strong><[warning.message]></strong>
+          </span>
+          <span ng-if="warning.type !== 'critical'">
+            <[warning.message]>
+          </span>
         </li>
       </ul>
     </li>
@@ -137,7 +142,7 @@
     </li>
 
     <li ng-if="isEditableOutsideTutorialMode()">
-      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;">
+      <div dropdown class="btn-group" style="margin-right: 10px; margin-top: 8px;" title="<[getSaveButtonTooltip()]>">
         <button class="btn btn-default protractor-test-save-changes" ng-class="{'btn-success': isExplorationSaveable()}" ng-click="saveChanges()" ng-disabled="!isExplorationSaveable()">
           <span ng-if="!isSaveInProgress">
             <span ng-if="!isPublic()">Save Draft</span>
@@ -385,6 +390,7 @@
     {{ include_js_file('player/StateTransitionService.js') }}
     {{ include_js_file('components/paramChangeEditor.js') }}
     {{ include_js_file('components/ruleEditor.js') }}
+
     {% for skin_js_url in skin_js_urls %}
       {{ include_skins_js_file(skin_js_url) }}
     {% endfor %}
@@ -392,4 +398,5 @@
 
   {{ skin_templates }}
   {{ interaction_templates }}
+  {{ interaction_validators_html }}
 {% endblock footer_js %}

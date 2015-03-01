@@ -49,7 +49,7 @@ class CodeRepl(base.BaseInteraction):
                 'coding_mode': 'none',
             },
         },
-        'default_value': '[Type your code here.]'
+        'default_value': '# Type your code here.'
     }, {
         'name': 'preCode',
         'description': 'Code to prepend to the reader\'s submission.',

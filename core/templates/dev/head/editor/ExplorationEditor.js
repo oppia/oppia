@@ -337,6 +337,7 @@ oppia.controller('EditorNavigation', [
 
   $scope.countWarnings = explorationWarningsService.countWarnings;
   $scope.getWarnings = explorationWarningsService.getWarnings;
+  $scope.hasCriticalWarnings = explorationWarningsService.hasCriticalWarnings;
 
   $scope.explorationRightsService = explorationRightsService;
   $scope.getTabStatuses = routerService.getTabStatuses;
@@ -435,7 +436,10 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
   };
 
   $scope.isExplorationSaveable = function() {
-    return $scope.isExplorationLockedForEditing() && !$scope.isSaveInProgress;
+    return (
+      $scope.isExplorationLockedForEditing() &&
+      !$scope.isSaveInProgress &&
+      !explorationWarningsService.hasCriticalWarnings());
   };
 
   $window.addEventListener('beforeunload', function(e) {
@@ -476,6 +480,12 @@ oppia.controller('ExplorationSaveAndPublishButtons', [
       return 'Please save your changes before publishing.';
     } else {
       return 'Click this button to publish your exploration to the gallery.';
+    }
+  };
+
+  $scope.getSaveButtonTooltip = function() {
+    if (explorationWarningsService.hasCriticalWarnings() > 0) {
+      return 'Please resolve the warnings.';
     }
   };
 

@@ -219,6 +219,9 @@ class ExplorationPage(EditorHandler):
             rte_component_registry.Registry.get_html_for_all_components() +
             interaction_registry.Registry.get_interaction_html(
                 interaction_ids))
+        interaction_validators_html = (
+            interaction_registry.Registry.get_validators_html(
+                interaction_ids))
 
         skin_templates = skins_services.Registry.get_skin_templates(
             skins_services.Registry.get_all_skin_ids())
@@ -244,6 +247,8 @@ class ExplorationPage(EditorHandler):
             'dependencies_html': jinja2.utils.Markup(dependencies_html),
             'interaction_templates': jinja2.utils.Markup(
                 interaction_templates),
+            'interaction_validators_html': jinja2.utils.Markup(
+                interaction_validators_html),
             'moderator_request_forum_url': MODERATOR_REQUEST_FORUM_URL.value,
             'nav_mode': feconf.NAV_MODE_CREATE,
             'object_editors_js': jinja2.utils.Markup(object_editors_js),

@@ -23,12 +23,12 @@ oppia.controller('ExplorationSettings', [
     'explorationTitleService', 'explorationCategoryService',
     'explorationObjectiveService', 'explorationLanguageCodeService', 'explorationRightsService',
     'explorationInitStateNameService', 'explorationParamSpecsService', 'changeListService',
-    'explorationWarningsService', 'warningsData', 'explorationStatesService', function(
+    'warningsData', 'explorationStatesService', function(
       $scope, $http, $window, $modal, $rootScope, activeInputData, explorationData,
       explorationTitleService, explorationCategoryService,
       explorationObjectiveService, explorationLanguageCodeService, explorationRightsService,
       explorationInitStateNameService, explorationParamSpecsService, changeListService,
-      explorationWarningsService, warningsData, explorationStatesService) {
+      warningsData, explorationStatesService) {
 
   var GALLERY_PAGE_URL = '/gallery';
   var EXPLORE_PAGE_PREFIX = '/explore/';
